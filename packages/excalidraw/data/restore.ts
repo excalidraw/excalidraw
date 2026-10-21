@@ -534,7 +534,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       return {
         mode,
         elementId: binding.elementId,
-        fixedPoint,
+        fixedPoint: normalizeFixedPoint(fixedPoint),
       };
     }
 
@@ -1011,32 +1011,11 @@ export const restoreElement = (
       );
       const startBinding = restorePointBinding(element.startBinding);
       const endBinding = restorePointBinding(element.endBinding);
-      const elementWithRestoredPoints = {
-        ...element,
-        points,
-        x,
-        y,
-        elbowed,
-        startBinding,
-        endBinding,
-      } as ExcalidrawArrowElement;
 
       const base = {
         type: element.type,
-        startBinding: repairBinding(
-          elementWithRestoredPoints,
-          startBinding,
-          targetElementsMap,
-          existingElementsMap,
-          "start",
-        ),
-        endBinding: repairBinding(
-          elementWithRestoredPoints,
-          endBinding,
-          targetElementsMap,
-          existingElementsMap,
-          "end",
-        ),
+        startBinding,
+        endBinding,
         startArrowhead,
         endArrowhead,
         points,
@@ -1069,14 +1048,32 @@ export const restoreElement = (
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
 
-      const normalizedRestoredElement = {
+      // legacy bindings are migrated from the arrow's geometry, so do it on
+      // the restored arrow rather than on its (possibly malformed) input
+      const arrowWithBindings = {
         ...restoredElement,
-        ...LinearElementEditor.getNormalizeElementPointsAndCoords(
+        startBinding: repairBinding(
           restoredElement,
+          startBinding,
+          targetElementsMap,
+          existingElementsMap,
+          "start",
+        ),
+        endBinding: repairBinding(
+          restoredElement,
+          endBinding,
+          targetElementsMap,
+          existingElementsMap,
+          "end",
         ),
       };
 
-      return handleOversizedLinearElements(normalizedRestoredElement);
+      return handleOversizedLinearElements({
+        ...arrowWithBindings,
+        ...LinearElementEditor.getNormalizeElementPointsAndCoords(
+          arrowWithBindings,
+        ),
+      });
     }
 
     // generic elements
@@ -1514,32 +1511,62 @@ export const restoreElements = <T extends ExcalidrawElement>(
 
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(sourceElements);
+  // keyed by the restored ids so that references resolve the same way.
+  // Id-less elements get a random id on restore, so nothing can reference them
+  const targetElementsMap: ElementsMap = new Map();
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
+  const migrateElement = (element: T): ExcalidrawElement | null => {
+    try {
+      return restoreElement(
+        element as Exclude<T, ExcalidrawSelectionElement>,
+        targetElementsMap,
+        existingElementsMap,
+        { deleteInvisibleElements: opts?.deleteInvisibleElements },
+      );
+    } catch (error) {
+      console.error("Error restoring element:", error);
+      return null;
+    }
+  };
+
+  // arrows are restored last, so that legacy bindings are migrated against
+  // the restored (coerced) geometry of the elements they bind to
+  const migratedElements = new Map<T, ExcalidrawElement | null>();
+  // the first element with an id keeps it (duplicates get a random id below),
+  // so references must resolve to that one
+  const claimedIds = new Set<string>();
+  for (const element of sourceElements) {
+    // filtering out selection, which is legacy, no longer kept in elements,
+    // and causing issues if retained
+    if (element.type === "selection") {
+      continue;
+    }
+    const id = restoreId(element.id);
+    if (element.type === "arrow") {
+      if (id) {
+        claimedIds.add(id);
+      }
+      continue;
+    }
+    const migratedElement = migrateElement(element);
+    migratedElements.set(element, migratedElement);
+    if (migratedElement && id && !claimedIds.has(id)) {
+      claimedIds.add(id);
+      targetElementsMap.set(id, migratedElement);
+    }
+  }
+
   const restoredElements = syncInvalidIndices(
     sourceElements.reduce((elements, element) => {
-      // filtering out selection, which is legacy, no longer kept in elements,
-      // and causing issues if retained
       if (element.type === "selection") {
         return elements;
       }
-      let migratedElement: ExcalidrawElement | null;
-      try {
-        migratedElement = restoreElement(
-          element,
-          targetElementsMap,
-          existingElementsMap,
-          {
-            deleteInvisibleElements: opts?.deleteInvisibleElements,
-          },
-        );
-      } catch (error) {
-        console.error("Error restoring element:", error);
-        migratedElement = null;
-      }
+      let migratedElement = migratedElements.has(element)
+        ? migratedElements.get(element)!
+        : migrateElement(element);
       if (migratedElement) {
         const localElement = existingElementsMap?.get(migratedElement.id);
 

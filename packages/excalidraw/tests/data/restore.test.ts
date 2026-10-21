@@ -1796,6 +1796,90 @@ describe("repairing malformed elements", () => {
     ]);
   });
 
+  it("should migrate legacy bindings against the restored bound element", () => {
+    const restoreArrow = (rect: Record<string, unknown>) =>
+      restoreImported([
+        { type: "rectangle", id: "rect", ...rect },
+        {
+          type: "arrow",
+          id: "arrow",
+          x: 0,
+          y: 0,
+          points: [
+            [0, 0],
+            [110, 125],
+          ],
+          endBinding: { elementId: "rect", focus: 0, gap: 0 },
+        },
+      ])[1] as ExcalidrawArrowElement;
+
+    const arrow = restoreArrow({
+      x: "100",
+      y: "100",
+      width: "50",
+      height: "50",
+    });
+
+    expect(arrow.endBinding).toEqual(
+      restoreArrow({ x: 100, y: 100, width: 50, height: 50 }).endBinding,
+    );
+    expect(arrow.endBinding?.mode).toBe("inside");
+  });
+
+  it("should migrate legacy bindings of arrows with malformed geometry", () => {
+    const restoreArrow = (arrow: Record<string, unknown>) =>
+      restoreImported([
+        { type: "rectangle", id: "rect", x: 0, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          id: "arrow",
+          x: 25,
+          y: 25,
+          points: [
+            [0, 0],
+            [200, 0],
+          ],
+          startBinding: "rect",
+          ...arrow,
+        },
+      ])[1] as ExcalidrawArrowElement;
+
+    const arrow = restoreArrow({ angle: "foo" });
+
+    expect(arrow.angle).toBe(0);
+    expect(arrow.startBinding).toEqual(restoreArrow({ angle: 0 }).startBinding);
+    expect(arrow.startBinding).toEqual(
+      expect.objectContaining({ elementId: "rect", mode: "inside" }),
+    );
+    expect(arrow.startBinding?.fixedPoint[0]).toBeCloseTo(0.25);
+    expect(arrow.startBinding?.fixedPoint[1]).toBeCloseTo(0.25);
+  });
+
+  it("should migrate legacy bindings against the element keeping a duplicate id", () => {
+    const [first, second, arrow] = restoreImported([
+      { type: "rectangle", id: "rect", x: 0, y: 0, width: 100, height: 100 },
+      { type: "rectangle", id: "rect", x: 500, y: 0, width: 100, height: 100 },
+      {
+        type: "arrow",
+        id: "arrow",
+        x: 25,
+        y: 25,
+        points: [
+          [0, 0],
+          [200, 0],
+        ],
+        startBinding: { elementId: "rect", focus: 0, gap: 0 },
+      },
+    ]) as [ExcalidrawElement, ExcalidrawElement, ExcalidrawArrowElement];
+
+    expect(first).toEqual(expect.objectContaining({ id: "rect", x: 0 }));
+    expect(second.id).not.toBe("rect");
+    expect(arrow.startBinding).toEqual(
+      expect.objectContaining({ elementId: "rect", mode: "inside" }),
+    );
+    expect(arrow.startBinding?.fixedPoint[0]).toBeCloseTo(0.25);
+  });
+
   it("should drop empty and unknown arrowheads", () => {
     const [arrow] = restoreImported([
       {
