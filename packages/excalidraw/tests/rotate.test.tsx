@@ -1,14 +1,21 @@
 import React from "react";
 import { expect } from "vitest";
 
-import { reseed } from "@excalidraw/common";
+import { arrayToMap, reseed } from "@excalidraw/common";
+import {
+  getElementAbsoluteCoords,
+  getTransformHandles,
+} from "@excalidraw/element";
 
 import { Excalidraw } from "../index";
 
+import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
 import { render, unmountComponent } from "./test-utils";
 
 unmountComponent();
+
+const { h } = window;
 
 beforeEach(() => {
   localStorage.clear();
@@ -82,4 +89,38 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(textArrow.points[0]).toEqual([0, 0]);
   expect(textArrow.points[1][0]).toBeCloseTo(-95.4635969899922, 0);
   expect(textArrow.points[1][1]).toBeCloseTo(-126.8785027399889, 0);
+});
+
+test("arrow with an off-center label doesn't jump when rotation starts", async () => {
+  await render(<Excalidraw handleKeyboardGlobally={true} />);
+  const arrow = UI.createElement("arrow", {
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 0,
+  });
+  const label = await UI.editText(
+    arrow,
+    "a long label that sticks out past the arrow",
+  );
+  // move the label towards the arrow's start, so the selection bounds
+  // (which include the label) are no longer centered on the arrow
+  API.updateElement(label.get(), { labelPosition: 0.1 });
+
+  const elementsMap = arrayToMap(h.elements);
+  const [, , , , cx] = getElementAbsoluteCoords(arrow.get(), elementsMap);
+  const [x, , width] = getTransformHandles(
+    arrow.get(),
+    h.state.zoom,
+    elementsMap,
+    "mouse",
+  ).rotation!;
+
+  // the rotation handle must sit on the axis the arrow rotates around
+  expect(x + width / 2).toBeCloseTo(cx);
+
+  // grabbing the handle and nudging it shouldn't snap the arrow to a new angle
+  UI.rotate(arrow, [1, 0]);
+  const angle = arrow.angle;
+  expect(Math.min(angle, 2 * Math.PI - angle)).toBeLessThan(0.1);
 });
