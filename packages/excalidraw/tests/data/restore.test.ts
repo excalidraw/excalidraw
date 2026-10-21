@@ -1387,6 +1387,87 @@ describe("repairing malformed elements", () => {
     expect(text.containerId).toBe("1");
   });
 
+  it("should drop boundElements entries without a matching type", () => {
+    const [container] = restoreImported([
+      {
+        type: "rectangle",
+        id: "container",
+        width: 100,
+        height: 100,
+        // a wrong type (re-added from the label's containerId), a missing type,
+        // a bare id, and a freedraw that can't bind
+        boundElements: [
+          { id: "label", type: "arrow" },
+          { id: "arrow", type: "Arrow" },
+          { id: "arrow2" },
+          "arrow2",
+          { id: "freedraw", type: "arrow" },
+        ],
+      },
+      { type: "text", id: "label", text: "hi", containerId: "container" },
+      {
+        type: "arrow",
+        id: "arrow",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+      },
+      {
+        type: "arrow",
+        id: "arrow2",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+      },
+      {
+        type: "freedraw",
+        id: "freedraw",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+      },
+    ]);
+
+    expect(container.boundElements).toEqual([
+      { id: "arrow", type: "arrow" },
+      { type: "text", id: "label" },
+    ]);
+  });
+
+  it("should not turn free text into a label through an untyped or mistyped entry", () => {
+    const restoredElements = restoreImported([
+      {
+        type: "rectangle",
+        id: "container",
+        width: 100,
+        height: 100,
+        boundElements: [
+          "text1",
+          { id: "text2" },
+          { id: "text3", type: "arrow" },
+        ],
+      },
+      { type: "text", id: "text1", text: "a", x: 200, y: 200 },
+      { type: "text", id: "text2", text: "b", x: 200, y: 300 },
+      { type: "text", id: "text3", text: "c", x: 200, y: 400 },
+    ]);
+
+    expect(
+      restoredElements.map(({ id, boundElements }) => ({ id, boundElements })),
+    ).toEqual([
+      { id: "container", boundElements: [] },
+      { id: "text1", boundElements: [] },
+      { id: "text2", boundElements: [] },
+      { id: "text3", boundElements: [] },
+    ]);
+    for (const text of restoredElements.slice(1)) {
+      expect((text as ExcalidrawTextElement).containerId).toBe(null);
+    }
+  });
+
   it("should restore legacy boundElementIds that aren't an array", () => {
     const [container] = restoreImported([
       {
@@ -1407,6 +1488,22 @@ describe("repairing malformed elements", () => {
     ]);
 
     expect(container.boundElements).toEqual([{ id: "arrow", type: "arrow" }]);
+  });
+
+  it("should unbind text from elements that can't contain it", () => {
+    const [, text] = restoreImported([
+      {
+        type: "freedraw",
+        id: "freedraw",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+      },
+      { type: "text", id: "text", text: "hi", containerId: "freedraw" },
+    ]) as [ExcalidrawElement, ExcalidrawTextElement];
+
+    expect(text.containerId).toBe(null);
   });
 
   it("should restore { x, y } and numeric string points", () => {

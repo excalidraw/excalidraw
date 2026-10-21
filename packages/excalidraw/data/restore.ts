@@ -1079,10 +1079,22 @@ export const restoreElement = (
   return null;
 };
 
+/** `null` if the element can't be bound to another one */
+const getBoundElementType = (
+  boundElement: ExcalidrawElement | undefined,
+): BoundElement["type"] | null =>
+  isTextElement(boundElement ?? null)
+    ? "text"
+    : isArrowElement(boundElement)
+    ? "arrow"
+    : null;
+
 /**
  * Repairs container element's boundElements array by removing duplicates and
  * fixing containerId of bound elements if not present. Also removes any
- * bound elements that do not exist in the elements array.
+ * bound elements that do not exist in the elements array, or whose type
+ * doesn't match the binding's (a label's binding is re-added from its
+ * `containerId` in `repairBoundElement`).
  *
  * NOTE mutates elements.
  */
@@ -1102,10 +1114,17 @@ const repairContainerElement = (
         binding,
       ) => {
         const boundElement = elementsMap.get(binding.id);
-        if (boundElement && !boundIds.has(binding.id)) {
+        if (
+          boundElement &&
+          !boundIds.has(binding.id) &&
+          getBoundElementType(boundElement) === binding.type
+        ) {
           boundIds.add(binding.id);
 
-          if (boundElement.isDeleted) {
+          if (
+            boundElement.isDeleted ||
+            (binding.type === "text" && !isTextBindableContainer(container))
+          ) {
             return acc;
           }
 
@@ -1117,8 +1136,10 @@ const repairContainerElement = (
             // if defined, lest boundElements is stale
             !boundElement.containerId
           ) {
-            (boundElement as Mutable<typeof boundElement>).containerId =
-              container.id;
+            Object.assign(boundElement, {
+              containerId: container.id,
+              angle: isArrowElement(container) ? 0 : container.angle,
+            });
           }
         }
         return acc;
@@ -1138,8 +1159,12 @@ const repairBoundElement = (
   boundElement: Mutable<ExcalidrawTextElement>,
   elementsMap: Map<string, Mutable<ExcalidrawElement>>,
 ) => {
-  const container = boundElement.containerId
+  const containerCandidate = boundElement.containerId
     ? elementsMap.get(boundElement.containerId)
+    : null;
+  // e.g. a label pointing to a freedraw or another text element
+  const container = isTextBindableContainer(containerCandidate ?? null)
+    ? containerCandidate
     : null;
 
   (boundElement as Mutable<typeof boundElement>).angle = (
@@ -1157,7 +1182,10 @@ const repairBoundElement = (
 
   if (
     container.boundElements &&
-    !container.boundElements.find((binding) => binding.id === boundElement.id)
+    // a binding of the wrong type is dropped in `repairContainerElement`
+    !container.boundElements.find(
+      (binding) => binding.id === boundElement.id && binding.type === "text",
+    )
   ) {
     // copy because we're not cloning on restore, and we don't want to mutate upstream
     const boundElements = (
@@ -1519,14 +1547,22 @@ export const restoreElements = <T extends ExcalidrawElement>(
   }
 
   // repair binding. Mutates elements.
+  // Labels go first, so that invalid `containerId`s are cleared before
+  // containers claim their unbound labels
+  for (const element of restoredElements) {
+    if (isTextElement(element) && element.containerId) {
+      repairBoundElement(element, restoredElementsMap);
+    }
+  }
   for (const element of restoredElements) {
     if (element.frameId) {
       repairFrameMembership(element, restoredElementsMap);
     }
 
-    if (isTextElement(element) && element.containerId) {
-      repairBoundElement(element, restoredElementsMap);
-    } else if (element.boundElements) {
+    if (
+      element.boundElements &&
+      !(isTextElement(element) && element.containerId)
+    ) {
       repairContainerElement(element, restoredElementsMap);
     }
 
