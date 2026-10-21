@@ -201,6 +201,18 @@ export default defineConfig(({ mode }) => {
           // app precache. en.json and percentages.json are needed for first load
           // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
           manualChunks(id) {
+            // Bundler runtime helpers (dynamic import preloading, CJS interop)
+            // would otherwise live in the main bundle, and every lazy chunk
+            // importing them would get a new file name with each deploy. Tabs
+            // still running the previous version would then fail to load
+            // non-precached lazy chunks (e.g. mermaid) after a deploy.
+            if (
+              id === "\0vite/preload-helper.js" ||
+              id === "\0commonjsHelpers.js"
+            ) {
+              return "bundler-helpers";
+            }
+
             if (
               id.includes("packages/excalidraw/locales") &&
               id.match(/en.json|percentages.json/) === null
