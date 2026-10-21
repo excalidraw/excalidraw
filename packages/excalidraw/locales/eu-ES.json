@@ -682,7 +682,10 @@
     "preview": "Aurrebista",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Konponketa automatikoa eskuragarri dago"
+    "autoFixAvailable": "Konponketa automatikoa eskuragarri dago",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Errorea!"
