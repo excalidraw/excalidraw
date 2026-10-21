@@ -34,6 +34,8 @@ import {
   type StrokeWidthKey,
   isTransparent,
   DEFAULT_ZOOM,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
   isMemberOf,
   isRecord as isRecordLike,
   toFiniteNumber,
@@ -104,6 +106,8 @@ import type {
   FixedPointBinding,
   FontFamilyValues,
   StrokeStyle,
+  TextAlign,
+  VerticalAlign,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -169,6 +173,13 @@ const handleOversizedLinearElements = <T extends ExcalidrawLinearElement>(
 const restoreId = (id: unknown): string | null =>
   typeof id === "string" ? id || null : isFiniteNumber(id) ? String(id) : null;
 
+const restoreString = (value: unknown): string | null =>
+  typeof value === "string"
+    ? value
+    : isFiniteNumber(value) || typeof value === "boolean"
+    ? String(value)
+    : null;
+
 const restoreBoolean = <T extends boolean | null>(
   value: unknown,
   defaultValue: T,
@@ -190,6 +201,8 @@ const FILL_STYLES: readonly FillStyle[] = [
   "zigzag",
 ];
 const STROKE_STYLES: readonly StrokeStyle[] = ["solid", "dashed", "dotted"];
+const TEXT_ALIGNS = Object.values(TEXT_ALIGN) as TextAlign[];
+const VERTICAL_ALIGNS = Object.values(VERTICAL_ALIGN) as VerticalAlign[];
 
 const restoreLinearElementPoints = (
   points: unknown,
@@ -635,32 +648,45 @@ export const restoreElement = (
       // conflict when porting between the apps
       delete (element as any).rawText;
 
-      let fontSize = element.fontSize;
-      let fontFamily = element.fontFamily;
-      if ("font" in element) {
-        const [fontPx, _fontFamily]: [string, string] = (
-          element as any
-        ).font.split(" ");
+      let fontSize: unknown = element.fontSize;
+      let fontFamily: unknown = element.fontFamily;
+      const legacyFont: unknown = (element as { font?: unknown }).font;
+      if (typeof legacyFont === "string") {
+        const [fontPx, _fontFamily = ""] = legacyFont.split(" ");
         fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
-      if (!isFiniteNumber(fontSize)) {
-        fontSize = DEFAULT_FONT_SIZE;
-      }
-      const text = (typeof element.text === "string" && element.text) || "";
+      const restoredFontSize = toPositiveNumber(fontSize) ?? DEFAULT_FONT_SIZE;
+      const restoredFontFamily = (toFiniteNumber(fontFamily) ??
+        (typeof fontFamily === "string"
+          ? getFontFamilyByName(fontFamily)
+          : DEFAULT_FONT_FAMILY)) as FontFamilyValues;
+      const text = restoreString(element.text) || "";
 
-      const lineHeight =
-        element.lineHeight ||
-        restoreLineHeight({ ...element, fontSize, fontFamily, text });
+      const lineHeight = (toPositiveNumber(element.lineHeight) ??
+        restoreLineHeight({
+          ...element,
+          fontSize: restoredFontSize,
+          fontFamily: restoredFontFamily,
+          text,
+        })) as ExcalidrawTextElement["lineHeight"];
       element = restoreElementWithProperties(element, {
-        fontSize,
-        fontFamily,
+        fontSize: restoredFontSize,
+        fontFamily: restoredFontFamily,
         text,
-        textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
-        verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
-        containerId: element.containerId ?? null,
-        originalText: element.originalText || text,
-        autoResize: element.autoResize ?? true,
+        textAlign: restoreEnum(
+          element.textAlign,
+          TEXT_ALIGNS,
+          DEFAULT_TEXT_ALIGN,
+        ),
+        verticalAlign: restoreEnum(
+          element.verticalAlign,
+          VERTICAL_ALIGNS,
+          DEFAULT_VERTICAL_ALIGN,
+        ),
+        containerId: restoreId(element.containerId),
+        originalText: restoreString(element.originalText) || text,
+        autoResize: restoreBoolean(element.autoResize, true),
         lineHeight,
         labelPosition: isFiniteNumber(element.labelPosition)
           ? clamp(element.labelPosition, 0, 1)

@@ -1147,6 +1147,40 @@ describe("repairing malformed elements", () => {
     );
   });
 
+  it("should resolve references to numeric ids", () => {
+    const [container, text] = restoreImported([
+      {
+        type: "rectangle",
+        id: 1,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: 2 }],
+      },
+      { type: "text", id: 2, text: "hi", containerId: 1 },
+    ]) as [ExcalidrawElement, ExcalidrawTextElement];
+
+    expect(container.id).toBe("1");
+    expect(container.boundElements).toEqual([{ id: "2", type: "text" }]);
+    expect(text.id).toBe("2");
+    expect(text.containerId).toBe("1");
+  });
+
+  it("should not throw on a non-string legacy font", () => {
+    const [text] = restoreImported([
+      { type: "text", id: "text", text: "hi", font: 5 },
+    ]) as ExcalidrawTextElement[];
+
+    expect(text.fontSize).toBe(DEFAULT_FONT_SIZE);
+  });
+
+  it("should restore a numeric string font family", () => {
+    const [text] = restoreImported([
+      { type: "text", id: "text", text: "hi", fontFamily: "3" },
+    ]) as ExcalidrawTextElement[];
+
+    expect(text.fontFamily).toBe(3);
+  });
+
   it("should never restore a version below 1", () => {
     const [rect] = restore.restoreElements(
       [
