@@ -2312,6 +2312,44 @@ describe("restoreAppState", () => {
 
       expect(restoredAppState.zoom).toMatchObject(getDefaultAppState().zoom);
     });
+
+    it("when the zoom value of imported data state is not finite", () => {
+      for (const value of ["abc", NaN, Infinity, null, {}]) {
+        const restoredAppState = restore.restoreAppState(
+          { zoom: { value } } as any,
+          null,
+        );
+        expect(restoredAppState.zoom).toEqual(getDefaultAppState().zoom);
+      }
+    });
+
+    it("when the zoom of imported data state is a numeric string", () => {
+      expect(
+        restore.restoreAppState({ zoom: { value: "2" } } as any, null).zoom
+          .value,
+      ).toBe(2);
+      expect(
+        restore.restoreAppState({ zoom: "2" } as any, null).zoom.value,
+      ).toBe(2);
+    });
+  });
+
+  it("should reset non-finite scroll values to defaults", () => {
+    for (const value of ["abc", NaN, Infinity, -Infinity, null, {}]) {
+      const restoredAppState = restore.restoreAppState(
+        { scrollX: value, scrollY: value } as any,
+        null,
+      );
+      expect(restoredAppState.scrollX).toBe(getDefaultAppState().scrollX);
+      expect(restoredAppState.scrollY).toBe(getDefaultAppState().scrollY);
+    }
+
+    expect(
+      restore.restoreAppState({ scrollX: 10, scrollY: -20 } as any, null),
+    ).toMatchObject({ scrollX: 10, scrollY: -20 });
+    expect(
+      restore.restoreAppState({ scrollX: "10", scrollY: "-20" } as any, null),
+    ).toMatchObject({ scrollX: 10, scrollY: -20 });
   });
 
   it("should handle appState.openSidebar legacy values", () => {
