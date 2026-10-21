@@ -5,7 +5,6 @@ import {
   distance,
   getGridPoint,
   randomInteger,
-  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
 import {
@@ -480,13 +479,6 @@ export class AppDuplicate {
           [],
         );
 
-      // update drag origin to the position at which we started
-      // the duplication so that the drag offset is correct
-      pointerDownState.drag.origin = viewportCoordsToSceneCoords(
-        event,
-        this.app.state,
-      );
-
       // switch selected elements to the duplicated ones
       this.app.setState((prevState) => ({
         ...getSelectionStateForElements(
@@ -506,10 +498,26 @@ export class AppDuplicate {
       );
 
       // (after advancing the list markers, which may resize the duplicates)
+      // The drag keeps its origin, so store each duplicate where it would have
+      // been before the drag. The duplicates then move exactly like the
+      // originals would have, e.g. when shift locks the drag to an axis.
+      const draggedElementsMap = arrayToMap(elements);
       duplicatedElements.forEach((element) => {
+        const origId = duplication.duplicateIdToOrigId.get(element.id);
+        const draggedElement = origId && draggedElementsMap.get(origId);
+        const elementBeforeDrag =
+          origId && pointerDownState.originalElements.get(origId);
+        const copy = deepCopyElement(element);
+
         pointerDownState.originalElements.set(
           element.id,
-          deepCopyElement(element),
+          draggedElement && elementBeforeDrag
+            ? {
+                ...copy,
+                x: copy.x - (draggedElement.x - elementBeforeDrag.x),
+                y: copy.y - (draggedElement.y - elementBeforeDrag.y),
+              }
+            : copy,
         );
       });
 
