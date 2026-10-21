@@ -148,13 +148,19 @@ export const saveFilesToFirebase = async ({
   prefix: string;
   files: { id: FileId; buffer: Uint8Array }[];
 }) => {
+  // failing to load the SDK must fail the whole save rather than be reported
+  // per file as `erroredFiles` (which share links ignore, and collab never
+  // retries)
+  const { storage, ref, uploadBytes } = await _loadStorage();
+
   const erroredFiles: FileId[] = [];
   const savedFiles: FileId[] = [];
 
   await Promise.all(
     files.map(async ({ id, buffer }) => {
       try {
-        await uploadBytesToFirebase(`${prefix}/${id}`, buffer, {
+        const storageRef = ref(storage, `${prefix}/${id}`);
+        await uploadBytes(storageRef, buffer, {
           cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
         });
         savedFiles.push(id);
