@@ -682,7 +682,10 @@
     "preview": "Previzualizare",
     "label": "Mermaid",
     "inputPlaceholder": "Scrie definiția diagramei Mermaid aici...",
-    "autoFixAvailable": "Este disponibilă funcția de fixare automată"
+    "autoFixAvailable": "Este disponibilă funcția de fixare automată",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Eroare!"
