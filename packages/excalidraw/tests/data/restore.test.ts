@@ -123,6 +123,80 @@ describe("restoreElements", () => {
     expect(restore.restoreElements(null, null)).toStrictEqual([]);
   });
 
+  it.each([
+    ["without options", undefined],
+    [
+      "with import options",
+      { repairBindings: true, deleteInvisibleElements: true },
+    ],
+  ] as const)(
+    "should skip malformed entries and keep the rest of the scene (%s)",
+    (_, opts) => {
+      const container = API.createElement({
+        type: "rectangle",
+        id: "container",
+        boundElements: [{ type: "text", id: "label" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        containerId: container.id,
+      });
+
+      const restoredElements = restore.restoreElements(
+        [
+          null,
+          undefined,
+          0,
+          "",
+          "rectangle",
+          true,
+          // arrays are objects, but not elements
+          Object.assign([], { type: "rectangle", id: "array" }),
+          {},
+          { id: "typeless" },
+          { type: 5, id: "non-string-type" },
+          container,
+          null,
+          label,
+        ] as any[],
+        null,
+        opts,
+      );
+
+      expect(restoredElements.map((element) => element.id)).toEqual([
+        container.id,
+        label.id,
+      ]);
+      expect(restoredElements[0].boundElements).toEqual([
+        { type: "text", id: label.id },
+      ]);
+      expect((restoredElements[1] as ExcalidrawTextElement).containerId).toBe(
+        container.id,
+      );
+    },
+  );
+
+  it.each([
+    ["without options", undefined],
+    [
+      "with import options",
+      { repairBindings: true, deleteInvisibleElements: true },
+    ],
+  ] as const)(
+    "should return empty array when elements are not an array or all malformed (%s)",
+    (_, opts) => {
+      const rect = API.createElement({ type: "rectangle" });
+
+      expect(
+        restore.restoreElements({ 0: rect, length: 1 } as any, null, opts),
+      ).toEqual([]);
+      expect(
+        restore.restoreElements([null, undefined, 1] as any[], null, opts),
+      ).toEqual([]);
+    },
+  );
+
   it("should not call isInvisiblySmallElement when element is a selection element", () => {
     const selectionEl = { type: "selection" } as ExcalidrawElement;
     const restoreElements = restore.restoreElements([selectionEl], null);
@@ -1261,6 +1335,69 @@ describe("restoreAppState", () => {
         null,
       ).openSidebar,
     ).toEqual({ name: DEFAULT_SIDEBAR.name, tab: "ola" });
+  });
+});
+
+describe("restoreLibraryItems", () => {
+  const rect = (id: string) => API.createElement({ type: "rectangle", id });
+
+  it("should skip null and primitive items", () => {
+    const restoredItems = restore.restoreLibraryItems(
+      [
+        null,
+        undefined,
+        0,
+        "item",
+        true,
+        // v1
+        [rect("A")],
+        // v2
+        { id: "item", status: "published", created: 1, elements: [rect("B")] },
+      ] as any,
+      "unpublished",
+    );
+
+    expect(restoredItems).toEqual([
+      {
+        id: expect.any(String),
+        status: "unpublished",
+        created: expect.any(Number),
+        elements: [expect.objectContaining({ id: "A" })],
+      },
+      {
+        id: "item",
+        status: "published",
+        created: 1,
+        elements: [expect.objectContaining({ id: "B" })],
+      },
+    ]);
+  });
+
+  it("should skip v2 items with malformed elements", () => {
+    const restoredItems = restore.restoreLibraryItems(
+      [
+        { id: "missing" },
+        { id: "null", elements: null },
+        { id: "string", elements: "abc" },
+        { id: "object", elements: { 0: rect("X"), length: 1 } },
+        { id: "malformed", elements: [null, 1, "abc", {}] },
+        { id: "mixed", elements: [null, rect("A")] },
+      ] as any,
+      "unpublished",
+    );
+
+    expect(restoredItems).toEqual([
+      expect.objectContaining({
+        id: "mixed",
+        elements: [expect.objectContaining({ id: "A" })],
+      }),
+    ]);
+  });
+
+  it("should skip a non-array library", () => {
+    expect(
+      restore.restoreLibraryItems({ 0: [rect("A")] } as any, "unpublished"),
+    ).toEqual([]);
   });
 });
 

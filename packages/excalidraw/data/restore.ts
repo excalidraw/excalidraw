@@ -963,15 +963,25 @@ export const restoreElements = <T extends ExcalidrawElement>(
       }
     | undefined,
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
+  // entries that aren't objects carry nothing to restore an element from
+  const sourceElements = (
+    Array.isArray(targetElements) ? (targetElements as unknown[]) : []
+  ).reduce<T[]>((acc, element) => {
+    if (isRecordLike(element)) {
+      acc.push(element as T);
+    }
+    return acc;
+  }, []);
+
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  const targetElementsMap = arrayToMap(sourceElements);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    sourceElements.reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
@@ -1391,7 +1401,10 @@ export const restoreLibraryItems = (
   defaultStatus: LibraryItem["status"],
 ) => {
   const restoredItems: LibraryItem[] = [];
-  for (const item of libraryItems) {
+  for (const item of Array.isArray(libraryItems) ? libraryItems : []) {
+    if (!item || typeof item !== "object") {
+      continue;
+    }
     // migrate older libraries
     if (Array.isArray(item)) {
       const restoredItem = restoreLibraryItem({
