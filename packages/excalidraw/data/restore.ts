@@ -100,6 +100,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 import type {
   AnyArrowhead,
   Arrowhead,
+  BoundElement,
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawArrowElement,
@@ -544,6 +545,45 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   return null;
 };
 
+const BOUND_ELEMENT_TYPES: ReadonlySet<string> = new Set<BoundElement["type"]>([
+  "arrow",
+  "text",
+]);
+
+/**
+ * Entries with a missing or unknown type are dropped rather than guessed, as
+ * that could e.g. turn a free text into a container's label. The legacy
+ * `boundElementIds` only held arrows, so its bare ids are restored as such.
+ */
+const restoreBoundElements = (
+  boundElements: unknown,
+  boundElementIds: unknown,
+): BoundElement[] => {
+  const isLegacy = boundElementIds != null;
+  const value = isLegacy ? boundElementIds : boundElements;
+  const entries = Array.isArray(value) ? value : value != null ? [value] : [];
+
+  return entries.reduce<BoundElement[]>((acc, entry) => {
+    if (isLegacy) {
+      const id = restoreId(entry);
+      if (id) {
+        acc.push({ id, type: "arrow" });
+      }
+      return acc;
+    }
+    if (!isRecordLike(entry)) {
+      return acc;
+    }
+    const id = restoreId(entry.id);
+    const type =
+      typeof entry.type === "string" ? entry.type.trim().toLowerCase() : "";
+    if (id && BOUND_ELEMENT_TYPES.has(type)) {
+      acc.push({ id, type: type as BoundElement["type"] });
+    }
+    return acc;
+  }, []);
+};
+
 // a record so that new arrowheads can't be missed
 const ARROWHEADS_RECORD: Record<Arrowhead, true> = {
   arrow: true,
@@ -738,9 +778,10 @@ const restoreElementWithProperties = <
       element.strokeSharpness,
       element.type,
     ),
-    boundElements: element.boundElementIds
-      ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
-      : element.boundElements ?? [],
+    boundElements: restoreBoundElements(
+      element.boundElements,
+      element.boundElementIds,
+    ),
     updated: toFiniteNumber(element.updated) ?? getUpdatedTimestamp(),
     created: toFiniteNumber(element.created),
     link:

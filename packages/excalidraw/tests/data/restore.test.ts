@@ -1162,6 +1162,39 @@ describe("restoreElements", () => {
     }
   });
 
+  it("should repair malformed boundElements entries", () => {
+    const nullEntry = API.createElement({ type: "rectangle", id: "a" });
+    const stringValue = API.createElement({ type: "rectangle", id: "b" });
+    const mixed = API.createElement({ type: "rectangle", id: "c" });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      containerId: "c",
+    });
+    (nullEntry as any).boundElements = [null];
+    (stringValue as any).boundElements = "abc";
+    (mixed as any).boundElements = [
+      null,
+      { id: 5, type: "text" },
+      { type: "text", id: "label" },
+    ];
+
+    const restoredElements = restore.restoreElements(
+      [nullEntry, stringValue, mixed, label],
+      null,
+      { repairBindings: true, deleteInvisibleElements: true },
+    );
+
+    expect(
+      restoredElements.map(({ id, boundElements }) => ({ id, boundElements })),
+    ).toEqual([
+      { id: "a", boundElements: [] },
+      { id: "b", boundElements: [] },
+      { id: "c", boundElements: [{ type: "text", id: "label" }] },
+      { id: "label", boundElements: [] },
+    ]);
+  });
+
   it("should keep text element if refreshing its dimensions fails", () => {
     const rect = API.createElement({ type: "rectangle", id: "rect" });
     const text = API.createElement({ type: "text", id: "text" });
@@ -1354,6 +1387,28 @@ describe("repairing malformed elements", () => {
     expect(text.containerId).toBe("1");
   });
 
+  it("should restore legacy boundElementIds that aren't an array", () => {
+    const [container] = restoreImported([
+      {
+        type: "rectangle",
+        id: "container",
+        width: 100,
+        height: 100,
+        boundElementIds: "arrow",
+      },
+      {
+        type: "arrow",
+        id: "arrow",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+      },
+    ]);
+
+    expect(container.boundElements).toEqual([{ id: "arrow", type: "arrow" }]);
+  });
+
   it("should restore { x, y } and numeric string points", () => {
     const [line] = restoreImported([
       {
@@ -1544,6 +1599,40 @@ describe("repairing malformed elements", () => {
 
     expect(arrow.fixedSegments?.map((segment) => segment.index)).toEqual([
       2, 3,
+    ]);
+  });
+
+  it("should drop untyped boundElements entries without repairing bindings", () => {
+    const [container] = restore.restoreElements(
+      [
+        {
+          type: "rectangle",
+          id: "rect",
+          width: 100,
+          height: 100,
+          boundElements: [
+            { id: "label", type: "Label" },
+            "arrow",
+            { id: "label", type: " TEXT " },
+            { id: "arrow", type: "Arrow" },
+          ],
+        },
+        { type: "text", id: "label", text: "hi", containerId: "rect" },
+        {
+          type: "arrow",
+          id: "arrow",
+          points: [
+            [0, 0],
+            [10, 10],
+          ],
+        },
+      ] as any[],
+      null,
+    );
+
+    expect(container.boundElements).toEqual([
+      { id: "label", type: "text" },
+      { id: "arrow", type: "arrow" },
     ]);
   });
 
