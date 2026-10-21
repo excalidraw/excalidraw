@@ -1183,6 +1183,77 @@ describe("repairing malformed elements", () => {
     expect(line.height).toBe(20);
   });
 
+  it("should keep pressures that don't quite match the points", () => {
+    const [freedraw] = restoreImported([
+      {
+        type: "freedraw",
+        id: "freedraw",
+        points: [
+          [0, 0],
+          [10, 10],
+          [20, 20],
+        ],
+        pressures: [0.2, 0.8],
+        simulatePressure: false,
+      },
+    ]) as ExcalidrawFreeDrawElement[];
+
+    expect(freedraw.simulatePressure).toBe(false);
+    expect(freedraw.pressures).toEqual([0.2, 0.8, 0.5]);
+  });
+
+  it("should keep pressures aligned when skipping invalid points", () => {
+    const [freedraw] = restoreImported([
+      {
+        type: "freedraw",
+        id: "freedraw",
+        points: [[0, 0], "invalid", [20, 20]],
+        pressures: [0.2, 0.4, 0.8],
+        simulatePressure: false,
+      },
+    ]) as ExcalidrawFreeDrawElement[];
+
+    expect(freedraw.points).toEqual([
+      [0, 0],
+      [20, 20],
+    ]);
+    expect(freedraw.pressures).toEqual([0.2, 0.8]);
+  });
+
+  it("should simulate pressure when there are no pressures", () => {
+    const [freedraw] = restoreImported([
+      {
+        type: "freedraw",
+        id: "freedraw",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+        simulatePressure: false,
+      },
+    ]) as ExcalidrawFreeDrawElement[];
+
+    expect(freedraw.simulatePressure).toBe(true);
+    expect(freedraw.pressures).toEqual([]);
+  });
+
+  it("should keep pressures matching the points", () => {
+    const [freedraw] = restoreImported([
+      {
+        type: "freedraw",
+        id: "freedraw",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+        pressures: [0.2, 0.8],
+      },
+    ]) as ExcalidrawFreeDrawElement[];
+
+    expect(freedraw.simulatePressure).toBe(false);
+    expect(freedraw.pressures).toEqual([0.2, 0.8]);
+  });
+
   it("should not throw on a non-string legacy font", () => {
     const [text] = restoreImported([
       { type: "text", id: "text", text: "hi", font: 5 },

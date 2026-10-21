@@ -297,9 +297,10 @@ const restoreFreedrawPoints = (
     const restoredPoint = restorePoint(point);
     if (restoredPoint) {
       restoredPoints.push(restoredPoint);
-      if (index in pressureValues) {
-        const pressure = pressureValues[index];
-        restoredPressures.push(isFiniteNumber(pressure) ? pressure : 0.5);
+      // keep pressures aligned with the points, defaulting the missing or
+      // malformed ones, so that a slightly off count doesn't lose them all
+      if (pressureValues.length) {
+        restoredPressures.push(toFiniteNumber(pressureValues[index]) ?? 0.5);
       }
     }
   });
@@ -849,11 +850,17 @@ export const restoreElement = (
         element.pressures,
       );
 
+      // pressures are only usable with one per point, otherwise simulate them
+      const hasPressures =
+        points.length > 0 && pressures.length === points.length;
+
       return restoreElementWithProperties(element, {
         points,
-        simulatePressure: element.simulatePressure,
+        simulatePressure: hasPressures
+          ? restoreBoolean(element.simulatePressure, false)
+          : true,
         strokeOptions: restoreFreedrawStrokeOptions(element.strokeOptions),
-        pressures,
+        pressures: hasPressures ? pressures : [],
       });
     }
     case "image":
