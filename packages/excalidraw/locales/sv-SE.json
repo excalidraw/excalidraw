@@ -682,7 +682,10 @@
     "preview": "Förhandsgranska",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Auto-fix är tillgängligt"
+    "autoFixAvailable": "Auto-fix är tillgängligt",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Fel!"
