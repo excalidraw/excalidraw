@@ -682,7 +682,10 @@
     "preview": "Voorbeeld",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Auto-correctie is beschikbaar"
+    "autoFixAvailable": "Auto-correctie is beschikbaar",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Fout!"
