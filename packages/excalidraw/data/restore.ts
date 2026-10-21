@@ -99,12 +99,15 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FileId,
   FillStyle,
   FixedPointBinding,
   FontFamilyValues,
+  ImageCrop,
   StrokeStyle,
   TextAlign,
   VerticalAlign,
@@ -203,6 +206,11 @@ const FILL_STYLES: readonly FillStyle[] = [
 const STROKE_STYLES: readonly StrokeStyle[] = ["solid", "dashed", "dotted"];
 const TEXT_ALIGNS = Object.values(TEXT_ALIGN) as TextAlign[];
 const VERTICAL_ALIGNS = Object.values(VERTICAL_ALIGN) as VerticalAlign[];
+const IMAGE_STATUSES: readonly ExcalidrawImageElement["status"][] = [
+  "pending",
+  "saved",
+  "error",
+];
 
 const restoreLinearElementPoints = (
   points: unknown,
@@ -524,6 +532,33 @@ const restoreRoundness = (
     : null;
 };
 
+const restoreImageScale = (scale: unknown): ExcalidrawImageElement["scale"] => {
+  const [x, y] = Array.isArray(scale) ? scale.map(toFiniteNumber) : [];
+  return x && y ? [x, y] : [1, 1];
+};
+
+const restoreImageCrop = (crop: unknown): ImageCrop | null => {
+  if (!isRecordLike(crop)) {
+    return null;
+  }
+
+  const x = toFiniteNumber(crop.x);
+  const y = toFiniteNumber(crop.y);
+  const width = toPositiveNumber(crop.width);
+  const height = toPositiveNumber(crop.height);
+  const naturalWidth = toPositiveNumber(crop.naturalWidth);
+  const naturalHeight = toPositiveNumber(crop.naturalHeight);
+
+  return x !== null &&
+    y !== null &&
+    width &&
+    height &&
+    naturalWidth &&
+    naturalHeight
+    ? { x, y, width, height, naturalWidth, naturalHeight }
+    : null;
+};
+
 const restoreElementWithProperties = <
   T extends Required<Omit<ExcalidrawElement, "customData">> & {
     customData?: ExcalidrawElement["customData"];
@@ -722,10 +757,10 @@ export const restoreElement = (
     }
     case "image":
       return restoreElementWithProperties(element, {
-        status: element.status || "pending",
-        fileId: element.fileId,
-        scale: element.scale || [1, 1],
-        crop: element.crop ?? null,
+        status: restoreEnum(element.status, IMAGE_STATUSES, "pending"),
+        fileId: restoreId(element.fileId) as FileId | null,
+        scale: restoreImageScale(element.scale),
+        crop: restoreImageCrop(element.crop),
       });
     case "line":
     // @ts-ignore LEGACY type
@@ -851,15 +886,18 @@ export const restoreElement = (
       return normalizeStickyNote(
         restoreElementWithProperties(element, {
           baseHeight:
-            element.baseHeight ??
-            (element as typeof element & { maxHeight?: number }).maxHeight ??
-            element.height,
+            toPositiveNumber(element.baseHeight) ??
+            toPositiveNumber(
+              (element as typeof element & { maxHeight?: unknown }).maxHeight,
+            ) ??
+            toFiniteNumber(element.height) ??
+            0,
         }),
       );
     case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
-        name: element.name ?? null,
+        name: restoreString(element.name),
       });
 
     // Don't use default case so as to catch a missing an element type case.
