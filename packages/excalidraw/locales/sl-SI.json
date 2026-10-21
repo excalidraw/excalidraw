@@ -682,7 +682,10 @@
     "preview": "Predogled",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Samodejno popravljanje je na voljo"
+    "autoFixAvailable": "Samodejno popravljanje je na voljo",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Napaka!"
