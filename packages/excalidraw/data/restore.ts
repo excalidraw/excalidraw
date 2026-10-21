@@ -34,6 +34,7 @@ import {
   type StrokeWidthKey,
   isTransparent,
   DEFAULT_ZOOM,
+  isRecord as isRecordLike,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -273,10 +274,7 @@ const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
 const restoreFreedrawStrokeOptions = (
   strokeOptions: unknown,
 ): { variability: StrokeVariability; streamline: number } => {
-  const options =
-    strokeOptions && typeof strokeOptions === "object"
-      ? (strokeOptions as { variability?: unknown; streamline?: unknown })
-      : null;
+  const options = isRecordLike(strokeOptions) ? strokeOptions : null;
 
   return {
     variability: restoreStrokeVariability(options?.variability, "variable"),
