@@ -166,7 +166,7 @@ export function pointRotateDegs<Point extends GenericPoint>(
 // TODO 99% of use is translating between global and local coords, which need to be formalized
 export function pointTranslate<
   From extends GenericPoint,
-  To extends GenericPoint = GlobalPoint | LocalPoint,
+  To extends GenericPoint = From,
 >(p: From, v: Vector = [0, 0] as Vector): To {
   return pointFrom(p[0] + v[0], p[1] + v[1]);
 }
