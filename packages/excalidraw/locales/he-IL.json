@@ -682,7 +682,10 @@
     "preview": "תצוגה מקדימה",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "התיקון האוטומטי זמין"
+    "autoFixAvailable": "התיקון האוטומטי זמין",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "שגיאה!"
