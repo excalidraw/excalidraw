@@ -50,6 +50,7 @@ const setup = (length = 100_000, angle = 0, diagonal = false) => {
     selectedElements: [],
   }).elementsMap;
   const renderConfig: StaticCanvasRenderConfig = {
+    scale: 1,
     imageCache: new Map(),
     renderGrid: false,
     isExporting: false,
@@ -60,7 +61,7 @@ const setup = (length = 100_000, angle = 0, diagonal = false) => {
     theme: "light",
   };
   const draw = (offset = { x: 0, y: 0 }) => {
-    const scale = appState.zoom.value * window.devicePixelRatio;
+    const scale = appState.zoom.value * renderConfig.scale;
     context.setTransform(scale, 0, 0, scale, 0, 0);
     renderElement(
       arrow,
@@ -139,14 +140,14 @@ describe("oversized linear element canvas", () => {
     expect(draw()).toBe(first);
   });
 
-  it("uses device resolution and invalidates the cache when DPR changes", () => {
-    const { draw, canvas } = setup();
+  it("uses the render scale and invalidates the cache when it changes", () => {
+    const { draw, canvas, renderConfig } = setup();
     const first = draw();
-    vi.stubGlobal("devicePixelRatio", 2);
+    renderConfig.scale = 2;
     const retina = draw();
     expect(retina).not.toBe(first);
     expect(retina.scale).toBe(30);
-    expect(retina.devicePixelRatio).toBe(2);
+    expect(retina.deviceScale).toBe(2);
     expect(retina.canvas.width).toBeLessThanOrEqual(canvas.width + 4);
     expect(retina.viewport!.width).toBeCloseTo(first.viewport!.width / 2, 1);
   });
@@ -176,13 +177,13 @@ describe("oversized linear element canvas", () => {
         cached.canvasOffsetX +
         40 * cached.scale +
         (centerX - arrow.x - cached.viewport!.x) *
-          cached.devicePixelRatio *
+          cached.deviceScale *
           cached.scale;
       const pixelY =
         cached.canvasOffsetY +
         40 * cached.scale +
         (centerY - arrow.y - cached.viewport!.y) *
-          cached.devicePixelRatio *
+          cached.deviceScale *
           cached.scale;
       const localX = Number(x) + (pixelX * Number(width)) / cached.canvas.width;
       const localY =

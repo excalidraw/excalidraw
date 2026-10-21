@@ -81,6 +81,8 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
 
@@ -371,6 +373,7 @@ export const adjustBoundTextSize = (
   container: ExcalidrawTextContainer,
   boundText: ExcalidrawTextElementWithContainer,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const maxWidth = getBoundTextMaxWidth(container, boundText);
   const maxHeight = getBoundTextMaxHeight(container, boundText);
@@ -379,12 +382,14 @@ export const adjustBoundTextSize = (
     boundText.text,
     getFontString(boundText),
     maxWidth,
+    renderEnvironment,
   );
 
   let metrics = measureText(
     wrappedText,
     getFontString(boundText),
     boundText.lineHeight,
+    renderEnvironment,
   );
 
   let nextFontSize = boundText.fontSize;
@@ -401,6 +406,7 @@ export const adjustBoundTextSize = (
       boundText.text,
       getFontString(_updatedTextElement),
       boundText.lineHeight,
+      renderEnvironment,
     );
   }
 
@@ -410,7 +416,7 @@ export const adjustBoundTextSize = (
     height: metrics.height,
   });
 
-  redrawTextBoundingBox(boundText, container, scene);
+  redrawTextBoundingBox(boundText, container, scene, renderEnvironment);
 };
 
 type ConversionType = "generic" | "linear" | null;
@@ -501,6 +507,7 @@ export const convertElementTypes = (
             element as ExcalidrawTextContainer,
             boundText,
             app.scene,
+            app.renderEnvironment,
           );
         }
       }

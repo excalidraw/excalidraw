@@ -93,16 +93,20 @@ export class AnimatedTrail implements Trail {
     }
 
     if (!AnimationController.running(this.key)) {
-      AnimationController.start(this.key, () => {
-        const needsNext = this.onFrame();
-        if (needsNext) {
-          return { keep: true };
-        }
+      AnimationController.start(
+        this.key,
+        () => {
+          const needsNext = this.onFrame();
+          if (needsNext) {
+            return { keep: true };
+          }
 
-        this.cleanup();
+          this.cleanup();
 
-        return null;
-      });
+          return null;
+        },
+        this.app.ownerWindow,
+      );
     }
   }
 

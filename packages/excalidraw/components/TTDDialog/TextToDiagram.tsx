@@ -3,6 +3,7 @@ import { useRef } from "react";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom, useAtomValue } from "../../editor-jotai";
+import { t } from "../../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "../App";
 
@@ -34,12 +35,14 @@ import type {
 
 const TextToDiagramContent = ({
   mermaidToExcalidrawLib,
+  onRetryLoad,
   onTextSubmit,
   renderWelcomeScreen,
   renderWarning,
   persistenceAdapter,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  onRetryLoad?: () => void;
   onTextSubmit: (
     props: TTTDDialog.OnTextSubmitProps,
   ) => Promise<TTTDDialog.OnTextSubmitRetValue>;
@@ -68,6 +71,7 @@ const TextToDiagramContent = ({
 
   const { onGenerate, handleAbort } = useTextGeneration({
     onTextSubmit,
+    mermaidToExcalidrawLib,
   });
 
   const {
@@ -100,7 +104,21 @@ const TextToDiagramContent = ({
 
   const handleInsertMessage = async (message: TChat.ChatMessage) => {
     const mermaidContent = message.content || "";
-    if (!mermaidContent.trim() || !mermaidToExcalidrawLib.loaded) {
+    if (!mermaidContent.trim()) {
+      return;
+    }
+
+    if (mermaidToExcalidrawLib.status !== "loaded") {
+      if (mermaidToExcalidrawLib.status === "error") {
+        setAppState({
+          toast: {
+            message: mermaidToExcalidrawLib.reloadRequired
+              ? t("mermaid.loadErrorReload")
+              : t("mermaid.loadError"),
+            closable: true,
+          },
+        });
+      }
       return;
     }
 
@@ -229,7 +247,9 @@ const TextToDiagramContent = ({
           canvasRef={canvasRef}
           hideErrorDetails={lastAssistantMessage?.errorType === "parse"}
           error={error}
-          loaded={mermaidToExcalidrawLib.loaded}
+          loadStatus={mermaidToExcalidrawLib.status}
+          loadErrorReloadRequired={mermaidToExcalidrawLib.reloadRequired}
+          onRetryLoad={onRetryLoad}
           onInsert={handleInsertToEditor}
         />
       )}
@@ -239,12 +259,14 @@ const TextToDiagramContent = ({
 
 export const TextToDiagram = ({
   mermaidToExcalidrawLib,
+  onRetryLoad,
   onTextSubmit,
   renderWelcomeScreen,
   renderWarning,
   persistenceAdapter,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  onRetryLoad?: () => void;
   onTextSubmit(
     props: TTTDDialog.OnTextSubmitProps,
   ): Promise<TTTDDialog.OnTextSubmitRetValue>;
@@ -255,6 +277,7 @@ export const TextToDiagram = ({
   return (
     <TextToDiagramContent
       mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+      onRetryLoad={onRetryLoad}
       onTextSubmit={onTextSubmit}
       renderWelcomeScreen={renderWelcomeScreen}
       renderWarning={renderWarning}
