@@ -11269,6 +11269,8 @@ class App extends React.Component<AppProps, AppState> {
       return [actionCopy, ...options];
     }
 
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
     const zIndexActions: ContextMenuItems =
       this.editorInterface.formFactor === "desktop"
         ? [
@@ -11311,6 +11313,12 @@ class App extends React.Component<AppProps, AppState> {
       actionFlipVertical,
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
+      ...(selectedElements.length > 0 &&
+      selectedElements.every(
+        (element) => isLinearElement(element) && !element.locked,
+      )
+        ? ["animation" as const]
+        : []),
       CONTEXT_MENU_SEPARATOR,
       actionLink,
       actionCopyElementLink,

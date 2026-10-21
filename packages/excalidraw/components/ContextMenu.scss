@@ -100,3 +100,25 @@
     border-top: 1px solid $color-gray-5;
   }
 }
+
+.excalidraw .animation-menu {
+  padding: 0.5rem;
+  min-width: 15rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
+  select {
+    font: inherit;
+    color: var(--popup-text-color);
+    background: var(--popup-secondary-bg-color);
+    border: 1px solid var(--button-gray-3);
+    border-radius: 4px;
+    padding: 0.25rem;
+  }
+}

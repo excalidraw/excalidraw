@@ -1,3 +1,4 @@
+import { restoreLinearElementAnimation } from "@excalidraw/element/linearElementAnimation";
 import {
   clamp,
   isFiniteNumber,
@@ -647,6 +648,9 @@ export const restoreElement = (
         type: "line",
         startBinding: null,
         endBinding: null,
+        ...(element.animation !== undefined
+          ? { animation: restoreLinearElementAnimation(element.animation) }
+          : {}),
         startArrowhead,
         endArrowhead,
         points,
@@ -699,6 +703,9 @@ export const restoreElement = (
           existingElementsMap,
           "end",
         ),
+        ...(element.animation !== undefined
+          ? { animation: restoreLinearElementAnimation(element.animation) }
+          : {}),
         startArrowhead,
         endArrowhead,
         points,

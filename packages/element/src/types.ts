@@ -366,10 +366,19 @@ export type Arrowhead =
 
 export type AnyArrowhead = Arrowhead | ArrowheadLegacy;
 
+/** Optional, persisted motion settings. Missing/null means a static element. */
+export type LinearElementAnimation = Readonly<{
+  type: "dots" | "dashes" | "pulse";
+  /** Speed multiplier: 0.5 (slow), 1 (normal), or 2 (fast). */
+  speed: 0.5 | 1 | 2;
+  direction: "forward" | "reverse";
+}>;
+
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
     points: readonly LocalPoint[];
+    animation?: LinearElementAnimation | null;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;

@@ -10,6 +10,8 @@ import type {
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderStaticScene } from "../../renderer/staticScene";
 
+import { LinearAnimationOverlay } from "./LinearAnimationOverlay";
+
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
@@ -71,7 +73,16 @@ const StaticCanvas = (props: StaticCanvasProps) => {
     );
   });
 
-  return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
+  return (
+    <>
+      <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />
+      <LinearAnimationOverlay
+        elements={props.visibleElements}
+        allElementsMap={props.allElementsMap}
+        appState={props.appState}
+      />
+    </>
+  );
 };
 
 const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
