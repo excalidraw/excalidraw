@@ -226,7 +226,7 @@ export const StatsInner = memo(
               </StatsRow>
               {gridModeEnabled && (
                 <>
-                  <StatsRow heading>Canvas</StatsRow>
+                  <StatsRow heading>{t("stats.canvas")}</StatsRow>
                   <StatsRow>
                     <CanvasGrid
                       property="gridStep"
