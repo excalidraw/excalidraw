@@ -682,7 +682,10 @@
     "preview": "预览",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "自动修复可用"
+    "autoFixAvailable": "自动修复可用",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "错误！"
