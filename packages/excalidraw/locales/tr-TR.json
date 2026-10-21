@@ -682,7 +682,10 @@
     "preview": "Önizleme",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Otomatik düzeltme mevcut"
+    "autoFixAvailable": "Otomatik düzeltme mevcut",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Hata!"
