@@ -682,7 +682,10 @@
     "preview": "Visualizar",
     "label": "Mermaid",
     "inputPlaceholder": "Digite a definição do diagrama Mermaid aqui...",
-    "autoFixAvailable": "Auto-correção disponível"
+    "autoFixAvailable": "Auto-correção disponível",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Erro!"
