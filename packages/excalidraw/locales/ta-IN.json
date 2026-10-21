@@ -682,7 +682,10 @@
     "preview": "முன்னோட்டம்",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": ""
