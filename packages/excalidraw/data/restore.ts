@@ -1290,6 +1290,30 @@ const restoreStickyNotes = (
   }
 };
 
+const isInvisibleElement = (
+  restoredElement: ExcalidrawElement,
+  sourceElement: ExcalidrawElement,
+) => {
+  // text is sized from its content once all elements are restored (see
+  // `restoreTextDimensions`)
+  if (isTextElement(restoredElement) && restoredElement.text) {
+    return false;
+  }
+  // linear elements with fewer than 2 points are rebuilt from their size
+  // (see `restoreLinearElementPoints`), which leaves nothing to show when they
+  // don't have a size either
+  if (
+    isLinearElement(restoredElement) &&
+    !restoredElement.width &&
+    !restoredElement.height &&
+    restorePoints((sourceElement as Partial<ExcalidrawLinearElement>).points)
+      .length < 2
+  ) {
+    return true;
+  }
+  return isInvisiblySmallElement(restoredElement);
+};
+
 export const restoreElements = <T extends ExcalidrawElement>(
   targetElements: readonly T[] | undefined | null,
   /** used for additional context (e.g. repairing arrow bindings) */
@@ -1341,10 +1365,11 @@ export const restoreElements = <T extends ExcalidrawElement>(
         migratedElement = null;
       }
       if (migratedElement) {
-        const localElement = existingElementsMap?.get(element.id);
+        const localElement = existingElementsMap?.get(migratedElement.id);
 
         const shouldMarkAsDeleted =
-          opts?.deleteInvisibleElements && isInvisiblySmallElement(element);
+          opts?.deleteInvisibleElements &&
+          isInvisibleElement(migratedElement, element);
 
         if (shouldMarkAsDeleted) {
           migratedElement = bumpVersion(migratedElement, localElement?.version);

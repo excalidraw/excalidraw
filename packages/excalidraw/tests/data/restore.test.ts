@@ -1090,6 +1090,77 @@ describe("restoreElements", () => {
     expect(restoredElements[0].version).toBe(modified_rectangle_2.version + 1);
   });
 
+  it("should not throw checking invisibility of a linear element without points", () => {
+    const rect = API.createElement({ type: "rectangle", id: "rect" });
+    const line = { type: "line", id: "line", x: 0, y: 0 } as any;
+
+    const restoredElements = restore.restoreElements([line, rect], null, {
+      repairBindings: true,
+      deleteInvisibleElements: true,
+    });
+
+    expect(
+      restoredElements.map(({ id, isDeleted }) => ({ id, isDeleted })),
+    ).toEqual([
+      { id: "line", isDeleted: true },
+      { id: "rect", isDeleted: false },
+    ]);
+  });
+
+  it("should rebuild linear elements with fewer than 2 valid points from their size", () => {
+    const base = { x: 0, y: 0, width: 50, height: 50 };
+    const elements = [
+      { ...base, type: "line", id: "line", points: [[0, 0]] },
+      {
+        ...base,
+        type: "line",
+        id: "zero-line",
+        points: [[0, 0]],
+        width: 0,
+        height: 0,
+      },
+      { ...base, type: "arrow", id: "arrow", points: [[0, 0]] },
+      { ...base, type: "freedraw", id: "freedraw", points: [[0, 0]] },
+      { ...base, type: "line", id: "pointless-line" },
+      {
+        ...base,
+        type: "line",
+        id: "valid-line",
+        points: [
+          [0, 0],
+          [50, 50],
+        ],
+      },
+    ];
+
+    const restoredElements = restore.restoreElements(elements as any[], null, {
+      deleteInvisibleElements: true,
+    });
+
+    expect(
+      restoredElements.map(({ id, isDeleted }) => ({ id, isDeleted })),
+    ).toEqual([
+      { id: "line", isDeleted: false },
+      // nothing to rebuild from
+      { id: "zero-line", isDeleted: true },
+      { id: "arrow", isDeleted: false },
+      // strokes can't be rebuilt from the size
+      { id: "freedraw", isDeleted: true },
+      { id: "pointless-line", isDeleted: false },
+      { id: "valid-line", isDeleted: false },
+    ]);
+    for (const element of [
+      restoredElements[0],
+      restoredElements[2],
+      restoredElements[4],
+    ]) {
+      expect((element as ExcalidrawLinearElement).points).toEqual([
+        [0, 0],
+        [50, 50],
+      ]);
+    }
+  });
+
   it("should keep text element if refreshing its dimensions fails", () => {
     const rect = API.createElement({ type: "rectangle", id: "rect" });
     const text = API.createElement({ type: "text", id: "text" });
@@ -1222,6 +1293,18 @@ describe("repairing malformed elements", () => {
     ]);
     expect(line.width).toBe(10);
     expect(line.height).toBe(20);
+  });
+
+  it("should rebuild a linear element from its only non-origin point", () => {
+    const [line] = restoreImported([
+      { type: "line", id: "line", points: [[30, 40]] },
+    ]) as ExcalidrawLinearElement[];
+
+    expect(line.isDeleted).toBe(false);
+    expect(line.points).toEqual([
+      [0, 0],
+      [30, 40],
+    ]);
   });
 
   it("should keep pressures that don't quite match the points", () => {
@@ -1543,6 +1626,24 @@ describe("repairing malformed elements", () => {
     expect(rect.x).toBe(0);
     expect(rect.updated).not.toBe(2024);
     expect((rect as any).created).not.toBe(2024);
+  });
+
+  it("should bump the version of invisible linear elements once", () => {
+    const [arrow] = restoreImported([
+      {
+        type: "arrow",
+        id: "arrow",
+        index: "a0",
+        version: 3,
+        x: 0,
+        y: 0,
+        points: [],
+      },
+    ]);
+
+    expect(arrow).toEqual(
+      expect.objectContaining({ isDeleted: true, version: 4 }),
+    );
   });
 
   it("should not share points with the input", () => {
@@ -2092,6 +2193,8 @@ describe("repairing bindings", () => {
       width: 0,
       height: 0,
     });
+    // a label with text gets measured, so it's only invisible when empty
+    Object.assign(invisibleBoundElement, { text: "", originalText: "" });
 
     const obsoleteBinding = { type: boundElement.type, id: boundElement.id };
     const invisibleBinding = {
