@@ -276,6 +276,7 @@ describe("restoreElements", () => {
     });
 
     textElement.text = null;
+    textElement.originalText = null;
     textElement.font = "10 unknown";
 
     expect(textElement.isDeleted).toBe(false);
@@ -1210,6 +1211,20 @@ describe("repairing malformed elements", () => {
     expect(text.height).toBeGreaterThan(0);
   });
 
+  it("should recover text from originalText", () => {
+    const [text] = restoreImported([
+      { type: "text", id: "text", text: null, originalText: "hi" },
+    ]) as ExcalidrawTextElement[];
+
+    expect(text).toEqual(
+      expect.objectContaining({
+        text: "hi",
+        originalText: "hi",
+        isDeleted: false,
+      }),
+    );
+  });
+
   it("should coerce malformed values instead of dropping them", () => {
     const [rect] = restoreImported([
       {
@@ -1626,6 +1641,21 @@ describe("repairing malformed elements", () => {
     expect(rect.x).toBe(0);
     expect(rect.updated).not.toBe(2024);
     expect((rect as any).created).not.toBe(2024);
+  });
+
+  it("should not detect the line height from the height of wrapped text it doesn't have", () => {
+    const [text] = restoreImported([
+      {
+        type: "text",
+        id: "text",
+        originalText: "a long sentence",
+        height: 50,
+        fontSize: 20,
+        fontFamily: FONT_FAMILY.Virgil,
+      },
+    ]) as ExcalidrawTextElement[];
+
+    expect(text.lineHeight).toBe(getLineHeight(FONT_FAMILY.Virgil));
   });
 
   it("should bump the version of invisible linear elements once", () => {

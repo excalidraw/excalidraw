@@ -804,7 +804,10 @@ export const restoreElement = (
         (typeof fontFamily === "string"
           ? getFontFamilyByName(fontFamily)
           : DEFAULT_FONT_FAMILY)) as FontFamilyValues;
-      const text = restoreString(element.text) || "";
+      // a label without `text` can still be recovered from its unwrapped
+      // `originalText` (rewrapped when refreshing dimensions)
+      const wrappedText = restoreString(element.text);
+      const text = wrappedText || restoreString(element.originalText) || "";
 
       const lineHeight = (toPositiveNumber(element.lineHeight) ??
         restoreLineHeight({
@@ -812,6 +815,9 @@ export const restoreElement = (
           fontSize: restoredFontSize,
           fontFamily: restoredFontFamily,
           text,
+          // the height spans the lines of `text` as it was wrapped, so it says
+          // nothing about the line height of the unwrapped `originalText`
+          height: wrappedText ? toFiniteNumber(element.height) ?? 0 : 0,
         })) as ExcalidrawTextElement["lineHeight"];
       element = restoreElementWithProperties(element, {
         fontSize: restoredFontSize,
