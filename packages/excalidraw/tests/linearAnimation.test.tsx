@@ -40,7 +40,8 @@ import {
 
 const { h } = window;
 const animation = {
-  type: "dots",
+  type: "dot",
+  count: 3,
   speed: 0.75,
   size: 12,
   direction: "reverse",
@@ -92,6 +93,11 @@ it.each([
   { ...animation, size: 101 },
   { ...animation, size: Infinity },
   { ...animation, size: null },
+  { ...animation, count: 0 },
+  { ...animation, count: 21 },
+  { ...animation, count: 1.5 },
+  { ...animation, count: NaN },
+  { ...animation, count: null },
   { ...animation, speed: Infinity },
   { ...animation, type: "future" },
   { ...animation, direction: "bad" },
@@ -167,6 +173,7 @@ it("opens Animate from a line's context menu and applies all controls", () => {
   fireEvent.click(screen.getByRole("button", { name: "Apply" }));
   expect(currentLine().animation).toEqual({
     type: "dashes",
+    count: 1,
     speed: 0.75,
     size: 18,
     direction: "reverse",
@@ -226,11 +233,17 @@ it("uses a continuous rendered shaft for straight, curved, and elbow arrows", ()
   }
 });
 
-it.each(["dot", "gap", "dots", "dashes", "pulse"] as const)(
+it.each(["dot", "gap", "dashes", "pulse"] as const)(
   "round trips %s with paused and fractional speed and custom size",
   (type) => {
     for (const speed of [0, 0.01, 0.5, 1]) {
-      const value = { type, speed, size: 37, direction: "forward" as const };
+      const value = {
+        type,
+        count: 4,
+        speed,
+        size: 37,
+        direction: "forward" as const,
+      };
       const element = {
         ...API.createElement({ type: "arrow" }),
         animation: value,
@@ -257,13 +270,20 @@ it.each([
         speed: oldSpeed,
         direction: "reverse",
       }),
-    ).toEqual({ type: "dots", speed: newSpeed, size: 8, direction: "reverse" });
+    ).toEqual({
+      type: "dot",
+      count: 8,
+      speed: newSpeed,
+      size: 8,
+      direction: "reverse",
+    });
   },
 );
 
 it("pauses at zero and reverses the traveling gap", () => {
   const value = {
     type: "gap",
+    count: 1,
     speed: 0.5,
     size: 20,
     direction: "forward",
@@ -283,7 +303,13 @@ it("draws a single traveling dot, with editable diameter and a paused clock", ()
   API.setElements([
     {
       ...element,
-      animation: { type: "dot", speed: 0, size: 19, direction: "forward" },
+      animation: {
+        type: "dot",
+        count: 1,
+        speed: 0,
+        size: 19,
+        direction: "forward",
+      },
     },
   ]);
   const dot = document.querySelector(".linear-animation-dot");
@@ -299,7 +325,13 @@ it("cuts a traveling gap only from its own bitmap, preserving normal export", ()
   API.setElements([
     {
       ...arrow,
-      animation: { type: "gap", speed: 0, size: 50, direction: "forward" },
+      animation: {
+        type: "gap",
+        count: 3,
+        speed: 0,
+        size: 50,
+        direction: "forward",
+      },
     },
   ]);
   const config = renderer.mock.calls.find(
@@ -311,6 +343,8 @@ it("cuts a traveling gap only from its own bitmap, preserving normal export", ()
   const clip = vi.spyOn(context, "clip");
   const arc = vi.spyOn(context, "arc");
   const point = vi.spyOn(LinearElementEditor, "getPointAtPathParameter");
+  clip.mockClear();
+  arc.mockClear();
   StaticScene.renderStaticScene(
     {
       ...config,
@@ -323,6 +357,11 @@ it("cuts a traveling gap only from its own bitmap, preserving normal export", ()
     0,
     expect.any(Map),
   );
+  expect(point).toHaveBeenCalledTimes(3);
+  point.mock.calls.forEach(([, progress], index) =>
+    expect(progress).toBeCloseTo(index / 3),
+  );
+  expect(clip).toHaveBeenCalledTimes(3);
   expect(clip).toHaveBeenCalledWith("evenodd");
   expect(arc).toHaveBeenCalledWith(
     expect.any(Number),
@@ -348,4 +387,100 @@ it("cuts a traveling gap only from its own bitmap, preserving normal export", ()
   clip.mockRestore();
   arc.mockRestore();
   renderer.mockRestore();
+});
+
+it.each([1, 4, 20])("renders exactly %s evenly spaced dots", (count) => {
+  const arrow = API.createElement({ type: "arrow" });
+  API.setElements([
+    {
+      ...arrow,
+      animation: {
+        type: "dot",
+        count,
+        size: 8,
+        speed: 0.5,
+        direction: "forward",
+      },
+    },
+  ]);
+  const dots = document.querySelectorAll<SVGPathElement>(
+    ".linear-animation-dot",
+  );
+  expect(dots).toHaveLength(count);
+  dots.forEach((dot, index) =>
+    expect(dot.style.animationDelay).toBe(`${(-5 * index) / count}s`),
+  );
+});
+
+it.each([
+  ["dot", "dot", 1],
+  ["dots", "dot", 8],
+  ["gap", "gap", 1],
+  ["gaps", "gap", 8],
+])(
+  "migrates the previous %s option into %s and count",
+  (oldType, type, count) => {
+    expect(
+      restoreLinearElementAnimation({
+        type: oldType,
+        size: 16,
+        speed: 0.4,
+        direction: "forward",
+      }),
+    ).toEqual({ type, count, size: 16, speed: 0.4, direction: "forward" });
+  },
+);
+
+it("keeps multiple paused gaps evenly spaced in either direction", () => {
+  const value = {
+    type: "gap",
+    count: 4,
+    size: 20,
+    speed: 0,
+    direction: "forward",
+  } as const;
+  expect(
+    [0, 1, 2, 3].map((index) => getAnimationProgress(8000, value, index)),
+  ).toEqual([0, 0.25, 0.5, 0.75]);
+  expect(
+    [0, 1, 2, 3].map((index) =>
+      getAnimationProgress(8000, { ...value, direction: "reverse" }, index),
+    ),
+  ).toEqual([1, 0.75, 0.5, 0.25]);
+});
+
+it("offers one dot/gap choice and an integer count slider that persists in JSON", () => {
+  const line = API.createElement({
+    type: "line",
+    x: 200,
+    y: 200,
+    width: 100,
+    height: 0,
+    points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+  });
+  API.setElements([line]);
+  API.setSelectedElements([line]);
+  fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+    button: 2,
+    clientX: 250,
+    clientY: 200,
+  });
+  fireEvent.click(screen.getByRole("button", { name: /Animate/ }));
+  expect(
+    screen.getAllByRole("option").map((option) => option.textContent),
+  ).not.toContain("Traveling dots");
+  const type = screen.getByRole("combobox", { name: "Animation type" });
+  fireEvent.change(type, { target: { value: "dot" } });
+  const count = screen.getByRole("slider", { name: "Count" });
+  expect(count).toHaveAttribute("step", "1");
+  expect(count).toHaveAttribute("min", "1");
+  expect(count).toHaveAttribute("max", "20");
+  fireEvent.change(count, { target: { value: "4" } });
+  fireEvent.keyDown(count, { key: "ArrowLeft" });
+  fireEvent.change(type, { target: { value: "gap" } });
+  expect(screen.getByRole("slider", { name: "Count" })).toHaveValue("4");
+  fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+  expect(currentLine().animation).toMatchObject({ type: "gap", count: 4 });
+  const json = JSON.parse(serializeAsJSON(h.elements, h.state, {}, "local"));
+  expect(json.elements[0].animation.count).toBe(4);
 });

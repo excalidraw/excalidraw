@@ -211,7 +211,6 @@
       "apply": "Apply",
       "type": "Animation type",
       "none": "None",
-      "dots": "Traveling dots",
       "dashes": "Moving dashes",
       "pulse": "Pulse",
       "speed": "Speed",
@@ -222,10 +221,11 @@
       "forward": "Start to end",
       "reverse": "End to start",
       "mixed": "Mixed animations",
-      "dot": "Traveling dot (single)",
+      "dot": "Traveling dot",
       "gap": "Traveling gap",
       "size": "Size",
-      "sizeValue": "Size value"
+      "sizeValue": "Size value",
+      "count": "Count"
     }
   },
   "elementLink": {

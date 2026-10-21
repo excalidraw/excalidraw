@@ -130,41 +130,55 @@ export const LinearAnimationOverlay = ({
                   } ${cx} ${cy}) translate(${element.x} ${element.y})`}
                   opacity={element.opacity / 100}
                 >
-                  <path
-                    d={d}
-                    fill="none"
-                    stroke={applyDarkModeFilter(
-                      element.strokeColor,
-                      appState.theme === "dark",
-                    )}
-                    strokeWidth={animation.size}
-                    pathLength={animation.type === "dot" ? 1 : undefined}
-                    strokeLinecap="round"
-                    strokeDasharray={
-                      animation.type === "dot"
-                        ? "0.000001 1"
-                        : animation.type === "pulse"
-                        ? undefined
-                        : animation.type === "dots"
-                        ? "0.1 23.9"
-                        : "10 14"
-                    }
-                    className={`linear-animation-${animation.type}`}
-                    style={{
-                      animationDuration: `${
-                        animation.type === "dot"
-                          ? getAnimationDuration(animation.speed)
-                          : (animation.type === "pulse" ? 1 : 0.5) /
-                            Math.max(animation.speed, 0.01)
-                      }s`,
-                      animationDirection:
-                        animation.direction === "reverse"
-                          ? "reverse"
-                          : "normal",
-                      animationPlayState:
-                        hidden || animation.speed === 0 ? "paused" : "running",
-                    }}
-                  />
+                  {Array.from(
+                    { length: animation.type === "dot" ? animation.count : 1 },
+                    (_, itemIndex) => (
+                      <path
+                        key={itemIndex}
+                        d={d}
+                        fill="none"
+                        stroke={applyDarkModeFilter(
+                          element.strokeColor,
+                          appState.theme === "dark",
+                        )}
+                        strokeWidth={animation.size}
+                        pathLength={animation.type === "dot" ? 1 : undefined}
+                        strokeLinecap="round"
+                        strokeDasharray={
+                          animation.type === "dot"
+                            ? "0.000001 1"
+                            : animation.type === "pulse"
+                            ? undefined
+                            : "10 14"
+                        }
+                        className={`linear-animation-${animation.type}`}
+                        style={{
+                          animationDelay:
+                            animation.type === "dot"
+                              ? `${
+                                  (-getAnimationDuration(animation.speed) *
+                                    itemIndex) /
+                                  animation.count
+                                }s`
+                              : undefined,
+                          animationDuration: `${
+                            animation.type === "dot"
+                              ? getAnimationDuration(animation.speed)
+                              : (animation.type === "pulse" ? 1 : 0.5) /
+                                Math.max(animation.speed, 0.01)
+                          }s`,
+                          animationDirection:
+                            animation.direction === "reverse"
+                              ? "reverse"
+                              : "normal",
+                          animationPlayState:
+                            hidden || animation.speed === 0
+                              ? "paused"
+                              : "running",
+                        }}
+                      />
+                    ),
+                  )}
                 </g>
               </g>
             </svg>

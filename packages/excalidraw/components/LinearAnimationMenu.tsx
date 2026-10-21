@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import {
   DEFAULT_ANIMATION_SIZE,
+  MAX_ANIMATION_COUNT,
   restoreLinearElementAnimation,
 } from "@excalidraw/element/linearElementAnimation";
 
@@ -37,7 +38,8 @@ export const LinearAnimationMenu = ({
   const [animation, setAnimation] = useState(initialAnimation);
   const [edited, setEdited] = useState(false);
   const settings = animation ?? {
-    type: "dots",
+    type: "dot",
+    count: 1,
     speed: 0.5,
     size: DEFAULT_ANIMATION_SIZE,
     direction: "forward",
@@ -100,11 +102,28 @@ export const LinearAnimationMenu = ({
           <option value="none">{t("labels.animation.none")}</option>
           <option value="dot">{t("labels.animation.dot")}</option>
           <option value="gap">{t("labels.animation.gap")}</option>
-          <option value="dots">{t("labels.animation.dots")}</option>
           <option value="dashes">{t("labels.animation.dashes")}</option>
           <option value="pulse">{t("labels.animation.pulse")}</option>
         </select>
       </label>
+      {(settings.type === "dot" || settings.type === "gap") && (
+        <label>
+          {t("labels.animation.count")}
+          <input
+            type="range"
+            aria-label={t("labels.animation.count")}
+            min={1}
+            max={MAX_ANIMATION_COUNT}
+            step={1}
+            disabled={!animation && !mixed}
+            value={settings.count}
+            onChange={(event) =>
+              update({ ...settings, count: Number(event.target.value) })
+            }
+          />
+          <output>{settings.count}</output>
+        </label>
+      )}
       <label>
         {t("labels.animation.speed")}
         <input

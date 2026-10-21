@@ -2,9 +2,10 @@
 
 Right-click an unlocked line or arrow and choose **Animate**. Select a type, then a speed and direction, and click **Apply**. Multiple selected lines and arrows can be configured together. **None** removes the effect. Applying settings creates one undoable edit; leaving the submenu without applying discards the draft.
 
-- **Traveling dot (single)** moves one dot along the entire path, then repeats.
-- **Traveling gap** cuts a moving opening from the actual line or arrow. Objects behind the line show through the opening.
-- **Traveling dots** and **Moving dashes** move from the first point to the last point, or in reverse.
+- **Traveling dot** moves dots along the entire path, then repeats.
+- **Traveling gap** cuts moving openings from the actual line or arrow. Objects behind the line show through the opening.
+- The **Count** slider selects an integer from `1` to `20` for dots or gaps. `1` gives a single dot/gap; larger values create evenly spaced items. Count does not change the travel speed.
+- **Moving dashes** move from the first point to the last point, or in reverse.
 - The **Speed** slider ranges from `0` (paused) to `1` (fastest), in steps of `0.01`. A single dot or gap takes five seconds to travel the path at `0.5`, or 2.5 seconds at `1`.
 - **Size** has a slider and numeric input from `1` to `100` scene units. It sets the dot diameter, dash/pulse thickness, or gap diameter. Very small gaps use at least twice the stroke width as their radius so the opening cuts through the whole stroke.
 - **Pulse** adds intermittent emphasis along the shaft. Direction is disabled because this effect has no traveling motion.
@@ -16,7 +17,8 @@ Line and arrow elements accept an optional `animation` property:
 ```json
 {
   "animation": {
-    "type": "dots",
+    "type": "dot",
+    "count": 4,
     "speed": 0.5,
     "size": 20,
     "direction": "forward"
@@ -24,7 +26,7 @@ Line and arrow elements accept an optional `animation` property:
 }
 ```
 
-Supported types are `dot`, `gap`, `dots`, `dashes`, and `pulse`. Speed is a finite number from `0` to `1`, and size is a finite number from `1` to `100`. Directions are `forward` and `reverse`. Original animations without a `size` property migrate their preset speed (`0.5`, `1`, or `2`) to the normalized scale (`0.25`, `0.5`, or `1`) and receive size `8`. Missing or `null` animation means static. Restoration treats malformed or unsupported settings as static while retaining the element's geometry. Existing files require no migration or format-version bump. The property travels with the element through scene JSON, copying, and undo/redo.
+Supported types are `dot`, `gap`, `dashes`, and `pulse`. `count` is an integer from `1` to `20` (used by dots and gaps). Missing count defaults to `1`; previous plural `dots`/`gaps` values migrate to `dot`/`gap` with count `8`. Speed is a finite number from `0` to `1`, and size is a finite number from `1` to `100`. Directions are `forward` and `reverse`. Original animations without a `size` property migrate their preset speed (`0.5`, `1`, or `2`) to the normalized scale (`0.25`, `0.5`, or `1`) and receive size `8`. Missing or `null` animation means static. Restoration treats malformed or unsupported settings as static while retaining the element's geometry. Existing files require no migration or format-version bump. The property travels with the element through scene JSON, copying, and undo/redo.
 
 ## Rendering
 
