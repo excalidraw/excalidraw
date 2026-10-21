@@ -237,7 +237,14 @@ export class AppClipboard {
     const nonEmptyLines = normalizeEOL(data.text)
       .split(/\n+/)
       .map((s) => s.trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      // some embed codes (e.g. Instagram) put the provider's loader <script>
+      // on a separate line, which isn't an embed by itself
+      .filter(
+        (s) =>
+          !/^<script\b[^>]*>\s*<\/script\b[^>]*>\s*$/i.test(s) ||
+          maybeParseEmbedSrc(s) !== s,
+      );
     const embbeddableUrls = nonEmptyLines
       .map((str) => maybeParseEmbedSrc(str))
       .filter(

@@ -57,6 +57,11 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+// share links can be prefixed with the author's username
+// (instagram.com/<username>/p/<shortcode>)
+const RE_INSTAGRAM =
+  /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(p|reels?|tv)\/([\w-]+)/;
+
 const parseYouTubeLikeTimestamp = (url: string): number => {
   let timeParam: string | null | undefined;
 
@@ -148,6 +153,7 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "instagram.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -163,6 +169,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "stackblitz.com",
   "reddit.com",
   "forms.microsoft.com",
+  "instagram.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -286,6 +293,30 @@ export const getEmbedLink = (
       link,
     )}`;
     aspectRatio = { w: 550, h: 550 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
+  }
+
+  const instagramLink = link.match(RE_INSTAGRAM);
+  if (instagramLink) {
+    const [, postType, shortcode] = instagramLink;
+    // uncaptioned so the height is predictable (only depends on the media)
+    // — we can't auto-resize to fit a long caption
+    link = `https://www.instagram.com/${
+      postType === "reels" ? "reel" : postType
+    }/${shortcode}/embed/`;
+    // fits portrait (4:5) posts and reels
+    aspectRatio = { w: 400, h: 720 };
     embeddedLinkCache.set(originalLink, {
       link,
       intrinsicSize: aspectRatio,
