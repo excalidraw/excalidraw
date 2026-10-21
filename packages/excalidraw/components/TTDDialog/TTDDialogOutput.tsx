@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import { useApp } from "../App";
 import { Button } from "../Button";
 import Spinner from "../Spinner";
 import { t } from "../../i18n";
@@ -37,6 +38,7 @@ export const TTDDialogOutput = ({
   autoFixAvailable,
   onApplyAutoFix,
 }: TTDDialogOutputProps) => {
+  const app = useApp();
   const loadFailed = loadStatus === "error";
   // a chunk failing to load is shown as a load failure (see `loadStatus`),
   // not as a syntax error
@@ -135,7 +137,7 @@ export const TTDDialogOutput = ({
             {loadErrorReloadRequired ? (
               <Button
                 className="ttd-dialog-panel-button"
-                onSelect={() => window.location.reload()}
+                onSelect={() => app.ownerWindow.location.reload()}
               >
                 {t("mermaid.reload")}
               </Button>

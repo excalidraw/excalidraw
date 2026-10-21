@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { addEventListener } from "@excalidraw/common";
+
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
 import { useApp } from "../App";
@@ -153,14 +155,16 @@ const TTDDialogBase = withInternalFallback(
       if (mermaidToExcalidrawLib.status !== "error") {
         return;
       }
-      window.addEventListener("online", retryLoadingMermaidToExcalidrawLib);
-      return () => {
-        window.removeEventListener(
-          "online",
-          retryLoadingMermaidToExcalidrawLib,
-        );
-      };
-    }, [mermaidToExcalidrawLib.status, retryLoadingMermaidToExcalidrawLib]);
+      return addEventListener(
+        app.ownerWindow,
+        "online",
+        retryLoadingMermaidToExcalidrawLib,
+      );
+    }, [
+      app,
+      mermaidToExcalidrawLib.status,
+      retryLoadingMermaidToExcalidrawLib,
+    ]);
 
     return (
       <Dialog

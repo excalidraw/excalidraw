@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 
-import { EDITOR_LS_KEYS, EVENT, debounce, isDevEnv } from "@excalidraw/common";
+import {
+  EDITOR_LS_KEYS,
+  EVENT,
+  addEventListener,
+  debounce,
+  isDevEnv,
+} from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -132,12 +138,16 @@ const MermaidToExcalidraw = ({
 
   useEffect(() => {
     const flush = () => debouncedSaveMermaidDefinition.flush();
-    window.addEventListener(EVENT.BEFORE_UNLOAD, flush);
+    const unsubscribe = addEventListener(
+      app.ownerWindow,
+      EVENT.BEFORE_UNLOAD,
+      flush,
+    );
     return () => {
-      window.removeEventListener(EVENT.BEFORE_UNLOAD, flush);
+      unsubscribe();
       flush();
     };
-  }, []);
+  }, [app]);
 
   useEffect(() => {
     const errorMessage = error?.message ?? "";
