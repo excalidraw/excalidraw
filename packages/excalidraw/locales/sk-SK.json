@@ -682,7 +682,10 @@
     "preview": "Ukážka",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Automatická oprava je dostupná"
+    "autoFixAvailable": "Automatická oprava je dostupná",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Chyba!"
