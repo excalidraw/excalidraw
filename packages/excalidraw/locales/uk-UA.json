@@ -682,7 +682,10 @@
     "preview": "Попередній перегляд",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Доступне автовиправлення"
+    "autoFixAvailable": "Доступне автовиправлення",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Помилка!"
