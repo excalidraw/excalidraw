@@ -1,6 +1,7 @@
 import { flushSync } from "react-dom";
 
 import {
+  DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   TEXT_MAX_WRAP_WIDTH,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -8,6 +9,7 @@ import {
   VERTICAL_ALIGN,
   getFontString,
   getLineHeight,
+  isRTL,
   sceneCoordsToViewportCoords,
   type Bounds,
   type StylesPanelMode,
@@ -207,6 +209,16 @@ export class AppText {
         getElementBounds(latestTextElement, elementsMap),
       );
       const maxWidth = this.getMaxTextWidth(textViewportOffsets);
+      // a new free text that starts with an RTL character is right-aligned
+      // (unless the user picked another alignment), so it grows leftwards
+      // from its right edge and the caret stays in place
+      const nextTextAlign: ExcalidrawTextElement["textAlign"] =
+        !isExistingElement &&
+        !container &&
+        latestTextElement.textAlign === DEFAULT_TEXT_ALIGN &&
+        isRTL(nextOriginalText)
+          ? "right"
+          : latestTextElement.textAlign;
 
       this.app.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
@@ -221,11 +233,12 @@ export class AppText {
           if (_element.id === latestTextElement.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
+              textAlign: nextTextAlign,
               isDeleted: isDeleted ?? _element.isDeleted,
               ...(stickyLayout?.text ??
                 // returns (wrapped) text and new dimensions
                 refreshTextDimensions(
-                  _element,
+                  { ..._element, textAlign: nextTextAlign },
                   getContainerElement(_element, elementsMap),
                   elementsMap,
                   nextOriginalText,
