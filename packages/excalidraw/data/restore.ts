@@ -101,6 +101,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 import type {
   AnyArrowhead,
   Arrowhead,
+  BindMode,
   BoundElement,
   ElementsMap,
   ElementsMapOrArray,
@@ -217,6 +218,7 @@ const FILL_STYLES: readonly FillStyle[] = [
 const STROKE_STYLES: readonly StrokeStyle[] = ["solid", "dashed", "dotted"];
 const TEXT_ALIGNS = Object.values(TEXT_ALIGN) as TextAlign[];
 const VERTICAL_ALIGNS = Object.values(VERTICAL_ALIGN) as VerticalAlign[];
+const BIND_MODES: readonly BindMode[] = ["inside", "orbit", "skip"];
 const IMAGE_STATUSES: readonly ExcalidrawImageElement["status"][] = [
   "pending",
   "saved",
@@ -583,6 +585,31 @@ const restoreBoundElements = (
     }
     return acc;
   }, []);
+};
+
+/**
+ * Accepts a bare bound element id, which is then migrated like a legacy
+ * binding (see `repairBinding`).
+ */
+const restorePointBinding = (binding: unknown): FixedPointBinding | null => {
+  if (!isRecordLike(binding)) {
+    const elementId = restoreId(binding);
+    return elementId ? ({ elementId } as FixedPointBinding) : null;
+  }
+
+  const elementId = restoreId(binding.elementId);
+  if (!elementId) {
+    return null;
+  }
+
+  return {
+    ...binding,
+    elementId,
+    // legacy bindings don't have a mode, so only repair a malformed one
+    ...(binding.mode != null && {
+      mode: restoreEnum(binding.mode, BIND_MODES, "inside"),
+    }),
+  } as FixedPointBinding;
 };
 
 // a record so that new arrowheads can't be missed
@@ -982,26 +1009,30 @@ export const restoreElement = (
         element.width,
         element.height,
       );
+      const startBinding = restorePointBinding(element.startBinding);
+      const endBinding = restorePointBinding(element.endBinding);
       const elementWithRestoredPoints = {
         ...element,
         points,
         x,
         y,
         elbowed,
+        startBinding,
+        endBinding,
       } as ExcalidrawArrowElement;
 
       const base = {
         type: element.type,
         startBinding: repairBinding(
           elementWithRestoredPoints,
-          element.startBinding,
+          startBinding,
           targetElementsMap,
           existingElementsMap,
           "start",
         ),
         endBinding: repairBinding(
           elementWithRestoredPoints,
-          element.endBinding,
+          endBinding,
           targetElementsMap,
           existingElementsMap,
           "end",

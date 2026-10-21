@@ -1225,6 +1225,31 @@ describe("restoreElements", () => {
       consoleError.mockRestore();
     }
   });
+
+  it("should restore id-less elements without resolving references to them", () => {
+    const idless1 = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
+    const idless2 = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow",
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+    });
+    // legacy (v1) binding referencing an id that doesn't exist
+    (arrow as any).startBinding = { elementId: undefined, focus: 0, gap: 0 };
+
+    const restoredElements = restore.restoreElements(
+      [idless1, idless2, arrow] as any[],
+      null,
+    );
+
+    expect(restoredElements.length).toBe(3);
+    expect(typeof restoredElements[0].id).toBe("string");
+    expect(typeof restoredElements[1].id).toBe("string");
+    expect(restoredElements[0].id).not.toBe(restoredElements[1].id);
+    expect(
+      (restoredElements[2] as ExcalidrawArrowElement).startBinding,
+    ).toBeNull();
+  });
 });
 
 describe("repairing malformed elements", () => {
@@ -1548,6 +1573,29 @@ describe("repairing malformed elements", () => {
       [0, 0],
       [30, 40],
     ]);
+  });
+
+  it("should restore an arrow binding given as a bare element id", () => {
+    const [, arrow] = restoreImported([
+      { type: "rectangle", id: "rect", x: 0, y: 0, width: 100, height: 100 },
+      {
+        type: "arrow",
+        id: "arrow",
+        x: 50,
+        y: 50,
+        points: [
+          [0, 0],
+          [200, 0],
+        ],
+        startBinding: "rect",
+        endBinding: 5,
+      },
+    ]) as [ExcalidrawElement, ExcalidrawArrowElement];
+
+    expect(arrow.startBinding).toEqual(
+      expect.objectContaining({ elementId: "rect" }),
+    );
+    expect(arrow.endBinding).toBe(null);
   });
 
   it("should keep pressures that don't quite match the points", () => {
