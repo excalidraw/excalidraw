@@ -76,6 +76,7 @@ import {
   isArrowBoundToElement,
   isArrowElement,
   isElbowArrow,
+  isFrameLikeElement,
   isLinearElement,
   isLineElement,
   isTextBindableContainer,
@@ -1305,7 +1306,8 @@ const restoreTextDimensions = (
 };
 
 /**
- * Remove an element's frameId if its containing frame is non-existent
+ * Remove an element's frameId if its containing frame is non-existent, or
+ * not a frame
  *
  * NOTE mutates elements.
  */
@@ -1316,7 +1318,7 @@ const repairFrameMembership = (
   if (element.frameId) {
     const containingFrame = elementsMap.get(element.frameId);
 
-    if (!containingFrame) {
+    if (!containingFrame || !isFrameLikeElement(containingFrame)) {
       element.frameId = null;
     }
   }

@@ -1506,6 +1506,21 @@ describe("repairing malformed elements", () => {
     expect(text.containerId).toBe(null);
   });
 
+  it("should remove frame membership pointing to an element that isn't a frame", () => {
+    const [, rect] = restoreImported([
+      { type: "ellipse", id: "ellipse", width: 10, height: 10 },
+      {
+        type: "rectangle",
+        id: "rect",
+        width: 10,
+        height: 10,
+        frameId: "ellipse",
+      },
+    ]);
+
+    expect(rect.frameId).toBe(null);
+  });
+
   it("should restore { x, y } and numeric string points", () => {
     const [line] = restoreImported([
       {
