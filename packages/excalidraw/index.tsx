@@ -67,6 +67,8 @@ export const ExcalidrawAPIProvider = ({
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onExport,
+    onOpenFromCloud,
+    onSaveToActiveFile,
     className,
     ownerDocument = document,
     renderEnvironment,
@@ -210,6 +212,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       <InitializeApp langCode={langCode} theme={theme}>
         <App
           onExport={onExport}
+          onOpenFromCloud={onOpenFromCloud}
+          onSaveToActiveFile={onSaveToActiveFile}
           className={className}
           ownerDocument={ownerDocument}
           renderEnvironment={renderEnvironment}
