@@ -683,9 +683,9 @@
     "label": "Mermaid",
     "inputPlaceholder": "Scrie definiția diagramei Mermaid aici...",
     "autoFixAvailable": "Este disponibilă funcția de fixare automată",
-    "loadError": "",
-    "loadErrorReload": "",
-    "reload": ""
+    "loadError": "Nu s-a putut încărca Mermaid. Verifică-ți conexiunea la internet și reîncearcă.",
+    "loadErrorReload": "Nu s-a putut încărca Mermaid. Verifică-ți conexiunea la internet și reîncearcă.",
+    "reload": "Reîncărcare"
   },
   "ttd": {
     "error": "Eroare!"
