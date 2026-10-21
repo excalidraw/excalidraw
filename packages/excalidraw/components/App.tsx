@@ -9317,23 +9317,62 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          const points = [...newElement.points];
+          const pressures = [...newElement.pressures];
+          const isStylus = event.pointerType === "pen";
+          // pen samples closer than this (squared scene px) to the previous point
+          // are skipped. 0 keeps the original behavior (only exact duplicates skipped).
+          const minDistSq = isStylus ? 0.25 : 0;
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+          const addFreedrawPoint = (
+            coords: { x: number; y: number },
+            pressure: number,
+          ): boolean => {
+            const dx = coords.x - newElement.x;
+            const dy = coords.y - newElement.y;
+            const lastPoint = points[points.length - 1];
+            if (lastPoint) {
+              const ddx = dx - lastPoint[0];
+              const ddy = dy - lastPoint[1];
+              if (ddx * ddx + ddy * ddy <= minDistSq) {
+                return false;
+              }
+            }
+            points.push(pointFrom<LocalPoint>(dx, dy));
+            if (!newElement.simulatePressure) {
+              pressures.push(pressure);
+            }
+            return true;
+          };
 
-          if (!discardPoint) {
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : [...newElement.pressures, event.pressure];
+          const coalescedEvents =
+            isStylus && typeof event.getCoalescedEvents === "function"
+              ? event.getCoalescedEvents()
+              : [];
 
+          let pointsChanged = false;
+
+          for (const coalescedEvent of coalescedEvents) {
+            const coords = viewportCoordsToSceneCoords(
+              coalescedEvent,
+              this.state,
+            );
+            if (addFreedrawPoint(coords, coalescedEvent.pressure)) {
+              pointsChanged = true;
+            }
+          }
+
+          // the current event always goes last (usually a duplicate of the last
+          // coalesced sample, which addFreedrawPoint skips)
+          if (addFreedrawPoint(pointerCoords, event.pressure)) {
+            pointsChanged = true;
+          }
+
+          if (pointsChanged) {
             this.scene.mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points,
                 pressures,
               },
               {
