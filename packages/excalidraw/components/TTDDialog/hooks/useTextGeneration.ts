@@ -16,6 +16,7 @@ import {
   removeLastAssistantMessage,
   updateAssistantContent,
 } from "../utils/chat";
+import { isModuleLoadError } from "../utils/mermaidError";
 
 import type {
   LLMMessage,
@@ -63,6 +64,11 @@ export const useTextGeneration = ({
       await parseMermaidToExcalidraw(mermaidDefinition);
       trackEvent("ai", "mermaid parse success", "ttd");
     } catch (error: any) {
+      if (isModuleLoadError(error)) {
+        // not a syntax error, but a diagram chunk failing to load
+        setPendingValidation(mermaidDefinition);
+        return;
+      }
       trackEvent("ai", "mermaid parse failed", "ttd");
       const _error = new Error(
         error.message || t("chat.errors.mermaidParseError"),

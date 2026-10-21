@@ -12,6 +12,7 @@ import TTDDialogTabs from "./TTDDialogTabs";
 import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
 import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
 import { TTDDialogTab } from "./TTDDialogTab";
+import { isModuleLoadError } from "./utils/mermaidError";
 
 import "./TTDDialog.scss";
 
@@ -44,8 +45,25 @@ export const TTDDialog = (
 
 TTDDialog.WelcomeMessage = TTDWelcomeMessage;
 
-const loadMermaidToExcalidrawLib = (): MermaidToExcalidrawLibProps["api"] => {
-  const api = import("@excalidraw/mermaid-to-excalidraw");
+const loadMermaidToExcalidrawLib = (
+  onChunkLoadError: (api: MermaidToExcalidrawLibProps["api"]) => void,
+): MermaidToExcalidrawLibProps["api"] => {
+  const api: MermaidToExcalidrawLibProps["api"] = import(
+    "@excalidraw/mermaid-to-excalidraw"
+  ).then((lib) => ({
+    // mermaid lazy-loads a chunk per diagram type, which can fail to load
+    // (e.g. offline) even though the lib itself loaded fine
+    parseMermaidToExcalidraw: async (definition, config) => {
+      try {
+        return await lib.parseMermaidToExcalidraw(definition, config);
+      } catch (error) {
+        if (isModuleLoadError(error)) {
+          onChunkLoadError(api);
+        }
+        throw error;
+      }
+    },
+  }));
   // called from state initializers/updaters, which React may invoke more than
   // once and discard the result -> don't let a discarded promise's rejection
   // go unhandled (consumers awaiting `api` still get the rejection)
@@ -79,16 +97,37 @@ const TTDDialogBase = withInternalFallback(
     const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
       useState<MermaidToExcalidrawLibProps>(() => ({
         status: "loading",
-        api: loadMermaidToExcalidrawLib(),
+        api: loadMermaidToExcalidrawLib((api) => setLoadError(api)),
       }));
+
+    // `api` (or one of the chunks it lazy-loads) failed to load
+    const setLoadError = useCallback(
+      (api: MermaidToExcalidrawLibProps["api"]) => {
+        const reloadRequired = navigator.onLine;
+        setMermaidToExcalidrawLib((prev) =>
+          prev.api === api
+            ? {
+                ...prev,
+                status: "error",
+                reloadRequired: prev.reloadRequired || reloadRequired,
+              }
+            : prev,
+        );
+      },
+      [],
+    );
 
     const retryLoadingMermaidToExcalidrawLib = useCallback(() => {
       setMermaidToExcalidrawLib((prev) =>
         prev.status === "error"
-          ? { ...prev, status: "loading", api: loadMermaidToExcalidrawLib() }
+          ? {
+              ...prev,
+              status: "loading",
+              api: loadMermaidToExcalidrawLib(setLoadError),
+            }
           : prev,
       );
-    }, []);
+    }, [setLoadError]);
 
     const { api: mermaidToExcalidrawLibApi } = mermaidToExcalidrawLib;
     useEffect(() => {
@@ -103,19 +142,10 @@ const TTDDialogBase = withInternalFallback(
         },
         (error: any) => {
           console.error("Failed to load mermaid-to-excalidraw", error);
-          const reloadRequired = navigator.onLine;
-          setMermaidToExcalidrawLib((prev) =>
-            prev.api === api
-              ? {
-                  ...prev,
-                  status: "error",
-                  reloadRequired: prev.reloadRequired || reloadRequired,
-                }
-              : prev,
-          );
+          setLoadError(api);
         },
       );
-    }, [mermaidToExcalidrawLibApi]);
+    }, [mermaidToExcalidrawLibApi, setLoadError]);
 
     // the lib chunk isn't precached, so a failed load is most likely due to
     // being offline -> retry automatically once we're back online

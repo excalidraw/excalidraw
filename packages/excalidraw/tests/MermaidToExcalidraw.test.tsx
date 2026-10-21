@@ -76,6 +76,12 @@ mockMermaidToExcalidraw({
             },
           ],
         });
+      } else if (firstLine === "sequenceDiagram") {
+        reject(
+          new TypeError(
+            "Failed to fetch dynamically imported module: http://localhost/assets/sequenceDiagram.js",
+          ),
+        );
       } else {
         reject(new Error("ERROR"));
       }
@@ -141,5 +147,22 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(
       dialog.querySelector('[data-testid="mermaid-error"]'),
     ).toMatchInlineSnapshot("null");
+  });
+
+  it("should show a load error when a diagram chunk fails to load", async () => {
+    const dialog = document.querySelector(".ttd-dialog")!;
+    const selector = ".ttd-dialog-input";
+    const editor = await getTextEditor({ selector, waitForEditor: true });
+
+    updateTextEditor(editor, "sequenceDiagram");
+
+    await waitFor(() =>
+      expect(
+        dialog.querySelector('[data-testid="ttd-dialog-output-load-error"]'),
+      ).not.toBeNull(),
+    );
+    expect(
+      dialog.querySelector('[data-testid="ttd-dialog-output-error"]'),
+    ).toBeNull();
   });
 });

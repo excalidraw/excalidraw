@@ -9,6 +9,7 @@ import {
   formatMermaidParseErrorMessage,
   getMermaidSyntaxErrorGuidance,
   isMermaidCaretLine,
+  isModuleLoadError,
 } from "./utils/mermaidError";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
@@ -37,15 +38,18 @@ export const TTDDialogOutput = ({
   onApplyAutoFix,
 }: TTDDialogOutputProps) => {
   const loadFailed = loadStatus === "error";
+  // a chunk failing to load is shown as a load failure (see `loadStatus`),
+  // not as a syntax error
+  const parseError = isModuleLoadError(error) ? null : error;
 
-  const errorMessage = error
+  const errorMessage = parseError
     ? hideErrorDetails
       ? t("chat.errors.mermaidParseError")
-      : formatMermaidParseErrorMessage(error.message)
+      : formatMermaidParseErrorMessage(parseError.message)
     : null;
   const syntaxGuidance =
-    error && !hideErrorDetails
-      ? getMermaidSyntaxErrorGuidance(error.message, sourceText)
+    parseError && !hideErrorDetails
+      ? getMermaidSyntaxErrorGuidance(parseError.message, sourceText)
       : null;
   const showAutoFixButton =
     !!autoFixAvailable && !!onApplyAutoFix && !hideErrorDetails;
@@ -55,10 +59,10 @@ export const TTDDialogOutput = ({
   return (
     <div
       className={`ttd-dialog-output-wrapper ${
-        error || loadFailed ? "ttd-dialog-output-wrapper--error" : ""
+        parseError || loadFailed ? "ttd-dialog-output-wrapper--error" : ""
       }`}
     >
-      {error && !loadFailed && (
+      {parseError && !loadFailed && (
         <div
           key="error"
           data-testid="ttd-dialog-output-error"
@@ -151,7 +155,7 @@ export const TTDDialogOutput = ({
         <div
           key="canvas"
           className={clsx("ttd-dialog-output-canvas-container", {
-            invisible: !!error,
+            invisible: !!parseError,
           })}
         >
           <div ref={canvasRef} className="ttd-dialog-output-canvas-content" />
