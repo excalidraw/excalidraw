@@ -1089,6 +1089,37 @@ describe("restoreElements", () => {
     );
     expect(restoredElements[0].version).toBe(modified_rectangle_2.version + 1);
   });
+
+  it("should keep text element if refreshing its dimensions fails", () => {
+    const rect = API.createElement({ type: "rectangle", id: "rect" });
+    const text = API.createElement({ type: "text", id: "text" });
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const spy = vi
+      .spyOn(sizeHelpers, "refreshTextDimensions")
+      .mockImplementationOnce(() => {
+        throw new Error("FORBIDDEN!");
+      });
+
+    try {
+      expect(
+        restore
+          .restoreElements([rect, text], null, {
+            repairBindings: true,
+            refreshDimensions: true,
+          })
+          .map((element) => element.id),
+      ).toEqual(["rect", "text"]);
+      expect(consoleError).toHaveBeenCalledWith(
+        "Error refreshing text dimensions:",
+        expect.any(Error),
+      );
+    } finally {
+      spy.mockRestore();
+      consoleError.mockRestore();
+    }
+  });
 });
 
 describe("repairing malformed elements", () => {
@@ -1097,6 +1128,16 @@ describe("repairing malformed elements", () => {
       repairBindings: true,
       deleteInvisibleElements: true,
     });
+
+  it("should measure text elements without a size", () => {
+    const [text] = restoreImported([
+      { type: "text", id: "text", text: "hi", x: 0, y: 0 },
+    ]);
+
+    expect(text.isDeleted).toBe(false);
+    expect(text.width).toBeGreaterThan(0);
+    expect(text.height).toBeGreaterThan(0);
+  });
 
   it("should coerce malformed values instead of dropping them", () => {
     const [rect] = restoreImported([
@@ -1262,6 +1303,29 @@ describe("repairing malformed elements", () => {
     expect(text.fontSize).toBe(DEFAULT_FONT_SIZE);
   });
 
+  it("should keep text when measuring it fails", () => {
+    const measureText = vi
+      .spyOn(sizeHelpers, "measureText")
+      .mockImplementation(() => {
+        throw new Error("no canvas");
+      });
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    try {
+      const [text] = restore.restoreElements(
+        [{ type: "text", id: "text", text: "hi" }] as any[],
+        null,
+      ) as ExcalidrawTextElement[];
+
+      expect(text).toEqual(expect.objectContaining({ id: "text", text: "hi" }));
+    } finally {
+      measureText.mockRestore();
+      consoleError.mockRestore();
+    }
+  });
+
   it("should restore a numeric string font family", () => {
     const [text] = restoreImported([
       { type: "text", id: "text", text: "hi", fontFamily: "3" },
@@ -1346,6 +1410,121 @@ describe("repairing malformed elements", () => {
     expect(arrow.endArrowhead).toBe(null);
     expect(line.startArrowhead).toBe(null);
     expect(line.endArrowhead).toBe("bar");
+  });
+
+  it("should wrap labels without a size to their container", () => {
+    const [container, label] = restore.restoreElements(
+      [
+        {
+          type: "rectangle",
+          id: "rect",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          boundElements: [{ type: "text", id: "label" }],
+        },
+        {
+          type: "text",
+          id: "label",
+          containerId: "rect",
+          text: "lorem ipsum dolor sit amet consectetur adipiscing elit",
+        },
+      ] as any[],
+      null,
+      { deleteInvisibleElements: true },
+    ) as [ExcalidrawElement, ExcalidrawTextElement];
+
+    expect(label.isDeleted).toBe(false);
+    expect(label.text).toContain("\n");
+    expect(label.width).toBeGreaterThan(0);
+    expect(label.width).toBeLessThanOrEqual(
+      sizeHelpers.getBoundTextMaxWidth(container, label),
+    );
+    expect(label.height).toBeGreaterThan(0);
+  });
+
+  it("should fit sticky note labels without a size to their note", () => {
+    const restoredElements = restoreImported([
+      {
+        type: "stickynote",
+        id: "sticky",
+        x: 0,
+        y: 0,
+        width: 250,
+        height: 250,
+        boundElements: [{ type: "text", id: "label" }],
+      },
+      { type: "text", id: "label", text: "hello", containerId: "sticky" },
+    ]);
+    const note = restoredElements.find(
+      (element) => element.id === "sticky",
+    ) as ExcalidrawStickyNoteElement;
+    const label = restoredElements.find(
+      (element) => element.id === "label",
+    ) as ExcalidrawTextElement;
+
+    expect(label.isDeleted).toBe(false);
+    expect(label.width).toBeGreaterThan(0);
+    expect(label.height).toBeGreaterThan(0);
+    expect(label).toEqual(
+      expect.objectContaining(getStickyNoteLayout(note, label).text),
+    );
+  });
+
+  it("should measure text without a size whose container doesn't exist", () => {
+    const [text] = restoreImported([
+      {
+        type: "text",
+        id: "text",
+        text: "abc",
+        x: 10,
+        y: 20,
+        containerId: "missing",
+      },
+    ]) as ExcalidrawTextElement[];
+
+    expect(text).toEqual(
+      expect.objectContaining({
+        isDeleted: false,
+        containerId: null,
+        x: 10,
+        y: 20,
+      }),
+    );
+    expect(text.width).toBeGreaterThan(0);
+    expect(text.height).toBeGreaterThan(0);
+  });
+
+  it("should wrap labels without a size bound only from their container", () => {
+    const [container, label] = restoreImported([
+      {
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ type: "text", id: "label" }],
+      },
+      {
+        type: "text",
+        id: "label",
+        x: 500,
+        y: 500,
+        text: "lorem ipsum dolor sit amet consectetur adipiscing elit",
+      },
+    ]) as [ExcalidrawElement, ExcalidrawTextElement];
+
+    expect(label.containerId).toBe("rect");
+    expect(label.text).toContain("\n");
+    expect(label.width).toBeLessThanOrEqual(
+      sizeHelpers.getBoundTextMaxWidth(container, label),
+    );
+    expect(label.x).toBeGreaterThanOrEqual(container.x);
+    expect(label.x + label.width).toBeLessThanOrEqual(
+      container.x + container.width,
+    );
   });
 
   it("should not truncate strings that aren't numbers to their leading number", () => {

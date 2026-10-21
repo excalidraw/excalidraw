@@ -65,7 +65,11 @@ import {
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
-import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+import {
+  computeBoundTextPosition,
+  getBoundTextElement,
+  getContainerElement,
+} from "@excalidraw/element";
 import { isStickyNoteElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
@@ -74,6 +78,7 @@ import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
+  isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
@@ -105,6 +110,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
   FileId,
   FillStyle,
   FixedPointBinding,
@@ -1143,6 +1149,86 @@ const repairBoundTextElementOrder = (
     : normalizedElements;
 };
 
+/** e.g. text created programmatically, whose size follows from its content */
+const isUnsizedText = (element: ExcalidrawElement | null) =>
+  isTextElement(element) && !!element.text && !element.width && !element.height;
+
+/**
+ * Sizes text elements restored without a size from their content, and all
+ * of them with `refreshDimensions`. Labels are wrapped to and positioned in
+ * their container, and sticky notes are refitted together with their label.
+ *
+ * Runs once bindings are repaired, as the layout follows from them.
+ *
+ * NOTE mutates elements.
+ */
+const restoreTextDimensions = (
+  elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
+  opts: { refreshDimensions: boolean },
+) => {
+  for (const element of elements) {
+    if (element.isDeleted) {
+      continue;
+    }
+    try {
+      if (isStickyNoteElement(element)) {
+        const textElement = getBoundTextElement(element, elementsMap);
+        if (opts.refreshDimensions || isUnsizedText(textElement)) {
+          const layout = getStickyNoteLayout(element, textElement);
+          Object.assign(element, layout.container);
+          if (textElement && layout.text) {
+            Object.assign(textElement, layout.text);
+          }
+        }
+      } else if (
+        isTextElement(element) &&
+        // refitted together with their note above
+        !isStickyNoteBoundText(element, elementsMap)
+      ) {
+        const containerCandidate = getContainerElement(element, elementsMap);
+        // bindings may not have been repaired
+        const container = isTextBindableContainer(containerCandidate)
+          ? containerCandidate
+          : null;
+        if (isUnsizedText(element)) {
+          // without a width there's nothing to wrap free text to, so it grows
+          // with its content instead
+          Object.assign(element, { autoResize: true });
+          Object.assign(
+            element,
+            refreshTextDimensions(
+              element,
+              container,
+              elementsMap,
+              element.originalText,
+            ),
+          );
+          if (container) {
+            Object.assign(
+              element,
+              computeBoundTextPosition(
+                container,
+                element as ExcalidrawTextElementWithContainer,
+                elementsMap,
+              ),
+            );
+          }
+        } else if (opts.refreshDimensions) {
+          Object.assign(
+            element,
+            refreshTextDimensions(element, container, elementsMap),
+          );
+        }
+      }
+    } catch (error) {
+      // e.g. no canvas to measure with. The restored dimensions are still
+      // usable, so keep the element
+      console.error("Error refreshing text dimensions:", error);
+    }
+  }
+};
+
 /**
  * Remove an element's frameId if its containing frame is non-existent
  *
@@ -1168,12 +1254,12 @@ const repairFrameMembership = (
  *   seeded from `fontSize` when missing, cleared everywhere else
  * - a sticky label's stroke is never transparent (it is the visible text)
  * - a note's stroke — its ink, which the footer paints with — equals its label's
- * - with `refreshDimensions`, the note and its label are refitted together
+ *
+ * The note and its label are refitted in `restoreTextDimensions`.
  */
 const restoreStickyNotes = (
   elements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
-  opts: { refreshDimensions: boolean },
 ) => {
   for (const element of elements) {
     if (!isTextElement(element) || element.isDeleted) {
@@ -1200,20 +1286,6 @@ const restoreStickyNotes = (
       }
     } else if (element.baseFontSize != null) {
       Object.assign(element, { baseFontSize: null });
-    }
-  }
-
-  if (opts.refreshDimensions) {
-    for (const element of elements) {
-      if (!isStickyNoteElement(element) || element.isDeleted) {
-        continue;
-      }
-      const textElement = getBoundTextElement(element, elementsMap);
-      const layout = getStickyNoteLayout(element, textElement);
-      Object.assign(element, layout.container);
-      if (textElement && layout.text) {
-        Object.assign(textElement, layout.text);
-      }
     }
   }
 };
@@ -1294,7 +1366,12 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }, [] as ExcalidrawElement[]),
   );
 
+  const restoredElementsMap = arrayToMap(restoredElements);
+
   if (!opts?.repairBindings) {
+    restoreTextDimensions(restoredElements, restoredElementsMap, {
+      refreshDimensions: false,
+    });
     return restoredElements as CombineBrandsIfNeeded<
       T,
       OrderedExcalidrawElement
@@ -1302,7 +1379,6 @@ export const restoreElements = <T extends ExcalidrawElement>(
   }
 
   // repair binding. Mutates elements.
-  const restoredElementsMap = arrayToMap(restoredElements);
   for (const element of restoredElements) {
     if (element.frameId) {
       repairFrameMembership(element, restoredElementsMap);
@@ -1312,22 +1388,6 @@ export const restoreElements = <T extends ExcalidrawElement>(
       repairBoundElement(element, restoredElementsMap);
     } else if (element.boundElements) {
       repairContainerElement(element, restoredElementsMap);
-    }
-
-    if (
-      opts.refreshDimensions &&
-      isTextElement(element) &&
-      // sticky labels are refitted together with their note below
-      !isStickyNoteBoundText(element, restoredElementsMap)
-    ) {
-      Object.assign(
-        element,
-        refreshTextDimensions(
-          element,
-          getContainerElement(element, restoredElementsMap),
-          restoredElementsMap,
-        ),
-      );
     }
 
     if (isLinearElement(element)) {
@@ -1348,7 +1408,8 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
-  restoreStickyNotes(restoredElements, restoredElementsMap, {
+  restoreStickyNotes(restoredElements, restoredElementsMap);
+  restoreTextDimensions(restoredElements, restoredElementsMap, {
     refreshDimensions: !!opts.refreshDimensions,
   });
 
