@@ -2,6 +2,13 @@ const MERMAID_SYNTAX_ERROR_LINE = /(?:Parse|Lexical) error on line (\d+)[.:]/i;
 const MERMAID_INACTIVE_PARTICIPANT_ERROR =
   /Trying to inactivate an inactive participant \((.+)\)/i;
 const MERMAID_CARET_LINE = /^\s*-+\^\s*$/;
+// Chrome, Firefox and Safari messages respectively
+const MODULE_LOAD_ERROR =
+  /Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed/i;
+
+/** a lazy-loaded chunk (e.g. one of mermaid's diagram chunks) failed to load */
+export const isModuleLoadError = (error: unknown) =>
+  error instanceof Error && MODULE_LOAD_ERROR.test(error.message);
 
 export const isMermaidParseSyntaxError = (message: string) =>
   MERMAID_SYNTAX_ERROR_LINE.test(message);
