@@ -3,6 +3,7 @@ import { vi } from "vitest";
 
 import {
   COLOR_PALETTE,
+  DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_SIZE,
   DEFAULT_SIDEBAR,
   FONT_FAMILY,
@@ -1086,6 +1087,100 @@ describe("restoreElements", () => {
       modified_rectangle_1.versionNonce,
     );
     expect(restoredElements[0].version).toBe(modified_rectangle_2.version + 1);
+  });
+});
+
+describe("repairing malformed elements", () => {
+  const restoreImported = (elements: unknown[]) =>
+    restore.restoreElements(elements as any[], null, {
+      repairBindings: true,
+      deleteInvisibleElements: true,
+    });
+
+  it("should coerce malformed values instead of dropping them", () => {
+    const [rect] = restoreImported([
+      {
+        type: "rectangle",
+        id: "rect",
+        x: "10",
+        y: null,
+        width: "30px",
+        height: 40,
+        opacity: 300,
+        angle: "abc",
+        strokeWidth: -1,
+        strokeStyle: "wavy",
+        fillStyle: 5,
+        strokeColor: 5,
+        groupIds: [1, null, "group"],
+        frameId: {},
+        roundness: 3,
+        isDeleted: "no",
+        locked: 1,
+        link: 5,
+        version: -2,
+        // valid, so that syncing indices doesn't bump the version
+        index: "a0",
+      },
+    ]);
+
+    expect(rect).toEqual(
+      expect.objectContaining({
+        x: 10,
+        y: 0,
+        width: 30,
+        height: 40,
+        opacity: 100,
+        angle: 0,
+        strokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
+        strokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
+        fillStyle: DEFAULT_ELEMENT_PROPS.fillStyle,
+        strokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
+        groupIds: ["1", "group"],
+        frameId: null,
+        roundness: { type: 3 },
+        isDeleted: false,
+        locked: false,
+        link: null,
+        version: 1,
+      }),
+    );
+  });
+
+  it("should never restore a version below 1", () => {
+    const [rect] = restore.restoreElements(
+      [
+        {
+          type: "rectangle",
+          id: "rect",
+          index: "a0",
+          width: 10,
+          height: 10,
+          version: 0.3,
+        },
+      ] as any[],
+      null,
+    );
+
+    expect(rect.version).toBe(1);
+  });
+
+  it("should not truncate strings that aren't numbers to their leading number", () => {
+    const [rect] = restoreImported([
+      {
+        type: "rectangle",
+        id: "rect",
+        x: "12 3",
+        width: 10,
+        height: 10,
+        created: "2024-05-01T10:00:00Z",
+        updated: "2024-05-01T10:00:00Z",
+      },
+    ]);
+
+    expect(rect.x).toBe(0);
+    expect(rect.updated).not.toBe(2024);
+    expect((rect as any).created).not.toBe(2024);
   });
 });
 
