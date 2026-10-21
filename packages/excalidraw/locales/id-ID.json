@@ -682,7 +682,10 @@
     "preview": "Pratinjau",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Perbaikan otomatis tersedia"
+    "autoFixAvailable": "Perbaikan otomatis tersedia",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Terjadi kesalahan!"
