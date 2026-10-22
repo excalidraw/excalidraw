@@ -100,7 +100,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 35,
+  "height": 32.88999673980294,
   "id": Any<String>,
   "index": "a2",
   "isDeleted": false,
@@ -113,8 +113,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
       0,
     ],
     [
-      394,
-      34,
+      371.5055393829614,
+      32.88999673980294,
     ],
   ],
   "roughness": 1,
@@ -134,11 +134,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
-  "width": 395,
-  "x": 247.5,
-  "y": 420.5,
+  "width": 371.5055393829614,
+  "x": 253,
+  "y": 420.56118987341773,
 }
 `;
 
@@ -162,7 +162,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": 0.009591838889264181,
   "id": Any<String>,
   "index": "a3",
   "isDeleted": false,
@@ -175,8 +175,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
       0,
     ],
     [
-      399,
-      0,
+      383.0807596341628,
+      -0.009591838889264181,
     ],
   ],
   "roughness": 1,
@@ -196,11 +196,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
-  "width": 400,
-  "x": 227.5,
-  "y": 450,
+  "width": 383.0807596341628,
+  "x": 241.7419168232014,
+  "y": 450.00964627197783,
 }
 `;
 
@@ -378,7 +378,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
       0,
     ],
     [
-      99,
+      94,
       0,
     ],
   ],
@@ -399,11 +399,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 255.5,
-  "y": 239,
+  "width": 94,
+  "x": 261,
+  "y": 239.0025,
 }
 `;
 
@@ -489,7 +489,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
       0,
     ],
     [
-      99,
+      88.00000089285714,
       0,
     ],
   ],
@@ -510,11 +510,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 255.5,
-  "y": 239,
+  "width": 88.00000089285714,
+  "x": 261,
+  "y": 239.01,
 }
 `;
 
@@ -676,7 +676,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
       0,
     ],
     [
-      99,
+      88,
       0,
     ],
   ],
@@ -697,11 +697,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
-  "width": 100,
-  "x": 255.5,
-  "y": 239,
+  "width": 88,
+  "x": 261,
+  "y": 239.0025,
 }
 `;
 
@@ -1572,7 +1572,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
       0,
     ],
     [
-      271.985,
+      266.28515625,
       0,
     ],
   ],
@@ -1595,11 +1595,11 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
-  "width": 272.985,
-  "x": 111.762,
-  "y": 57,
+  "width": 266.28515625,
+  "x": 117.26171875,
+  "y": 57.004400000000004,
 }
 `;
 

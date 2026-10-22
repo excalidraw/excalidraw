@@ -23,7 +23,7 @@ import {
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 import type { Zoom } from "@excalidraw/excalidraw/types";
 
-import { bindBindingElement } from "./binding";
+import { bindBindingElement, updateBoundElements } from "./binding";
 import {
   newArrowElement,
   newElement,
@@ -41,7 +41,11 @@ import {
 } from "./newElement";
 import { normalizeStickyNoteStrokeColor } from "./stickyNote";
 import { measureText, normalizeText } from "./textMeasurements";
-import { isArrowElement, isStickyNoteElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isBindableElement,
+  isStickyNoteElement,
+} from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -910,6 +914,30 @@ export const convertToExcalidrawElements = (
       console.info(
         "User provided frame attributes are being considered, if you find this inaccurate, please remove any of the attributes - x, y, width and height so frame coordinates and dimensions are calculated automatically",
       );
+    }
+  }
+
+  // Excalidraw places the ends of bound arrows itself whenever it updates
+  // their bindings (e.g. on undo/redo, or moving what they're bound to), so
+  // place them now, or they'd move then
+  const boundScene = new Scene(elementStore.getElementsMap());
+  // updating an arrow from either end updates both, so once is enough
+  const updatedArrows: NonDeletedExcalidrawElement[] = [];
+  for (const element of boundScene.getNonDeletedElements()) {
+    const arrows = isBindableElement(element)
+      ? (element.boundElements ?? []).filter(({ type }) => type === "arrow")
+      : [];
+    if (arrows.length) {
+      updateBoundElements(element, boundScene, {
+        // a copy: the ids to skip are cached by array
+        simultaneouslyUpdated: [...updatedArrows],
+      });
+      arrows.forEach(({ id }) => {
+        const arrow = boundScene.getNonDeletedElement(id);
+        if (arrow) {
+          updatedArrows.push(arrow);
+        }
+      });
     }
   }
 

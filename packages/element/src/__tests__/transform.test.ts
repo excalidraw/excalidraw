@@ -446,10 +446,11 @@ describe("Test Transform", () => {
 
       expect(excalidrawElements.length).toBe(4);
       const [arrow, text, rectangle, ellipse] = excalidrawElements;
+      // placed where binding puts bound arrows: off the shape by the gap
+      expect(arrow.y).toBeCloseTo(239, 1);
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255.5,
-        y: 239,
+        x: 261,
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
           elementId: rectangle.id,
@@ -528,10 +529,11 @@ describe("Test Transform", () => {
       expect(excalidrawElements.length).toBe(4);
       const [arrow, text1, text2, text3] = excalidrawElements;
 
+      // placed where binding puts bound arrows: off the text by the gap
+      expect(arrow.y).toBeCloseTo(239, 1);
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255.5,
-        y: 239,
+        x: 261,
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
           elementId: text2.id,
