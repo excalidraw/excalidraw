@@ -136,9 +136,9 @@ describe("image insertion", () => {
     await assert();
   });
 
-  it("passes host-configured max image dimensions to the resize helper", async () => {
+  it("passes host-configured max image dimensions to the resize helper when the file exceeds the size limit", async () => {
     await setupImageTest([DEER_IMAGE_DIMENSIONS], {
-      imageOptions: { maxWidthOrHeight: 2048 },
+      imageOptions: { maxWidthOrHeight: 2048, maxFileSizeBytes: 1024 },
     });
 
     await API.drop([
@@ -151,6 +151,25 @@ describe("image insertion", () => {
         { maxWidthOrHeight: 2048 },
       );
     });
+  });
+
+  it("does not resize images that fit within the size limit", async () => {
+    // maxWidthOrHeight below the image dimensions — the file must still be
+    // stored untouched since it fits within maxFileSizeBytes
+    await setupImageTest([DEER_IMAGE_DIMENSIONS], {
+      imageOptions: { maxWidthOrHeight: 200 },
+    });
+
+    await API.drop([
+      { kind: "file", file: await API.loadFile("./fixtures/deer.png") },
+    ]);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining(INITIALIZED_IMAGE_PROPS),
+      ]);
+    });
+    expect(blobModule.resizeImageFile).not.toHaveBeenCalled();
   });
 
   it("enforces host-configured max image file size", async () => {
