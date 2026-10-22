@@ -3593,5 +3593,56 @@ describe("textWysiwyg", () => {
 
       expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(0);
     });
+
+    it("right-aligns a new text typed in Hebrew after a text tool click", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+
+      updateTextEditor(editor, "שלום עולם");
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe(
+        TEXT_ALIGN.RIGHT,
+      );
+
+      Keyboard.exitTextEditor(editor);
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe(
+        TEXT_ALIGN.RIGHT,
+      );
+    });
+
+    it("goes back to left alignment when a new text is cleared and retyped in English", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+
+      updateTextEditor(editor, "שלום עולם");
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe(
+        TEXT_ALIGN.RIGHT,
+      );
+
+      updateTextEditor(editor, "");
+      updateTextEditor(editor, "hello world");
+      Keyboard.exitTextEditor(editor);
+
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe(
+        TEXT_ALIGN.LEFT,
+      );
+    });
+
+    it("stops following the typed language once the user picks an alignment", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+
+      updateTextEditor(editor, "שלום");
+      editor.select();
+      fireEvent.click(screen.getByTitle("Center"));
+      updateTextEditor(editor, "שלום עולם");
+      Keyboard.exitTextEditor(editor);
+
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe(
+        TEXT_ALIGN.CENTER,
+      );
+    });
   });
 });
