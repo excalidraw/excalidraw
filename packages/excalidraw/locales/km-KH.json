@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "បិទភ្ជាប់",
     "pasteAsPlaintext": "បិទភ្ជាប់ជាអត្ថបទធម្មតា",
     "pasteCharts": "បិទភ្ជាប់តារាង",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "ជ្រើសរើស​ទាំងអស់",
     "multiSelect": "បន្ថែមធាតុទៅលើការជ្រើសរើស",
     "moveCanvas": "ផ្លាស់ទីបាវ",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "ដាច់ៗ",
     "strokeStyle_dotted": "ចំណុចៗ",
     "sloppiness": "រចនាប័ទ្មបន្ទាត់",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ភាពច្បាស់",
     "textAlign": "តម្រឹមអត្ថបទ",
     "edges": "គែម",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,6 +111,7 @@
     "group": "ការជ្រើសរើសជាក្រុម",
     "ungroup": "បំបែកក្រុមការជ្រើសរើសជាក្រុម",
     "collaborators": "អ្នកសហការ",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "បន្ថែមទៅបណ្ណាល័យ",
     "removeFromLibrary": "លុបចេញពីបណ្ណាល័យ",
@@ -171,7 +188,14 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -310,10 +334,16 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "ដៃ (panning tool)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -345,6 +375,7 @@
     "freeDraw": "ចុច​ហើយ​អូស លែង​ពេល​រួចរាល់",
     "text": "គន្លឹះ៖ អ្នកក៏អាចបន្ថែមអត្ថបទដោយចុចពីរដងនៅកន្លែងណាមួយដោយប្រើឧបករណ៍ជ្រើសរើស",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "មានកំហុស"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "រក្សាទុកទៅថាស",
@@ -576,7 +612,11 @@
     "colors": "ពណ៌",
     "shades": "ស្រមោល",
     "hexCode": "លេខកូដ hex",
-    "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ"
+    "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +656,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

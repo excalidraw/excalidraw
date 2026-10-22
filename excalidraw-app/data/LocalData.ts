@@ -26,7 +26,6 @@ import {
   get,
 } from "idb-keyval";
 
-import { appJotaiStore, atom } from "excalidraw-app/app-jotai";
 import { getNonDeletedElements } from "@excalidraw/element";
 
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
@@ -39,6 +38,7 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
+import { appJotaiStore, atom } from "../app-jotai";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 
 import { FileManager } from "./FileManager";
@@ -109,7 +109,14 @@ const saveDataStateToLocalStorage = (
 };
 
 const isQuotaExceededError = (error: any) => {
-  return error instanceof DOMException && error.name === "QuotaExceededError";
+  return (
+    error instanceof DOMException &&
+    (error.name === "QuotaExceededError" ||
+      error.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+      error.name === "QUOTA_EXCEEDED_ERR" ||
+      error.code === 22 ||
+      error.code === 1014)
+  );
 };
 
 type SavingLockTypes = "collaboration";

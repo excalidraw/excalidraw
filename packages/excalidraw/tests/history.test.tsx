@@ -314,7 +314,7 @@ describe("history", () => {
         expect.objectContaining({ id: rect2.id, isDeleted: true }),
       ]);
 
-      mouse.downAt(0, 0);
+      mouse.downAt(-10, -10);
       mouse.moveTo(25, 25);
       mouse.moveTo(50, 50);
       mouse.upAt(50, 50);
@@ -1283,6 +1283,7 @@ describe("history", () => {
 
       togglePopover("Stroke");
       UI.clickOnTestId("color-red");
+      mouse.reset();
       mouse.down(40, -20);
       mouse.up(50, 10);
 

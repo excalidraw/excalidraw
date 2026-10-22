@@ -63,7 +63,10 @@ export const useMermaidRenderer = ({
 
   const renderMermaid = useCallback(
     async (mermaidDefinition: string): Promise<boolean> => {
-      if (!mermaidDefinition.trim() || !mermaidToExcalidrawLib.loaded) {
+      if (
+        !mermaidDefinition.trim() ||
+        mermaidToExcalidrawLib.status !== "loaded"
+      ) {
         return false;
       }
 

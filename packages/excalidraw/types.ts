@@ -4,11 +4,15 @@ import type {
   throttleRAF,
   MIME_TYPES,
   EditorInterface,
+  StrokeWidthKey,
 } from "@excalidraw/common";
 
 import type { LinearElementEditor } from "@excalidraw/element";
 
-import type { MaybeTransformHandleType } from "@excalidraw/element";
+import type {
+  ListMarkerAdvance,
+  MaybeTransformHandleType,
+} from "@excalidraw/element";
 
 import type {
   PointerType,
@@ -19,6 +23,7 @@ import type {
   ExcalidrawElement,
   GroupId,
   ExcalidrawBindableElement,
+  ExcalidrawArrowElement,
   Arrowhead,
   FontFamilyValues,
   FileId,
@@ -33,6 +38,7 @@ import type {
   ExcalidrawNonSelectionElement,
   BindMode,
   ExcalidrawTextElement,
+  StrokeVariability,
 } from "@excalidraw/element/types";
 
 import type {
@@ -46,6 +52,8 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  RenderEnvironment,
+  OnDuplicateData,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -57,6 +65,7 @@ import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
@@ -80,7 +89,7 @@ export type Collaborator = Readonly<{
   // The url of the collaborator's avatar, defaults to username initials
   // if not present
   avatarUrl?: string;
-  // user id. If supplied, we'll filter out duplicates when rendering user avatars.
+  // Stable user id. A user may have multiple collaborators, one per client.
   id?: string;
   socketId?: SocketId;
   isCurrentUser?: boolean;
@@ -155,8 +164,11 @@ export type ToolType =
   | "hand"
   | "frame"
   | "magicframe"
+  | "stickynote"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "autoshape"
+  | "bucketfill";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -224,7 +236,9 @@ export type InteractiveCanvasAppState = Readonly<
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
     isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
+    gridModeEnabled: AppState["gridModeEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
+    textToolHover: AppState["textToolHover"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
@@ -270,6 +284,50 @@ export type ObservedElementsAppState = {
   activeLockedId: AppState["activeLockedId"];
 };
 
+export type BoxSelectionMode = "contain" | "overlap";
+
+/**
+ * The pointing device the wheel mappings are tuned for. `auto` is reserved
+ * for detecting it from the wheel events; see `resolveInputDevice`.
+ */
+export type InputDevice = "auto" | "mouse" | "trackpad";
+
+/**
+ * A box, in scene coordinates, that pan & zoom are constrained to.
+ *
+ * This is a private type. For public API, only use specific properties,
+ * needed.
+ */
+export type ScrollConstraints = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** when set, panning is constrained so the viewport stays within the box */
+  lockScroll: boolean;
+  /** when set, the viewport cannot zoom out below `zoom` */
+  lockZoom: boolean;
+  /**
+   * The zoom resolved after the `setViewport` navigation settled.
+   */
+  zoom: number;
+  /**
+   * Pixel amount the viewport may overscroll past its resting clamp before
+   * snapping back (rubberband). Screen pixels, zoom-independent. Resolved
+   * from `lock.overscroll` at the time the lock was installed (`true` →
+   * default give, `false` → 0).
+   */
+  overscroll: number;
+  /**
+   * Extra scrollable margin around the box (CSS-style), letting the viewport
+   * scroll past each box edge to reveal that much empty space. Values are
+   * viewport pixels and zoom-independent (a fixed on-screen distance).
+   * Resolved from the `offsets` passed to `setViewport` (see
+   * {@link ViewportOffsets}) at the time the lock was installed.
+   */
+  offsets?: Offsets;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -308,15 +366,46 @@ export interface AppState {
    * `bindingPreference` and keyboard modifiers (ctrl/alt)
    */
   isBindingEnabled: boolean;
+  /** user box selection preference; defaults to "contain" when unset */
+  boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
-  startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
+  /** user preference whether to show contextual hints above the toolbar */
+  showHints: boolean;
+  /**
+   * user preference for what the wheel does: with a `trackpad` a plain wheel
+   * pans; with a `mouse` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is
+   * delivered) zooms with either device. Shift+wheel pans horizontally;
+   * ctrl/cmd+shift+wheel pans vertically. `auto` resolves to `trackpad` until
+   * device detection exists — see `resolveInputDevice`
+   */
+  inputDevice: InputDevice;
+  /**
+   * The bindable element the UI highlights for the user when an arrow is
+   * dragged or otherwise its endpoint being close to said element.
+   */
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
     midPoint?: GlobalPoint;
   } | null;
+  /**
+   * What a text-tool click at the hovered position would act on — the text
+   * it would edit, the empty container it would label, or the arrow anchor
+   * (a free endpoint, or the midpoint for a label) it would attach text to.
+   * `null` when the click would create free text, or the tool isn't active.
+   * Drives the hover affordance only.
+   */
+  textToolHover:
+    | { type: "text"; elementId: ExcalidrawElement["id"] }
+    | { type: "container"; elementId: ExcalidrawElement["id"] }
+    | {
+        type: "arrow";
+        elementId: ExcalidrawArrowElement["id"];
+        anchor: "start" | "end" | "label";
+      }
+    | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -324,8 +413,15 @@ export interface AppState {
     outline: boolean;
     clip: boolean;
   };
-  editingFrame: string | null;
-  elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
+  /**
+   * frame-like element whose name is currently being edited
+   */
+  editingFrame: ExcalidrawFrameLikeElement["id"] | null;
+  /**
+   * Elements the UI highlights with a bounding-box outline — those that
+   * would get added to a frame being dragged/resized.
+   */
+  elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
    */
@@ -344,18 +440,24 @@ export interface AppState {
     type: "selection" | "lasso";
     initialized: boolean;
   };
+
+  // Pen handling
   penMode: boolean;
   penDetected: boolean;
+
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemStickynoteStrokeColor: string;
+  currentItemStickynoteBackgroundColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
-  currentItemStrokeWidth: number;
+  currentItemStrokeWidthKey: StrokeWidthKey;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
+  currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
@@ -368,6 +470,7 @@ export interface AppState {
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
+  scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
@@ -448,10 +551,6 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-  /** the user's socket id & username who is being followed on the canvas */
-  userToFollow: UserToFollow | null;
-  /** the socket ids of the users following the current user */
-  followedBy: Set<SocketId>;
 
   /** image cropping */
   isCropping: boolean;
@@ -470,7 +569,27 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+  // Stores the current bind mode which is detemined at various points during
+  // a drag operation (like pointer position vs bindable element) but needed
+  // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** user-customized color-picker top picks (pinned via drag & drop from the
+   * color picker popup). `null` means no customization (defaults, or
+   * host-supplied `topPicks`, are used). Kept per picker. */
+  colorTopPicks: {
+    elementStroke: readonly string[] | null;
+    elementBackground: readonly string[] | null;
+    /** the bucket-fill tool keeps a list separate from `elementBackground`
+     * even though both drive `currentItemBackgroundColor` (its defaults and
+     * use case differ — no transparent) */
+    bucketFill: readonly string[] | null;
+    /** sticky notes are their own color domain (own defaults, own picks) */
+    stickyNoteStroke: readonly string[] | null;
+    stickyNoteBackground: readonly string[] | null;
+  };
+  /** user-customized font-picker top picks (pinned via drag & drop from the
+   * font picker popup). `null` means no customization (defaults are used) */
+  fontTopPicks: readonly FontFamilyValues[] | null;
 }
 
 export type SearchMatch = {
@@ -487,7 +606,22 @@ export type SearchMatch = {
 
 export type UIAppState = Omit<
   AppState,
-  "startBoundElement" | "cursorButton" | "scrollX" | "scrollY"
+  // stripped from the UI-relevant app state so their (often per-frame)
+  // updates don't re-render the editor UI — canvas-only concerns.
+  // Subscribe via `useExcalidrawStateValue` if you need them in UI.
+  | "cursorButton"
+  | "scrollX"
+  | "scrollY"
+  | "zoom"
+  | "shouldCacheIgnoreZoom"
+  // canvas-interaction transients (snapping, binding & frame
+  // highlights) — identity churns per pointermove while interacting
+  | "snapLines"
+  | "originSnapOffset"
+  | "suggestedBinding"
+  | "textToolHover"
+  | "frameToHighlight"
+  | "elementsToHighlight"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
@@ -547,9 +681,31 @@ export type ExcalidrawInitialDataState = Merge<
   }
 >;
 
+export type ExcalidrawInitialState = {
+  viewport?: Omit<SetViewportOptions, "animation">;
+};
+
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
   action: "FOLLOW" | "UNFOLLOW";
+};
+
+export type ViewportStatusFrame = {
+  /** the badge (bottom-center pill) */
+  label?: {
+    label: React.ReactNode;
+    icon?: React.ReactNode;
+    /** badge background; defaults to var(--color-primary-hover) */
+    background?: string;
+    /** badge text color; defaults to var(--color-primary-light) */
+    color?: string;
+    /** makes the badge label interactive */
+    onClick?: () => void;
+    /** renders a close button when set */
+    onClose?: () => void;
+  };
+  /** viewport-edge border: CSS color, or `false` for none */
+  border: false | string;
 };
 
 export type OnExportProgress = {
@@ -559,12 +715,175 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+export type InteractionConfig = {
+  /**
+   * Interactions that stay enabled while the editor is otherwise
+   * non-interactive. Opt-in: anything omitted or `false` is disabled.
+   */
+  enabled?: {
+    /**
+     * Element links render their link icon and stay clickable — clicking
+     * anywhere on a linked element opens the link, same as in view mode.
+     * When disabled, link icons are not rendered at all.
+     *
+     * @default false
+     */
+    links?: boolean;
+    /**
+     * Embeddable & iframe elements stay interactive — hovering & clicking
+     * activates them so their content can be used, same as in view mode.
+     *
+     * @default false
+     */
+    embeds?: boolean;
+    /**
+     * Umbrella for all interactive content on canvas — shorthand for
+     * enabling `links` & `embeds` (and future interactive content kinds)
+     * together. Additive: `interactiveContent: true` enables them
+     * regardless of their individual values.
+     *
+     * @default false
+     */
+    interactiveContent?: boolean;
+    /**
+     * Canvas navigation — panning (pointer drag, wheel, PageUp/PageDown)
+     * and zooming (ctrl/cmd + wheel, pinch, and the canvas zoom &
+     * zoom-to-fit shortcuts: ctrl/cmd +/-/0, shift+1/2/3), same as in view
+     * mode. Respects `appState.scrollConstraints` if set, so it composes
+     * with viewport locking. The rest of the keyboard stays disabled. Note
+     * the editor consumes wheel & touch input again when enabled, so the
+     * page no longer scrolls over the editor.
+     *
+     * @default false
+     */
+    navigation?: boolean;
+    /**
+     * Whether the browser's own zoom remains available over the editor —
+     * ctrl/cmd + wheel, pinch, and (while the editor has focus)
+     * ctrl/cmd +/-/0 shortcuts. Prevented by default, mirroring the
+     * interactive editor. Regular page scrolling stays available either way.
+     * With `navigation` enabled, the zoom input (wheel, pinch, keyboard
+     * shortcuts) zooms the canvas instead either way, making this moot.
+     *
+     * @default false
+     */
+    browserZoom?: boolean;
+    /**
+     * Tools that stay user-driven while the editor is otherwise
+     * non-interactive: pointer input keeps driving the listed tool when it's
+     * the active tool. Does not enable user-driven tool *switching* — the
+     * keyboard stays disabled and tool selection remains host-driven
+     * (`ExcalidrawAPI.setActiveTool`).
+     *
+     * Composes with `navigation`: the enabled tool wins the primary-pointer
+     * drag, while wheel input (and wheel-button drag) still pans/zooms.
+     */
+    tools?: {
+      /**
+       * The laser pointer stays usable — pointer strokes draw laser trails
+       * and pointer positions keep broadcasting via `onPointerUpdate`, so
+       * e.g. collaborators see a presenter's laser & cursor.
+       *
+       * @default false
+       */
+      laser?: boolean;
+      /**
+       * Custom tools (`activeTool.type === "custom"`) stay usable — the
+       * editor keeps dispatching `onPointerDown` / `onPointerUp` for them.
+       * Tool behavior is host-implemented; activate custom tools with
+       * `locked: true` or they revert to the selection tool (and go inert)
+       * after the first pointer interaction.
+       *
+       * @default false
+       */
+      custom?: boolean;
+    };
+  };
+};
+
+export type UIConfig = {
+  /**
+   * Default UI controls that stay enabled while the rest of Excalidraw's
+   * default UI is hidden. Opt-in: anything omitted or `false` is disabled.
+   */
+  enabled: {
+    /**
+     * The zoom-out, reset-zoom, and zoom-in controls.
+     *
+     * @default false
+     */
+    zoom?: boolean;
+    /**
+     * The button shown when the viewport is scrolled away from all content.
+     *
+     * @default false
+     */
+    scrollBackToContent?: boolean;
+  };
+};
+
+/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
+export type ElementRenderOverride = Readonly<{
+  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
+  opacity?: number;
+  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
+  offset?: Readonly<{ x: number; y: number }>;
+}>;
+
+/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
+export type ElementRenderOverrides = ReadonlyMap<
+  ExcalidrawElement["id"],
+  ElementRenderOverride
+>;
+
+/** The translation part of a snapshot: only the entries that carry an offset. */
+export type ElementRenderOffsets = ReadonlyMap<
+  ExcalidrawElement["id"],
+  NonNullable<ElementRenderOverride["offset"]>
+>;
+
 export interface ExcalidrawProps {
+  className?: string;
+  /**
+   * Document that owns Excalidraw's mounted DOM.
+   *
+   * Set only when it differs from the global `document`, such as when code
+   * executing in a parent window mounts Excalidraw into an iframe document.
+   * The value must remain stable for the editor's lifetime.
+   *
+   * @default document
+   */
+  ownerDocument?: Document;
+  /**
+   * Host environment used by the renderer and export pipeline to create
+   * canvases and images. Supply a custom implementation to redirect canvas
+   * creation and image decoding to e.g. a host canvas pool, an
+   * `OffscreenCanvas`, or a non-DOM image decoder. When omitted, canvas and
+   * image creation fall back to `ownerDocument` / `ownerWindow`.
+   *
+   * The value must be referentially stable -- every render cache (element
+   * canvases, text metrics, char widths, link icons) is keyed by this
+   * object's identity, so a new identity is a full cache miss. Passing an
+   * inline object literal mints a fresh identity on every React render,
+   * which silently re-rasterizes every element on every frame; hoist it to a
+   * module constant or memoize it (e.g. `useMemo`) instead.
+   *
+   * Only `createCanvas` and `createImage` are required. `createPath` (used to
+   * fill freedraw strokes) falls back to the global `Path2D`, which every
+   * browser has -- a non-browser host without one must supply it. Pass
+   * `document` (the owner document) for SVG exports to be built in it rather
+   * than in the global `document`, and `textMetrics` to measure the editor's
+   * text with your own provider.
+   *
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new ownerWindow.Path2D(d), document: ownerDocument }
+   */
+  renderEnvironment?: RenderEnvironment;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  onThemeChange?: (theme: Theme | "system") => void;
   /**
    * note: only subscribes if the props.onIncrement is defined on initial render
    */
@@ -572,6 +891,7 @@ export interface ExcalidrawProps {
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
+  initialState?: ExcalidrawInitialState;
   /**
    * Invoked as soon as the Excalidraw API is available
    * NOTE editor is not yet mounted, and state is not yet initialized
@@ -608,13 +928,29 @@ export interface ExcalidrawProps {
    *
    * Returned elements will be used in place of the next elements
    * (you should return all elements, including deleted, and not mutate
-   * the element if changes are made)
+   * the element if changes are made).
+   *
+   * The duplicates are the elements in `nextElements` which are not in
+   * `prevElements` (see also `data.duplicateElements`). When pasting or
+   * inserting onto a frame, their `frameId` is already set. To change a
+   * duplicate, return a new object with the same `id`. It is shallow-merged
+   * into the duplicate (omitted properties are kept), and your changes are
+   * part of the duplication itself (same undo entry, same durable increment).
+   *
+   * To prevent an element from being duplicated, omit its duplicate from the
+   * returned array. References to it from the remaining duplicates are
+   * cleared, and a bound text isn't duplicated without its container. To
+   * prevent the duplication as a whole, return `false`. If no duplicate
+   * remains, the duplication is cancelled and the returned elements are
+   * ignored (alt-drag then moves the original elements instead).
    */
   onDuplicate?: (
     nextElements: readonly ExcalidrawElement[],
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
-  ) => ExcalidrawElement[] | void;
+    /** lookups covering just the elements taking part in the duplication */
+    data: OnDuplicateData,
+  ) => ExcalidrawElement[] | void | false;
   renderTopLeftUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -625,6 +961,67 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
+  /**
+   * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
+   * clipboard, drag&drop). When `false`, the scene still renders and reacts
+   * to programmatic updates (imperative API), but the user cannot affect it
+   * in any way. Implies view mode.
+   *
+   * Pass a config object to keep specific interactions enabled while the
+   * editor is otherwise non-interactive (see `InteractionConfig`):
+   *
+   * ```tsx
+   * <Excalidraw interaction={{ enabled: { links: true } }} />
+   * ```
+   *
+   * @default true
+   */
+  interaction?: boolean | InteractionConfig;
+  /**
+   * Whether Excalidraw's default UI is rendered — toolbar, default menus,
+   * footer controls, sidebars, and canvas popups. Host UI passed through
+   * children (including exported components such as `MainMenu` and `Footer`)
+   * or render props continues to render, together with any supporting dialogs
+   * it opens.
+   *
+   * Canvas content (elements, text editing surface, frame names, embeds) still
+   * renders, and the editor remains interactive unless `interaction` is set to
+   * `false`.
+   *
+   * Pass a config object to keep specific default controls rendered while the
+   * rest of the default UI is hidden (see `UIConfig`):
+   *
+   * ```tsx
+   * <Excalidraw ui={{ enabled: { zoom: true } }} />
+   * ```
+   *
+   * NOTE: this is WIP and what default UI is/is not rendered when ui=false
+   * may yet change.
+   *
+   * @default true
+   */
+  ui?: boolean | UIConfig;
+  /**
+   * Forces the active editor tool (controlled). While set, user- and
+   * API-driven tool switching is ignored — `setActiveTool` refuses with a
+   * console warning, non-forced toolbar buttons render disabled — and the
+   * editor snaps back if internal flows reset the tool. The forced tool
+   * behaves as if locked (see the tool lock / padlock): it doesn't revert to
+   * the selection tool after use, and elements drawn with it aren't
+   * auto-selected — without mutating `appState.activeTool.locked`, so the
+   * user's persisted padlock preference stays untouched. Unset to return
+   * tool control to the editor (the current tool stays active).
+   *
+   * The forced tool must be activatable to take effect: not disabled via
+   * `UIOptions.tools`, and — while the editor is non-interactive — allowed
+   * via `interaction.enabled.tools`. Otherwise the editor stays on (or, when
+   * non-interactive, resets to) the `selection` tool, and the forced tool is
+   * applied once it becomes activatable. `image` cannot be forced (its
+   * activation opens the file picker).
+   */
+  activeTool?:
+    | { type: Exclude<ToolType, "image"> }
+    | { type: "custom"; customType: string };
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
@@ -637,6 +1034,10 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element;
   UIOptions?: Partial<UIOptions>;
+  /**
+   * dimensions and size constraints for inserted images
+   */
+  imageOptions?: ImageOptions;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
@@ -673,6 +1074,23 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  viewportStatusFrame?: ViewportStatusFrame | null;
+  /**
+   * Rendered inside the UserList "who's here" dropdown (desktop) and inline
+   * in the mobile menu's collaborators section, below a divider. Accepts a
+   * render function — called with `isMobile` so hosts can render different
+   * UI for each surface — in addition to a plain node.
+   */
+  currentUserControls?:
+    | React.ReactNode
+    | ((isMobile: boolean) => React.ReactNode);
+  /**
+   * The user being followed on the canvas, if any. Controlled by the host —
+   * the editor never sets it; it emits follow/unfollow intents via
+   * `onUserFollow` (prop or imperative API) and renders the followed
+   * user's avatar highlight from this value.
+   */
+  userToFollow?: UserToFollow | null;
   /**
    * Called before exporting to a file.
    *
@@ -702,7 +1120,8 @@ export interface ExcalidrawProps {
 }
 
 export type SceneData = {
-  elements?: ImportedDataState["elements"];
+  /** Expects normalized elements; restore imported data before updating the scene. */
+  elements?: readonly ExcalidrawElement[] | null;
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
   captureUpdate?: CaptureUpdateActionType;
@@ -723,6 +1142,11 @@ export type ExportOpts = {
   ) => JSX.Element;
 };
 
+export type ImageOptions = Partial<{
+  maxWidthOrHeight: number;
+  maxFileSizeBytes: number;
+}>;
+
 // NOTE at the moment, if action name corresponds to canvasAction prop, its
 // truthiness value will determine whether the action is rendered or not
 // (see manager renderAction). We also override canvasAction values in
@@ -733,6 +1157,11 @@ export type CanvasActions = Partial<{
   export: false | ExportOpts;
   loadScene: boolean;
   saveToActiveFile: boolean;
+  /**
+   * defaults to true if `props.theme` is omitted or `props.onThemeChange`
+   * is supplied (at which point the theme is considered as host-app controlled),
+   * else default to false
+   * */
   toggleTheme: boolean | null;
   saveAsImage: boolean;
 }>;
@@ -764,6 +1193,7 @@ export type AppProps = Merge<
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
     >;
+    imageOptions: Required<ImageOptions>;
     detectScroll: boolean;
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
@@ -777,6 +1207,9 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  readonly ownerDocument: Document;
+  readonly ownerWindow: Window & typeof globalThis;
+  renderEnvironment: RenderEnvironment;
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
@@ -796,12 +1229,11 @@ export type AppClassProperties = {
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
   fonts: App["fonts"];
-  pasteFromClipboard: App["pasteFromClipboard"];
+  clipboard: App["clipboard"];
   id: App["id"];
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
-  lastViewportPosition: App["lastViewportPosition"];
-  scrollToContent: App["scrollToContent"];
+  viewport: App["viewport"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -812,11 +1244,22 @@ export type AppClassProperties = {
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
-  flowChartCreator: App["flowChartCreator"];
+  flowchart: App["flowchart"];
+  drawShape: App["drawShape"];
+  arrowText: App["arrowText"];
+  textTool: App["textTool"];
+  cursor: App["cursor"];
+  bucketFill: App["bucketFill"];
+  duplicate: App["duplicate"];
+  toolDrag: App["toolDrag"];
+  activeResizeHandle: App["activeResizeHandle"];
+  selectionTool: App["selectionTool"];
+  wrap: App["wrap"];
+  modifiers: App["modifiers"];
+  isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
-  getEditorUIOffsets: App["getEditorUIOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
@@ -827,9 +1270,16 @@ export type AppClassProperties = {
   onStateChange: App["onStateChange"];
 
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
+  lastPointerMoveEvent: App["lastPointerMoveEvent"];
   bindModeHandler: App["bindModeHandler"];
 
+  emitUserFollowIntent: App["emitUserFollowIntent"];
+  requestUnfollow: App["requestUnfollow"];
+
   setAppState: App["setAppState"];
+
+  isInteractionEnabled: App["isInteractionEnabled"];
+  isNavigationEnabled: App["isNavigationEnabled"];
 };
 
 export type PointerDownState = Readonly<{
@@ -865,11 +1315,30 @@ export type PointerDownState = Readonly<{
     allHitElements: NonDeleted<ExcalidrawElement>[];
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
+    // The element an alt-click selects instead: the one below the selected
+    // one, cycling through the elements under the pointer (determined on the
+    // initial pointer down event)
+    cycleTarget: NonDeleted<ExcalidrawElement> | null;
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
+    // The list markers advanced by duplicating the selected element(s)
+    // (alt-drag)
+    advancedListMarkers: readonly ListMarkerAdvance[];
+    // The text whose editing the pointer down ended (alt-pressing it in the
+    // text editor), swapped with its duplicate when duplicated, which is
+    // then edited on drop
+    editedTextId: ExcalidrawTextElement["id"] | null;
+    // Whether the pointer is hitting the common bounding box of selected
+    // elements, which is useful for discriminating between selecitng
+    // the entire selection vs a specific element
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
+    // Whether the pointer went down on the selected arrow's label, which
+    // makes the gesture a label drag along the arrow rather than a point drag
+    arrowLabel: boolean;
   };
+  // This is determined on the initial pointer down event to
+  // set various interaction modalities
   withCmdOrCtrl: boolean;
   drag: {
     // Might change during the pointer interaction
@@ -879,6 +1348,9 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // The offset from origin (axis-locked with shift) as of the previous
+    // pointer move in the crop editor, which moves the image by the change
+    lastOffset: { x: number; y: number };
     // explicit flag for specific scenarios such as:
     // - after lasso selection until the next pointer down
     blockDragging: boolean;
@@ -895,6 +1367,7 @@ export type PointerDownState = Readonly<{
     onKeyUp: null | ((event: KeyboardEvent) => void);
   };
   boxSelection: {
+    // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
   };
 }>;
@@ -933,19 +1406,56 @@ export interface ExcalidrawImperativeAPI {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
+  /**
+   * Selects elements (or their ids — one or many), adds them to or removes
+   * them from the selection, or clears it — as the editor does: an element is
+   * selected with its group (unless `deep`), a frame and its children aren't
+   * selected at the same time, and locked elements are skipped (unless
+   * `includeLocked`). Text editing and cropping end, and the link popup of a
+   * lone selected element shows. Missing and deleted elements are skipped.
+   *
+   * By default the change is recorded for undo along with the next undoable
+   * change — pass `captureUpdate` as for `updateScene()` otherwise. Like
+   * `updateScene()`, it applies on the next render: read it back through
+   * `onChange()` or `getAppState()` after that. Works in view mode too, where
+   * the selection shows without transform handles.
+   */
+  selection: Pick<
+    InstanceType<typeof App>["selection"],
+    "select" | "add" | "remove" | "clear"
+  >;
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  setViewport: InstanceType<typeof App>["viewport"]["setViewport"];
+  getViewportOffsets: InstanceType<typeof App>["viewport"]["getOffsets"];
+  /**
+   * Atomically replaces all transient visual overrides. Values are copied;
+   * omitted IDs/fields use document values, except for inherited label offsets.
+   * null clears the snapshot.
+   * Repaints without document changes, history entries or onChange events;
+   * an equivalent snapshot may still repaint (clearing an already clear
+   * snapshot does not), so submit only when something changed.
+   * Finite opacity is clamped to 0–100; non-finite values reject the snapshot.
+   * Unknown/deleted IDs are ignored when rendering. Reset/unmount clears it.
+   * Bound labels inherit their container's offset; offsets targeting them are
+   * ignored. Label opacity remains independent. Target frame children explicitly.
+   * Frame opacity still multiplies child opacity. Decorations follow their owner.
+   * Exports and interactive geometry (hit tests, selection, editing) use document
+   * values, including while authoring an animation preview in edit mode.
+   */
+  setElementRenderOverrides: InstanceType<
+    typeof App
+  >["setElementRenderOverrides"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
   id: string;
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
-  setCursor: InstanceType<typeof App>["setCursor"];
-  resetCursor: InstanceType<typeof App>["resetCursor"];
+  setCursor: InstanceType<typeof App>["cursor"]["set"];
+  resetCursor: InstanceType<typeof App>["cursor"]["reset"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getEditorInterface: () => EditorInterface;
   /**
@@ -993,7 +1503,6 @@ export type FrameNameBounds = {
   y: number;
   width: number;
   height: number;
-  angle: number;
 };
 
 export type FrameNameBoundsCache = {
@@ -1034,7 +1543,7 @@ export type EmbedsValidationStatus = Map<
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 
-export type PendingExcalidrawElements = ExcalidrawElement[];
+export type PendingExcalidrawElements = NonDeletedExcalidrawElement[];
 
 /** Runtime gridSize value. Null indicates disabled grid. */
 export type NullableGridSize =
@@ -1042,8 +1551,14 @@ export type NullableGridSize =
   | null;
 
 export type GenerateDiagramToCode = (props: {
-  frame: ExcalidrawMagicFrameElement;
-  children: readonly ExcalidrawElement[];
+  frame: NonDeleted<ExcalidrawMagicFrameElement>;
+  children: readonly NonDeletedExcalidrawElement[];
+  /**
+   * Optional streaming hook. Call with the accumulated response text as it
+   * streams in so the editor can progressively render the partial HTML
+   * inside the generated frame.
+   */
+  onPartial?: (html: string) => void;
 }) => MaybePromise<{ html: string }>;
 
 export type Offsets = Partial<{
@@ -1052,3 +1567,107 @@ export type Offsets = Partial<{
   bottom: number;
   left: number;
 }>;
+
+/**
+ * Value of the `data-viewport-ui` attribute, marking a DOM node as a UI
+ * surface that occludes the canvas. Such nodes are measured by
+ * `getViewportOffsets` to compute the default per-side viewport offsets:
+ *
+ * - `top` / `bottom` — offsets that side by the node's bottom/top edge
+ * - `side` — a panel hugging the left or right edge. Which side is not
+ *   declared but resolved geometrically: if the node's horizontal center
+ *   lies in the left half of the viewport it counts against the left
+ *   offset (by its right edge), otherwise against the right offset (by
+ *   `viewportWidth - left edge`). Measuring the rendered position instead
+ *   of declaring a side means RTL layouts and host-configurable docking
+ *   (e.g. sidebar side) are handled for free — but it assumes the surface
+ *   actually hugs one edge; don't mark a centered/near-full-width node as
+ *   `side` (its midpoint would classify it to one side and the offset
+ *   would swallow most of the viewport).
+ *
+ * The attribute should only be present while the surface is actually
+ * rendered — omit it (don't just hide the node) when the surface shouldn't
+ * push the viewport around.
+ */
+export type ViewportUIDock = "top" | "bottom" | "side";
+
+/**
+ * Options for `getViewportOffsets` (and the `ui` key of
+ * {@link ViewportOffsets}), controlling how offsets are derived from the
+ * currently rendered editor UI.
+ *
+ * NOTE unlike the physical sides of {@link Offsets}, the horizontal values
+ * here are logical, i.e. flipped in RTL layouts (`left` refers to the
+ * reading-direction start side).
+ */
+export type ViewportOffsetsOptions = {
+  /** padding added to each measured side (default 24) */
+  padding?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  /** final value for the given side, replacing the measured UI size
+   * (padding is not added on top) */
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+  /**
+   * Reserve space for the given conditionally-rendered surfaces even while
+   * they're hidden, so the resulting offsets don't shift when they
+   * (dis)appear. Uses the surface's last-measured footprint, falling back
+   * to an approximate default if it hasn't been rendered yet. Ignored on
+   * phones (where these surfaces never occlude the canvas).
+   */
+  reserve?: {
+    /** styles panel (rendered when a tool or selection is active) */
+    stylesPanel?: boolean;
+    /** sidebar (e.g. library) */
+    sidebar?: boolean;
+  };
+};
+
+/**
+ * Viewport offsets accepted by the `setViewport`-family APIs (`setViewport`,
+ * `props.initialState.viewport`), insetting the usable viewport area per
+ * side so the target isn't fitted/centered underneath overlaid UI.
+ *
+ * Two (combinable) ways to specify:
+ *
+ * - **Static sides** (`top`/`right`/`bottom`/`left`) — absolute pixel
+ *   values, used as-is: physical (not flipped in RTL), zoom-independent,
+ *   no padding added. Sides not specified default to `0` (unless `ui` is
+ *   set, see below).
+ *
+ * - **`ui`** — derive the offsets from the editor UI (toolbar, styles
+ *   panel, sidebar...) as rendered at the time the viewport is set,
+ *   equivalent to calling `getViewportOffsets()`. Pass `true` for the
+ *   defaults, or options ({@link ViewportOffsetsOptions}) to customize
+ *   padding or reserve space for currently-hidden surfaces.
+ *
+ * When both are given, a static side always wins for that side — it
+ * replaces whatever `ui` would yield (including `ui`'s own side overrides,
+ * which — unlike the physical static sides — are RTL-relative). The
+ * remaining sides fall back to the `ui`-derived values.
+ *
+ * @example
+ * { top: 40 }                              // top 40px, other sides 0
+ * { ui: true }                             // measured UI + default padding
+ * { ui: { reserve: { stylesPanel: true } } } // + keep space for hidden panel
+ * { top: 40, ui: true }                    // top exactly 40px, rest from UI
+ */
+export type ViewportOffsets = Offsets & {
+  ui?: true | ViewportOffsetsOptions;
+};
+
+/**
+ * Value of the `data-viewport-ui-name` attribute, identifying a
+ * conditionally-rendered surface (marked with `data-viewport-ui`) so that
+ * it can be measured on its own, and so that `getViewportOffsets` can
+ * reserve space for it while it's hidden (see the `reserve` option).
+ * Whenever a named surface is rendered, its measured footprint is
+ * remembered; reserving uses that remembered footprint, or an approximate
+ * default if the surface hasn't been rendered yet.
+ */
+export type ViewportUIName = "sidebar" | "stylesPanel" | "stats";

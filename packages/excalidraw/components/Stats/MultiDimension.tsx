@@ -4,9 +4,16 @@ import { useMemo } from "react";
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   getElementsInResizingFrame,
+  getNonDeletedElements,
   isFrameLikeElement,
   replaceAllElementsInFrame,
   updateBoundElements,
+} from "@excalidraw/element";
+import {
+  getStickyNoteResizeIntent,
+  isStickyNoteBoundText,
+  isStickyNoteElement,
+  updateStickyNoteLayout,
 } from "@excalidraw/element";
 import {
   rescalePointsInElement,
@@ -20,11 +27,11 @@ import { getCommonBounds } from "@excalidraw/utils";
 
 import type {
   ElementsMap,
-  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { Scene } from "@excalidraw/element";
+import type { RenderEnvironment, Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
@@ -39,7 +46,7 @@ import type { AppState } from "../../types";
 
 interface MultiDimensionProps {
   property: "width" | "height";
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   elementsMap: NonDeletedSceneElementsMap;
   atomicUnits: AtomicUnit[];
   scene: Scene;
@@ -52,7 +59,7 @@ const getResizedUpdates = (
   anchorX: number,
   anchorY: number,
   scale: number,
-  origElement: ExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
 ) => {
   const offsetX = origElement.x - anchorX;
   const offsetY = origElement.y - anchorY;
@@ -78,15 +85,42 @@ const resizeElementInGroup = (
   anchorY: number,
   property: MultiDimensionProps["property"],
   scale: number,
-  latestElement: ExcalidrawElement,
-  origElement: ExcalidrawElement,
+  latestElement: NonDeletedExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (
+    isTextElement(latestElement) &&
+    isStickyNoteBoundText(latestElement, elementsMap)
+  ) {
+    // a group unit lists the note's label too; the note's layout owns it
+    // entirely (a direct scale here would overwrite the fitted size)
+    return;
+  }
+
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
   scene.mutateElement(latestElement, updates);
+
+  if (isStickyNoteElement(latestElement)) {
+    // group scaling is uniform: base height and font ceiling scale with the
+    // note (empty notes included); the layout runs the arrow pass itself
+    updateStickyNoteLayout(latestElement, scene, {
+      ...getStickyNoteResizeIntent(
+        latestElement,
+        originalElementsMap,
+        property === "width" ? "e" : "s",
+        { proportional: true, fromCenter: false },
+      ),
+      anchor: "top",
+      renderEnvironment,
+    });
+    return;
+  }
 
   const boundTextElement = getBoundTextElement(
     origElement,
@@ -105,6 +139,9 @@ const resizeElementInGroup = (
         scene,
         property === "width" ? "e" : "s",
         true,
+        false,
+        false,
+        renderEnvironment,
       );
     }
   }
@@ -117,10 +154,11 @@ const resizeGroup = (
   aspectRatio: number,
   anchor: GlobalPoint,
   property: MultiDimensionProps["property"],
-  latestElements: ExcalidrawElement[],
-  originalElements: ExcalidrawElement[],
+  latestElements: NonDeletedExcalidrawElement[],
+  originalElements: NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -144,6 +182,7 @@ const resizeGroup = (
       origElement,
       originalElementsMap,
       scene,
+      renderEnvironment,
     );
   }
 };
@@ -199,6 +238,7 @@ const handleDimensionChange: DragInputCallbackType<
           originalElements,
           originalElementsMap,
           scene,
+          app.renderEnvironment,
         );
       } else {
         const [el] = elementsInUnit;
@@ -245,6 +285,7 @@ const handleDimensionChange: DragInputCallbackType<
             property === "width" ? "e" : "s",
             {
               shouldInformMutation: false,
+              renderEnvironment: app.renderEnvironment,
             },
           );
 
@@ -261,7 +302,6 @@ const handleDimensionChange: DragInputCallbackType<
               scene.getElementsIncludingDeleted(),
               nextElementsInFrame,
               latestElement,
-              app,
             );
 
             scene.replaceAllElements(updatedElements);
@@ -277,7 +317,7 @@ const handleDimensionChange: DragInputCallbackType<
 
   const changeInWidth = property === "width" ? accumulatedChange : 0;
   const changeInHeight = property === "height" ? accumulatedChange : 0;
-  const elementsToHighlight: ExcalidrawElement[] = [];
+  const elementsToHighlight: NonDeletedExcalidrawElement[] = [];
 
   for (const atomicUnit of atomicUnits) {
     const elementsInUnit = getElementsInAtomicUnit(
@@ -373,11 +413,13 @@ const handleDimensionChange: DragInputCallbackType<
 
         // Handle highlighting frame element candidates
         if (isFrameLikeElement(latestElement)) {
-          const nextElementsInFrame = getElementsInResizingFrame(
-            scene.getElementsIncludingDeleted(),
-            latestElement,
-            originalAppState,
-            scene.getNonDeletedElementsMap(),
+          const nextElementsInFrame = getNonDeletedElements(
+            getElementsInResizingFrame(
+              scene.getElementsIncludingDeleted(),
+              latestElement,
+              originalAppState,
+              scene.getNonDeletedElementsMap(),
+            ),
           );
 
           elementsToHighlight.push(...nextElementsInFrame);
@@ -416,7 +458,6 @@ const handleDragFinished: DragFinishedCallbackType = ({
       app.scene.getElementsIncludingDeleted(),
       nextElementsInFrame,
       latestElement,
-      app,
     );
 
     app.scene.replaceAllElements(updatedElements);

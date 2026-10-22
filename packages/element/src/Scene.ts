@@ -51,7 +51,7 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   allElements: readonly T[],
 ) => {
   const elementsMap = new Map() as NonDeletedSceneElementsMap;
-  const elements: T[] = [];
+  const elements: NonDeleted<T>[] = [];
   for (const element of allElements) {
     if (!element.isDeleted) {
       elements.push(element as NonDeleted<T>);
@@ -187,7 +187,7 @@ export class Scene {
     // selection-related options
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;
-  }): NonDeleted<ExcalidrawElement>[] {
+  }): NonDeletedExcalidrawElement[] {
     const hash = hashSelectionOpts(opts);
 
     const elements = opts?.elements || this.nonDeletedElements;
@@ -338,27 +338,18 @@ export class Scene {
     this.callbacks.clear();
   }
 
-  insertElementAtIndex(element: ExcalidrawElement, index: number) {
-    if (!Number.isFinite(index) || index < 0) {
-      throw new Error(
-        "insertElementAtIndex can only be called with index >= 0",
-      );
-    }
-
-    const nextElements = [
-      ...this.elements.slice(0, index),
-      element,
-      ...this.elements.slice(index),
-    ];
-
-    syncMovedIndices(nextElements, arrayToMap([element]));
-
-    this.replaceAllElements(nextElements);
-  }
-
-  insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+  /** low-level - generally use app.insertNewElements() */
+  insertElementsAtIndex(
+    elements: ExcalidrawElement[],
+    /** null indicates end of the array */
+    index: number | null,
+  ) {
     if (!elements.length) {
       return;
+    }
+
+    if (index === null) {
+      index = this.elements.length;
     }
 
     if (!Number.isFinite(index) || index < 0) {
@@ -378,24 +369,9 @@ export class Scene {
     this.replaceAllElements(nextElements);
   }
 
+  /** low-level - generally use app.insertNewElement() */
   insertElement = (element: ExcalidrawElement) => {
-    const index = element.frameId
-      ? this.getElementIndex(element.frameId)
-      : this.elements.length;
-
-    this.insertElementAtIndex(element, index);
-  };
-
-  insertElements = (elements: ExcalidrawElement[]) => {
-    if (!elements.length) {
-      return;
-    }
-
-    const index = elements[0]?.frameId
-      ? this.getElementIndex(elements[0].frameId)
-      : this.elements.length;
-
-    this.insertElementsAtIndex(elements, index);
+    this.insertElementsAtIndex([element], null);
   };
 
   getElementIndex(elementId: string) {

@@ -51,6 +51,7 @@ export const KEYS = {
   SLASH: "/",
 
   A: "a",
+  B: "b",
   C: "c",
   D: "d",
   E: "e",
@@ -59,6 +60,7 @@ export const KEYS = {
   H: "h",
   I: "i",
   L: "l",
+  N: "n",
   O: "o",
   P: "p",
   Q: "q",

@@ -1,7 +1,7 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { KEYS, reseed } from "@excalidraw/common";
+import { KEYS, STROKE_WIDTH, reseed } from "@excalidraw/common";
 
 import { setDateTimeForTests } from "@excalidraw/common";
 
@@ -378,7 +378,7 @@ describe("contextMenu element", () => {
     expect(firstRect.strokeColor).toBe("#e03131");
     expect(firstRect.backgroundColor).toBe("#a5d8ff");
     expect(firstRect.fillStyle).toBe("cross-hatch");
-    expect(firstRect.strokeWidth).toBe(2); // Bold: 2
+    expect(firstRect.strokeWidth).toBe(STROKE_WIDTH.bold);
     expect(firstRect.strokeStyle).toBe("dotted");
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);

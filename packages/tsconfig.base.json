@@ -6,7 +6,7 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "emitDeclarationOnly": true,
@@ -17,10 +17,14 @@
       "@excalidraw/element/*": ["./element/src/*"],
       "@excalidraw/excalidraw": ["./excalidraw/index.tsx"],
       "@excalidraw/excalidraw/*": ["./excalidraw/*"],
+      "@excalidraw/laser-pointer": ["./laser-pointer/src/index.ts"],
+      "@excalidraw/laser-pointer/*": ["./laser-pointer/src/*"],
       "@excalidraw/math": ["./math/src/index.ts"],
       "@excalidraw/math/*": ["./math/src/*"],
       "@excalidraw/utils": ["./utils/src/index.ts"],
-      "@excalidraw/utils/*": ["./utils/src/*"]
+      "@excalidraw/utils/*": ["./utils/src/*"],
+      "@excalidraw/fractional-indexing": ["./fractional-indexing/src/index.ts"],
+      "@excalidraw/fractional-indexing/*": ["./fractional-indexing/src/*"]
     }
   }
 }

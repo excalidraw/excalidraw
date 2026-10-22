@@ -3,7 +3,10 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_SIZE,
   DEFAULT_VERTICAL_ALIGN,
+  DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
   randomInteger,
   randomId,
@@ -21,11 +24,17 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
+import {
+  normalizeStickyNoteBackgroundColor,
+  normalizeStickyNoteStrokeColor,
+} from "./stickyNote";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type {
   ExcalidrawElement,
@@ -48,6 +57,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  ExcalidrawStickyNoteElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -73,6 +83,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
+  | "created"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -122,8 +133,13 @@ const _newElementBase = <T extends ExcalidrawElement>(
     });
   }
 
+  const timestamp = getUpdatedTimestamp();
+
   // assign type to guard against excess properties
-  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
+  const element: Merge<
+    ExcalidrawGenericElement,
+    { type: T["type"]; isDeleted: false }
+  > = {
     id: rest.id || randomId(),
     type,
     x,
@@ -147,7 +163,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     versionNonce: rest.versionNonce ?? 0,
     isDeleted: false as false,
     boundElements,
-    updated: getUpdatedTimestamp(),
+    updated: timestamp,
+    // Preserve explicit null when reconstructing a legacy element with its id.
+    created: rest.created === undefined ? timestamp : rest.created,
     link,
     locked,
     customData: rest.customData,
@@ -161,6 +179,70 @@ export const newElement = (
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
+
+/**
+ * Style invariants of a sticky note: never-transparent colors, solid fill.
+ * Applied by the constructor and by every normalization pass. Returns the
+ * same object when nothing needs fixing.
+ */
+export const normalizeStickyNoteStyle = <T extends ExcalidrawStickyNoteElement>(
+  element: T,
+): T => {
+  return newElementWith(element as ExcalidrawStickyNoteElement, {
+    backgroundColor: normalizeStickyNoteBackgroundColor(
+      element.backgroundColor,
+    ),
+    strokeColor: normalizeStickyNoteStrokeColor(element.strokeColor),
+    fillStyle: "solid",
+  }) as T;
+};
+
+/**
+ * Geometry invariants of a *finalized* sticky note: minimum size and
+ * `baseHeight ≤ height`. Deliberately not part of the constructor — a
+ * pointer-down draft starts at 0×0 like every other tool and is previewed at
+ * its true dragged size; pointer-up, restore, the skeleton path and the
+ * action post-passes enforce this.
+ */
+export const normalizeStickyNoteGeometry = <
+  T extends ExcalidrawStickyNoteElement,
+>(
+  element: T,
+): T => {
+  const width = Math.max(element.width, STICKY_NOTE_MIN_SIZE);
+  const baseHeight = Math.max(
+    element.baseHeight || element.height || DEFAULT_STICKY_NOTE_SIZE,
+    STICKY_NOTE_MIN_SIZE,
+  );
+
+  return newElementWith(element as ExcalidrawStickyNoteElement, {
+    width,
+    height: Math.max(element.height, baseHeight),
+    baseHeight,
+  }) as T;
+};
+
+/** all sticky note invariants (style + finalized geometry) */
+export const normalizeStickyNote = <T extends ExcalidrawStickyNoteElement>(
+  element: T,
+): T => {
+  return normalizeStickyNoteGeometry(normalizeStickyNoteStyle(element));
+};
+
+export const newStickyNoteElement = (
+  opts: {
+    type: "stickynote";
+    baseHeight?: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawStickyNoteElement> => {
+  const base = _newElementBase<ExcalidrawStickyNoteElement>("stickynote", opts);
+
+  // no size inflation here (see `normalizeStickyNoteGeometry`)
+  return normalizeStickyNoteStyle({
+    ...base,
+    baseHeight: opts.baseHeight ?? base.height,
+  });
+};
 
 export const newEmbeddableElement = (
   opts: {
@@ -214,6 +296,25 @@ export const newMagicFrameElement = (
   return frameElement;
 };
 
+/**
+ * The point of the text box its alignment pins, as ratios of width/height.
+ *
+ * This is the point that stays put as the text grows — see the sides passed to
+ * `adjustXYWithRotation` in `getAdjustedDimensions`.
+ */
+export const getTextAnchorRatios = (opts: {
+  textAlign: ExcalidrawTextElement["textAlign"];
+  verticalAlign: ExcalidrawTextElement["verticalAlign"];
+}) => ({
+  x: opts.textAlign === "center" ? 0.5 : opts.textAlign === "right" ? 1 : 0,
+  y:
+    opts.verticalAlign === VERTICAL_ALIGN.MIDDLE
+      ? 0.5
+      : opts.verticalAlign === VERTICAL_ALIGN.BOTTOM
+      ? 1
+      : 0,
+});
+
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
   opts: {
@@ -225,14 +326,11 @@ const getTextElementPositionOffsets = (
     height: number;
   },
 ) => {
+  const ratios = getTextAnchorRatios(opts);
+
   return {
-    x:
-      opts.textAlign === "center"
-        ? metrics.width / 2
-        : opts.textAlign === "right"
-        ? metrics.width
-        : 0,
-    y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
+    x: metrics.width * ratios.x,
+    y: metrics.height * ratios.y,
   };
 };
 
@@ -247,6 +345,9 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
+    labelPosition?: ExcalidrawTextElement["labelPosition"];
+    baseFontSize?: ExcalidrawTextElement["baseFontSize"];
+    renderEnvironment?: RenderEnvironment;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -257,6 +358,7 @@ export const newTextElement = (
     text,
     getFontString({ fontFamily, fontSize }),
     lineHeight,
+    opts.renderEnvironment,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
@@ -265,10 +367,11 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElementProps: ExcalidrawTextElement = {
+  const textElementProps: NonDeleted<ExcalidrawTextElement> = {
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
+    baseFontSize: opts.baseFontSize ?? null,
     fontFamily,
     textAlign,
     verticalAlign,
@@ -280,9 +383,10 @@ export const newTextElement = (
     originalText: opts.originalText ?? text,
     autoResize: opts.autoResize ?? true,
     lineHeight,
+    labelPosition: opts.labelPosition ?? null,
   };
 
-  const textElement: ExcalidrawTextElement = newElementWith(
+  const textElement: NonDeleted<ExcalidrawTextElement> = newElementWith(
     textElementProps,
     {},
   );
@@ -294,6 +398,9 @@ const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
   elementsMap: ElementsMap,
   nextText: string,
+  /** the width the text is to take regardless of its content */
+  nextFixedWidth?: number,
+  renderEnvironment?: RenderEnvironment,
 ): {
   x: number;
   y: number;
@@ -304,10 +411,13 @@ const getAdjustedDimensions = (
     nextText,
     getFontString(element),
     element.lineHeight,
+    renderEnvironment,
   );
 
   // wrapped text
-  if (!element.autoResize) {
+  if (nextFixedWidth !== undefined) {
+    nextWidth = nextFixedWidth;
+  } else if (!element.autoResize) {
     nextWidth = element.width;
   }
 
@@ -324,6 +434,7 @@ const getAdjustedDimensions = (
       element.text,
       getFontString(element),
       element.lineHeight,
+      renderEnvironment,
     );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
@@ -346,9 +457,18 @@ const getAdjustedDimensions = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
 
+    // grow away from the edge(s) the alignment anchors the text to, so that
+    // the anchor stays put as the text is edited. `verticalAlign` has no
+    // visual effect on unbound text, but standalone text bound to an arrow
+    // endpoint uses it to pin the side the arrow attaches to.
     [x, y] = adjustXYWithRotation(
       {
-        s: true,
+        n:
+          verticalAlign === VERTICAL_ALIGN.MIDDLE ||
+          verticalAlign === VERTICAL_ALIGN.BOTTOM,
+        s:
+          verticalAlign === VERTICAL_ALIGN.MIDDLE ||
+          verticalAlign === VERTICAL_ALIGN.TOP,
         e: textAlign === "center" || textAlign === "left",
         w: textAlign === "center" || textAlign === "right",
       },
@@ -422,9 +542,42 @@ export const refreshTextDimensions = (
   container: ExcalidrawTextContainer | null,
   elementsMap: ElementsMap,
   text = textElement.text,
+  /**
+   * For a free text that grows with its content (`autoResize`): the widest
+   * it may grow to. Crossing it, the text stops growing and wraps at this
+   * width from then on (`autoResize: false`), anchored as its growth was. A
+   * text that is already wider keeps growing.
+   */
+  maxWidth?: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (textElement.isDeleted) {
     return;
+  }
+  if (
+    maxWidth !== undefined &&
+    !container &&
+    textElement.autoResize &&
+    textElement.width <= maxWidth
+  ) {
+    const font = getFontString(textElement);
+    if (
+      measureText(text, font, textElement.lineHeight, renderEnvironment).width >
+      maxWidth
+    ) {
+      const wrappedText = wrapText(text, font, maxWidth, renderEnvironment);
+      return {
+        text: wrappedText,
+        autoResize: false,
+        ...getAdjustedDimensions(
+          textElement,
+          elementsMap,
+          wrappedText,
+          maxWidth,
+          renderEnvironment,
+        ),
+      };
+    }
   }
   if (container || !textElement.autoResize) {
     text = wrapText(
@@ -433,9 +586,16 @@ export const refreshTextDimensions = (
       container
         ? getBoundTextMaxWidth(container, textElement)
         : textElement.width,
+      renderEnvironment,
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
+  const dimensions = getAdjustedDimensions(
+    textElement,
+    elementsMap,
+    text,
+    undefined,
+    renderEnvironment,
+  );
   return { text, ...dimensions };
 };
 
@@ -444,6 +604,7 @@ export const newFreeDrawElement = (
     type: "freedraw";
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
+    strokeOptions?: ExcalidrawFreeDrawElement["strokeOptions"];
     pressures?: ExcalidrawFreeDrawElement["pressures"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
@@ -452,6 +613,10 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
+    strokeOptions: opts.strokeOptions ?? {
+      variability: "variable",
+      streamline: DEFAULT_STROKE_STREAMLINE,
+    },
   };
 };
 

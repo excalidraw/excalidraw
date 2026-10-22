@@ -4,10 +4,12 @@ import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
 import { getSelectedElementsByGroup } from "./groups";
 
+import { getNonDeletedElements } from ".";
+
 import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
-import type { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -15,16 +17,16 @@ export interface Alignment {
 }
 
 export const alignElements = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: NonDeletedExcalidrawElement[],
   alignment: Alignment,
   scene: Scene,
   appState: Readonly<AppState>,
-): ExcalidrawElement[] => {
-  const groups: ExcalidrawElement[][] = getSelectedElementsByGroup(
+): NonDeletedExcalidrawElement[] => {
+  const groups = getSelectedElementsByGroup(
     selectedElements,
     scene.getNonDeletedElementsMap(),
     appState,
-  );
+  ).map(getNonDeletedElements); // Nothing to align on deleted elements
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 
   return groups.flatMap((group) => {
@@ -50,7 +52,7 @@ export const alignElements = (
 };
 
 const calculateTranslation = (
-  group: ExcalidrawElement[],
+  group: readonly ExcalidrawElement[],
   selectionBoundingBox: BoundingBox,
   { axis, position }: Alignment,
 ): { x: number; y: number } => {

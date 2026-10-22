@@ -1,10 +1,16 @@
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+  isSelectionLikeTool,
+} from "@excalidraw/common";
 
 import {
+  isArrowElement,
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isLineElement,
+  isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
 } from "@excalidraw/element";
@@ -39,7 +45,8 @@ const getHints = ({
   isMobile,
   editorInterface,
   app,
-}: HintViewerProps): null | string | string[] => {
+  altHeld,
+}: HintViewerProps & { altHeld: boolean }): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
@@ -103,6 +110,14 @@ const getHints = ({
     return t("hints.embeddable");
   }
 
+  if (activeTool.type === "stickynote") {
+    return t("hints.stickynote");
+  }
+
+  if (activeTool.type === "autoshape") {
+    return t("hints.autoshape");
+  }
+
   if (
     isResizing &&
     lastPointerDownWith === "mouse" &&
@@ -112,6 +127,17 @@ const getHints = ({
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
       return t("hints.lockAngle", {
         shortcut: getTaggedShortcutKey("Shift"),
+      });
+    }
+    if (
+      isStickyNoteElement(targetElement) &&
+      // a note's corners are proportional by default (Shift frees them); its
+      // edges are free by default, so they get the generic hint below
+      app.activeResizeHandle?.length === 2
+    ) {
+      return t("hints.resizeStickyNote", {
+        shortcut_1: getTaggedShortcutKey("Shift"),
+        shortcut_2: getTaggedShortcutKey("Alt"),
       });
     }
     return isImageElement(targetElement)
@@ -128,6 +154,23 @@ const getHints = ({
   if (isRotating && lastPointerDownWith === "mouse") {
     return t("hints.rotate", {
       shortcut: getTaggedShortcutKey("Shift"),
+    });
+  }
+
+  if (
+    // as the alt-click that cycles it (Shift and Ctrl/Cmd don't re-render
+    // the hint, they're read as they are when Alt does)
+    altHeld &&
+    !app.modifiers.get().shift &&
+    !app.modifiers.get().ctrlOrCmd &&
+    !isMobile &&
+    isSelectionLikeTool(activeTool.type) &&
+    !appState.editingTextElement &&
+    !appState.selectedElementsAreBeingDragged &&
+    app.selectionTool.canCycleSelection()
+  ) {
+    return t("hints.cycleSelection", {
+      shortcut: getTaggedShortcutKey("Alt"),
     });
   }
 
@@ -184,6 +227,16 @@ const getHints = ({
 
     if (selectedElements.length === 1) {
       if (isLinearElement(selectedElements[0])) {
+        if (
+          isArrowElement(selectedElements[0]) &&
+          appState.selectedLinearElement?.elementId ===
+            selectedElements[0].id &&
+          (appState.selectedLinearElement.hoverPointIndex === 0 ||
+            appState.selectedLinearElement.hoverPointIndex ===
+              selectedElements[0].points.length - 1)
+        ) {
+          return t("hints.toggleArrowhead");
+        }
         if (appState.selectedLinearElement?.isEditing) {
           return appState.selectedLinearElement.selectedPointsIndices
             ? t("hints.lineEditor_pointSelected", {
@@ -242,11 +295,18 @@ export const HintViewer = ({
   editorInterface,
   app,
 }: HintViewerProps) => {
+  const altHeld = app.modifiers.useHeld("alt");
+
+  if (!appState.showHints) {
+    return null;
+  }
+
   const hints = getHints({
     appState,
     isMobile,
     editorInterface,
     app,
+    altHeld,
   });
 
   if (!hints) {

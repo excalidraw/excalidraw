@@ -2,9 +2,15 @@ import type {
   ExcalidrawElement,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
+import type {
+  AppProps,
+  AppState,
+  NormalizedZoomValue,
+} from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
+
+export { DEFAULT_STICKY_NOTE_BG } from "./colors";
 
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
@@ -16,6 +22,12 @@ export const APP_NAME = "Excalidraw";
 // don't unintentionally create text elements that are wrapped to a few chars
 // (happens a lot with fast clicks with the text tool)
 export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
+// room left at each side of the visible canvas when a text stops growing at
+// its width, or is brought into view once it wraps
+export const TEXT_VIEWPORT_PADDING = 20; // px
+// the widest a typed or pasted text gets before it wraps (in scene units, so
+// at any zoom), however wide the view
+export const TEXT_MAX_WRAP_WIDTH = 800; // px
 export const DRAGGING_THRESHOLD = 10; // px
 export const MINIMUM_ARROW_SIZE = 20; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
@@ -69,6 +81,7 @@ export enum EVENT {
   POINTER_MOVE = "pointermove",
   POINTER_DOWN = "pointerdown",
   POINTER_UP = "pointerup",
+  POINTER_CANCEL = "pointercancel",
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",
   TOUCH_START = "touchstart",
@@ -211,7 +224,56 @@ export const FRAME_STYLE = {
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
+export const STICKY_NOTE_MIN_FONT_SIZE = 16;
+export const STICKY_NOTE_MAX_FONT_SIZE = 512;
+export const STICKY_NOTE_FALLBACK_FONT_SIZE = 28;
+export const STICKY_NOTE_FONT_STEP = 2;
+export const STICKY_NOTE_PADDING = 16;
+/**
+ * The creation-date footer: a 20px text row under the label body plus a 12px
+ * gap above it, inside the note's bottom padding. Reserved for every note —
+ * also when `created` is unknown — so geometry never depends on data
+ * availability. The label is chosen by width bucket, never measured, so
+ * painting stays measurement-free (the server has no text measurer):
+ * `minBodyWidthForYear` is the worst case ("30 May 2026") in the system sans
+ * stack at 12px, with margin for wider fallbacks such as DejaVu Sans.
+ */
+/**
+ * The creation-date footer of a sticky note. The label body ends `height`
+ * above the note's bottom padding, and the date's baseline sits
+ * `baselineFromBottom` above the note's bottom edge — so the 12px glyphs
+ * (~9px above the baseline, ~3px below) end up roughly 11px from the edge
+ * with a ~13px gap to the label body above them.
+ */
+export const STICKY_NOTE_FOOTER = {
+  height: 20,
+  fontSize: 12,
+  fontFamily: "Helvetica, Arial, sans-serif",
+  baselineFromBottom: 14,
+  opacity: 1,
+  minBodyWidthForYear: 80,
+} as const;
+/**
+ * outer height → label body height: top + bottom padding + footer. The body
+ * is what the label is fitted into; a middle-aligned label is still centered
+ * in the whole padded note when it fits (see `computeBoundTextPosition`).
+ */
+export const STICKY_NOTE_BODY_INSET_Y =
+  STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.height;
+export const DEFAULT_STICKY_NOTE_SIZE = 250;
+// floor for a finalized note's width and base height; the UI floor is font-aware
+// on top of it (see `getStickyNoteMinSize`)
+export const STICKY_NOTE_MIN_SIZE = 75;
+export const STICKY_NOTE_SHADOW_OFFSET = 3;
+export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
+export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
+export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+/** number of slots in the font-picker top-picks strip — pick customization
+ * (replace / reorder) preserves it. Must equal `DEFAULT_FONTS.length` in
+ * `packages/excalidraw/components/FontPicker/FontPicker.tsx` (enforced by
+ * `fontTopPicks.test.ts`) */
+export const FONT_TOP_PICKS_SLOTS = 3;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
@@ -299,9 +361,14 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
+export const ZEN_MODE_TRANSITION_DURATION = 250;
 export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 30;
+/** 100% zoom, for computations that have no editor zoom to go by */
+export const DEFAULT_ZOOM: AppState["zoom"] = Object.freeze({
+  value: 1 as NormalizedZoomValue,
+});
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
@@ -337,9 +404,10 @@ export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
 
-export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
-
-export const MAX_ALLOWED_FILE_BYTES = 4 * 1024 * 1024;
+export const DEFAULT_IMAGE_OPTIONS: AppProps["imageOptions"] = {
+  maxWidthOrHeight: 1440,
+  maxFileSizeBytes: 4 * 1024 * 1024,
+};
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 export const SVG_DOCUMENT_PREAMBLE = `<?xml version="1.0" standalone="no"?>
@@ -370,6 +438,7 @@ export const TEXT_ALIGN = {
 };
 
 export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
+export const ELEMENT_PENDING_DRAW_SHAPE_OPACITY = 70;
 
 // Radius represented as 25% of element's largest side (width/height).
 // Used for LEGACY and PROPORTIONAL_RADIUS algorithms, or when the element is
@@ -403,11 +472,47 @@ export const ROUGHNESS = {
   cartoonist: 2,
 } as const;
 
-export const STROKE_WIDTH = {
+export type StrokeWidthKey = "thin" | "medium" | "bold";
+
+export const STROKE_WIDTH_KEYS: readonly StrokeWidthKey[] = [
+  "thin",
+  "medium",
+  "bold",
+];
+
+export const STROKE_WIDTH: Readonly<
+  Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
+> = {
   thin: 1,
+  medium: 2,
+  bold: 4,
+  extraBold: 8, // unused (may be introduced in the future)
+};
+
+// freedraw schema 2.0 uses thinner stroke, but to maintain backwards and
+// forwards compatibility, instead of changing the shape renderer, we scale
+// the stroke width by 1/2 (previous, thin was 1, medium 2 etc.)
+//
+// note that in the UI, STROKE_WIDTH.thin == FREEDRAW_STROKE_WIDTH.thin still
+export const FREEDRAW_STROKE_WIDTH: Readonly<
+  Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
+> = {
+  thin: 0.5,
+  medium: 1,
   bold: 2,
-  extraBold: 4,
-} as const;
+  extraBold: 4, // legacy (may be used again in the future)
+};
+
+export const getStrokeWidthByKey = (
+  elementType: ExcalidrawElement["type"],
+  strokeWidthKey: StrokeWidthKey,
+): ExcalidrawElement["strokeWidth"] => {
+  return elementType === "freedraw"
+    ? FREEDRAW_STROKE_WIDTH[strokeWidthKey]
+    : STROKE_WIDTH[strokeWidthKey];
+};
+
+export const DEFAULT_ELEMENT_STROKE_WIDTH_KEY: StrokeWidthKey = "medium";
 
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
@@ -422,7 +527,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
   fillStyle: "solid",
-  strokeWidth: 2,
+  strokeWidth: STROKE_WIDTH[DEFAULT_ELEMENT_STROKE_WIDTH_KEY],
   strokeStyle: "solid",
   roughness: ROUGHNESS.artist,
   opacity: 100,
@@ -459,8 +564,11 @@ export const TOOL_TYPE = {
   hand: "hand",
   frame: "frame",
   magicframe: "magicframe",
+  stickynote: "stickynote",
   embeddable: "embeddable",
   laser: "laser",
+  autoshape: "autoshape",
+  bucketfill: "bucketfill",
 } as const;
 
 export const EDITOR_LS_KEYS = {
@@ -513,3 +621,6 @@ export const BIND_MODE_TIMEOUT = 700; // ms
 export const MOBILE_ACTION_BUTTON_BG = {
   background: "var(--mobile-action-button-bg)",
 } as const;
+
+export const DEFAULT_STROKE_STREAMLINE = 0.5;
+export const DEFAULT_STROKE_STREAMLINE_PRECISE = 0.2;

@@ -9,10 +9,7 @@ import { getNonDeletedElements } from "@excalidraw/element";
 
 import { LinearElementEditor } from "@excalidraw/element";
 
-import {
-  getSelectedElements,
-  getSelectionStateForElements,
-} from "@excalidraw/element";
+import { getSelectedElements } from "@excalidraw/element";
 
 import { syncMovedIndices } from "@excalidraw/element";
 
@@ -20,7 +17,7 @@ import { duplicateElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
@@ -28,6 +25,8 @@ import { isSomeElementSelected } from "../scene";
 import { getShortcutKey } from "../shortcut";
 
 import { useStylesPanelMode } from "../components/App";
+
+import { getSelectionStateForElements } from "../components/App.selection";
 
 import { register } from "./register";
 
@@ -60,7 +59,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    let { duplicatedElements, elementsWithDuplicates } = duplicateElements({
+    const duplication = duplicateElements({
       type: "in-place",
       elements,
       idsOfElementsToDuplicate: arrayToMap(
@@ -82,15 +81,23 @@ export const actionDuplicateSelection = register({
       },
     });
 
-    if (app.props.onDuplicate && elementsWithDuplicates) {
-      const mappedElements = app.props.onDuplicate(
-        elementsWithDuplicates,
-        elements,
-      );
-      if (mappedElements) {
-        elementsWithDuplicates = mappedElements;
+    let { duplicatedElements, elementsWithDuplicates } = duplication;
+
+    if (app.props.onDuplicate) {
+      ({ elements: elementsWithDuplicates, duplicatedElements } =
+        app.duplicate.runOnDuplicate(
+          duplication,
+          elementsWithDuplicates,
+          elements,
+        ));
+
+      // host vetoed the duplication
+      if (!duplicatedElements.length) {
+        return false;
       }
     }
+
+    app.duplicate.advanceListMarkers(duplicatedElements);
 
     return {
       elements: syncMovedIndices(
@@ -113,7 +120,7 @@ export const actionDuplicateSelection = register({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={DuplicateIcon}
         title={`${t("labels.duplicateSelection")} — ${getShortcutKey(

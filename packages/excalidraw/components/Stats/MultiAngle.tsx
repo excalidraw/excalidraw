@@ -7,7 +7,7 @@ import { isInGroup } from "@excalidraw/element";
 
 import type { Degrees } from "@excalidraw/math";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -20,7 +20,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
 
 interface MultiAngleProps {
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   scene: Scene;
   appState: AppState;
   property: "angle";
