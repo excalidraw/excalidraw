@@ -5,13 +5,24 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   FREEDRAW_STROKE_WIDTH,
   FONT_FAMILY,
+  KEYS,
   STROKE_WIDTH,
 } from "@excalidraw/common";
 
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
-import { UI } from "../tests/helpers/ui";
-import { render } from "../tests/test-utils";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { act, render } from "../tests/test-utils";
+
+import {
+  actionChangeFontFamily,
+  actionIncreaseFontSize,
+} from "./actionProperties";
+
+const { h } = window;
+const mouse = new Pointer("mouse");
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -252,4 +263,87 @@ describe("element locking", () => {
       );
     });
   });
+});
+
+describe("arrows bound to a text whose font changes", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const setup = (elbowed: boolean) => {
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      x: 300,
+      y: 0,
+      text: "first line\nsecond line\nthird line",
+      fontSize: 40,
+      fontFamily: FONT_FAMILY.Excalifont,
+    });
+    API.setElements([text]);
+
+    // ends near the text's bottom-left, so a taller text moves the end
+    UI.clickTool("arrow");
+    if (elbowed) {
+      UI.clickOnTestId("elbow-arrow");
+    }
+    mouse.reset();
+    mouse.downAt(0, text.y + text.height * 0.9);
+    mouse.moveTo(150, text.y + text.height * 0.9);
+    mouse.moveTo(text.x + 5, text.y + text.height * 0.9);
+    mouse.up();
+
+    const arrow = h.elements.find(
+      (el) => el.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(text.id);
+
+    API.setSelectedElements([text]);
+
+    return arrow.id;
+  };
+
+  const getArrowEnd = (arrowId: string) => {
+    const arrow = h.elements.find(
+      (el) => el.id === arrowId,
+    ) as ExcalidrawArrowElement;
+    const [x, y] = arrow.points[arrow.points.length - 1];
+    return [arrow.x + x, arrow.y + y];
+  };
+
+  // nudging the text re-routes its arrows from scratch
+  const getRoutedArrowEnd = (arrowId: string) => {
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    return getArrowEnd(arrowId);
+  };
+
+  for (const elbowed of [false, true]) {
+    const arrowType = elbowed ? "elbow" : "simple";
+
+    it(`re-routes a bound ${arrowType} arrow when changing the font family`, () => {
+      const arrowId = setup(elbowed);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeFontFamily, "ui", {
+          currentItemFontFamily: FONT_FAMILY["Lilita One"],
+          currentHoveredFontFamily: null,
+        });
+      });
+
+      const end = getArrowEnd(arrowId);
+      expect(end).toEqual(getRoutedArrowEnd(arrowId));
+    });
+
+    it(`re-routes a bound ${arrowType} arrow when changing the font size`, () => {
+      const arrowId = setup(elbowed);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionIncreaseFontSize);
+      });
+
+      const end = getArrowEnd(arrowId);
+      expect(end).toEqual(getRoutedArrowEnd(arrowId));
+    });
+  }
 });
