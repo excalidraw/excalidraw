@@ -228,12 +228,12 @@ import type {
   IframeData,
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
-  Ordered,
   MagicGenerationData,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
   NonDeletedSceneElementsMap,
+  NonRestoredExcalidrawElement,
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
@@ -1803,7 +1803,7 @@ class App extends React.Component<AppProps, AppState> {
     const embeddableElements = this.scene
       .getNonDeletedElements()
       .filter(
-        (el): el is Ordered<NonDeleted<ExcalidrawIframeLikeElement>> =>
+        (el): el is NonDeleted<ExcalidrawIframeLikeElement> =>
           (isEmbeddableElement(el) &&
             this.embedsValidationStatus.get(el.id) === true) ||
           isIframeElement(el),
@@ -4989,7 +4989,14 @@ class App extends React.Component<AppProps, AppState> {
        */
       captureUpdate?: SceneData["captureUpdate"];
     }) => {
-      const { elements, appState, collaborators, captureUpdate } = sceneData;
+      const { appState, collaborators, captureUpdate } = sceneData;
+      // elements passed by the host app don't have to be ordered, their
+      // indices get assigned in place by `scene.replaceAllElements` below
+      // (the same instances are passed to the store)
+      const elements = sceneData.elements as
+        | readonly ExcalidrawElement[]
+        | null
+        | undefined;
 
       if (captureUpdate) {
         const nextElements = elements ? elements : undefined;
@@ -6048,7 +6055,7 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement>[] {
-    const iframeLikes: Ordered<NonDeleted<ExcalidrawIframeLikeElement>>[] = [];
+    const iframeLikes: NonDeleted<ExcalidrawIframeLikeElement>[] = [];
 
     const elements = (
       opts?.includeBoundTextElement && opts?.includeLockedElements
@@ -11452,7 +11459,9 @@ declare global {
   interface Window {
     h: {
       scene: Scene;
-      elements: readonly ExcalidrawElement[];
+      get elements(): readonly ExcalidrawElement[];
+      /** elements don't have to be ordered, indices are synced on set */
+      set elements(elements: readonly NonRestoredExcalidrawElement[]);
       state: AppState;
       setState: React.Component<any, AppState>["setState"];
       watchState: (prev: any, next: any) => void | undefined;
@@ -11473,9 +11482,10 @@ export const createTestHook = () => {
         get() {
           return this.app?.scene.getElementsIncludingDeleted();
         },
-        set(elements: ExcalidrawElement[]) {
+        set(elements: readonly NonRestoredExcalidrawElement[]) {
           return this.app?.scene.replaceAllElements(
-            syncInvalidIndices(elements),
+            // assigns the missing indices
+            syncInvalidIndices(elements as readonly ExcalidrawElement[]),
           );
         },
       },

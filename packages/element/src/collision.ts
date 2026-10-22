@@ -81,7 +81,6 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  Ordered,
 } from "./types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -362,7 +361,7 @@ export const isOpaqueForBinding = (element: ExcalidrawElement) =>
  */
 const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   zoom: AppState["zoom"],
 ): BindingCandidate[] => {
@@ -426,7 +425,7 @@ const getBindingCandidates = (
  */
 export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   zoom: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement>[] =>
@@ -436,7 +435,7 @@ export const getAllHoveredElementAtPoint = (
 
 export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   zoom: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {

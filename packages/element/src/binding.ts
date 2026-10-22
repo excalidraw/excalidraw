@@ -85,7 +85,6 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  Ordered,
   PointsPositionUpdates,
 } from "./types";
 
@@ -268,7 +267,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   zoom: AppState["zoom"],
 ): {
   start: BindingStrategy;
@@ -320,7 +319,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   startDragged: boolean,
   endDragged: boolean,
   startIdx: number,
@@ -489,7 +488,7 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   currentBinding: FixedPointBinding | null,
   oppositeBinding: FixedPointBinding | null,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   globalBindMode: AppState["bindMode"],
   arrow: NonDeleted<ExcalidrawArrowElement>,
   zoom: AppState["zoom"],
@@ -617,7 +616,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   screenPointerX: number,
   screenPointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;
@@ -657,7 +656,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   scenePointerX: number,
   scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;
@@ -965,7 +964,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   opts?: {
     newArrow?: boolean;

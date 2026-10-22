@@ -2,10 +2,7 @@ import { syncInvalidIndices } from "@excalidraw/element";
 
 import { randomInteger, cloneJSON } from "@excalidraw/common";
 
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { reconcileElements } from "../../data/reconcile";
 
@@ -311,7 +308,7 @@ describe("elements reconciliation", () => {
       expected: Id[],
     ) => {
       const ret = reconcileElements(
-        local as unknown as OrderedExcalidrawElement[],
+        local as unknown as ExcalidrawElement[],
         remote as unknown as RemoteExcalidrawElement[],
         {} as AppState,
       );

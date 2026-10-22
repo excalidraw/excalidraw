@@ -1,6 +1,9 @@
 import type { VERSIONS } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonRestoredExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { cleanAppStateForExport } from "../appState";
 import type {
@@ -36,7 +39,7 @@ export interface ImportedDataState {
   type?: string;
   version?: number;
   source?: string;
-  elements?: readonly ExcalidrawElement[] | null;
+  elements?: readonly NonRestoredExcalidrawElement[] | null;
   appState?: Readonly<
     Partial<
       AppState & {
