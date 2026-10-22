@@ -3,10 +3,10 @@ import React from "react";
 import { SVG_NS } from "@excalidraw/common";
 import { vi } from "vitest";
 
-import type { FileId } from "@excalidraw/element/types";
+import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
-import * as clipboard from "../clipboard";
+import * as clipboardModule from "../clipboard";
 import { exportCanvas, prepareElementsForExport } from "../data";
 import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
@@ -15,7 +15,7 @@ import { Excalidraw } from "../index";
 import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,
-  exportToSvg,
+  exportScene,
 } from "../scene/export";
 import * as sceneExport from "../scene/export";
 
@@ -30,6 +30,9 @@ const testElements = [
       type: "text",
       id: "A",
       text: "😀",
+      // a valid index, as in a real scene (restoring on export would
+      // otherwise re-index it, bumping its version with a random nonce)
+      index: "a0" as FractionalIndex,
     }),
     // can't get jsdom text measurement to work so this is a temp hack
     // to ensure the element isn't stripped as invisible
@@ -86,12 +89,42 @@ describe("export", () => {
     ]);
   });
 
+  it("exports SVG at the export scale", async () => {
+    const copySpy = vi
+      .spyOn(clipboardModule, "copyTextToSystemClipboard")
+      .mockResolvedValue();
+    const exportedWidthAt = async (exportScale: number) => {
+      const appState = { ...h.state, exportScale };
+      const { exportedElements } = prepareElementsForExport(
+        testElements,
+        appState,
+        false,
+      );
+      await exportCanvas(
+        "clipboard-svg",
+        exportedElements,
+        appState,
+        {},
+        { exportingFrame: null },
+      );
+      const svg = copySpy.mock.lastCall![0] as string;
+      return Number(/<svg[^>]* width="([\d.]+)"/.exec(svg)![1]);
+    };
+
+    expect(await exportedWidthAt(2)).toBe((await exportedWidthAt(1)) * 2);
+    copySpy.mockRestore();
+  });
+
   it("export svg-embedded scene", async () => {
-    const svg = await exportToSvg(
-      testElements,
-      { ...getDefaultAppState(), exportEmbedScene: true },
-      {},
-    );
+    const svg = await exportScene({
+      type: "svg",
+      data: {
+        elements: testElements,
+        appState: getDefaultAppState(),
+        files: {},
+      },
+      config: { embedScene: true },
+    });
     const svgText = svg.outerHTML;
 
     expect(svgText).toMatchSnapshot(`svg-embdedded scene export output`);
@@ -104,9 +137,9 @@ describe("export", () => {
       { selectedElementIds: {} },
       false,
     );
-    const exportToSvgSpy = vi.spyOn(sceneExport, "exportToSvg");
+    const exportSceneSpy = vi.spyOn(sceneExport, "exportScene");
     const copyToClipboardSpy = vi
-      .spyOn(clipboard, "copyTextToSystemClipboard")
+      .spyOn(clipboardModule, "copyTextToSystemClipboard")
       .mockResolvedValue(undefined);
 
     try {
@@ -116,23 +149,26 @@ describe("export", () => {
         { ...h.state, name: title },
         {},
         {
-          exportBackground: false,
           name: title,
-          viewBackgroundColor: "#ffffff",
           exportingFrame,
         },
       );
 
-      expect(exportToSvgSpy).toHaveBeenCalledWith(
-        exportedElements,
-        expect.objectContaining({ exportBackground: false }),
-        {},
-        expect.objectContaining({ title }),
+      expect(exportSceneSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "svg",
+          data: expect.objectContaining({ elements: exportedElements }),
+          config: expect.objectContaining({ title }),
+        }),
       );
-      expect(copyToClipboardSpy).toHaveBeenCalledWith(expect.any(String));
+      expect(copyToClipboardSpy.mock.lastCall?.[0]).toEqual(
+        expect.stringContaining(
+          "<title>R&amp;D &lt;Roadmap&gt; &gt; Q4</title>",
+        ),
+      );
     } finally {
       copyToClipboardSpy.mockRestore();
-      exportToSvgSpy.mockRestore();
+      exportSceneSpy.mockRestore();
     }
   });
 
@@ -237,7 +273,7 @@ describe("export", () => {
         angle: normalizeAngle(315),
       }),
     ];
-    const appState = { ...getDefaultAppState(), exportBackground: false };
+    const appState = getDefaultAppState();
     const files = {
       file_A: {
         id: "file_A" as FileId,
@@ -248,7 +284,15 @@ describe("export", () => {
       },
     } as const;
 
-    const svg = await exportToSvg(elements, appState, files);
+    const svg = await exportScene({
+      type: "svg",
+      data: {
+        elements,
+        appState,
+        files,
+      },
+      config: { canvasBackgroundColor: false },
+    });
 
     const svgText = svg.outerHTML;
 
