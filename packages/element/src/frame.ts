@@ -33,6 +33,7 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { syncMovedIndices } from "./fractionalIndex";
 import {
+  isArrowElement,
   isFrameElement,
   isFrameLikeElement,
   isTextElement,
@@ -45,6 +46,7 @@ import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 import type {
   ElementsMap,
   ElementsMapOrArray,
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -719,7 +721,7 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
   ).slice();
 };
 
-/** does not mutate elements, but returns new ones */
+/** Updates frame membership of moved elements and their attached arrows. */
 export const updateFrameMembershipOfSelectedElements = <
   T extends ElementsMapOrArray,
 >(
@@ -762,6 +764,40 @@ export const updateFrameMembershipOfSelectedElements = <
 
   if (elementsToRemove.size > 0) {
     removeElementsFromFrame(elementsToRemove, elementsMap);
+  }
+
+  // Bound arrows move with their endpoints even when they aren't selected.
+  // Check them after updating the endpoints' membership, including when a
+  // selected shape has just left its frame or joined a different one.
+  const boundArrows = new Set<ExcalidrawArrowElement>();
+  for (const element of elementsToFilter) {
+    for (const boundElement of element.boundElements ?? []) {
+      const arrow = elementsMap.get(boundElement.id);
+      if (arrow && !arrow.isDeleted && isArrowElement(arrow)) {
+        boundArrows.add(arrow);
+      }
+    }
+  }
+
+  const arrowsToRemove = new Set<ExcalidrawElement>();
+  for (const arrow of boundArrows) {
+    if (
+      arrow.frameId &&
+      [arrow.startBinding, arrow.endBinding].some((binding) => {
+        const endpoint = binding && elementsMap.get(binding.elementId);
+        return (
+          endpoint &&
+          !endpoint.isDeleted &&
+          endpoint.id !== arrow.frameId &&
+          endpoint.frameId !== arrow.frameId
+        );
+      })
+    ) {
+      arrowsToRemove.add(arrow);
+    }
+  }
+  if (arrowsToRemove.size > 0) {
+    removeElementsFromFrame(arrowsToRemove, elementsMap);
   }
   return allElements;
 };
