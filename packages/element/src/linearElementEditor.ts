@@ -1883,8 +1883,20 @@ export class LinearElementEditor {
         pointFrom(dX, dY),
         element.angle,
       );
+      // only the bindings: `movePoints()` options (e.g.
+      // `moveMidPointsWithElement`) aren't element properties
+      const bindingUpdates: {
+        startBinding?: FixedPointBinding | null;
+        endBinding?: FixedPointBinding | null;
+      } = {};
+      if (otherUpdates?.startBinding !== undefined) {
+        bindingUpdates.startBinding = otherUpdates.startBinding;
+      }
+      if (otherUpdates?.endBinding !== undefined) {
+        bindingUpdates.endBinding = otherUpdates.endBinding;
+      }
       scene.mutateElement(element, {
-        ...otherUpdates,
+        ...bindingUpdates,
         points: nextPoints,
         x: element.x + rotatedOffset[0],
         y: element.y + rotatedOffset[1],
