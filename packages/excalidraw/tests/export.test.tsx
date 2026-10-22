@@ -1,10 +1,13 @@
 import React from "react";
 
 import { SVG_NS } from "@excalidraw/common";
+import { vi } from "vitest";
 
 import type { FileId } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
+import * as clipboard from "../clipboard";
+import { exportCanvas, prepareElementsForExport } from "../data";
 import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
@@ -14,6 +17,7 @@ import {
   encodeSvgBase64Payload,
   exportToSvg,
 } from "../scene/export";
+import * as sceneExport from "../scene/export";
 
 import { API } from "./helpers/api";
 import { render, waitFor } from "./test-utils";
@@ -91,6 +95,45 @@ describe("export", () => {
     const svgText = svg.outerHTML;
 
     expect(svgText).toMatchSnapshot(`svg-embdedded scene export output`);
+  });
+
+  it("passes the export name to SVG generation", async () => {
+    const title = "R&D <Roadmap> > Q4";
+    const { exportedElements, exportingFrame } = prepareElementsForExport(
+      testElements,
+      { selectedElementIds: {} },
+      false,
+    );
+    const exportToSvgSpy = vi.spyOn(sceneExport, "exportToSvg");
+    const copyToClipboardSpy = vi
+      .spyOn(clipboard, "copyTextToSystemClipboard")
+      .mockResolvedValue(undefined);
+
+    try {
+      await exportCanvas(
+        "clipboard-svg",
+        exportedElements,
+        { ...h.state, name: title },
+        {},
+        {
+          exportBackground: false,
+          name: title,
+          viewBackgroundColor: "#ffffff",
+          exportingFrame,
+        },
+      );
+
+      expect(exportToSvgSpy).toHaveBeenCalledWith(
+        exportedElements,
+        expect.objectContaining({ exportBackground: false }),
+        {},
+        expect.objectContaining({ title }),
+      );
+      expect(copyToClipboardSpy).toHaveBeenCalledWith(expect.any(String));
+    } finally {
+      copyToClipboardSpy.mockRestore();
+      exportToSvgSpy.mockRestore();
+    }
   });
 
   it("import embedded png (legacy v1)", async () => {

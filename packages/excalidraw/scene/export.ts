@@ -308,6 +308,7 @@ export const exportToSvg = async (
      */
     renderEmbeddables?: boolean;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    title?: string | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
   },
@@ -325,7 +326,7 @@ export const exportToSvg = async (
     exportEmbedScene,
   } = appState;
 
-  const { exportingFrame = null } = opts || {};
+  const { exportingFrame = null, title } = opts || {};
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -367,6 +368,11 @@ export const exportToSvg = async (
 
   svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
   svgRoot.appendChild(metadataElement);
+  if (title?.trim()) {
+    const titleElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "title");
+    titleElement.textContent = title;
+    svgRoot.appendChild(titleElement);
+  }
   svgRoot.appendChild(defsElement);
 
   // ---------------------------------------------------------------------------

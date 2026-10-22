@@ -5,6 +5,7 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  SVG_NS,
 } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
@@ -73,6 +74,33 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement).toMatchSnapshot();
+    expect(svgElement.querySelector("title")).toBeNull();
+  });
+
+  it("with a title", async () => {
+    const title = "R&D <Roadmap> > Q4";
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      DEFAULT_OPTIONS,
+      null,
+      { title },
+    );
+
+    const titleElement = svgElement.querySelector("title");
+    expect(titleElement?.namespaceURI).toBe(SVG_NS);
+    expect(titleElement?.textContent).toBe(title);
+    expect(titleElement?.childElementCount).toBe(0);
+  });
+
+  it.each(["", "   "])("without a title when title is %j", async (title) => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      DEFAULT_OPTIONS,
+      null,
+      { title },
+    );
+
+    expect(svgElement.querySelector("title")).toBeNull();
   });
 
   it("with a CJK font", async () => {
