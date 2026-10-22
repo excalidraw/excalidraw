@@ -1878,9 +1878,9 @@ const _renderInteractiveScene = ({
 
       for (const element of elementsMap.values()) {
         const selectionColors = [];
-        const remoteClients = renderConfig.remoteSelectedElementIds.get(
-          element.id,
-        );
+        const remoteClients = appState.collaboratorsCursorsHidden
+          ? undefined
+          : renderConfig.remoteSelectedElementIds.get(element.id);
         if (
           !(
             // Elbow arrow elements cannot be selected when bound on either end
@@ -1899,7 +1899,7 @@ const _renderInteractiveScene = ({
             selectionColors.push(selectionColor);
           }
           // remote users
-          if (remoteClients && !appState.collaboratorsCursorsHidden) {
+          if (remoteClients) {
             selectionColors.push(
               ...remoteClients.map((socketId) => {
                 const background = getClientColor(
