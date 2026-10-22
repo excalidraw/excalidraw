@@ -104,6 +104,7 @@ import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
 import { IconButton } from "../components/IconButton";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { getPresetAppStateUpdates } from "../components/ColorPicker/colorTopPickUtils";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
@@ -177,7 +178,12 @@ import {
 } from "./colorTargets";
 import { register } from "./register";
 
-import type { AppClassProperties, AppState, Primitive } from "../types";
+import type {
+  AppClassProperties,
+  AppState,
+  Primitive,
+  SavedPenPreset,
+} from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -360,14 +366,33 @@ const changeFontSize = (
 
 // -----------------------------------------------------------------------------
 
+const getPresetElementUpdates = (
+  element: ExcalidrawElement,
+  preset: SavedPenPreset,
+) => ({
+  strokeWidth: getStrokeWidthByKey(element.type, preset.strokeWidthKey),
+  strokeStyle: preset.strokeStyle,
+  roughness: preset.roughness,
+  opacity: preset.opacity,
+  ...(hasFillStyle(element.type) ? { fillStyle: preset.fillStyle } : {}),
+  ...(element.type === "freedraw"
+    ? {
+        strokeOptions: {
+          ...element.strokeOptions,
+          variability: preset.strokeVariability,
+        },
+      }
+    : {}),
+});
+
 export const actionChangeStrokeColor = register<
-  Partial<AppState> & { color?: string }
+  Partial<AppState> & { color?: string; preset?: SavedPenPreset }
 >({
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
-    const { color, ...appStateUpdates } = value ?? {};
+    const { color, preset, ...appStateUpdates } = value ?? {};
     if (color === undefined) {
       return {
         appState: { ...appState, ...appStateUpdates },
@@ -388,10 +413,10 @@ export const actionChangeStrokeColor = register<
           appState,
           (el) =>
             hasStrokeColor(el.type)
-              ? newElementWith(
-                  el,
-                  getColorUpdate(el, "strokeColor", color, elementsMap),
-                )
+              ? newElementWith(el, {
+                  ...getColorUpdate(el, "strokeColor", color, elementsMap),
+                  ...(preset ? getPresetElementUpdates(el, preset) : {}),
+                })
               : el,
           true,
         ),
@@ -400,6 +425,7 @@ export const actionChangeStrokeColor = register<
       appState: {
         ...appState,
         ...appStateUpdates,
+        ...(preset ? getPresetAppStateUpdates(preset) : {}),
         ...getColorTargetAppStateUpdates(target, color),
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -429,7 +455,9 @@ export const actionChangeStrokeColor = register<
             true,
             (hasSelection) => (!hasSelection ? target.currentValue : null),
           )}
-          onChange={(color) => updateData({ color })}
+          onChange={(color, appStateUpdates, preset) =>
+            updateData({ color, preset, ...appStateUpdates })
+          }
           elements={elements}
           appState={appState}
           updateData={updateData}
@@ -440,13 +468,13 @@ export const actionChangeStrokeColor = register<
 });
 
 export const actionChangeBackgroundColor = register<
-  Partial<AppState> & { color?: string }
+  Partial<AppState> & { color?: string; preset?: SavedPenPreset }
 >({
   name: "changeBackgroundColor",
   label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    const { color, ...appStateUpdates } = value ?? {};
+    const { color, preset, ...appStateUpdates } = value ?? {};
     if (color === undefined) {
       return {
         appState: { ...appState, ...appStateUpdates },
@@ -474,6 +502,7 @@ export const actionChangeBackgroundColor = register<
           return newElementWith(el, {
             backgroundColor: color,
             ...toggleLinePolygonState(el, true),
+            ...(preset ? getPresetElementUpdates(el, preset) : {}),
           });
         }
         return el;
@@ -482,10 +511,10 @@ export const actionChangeBackgroundColor = register<
       nextElements = changeProperty(elements, appState, (el) =>
         // a note's label passes the pick on to the note (below)
         getColorTargetElement(el, "backgroundColor", elementsMap) === el
-          ? newElementWith(
-              el,
-              getColorUpdate(el, "backgroundColor", color, elementsMap),
-            )
+          ? newElementWith(el, {
+              ...getColorUpdate(el, "backgroundColor", color, elementsMap),
+              ...(preset ? getPresetElementUpdates(el, preset) : {}),
+            })
           : el,
       );
       // editing a note's label (no selection): the label has no fill, the
@@ -499,10 +528,10 @@ export const actionChangeBackgroundColor = register<
       if (editingTarget && editingTarget !== editingText) {
         nextElements = nextElements.map((el) =>
           el.id === editingTarget.id
-            ? newElementWith(
-                el,
-                getColorUpdate(el, "backgroundColor", color, elementsMap),
-              )
+            ? newElementWith(el, {
+                ...getColorUpdate(el, "backgroundColor", color, elementsMap),
+                ...(preset ? getPresetElementUpdates(el, preset) : {}),
+              })
             : el,
         );
       }
@@ -513,6 +542,7 @@ export const actionChangeBackgroundColor = register<
       appState: {
         ...appState,
         ...appStateUpdates,
+        ...(preset ? getPresetAppStateUpdates(preset) : {}),
         ...getColorTargetAppStateUpdates(target, color),
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -545,7 +575,9 @@ export const actionChangeBackgroundColor = register<
             true,
             (hasSelection) => (!hasSelection ? target.currentValue : null),
           )}
-          onChange={(color) => updateData({ color })}
+          onChange={(color, appStateUpdates, preset) =>
+            updateData({ color, preset, ...appStateUpdates })
+          }
           elements={elements}
           appState={appState}
           updateData={updateData}
@@ -596,8 +628,12 @@ export const actionChangeBucketFillBackgroundColor = register<
           color={app.bucketFill.getBucketFillBackgroundColor(
             appState.currentItemBackgroundColor,
           )}
-          onChange={(color) =>
-            updateData({ currentItemBackgroundColor: color })
+          onChange={(color, appStateUpdates, preset) =>
+            updateData({
+              currentItemBackgroundColor: color,
+              ...(preset ? getPresetAppStateUpdates(preset) : {}),
+              ...appStateUpdates,
+            })
           }
           elements={elements}
           appState={appState}
