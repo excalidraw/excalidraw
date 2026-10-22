@@ -8,9 +8,102 @@ import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+
+import type { Plugin, Rollup } from "vite";
+
+/**
+ * Collects into `lazyChunkFileNames` the chunks reachable only via a dynamic
+ * import of a module matching `moduleRegex`, so we can exclude them from the
+ * PWA precache. Needed for large lazy deps that Rollup splits into many
+ * arbitrarily named chunks (e.g. mermaid), which `globIgnores` can't target.
+ */
+const lazyChunksPlugin = (
+  moduleRegex: RegExp,
+  lazyChunkFileNames: Set<string>,
+): Plugin => ({
+  name: "excalidraw-lazy-chunks",
+  apply: "build",
+  generateBundle(_options, bundle) {
+    const chunks = new Map<string, Rollup.OutputChunk>();
+    for (const file of Object.values(bundle)) {
+      if (file.type === "chunk") {
+        chunks.set(file.fileName, file);
+      }
+    }
+
+    // the dynamically imported module may share its chunk with its deps
+    // (no `facadeModuleId` then), so match on any contained module
+    const isLazyRoot = (chunk: Rollup.OutputChunk) =>
+      chunk.isDynamicEntry &&
+      !chunk.isEntry &&
+      chunk.moduleIds.some((id) => moduleRegex.test(id));
+
+    const collectReachable = (
+      roots: Rollup.OutputChunk[],
+      skipDynamicImport: (chunk: Rollup.OutputChunk) => boolean,
+    ) => {
+      const reachable = new Set<string>();
+      const stack = [...roots];
+      while (stack.length) {
+        const chunk = stack.pop()!;
+        if (reachable.has(chunk.fileName)) {
+          continue;
+        }
+        reachable.add(chunk.fileName);
+        // static imports are always followed: they're needed whenever the
+        // importing chunk is loaded
+        for (const fileName of chunk.imports) {
+          const next = chunks.get(fileName);
+          if (next) {
+            stack.push(next);
+          }
+        }
+        for (const fileName of chunk.dynamicImports) {
+          const next = chunks.get(fileName);
+          if (next && !skipDynamicImport(next)) {
+            stack.push(next);
+          }
+        }
+      }
+      return reachable;
+    };
+
+    const lazyRoots = [...chunks.values()].filter(isLazyRoot);
+    if (!lazyRoots.length) {
+      this.warn(`no lazy-loaded chunk found for ${moduleRegex}`);
+    }
+
+    // anything also reachable without dynamically importing the lazy roots
+    // (e.g. deps shared with the main bundle, or a lazy root that Rollup
+    // merged into a statically imported chunk) must stay precached
+    const reachableOtherwise = collectReachable(
+      [...chunks.values()].filter((chunk) => chunk.isEntry),
+      isLazyRoot,
+    );
+
+    for (const chunk of lazyRoots) {
+      if (reachableOtherwise.has(chunk.fileName)) {
+        this.warn(
+          `${chunk.fileName} (matching ${moduleRegex}) is reachable without a dynamic import, so it's not lazy-loaded and stays precached`,
+        );
+      }
+    }
+
+    lazyChunkFileNames.clear();
+    for (const fileName of collectReachable(lazyRoots, () => false)) {
+      if (!reachableOtherwise.has(fileName)) {
+        lazyChunkFileNames.add(fileName);
+      }
+    }
+  },
+});
+
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
+  // mermaid (+ its many deps & per-diagram chunks) is lazy-loaded and large,
+  // so we don't precache it. Populated at build time by `lazyChunksPlugin`.
+  const mermaidChunkFileNames = new Set<string>();
   // https://vitejs.dev/config/
   return {
     server: {
@@ -108,6 +201,18 @@ export default defineConfig(({ mode }) => {
           // app precache. en.json and percentages.json are needed for first load
           // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
           manualChunks(id) {
+            // Bundler runtime helpers (dynamic import preloading, CJS interop)
+            // would otherwise live in the main bundle, and every lazy chunk
+            // importing them would get a new file name with each deploy. Tabs
+            // still running the previous version would then fail to load
+            // non-precached lazy chunks (e.g. mermaid) after a deploy.
+            if (
+              id === "\0vite/preload-helper.js" ||
+              id === "\0commonjsHelpers.js"
+            ) {
+              return "bundler-helpers";
+            }
+
             if (
               id.includes("packages/excalidraw/locales") &&
               id.match(/en.json|percentages.json/) === null
@@ -115,10 +220,6 @@ export default defineConfig(({ mode }) => {
               const index = id.indexOf("locales/");
               // Taking the substring after "locales/"
               return `locales/${id.substring(index + 8)}`;
-            }
-
-            if (id.includes("@excalidraw/mermaid-to-excalidraw")) {
-              return "mermaid-to-excalidraw";
             }
 
             if (id.includes("@codemirror/") || id.includes("@lezer/")) {
@@ -140,6 +241,10 @@ export default defineConfig(({ mode }) => {
         generateRobotsTxt: false,
       }),
       woff2BrowserPlugin(),
+      lazyChunksPlugin(
+        /[\\/]node_modules[\\/]@excalidraw[\\/]mermaid-to-excalidraw[\\/]/,
+        mermaidChunkFileNames,
+      ),
       react(),
       checker({
         typescript: true,
@@ -173,6 +278,19 @@ export default defineConfig(({ mode }) => {
             // via a static import from the main bundle, defeating lazy
             // loading. So we exclude it by name instead.
             "**/CodeMirrorEditor-*.js",
+            // lazy-loaded Firebase SDK, only needed for collab/sharing, which
+            // require network anyway
+            "**/firebaseSDK-*.js",
+          ],
+          // mermaid chunks are excluded here rather than via `globIgnores`
+          // as their file names are arbitrary
+          manifestTransforms: [
+            (entries) => ({
+              manifest: entries.filter(
+                (entry) => !mermaidChunkFileNames.has(entry.url),
+              ),
+              warnings: [],
+            }),
           ],
           runtimeCaching: [
             {
@@ -218,6 +336,17 @@ export default defineConfig(({ mode }) => {
                 cacheName: "chunk",
                 expiration: {
                   maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
+                },
+              },
+            },
+            {
+              urlPattern: new RegExp("/assets/[^/]+\\.js$"),
+              handler: "CacheFirst",
+              options: {
+                cacheName: "lazy-chunks",
+                expiration: {
+                  maxEntries: 200,
                   maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
                 },
               },

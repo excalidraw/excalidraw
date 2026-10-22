@@ -13,6 +13,33 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Export API: `exportScene` (2026-10-18) [#12347](https://github.com/excalidraw/excalidraw/pull/12347)
+
+Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidraw/excalidraw` and `@excalidraw/utils`) are replaced by a single `exportScene`, and every rendering option moved from `appState` into an explicit `config`.
+
+- `exportScene({ type, data, config })` with `type` `"canvas"`, `"png"`, `"jpeg"` or `"svg"` resolves to an `HTMLCanvasElement`, a `Blob` or an `SVGSVGElement`. `exportToClipboard({ type: "png" | "svg" | "json", data, config })` stays. Types: `ExportSceneData`, `ExportSceneConfig`, `ExportSceneOptions`.
+- `data` is `{ elements, appState?, files? }`, the shape of a `.excalidraw` file. Only the scene settings a file stores are read from `appState`: `viewBackgroundColor` as the default background, and the grid settings that `embedScene` embeds. Any other key is ignored, so passing a live `appState` can't affect the output.
+- Migration:
+
+  | Before | Now |
+  | --- | --- |
+  | `exportToCanvas({ elements, appState, files, … })` | `exportScene({ type: "canvas", data: { elements, appState, files }, config })` |
+  | `exportToBlob({ …, mimeType, quality })` | `exportScene({ type: "png" \| "jpeg", …, config })` — `quality` is JPEG-only |
+  | `exportToSvg({ … })` | `exportScene({ type: "svg", … })` |
+  | `appState.exportBackground: false` | `config.canvasBackgroundColor: false` (a color string overrides the background; JPEG always gets one) |
+  | `appState.exportWithDarkMode` | `config.theme: "dark"` |
+  | `appState.exportScale` | `config.scale` (also multiplies a `maxWidthOrHeight` result) |
+  | `appState.exportEmbedScene` | `config.embedScene` (png, svg) |
+  | `appState.frameRendering` | `config.frames: { name?, outline?, clip? }` |
+  | `exportPadding` | `config.padding` (default 10, as before) |
+  | `getDimensions: (w, h) => ({ width, height, scale })` | `config.width`/`height`, `maxWidthOrHeight` or `widthOrHeight`, plus `config.scale` — a number, or `(width, height) => number` receiving the export size at scale 1 (padding included), e.g. to cap the output by a pixel budget |
+  | `maxWidthOrHeight`, `exportingFrame`, `renderEmbeddables`, `skipInliningFonts`, `reuseImages` | same names, in `config` |
+
+- New sizing options: `width`/`height` (only one given: the other follows the content's aspect ratio), `widthOrHeight` (scales the longest side to exactly that size), `fit: "contain" | "none"` and `position: "center" | "topLeft"` within a `width`/`height` frame, and `x`/`y`/`origin` to export a region (cropped, with padding on all sides). The size options are mutually exclusive in the types, and `fit`, `position` and `x`/`y` only combine with `width`/`height`.
+- `config.environment` for non-browser hosts and other windows, the same for every format: `createCanvas` (e.g. `node-canvas`), `createImage`, `createPath`, `document` (the one SVG is built in, e.g. `linkedom`), `textMetrics` and `loadFonts`.
+- Canvas dimensions are rounded instead of truncated, so float noise no longer costs a pixel (a 20.5px frame-label band now rounds up), and are at least 1px (flat content with no padding used to produce an empty canvas that couldn't be encoded).
+- In dark exports, frame names now use the editor's dark frame-name color (they were dark-filtered twice and came out lighter).
+
 ### Selection API (2026-10-10) [#12258](https://github.com/excalidraw/excalidraw/pull/12258)
 
 - New `excalidrawAPI.selection`: `select(elements, opts?)`, `add(elements, opts?)`, `remove(elements, opts?)` and `clear(opts?)`, taking elements or their ids, one or many. Missing and deleted elements are skipped.
@@ -20,12 +47,12 @@ Please add the latest change on the top under the correct section.
 - Options: `deep` selects the elements themselves rather than their groups, editing their group if they share one (as Ctrl/Cmd+click does); `includeLocked` selects locked elements too; `captureUpdate` records the change for undo as for `updateScene()` — by default it's recorded along with the next undoable change.
 - Like `updateScene()`, the change applies on the next render: read it back through `onChange()` or `getAppState()` after that. It works in view mode too, where the selection shows without the transform handles.
 
-### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+### Wheel navigation (2026-09-13) [#12099](https://github.com/excalidraw/excalidraw/pull/12099)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
 - New `appState.inputDevice` preference (`"auto" | "mouse" | "trackpad"`, default `"auto"`, persisted in browser storage) selecting the wheel mappings. With `"trackpad"` a plain wheel pans; with `"mouse"` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is delivered) zooms with either device. Shift+wheel pans horizontally, and ctrl/cmd+shift+wheel pans vertically. The wheel-button zoom above is unaffected. `"auto"` is reserved for detecting the device from the wheel events and resolves to `"trackpad"` until that is implemented (`resolveInputDevice()`). Set it from the new "Input device" radio in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.InputDevice`.
 
-### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+### Sticky notes (2026-09-06) [#12064](https://github.com/excalidraw/excalidraw/pull/12064)
 
 - New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.
 - Element model: the note carries `baseHeight` (the user's height; `height ≥ baseHeight`), its label carries `baseFontSize` (the user's font ceiling, `null`/absent on any other text) while `fontSize` holds the fitted size. Read a text element's user-facing size through `getBaseFontSize(text, elementsMap)`.
@@ -38,11 +65,11 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-### `setViewport` stops following a collaborator (2026-09-26) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+### `setViewport` stops following a collaborator (2026-09-26) [#12184](https://github.com/excalidraw/excalidraw/pull/12184)
 
 - `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
 
-### `onDuplicate` can replace and veto duplicates (2026-09-18) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+### `onDuplicate` can replace and veto duplicates (2026-09-18) [#12124](https://github.com/excalidraw/excalidraw/pull/12124)
 
 - `props.onDuplicate` may now return new objects for the duplicated elements in every duplication path. Previously the editor kept using the objects it created, so on paste (and library insert) the frame assignment and bound text redraw went to objects that were no longer in the scene, and alt-drag dragged an element that wasn't in the scene. The returned changes are now merged into the editor's duplicates, so they're part of the duplication's own undo entry and durable increment (no follow-up `updateScene` needed).
 - When pasting or inserting onto a frame, the duplicates passed to `onDuplicate` already have their `frameId` set (and are ordered under the frame).

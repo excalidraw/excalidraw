@@ -17,7 +17,9 @@ const createColorGhost: CreateTopPicksGhost<ColorTopPick> = ({
   sourceEl,
 }) => {
   const color = getTopPickColor(value);
-  const swatch = sourceEl.ownerDocument.createElement("div");
+  // the source may live in another window's document (e.g. a popout)
+  const ownerDocument = sourceEl.ownerDocument;
+  const swatch = ownerDocument.createElement("div");
   swatch.className = "excalidraw-color-dnd-ghost-swatch";
   if (isTransparent(color)) {
     swatch.classList.add("is-transparent");
@@ -26,9 +28,7 @@ const createColorGhost: CreateTopPicksGhost<ColorTopPick> = ({
     // rather than CSS-filtering them) — sample the rendered color so the
     // ghost matches what the user picked up
     const rendered =
-      sourceEl.ownerDocument.defaultView!.getComputedStyle(
-        sourceEl,
-      ).backgroundColor;
+      ownerDocument.defaultView?.getComputedStyle(sourceEl).backgroundColor;
     swatch.style.backgroundColor =
       rendered && rendered !== "rgba(0, 0, 0, 0)" ? rendered : color;
   }

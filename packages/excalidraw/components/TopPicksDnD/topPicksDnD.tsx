@@ -43,7 +43,7 @@ export type TopPicksDragState<T> = {
 } | null;
 
 export type TopPicksGhost = {
-  /** the ghost's visual. Rendered into `document.body` — outside the
+  /** the ghost's visual. Rendered into the source's `document.body` — outside the
    * editor's CSS scope, so theme-dependent styling must be resolved from the
    * rendered DOM (computed styles) rather than CSS variables */
   content: HTMLElement;
@@ -62,6 +62,8 @@ export type CreateTopPicksGhost<T> = (args: {
 }) => TopPicksGhost;
 
 type DragSession<T> = {
+  ownerDocument: Document;
+  ownerWindow: Window;
   pointerId: number;
   startX: number;
   startY: number;
@@ -252,13 +254,18 @@ export const useTopPicksDnD = <T,>({
       if (!session) {
         return;
       }
-      const { ghostContent, homeRect: rect } = session;
+      const {
+        ownerDocument,
+        ownerWindow,
+        ghostContent,
+        homeRect: rect,
+      } = session;
 
-      const ghost = document.createElement("div");
+      const ghost = ownerDocument.createElement("div");
       ghost.className = GHOST_CLASS;
       ghostContent.classList.add(`${GHOST_CLASS}__content`);
       ghost.appendChild(ghostContent);
-      document.body.appendChild(ghost);
+      ownerDocument.body.appendChild(ghost);
 
       session.ghost = ghost;
       session.ghostW = rect.width;
@@ -267,7 +274,7 @@ export const useTopPicksDnD = <T,>({
       ghost.style.height = `${rect.height}px`;
       positionGhost(x, y);
       // let the spawn frame paint at rest, then "lift" (scale-up transition)
-      requestAnimationFrame(() => {
+      ownerWindow.requestAnimationFrame(() => {
         // unless the drag already ended — don't restyle a ghost that's
         // mid-flight in its release animation (or already removed)
         if (session?.ghost === ghost) {
@@ -275,7 +282,7 @@ export const useTopPicksDnD = <T,>({
         }
       });
 
-      document.body.classList.add(BODY_CLASS);
+      ownerDocument.body.classList.add(BODY_CLASS);
       session.activated = true;
       publish();
     };
@@ -352,7 +359,7 @@ export const useTopPicksDnD = <T,>({
       if (!session?.ghost) {
         return;
       }
-      const { ghost } = session;
+      const { ghost, ownerWindow } = session;
       session.ghost = null;
       ghost.classList.add(`${GHOST_CLASS}--dropping`);
       const rect = target.rect;
@@ -361,10 +368,10 @@ export const useTopPicksDnD = <T,>({
         ghost.style.height = `${rect.height}px`;
         ghost.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
       }
-      window.setTimeout(() => {
+      ownerWindow.setTimeout(() => {
         ghost.classList.add(`${GHOST_CLASS}--fade`);
       }, 160);
-      window.setTimeout(() => {
+      ownerWindow.setTimeout(() => {
         ghost.remove();
       }, 340);
     };
@@ -398,28 +405,43 @@ export const useTopPicksDnD = <T,>({
     };
 
     const suppressNextClick = () => {
+      if (!session) {
+        return;
+      }
+      const { ownerWindow } = session;
       const suppress = (event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
       };
-      window.addEventListener("click", suppress, { capture: true, once: true });
-      window.setTimeout(() => {
-        window.removeEventListener("click", suppress, { capture: true });
+      ownerWindow.addEventListener("click", suppress, {
+        capture: true,
+        once: true,
+      });
+      ownerWindow.setTimeout(() => {
+        ownerWindow.removeEventListener("click", suppress, { capture: true });
       }, 100);
     };
 
     const removeListeners = () => {
-      window.removeEventListener("pointermove", onPointerMove, true);
-      window.removeEventListener("pointerup", onPointerUp, true);
-      window.removeEventListener("pointercancel", onPointerCancel, true);
-      window.removeEventListener("keydown", onKeyDown, true);
+      session?.ownerWindow.removeEventListener(
+        "pointermove",
+        onPointerMove,
+        true,
+      );
+      session?.ownerWindow.removeEventListener("pointerup", onPointerUp, true);
+      session?.ownerWindow.removeEventListener(
+        "pointercancel",
+        onPointerCancel,
+        true,
+      );
+      session?.ownerWindow.removeEventListener("keydown", onKeyDown, true);
     };
 
     const dispose = () => {
       removeListeners();
-      document.body.classList.remove(BODY_CLASS);
+      session?.ownerDocument.body.classList.remove(BODY_CLASS);
       if (session?.activationTimer != null) {
-        window.clearTimeout(session.activationTimer);
+        session.ownerWindow.clearTimeout(session.activationTimer);
       }
       session = null;
       setDragState(null);
@@ -470,18 +492,19 @@ export const useTopPicksDnD = <T,>({
           // while we were beyond it no longer applies (wiggle-and-return
           // must stay a click)
           if (session.activationTimer !== null) {
-            window.clearTimeout(session.activationTimer);
+            session.ownerWindow.clearTimeout(session.activationTimer);
             session.activationTimer = null;
           }
           return;
         }
-        const elapsed = performance.now() - session.startTime;
+        const elapsed =
+          session.ownerWindow.performance.now() - session.startTime;
         if (elapsed < DRAG_TIME_THRESHOLD_MS) {
           // spatial threshold crossed, temporal not yet — likely a fast
           // sloppy click. Wait out the rest of the grace period; the timeout
           // covers "flick then hold still", where no further moves fire
           if (session.activationTimer === null) {
-            session.activationTimer = window.setTimeout(() => {
+            session.activationTimer = session.ownerWindow.setTimeout(() => {
               if (session) {
                 session.activationTimer = null;
                 // the pointer may have returned inside the tolerance after
@@ -574,6 +597,12 @@ export const useTopPicksDnD = <T,>({
       ) {
         return;
       }
+      const sourceEl = event.currentTarget as HTMLElement;
+      const ownerDocument = sourceEl.ownerDocument;
+      const ownerWindow = ownerDocument.defaultView;
+      if (!ownerWindow) {
+        return;
+      }
       const stripEl = stripRef.current;
       if (!stripEl) {
         return;
@@ -586,14 +615,16 @@ export const useTopPicksDnD = <T,>({
       const { content: ghostContent, rect: homeRect } =
         latestRef.current.createGhost({
           value,
-          sourceEl: event.currentTarget as HTMLElement,
+          sourceEl,
           stripEl,
         });
       session = {
+        ownerDocument,
+        ownerWindow,
         pointerId: event.pointerId,
         startX: event.clientX,
         startY: event.clientY,
-        startTime: performance.now(),
+        startTime: ownerWindow.performance.now(),
         lastX: event.clientX,
         lastY: event.clientY,
         activationTimer: null,
@@ -611,10 +642,10 @@ export const useTopPicksDnD = <T,>({
         overIndex: null,
         duplicateIndex: null,
       };
-      window.addEventListener("pointermove", onPointerMove, true);
-      window.addEventListener("pointerup", onPointerUp, true);
-      window.addEventListener("pointercancel", onPointerCancel, true);
-      window.addEventListener("keydown", onKeyDown, true);
+      ownerWindow.addEventListener("pointermove", onPointerMove, true);
+      ownerWindow.addEventListener("pointerup", onPointerUp, true);
+      ownerWindow.addEventListener("pointercancel", onPointerCancel, true);
+      ownerWindow.addEventListener("keydown", onKeyDown, true);
     };
 
     return {

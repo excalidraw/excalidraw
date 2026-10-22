@@ -28,6 +28,7 @@ import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import { isStickyNoteElement, isTextElement } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 import type { VerticalResizeAnchor } from "./sizeHelpers";
 import type { TransformHandleDirection } from "./transformHandles";
@@ -543,6 +544,12 @@ export type StickyNoteLayoutOpts = {
   baseFontSize?: number;
   /** the edge that stays put when the content correction changes the height */
   anchor?: StickyNoteLayoutAnchor;
+  /**
+   * the host whose text metrics the fit measures with; omitted = the global
+   * environment. An editor passes its own so a note laid out in one window
+   * (or headlessly) is measured with that realm's fonts and canvas.
+   */
+  renderEnvironment?: RenderEnvironment;
 };
 
 export type StickyNoteLayout = {
@@ -677,6 +684,7 @@ export const getStickyNoteLayout = (
     STICKY_NOTE_MIN_SIZE,
   );
   const anchor = opts.anchor ?? "top";
+  const { renderEnvironment } = opts;
 
   if (!textElement) {
     // an empty note sits at its base height
@@ -702,8 +710,12 @@ export const getStickyNoteLayout = (
 
   const fit = (fontSize: number): FontFit => {
     const font = getFontString({ fontFamily, fontSize });
-    const text = wrapText(originalText, font, maxWidth);
-    return { text, fontSize, ...measureText(text, font, lineHeight) };
+    const text = wrapText(originalText, font, maxWidth, renderEnvironment);
+    return {
+      text,
+      fontSize,
+      ...measureText(text, font, lineHeight, renderEnvironment),
+    };
   };
 
   const isBlank = !originalText.trim();
@@ -715,6 +727,7 @@ export const getStickyNoteLayout = (
           "",
           getFontString({ fontFamily, fontSize: baseFontSize }),
           lineHeight,
+          renderEnvironment,
         ),
       }
     : fitStickyNoteFont(fit, {
@@ -913,7 +926,10 @@ const hasStickyNoteLayoutInputChanged = (
 export const relayoutStickyNotes = <T extends ExcalidrawElement>(
   elements: readonly T[],
   affectedIds: ReadonlySet<ExcalidrawElement["id"]>,
-  opts?: { prevElementsMap?: ElementsMap },
+  opts?: {
+    prevElementsMap?: ElementsMap;
+    renderEnvironment?: RenderEnvironment;
+  },
 ): readonly T[] => {
   if (!affectedIds.size) {
     return elements;
@@ -952,7 +968,9 @@ export const relayoutStickyNotes = <T extends ExcalidrawElement>(
     ) {
       continue;
     }
-    const layout = getStickyNoteLayout(container, textElement);
+    const layout = getStickyNoteLayout(container, textElement, {
+      renderEnvironment: opts?.renderEnvironment,
+    });
     const nextContainer = newElementWith(container, layout.container);
     if (nextContainer !== container) {
       replacements.set(id, nextContainer as unknown as T);

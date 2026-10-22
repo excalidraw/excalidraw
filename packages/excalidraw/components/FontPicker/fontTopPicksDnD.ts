@@ -20,6 +20,9 @@ const createFontGhost: CreateTopPicksGhost<FontFamilyValues> = ({
   sourceEl,
   stripEl,
 }) => {
+  // the source may live in another window's document (e.g. a popout)
+  const ownerDocument = sourceEl.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   const isPick = sourceEl.dataset.topPickIndex != null;
   const template =
     (isPick
@@ -27,10 +30,10 @@ const createFontGhost: CreateTopPicksGhost<FontFamilyValues> = ({
       : stripEl.querySelector<HTMLElement>(
           "[data-top-pick-index]:not(.active)",
         )) ?? stripEl.querySelector<HTMLElement>("[data-top-pick-index]")!;
-  const templateStyle = getComputedStyle(template);
+  const templateStyle = ownerWindow.getComputedStyle(template);
   const templateRect = template.getBoundingClientRect();
 
-  const tile = document.createElement("div");
+  const tile = ownerDocument.createElement("div");
   tile.className = "excalidraw-font-dnd-ghost-tile";
   tile.style.backgroundColor = templateStyle.backgroundColor;
   tile.style.color = templateStyle.color;
@@ -58,7 +61,8 @@ const createFontGhost: CreateTopPicksGhost<FontFamilyValues> = ({
     if (sample) {
       const sampleClone = sample.cloneNode(true) as HTMLElement;
       // the ghost is outside the editor's CSS scope
-      sampleClone.style.fontSize = getComputedStyle(sample).fontSize;
+      sampleClone.style.fontSize =
+        ownerWindow.getComputedStyle(sample).fontSize;
       sampleClone.style.lineHeight = "1";
       tile.appendChild(sampleClone);
     }
