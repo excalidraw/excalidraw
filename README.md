@@ -94,6 +94,14 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
+## Deploy on Wasmer
+
+[![Deploy to Wasmer](https://img.shields.io/badge/Deploy%20to-Wasmer-171717?logo=wasmer&logoColor=white)](https://wasmer.io/apps/create?github=excalidraw%2Fexcalidraw)
+
+[Wasmer Edge](https://docs.wasmer.io/edge/) is a cloud hosting platform powered by WebAssembly. The included [Anybuild file](./Anybuild) configures a static deployment: `yarn --frozen-lockfile` installs dependencies, `yarn build:app:docker` builds the editor, and `excalidraw-app/build` contains the output. Run these commands from the repository root.
+
+The button opens the import page for this public repository; review the build settings before deploying. To customise the app and deploy your changes, fork this repository and import your own fork. This hosts the web editor; collaboration, cloud storage, and AI features still depend on separately configured services.
+
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
