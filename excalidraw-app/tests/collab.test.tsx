@@ -13,6 +13,8 @@ import { StoreIncrement } from "@excalidraw/element";
 import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
 
 import ExcalidrawApp from "../App";
+import { appJotaiStore } from "../app-jotai";
+import { isCollaboratingAtom, isOfflineAtom } from "../collab/Collab";
 
 const { h } = window;
 
@@ -248,5 +250,25 @@ describe("collaboration", () => {
         expect.objectContaining({ ...rect2Props, isDeleted: true }),
       ]);
     });
+  });
+
+  it("should show the offline warning when collaborating offline", async () => {
+    const { container } = await render(<ExcalidrawApp />);
+
+    act(() => {
+      appJotaiStore.set(isCollaboratingAtom, true);
+      appJotaiStore.set(isOfflineAtom, true);
+    });
+
+    try {
+      await waitFor(() => {
+        expect(container.querySelector(".alert.alert--warning")).not.toBeNull();
+      });
+    } finally {
+      act(() => {
+        appJotaiStore.set(isCollaboratingAtom, false);
+        appJotaiStore.set(isOfflineAtom, false);
+      });
+    }
   });
 });
