@@ -847,6 +847,31 @@ export const convertToExcalidrawElements = (
     }
   }
 
+  // Excalidraw places the ends of bound arrows itself whenever it updates
+  // their bindings (e.g. on undo/redo, or moving what they're bound to), so
+  // place them now, or they'd move then (before sizing frames around them)
+  const boundScene = new Scene(elementStore.getElementsMap());
+  // updating an arrow from either end updates both, so once is enough
+  const updatedArrows: NonDeletedExcalidrawElement[] = [];
+  for (const element of boundScene.getNonDeletedElements()) {
+    const arrows = isBindableElement(element)
+      ? (element.boundElements ?? []).filter(({ type }) => type === "arrow")
+      : [];
+    if (arrows.length) {
+      updateBoundElements(element, boundScene, {
+        // a copy: the ids to skip are cached by array
+        simultaneouslyUpdated: [...updatedArrows],
+        renderEnvironment: opts?.renderEnvironment,
+      });
+      arrows.forEach(({ id }) => {
+        const arrow = boundScene.getNonDeletedElement(id);
+        if (arrow) {
+          updatedArrows.push(arrow);
+        }
+      });
+    }
+  }
+
   // Once all the excalidraw elements are created, we can add frames since we
   // need to calculate coordinates and dimensions of frame which is possible after all
   // frame children are processed.
@@ -914,30 +939,6 @@ export const convertToExcalidrawElements = (
       console.info(
         "User provided frame attributes are being considered, if you find this inaccurate, please remove any of the attributes - x, y, width and height so frame coordinates and dimensions are calculated automatically",
       );
-    }
-  }
-
-  // Excalidraw places the ends of bound arrows itself whenever it updates
-  // their bindings (e.g. on undo/redo, or moving what they're bound to), so
-  // place them now, or they'd move then
-  const boundScene = new Scene(elementStore.getElementsMap());
-  // updating an arrow from either end updates both, so once is enough
-  const updatedArrows: NonDeletedExcalidrawElement[] = [];
-  for (const element of boundScene.getNonDeletedElements()) {
-    const arrows = isBindableElement(element)
-      ? (element.boundElements ?? []).filter(({ type }) => type === "arrow")
-      : [];
-    if (arrows.length) {
-      updateBoundElements(element, boundScene, {
-        // a copy: the ids to skip are cached by array
-        simultaneouslyUpdated: [...updatedArrows],
-      });
-      arrows.forEach(({ id }) => {
-        const arrow = boundScene.getNonDeletedElement(id);
-        if (arrow) {
-          updatedArrows.push(arrow);
-        }
-      });
     }
   }
 

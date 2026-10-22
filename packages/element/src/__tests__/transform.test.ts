@@ -17,10 +17,13 @@ import {
   newIframeElement,
 } from "../newElement";
 
+import { getCommonBounds } from "../bounds";
 import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
 } from "../transform";
+
+import type { RenderEnvironment } from "../renderEnvironment";
 
 import type {
   ExcalidrawArrowElement,
@@ -1226,5 +1229,68 @@ describe("Test Transform", () => {
     // centered a quarter of the way along the arrow
     const label = getLabel(arrow.id);
     expect(label.x + label.width / 2).toBeCloseTo(150);
+  });
+
+  it("should measure bound arrow labels with the given render environment", () => {
+    const renderEnvironment: RenderEnvironment = {
+      createCanvas: () => document.createElement("canvas"),
+      createImage: () => ({} as HTMLImageElement),
+      textMetrics: { getLineWidth: () => 42 },
+    };
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+        { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          x: 100,
+          y: 50,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          label: { text: "LABEL" },
+        },
+      ],
+      { ...opts, renderEnvironment },
+    );
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(label.width).toBe(42);
+  });
+
+  it("should size frames around bound arrows as placed by their bindings", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "arrow",
+          x: 100,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          // fits on one line along the arrow as given (280px), but wraps
+          // along the arrow shortened by its binding gaps
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+        { type: "frame", children: ["A", "B", "arrow"] },
+      ],
+      opts,
+    );
+    const frame = elements.find((element) => element.type === "frame")!;
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(label.text).toContain("\n");
+    const [, minY, , maxY] = getCommonBounds(
+      elements.filter((element) => element.frameId === frame.id),
+    );
+    expect(frame.y).toBeLessThanOrEqual(minY);
+    expect(frame.y + frame.height).toBeGreaterThanOrEqual(maxY);
   });
 });

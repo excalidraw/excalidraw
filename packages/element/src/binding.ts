@@ -68,6 +68,7 @@ import {
 
 import { isNonDeletedElement } from ".";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { ElementUpdate } from "./mutateElement";
@@ -1325,6 +1326,8 @@ export const updateBoundElements = (
     /** see `getSimultaneouslyUpdatedElementIds` for how to pass it */
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
+    /** measures the labels of the updated arrows */
+    renderEnvironment?: RenderEnvironment;
   },
 ) => {
   if (!isBindableElement(changedElement)) {
@@ -1421,7 +1424,15 @@ export const updateBoundElements = (
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
-      handleBindTextResize(element, scene, false);
+      handleBindTextResize(
+        element,
+        scene,
+        false,
+        false,
+        false,
+        false,
+        options?.renderEnvironment,
+      );
     }
   };
 
