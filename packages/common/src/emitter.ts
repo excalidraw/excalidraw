@@ -25,9 +25,18 @@ export class Emitter<T extends any[] = []> {
       .flat()
       .filter((item) => typeof item === "function");
 
-    _handlers.push(() => detach());
-
-    const detach = this.on(..._handlers);
+    let fired = false;
+    const detach = this.on((...payload: T) => {
+      // A nested trigger can consume this listener before an outer trigger reaches it.
+      if (fired) {
+        return;
+      }
+      fired = true;
+      detach();
+      for (const handler of _handlers) {
+        handler(...payload);
+      }
+    });
     return detach;
   }
 
