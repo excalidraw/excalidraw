@@ -287,6 +287,39 @@ describe("ElementsDelta", () => {
     });
   });
 
+  describe("redraw errors", () => {
+    it.each(["development", "test", "production"])(
+      "rethrows redraw errors outside production (%s)",
+      (mode) => {
+        const element = API.createElement({ type: "rectangle" });
+        const elements = arrayToMap([element]) as SceneElementsMap;
+        const redraw = vi
+          .spyOn(ElementsDelta as any, "redrawTextBoundingBoxes")
+          .mockImplementationOnce(() => {
+            throw new Error("redraw failed");
+          });
+        const consoleError = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {});
+        vi.stubEnv("MODE", mode);
+
+        try {
+          const redrawElements = () =>
+            ElementsDelta.redrawElements(elements, new Map());
+          if (mode === "production") {
+            expect(redrawElements()).toBe(elements);
+          } else {
+            expect(redrawElements).toThrow("redraw failed");
+          }
+        } finally {
+          redraw.mockRestore();
+          consoleError.mockRestore();
+          vi.unstubAllEnvs();
+        }
+      },
+    );
+  });
+
   describe("elements delta calculation", () => {
     it("should not throw when element gets removed but was already deleted", () => {
       const element = API.createElement({
