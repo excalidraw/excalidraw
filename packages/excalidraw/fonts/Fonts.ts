@@ -43,6 +43,7 @@ import { LilitaFontFaces } from "./Lilita";
 import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
+import { VazirFontFaces } from "./Vazir";
 
 /** warned once per process, not per export (e.g. on a server) */
 let warnedNoFontFaceSet = false;
@@ -456,6 +457,7 @@ export class Fonts {
     // fallback font faces
     init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);
     init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
+    init("Vazir", ...VazirFontFaces);
 
     Fonts._initialized = true;
 
