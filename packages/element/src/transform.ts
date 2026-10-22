@@ -102,6 +102,8 @@ export type ValidLinearElement = {
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
+    /** where along an arrow's path (0-1) the label is centered */
+    labelPosition?: ExcalidrawTextElement["labelPosition"];
   } & FragmentConstructorOpts;
   end?:
     | (
@@ -260,7 +262,8 @@ const DEFAULT_DIMENSION = 100;
 
 const bindTextToContainer = (
   container: ExcalidrawElement,
-  textProps: { text: string } & FragmentConstructorOpts,
+  textProps: { text: string } & FragmentConstructorOpts &
+    Pick<Partial<ExcalidrawTextElement>, "labelPosition">,
   scene: Scene,
   renderEnvironment?: RenderEnvironment,
 ) => {
@@ -283,7 +286,7 @@ const bindTextToContainer = (
     containerId: container.id,
     strokeColor: stickyInk ?? (textProps.strokeColor || container.strokeColor),
     labelPosition: isArrowElement(container)
-      ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+      ? textProps.labelPosition ?? DEFAULT_BOUND_TEXT_LABEL_POSITION
       : null,
     renderEnvironment,
   });

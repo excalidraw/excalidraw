@@ -8,6 +8,8 @@ import {
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
+import type { LocalPoint } from "@excalidraw/math";
+
 import {
   newElement,
   newEmbeddableElement,
@@ -1186,5 +1188,41 @@ describe("Test Transform", () => {
       expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
       expect(note.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
     });
+  });
+
+  it("should position arrow labels along the arrow when labelPosition provided", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        {
+          type: "arrow",
+          x: 100,
+          y: 100,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+          label: { text: "QUARTER", labelPosition: 0.25 },
+        },
+        {
+          type: "arrow",
+          x: 100,
+          y: 200,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+          label: { text: "HALF" },
+        },
+      ],
+      opts,
+    );
+    const [arrow, defaultArrow] = elements.filter(
+      (element) => element.type === "arrow",
+    );
+    const getLabel = (containerId: string) =>
+      elements.find(
+        (element) =>
+          element.type === "text" && element.containerId === containerId,
+      ) as ExcalidrawTextElement;
+
+    expect(getLabel(arrow.id).labelPosition).toBe(0.25);
+    expect(getLabel(defaultArrow.id).labelPosition).toBe(0.5);
+    // centered a quarter of the way along the arrow
+    const label = getLabel(arrow.id);
+    expect(label.x + label.width / 2).toBeCloseTo(150);
   });
 });
