@@ -865,7 +865,13 @@ export const convertToExcalidrawElements = (
       });
       arrows.forEach(({ id }) => {
         const arrow = boundScene.getNonDeletedElement(id);
-        if (arrow) {
+        // only those actually bound to it, which it updated
+        if (
+          arrow &&
+          isArrowElement(arrow) &&
+          (arrow.startBinding?.elementId === element.id ||
+            arrow.endBinding?.elementId === element.id)
+        ) {
           updatedArrows.push(arrow);
         }
       });

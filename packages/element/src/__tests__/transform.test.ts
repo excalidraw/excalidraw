@@ -1293,4 +1293,47 @@ describe("Test Transform", () => {
     expect(frame.y).toBeLessThanOrEqual(minY);
     expect(frame.y + frame.height).toBeGreaterThanOrEqual(maxY);
   });
+
+  it("should place bound arrows listed by elements they aren't bound to", () => {
+    const convert = (stale: boolean) =>
+      convertToExcalidrawElements(
+        [
+          // lists the arrow without it being bound to it
+          ...(stale
+            ? [
+                {
+                  type: "rectangle" as const,
+                  id: "X",
+                  x: 0,
+                  y: 300,
+                  boundElements: [{ id: "arrow", type: "arrow" as const }],
+                },
+              ]
+            : []),
+          { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+          { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+          {
+            type: "arrow",
+            id: "arrow",
+            x: 100,
+            y: 50,
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(300, 0),
+            ],
+            start: { id: "A" },
+            end: { id: "B" },
+          },
+        ],
+        opts,
+      ).find((element) => element.id === "arrow")!;
+
+    const arrow = convert(true);
+    expect(arrow).toMatchObject({
+      x: convert(false).x,
+      width: convert(false).width,
+    });
+    // placed off A by the binding gap
+    expect(arrow.x).toBeGreaterThan(100);
+  });
 });
