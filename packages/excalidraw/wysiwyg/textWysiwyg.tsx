@@ -1084,6 +1084,18 @@ export const textWysiwyg = ({
     });
   };
 
+  // The textarea also blurs when the whole window loses focus (switching
+  // apps/tabs). It stays the active element and gets focus back when the
+  // window returns, so keep editing then: only submit when focus actually
+  // moved to something else in the document. Same for the window blur that
+  // temporarilyDisableSubmit() listens to.
+  const handleBlur = () => {
+    if (ownerDocument.activeElement === editable) {
+      return;
+    }
+    handleSubmit();
+  };
+
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
@@ -1100,7 +1112,7 @@ export const textWysiwyg = ({
       capture: true,
     });
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
-    ownerWindow.removeEventListener("blur", handleSubmit);
+    ownerWindow.removeEventListener("blur", handleBlur);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -1144,7 +1156,7 @@ export const textWysiwyg = ({
       // let the focus scroll the container: for a box reaching past the
       // viewport, revealing the caret the textarea has until the click's is
       // placed (the end of the value) would pan the canvas there.
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
       editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
         editable.setSelectionRange(
@@ -1161,7 +1173,7 @@ export const textWysiwyg = ({
     ownerWindow.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    ownerWindow.addEventListener("blur", handleSubmit);
+    ownerWindow.addEventListener("blur", handleBlur);
   };
 
   // prevent blur when changing properties from the menu
