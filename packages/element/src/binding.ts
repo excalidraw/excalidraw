@@ -1317,6 +1317,81 @@ export const reanchorBindingsToOutline = (
   });
 };
 
+/**
+ * Places both bound ends of `arrow` where its bindings put them on the elements
+ * in `elementsMap` they're bound to, and rewraps its label along it as placed.
+ * Leaves the label's x/y as they were (the editor derives arrow labels' x/y as
+ * it renders them), so callers returning the elements as data must store them
+ * (see `LinearElementEditor.getBoundTextElementPosition`).
+ */
+export const updateBoundArrow = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  scene: Scene,
+  elementsMap: ElementsMap,
+  /** measures the arrow's label */
+  renderEnvironment?: RenderEnvironment,
+) => {
+  const startBindingElement = arrow.startBinding
+    ? elementsMap.get(arrow.startBinding.elementId)
+    : null;
+  const endBindingElement = arrow.endBinding
+    ? // PERF: If the arrow is bound to the same element on both ends.
+      startBindingElement?.id === arrow.endBinding.elementId
+      ? startBindingElement
+      : elementsMap.get(arrow.endBinding.elementId)
+    : null;
+
+  const updates = bindableElementsVisitor(
+    elementsMap,
+    arrow,
+    (bindableElement, bindingProp) => {
+      if (
+        bindableElement &&
+        isBindableElement(bindableElement) &&
+        (bindingProp === "startBinding" || bindingProp === "endBinding")
+      ) {
+        const point = updateBoundPoint(
+          arrow,
+          bindingProp,
+          arrow[bindingProp],
+          bindableElement,
+          elementsMap,
+        );
+
+        if (point) {
+          return [
+            bindingProp === "startBinding" ? 0 : arrow.points.length - 1,
+            { point },
+          ] as MapEntry<PointsPositionUpdates>;
+        }
+      }
+
+      return null;
+    },
+  ).filter(
+    (update): update is MapEntry<PointsPositionUpdates> => update !== null,
+  );
+
+  LinearElementEditor.movePoints(arrow, scene, new Map(updates), undefined, {
+    moveMidPointsWithElement:
+      !!startBindingElement &&
+      startBindingElement?.id === endBindingElement?.id,
+  });
+
+  const boundText = getBoundTextElement(arrow, elementsMap);
+  if (boundText && !boundText.isDeleted) {
+    handleBindTextResize(
+      arrow,
+      scene,
+      false,
+      false,
+      false,
+      false,
+      renderEnvironment,
+    );
+  }
+};
+
 // Supports translating, rotating and scaling `changedElement` with bound
 // linear elements.
 export const updateBoundElements = (
@@ -1364,82 +1439,12 @@ export const updateBoundElements = (
       return;
     }
 
-    // Check for intersections before updating bound elements incase connected elements overlap
-    const startBindingElement = element.startBinding
-      ? elementsMap.get(element.startBinding.elementId)
-      : null;
-    const endBindingElement = element.endBinding
-      ? // PERF: If the arrow is bound to the same element on both ends.
-        startBindingElement?.id === element.endBinding.elementId
-        ? startBindingElement
-        : elementsMap.get(element.endBinding.elementId)
-      : null;
-
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
       return;
     }
 
-    const updates = bindableElementsVisitor(
-      elementsMap,
-      element,
-      (bindableElement, bindingProp) => {
-        if (
-          bindableElement &&
-          isBindableElement(bindableElement) &&
-          (bindingProp === "startBinding" || bindingProp === "endBinding") &&
-          (changedElement.id === element[bindingProp]?.elementId ||
-            changedElement.id ===
-              element[
-                bindingProp === "startBinding" ? "endBinding" : "startBinding"
-              ]?.elementId)
-        ) {
-          const point = updateBoundPoint(
-            element,
-            bindingProp,
-            element[bindingProp],
-            bindableElement,
-            elementsMap,
-          );
-
-          if (point) {
-            return [
-              bindingProp === "startBinding" ? 0 : element.points.length - 1,
-              { point },
-            ] as MapEntry<PointsPositionUpdates>;
-          }
-        }
-
-        return null;
-      },
-    ).filter(
-      (update): update is MapEntry<PointsPositionUpdates> => update !== null,
-    );
-
-    LinearElementEditor.movePoints(
-      element,
-      scene,
-      new Map(updates),
-      undefined,
-      {
-        moveMidPointsWithElement:
-          !!startBindingElement &&
-          startBindingElement?.id === endBindingElement?.id,
-      },
-    );
-
-    const boundText = getBoundTextElement(element, elementsMap);
-    if (boundText && !boundText.isDeleted) {
-      handleBindTextResize(
-        element,
-        scene,
-        false,
-        false,
-        false,
-        false,
-        options?.renderEnvironment,
-      );
-    }
+    updateBoundArrow(element, scene, elementsMap, options?.renderEnvironment);
   };
 
   boundElementsVisitor(elementsMap, changedElement, visitor);

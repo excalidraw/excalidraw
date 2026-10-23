@@ -31,7 +31,7 @@ import {
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 import type { Zoom } from "@excalidraw/excalidraw/types";
 
-import { bindBindingElement, updateBoundElements } from "./binding";
+import { bindBindingElement, updateBoundArrow } from "./binding";
 import {
   newArrowElement,
   newElement,
@@ -49,11 +49,7 @@ import {
 } from "./newElement";
 import { normalizeStickyNoteStrokeColor } from "./stickyNote";
 import { measureText, normalizeText } from "./textMeasurements";
-import {
-  isArrowElement,
-  isBindableElement,
-  isStickyNoteElement,
-} from "./typeChecks";
+import { isArrowElement, isStickyNoteElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -917,41 +913,29 @@ export const convertToExcalidrawElements = (
   // their bindings (e.g. on undo/redo, or moving what they're bound to), so
   // place them now, or they'd move then (before sizing frames around them)
   const boundScene = new Scene(elementStore.getElementsMap());
-  // updating an arrow from either end updates both, so once is enough
-  const updatedArrows: NonDeletedExcalidrawElement[] = [];
-  for (const element of boundScene.getNonDeletedElements()) {
-    const arrows = isBindableElement(element)
-      ? (element.boundElements ?? []).filter(({ type }) => type === "arrow")
-      : [];
-    if (arrows.length) {
-      updateBoundElements(element, boundScene, {
-        // a copy: the ids to skip are cached by array
-        simultaneouslyUpdated: [...updatedArrows],
-        renderEnvironment: opts?.renderEnvironment,
-      });
-      arrows.forEach(({ id }) => {
-        const arrow = boundScene.getNonDeletedElement(id);
-        // only those actually bound to it, which it updated
-        if (
-          arrow &&
-          isArrowElement(arrow) &&
-          (arrow.startBinding?.elementId === element.id ||
-            arrow.endBinding?.elementId === element.id)
-        ) {
-          updatedArrows.push(arrow);
-        }
-      });
-    }
-  }
-
-  // placing an arrow shortens its path, so its label's `labelPosition` would
-  // no longer put it where it was placed (e.g. by a layout engine)
   const placedElementsMap = boundScene.getNonDeletedElementsMap();
-  for (const arrow of updatedArrows) {
-    const label = getBoundTextElement(arrow, placedElementsMap);
-    if (!label || !isArrowElement(arrow)) {
+  for (const arrow of boundScene.getNonDeletedElements()) {
+    if (
+      !isArrowElement(arrow) ||
+      ![arrow.startBinding, arrow.endBinding].some(
+        (binding) => binding && placedElementsMap.has(binding.elementId),
+      )
+    ) {
       continue;
     }
+    updateBoundArrow(
+      arrow,
+      boundScene,
+      placedElementsMap,
+      opts?.renderEnvironment,
+    );
+
+    const label = getBoundTextElement(arrow, placedElementsMap);
+    if (!label) {
+      continue;
+    }
+    // placing an arrow shortens its path, so its label's `labelPosition` would
+    // no longer put it where it was placed (e.g. by a layout engine)
     const labelPoint = labelPoints.get(label.id);
     if (labelPoint) {
       const labelPosition = LinearElementEditor.getPathParameterAtPoint(
