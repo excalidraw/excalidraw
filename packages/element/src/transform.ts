@@ -749,7 +749,8 @@ export const convertToExcalidrawElements = (
   }
 
   const elementsMap = elementStore.getElementsMap();
-  // we don't have a real scene, so we just use a temp scene to query and mutate elements
+  // we don't have a real scene, so we just use a temp scene to query and mutate
+  // elements (a snapshot of the store: resynced below once the store is complete)
   const scene = new Scene(elementsMap);
   // where on the arrows as given their labels' `labelPosition` puts them
   const labelPoints = new Map<ExcalidrawTextElement["id"], GlobalPoint>();
@@ -865,10 +866,12 @@ export const convertToExcalidrawElements = (
 
   // Excalidraw places the ends of bound arrows itself whenever it updates
   // their bindings (e.g. on undo/redo, or moving what they're bound to), so
-  // place them now, or they'd move then (before sizing frames around them)
-  const boundScene = new Scene(elementStore.getElementsMap());
-  const placedElementsMap = boundScene.getNonDeletedElementsMap();
-  for (const arrow of boundScene.getNonDeletedElements()) {
+  // place them now, or they'd move then (before sizing frames around them).
+  // The store has gained the labels and the elements bound arrows were
+  // created to bind to since the scene was built, so resync it first
+  scene.replaceAllElements(elementStore.getElementsMap());
+  const placedElementsMap = scene.getNonDeletedElementsMap();
+  for (const arrow of scene.getNonDeletedElements()) {
     if (
       !isArrowElement(arrow) ||
       ![arrow.startBinding, arrow.endBinding].some(
@@ -878,12 +881,7 @@ export const convertToExcalidrawElements = (
       continue;
     }
     // also wraps and measures its label, along it as placed
-    updateBoundArrow(
-      arrow,
-      boundScene,
-      placedElementsMap,
-      opts?.renderEnvironment,
-    );
+    updateBoundArrow(arrow, scene, placedElementsMap, opts?.renderEnvironment);
 
     const label = getBoundTextElement(arrow, placedElementsMap);
     if (!label) {
@@ -900,7 +898,7 @@ export const convertToExcalidrawElements = (
         placedElementsMap,
       );
       if (labelPosition !== null) {
-        boundScene.mutateElement(label, {
+        scene.mutateElement(label, {
           labelPosition: clampLabelPositionOffEnds(
             arrow,
             label,
@@ -913,7 +911,7 @@ export const convertToExcalidrawElements = (
     // the editor derives arrow labels' x/y from their arrows as it renders
     // them, but placing (and rewrapping) leaves them stale, and they're
     // returned as data, so store them where they're rendered
-    boundScene.mutateElement(
+    scene.mutateElement(
       label,
       LinearElementEditor.getBoundTextElementPosition(
         arrow,
@@ -924,7 +922,7 @@ export const convertToExcalidrawElements = (
   }
   // the labels of arrows not placed, along them as given
   for (const [arrow, label] of unmeasuredArrowLabels.values()) {
-    redrawTextBoundingBox(label, arrow, boundScene, opts?.renderEnvironment);
+    redrawTextBoundingBox(label, arrow, scene, opts?.renderEnvironment);
   }
 
   // Once all the excalidraw elements are created, we can add frames since we
