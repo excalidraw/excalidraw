@@ -12,8 +12,15 @@ import { Excalidraw, convertToExcalidrawElements } from "../index";
 import { actionAlignTop } from "../actions/actionAlign";
 
 import { API } from "./helpers/api";
+import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { render, unmountComponent } from "./test-utils";
+import { fireEvent, render, unmountComponent, waitFor } from "./test-utils";
+
+// Mock CodeMirror deps so the TTD dialog falls back to a <textarea>.
+vi.mock("@codemirror/view", () => ({}));
+vi.mock("@codemirror/state", () => ({}));
+vi.mock("@codemirror/language", () => ({}));
+vi.mock("@lezer/highlight", () => ({}));
 
 unmountComponent();
 
@@ -142,5 +149,80 @@ describe("bound labels re-measured with the host's render environment", () => {
     mouse.upAt(x, y + 1);
 
     expectLabelMeasuredByHost();
+  });
+});
+
+describe("mermaid labels measured with the host's render environment", () => {
+  beforeAll(() => {
+    mockMermaidToExcalidraw({
+      parseMermaidToExcalidraw: async () => ({
+        elements: [
+          {
+            type: "rectangle",
+            id: "A",
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 40,
+            // fits on one line with the host's metrics (70px), but wraps with
+            // the default ones, growing the rectangle to fit two lines
+            label: { text: "aaaa bbbb cccc" },
+          },
+          {
+            type: "rectangle",
+            id: "B",
+            x: 400,
+            y: 10,
+            width: 100,
+            height: 100,
+          },
+          {
+            type: "arrow",
+            id: "arrow",
+            x: 100,
+            y: 50,
+            points: [
+              [0, 0],
+              [300, 0],
+            ],
+            start: { id: "A" },
+            end: { id: "B" },
+            label: { text: LABEL },
+          },
+        ],
+      }),
+    });
+  });
+
+  it("when inserting from the mermaid dialog", async () => {
+    await render(
+      <Excalidraw
+        renderEnvironment={renderEnvironment}
+        initialData={{
+          appState: { openDialog: { name: "ttd", tab: "mermaid" } },
+        }}
+      />,
+    );
+    const dialog = document.querySelector(".ttd-dialog")!;
+    await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
+
+    fireEvent.click(
+      Array.from(dialog.querySelectorAll("button")).find(
+        (button) => button.textContent === "Insert",
+      )!,
+    );
+
+    const texts = h.elements.filter(
+      (element): element is ExcalidrawTextElement => element.type === "text",
+    );
+    const rectLabel = texts.find((text) => text.originalText !== LABEL)!;
+    const arrowLabel = texts.find((text) => text.originalText === LABEL)!;
+    expect(rectLabel.text).toBe("aaaa bbbb cccc");
+    expect(rectLabel.width).toBe(70);
+    expect(
+      h.elements.find((el) => el.id === rectLabel.containerId)!.height,
+    ).toBe(40);
+    expect(arrowLabel.text).toBe(LABEL);
+    expect(arrowLabel.width).toBe(145);
   });
 });
