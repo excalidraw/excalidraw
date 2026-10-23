@@ -315,7 +315,11 @@ const bindTextToContainer = (
       : null),
   });
 
-  redrawTextBoundingBox(textElement, container, scene, renderEnvironment);
+  // the caller measures an arrow's label once, along its arrow as placed
+  // (binding shortens a bound one)
+  if (!isArrowElement(container)) {
+    redrawTextBoundingBox(textElement, container, scene, renderEnvironment);
+  }
 
   return [container, textElement] as const;
 };
@@ -749,6 +753,11 @@ export const convertToExcalidrawElements = (
   const scene = new Scene(elementsMap);
   // where on the arrows as given their labels' `labelPosition` puts them
   const labelPoints = new Map<ExcalidrawTextElement["id"], GlobalPoint>();
+  // arrow labels yet to be measured, along their arrows
+  const unmeasuredArrowLabels = new Map<
+    ExcalidrawTextElement["id"],
+    [ExcalidrawArrowElement, ExcalidrawTextElement]
+  >();
 
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
@@ -771,6 +780,9 @@ export const convertToExcalidrawElements = (
           );
           elementStore.add(container);
           elementStore.add(text);
+          if (isArrowElement(container)) {
+            unmeasuredArrowLabels.set(text.id, [container, text]);
+          }
 
           // given or default alike: omitting it is the same as giving 0.5
           if (isArrowElement(container) && text.labelPosition != null) {
@@ -865,6 +877,7 @@ export const convertToExcalidrawElements = (
     ) {
       continue;
     }
+    // also wraps and measures its label, along it as placed
     updateBoundArrow(
       arrow,
       boundScene,
@@ -876,6 +889,7 @@ export const convertToExcalidrawElements = (
     if (!label) {
       continue;
     }
+    unmeasuredArrowLabels.delete(label.id);
     // placing an arrow shortens its path, so its label's `labelPosition` would
     // no longer put it where it was placed (e.g. by a layout engine)
     const labelPoint = labelPoints.get(label.id);
@@ -907,6 +921,10 @@ export const convertToExcalidrawElements = (
         placedElementsMap,
       ),
     );
+  }
+  // the labels of arrows not placed, along them as given
+  for (const [arrow, label] of unmeasuredArrowLabels.values()) {
+    redrawTextBoundingBox(label, arrow, boundScene, opts?.renderEnvironment);
   }
 
   // Once all the excalidraw elements are created, we can add frames since we

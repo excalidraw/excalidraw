@@ -21,6 +21,8 @@ import {
 import { getArrowheadSize, getCommonBounds } from "../bounds";
 import { LinearElementEditor } from "../linearElementEditor";
 import { getBoundTextElement } from "../textElement";
+import * as textMeasurements from "../textMeasurements";
+import * as textWrapping from "../textWrapping";
 import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
@@ -1649,5 +1651,50 @@ describe("Test Transform", () => {
         [300, 0],
       ],
     });
+  });
+
+  it("should wrap and measure arrow labels once, along the arrows as placed", () => {
+    const wrapTextSpy = vi.spyOn(textWrapping, "wrapText");
+    const measureTextSpy = vi.spyOn(textMeasurements, "measureText");
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "bound",
+          x: 100,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+        {
+          type: "arrow",
+          id: "unbound",
+          x: 100,
+          y: 300,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+      ],
+      opts,
+    );
+    const labelOf = (arrowId: string) =>
+      elements.find(
+        (element) => element.type === "text" && element.containerId === arrowId,
+      ) as ExcalidrawTextElement;
+
+    // wrapped along the bound arrow shortened by its binding gaps, and along
+    // the unbound one as given
+    expect(labelOf("bound").text).toContain("\n");
+    expect(labelOf("unbound").text).not.toContain("\n");
+    // once each (plus each unwrapped label's measurement as created)
+    expect(wrapTextSpy).toHaveBeenCalledTimes(2);
+    expect(measureTextSpy).toHaveBeenCalledTimes(4);
+
+    wrapTextSpy.mockRestore();
+    measureTextSpy.mockRestore();
   });
 });
