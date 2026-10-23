@@ -1364,6 +1364,31 @@ describe("textWysiwyg", () => {
       await waitFor(() => expect(document.activeElement).toBe(textarea));
     });
 
+    it("should keep editing when the window loses focus, and submit when focus moves", async () => {
+      // the editor arms its submit-on-blur a tick after it's created
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      updateTextEditor(textarea, "Hello");
+      expect(document.activeElement).toBe(textarea);
+
+      // switching apps/tabs blurs the textarea without moving the document's
+      // focus elsewhere: the browser gives it back when the window returns
+      fireEvent.blur(textarea);
+      expect(document.activeElement).toBe(textarea);
+      expect(h.state.editingTextElement?.id).toBe(textElement.id);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
+
+      fireEvent.focus(textarea);
+      updateTextEditor(textarea, "Hello world");
+      expect(h.state.editingTextElement?.id).toBe(textElement.id);
+
+      // focus actually leaving the textarea still submits
+      textarea.blur();
+      expect(document.activeElement).not.toBe(textarea);
+      expect(h.state.editingTextElement).toBeNull();
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello world");
+    });
+
     it("should keep the editor's box off a docked sidebar", () => {
       const editorBox = textarea.parentElement!;
       const sidebar = dockSidebar(500, 300);
