@@ -92,6 +92,19 @@ import type App from "./App";
 export class AppSelectionTool {
   constructor(private app: App) {}
 
+  // Keep a drag's applied movement stable when Shift is pressed or released.
+  // WeakMap ensures that state from a completed pointer interaction can be collected.
+  private axisLockedDragStates = new WeakMap<
+    PointerDownState,
+    {
+      origin: { x: number; y: number };
+      lastPointer: { x: number; y: number };
+      appliedOffset: { x: number; y: number };
+      lockedAxis: "x" | "y" | null;
+      wasShiftHeld: boolean;
+    }
+  >();
+
   clearSelectionIfNotUsingSelection = (): void => {
     if (!isSelectionLikeTool(this.app.state.activeTool.type)) {
       this.app.selection.clear();
@@ -845,24 +858,62 @@ export class AppSelectionTool {
           ...pointerDownState.originalElements.values(),
         ];
 
-        // We only drag in one direction if shift is pressed
-        const lockDirection = event.shiftKey;
+        // Store the movement already applied to the elements, so switching
+        // Shift on/off cannot discard earlier movement and cause a jump.
+        // Alt-drag changes drag.origin, so reset the offset after duplication.
+        let axisLockedDragState =
+          this.axisLockedDragStates.get(pointerDownState);
+        const dragOrigin = pointerDownState.drag.origin;
 
-        if (lockDirection) {
-          const distanceX = Math.abs(dragOffset.x);
-          const distanceY = Math.abs(dragOffset.y);
-
-          const lockX = lockDirection && distanceX < distanceY;
-          const lockY = lockDirection && distanceX > distanceY;
-
-          if (lockX) {
-            dragOffset.x = 0;
-          }
-
-          if (lockY) {
-            dragOffset.y = 0;
-          }
+        if (
+          !axisLockedDragState ||
+          axisLockedDragState.origin.x !== dragOrigin.x ||
+          axisLockedDragState.origin.y !== dragOrigin.y
+        ) {
+          axisLockedDragState = {
+            origin: { ...dragOrigin },
+            lastPointer: { ...dragOrigin },
+            appliedOffset: { x: 0, y: 0 },
+            lockedAxis: null,
+            wasShiftHeld: false,
+          };
+          this.axisLockedDragStates.set(pointerDownState, axisLockedDragState);
         }
+
+        // Calculate only the movement since the previous pointer event.
+        const movementX = pointerCoords.x - axisLockedDragState.lastPointer.x;
+        const movementY = pointerCoords.y - axisLockedDragState.lastPointer.y;
+
+        if (event.shiftKey) {
+          // Pick one axis for this Shift press, then keep it until release.
+          if (!axisLockedDragState.wasShiftHeld) {
+            axisLockedDragState.lockedAxis = null;
+          }
+
+          if (!axisLockedDragState.lockedAxis) {
+            if (Math.abs(movementX) > Math.abs(movementY)) {
+              axisLockedDragState.lockedAxis = "x";
+            } else if (Math.abs(movementY) > Math.abs(movementX)) {
+              axisLockedDragState.lockedAxis = "y";
+            }
+          }
+
+          if (axisLockedDragState.lockedAxis === "x") {
+            axisLockedDragState.appliedOffset.x += movementX;
+          } else if (axisLockedDragState.lockedAxis === "y") {
+            axisLockedDragState.appliedOffset.y += movementY;
+          }
+        } else {
+          // Resume unconstrained movement from the current element position.
+          axisLockedDragState.lockedAxis = null;
+          axisLockedDragState.appliedOffset.x += movementX;
+          axisLockedDragState.appliedOffset.y += movementY;
+        }
+
+        axisLockedDragState.lastPointer = { ...pointerCoords };
+        axisLockedDragState.wasShiftHeld = event.shiftKey;
+        dragOffset.x = axisLockedDragState.appliedOffset.x;
+        dragOffset.y = axisLockedDragState.appliedOffset.y;
 
         // #region move crop region
         if (this.app.state.croppingElementId) {
