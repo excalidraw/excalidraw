@@ -875,3 +875,35 @@ function test(
     });
   });
 }
+
+describe("syncInvalidIndices with preserveVersions", () => {
+  it("should not bump version or re-roll versionNonce when healing", () => {
+    const elements = [
+      API.createElement({ type: "rectangle" }),
+      API.createElement({ type: "rectangle" }),
+    ].map((element, index) =>
+      // invalid (duplicated) indices, versions as if coming from a remote peer
+      ({ ...element, index: "a1", version: 10, versionNonce: 777 + index }),
+    ) as ExcalidrawElement[];
+
+    const synced = syncInvalidIndices(
+      elements.map((x) => deepCopyElement(x)),
+      { preserveVersions: true },
+    );
+
+    // indices got healed
+    expect(() =>
+      validateFractionalIndices(synced, {
+        shouldThrow: true,
+        includeBoundTextValidation: true,
+        ignoreLogs: true,
+      }),
+    ).not.toThrowError(InvalidFractionalIndexError);
+
+    // but versions were preserved — healing is a repair, not an edit
+    synced.forEach((syncedElement, index) => {
+      expect(syncedElement.version).toBe(elements[index].version);
+      expect(syncedElement.versionNonce).toBe(elements[index].versionNonce);
+    });
+  });
+});
