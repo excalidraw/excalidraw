@@ -756,7 +756,7 @@ describe("Test Transform", () => {
       const [, , arrow, text] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255.5,
+        x: 255,
         y: 239,
         boundElements: [
           {
@@ -1600,5 +1600,54 @@ describe("Test Transform", () => {
       expect(label.x).toBeCloseTo(x);
       expect(label.y).toBeCloseTo(y);
     }
+  });
+
+  it("should keep arrows' unbound ends where they're given", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          id: "half-bound",
+          x: 100,
+          y: 50,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(300, 100),
+          ],
+          start: { id: "A" },
+        },
+        {
+          type: "arrow",
+          id: "unbound",
+          x: 100,
+          y: 300,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+        },
+      ],
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const halfBound = elementsMap.get("half-bound") as ExcalidrawArrowElement;
+    const unbound = elementsMap.get("unbound") as ExcalidrawArrowElement;
+
+    // placed off A by the binding gap
+    expect(halfBound.x).toBeGreaterThan(100);
+    const [endX, endY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      halfBound,
+      -1,
+      elementsMap,
+    );
+    expect(endX).toBeCloseTo(400);
+    expect(endY).toBeCloseTo(150);
+    expect(unbound).toMatchObject({
+      x: 100,
+      y: 300,
+      width: 300,
+      points: [
+        [0, 0],
+        [300, 0],
+      ],
+    });
   });
 });

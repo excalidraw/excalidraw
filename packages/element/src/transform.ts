@@ -499,64 +499,6 @@ const bindLinearElementToElement = (
     }
   }
 
-  // Safe check to early return for single point
-  if (linearElement.points.length < 2) {
-    return {
-      linearElement,
-      startBoundElement,
-      endBoundElement,
-    };
-  }
-
-  // Update start/end points by 0.5 so bindings don't overlap with start/end bound element coordinates.
-  const endPointIndex = linearElement.points.length - 1;
-  const delta = 0.5;
-
-  const newPoints = cloneJSON<readonly LocalPoint[]>(linearElement.points);
-
-  // left to right so shift the arrow towards right
-  if (
-    linearElement.points[endPointIndex][0] >
-    linearElement.points[endPointIndex - 1][0]
-  ) {
-    newPoints[0][0] = delta;
-    newPoints[endPointIndex][0] -= delta;
-  }
-
-  // right to left so shift the arrow towards left
-  if (
-    linearElement.points[endPointIndex][0] <
-    linearElement.points[endPointIndex - 1][0]
-  ) {
-    newPoints[0][0] = -delta;
-    newPoints[endPointIndex][0] += delta;
-  }
-  // top to bottom so shift the arrow towards top
-  if (
-    linearElement.points[endPointIndex][1] >
-    linearElement.points[endPointIndex - 1][1]
-  ) {
-    newPoints[0][1] = delta;
-    newPoints[endPointIndex][1] -= delta;
-  }
-
-  // bottom to top so shift the arrow towards bottom
-  if (
-    linearElement.points[endPointIndex][1] <
-    linearElement.points[endPointIndex - 1][1]
-  ) {
-    newPoints[0][1] = -delta;
-    newPoints[endPointIndex][1] += delta;
-  }
-
-  Object.assign(
-    linearElement,
-    LinearElementEditor.getNormalizeElementPointsAndCoords({
-      ...linearElement,
-      points: newPoints,
-    }),
-  );
-
   return {
     linearElement,
     startBoundElement,

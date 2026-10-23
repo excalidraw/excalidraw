@@ -906,7 +906,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
       0,
     ],
     [
-      99,
+      100,
       0,
     ],
   ],
@@ -923,7 +923,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100.5,
+  "x": 100,
   "y": 20,
 }
 `;
@@ -954,7 +954,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
       0,
     ],
     [
-      99,
+      100,
       0,
     ],
   ],
@@ -971,7 +971,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 450.5,
+  "x": 450,
   "y": 20,
 }
 `;
@@ -1971,7 +1971,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
       0,
     ],
     [
-      99,
+      100,
       0,
     ],
   ],
@@ -1988,7 +1988,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100.5,
+  "x": 100,
   "y": 100,
 }
 `;
@@ -2024,7 +2024,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
       0,
     ],
     [
-      99,
+      100,
       0,
     ],
   ],
@@ -2041,7 +2041,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100.5,
+  "x": 100,
   "y": 200,
 }
 `;
@@ -2077,7 +2077,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
       0,
     ],
     [
-      99,
+      100,
       0,
     ],
   ],
@@ -2094,7 +2094,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100.5,
+  "x": 100,
   "y": 300,
 }
 `;
@@ -2130,7 +2130,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
       0,
     ],
     [
-      99,
+      100,
       0,
     ],
   ],
@@ -2147,7 +2147,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100.5,
+  "x": 100,
   "y": 400,
 }
 `;
