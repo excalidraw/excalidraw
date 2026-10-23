@@ -60,6 +60,10 @@ import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import {
+  CARDINALITY_INNER_BAR_OFFSET,
+  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_SCALE,
   elementCenterPoint,
   getArrowheadPoints,
   getDiamondPoints,
@@ -387,9 +391,6 @@ const getArrowheadShapes = (
     canvasBackgroundColor,
     isDarkMode,
   );
-  const cardinalityOneOrManyOffset = -0.25;
-  const cardinalityZeroCircleScale = 0.8;
-
   switch (arrowhead) {
     case "circle":
     case "circle_outline": {
@@ -504,7 +505,7 @@ const getArrowheadShapes = (
             shape,
             position,
             "cardinality_one",
-            cardinalityOneOrManyOffset,
+            CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
           ),
           lineOptions,
         ),
@@ -516,7 +517,13 @@ const getArrowheadShapes = (
       return [
         ...generateArrowheadCardinalityOne(
           generator,
-          getArrowheadPoints(element, shape, position, "cardinality_one", -0.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_INNER_BAR_OFFSET,
+          ),
           lineOptions,
         ),
         ...generateArrowheadCardinalityOne(
@@ -534,13 +541,25 @@ const getArrowheadShapes = (
           generator,
           options,
           strokeColor,
-          getArrowheadPoints(element, shape, position, "circle_outline", 1.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "circle_outline",
+            CARDINALITY_ZERO_CIRCLE_OFFSET,
+          ),
           backgroundFillColor,
-          cardinalityZeroCircleScale,
+          CARDINALITY_ZERO_CIRCLE_SCALE,
         ),
         ...generateArrowheadCardinalityOne(
           generator,
-          getArrowheadPoints(element, shape, position, "cardinality_one", -0.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_INNER_BAR_OFFSET,
+          ),
           lineOptions,
         ),
       ];
@@ -558,9 +577,15 @@ const getArrowheadShapes = (
           generator,
           options,
           strokeColor,
-          getArrowheadPoints(element, shape, position, "circle_outline", 1.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "circle_outline",
+            CARDINALITY_ZERO_CIRCLE_OFFSET,
+          ),
           backgroundFillColor,
-          cardinalityZeroCircleScale,
+          CARDINALITY_ZERO_CIRCLE_SCALE,
         ),
       ];
     }
@@ -645,8 +670,10 @@ export const generateLinearCollisionShape = (
         : [pointFrom<LocalPoint>(0, 0)];
 
       if (isElbowArrow(element)) {
-        return generator.path(generateElbowArrowShape(points, 16), options)
-          .sets[0].ops;
+        return generator.path(
+          generateElbowArrowShape(points, ELBOW_ARROW_CORNER_RADIUS),
+          options,
+        ).sets[0].ops;
       } else if (!element.roundness) {
         return points.map((point, idx) => {
           const p = pointRotateRads(
@@ -914,7 +941,7 @@ const _generateElementShape = (
         } else {
           shape = [
             generator.path(
-              generateElbowArrowShape(points, 16),
+              generateElbowArrowShape(points, ELBOW_ARROW_CORNER_RADIUS),
               generateRoughOptions(element, true, isDarkMode),
             ),
           ];
@@ -1014,6 +1041,8 @@ const _generateElementShape = (
     }
   }
 };
+
+export const ELBOW_ARROW_CORNER_RADIUS = 16;
 
 const generateElbowArrowShape = (
   points: readonly LocalPoint[],
