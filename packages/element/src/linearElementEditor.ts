@@ -630,7 +630,15 @@ export class LinearElementEditor {
     // Attached text might need to update if arrow dimensions change
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      handleBindTextResize(element, app.scene, false);
+      handleBindTextResize(
+        element,
+        app.scene,
+        false,
+        false,
+        false,
+        false,
+        app.renderEnvironment,
+      );
     }
 
     // Update selected points for elbow arrows because elbow arrows add and

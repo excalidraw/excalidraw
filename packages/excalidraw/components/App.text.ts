@@ -271,7 +271,9 @@ export class AppText {
           stickyContainer.id,
         );
         if (latestContainer) {
-          updateBoundElements(latestContainer, this.app.scene);
+          updateBoundElements(latestContainer, this.app.scene, {
+            renderEnvironment: this.app.renderEnvironment,
+          });
         }
       }
     };
@@ -294,7 +296,9 @@ export class AppText {
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false);
         if (isNonDeletedElement(element)) {
-          updateBoundElements(element, this.app.scene);
+          updateBoundElements(element, this.app.scene, {
+            renderEnvironment: this.app.renderEnvironment,
+          });
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {

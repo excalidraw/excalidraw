@@ -47,6 +47,8 @@ export const dragSelectedElements = (
     y: number;
   },
   gridSize: NullableGridSize,
+  /** measures the labels of the bound arrows the drag moves */
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (
     _selectedElements.length === 1 &&
@@ -134,6 +136,7 @@ export const dragSelectedElements = (
       }
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdateArray,
+        renderEnvironment,
       });
     } else if (
       // NOTE: Add a little initial drag to the arrow dragging when the arrow

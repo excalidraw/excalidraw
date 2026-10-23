@@ -225,7 +225,9 @@ export const actionPasteStyles = register({
           prev.x !== element.x ||
           prev.y !== element.y)
       ) {
-        updateBoundElements(element, app.scene);
+        updateBoundElements(element, app.scene, {
+          renderEnvironment: app.renderEnvironment,
+        });
       }
     }
 

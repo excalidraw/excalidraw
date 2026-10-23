@@ -339,7 +339,9 @@ const changeFontSize = (
     includeBoundTextElement: true,
   }).forEach((element) => {
     if (isTextElement(element)) {
-      updateBoundElements(element, app.scene);
+      updateBoundElements(element, app.scene, {
+        renderEnvironment: app.renderEnvironment,
+      });
     }
   });
 

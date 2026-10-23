@@ -1401,7 +1401,7 @@ export const updateBoundElements = (
     /** see `getSimultaneouslyUpdatedElementIds` for how to pass it */
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
-    /** measures the labels of the updated arrows */
+    /** measures the labels of the arrows it updates (the host's, in the editor) */
     renderEnvironment?: RenderEnvironment;
   },
 ) => {
@@ -1522,6 +1522,8 @@ export const updateBindings = (
   options?: {
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     newSize?: { width: number; height: number };
+    /** measures the labels of the bound arrows it updates */
+    renderEnvironment?: RenderEnvironment;
   },
 ) => {
   if (isArrowElement(latestElement)) {
