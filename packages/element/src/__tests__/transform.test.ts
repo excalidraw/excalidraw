@@ -467,9 +467,10 @@ describe("Test Transform", () => {
         },
       });
 
+      // centered on the arrow as placed
+      expect(text.x).toBeCloseTo(240, 1);
+      expect(text.y).toBeCloseTo(226.5, 1);
       expect(text).toMatchObject({
-        x: 240,
-        y: 226.5,
         type: "text",
         text: "HELLO WORLD!!",
         containerId: arrow.id,
@@ -550,9 +551,10 @@ describe("Test Transform", () => {
         },
       });
 
+      // centered on the arrow as placed
+      expect(text1.x).toBeCloseTo(240, 1);
+      expect(text1.y).toBeCloseTo(226.5, 1);
       expect(text1).toMatchObject({
-        x: 240,
-        y: 226.5,
         type: "text",
         text: "HELLO WORLD!!",
         containerId: arrow.id,
@@ -1545,5 +1547,58 @@ describe("Test Transform", () => {
     expect(endLabel.x + endLabel.label.width).toBeCloseTo(
       endLabel.endX - getArrowheadSize("arrow"),
     );
+  });
+
+  it("should store bound arrow labels' x/y where the placed arrows put them", () => {
+    const elements = convertToExcalidrawElements(
+      [undefined, 0.25].flatMap((labelPosition, i) => [
+        {
+          type: "rectangle" as const,
+          id: `A${i}`,
+          x: 0,
+          y: 100 * i,
+          width: 100,
+          height: 20,
+        },
+        {
+          type: "rectangle" as const,
+          id: `B${i}`,
+          x: 500,
+          y: 100 * i,
+          width: 100,
+          height: 20,
+        },
+        {
+          type: "arrow" as const,
+          x: 100,
+          y: 100 * i + 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: `A${i}` },
+          end: { id: `B${i}` },
+          // wraps along the arrow shortened by its binding gaps
+          label: { text: "aaaa bbbb cccc dddd eeee fff", labelPosition },
+        },
+      ]),
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const labels = elements.filter(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElementWithContainer[];
+
+    expect(labels).toHaveLength(2);
+    for (const label of labels) {
+      const arrow = elementsMap.get(
+        label.containerId,
+      ) as ExcalidrawArrowElement;
+      expect(label.text).toContain("\n");
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      expect(label.x).toBeCloseTo(x);
+      expect(label.y).toBeCloseTo(y);
+    }
   });
 });

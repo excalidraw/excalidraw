@@ -442,12 +442,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 3,
+  "version": 4,
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 240,
-  "y": 226.5,
+  "x": 243,
+  "y": 226.5025,
 }
 `;
 
@@ -553,12 +553,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 3,
+  "version": 4,
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 240,
-  "y": 226.5,
+  "x": 240.00000044642854,
+  "y": 226.51,
 }
 `;
 
@@ -740,12 +740,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 3,
+  "version": 4,
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
   "x": 240,
-  "y": 226.5,
+  "y": 226.5025,
 }
 `;
 
@@ -1887,12 +1887,12 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 4,
+  "version": 5,
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 120,
-  "x": 187.75450000000004,
-  "y": 44.5,
+  "x": 187.816836560854,
+  "y": 44.504400000000004,
 }
 `;
 

@@ -949,8 +949,11 @@ export const convertToExcalidrawElements = (
   const placedElementsMap = boundScene.getNonDeletedElementsMap();
   for (const arrow of updatedArrows) {
     const label = getBoundTextElement(arrow, placedElementsMap);
-    const labelPoint = label && labelPoints.get(label.id);
-    if (labelPoint && isArrowElement(arrow)) {
+    if (!label || !isArrowElement(arrow)) {
+      continue;
+    }
+    const labelPoint = labelPoints.get(label.id);
+    if (labelPoint) {
       const labelPosition = LinearElementEditor.getPathParameterAtPoint(
         arrow,
         labelPoint,
@@ -967,6 +970,17 @@ export const convertToExcalidrawElements = (
         });
       }
     }
+    // the editor derives arrow labels' x/y from their arrows as it renders
+    // them, but placing (and rewrapping) leaves them stale, and they're
+    // returned as data, so store them where they're rendered
+    boundScene.mutateElement(
+      label,
+      LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        placedElementsMap,
+      ),
+    );
   }
 
   // Once all the excalidraw elements are created, we can add frames since we
