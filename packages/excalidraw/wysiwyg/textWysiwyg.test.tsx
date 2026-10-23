@@ -3,6 +3,7 @@ import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
+  CaptureUpdateAction,
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
   isTextElement,
@@ -27,8 +28,10 @@ import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
+  OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import { reconcileElements } from "../data/reconcile";
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
@@ -52,6 +55,8 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getTextAutoResizeHandle } from "../textAutoResizeHandle";
 
 import { CARET_FOLLOW_PADDING } from "./textWysiwyg";
+
+import type { RemoteExcalidrawElement } from "../data/reconcile";
 
 const { h } = window;
 
@@ -1445,6 +1450,45 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
+    });
+
+    it("should keep a label as free text when its container is deleted meanwhile", async () => {
+      const [container, label] = API.createTextContainer({
+        label: { text: "abc" },
+      });
+      API.setElements([container, label]);
+      API.setSelectedElements([container]);
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "abcdef");
+
+      // a collaborator deletes the container, along with its label
+      act(() => {
+        h.app.updateScene({
+          elements: reconcileElements(
+            h.elements as OrderedExcalidrawElement[],
+            h.elements.map((element) => ({
+              ...element,
+              isDeleted: true,
+              version: element.version + 1,
+              versionNonce: element.versionNonce + 1,
+            })) as RemoteExcalidrawElement[],
+            h.state,
+          ),
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+      });
+      expect(API.getElement(container).isDeleted).toBe(true);
+
+      updateTextEditor(editor, "abcdefgh");
+      Keyboard.exitTextEditor(editor);
+
+      expect(API.getElement(label)).toMatchObject({
+        isDeleted: false,
+        containerId: null,
+        originalText: "abcdefgh",
+      });
+      expect(h.state.selectedElementIds).toEqual({ [label.id]: true });
     });
 
     it("should not add bound text to a frame when its container is not a frame child", async () => {
