@@ -1517,7 +1517,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
           {
-            "height": 130,
+            "height": 0,
             "width": 340,
           }
         `);

@@ -1294,6 +1294,36 @@ describe("Test Transform", () => {
     expect(frame.y + frame.height).toBeGreaterThanOrEqual(maxY);
   });
 
+  it("should keep bound arrows sized by their points when labels rewrap", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          x: 100,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          // wraps to a taller label along the arrow shortened by its binding
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+      ],
+      opts,
+    );
+    const arrow = elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(label.text).toContain("\n");
+    expect(arrow.points.every(([, y]) => y === 0)).toBe(true);
+    expect(arrow.height).toBe(0);
+  });
+
   it("should place bound arrows listed by elements they aren't bound to", () => {
     const convert = (stale: boolean) =>
       convertToExcalidrawElements(
