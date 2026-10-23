@@ -323,7 +323,15 @@
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",
-    "copyToSystemClipboardFailed": "Couldn't copy to clipboard."
+    "copyToSystemClipboardFailed": "Couldn't copy to clipboard.",
+    "fileSystemPermission": {
+      "description": "Excalidraw couldn't access the file system because your browser blocked the permission. To fix this in Chrome:",
+      "step1": "Open Chrome Settings.",
+      "step2": "Go to Privacy and security > Site Settings.",
+      "step3": "Scroll to Additional permissions > On-device site data.",
+      "step4": "Make sure this site is allowed to save data on your device (remove it from the blocked list if it appears).",
+      "adminNote": "If the option is greyed out or you can't change it, it may be blocked by your system administrator (for example, on a school or company network)."
+    }
   },
   "toolBar": {
     "selection": "Selection",
