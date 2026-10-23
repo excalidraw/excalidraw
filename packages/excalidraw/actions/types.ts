@@ -143,7 +143,8 @@ export type ActionName =
   | "wrapSelectionInFrame"
   | "toggleWrap"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "changeLinearAnimation";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

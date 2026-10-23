@@ -100,3 +100,41 @@
     border-top: 1px solid $color-gray-5;
   }
 }
+
+.excalidraw .animation-menu {
+  padding: 0.5rem;
+  min-width: 20rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+
+  input[type="range"] {
+    width: 8rem;
+    min-width: 0;
+  }
+
+  input[type="number"] {
+    width: 3.5rem;
+  }
+
+  output {
+    min-width: 3.5rem;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  select,
+  input[type="number"] {
+    font: inherit;
+    color: var(--popup-text-color);
+    background: var(--popup-secondary-bg-color);
+    border: 1px solid var(--button-gray-3);
+    border-radius: 4px;
+    padding: 0.25rem;
+  }
+}

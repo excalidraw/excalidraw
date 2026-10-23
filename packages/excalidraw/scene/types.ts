@@ -28,6 +28,8 @@ export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;
 
 export type StaticCanvasRenderConfig = {
+  /** Editor-only motion clock in milliseconds. Omitted for exports/reduced motion. */
+  linearAnimationTime?: number;
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   /**
    * Backing-store scale the target canvas was bootstrapped with -- the owner
