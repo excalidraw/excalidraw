@@ -2012,6 +2012,41 @@ describe("Test Linear Elements", () => {
       expect(line.points[line.points.length - 1][1]).toBe(-20);
     });
 
+    it("should move midpoints with the element via the `moveMidPointsWithElement` option without storing it", () => {
+      const line = createThreePointerLinearElement("arrow");
+      const [origX, origY] = [line.x, line.y];
+      const origMidPoint = line.points[1];
+      const origEndPoint = line.points[2];
+
+      act(() => {
+        LinearElementEditor.movePoints(
+          line,
+          h.app.scene,
+          new Map([
+            [0, { point: pointFrom<LocalPoint>(10, 10) }],
+            [
+              2,
+              {
+                point: pointFrom<LocalPoint>(
+                  origEndPoint[0] + 10,
+                  origEndPoint[1] + 10,
+                ),
+              },
+            ],
+          ]),
+          undefined,
+          { moveMidPointsWithElement: true },
+        );
+      });
+
+      expect(line.x).toBe(origX + 10);
+      expect(line.y).toBe(origY + 10);
+      // local coords unchanged => the midpoint moved along with the element
+      expect(line.points[1]).toEqual(origMidPoint);
+      expect(line.points[2]).toEqual(origEndPoint);
+      expect(line).not.toHaveProperty("moveMidPointsWithElement");
+    });
+
     it("should preserve original angle when dragging endpoint with SHIFT key", () => {
       createTwoPointerLinearElement("line");
       const line = h.elements[0] as ExcalidrawLinearElement;

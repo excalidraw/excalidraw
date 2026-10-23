@@ -1416,11 +1416,17 @@ export const updateBoundElements = (
       (update): update is MapEntry<PointsPositionUpdates> => update !== null,
     );
 
-    LinearElementEditor.movePoints(element, scene, new Map(updates), {
-      moveMidPointsWithElement:
-        !!startBindingElement &&
-        startBindingElement?.id === endBindingElement?.id,
-    });
+    LinearElementEditor.movePoints(
+      element,
+      scene,
+      new Map(updates),
+      undefined,
+      {
+        moveMidPointsWithElement:
+          !!startBindingElement &&
+          startBindingElement?.id === endBindingElement?.id,
+      },
+    );
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {

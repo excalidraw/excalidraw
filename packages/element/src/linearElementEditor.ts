@@ -127,7 +127,6 @@ const getNormalizedPoints = ({
 type PointMoveOtherUpdates = {
   startBinding?: FixedPointBinding | null;
   endBinding?: FixedPointBinding | null;
-  moveMidPointsWithElement?: boolean | null;
   suggestedBinding?: AppState["suggestedBinding"] | null;
 };
 
@@ -387,7 +386,6 @@ export class LinearElementEditor {
       {
         startBinding: updates?.startBinding,
         endBinding: updates?.endBinding,
-        moveMidPointsWithElement: updates?.moveMidPointsWithElement,
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
@@ -592,7 +590,6 @@ export class LinearElementEditor {
       {
         startBinding: updates?.startBinding,
         endBinding: updates?.endBinding,
-        moveMidPointsWithElement: updates?.moveMidPointsWithElement,
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
@@ -1653,11 +1650,11 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: FixedPointBinding | null;
       endBinding?: FixedPointBinding | null;
-      moveMidPointsWithElement?: boolean | null;
     },
     options?: {
       isBindingEnabled?: boolean;
       isMidpointSnappingEnabled?: boolean;
+      moveMidPointsWithElement?: boolean;
     },
   ) {
     const { points } = element;
@@ -1704,7 +1701,7 @@ export class LinearElementEditor {
           const current = pointUpdates.get(idx)?.point ?? p;
 
           if (
-            otherUpdates?.moveMidPointsWithElement &&
+            options?.moveMidPointsWithElement &&
             idx !== 0 &&
             idx !== points.length - 1 &&
             !pointUpdates.has(idx)
@@ -1883,20 +1880,8 @@ export class LinearElementEditor {
         pointFrom(dX, dY),
         element.angle,
       );
-      // only the bindings: `movePoints()` options (e.g.
-      // `moveMidPointsWithElement`) aren't element properties
-      const bindingUpdates: {
-        startBinding?: FixedPointBinding | null;
-        endBinding?: FixedPointBinding | null;
-      } = {};
-      if (otherUpdates?.startBinding !== undefined) {
-        bindingUpdates.startBinding = otherUpdates.startBinding;
-      }
-      if (otherUpdates?.endBinding !== undefined) {
-        bindingUpdates.endBinding = otherUpdates.endBinding;
-      }
       scene.mutateElement(element, {
-        ...bindingUpdates,
+        ...otherUpdates,
         points: nextPoints,
         x: element.x + rotatedOffset[0],
         y: element.y + rotatedOffset[1],
