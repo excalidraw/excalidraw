@@ -2,6 +2,11 @@ import { base64urlToString } from "@excalidraw/excalidraw/data/encode";
 import { ExcalidrawError } from "@excalidraw/excalidraw/errors";
 import { useLayoutEffect, useRef } from "react";
 
+import {
+  isInitializedImageElement,
+  isNonDeletedElement,
+} from "@excalidraw/element";
+
 import type {
   FileId,
   OrderedExcalidrawElement,
@@ -10,6 +15,7 @@ import type { AppState, BinaryFileData } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "./app_constants";
 import { LocalData } from "./data/LocalData";
+import { withBrowserStorageLock } from "./data/localStorage";
 
 const EVENT_REQUEST_SCENE = "REQUEST_SCENE";
 
@@ -51,9 +57,9 @@ const parseSceneData = async ({
   }
 
   try {
-    const elements = JSON.parse(
-      rawElementsString,
-    ) as OrderedExcalidrawElement[];
+    const elements = (
+      JSON.parse(rawElementsString) as OrderedExcalidrawElement[]
+    ).filter(isNonDeletedElement);
 
     if (!elements.length) {
       throw new ExcalidrawError("Scene is empty, nothing to export.");
@@ -65,7 +71,7 @@ const parseSceneData = async ({
     >;
 
     const fileIds = elements.reduce((acc, el) => {
-      if ("fileId" in el && el.fileId) {
+      if (isInitializedImageElement(el)) {
         acc.push(el.fileId);
       }
       return acc;
@@ -175,14 +181,17 @@ export const ExcalidrawPlusIframeExport = () => {
             throw new ExcalidrawError("Failed to verify JWT");
           }
 
-          const parsedSceneData: MESSAGE_SCENE_DATA = await parseSceneData({
+          const storedScene = await withBrowserStorageLock(() => ({
             rawAppStateString: localStorage.getItem(
               STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
             ),
             rawElementsString: localStorage.getItem(
               STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
             ),
-          });
+          }));
+          const parsedSceneData: MESSAGE_SCENE_DATA = await parseSceneData(
+            storedScene,
+          );
 
           event.source!.postMessage(parsedSceneData, {
             targetOrigin: EXCALIDRAW_PLUS_ORIGIN,
