@@ -27,3 +27,7 @@ dev-dist
 html
 meta*.json
 .claude
+# local notes database (SQLite)
+/data
+# macOS app build output
+desktop/release

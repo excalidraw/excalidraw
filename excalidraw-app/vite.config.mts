@@ -9,6 +9,8 @@ import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
+import { createNotesApi } from "./notes-server/notesApi.mts";
+
 import type { Plugin, Rollup } from "vite";
 
 /**
@@ -97,6 +99,21 @@ const lazyChunksPlugin = (
     }
   },
 });
+
+/** Serves the SQLite-backed notes API (`/api/notes`) from the Vite servers. */
+const notesApiPlugin = (dbFile: string): Plugin => {
+  let notesApi: ReturnType<typeof createNotesApi> | null = null;
+  const getNotesApi = () => (notesApi ??= createNotesApi(dbFile));
+  return {
+    name: "excalidraw-notes-api",
+    configureServer(server) {
+      server.middlewares.use(getNotesApi());
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(getNotesApi());
+    },
+  };
+};
 
 export default defineConfig(({ mode }) => {
   // To load .env variables
@@ -240,6 +257,11 @@ export default defineConfig(({ mode }) => {
         // its static in public folder
         generateRobotsTxt: false,
       }),
+      notesApiPlugin(
+        path.resolve(
+          process.env.NOTES_DB_PATH || path.join(__dirname, "../data/notes.db"),
+        ),
+      ),
       woff2BrowserPlugin(),
       lazyChunksPlugin(
         /[\\/]node_modules[\\/]@excalidraw[\\/]mermaid-to-excalidraw[\\/]/,

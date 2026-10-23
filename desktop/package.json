@@ -1,0 +1,54 @@
+{
+  "name": "excalidraw-notes-desktop",
+  "productName": "Excalidraw Notes",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Excalidraw notes gallery as a macOS app, stored in SQLite",
+  "main": "dist/main.mjs",
+  "scripts": {
+    "build:web": "yarn --cwd .. build:app:docker",
+    "build:main": "esbuild src/main.mts --bundle --platform=node --format=esm --target=node24 --external:electron --outfile=dist/main.mjs",
+    "typecheck": "tsc -p .",
+    "dev": "yarn build:main && electron .",
+    "start": "yarn build:web && yarn dev",
+    "package": "yarn build:web && yarn build:main && electron-builder --mac --publish never"
+  },
+  "build": {
+    "appId": "com.lucassantoss.excalidraw-notes",
+    "productName": "Excalidraw Notes",
+    "directories": {
+      "output": "release",
+      "buildResources": "resources"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../excalidraw-app/build",
+        "to": "web",
+        "filter": [
+          "**/*",
+          "!**/*.map"
+        ]
+      }
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "resources/icon.png",
+      "identity": "-",
+      "hardenedRuntime": false
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "electron": "45.0.0",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  }
+}
