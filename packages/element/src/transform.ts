@@ -31,7 +31,13 @@ import {
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 import type { Zoom } from "@excalidraw/excalidraw/types";
 
-import { bindBindingElement, updateBoundArrow } from "./binding";
+import {
+  bindBindingElement,
+  extendBoundEndOntoElement,
+  isEndBoundBeyondBindingArea,
+  unbindBindingElement,
+  updateBoundArrow,
+} from "./binding";
 import {
   newArrowElement,
   newElement,
@@ -49,7 +55,11 @@ import {
 } from "./newElement";
 import { normalizeStickyNoteStrokeColor } from "./stickyNote";
 import { measureText, normalizeText } from "./textMeasurements";
-import { isArrowElement, isStickyNoteElement } from "./typeChecks";
+import {
+  isArrowElement,
+  isBindableElement,
+  isStickyNoteElement,
+} from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -949,9 +959,54 @@ export const convertToExcalidrawElements = (
   // created to bind to since the scene was built, so resync it first
   scene.replaceAllElements(elementStore.getElementsMap());
   const placedElementsMap = scene.getNonDeletedElementsMap();
+  // arrows unbound below, by what they were bound to: they still connect it
+  // (e.g. they're framed with it)
+  const unboundArrowIds = new Map<ExcalidrawElement["id"], string[]>();
   for (const arrow of scene.getNonDeletedElements()) {
+    if (!isArrowElement(arrow)) {
+      continue;
+    }
+    // users can't (re)bind an end given (e.g. by a layout engine) beyond the
+    // binding area of what it's bound to, so don't leave it bound there,
+    // unless it just falls short of it: then extend it onto it
+    for (const startOrEnd of ["start", "end"] as const) {
+      if (
+        isEndBoundBeyondBindingArea(
+          arrow,
+          startOrEnd,
+          placedElementsMap,
+          DEFAULT_ZOOM,
+        ) &&
+        !extendBoundEndOntoElement(arrow, startOrEnd, scene)
+      ) {
+        const elementId = unbindBindingElement(arrow, startOrEnd, scene);
+        if (elementId) {
+          unboundArrowIds.set(elementId, [
+            ...(unboundArrowIds.get(elementId) ?? []),
+            arrow.id,
+          ]);
+        }
+        continue;
+      }
+      // it was bound before what it's bound to was sized if that came later
+      // (e.g. to fit its label), so its fixed point may be off (e.g. the
+      // center of a 0x0 element): rebind it against the element as sized
+      const binding =
+        startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+      const bindableElement =
+        binding && placedElementsMap.get(binding.elementId);
+      if (bindableElement && isBindableElement(bindableElement)) {
+        bindBindingElement(
+          arrow,
+          bindableElement,
+          binding.mode,
+          startOrEnd,
+          scene,
+          DEFAULT_ZOOM,
+        );
+      }
+    }
     if (
-      !isArrowElement(arrow) ||
       ![arrow.startBinding, arrow.endBinding].some(
         (binding) => binding && placedElementsMap.has(binding.elementId),
       )
@@ -1029,11 +1084,14 @@ export const convertToExcalidrawElements = (
       }
       Object.assign(elementInFrame, { frameId: frame.id });
 
-      elementInFrame?.boundElements?.forEach((boundElement) => {
-        const ele = elementStore.getElement(boundElement.id);
+      [
+        ...(elementInFrame.boundElements ?? []).map(({ id }) => id),
+        ...(unboundArrowIds.get(elementInFrame.id) ?? []),
+      ].forEach((boundElementId) => {
+        const ele = elementStore.getElement(boundElementId);
         if (!ele) {
           throw new Error(
-            `Bound element with id ${boundElement.id} doesn't exist`,
+            `Bound element with id ${boundElementId} doesn't exist`,
           );
         }
         Object.assign(ele, { frameId: frame.id });

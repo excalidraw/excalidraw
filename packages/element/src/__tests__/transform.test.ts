@@ -684,6 +684,8 @@ describe("Test Transform", () => {
           type: "arrow",
           x: 255,
           y: 239,
+          // reaching text-2, within its binding area
+          width: 305,
           label: {
             text: "HELLO WORLD!!",
           },
@@ -785,7 +787,8 @@ describe("Test Transform", () => {
       const elements = [
         {
           type: "arrow",
-          x: 255,
+          // reaching rect-1, within its binding area
+          x: 460,
           y: 239,
           end: {
             id: "rect-1",
@@ -809,7 +812,7 @@ describe("Test Transform", () => {
       const [arrow, rect] = excalidrawElements;
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
-        fixedPoint: [-2.05, 0.5001],
+        fixedPoint: [0, 0.5001],
         mode: "orbit",
       });
       expect(rect.boundElements).toStrictEqual([
@@ -1652,6 +1655,297 @@ describe("Test Transform", () => {
         [300, 0],
       ],
     });
+  });
+
+  it("should unbind arrow ends given beyond the binding areas of the elements they're bound to", () => {
+    // e.g. a sequence diagram's messages, bound to their participants' headers
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "beyond",
+          x: 50,
+          // further below them than binding distance
+          y: 40,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(500, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          label: { text: "message" },
+        },
+        {
+          type: "arrow",
+          id: "half-far",
+          x: 100,
+          y: 10,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(450, 490),
+          ],
+          start: { id: "A" },
+          end: { id: "B" },
+        },
+        {
+          type: "arrow",
+          id: "near",
+          x: 50,
+          // within binding distance below them
+          y: 30,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(500, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+        },
+      ],
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const near = elementsMap.get("near") as ExcalidrawArrowElement;
+    const beyond = elementsMap.get("beyond") as ExcalidrawArrowElement;
+    const halfFar = elementsMap.get("half-far") as ExcalidrawArrowElement;
+
+    expect(beyond).toMatchObject({
+      startBinding: null,
+      endBinding: null,
+      x: 50,
+      y: 40,
+      width: 500,
+      height: 0,
+      points: [
+        [0, 0],
+        [500, 0],
+      ],
+    });
+    expect(near.startBinding?.elementId).toBe("A");
+    expect(near.endBinding?.elementId).toBe("B");
+    expect(halfFar.startBinding?.elementId).toBe("A");
+    expect(halfFar.endBinding).toBeNull();
+    expect(elementsMap.get("A")?.boundElements).toEqual([
+      { id: "half-far", type: "arrow" },
+      { id: "near", type: "arrow" },
+    ]);
+    expect(elementsMap.get("B")?.boundElements).toEqual([
+      { id: "near", type: "arrow" },
+    ]);
+
+    // placed off A by the binding gap, its unbound end left where given
+    expect(halfFar.x).toBeGreaterThan(100);
+    const [endX, endY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      halfFar,
+      -1,
+      elementsMap,
+    );
+    expect(endX).toBeCloseTo(550);
+    expect(endY).toBeCloseTo(500);
+  });
+
+  it("should frame arrows unbound from a frame's children with them", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "arrow",
+          x: 50,
+          // further below them than binding distance
+          y: 60,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(500, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+        },
+        { type: "frame", children: ["A", "B"] },
+      ],
+      opts,
+    );
+    const frame = elements.find((element) => element.type === "frame")!;
+    const arrow = elements.find(
+      (element) => element.id === "arrow",
+    ) as ExcalidrawArrowElement;
+
+    expect(arrow.startBinding).toBeNull();
+    expect(arrow.endBinding).toBeNull();
+    expect(arrow.frameId).toBe(frame.id);
+    const [, , , maxY] = getCommonBounds([arrow]);
+    expect(frame.y + frame.height).toBeGreaterThanOrEqual(maxY);
+  });
+
+  it("should extend arrow ends falling short of the elements they're bound to onto them", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "short",
+          // ends 100px short of B: within its end segment's length
+          x: 150,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(250, 0)],
+          end: { id: "B" },
+        },
+        {
+          type: "arrow",
+          id: "stub",
+          // starts 80px short of A: within the minimum extension
+          x: 180,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(20, 0)],
+          start: { id: "A" },
+        },
+        {
+          type: "arrow",
+          id: "too-short",
+          // ends 200px short of B: beyond its end segment's length
+          x: 200,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+          end: { id: "B" },
+        },
+      ],
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const short = elementsMap.get("short") as ExcalidrawArrowElement;
+    const stub = elementsMap.get("stub") as ExcalidrawArrowElement;
+    const tooShort = elementsMap.get("too-short") as ExcalidrawArrowElement;
+
+    expect(short.endBinding?.elementId).toBe("B");
+    const [shortEndX, shortEndY] =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        short,
+        -1,
+        elementsMap,
+      );
+    expect(shortEndX).toBeCloseTo(500 - getBindingGap(elementsMap.get("B")!));
+    expect(shortEndY).toBeCloseTo(10);
+
+    expect(stub.startBinding?.elementId).toBe("A");
+    const [stubStartX, stubStartY] =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        stub,
+        0,
+        elementsMap,
+      );
+    expect(stubStartX).toBeCloseTo(100 + getBindingGap(elementsMap.get("A")!));
+    expect(stubStartY).toBeCloseTo(10);
+
+    expect(tooShort).toMatchObject({
+      endBinding: null,
+      x: 200,
+      y: 10,
+      points: [
+        [0, 0],
+        [100, 0],
+      ],
+    });
+    expect(elementsMap.get("A")?.boundElements).toEqual([
+      { id: "stub", type: "arrow" },
+    ]);
+    expect(elementsMap.get("B")?.boundElements).toEqual([
+      { id: "short", type: "arrow" },
+    ]);
+  });
+
+  it("should keep arrow ends bound to frame children where given, whether frameId or children is given", () => {
+    for (const byFrameId of [true, false]) {
+      const elements = convertToExcalidrawElements(
+        [
+          // not sized yet when arrow ends are checked
+          {
+            type: "frame",
+            id: "frame",
+            x: 0,
+            y: 0,
+            children: byFrameId ? [] : ["A", "B"],
+          },
+          {
+            type: "rectangle",
+            id: "A",
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 20,
+            ...(byFrameId && { frameId: "frame" }),
+          },
+          {
+            type: "rectangle",
+            id: "B",
+            x: 300,
+            y: 0,
+            width: 100,
+            height: 20,
+            ...(byFrameId && { frameId: "frame" }),
+          },
+          {
+            type: "arrow",
+            id: "arrow",
+            x: 100,
+            y: 10,
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(200, 0),
+            ],
+            start: { id: "A" },
+            end: { id: "B" },
+          },
+        ],
+        opts,
+      );
+      const elementsMap = arrayToMap(elements);
+      const arrow = elementsMap.get("arrow") as ExcalidrawArrowElement;
+
+      expect(elementsMap.get("A")?.frameId).toBe("frame");
+      expect(elementsMap.get("B")?.frameId).toBe("frame");
+      // on the edges they're given on, facing each other
+      expect(arrow.startBinding).toStrictEqual({
+        elementId: "A",
+        fixedPoint: [1, 0.5001],
+        mode: "orbit",
+      });
+      expect(arrow.endBinding).toStrictEqual({
+        elementId: "B",
+        fixedPoint: [0, 0.5001],
+        mode: "orbit",
+      });
+    }
+  });
+
+  it("should bind arrows to elements sized to fit their labels after them as to those before them", () => {
+    const convert = (rectangleFirst: boolean) => {
+      // sized to fit its label, after the arrows listed before it are bound
+      const rectangle = {
+        type: "rectangle",
+        id: "B",
+        x: 400,
+        y: 25,
+        label: { text: "B" },
+      } as const;
+      const arrow = {
+        type: "arrow",
+        id: "arrow",
+        x: 100,
+        y: 50,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+        end: { id: "B" },
+      } as const;
+      const elements = convertToExcalidrawElements(
+        rectangleFirst ? [rectangle, arrow] : [arrow, rectangle],
+        opts,
+      );
+      return elements.find(
+        (element) => element.id === "arrow",
+      ) as ExcalidrawArrowElement;
+    };
+    const arrowFirst = convert(false);
+    const rectangleFirst = convert(true);
+
+    // not bound to the center of B as it was before being sized, but where
+    // the end was given: B's left edge
+    expect(arrowFirst.endBinding?.fixedPoint[0]).toBeCloseTo(0);
+    expect(arrowFirst.endBinding).toEqual(rectangleFirst.endBinding);
+    expect(arrowFirst.points).toEqual(rectangleFirst.points);
+    expect(arrowFirst.height).toBe(0);
   });
 
   it("should create shapes for start / end without ids where arrows in any direction start / end", () => {

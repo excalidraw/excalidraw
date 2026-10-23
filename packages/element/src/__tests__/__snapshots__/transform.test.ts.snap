@@ -134,7 +134,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "versionNonce": Any<Number>,
   "width": 371.50564585626694,
   "x": 253,
@@ -196,7 +196,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "versionNonce": Any<Number>,
   "width": 383.0807596341628,
   "x": 241.7419168232014,
@@ -357,7 +357,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endBinding": {
     "elementId": "text-2",
     "fixedPoint": [
-      -2.05,
+      0,
       0.5001,
     ],
     "mode": "orbit",
@@ -378,7 +378,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
       0,
     ],
     [
-      94,
+      293,
       0,
     ],
   ],
@@ -399,11 +399,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "versionNonce": Any<Number>,
-  "width": 94,
+  "width": 293,
   "x": 261,
-  "y": 239.0025,
+  "y": 239.00250000000003,
 }
 `;
 
@@ -446,8 +446,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 243,
-  "y": 226.5025,
+  "x": 342.5,
+  "y": 226.50250000000003,
 }
 `;
 
@@ -510,7 +510,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "versionNonce": Any<Number>,
   "width": 88.00000089285714,
   "x": 261,
@@ -697,7 +697,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "versionNonce": Any<Number>,
   "width": 88,
   "x": 261,
@@ -1595,7 +1595,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 5,
+  "version": 7,
   "versionNonce": Any<Number>,
   "width": 266.28515625,
   "x": 117.26171875,
@@ -1660,7 +1660,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 4,
+  "version": 6,
   "versionNonce": Any<Number>,
   "width": 0,
   "x": 77.017,
