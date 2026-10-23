@@ -1,8 +1,15 @@
-import { KEYS, ROUNDNESS, arrayToMap, DEFAULT_ZOOM } from "@excalidraw/common";
+import {
+  KEYS,
+  ROUNDNESS,
+  arrayToMap,
+  DEFAULT_ZOOM,
+  getSizeFromPoints,
+} from "@excalidraw/common";
 
-import { pointFrom } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { actionWrapTextInContainer } from "@excalidraw/excalidraw/actions/actionBoundText";
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 
 import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw";
 
@@ -16,13 +23,25 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
-import type { Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+
+import type { AppState, NullableGridSize } from "@excalidraw/excalidraw/types";
 
 import {
+  BindableElement,
+  avoidRectangularCorner,
   bindBindingElement,
+  bindPointToSnapToElementOutline,
   getBindingGap,
+  getBindingStrategyForDraggingBindingElementEndpoints,
+  updateBindings,
   updateBoundElements,
+  updateBoundPoint,
 } from "../src/binding";
+import { LinearElementEditor } from "../src/linearElementEditor";
+import { mutateElement } from "../src/mutateElement";
+import { newArrowElement, newElement } from "../src/newElement";
+import { Scene } from "../src/Scene";
 import { getAllMidpoints } from "../src/utils";
 import { getTransformHandles } from "../src/transformHandles";
 import {
@@ -33,9 +52,12 @@ import {
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
+  ExcalidrawElement,
   ExcalidrawLinearElement,
   FixedPointBinding,
   NonDeleted,
+  NonDeletedSceneElementsMap,
+  Ordered,
 } from "../src/types";
 
 const { h } = window;
@@ -1100,4 +1122,669 @@ describe("binding to a point-like (sub-pixel) element", () => {
       expect(Math.abs(arrow.height)).toBeLessThan(1000);
     },
   );
+});
+
+const rectangle = (
+  id: string,
+  x: number,
+  y: number,
+  width = 100,
+  height = 100,
+  extra: Partial<ExcalidrawBindableElement> = {},
+  type: "rectangle" | "diamond" | "ellipse" = "rectangle",
+) =>
+  ({
+    ...newElement({ type, x, y, width, height }),
+    id,
+    ...extra,
+  } as NonDeleted<ExcalidrawBindableElement>);
+
+const simpleArrow = (
+  id: string,
+  globalPoints: [number, number][],
+  extra: Partial<ExcalidrawArrowElement> = {},
+) => {
+  const points = globalPoints.map(([x, y]) =>
+    pointFrom<LocalPoint>(x - globalPoints[0][0], y - globalPoints[0][1]),
+  );
+  return {
+    ...newArrowElement({
+      type: "arrow",
+      elbowed: !!extra.elbowed,
+      x: globalPoints[0][0],
+      y: globalPoints[0][1],
+      startArrowhead: null,
+      endArrowhead: "arrow",
+      points,
+    }),
+    // `newArrowElement` does not derive the size from the points
+    ...getSizeFromPoints(points),
+    id,
+    ...extra,
+  } as NonDeleted<ExcalidrawArrowElement>;
+};
+
+const toMap = (...elements: ExcalidrawElement[]) =>
+  arrayToMap(elements) as NonDeletedSceneElementsMap;
+
+const orbit = (elementId: string, fixedPoint: [number, number]) =>
+  ({ elementId, mode: "orbit", fixedPoint } as FixedPointBinding);
+
+/** global coordinates of a local point returned by `updateBoundPoint` */
+const toGlobal = (arrow: ExcalidrawArrowElement, point: LocalPoint) => [
+  arrow.x + point[0],
+  arrow.y + point[1],
+];
+
+describe("updateBoundPoint", () => {
+  it("short-circuits to the focus point when the outline point is inside the other shape", () => {
+    // overlapping shapes: the segment between the focus points crosses b's
+    // outline at x = 50 - gap, which lies inside a
+    const a = rectangle("a", 0, 0);
+    const b = rectangle("b", 50, 0);
+    const arrow = simpleArrow("x", [
+      [10, 50],
+      [100, 50],
+    ]);
+    const bound = {
+      ...arrow,
+      startBinding: orbit("a", [0.1, 0.5001]),
+      endBinding: orbit("b", [0.5001, 0.5001]),
+    };
+
+    const point = updateBoundPoint(
+      bound,
+      "endBinding",
+      bound.endBinding,
+      b,
+      toMap(a, b, bound),
+    );
+
+    // the end has an arrowhead, so it resolves to b's focus point (center)
+    // rather than to the outline point, which would invert the arrow
+    expect(toGlobal(bound, point!)[0]).toBeCloseTo(100, 0);
+    expect(toGlobal(bound, point!)[1]).toBeCloseTo(50, 0);
+  });
+
+  it("short-circuits to the focus point when an arrow bound at both ends is too short", () => {
+    // a is too large for the overlap short-circuit, the shapes are 8px apart
+    const a = rectangle("a", 0, 0, 300, 300);
+    const b = rectangle("b", 308, 100);
+    const arrow = simpleArrow("x", [
+      [300, 150],
+      [308, 150],
+    ]);
+    const bound = {
+      ...arrow,
+      startBinding: orbit("a", [1, 0.5001]),
+      endBinding: orbit("b", [0, 0.5001]),
+    };
+
+    const point = updateBoundPoint(
+      bound,
+      "endBinding",
+      bound.endBinding,
+      b,
+      toMap(a, b, bound),
+    );
+
+    // the focus point on b's left edge, not the outline point one gap
+    // further out, which would leave the arrow shorter than its minimum
+    expect(toGlobal(bound, point!)[0]).toBeCloseTo(308, 0);
+    expect(toGlobal(bound, point!)[1]).toBeCloseTo(150, 0);
+  });
+});
+
+describe("avoidRectangularCorner", () => {
+  const target = rectangle("a", 0, 0);
+  const arrow = simpleArrow("x", [
+    [300, 300],
+    [0, 0],
+  ]);
+  const gap = getBindingGap(target);
+  const map = toMap(target, arrow);
+
+  it.each([
+    ["top left, near the top side", [-3, -gap / 2], [-gap, 0]],
+    ["top left, away from the top side", [-3, -gap * 2], [0, -gap]],
+    ["bottom left, near the left side", [-gap / 2, 103], [0, 100 + gap]],
+    ["bottom left, away from the left side", [-gap * 2, 103], [-gap, 100]],
+    [
+      "bottom right, near the right side",
+      [100 + gap / 2, 110],
+      [100, 100 + gap],
+    ],
+    [
+      "bottom right, away from the right side",
+      [100 + gap * 2, 103],
+      [100 + gap, 100],
+    ],
+    ["top right, near the right side", [100 + gap / 2, -10], [100, -gap]],
+    [
+      "top right, away from the right side",
+      [100 + gap * 2, -3],
+      [100 + gap, 0],
+    ],
+  ] as [string, [number, number], [number, number]][])(
+    "moves a point in the %s corner onto the adjacent side",
+    (_, input, expected) => {
+      const result = avoidRectangularCorner(
+        arrow,
+        target,
+        map,
+        pointFrom<GlobalPoint>(...input),
+      );
+
+      expect(result[0]).toBeCloseTo(expected[0]);
+      expect(result[1]).toBeCloseTo(expected[1]);
+    },
+  );
+
+  it("leaves points outside the corner regions alone", () => {
+    const point = pointFrom<GlobalPoint>(120, 50);
+
+    expect(avoidRectangularCorner(arrow, target, map, point)).toEqual(point);
+  });
+
+  it("works in the rotated frame of a rotated target", () => {
+    const angle = (Math.PI / 2) as Radians;
+    const rotated = { ...target, angle };
+    const center = pointFrom<GlobalPoint>(50, 50);
+    const rotate = (point: [number, number]) =>
+      pointRotateRads(pointFrom<GlobalPoint>(...point), center, angle);
+
+    const result = avoidRectangularCorner(
+      arrow,
+      rotated,
+      toMap(rotated, arrow),
+      rotate([-3, -gap * 2]),
+    );
+    const expected = rotate([0, -gap]);
+
+    expect(result[0]).toBeCloseTo(expected[0]);
+    expect(result[1]).toBeCloseTo(expected[1]);
+  });
+});
+
+describe("bindPointToSnapToElementOutline for simple arrows", () => {
+  const target = rectangle("a", 0, 0);
+
+  it("projects the endpoint onto the outline along the last segment", () => {
+    const arrow = simpleArrow("x", [
+      [300, 50],
+      [80, 50],
+    ]);
+
+    const point = bindPointToSnapToElementOutline(
+      arrow,
+      target,
+      "end",
+      toMap(target, arrow),
+      DEFAULT_ZOOM,
+    );
+
+    expect(point[0]).toBeCloseTo(100 + getBindingGap(target));
+    expect(point[1]).toBeCloseTo(50);
+  });
+
+  it("keeps the endpoint when it is too close to its neighbor to project", () => {
+    const arrow = simpleArrow("x", [
+      [300, 50],
+      [110, 50],
+      [110.5, 50],
+    ]);
+
+    const point = bindPointToSnapToElementOutline(
+      arrow,
+      target,
+      "end",
+      toMap(target, arrow),
+      DEFAULT_ZOOM,
+    );
+
+    expect(point[0]).toBeCloseTo(110.5);
+    expect(point[1]).toBeCloseTo(50);
+  });
+});
+
+describe("updateBindings for arrows", () => {
+  const appState = {
+    ...getDefaultAppState(),
+    width: 1000,
+    height: 1000,
+  } as AppState;
+
+  const setup = (arrowX: number) => {
+    const target = rectangle("a", 0, 0, 100, 100, {
+      boundElements: [{ id: "x", type: "arrow" }],
+    });
+    // the start target moves along with the arrow, so it stays in reach
+    const start = rectangle("b", arrowX + 206, 0, 100, 100, {
+      boundElements: [{ id: "x", type: "arrow" }],
+    });
+    const arrow = simpleArrow(
+      "x",
+      [
+        [arrowX + 200, 50],
+        [arrowX + 106, 50],
+      ],
+      {
+        startBinding: orbit("b", [-0.06, 0.5001]),
+        endBinding: orbit("a", [1.06, 0.5001]),
+      },
+    );
+    const scene = new Scene([target, start, arrow], { skipValidation: true });
+
+    updateBindings(arrow, scene, appState);
+
+    return { target, start, arrow };
+  };
+
+  it("keeps the bindings when the endpoints are still within binding distance", () => {
+    const { target, start, arrow } = setup(0);
+
+    expect(arrow.startBinding?.elementId).toBe("b");
+    expect(arrow.endBinding?.elementId).toBe("a");
+    expect(start.boundElements).toEqual([{ id: "x", type: "arrow" }]);
+    expect(target.boundElements).toEqual([{ id: "x", type: "arrow" }]);
+  });
+
+  it("unbinds on both sides when an endpoint moved out of reach", () => {
+    const { target, start, arrow } = setup(500);
+
+    expect(arrow.startBinding?.elementId).toBe("b");
+    expect(start.boundElements).toEqual([{ id: "x", type: "arrow" }]);
+    expect(arrow.endBinding).toBeNull();
+    expect(target.boundElements).toEqual([]);
+  });
+});
+
+describe("BindableElement.rebindAffected with conflicting labels", () => {
+  const label = (id: string, containerId: string | null) =>
+    ({
+      ...newElement({ type: "rectangle", x: 0, y: 0, width: 10, height: 10 }),
+      type: "text",
+      id,
+      containerId,
+    } as unknown as ExcalidrawElement);
+
+  const rebind = (...elements: ExcalidrawElement[]) => {
+    const map = toMap(...elements);
+    BindableElement.rebindAffected(map, map.get("a"), (element, updates) =>
+      mutateElement(element, map, updates),
+    );
+    return map as Map<string, any>;
+  };
+
+  it("keeps only the last listed label and unbinds the others", () => {
+    const map = rebind(
+      rectangle("a", 0, 0, 100, 100, {
+        boundElements: [
+          { id: "t1", type: "text" },
+          { id: "t2", type: "text" },
+        ],
+      }),
+      label("t1", "a"),
+      label("t2", "a"),
+    );
+
+    expect(map.get("t1").containerId).toBeNull();
+    expect(map.get("t2").containerId).toBe("a");
+    expect(map.get("a").boundElements).toEqual([{ id: "t2", type: "text" }]);
+  });
+
+  it("rebinds the last listed label that lost its container", () => {
+    const map = rebind(
+      rectangle("a", 0, 0, 100, 100, {
+        boundElements: [{ id: "t1", type: "text" }],
+      }),
+      label("t1", null),
+    );
+
+    expect(map.get("t1").containerId).toBe("a");
+    expect(map.get("a").boundElements).toEqual([{ id: "t1", type: "text" }]);
+  });
+});
+
+describe("getBindingStrategyForDraggingBindingElementEndpoints", () => {
+  const appState = (overrides: Partial<AppState> = {}) =>
+    ({
+      ...getDefaultAppState(),
+      width: 1000,
+      height: 1000,
+      ...overrides,
+    } as AppState);
+
+  /** strategy for dragging one endpoint of `arrow` to `to` */
+  const drag = (
+    arrow: NonDeleted<ExcalidrawArrowElement>,
+    endpoint: "start" | "end",
+    to: [number, number],
+    elements: NonDeleted<ExcalidrawElement>[],
+    state: AppState,
+    opts?: Parameters<
+      typeof getBindingStrategyForDraggingBindingElementEndpoints
+    >[7],
+    pointer: [number, number] = to,
+  ) =>
+    getBindingStrategyForDraggingBindingElementEndpoints(
+      arrow,
+      new Map([
+        [
+          endpoint === "start" ? 0 : arrow.points.length - 1,
+          { point: pointFrom<LocalPoint>(to[0] - arrow.x, to[1] - arrow.y) },
+        ],
+      ]),
+      pointer[0],
+      pointer[1],
+      toMap(...elements),
+      elements as Ordered<NonDeleted<ExcalidrawElement>>[],
+      state,
+      opts,
+    );
+
+  const a = rectangle("a", 0, 0);
+  const b = rectangle("b", 300, 0);
+  // start bound just outside a's right side, end free
+  const startBound = simpleArrow(
+    "x",
+    [
+      [106, 50],
+      [250, 50],
+    ],
+    { startBinding: orbit("a", [1.06, 0.5001]) },
+  );
+
+  it("breaks the dragged binding when binding is disabled", () => {
+    const { start, end } = drag(
+      startBound,
+      "end",
+      [310, 50],
+      [a, b, startBound],
+      appState({ isBindingEnabled: false }),
+    );
+
+    expect(start.mode).toBeUndefined();
+    expect(end.mode).toBeNull();
+  });
+
+  describe("dragging an endpoint onto the element the other end is bound to", () => {
+    it("binds both ends inside, keeping the other end's focus point", () => {
+      const { start, end } = drag(
+        startBound,
+        "end",
+        [50, 60],
+        [a, startBound],
+        appState(),
+      );
+
+      expect(start).toMatchObject({ mode: "inside", element: a });
+      expect(start.focusPoint![0]).toBeCloseTo(106);
+      expect(start.focusPoint![1]).toBeCloseTo(50, 1);
+      expect(end).toMatchObject({ mode: "inside", element: a });
+      expect(end.focusPoint).toEqual([50, 60]);
+    });
+
+    it("keeps the end's focus point when the start is dragged", () => {
+      const endBound = simpleArrow(
+        "x",
+        [
+          [250, 50],
+          [106, 50],
+        ],
+        { endBinding: orbit("a", [1.06, 0.5001]) },
+      );
+
+      const { start, end } = drag(
+        endBound,
+        "start",
+        [50, 60],
+        [a, endBound],
+        appState(),
+      );
+
+      expect(start).toMatchObject({ mode: "inside", element: a });
+      expect(start.focusPoint).toEqual([50, 60]);
+      expect(end).toMatchObject({ mode: "inside", element: a });
+      expect(end.focusPoint![0]).toBeCloseTo(106);
+    });
+
+    it("snaps a new arrow's start to the grid point of its origin", () => {
+      const { start } = drag(
+        startBound,
+        "end",
+        [50, 60],
+        [a, startBound],
+        appState({
+          selectedLinearElement: {
+            initialState: { origin: pointFrom<GlobalPoint>(13, 17) },
+          } as AppState["selectedLinearElement"],
+        }),
+        { newArrow: true, gridSize: 20 as NullableGridSize },
+      );
+
+      expect(start).toMatchObject({ mode: "inside", element: a });
+      expect(start.focusPoint).toEqual([20, 20]);
+    });
+  });
+
+  describe("with the alt key", () => {
+    it("binds inside an element it would otherwise orbit", () => {
+      const { start, end } = drag(
+        startBound,
+        "end",
+        [297, 50],
+        [a, b, startBound],
+        appState(),
+        { altKey: true },
+      );
+
+      expect(start.mode).toBeUndefined();
+      expect(end).toMatchObject({ mode: "inside", element: b });
+      expect(end.focusPoint).toEqual([297, 50]);
+    });
+
+    it("unbinds when there is nothing to bind to", () => {
+      const { end } = drag(
+        startBound,
+        "end",
+        [600, 50],
+        [a, b, startBound],
+        appState(),
+        { altKey: true },
+      );
+
+      expect(end.mode).toBeNull();
+    });
+  });
+
+  describe("the other endpoint", () => {
+    const startInside = simpleArrow(
+      "x",
+      [
+        [50, 50],
+        [250, 50],
+      ],
+      { startBinding: orbit("a", [0.5001, 0.5001]) },
+    );
+    startInside.startBinding!.mode = "inside";
+
+    it("switches from inside to orbit when it was not inside at the start of the drag", () => {
+      const { start } = drag(
+        startInside,
+        "end",
+        [600, 50],
+        [a, startInside],
+        appState(),
+      );
+
+      expect(start).toMatchObject({ mode: "orbit", element: a });
+      expect(start.focusPoint![0]).toBeCloseTo(50, 1);
+      expect(start.focusPoint![1]).toBeCloseTo(50, 1);
+    });
+
+    it("stays inside when it was inside at the start of the drag", () => {
+      const { start } = drag(
+        startInside,
+        "end",
+        [600, 50],
+        [a, startInside],
+        appState({
+          selectedLinearElement: {
+            initialState: {
+              arrowOtherEndpointInitialBinding: { mode: "inside" },
+            },
+          } as unknown as AppState["selectedLinearElement"],
+        }),
+      );
+
+      expect(start.mode).toBeUndefined();
+    });
+
+    it("is re-projected onto its element when the angle is locked", () => {
+      // the dragged point is far away, but angle-locked hit-testing uses the
+      // pointer, which is next to b
+      const { start, end } = drag(
+        startBound,
+        "end",
+        [600, 300],
+        [a, b, startBound],
+        appState(),
+        { angleLocked: true },
+        [297, 50],
+      );
+
+      expect(start).toMatchObject({ mode: "orbit", element: a });
+      expect(start.focusPoint).toBeDefined();
+      expect(end).toMatchObject({ mode: "orbit", element: b });
+    });
+  });
+
+  describe("in grid mode", () => {
+    const grid = appState({
+      gridModeEnabled: true,
+      gridSize: 20 as AppState["gridSize"],
+    });
+    const noGrid = appState({ isMidpointSnappingEnabled: false });
+
+    it("snaps the focus point to the grid along a rectangle's top side", () => {
+      // approaching b's top side vertically from x = 340
+      const arrow = simpleArrow("x", [
+        [340, -200],
+        [343, -3],
+      ]);
+
+      const snapped = drag(arrow, "end", [343, -3], [b, arrow], grid).end;
+      const unsnapped = drag(arrow, "end", [343, -3], [b, arrow], noGrid).end;
+
+      expect(snapped).toMatchObject({ mode: "orbit", element: b });
+      expect(snapped.focusPoint![0]).toBeCloseTo(340);
+      expect(unsnapped.focusPoint![0]).not.toBeCloseTo(340);
+    });
+
+    it("uses the incoming direction on a diamond's angled face", () => {
+      const diamond = rectangle("d", 300, 0, 100, 100, {}, "diamond");
+      // the pointer is on the upper-right face, but the arrow comes straight
+      // down from x = 380, so x must be snapped (not y)
+      const arrow = simpleArrow("x", [
+        [380, -200],
+        [383, 27],
+      ]);
+
+      const { end } = drag(arrow, "end", [383, 27], [diamond, arrow], grid);
+
+      expect(end).toMatchObject({ mode: "orbit", element: diamond });
+      expect(end.focusPoint![0]).toBeCloseTo(380);
+      expect(end.focusPoint![1]).toBeCloseTo(50);
+    });
+  });
+});
+
+describe("updateBoundElements with stale records", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("skips arrows listed in boundElements that are bound elsewhere", () => {
+    const stale = rectangle("a", 0, 0, 100, 100, {
+      boundElements: [{ id: "x", type: "arrow" }],
+    });
+    const other = rectangle("b", 300, 0);
+    const arrow = simpleArrow(
+      "x",
+      [
+        [200, 50],
+        [294, 50],
+      ],
+      { endBinding: orbit("b", [-0.06, 0.5001]) },
+    );
+    const scene = new Scene([stale, other, arrow], { skipValidation: true });
+    const movePoints = vi.spyOn(LinearElementEditor, "movePoints");
+
+    updateBoundElements(stale, scene);
+
+    expect(movePoints).not.toHaveBeenCalled();
+    expect(arrow.endBinding?.elementId).toBe("b");
+  });
+});
+
+describe("grid mode binding near a rectangle corner", () => {
+  it("keeps the grid snap when the diagonal projection misses", () => {
+    const a = {
+      ...newElement({ type: "rectangle", x: 0, y: 0, width: 100, height: 100 }),
+      id: "a",
+    } as NonDeleted<ExcalidrawBindableElement>;
+    const b = {
+      ...newElement({
+        type: "rectangle",
+        x: 300,
+        y: 0,
+        width: 100,
+        height: 100,
+      }),
+      id: "b",
+    } as NonDeleted<ExcalidrawBindableElement>;
+    // bound to a, dragged to just above b's top side near its left corner:
+    // the line from a's focus point crosses b's diagonal inside the part
+    // trimmed off near the corner, so the diagonal projection misses
+    const points = [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(237, -53),
+    ];
+    const arrow = {
+      ...newArrowElement({ type: "arrow", x: 106, y: 50, points }),
+      ...getSizeFromPoints(points),
+      id: "x",
+      startBinding: {
+        elementId: "a",
+        mode: "orbit",
+        fixedPoint: [1.06, 0.5001],
+      },
+    } as NonDeleted<ExcalidrawArrowElement>;
+    const elements = [a, b, arrow];
+
+    const { end } = getBindingStrategyForDraggingBindingElementEndpoints(
+      arrow,
+      new Map([[1, { point: points[1] }]]),
+      343,
+      -3,
+      arrayToMap(elements) as NonDeletedSceneElementsMap,
+      elements as Ordered<NonDeleted<ExcalidrawBindableElement>>[],
+      {
+        ...getDefaultAppState(),
+        width: 1000,
+        height: 1000,
+        offsetTop: 0,
+        offsetLeft: 0,
+        gridModeEnabled: true,
+        gridSize: 20 as NullableGridSize,
+      } as AppState,
+    );
+
+    // snapped to the grid line x = 340, one binding gap above the top side,
+    // instead of falling back to the raw pointer at (343, -3)
+    expect(end).toMatchObject({ mode: "orbit", element: b });
+    expect(end.focusPoint![0]).toBeCloseTo(340);
+    expect(end.focusPoint![1]).toBeCloseTo(-getBindingGap(b));
+  });
 });

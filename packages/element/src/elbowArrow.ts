@@ -115,7 +115,7 @@ const handleSegmentRenormalization = (
   elementsMap: NonDeletedSceneElementsMap,
 ) => {
   const nextFixedSegments: FixedSegment[] | null = arrow.fixedSegments
-    ? arrow.fixedSegments.slice()
+    ? arrow.fixedSegments.map((segment) => ({ ...segment }))
     : null;
 
   if (nextFixedSegments) {
