@@ -1,4 +1,5 @@
 import {
+  arrayToMap,
   DEFAULT_STICKY_NOTE_BG,
   DEFAULT_STICKY_NOTE_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
@@ -17,7 +18,9 @@ import {
   newIframeElement,
 } from "../newElement";
 
-import { getCommonBounds } from "../bounds";
+import { getArrowheadSize, getCommonBounds } from "../bounds";
+import { LinearElementEditor } from "../linearElementEditor";
+import { getBoundTextElement } from "../textElement";
 import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
@@ -29,6 +32,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
 } from "../types";
 
 const opts = { regenerateIds: false };
@@ -1365,5 +1369,163 @@ describe("Test Transform", () => {
     });
     // placed off A by the binding gap
     expect(arrow.x).toBeGreaterThan(100);
+  });
+
+  it("should keep arrow labels where labelPosition puts them on the arrow as given", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+        { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          x: 80,
+          y: 50,
+          // starts inside A and ends short of B, so placing it shortens its
+          // start end only
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(250, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          // a quarter of the way along the arrow as given: x = 142.5
+          label: { text: "LABEL", labelPosition: 0.25 },
+        },
+      ],
+      opts,
+    );
+    const arrow = elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElementWithContainer;
+
+    // placed off A by the binding gap
+    expect(arrow.x).toBeGreaterThan(100);
+    const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+      arrow,
+      label,
+      arrayToMap(elements),
+    );
+    expect(x + label.width / 2).toBeCloseTo(142.5);
+    expect(y + label.height / 2).toBeCloseTo(50, 1);
+  });
+
+  it("should place arrow labels with no labelPosition as with the default one given", () => {
+    const elements = convertToExcalidrawElements(
+      [undefined, 0.5].flatMap((labelPosition, i) => [
+        {
+          type: "rectangle" as const,
+          id: `A${i}`,
+          x: 0,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "rectangle" as const,
+          id: `B${i}`,
+          x: 400,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "arrow" as const,
+          id: `arrow${i}`,
+          // starts inside A and ends short of B, so placing it shortens its
+          // start end only
+          x: 80,
+          y: 200 * i + 50,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(250, 0)],
+          start: { id: `A${i}` },
+          end: { id: `B${i}` },
+          // halfway along the arrow as given: x = 205
+          label: { text: "LABEL", labelPosition },
+        },
+      ]),
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const [defaultLabel, givenLabel] = ["arrow0", "arrow1"].map((id) => {
+      const arrow = elementsMap.get(id) as ExcalidrawArrowElement;
+      const label = getBoundTextElement(
+        arrow,
+        elementsMap,
+      ) as ExcalidrawTextElementWithContainer;
+      const { x } = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      return { label, centerX: x + label.width / 2 };
+    });
+
+    expect(defaultLabel.label.labelPosition).toBeCloseTo(
+      givenLabel.label.labelPosition!,
+    );
+    expect(defaultLabel.centerX).toBeCloseTo(205);
+    expect(givenLabel.centerX).toBeCloseTo(205);
+  });
+
+  it("should keep arrow labels clear of the arrow's ends when labelPosition puts them on a stretch placing trimmed off", () => {
+    const elements = convertToExcalidrawElements(
+      [0.05, 0.95].flatMap((labelPosition, i) => [
+        {
+          type: "rectangle" as const,
+          id: `A${i}`,
+          x: 0,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "rectangle" as const,
+          id: `B${i}`,
+          x: 400,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "arrow" as const,
+          id: `arrow${i}`,
+          // from A's center to B's center, as a layout engine might route it
+          x: 50,
+          y: 200 * i + 50,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: `A${i}` },
+          end: { id: `B${i}` },
+          // inside A, and inside B
+          label: { text: "LABEL", labelPosition },
+        },
+      ]),
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const [startLabel, endLabel] = ["arrow0", "arrow1"].map((id) => {
+      const arrow = elementsMap.get(id) as ExcalidrawArrowElement;
+      const label = getBoundTextElement(
+        arrow,
+        elementsMap,
+      ) as ExcalidrawTextElementWithContainer;
+      const { x } = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      const [, [endX]] = LinearElementEditor.getPointsGlobalCoordinates(
+        arrow,
+        elementsMap,
+      );
+      return { arrow, label, x, endX };
+    });
+
+    // as close to the start as it can be without covering it
+    expect(startLabel.label.labelPosition).toBeGreaterThan(0);
+    expect(startLabel.x).toBeCloseTo(startLabel.arrow.x);
+    // ...and to the end without covering its arrowhead
+    expect(endLabel.label.labelPosition).toBeLessThan(1);
+    expect(endLabel.x + endLabel.label.width).toBeCloseTo(
+      endLabel.endX - getArrowheadSize("arrow"),
+    );
   });
 });

@@ -1,4 +1,11 @@
-import { pointFrom, type LocalPoint } from "@excalidraw/math";
+import {
+  clamp,
+  pointFrom,
+  vectorFromPoint,
+  vectorNormalize,
+  type GlobalPoint,
+  type LocalPoint,
+} from "@excalidraw/math";
 
 import {
   DEFAULT_FONT_FAMILY,
@@ -51,18 +58,21 @@ import { syncInvalidIndices } from "./fractionalIndex";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  getBoundTextElement,
   redrawTextBoundingBox,
 } from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
 
-import { getCommonBounds } from "./bounds";
+import { getArrowheadSize, getCommonBounds } from "./bounds";
 
 import { Scene } from "./Scene";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 
 import type {
+  Arrowhead,
+  ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -583,6 +593,44 @@ class ElementStore {
   };
 }
 
+// a label point on a stretch placing trimmed off its arrow projects onto the
+// arrow's end, centering the label on its endpoint (or arrowhead): keep it as
+// close to there as it can be while clear of them
+const clampLabelPositionOffEnds = (
+  arrow: ExcalidrawArrowElement,
+  label: ExcalidrawTextElement,
+  labelPosition: number,
+  elementsMap: ElementsMap,
+) => {
+  const length = LinearElementEditor.getPathLength(arrow, elementsMap);
+  // how far the label's center has to stay from the end leaving `from` for
+  // `to`: half the label along the arrow there, past its arrowhead
+  const margin = (
+    from: LocalPoint,
+    to: LocalPoint,
+    arrowhead: Arrowhead | null,
+  ) => {
+    const [dx, dy] = vectorNormalize(vectorFromPoint(to, from));
+    return (
+      (Math.abs(dx) * label.width + Math.abs(dy) * label.height) / 2 +
+      (arrowhead ? getArrowheadSize(arrowhead) : 0)
+    );
+  };
+  const { points } = arrow;
+  const min = margin(points[0], points[1], arrow.startArrowhead) / length;
+  const max =
+    1 -
+    margin(
+      points[points.length - 1],
+      points[points.length - 2],
+      arrow.endArrowhead,
+    ) /
+      length;
+
+  // too short to clear both ends: as close to both as it can be
+  return min < max ? clamp(labelPosition, min, max) : 0.5;
+};
+
 export const convertToExcalidrawElements = (
   elementsSkeleton: ExcalidrawElementSkeleton[] | null,
   opts?: { regenerateIds?: boolean; renderEnvironment?: RenderEnvironment },
@@ -757,6 +805,8 @@ export const convertToExcalidrawElements = (
   const elementsMap = elementStore.getElementsMap();
   // we don't have a real scene, so we just use a temp scene to query and mutate elements
   const scene = new Scene(elementsMap);
+  // where on the arrows as given their labels' `labelPosition` puts them
+  const labelPoints = new Map<ExcalidrawTextElement["id"], GlobalPoint>();
 
   // Add labels and arrow bindings
   for (const [id, element] of elementsWithIds) {
@@ -779,6 +829,18 @@ export const convertToExcalidrawElements = (
           );
           elementStore.add(container);
           elementStore.add(text);
+
+          // given or default alike: omitting it is the same as giving 0.5
+          if (isArrowElement(container) && text.labelPosition != null) {
+            const labelPoint = LinearElementEditor.getPointAtPathParameter(
+              container,
+              text.labelPosition,
+              elementsMap,
+            );
+            if (labelPoint) {
+              labelPoints.set(text.id, labelPoint);
+            }
+          }
 
           if (isArrowElement(container)) {
             const originalStart =
@@ -875,6 +937,31 @@ export const convertToExcalidrawElements = (
           updatedArrows.push(arrow);
         }
       });
+    }
+  }
+
+  // placing an arrow shortens its path, so its label's `labelPosition` would
+  // no longer put it where it was placed (e.g. by a layout engine)
+  const placedElementsMap = boundScene.getNonDeletedElementsMap();
+  for (const arrow of updatedArrows) {
+    const label = getBoundTextElement(arrow, placedElementsMap);
+    const labelPoint = label && labelPoints.get(label.id);
+    if (labelPoint && isArrowElement(arrow)) {
+      const labelPosition = LinearElementEditor.getPathParameterAtPoint(
+        arrow,
+        labelPoint,
+        placedElementsMap,
+      );
+      if (labelPosition !== null) {
+        boundScene.mutateElement(label, {
+          labelPosition: clampLabelPositionOffEnds(
+            arrow,
+            label,
+            labelPosition,
+            placedElementsMap,
+          ),
+        });
+      }
     }
   }
 

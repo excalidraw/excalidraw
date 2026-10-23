@@ -1991,40 +1991,14 @@ export class LinearElementEditor {
       pointerX - linearElementEditor.pointerOffset.x,
       pointerY - linearElementEditor.pointerOffset.y,
     );
-    const { segments, lengths, prefixSums, totalLength } =
-      getLinearElementPathMetrics(element, elementsMap);
-    if (segments.length === 0 || totalLength === 0) {
+    const labelPosition = LinearElementEditor.getPathParameterAtPoint(
+      element,
+      pointerGlobalPoint,
+      elementsMap,
+    );
+    if (labelPosition === null) {
       return null;
     }
-
-    let bestDistance = Infinity;
-    let bestSegmentIndex = 0;
-    let bestParameter = 0;
-
-    for (let i = 0; i < segments.length; i++) {
-      const { t, distance } = pathSegmentClosestParameter(
-        segments[i],
-        pointerGlobalPoint,
-      );
-
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestSegmentIndex = i;
-        bestParameter = t;
-      }
-    }
-
-    const lengthWithinSegment = pathSegmentLengthAtParameter(
-      segments[bestSegmentIndex],
-      bestParameter,
-      lengths[bestSegmentIndex],
-    );
-
-    const labelPosition = clamp(
-      (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
-      0,
-      1,
-    );
     const pathPoint = LinearElementEditor.getPointAtPathParameter(
       element,
       labelPosition,
@@ -2044,6 +2018,52 @@ export class LinearElementEditor {
       ...linearElementEditor,
       isDragging: true,
     };
+  }
+
+  static getPathLength(
+    element: ExcalidrawLinearElement,
+    elementsMap: ElementsMap,
+  ): number {
+    return getLinearElementPathMetrics(element, elementsMap).totalLength;
+  }
+
+  /** the path parameter (0-1) of the point on the path closest to `point` */
+  static getPathParameterAtPoint(
+    element: ExcalidrawLinearElement,
+    point: GlobalPoint,
+    elementsMap: ElementsMap,
+  ): number | null {
+    const { segments, lengths, prefixSums, totalLength } =
+      getLinearElementPathMetrics(element, elementsMap);
+    if (segments.length === 0 || totalLength === 0) {
+      return null;
+    }
+
+    let bestDistance = Infinity;
+    let bestSegmentIndex = 0;
+    let bestParameter = 0;
+
+    for (let i = 0; i < segments.length; i++) {
+      const { t, distance } = pathSegmentClosestParameter(segments[i], point);
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSegmentIndex = i;
+        bestParameter = t;
+      }
+    }
+
+    const lengthWithinSegment = pathSegmentLengthAtParameter(
+      segments[bestSegmentIndex],
+      bestParameter,
+      lengths[bestSegmentIndex],
+    );
+
+    return clamp(
+      (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
+      0,
+      1,
+    );
   }
 
   static getPointAtPathParameter(
