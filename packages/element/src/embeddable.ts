@@ -550,11 +550,12 @@ export const embeddableURLValidator = (
     } else if (typeof validateEmbeddable === "boolean") {
       return validateEmbeddable;
     } else if (validateEmbeddable instanceof RegExp) {
-      return validateEmbeddable.test(url);
+      // search ignores lastIndex and preserves it for global and sticky regexes.
+      return url.search(validateEmbeddable) !== -1;
     } else if (Array.isArray(validateEmbeddable)) {
       for (const domain of validateEmbeddable) {
         if (domain instanceof RegExp) {
-          if (url.match(domain)) {
+          if (url.search(domain) !== -1) {
             return true;
           }
         } else if (matchHostname(url, domain)) {
