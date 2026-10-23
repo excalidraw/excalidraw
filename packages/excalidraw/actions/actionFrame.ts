@@ -143,7 +143,7 @@ const FRAME_PADDING = 16;
 /**
  * The frame that wrapping the selection removes instead: the one frame the
  * selection holds (along with any of its children), or, with no frame
- * selected, the frame whose children are all selected.
+ * selected, the frame whose children are all selected. Never a locked frame.
  */
 export const getFrameToUnwrap = (
   selectedElements: readonly ExcalidrawElement[],
@@ -159,7 +159,7 @@ export const getFrameToUnwrap = (
 
   const frameId = frames[0]?.id ?? elements[0]?.frameId;
   const frame = frameId ? elementsMap.get(frameId) : null;
-  if (!frame || frame.isDeleted || !isFrameLikeElement(frame)) {
+  if (!frame || frame.isDeleted || frame.locked || !isFrameLikeElement(frame)) {
     return null;
   }
 
