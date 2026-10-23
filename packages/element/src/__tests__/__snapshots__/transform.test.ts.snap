@@ -100,7 +100,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 32.88999673980294,
+  "height": 32.91822178473251,
   "id": Any<String>,
   "index": "a2",
   "isDeleted": false,
@@ -113,8 +113,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
       0,
     ],
     [
-      371.5055393829614,
-      32.88999673980294,
+      371.50564585626694,
+      32.91822178473251,
     ],
   ],
   "roughness": 1,
@@ -125,7 +125,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
     "elementId": "id49",
     "fixedPoint": [
       1,
-      0.5001,
+      0.5443037974683543,
     ],
     "mode": "orbit",
   },
@@ -136,9 +136,9 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "updated": 1,
   "version": 5,
   "versionNonce": Any<Number>,
-  "width": 371.5055393829614,
+  "width": 371.50564585626694,
   "x": 253,
-  "y": 420.56118987341773,
+  "y": 420.53164556962025,
 }
 `;
 
@@ -238,7 +238,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "versionNonce": Any<Number>,
   "width": 300,
   "x": -53,
-  "y": 270,
+  "y": 256.7088607594937,
 }
 `;
 

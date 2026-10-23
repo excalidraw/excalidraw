@@ -6,10 +6,10 @@ import {
   STICKY_NOTE_MIN_SIZE,
   getUpdatedTimestamp,
 } from "@excalidraw/common";
-import { pointFrom } from "@excalidraw/math";
+import { pointDistance, pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import {
   newElement,
@@ -18,6 +18,7 @@ import {
   newIframeElement,
 } from "../newElement";
 
+import { getBindingGap } from "../binding";
 import { getArrowheadSize, getCommonBounds } from "../bounds";
 import { LinearElementEditor } from "../linearElementEditor";
 import { getBoundTextElement } from "../textElement";
@@ -1651,6 +1652,57 @@ describe("Test Transform", () => {
         [300, 0],
       ],
     });
+  });
+
+  it("should create shapes for start / end without ids where arrows in any direction start / end", () => {
+    const arrows = {
+      diagonal: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+      vertical: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 200)],
+      "right-to-left": [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(-200, 0),
+      ],
+      "multi-point": [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(0, 150),
+        pointFrom<LocalPoint>(200, 150),
+      ],
+    };
+    for (const [id, points] of Object.entries(arrows)) {
+      for (const [start, end] of [
+        [{ type: "rectangle" }, { type: "ellipse" }],
+        [{ type: "diamond" }, { type: "text", text: "end" }],
+      ] as const) {
+        const elements = convertToExcalidrawElements(
+          [{ type: "arrow", id, x: 0, y: 0, points, start, end }],
+          opts,
+        );
+        const elementsMap = arrayToMap(elements);
+        const arrow = elementsMap.get(id) as ExcalidrawArrowElement;
+        const [, startElement, endElement] = elements;
+
+        expect(arrow.startBinding?.elementId).toBe(startElement.id);
+        expect(arrow.endBinding?.elementId).toBe(endElement.id);
+        expect(startElement.boundElements).toEqual([{ id, type: "arrow" }]);
+        expect(endElement.boundElements).toEqual([{ id, type: "arrow" }]);
+
+        // placed off the shapes by about the gap, not routed around them
+        for (const [index, element, [x, y]] of [
+          [0, startElement, points[0]],
+          [-1, endElement, points[points.length - 1]],
+        ] as const) {
+          const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            index,
+            elementsMap,
+          );
+          // the arrows are at 0,0
+          expect(
+            pointDistance(point, pointFrom<GlobalPoint>(x, y)),
+          ).toBeLessThan(2 * getBindingGap(element));
+        }
+      }
+    }
   });
 
   it("should wrap and measure arrow labels once, along the arrows as placed", () => {

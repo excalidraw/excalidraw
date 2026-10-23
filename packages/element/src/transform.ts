@@ -324,6 +324,54 @@ const bindTextToContainer = (
   return [container, textElement] as const;
 };
 
+// where to create a shape for an arrow end: centered on its end segment as
+// extended past the end, with the end on its outline, so the arrow points
+// into it (left to right if the segment has no length)
+const getArrowEndShapePosition = (
+  arrow: ExcalidrawLinearElement,
+  startOrEnd: "start" | "end",
+  type: ExcalidrawElement["type"] | undefined,
+  width: number,
+  height: number,
+) => {
+  const { points } = arrow;
+  const [endPoint, nextPoint] =
+    startOrEnd === "start"
+      ? [points[0], points[1]]
+      : [points[points.length - 1], points[points.length - 2]];
+  let dx = nextPoint ? endPoint[0] - nextPoint[0] : 0;
+  let dy = nextPoint ? endPoint[1] - nextPoint[1] : 0;
+  const length = Math.hypot(dx, dy);
+  if (length) {
+    dx /= length;
+    dy /= length;
+  } else {
+    dx = startOrEnd === "start" ? -1 : 1;
+  }
+
+  // from the center to the outline, along the segment
+  const a = width / 2;
+  const b = height / 2;
+  let distance;
+  if (type === "ellipse" || type === "diamond") {
+    const denominator =
+      type === "ellipse"
+        ? Math.hypot(b * dx, a * dy)
+        : b * Math.abs(dx) + a * Math.abs(dy);
+    distance = denominator ? (a * b) / denominator : 0;
+  } else {
+    distance = Math.min(
+      dx ? a / Math.abs(dx) : Infinity,
+      dy ? b / Math.abs(dy) : Infinity,
+    );
+  }
+
+  return {
+    x: arrow.x + endPoint[0] + dx * distance - a,
+    y: arrow.y + endPoint[1] + dy * distance - b,
+  };
+};
+
 const bindLinearElementToElement = (
   linearElement: NonDeleted<ExcalidrawArrowElement>,
   start: ValidLinearElement["start"],
@@ -357,9 +405,16 @@ const bindLinearElementToElement = (
       }
     }
 
-    const startX = start.x || linearElement.x - width;
-    const startY = start.y || linearElement.y - height / 2;
     const startType = existingElement ? existingElement.type : start.type;
+    const startPosition = getArrowEndShapePosition(
+      linearElement,
+      "start",
+      startType,
+      width,
+      height,
+    );
+    const startX = start.x || startPosition.x;
+    const startY = start.y || startPosition.y;
 
     if (startType) {
       if (startType === "text") {
@@ -384,9 +439,16 @@ const bindLinearElementToElement = (
           renderEnvironment,
         });
         // to position the text correctly when coordinates not provided
+        const position = getArrowEndShapePosition(
+          linearElement,
+          "start",
+          "text",
+          startBoundElement.width,
+          startBoundElement.height,
+        );
         Object.assign(startBoundElement, {
-          x: start.x || linearElement.x - startBoundElement.width,
-          y: start.y || linearElement.y - startBoundElement.height / 2,
+          x: start.x || position.x,
+          y: start.y || position.y,
         });
       } else {
         switch (startType) {
@@ -435,9 +497,16 @@ const bindLinearElementToElement = (
         console.error(`No element for end binding with id ${end.id} found`);
       }
     }
-    const endX = end.x || linearElement.x + linearElement.width;
-    const endY = end.y || linearElement.y - height / 2;
     const endType = existingElement ? existingElement.type : end.type;
+    const endPosition = getArrowEndShapePosition(
+      linearElement,
+      "end",
+      endType,
+      width,
+      height,
+    );
+    const endX = end.x || endPosition.x;
+    const endY = end.y || endPosition.y;
 
     if (endType) {
       if (endType === "text") {
@@ -463,8 +532,17 @@ const bindLinearElementToElement = (
           renderEnvironment,
         });
         // to position the text correctly when coordinates not provided
+        const position = getArrowEndShapePosition(
+          linearElement,
+          "end",
+          "text",
+          endBoundElement.width,
+          endBoundElement.height,
+        );
         Object.assign(endBoundElement, {
-          y: end.y || linearElement.y - endBoundElement.height / 2,
+          // an existing text keeps its x, as it always has
+          x: end.x || (existingElement ? endBoundElement.x : position.x),
+          y: end.y || position.y,
         });
       } else {
         switch (endType) {
