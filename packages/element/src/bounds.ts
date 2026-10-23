@@ -7,7 +7,9 @@ import {
   sizeOf,
 } from "@excalidraw/common";
 import {
+  bezierEquation,
   clamp,
+  curve,
   degreesToRadians,
   lineSegment,
   pointFrom,
@@ -31,6 +33,12 @@ import type {
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
+import {
+  CARDINALITY_INNER_BAR_OFFSET,
+  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_SCALE,
+} from "./arrowheads";
 import { ELBOW_ARROW_CORNER_RADIUS, generateRoughOptions } from "./shape";
 import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -716,13 +724,6 @@ const getFreeDrawElementAbsoluteCoords = (
 const CARDINALITY_MARKER_SIZE = 20;
 const CROWFOOT_ARROWHEAD_SIZE = 15;
 
-// layout of the parts of composite cardinality markers, in multiples of
-// the part's size (negative offsets move a part toward the tip)
-export const CARDINALITY_ONE_OR_MANY_BAR_OFFSET = -0.25;
-export const CARDINALITY_INNER_BAR_OFFSET = -0.5;
-export const CARDINALITY_ZERO_CIRCLE_OFFSET = 1.5;
-export const CARDINALITY_ZERO_CIRCLE_SCALE = 0.8;
-
 /** @returns number in pixels */
 export const getArrowheadSize = (arrowhead: Arrowhead): number => {
   switch (arrowhead) {
@@ -743,6 +744,18 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
       return 15;
   }
 };
+
+/**
+ * How far an arrow's arrowheads can reach out of its path's bounds: no part
+ * of an arrowhead is further than its size (plus the stroke) from the path.
+ */
+export const getArrowheadsMaxExtent = (element: ExcalidrawLinearElement) =>
+  element.startArrowhead || element.endArrowhead
+    ? Math.max(
+        element.startArrowhead ? getArrowheadSize(element.startArrowhead) : 0,
+        element.endArrowhead ? getArrowheadSize(element.endArrowhead) : 0,
+      ) + element.strokeWidth
+    : 0;
 
 const ARROW_ARROWHEAD_ANGLE = 20;
 // scaled down `arrow` arrowheads open up to this angle so that they don't
@@ -989,6 +1002,33 @@ const getArrowheadSizeBeyondLastSegment = (
   }
 };
 
+/**
+ * Where an arrowhead sits on its arrow, in the coordinate space of the
+ * arrowhead's points: the arrow's `tip`, a point on the arrow near it the
+ * arrowhead points away from (`along`), and the arrow's next point (`prev`).
+ */
+export type ArrowheadAnchor<Point extends GlobalPoint | LocalPoint> = {
+  tip: Point;
+  along: Point;
+  prev: Point;
+};
+
+/**
+ * @param endCurve the arrow's first (start) or last (end) curve
+ */
+export const getArrowheadAnchorOnCurve = <
+  Point extends GlobalPoint | LocalPoint,
+>(
+  endCurve: Curve<Point>,
+  position: "start" | "end",
+  prev: Point,
+): ArrowheadAnchor<Point> => ({
+  tip: position === "start" ? endCurve[0] : endCurve[3],
+  // a point closer to the curve's end, 0.7 works best for all tested cases
+  along: bezierEquation(endCurve, 0.7),
+  prev,
+});
+
 export const getArrowheadPoints = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
@@ -1016,42 +1056,63 @@ export const getArrowheadPoints = (
 
   invariant(data.length === 6, "Op data length is not 6");
 
-  const p3 = pointFrom(data[4], data[5]);
-  const p2 = pointFrom(data[2], data[3]);
-  const p1 = pointFrom(data[0], data[1]);
+  const p3 = pointFrom<LocalPoint>(data[4], data[5]);
+  const p2 = pointFrom<LocalPoint>(data[2], data[3]);
+  const p1 = pointFrom<LocalPoint>(data[0], data[1]);
 
   // We need to find p0 of the bezier curve.
   // It is typically the last point of the previous
   // curve; it can also be the position of moveTo operation.
   const prevOp = ops[index - 1];
-  let p0 = pointFrom(0, 0);
+  let p0 = pointFrom<LocalPoint>(0, 0);
   if (prevOp.op === "move") {
-    const p = pointFromArray(prevOp.data);
+    const p = pointFromArray<LocalPoint>(prevOp.data);
     invariant(p != null, "Op data is not a point");
     p0 = p;
   } else if (prevOp.op === "bcurveTo") {
-    p0 = pointFrom(prevOp.data[4], prevOp.data[5]);
+    p0 = pointFrom<LocalPoint>(prevOp.data[4], prevOp.data[5]);
   }
 
-  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-  const equation = (t: number, idx: number) =>
-    Math.pow(1 - t, 3) * p3[idx] +
-    3 * t * Math.pow(1 - t, 2) * p2[idx] +
-    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-    p0[idx] * Math.pow(t, 3);
+  const { points } = element;
+  const prev =
+    points.length > 1
+      ? position === "start"
+        ? points[1]
+        : points[points.length - 2]
+      : pointFrom<LocalPoint>(0, 0);
 
-  // Ee know the last point of the arrow (or the first, if start arrowhead).
-  const [x2, y2] = position === "start" ? p0 : p3;
+  return getArrowheadPointsAt(
+    element,
+    position,
+    arrowhead,
+    getArrowheadAnchorOnCurve(curve(p0, p1, p2, p3), position, prev),
+    offsetMultiplier,
+  );
+};
 
-  // By using cubic bezier equation (B(t)) and the given parameters,
-  // we calculate a point that is closer to the last point.
-  // The value 0.3 is chosen arbitrarily and it works best for all
-  // the tested cases.
-  const [x1, y1] = [equation(0.3, 0), equation(0.3, 1)];
+/**
+ * The points of an arrowhead (or a part of a composite marker) at `anchor`,
+ * in the anchor's coordinate space.
+ */
+export const getArrowheadPointsAt = <Point extends GlobalPoint | LocalPoint>(
+  element: ExcalidrawLinearElement,
+  position: "start" | "end",
+  arrowhead: Arrowhead,
+  { tip, along, prev }: ArrowheadAnchor<Point>,
+  offsetMultiplier = 0,
+) => {
+  const [x2, y2] = tip;
+  const [x1, y1] = along;
 
   // Find the normalized direction vector based on the
   // previously calculated points.
   const distance = Math.hypot(x2 - x1, y2 - y1);
+
+  // the arrow's end has no direction (e.g. its last two points coincide)
+  if (!distance) {
+    return null;
+  }
+
   const nx = (x2 - x1) / distance;
   const ny = (y2 - y1) / distance;
 
@@ -1136,20 +1197,15 @@ export const getArrowheadPoints = (
     let ox;
     let oy;
 
-    if (position === "start") {
-      const [px, py] = element.points.length > 1 ? element.points[1] : [0, 0];
+    const [px, py] = prev;
 
+    if (position === "start") {
       [ox, oy] = pointRotateRads(
         pointFrom(tx + minSize * 2, ty),
         pointFrom(tx, ty),
         Math.atan2(py - ty, px - tx) as Radians,
       );
     } else {
-      const [px, py] =
-        element.points.length > 1
-          ? element.points[element.points.length - 2]
-          : [0, 0];
-
       [ox, oy] = pointRotateRads(
         pointFrom(tx - minSize * 2, ty),
         pointFrom(tx, ty),
