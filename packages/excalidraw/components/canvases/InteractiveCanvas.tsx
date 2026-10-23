@@ -8,7 +8,6 @@ import {
 
 import type {
   InteractiveCanvasRenderConfig,
-  InteractiveSceneRenderAnimationState,
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
@@ -22,8 +21,6 @@ import type {
 import { t } from "../../i18n";
 import { getSelectionColor } from "../../renderer/helpers";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
-
-import { AnimationController } from "../../renderer/animation";
 
 import type {
   AppClassProperties,
@@ -85,20 +82,6 @@ type InteractiveCanvasProps = {
 
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
-  const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
-  // Unique per mounted instance so concurrent editors don't share the
-  // interactive scene animation slot.
-  const animationKeyRef = useRef<symbol | null>(null);
-  if (animationKeyRef.current === null) {
-    animationKeyRef.current = Symbol("interactiveSceneAnimation");
-  }
-  const animationKey = animationKeyRef.current;
-
-  useEffect(() => {
-    return () => {
-      AnimationController.cancel(animationKey);
-    };
-  }, [animationKey]);
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -150,7 +133,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
 
     const selectionColor = getSelectionColor(props.containerRef?.current);
 
-    rendererParams.current = {
+    const rendererParams: InteractiveSceneRenderConfig = {
       app: props.app,
       canvas: props.canvas,
       elementsMap: props.elementsMap,
@@ -172,39 +155,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       },
       editorInterface: props.editorInterface,
       callback: props.renderInteractiveSceneCallback,
-      animationState: {
-        bindingHighlight: undefined,
-      },
-      deltaTime: 0,
     };
 
-    if (!AnimationController.running(animationKey)) {
-      AnimationController.start<InteractiveSceneRenderAnimationState>(
-        animationKey,
-        ({ deltaTime, state }) => {
-          const nextAnimationState = renderInteractiveScene({
-            ...rendererParams.current!,
-            deltaTime,
-            animationState: state,
-          }).animationState;
-
-          if (nextAnimationState) {
-            for (const key in nextAnimationState) {
-              if (
-                nextAnimationState[
-                  key as keyof InteractiveSceneRenderAnimationState
-                ] !== undefined
-              ) {
-                return nextAnimationState;
-              }
-            }
-          }
-
-          return undefined;
-        },
-        props.app.ownerWindow,
-      );
-    }
+    renderInteractiveScene(rendererParams);
   });
 
   return (
