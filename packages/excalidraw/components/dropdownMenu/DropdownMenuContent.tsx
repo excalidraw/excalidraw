@@ -8,6 +8,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import { useCallbackRefState } from "../../hooks/useCallbackRefState";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
+import { getLanguage } from "../../i18n";
 import { useEditorInterface } from "../App";
 import { Island } from "../Island";
 import Stack from "../Stack";
@@ -93,6 +94,7 @@ const MenuContent = ({
       <DropdownMenuPrimitive.Content
         ref={setMenuNode}
         className={classNames}
+        dir={getLanguage().rtl ? "rtl" : "ltr"}
         style={style}
         data-testid="dropdown-menu"
         align={align}
