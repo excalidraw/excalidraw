@@ -421,7 +421,9 @@ export const textWysiwyg = ({
             app.scene.mutateElement(container, {
               height: targetContainerHeight,
             });
-            updateBoundElements(container, app.scene);
+            updateBoundElements(container, app.scene, {
+              renderEnvironment: app.renderEnvironment,
+            });
             return;
           } else if (
             // autoshrink container height until original container height
@@ -437,7 +439,9 @@ export const textWysiwyg = ({
             app.scene.mutateElement(container, {
               height: targetContainerHeight,
             });
-            updateBoundElements(container, app.scene);
+            updateBoundElements(container, app.scene, {
+              renderEnvironment: app.renderEnvironment,
+            });
           } else {
             const { x, y } = computeBoundTextPosition(
               container,

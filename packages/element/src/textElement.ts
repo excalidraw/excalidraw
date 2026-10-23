@@ -218,8 +218,9 @@ export const handleBindTextResize = (
       nextHeight = metrics.height;
       nextWidth = metrics.width;
     }
-    // increase height in case text element height exceeds
-    if (nextHeight > maxHeight) {
+    // increase height in case text element height exceeds (but not an
+    // arrow's, which its points determine, and its label doesn't grow)
+    if (!isArrowElement(container) && nextHeight > maxHeight) {
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
@@ -233,16 +234,15 @@ export const handleBindTextResize = (
 
       scene.mutateElement(container, {
         height: containerHeight,
-        ...(!isArrowElement(container) &&
-          getPositionAfterHeightChange(
-            container,
-            containerHeight,
-            shouldResizeFromCenter
-              ? "center"
-              : shouldResizeFromTop
-              ? "bottom"
-              : "top",
-          )),
+        ...getPositionAfterHeightChange(
+          container,
+          containerHeight,
+          shouldResizeFromCenter
+            ? "center"
+            : shouldResizeFromTop
+            ? "bottom"
+            : "top",
+        ),
       });
     }
 

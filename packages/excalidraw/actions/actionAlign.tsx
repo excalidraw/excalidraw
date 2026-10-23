@@ -65,6 +65,7 @@ const alignSelectedElements = (
     alignment,
     app.scene,
     appState,
+    app.renderEnvironment,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);
