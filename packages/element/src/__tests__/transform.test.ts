@@ -1235,6 +1235,24 @@ describe("Test Transform", () => {
     expect(label.x + label.width / 2).toBeCloseTo(150);
   });
 
+  it("should clamp out-of-range arrow label positions as restore does", () => {
+    const elements = convertToExcalidrawElements(
+      [-1, 5].map((labelPosition, i) => ({
+        type: "arrow" as const,
+        x: 100,
+        y: 100 * i,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+        label: { text: "LABEL", labelPosition },
+      })),
+      opts,
+    );
+    const labels = elements.filter(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement[];
+
+    expect(labels.map((label) => label.labelPosition)).toEqual([0, 1]);
+  });
+
   it("should measure bound arrow labels with the given render environment", () => {
     const renderEnvironment: RenderEnvironment = {
       createCanvas: () => document.createElement("canvas"),

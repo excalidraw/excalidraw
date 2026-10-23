@@ -1,5 +1,6 @@
 import {
   clamp,
+  isFiniteNumber,
   pointFrom,
   vectorFromPoint,
   vectorNormalize,
@@ -299,8 +300,11 @@ const bindTextToContainer = (
     ...textProps,
     containerId: container.id,
     strokeColor: stickyInk ?? (textProps.strokeColor || container.strokeColor),
+    // normalized as `restore` does
     labelPosition: isArrowElement(container)
-      ? textProps.labelPosition ?? DEFAULT_BOUND_TEXT_LABEL_POSITION
+      ? isFiniteNumber(textProps.labelPosition)
+        ? clamp(textProps.labelPosition, 0, 1)
+        : DEFAULT_BOUND_TEXT_LABEL_POSITION
       : null,
     renderEnvironment,
   });
