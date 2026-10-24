@@ -126,3 +126,97 @@ describe("color picker hotkeys", () => {
     expect(onChange).toHaveBeenCalledWith("#r1");
   });
 });
+
+describe("color picker arrow navigation", () => {
+  const palette = {
+    red: ["#ff0000", "#dd0000", "#bb0000", "#990000", "#770000"],
+    green: ["#00ff00", "#00dd00", "#00bb00", "#009900", "#007700"],
+    blue: ["#0000ff", "#0000dd", "#0000bb", "#000099", "#000077"],
+  } as ColorPaletteCustom;
+
+  it.each(["ltr", "rtl"])(
+    "moves horizontally in the visual direction in %s across all palette sections",
+    (direction) => {
+      const picker = document.createElement("div");
+      picker.style.direction = direction;
+      document.body.append(picker);
+      try {
+        for (const section of ["baseColors", "shades", "custom"] as const) {
+          for (const key of ["ArrowLeft", "ArrowRight"]) {
+            const onChange = vi.fn();
+            const args = handlerArgs(key, palette, onChange);
+            const colors =
+              section === "shades"
+                ? (palette.red as readonly string[])
+                : ["#dd0000", "#00dd00", "#0000dd"];
+            const index = 1;
+            const step =
+              (key === "ArrowRight" ? 1 : -1) * (direction === "rtl" ? -1 : 1);
+            expect(
+              colorPickerKeyNavHandler({
+                ...args,
+                event: { ...args.event, currentTarget: picker },
+                activeColorPickerSection: section,
+                color: colors[index],
+                customColors: [...colors],
+              }),
+            ).toBe(true);
+            expect(onChange).toHaveBeenCalledWith(colors[index + step]);
+          }
+        }
+      } finally {
+        picker.remove();
+      }
+    },
+  );
+
+  it.each([
+    ["ltr", "ArrowLeft"],
+    ["rtl", "ArrowRight"],
+  ])("wraps and skips excluded colors in %s", (direction, key) => {
+    const picker = document.createElement("div");
+    picker.style.direction = direction;
+    document.body.append(picker);
+    try {
+      const onChange = vi.fn();
+      const args = handlerArgs(key, palette, onChange, ["#0000dd"]);
+      expect(
+        colorPickerKeyNavHandler({
+          ...args,
+          event: { ...args.event, currentTarget: picker },
+          activeColorPickerSection: "baseColors",
+          color: "#dd0000",
+        }),
+      ).toBe(true);
+      expect(onChange).toHaveBeenCalledWith("#00dd00");
+    } finally {
+      picker.remove();
+    }
+  });
+
+  it.each([
+    ["ltr", "ArrowLeft", 0, 2],
+    ["ltr", "ArrowRight", 2, 0],
+    ["rtl", "ArrowLeft", 2, 0],
+    ["rtl", "ArrowRight", 0, 2],
+  ] as const)("wraps %s %s from index %i to %i", (direction, key, from, to) => {
+    const picker = document.createElement("div");
+    picker.style.direction = direction;
+    document.body.append(picker);
+    try {
+      const onChange = vi.fn();
+      const args = handlerArgs(key, palette, onChange);
+      const colors = ["#dd0000", "#00dd00", "#0000dd"];
+      colorPickerKeyNavHandler({
+        ...args,
+        event: { ...args.event, currentTarget: picker },
+        activeColorPickerSection: "custom",
+        color: colors[from],
+        customColors: [...colors],
+      });
+      expect(onChange).toHaveBeenCalledWith(colors[to]);
+    } finally {
+      picker.remove();
+    }
+  });
+});
