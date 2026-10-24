@@ -3,6 +3,7 @@ import {
   getFrameChildrenInsertionIndex,
   getContainerElement,
   isElementInViewport,
+  isFreeDrawElement,
   isTextElement,
 } from "@excalidraw/element";
 
@@ -23,6 +24,15 @@ import { cancelStaticSceneThrottle } from "../renderer/staticScene";
 import type { RenderableElementsMap } from "./types";
 
 import type { AppState, ElementRenderOffsets } from "../types";
+
+// A new element added to a frame is rendered in the static canvas so that it's
+// sorted underneath the frame's higher-index children. Freedraw is exempt:
+// it's mutated on every pointer move, and re-rendering the whole static scene
+// for each move is too slow. The new element canvas still clips it to the
+// frame; it's only drawn above the frame's other children until pointerup.
+const isRenderedOnStaticCanvas = (
+  newElement: AppState["newElement"],
+): boolean => !!newElement?.frameId && !isFreeDrawElement(newElement);
 
 type GetRenderableElementsOpts = {
   zoom: AppState["zoom"];
@@ -249,7 +259,9 @@ export class Renderer {
     newElement: AppState["newElement"];
   }) {
     const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
-    const newElementCanvasElement = newElement?.frameId ? null : newElement;
+    const newElementCanvasElement = isRenderedOnStaticCanvas(newElement)
+      ? null
+      : newElement;
 
     for (const element of elements) {
       if (newElementCanvasElement?.id === element.id) {
@@ -367,7 +379,8 @@ export class Renderer {
     // (see getRenderableElementsMap), and a new text gets its dashed text box
     // drawn by the interactive canvas (it doubles as `editingTextElement`).
     const canvasNonce = `${this.scene.getSceneNonce()}${
-      newElement?.frameId || isTextElement(newElement)
+      newElement &&
+      (isRenderedOnStaticCanvas(newElement) || isTextElement(newElement))
         ? `:${newElement.versionNonce}`
         : ""
     }`;
