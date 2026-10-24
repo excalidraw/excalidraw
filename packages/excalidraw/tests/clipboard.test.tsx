@@ -913,6 +913,52 @@ describe("paste routing", () => {
     expect(h.elements.length).toBe(0);
   });
 
+  // https://github.com/excalidraw/excalidraw/issues/5156
+  it("should open the charts dialog for CSV with quoted values", async () => {
+    pasteWithCtrlCmdV('Month,Sales\nJan,"1,000"\nFeb,"2,500"');
+    await waitFor(() => {
+      expect(h.state.openDialog).toMatchObject({
+        name: "charts",
+        data: {
+          labels: ["Jan", "Feb"],
+          series: [{ title: "Sales", values: [1000, 2500] }],
+        },
+      });
+    });
+    expect(h.elements.length).toBe(0);
+  });
+
+  it("should open the charts dialog for space-separated values", async () => {
+    pasteWithCtrlCmdV('greeting points\n"hello world" "1,000"\nhi 300');
+    await waitFor(() => {
+      expect(h.state.openDialog).toMatchObject({
+        name: "charts",
+        data: {
+          labels: ["hello world", "hi"],
+          series: [{ title: "points", values: [1000, 300] }],
+        },
+      });
+    });
+  });
+
+  it("should paste a numbered list as text, not as a chart", async () => {
+    pasteWithCtrlCmdV("Step 1\nStep 2\nStep 3");
+    await waitFor(() => {
+      expect(h.elements.length).toBeGreaterThan(0);
+    });
+    expect(h.state.openDialog?.name).not.toBe("charts");
+    expect(h.elements.every((element) => element.type === "text")).toBe(true);
+  });
+
+  it("should paste a sentence with spaces as text, not as a chart", async () => {
+    pasteWithCtrlCmdV("hello world");
+    await waitFor(() => {
+      expect(h.elements.length).toBe(1);
+    });
+    expect(h.elements[0].type).toBe("text");
+    expect(h.state.openDialog?.name).not.toBe("charts");
+  });
+
   it("should paste the text of mixed content when images can't be inserted", async () => {
     unmountComponent();
     await render(
