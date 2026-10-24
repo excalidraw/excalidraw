@@ -943,6 +943,7 @@ type ExportToSvgConfig = Pick<
      * if true, all embeddables passed in will be rendered when possible.
      */
     renderEmbeddables?: boolean;
+    title?: string | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
     /**
@@ -1024,6 +1025,11 @@ const exportToSvg = async ({
     createHTMLComment(ownerDocument, "svg-source:excalidraw"),
   );
   svgRoot.appendChild(metadataElement);
+  if (config?.title?.trim()) {
+    const titleElement = ownerDocument.createElementNS(SVG_NS, "title");
+    titleElement.textContent = config.title;
+    svgRoot.appendChild(titleElement);
+  }
   svgRoot.appendChild(defsElement);
 
   // ---------------------------------------------------------------------------
