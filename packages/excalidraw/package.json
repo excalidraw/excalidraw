@@ -90,6 +90,7 @@
     "@excalidraw/math": "0.18.0",
     "@excalidraw/mermaid-to-excalidraw": "2.2.2",
     "@excalidraw/random-username": "1.1.0",
+    "@huggingface/transformers": "3.8.1",
     "browser-fs-access": "0.38.0",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",

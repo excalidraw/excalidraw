@@ -1,4 +1,5 @@
 import path from "path";
+
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
@@ -7,6 +8,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
+
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
 import type { Plugin, Rollup } from "vite";
@@ -278,6 +280,9 @@ export default defineConfig(({ mode }) => {
             // via a static import from the main bundle, defeating lazy
             // loading. So we exclude it by name instead.
             "**/CodeMirrorEditor-*.js",
+            // Handwriting recognition is loaded only when explicitly enabled.
+            "**/transformers.web-*.js",
+            "**/ort-wasm-*.wasm",
             // lazy-loaded Firebase SDK, only needed for collab/sharing, which
             // require network anyway
             "**/firebaseSDK-*.js",

@@ -230,7 +230,11 @@
     "multipleResults": "results",
     "placeholder": "Find text on canvas...",
     "frames": "Frames",
-    "texts": "Texts"
+    "texts": "Texts",
+    "includeHandwriting": "Search handwriting (experimental)",
+    "handwritingHint": "Recognizes English handwriting on this device. Downloads a model on first use; drawings are not uploaded.",
+    "handwritingLoading": "Recognizing handwriting… The first model download may take a few minutes. Typed text search is ready.",
+    "handwritingError": "Could not recognize handwriting. Turn handwriting search off and on to retry. Typed text search is still available."
   },
   "buttons": {
     "clearReset": "Reset the canvas",
