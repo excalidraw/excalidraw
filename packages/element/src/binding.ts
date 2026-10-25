@@ -36,6 +36,7 @@ import {
   hitElementItself,
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
+  isPointInBindingArea,
   isPointInElement,
 } from "./collision";
 import { distanceToElement } from "./distance";
@@ -1184,6 +1185,100 @@ export const bindBindingElement = (
   }
 
   applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
+};
+
+/**
+ * Whether the arrow's end is bound to an element it's beyond the binding area
+ * of, i.e. that it couldn't be bound to in the editor (e.g. a participant's
+ * header in a sequence diagram, as laid out by mermaid)
+ */
+export const isEndBoundBeyondBindingArea = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "start" | "end",
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): boolean => {
+  const binding =
+    startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+  const bindableElement = binding && elementsMap.get(binding.elementId);
+  return (
+    !!bindableElement &&
+    isBindableElement(bindableElement) &&
+    !isPointInBindingArea(
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      ),
+      bindableElement,
+      elementsMap,
+      zoom,
+    )
+  );
+};
+
+// how far at least to extend an arrow's end segment looking for what it's
+// bound to (see `getBoundEndExtension`)
+const MIN_BOUND_END_EXTENSION = 100;
+
+/**
+ * Extends the arrow's bound end along its end segment, by the segment's length
+ * (at least MIN_BOUND_END_EXTENSION), to find where it would reach the element
+ * it's bound to, off the element by the binding gap. Moving the end there
+ * restores bindings given to arrows that just fall short of their elements.
+ *
+ * @returns where to move the end to, or null if it doesn't reach the element
+ */
+export const getBoundEndExtension = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "start" | "end",
+  elementsMap: NonDeletedSceneElementsMap,
+): GlobalPoint | null => {
+  const binding =
+    startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+  const bindableElement = binding && elementsMap.get(binding.elementId);
+  if (
+    !bindableElement ||
+    !isBindableElement(bindableElement) ||
+    arrow.points.length < 2
+  ) {
+    return null;
+  }
+
+  const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
+  const adjacent = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 1 : -2,
+    elementsMap,
+  );
+  const segmentLength = pointDistance(adjacent, end);
+  if (segmentLength < PRECISION) {
+    return null;
+  }
+
+  const extension = lineSegment(
+    end,
+    pointFromVector(
+      vectorScale(
+        vectorNormalize(vectorFromPoint(end, adjacent)),
+        Math.max(segmentLength, MIN_BOUND_END_EXTENSION),
+      ),
+      end,
+    ),
+  );
+  return (
+    intersectElementWithLineSegment(
+      bindableElement,
+      elementsMap,
+      extension,
+      getBindingGap(bindableElement),
+    ).sort((a, b) => pointDistanceSq(a, end) - pointDistanceSq(b, end))[0] ??
+    null
+  );
 };
 
 export const unbindBindingElement = (
@@ -2374,6 +2469,45 @@ export const repairBindings = (
   }
 
   for (const arrow of arrows) {
+    // users can't (re)bind an end beyond the binding area of what it's bound
+    // to, and it'd jump onto it once that is moved, so don't leave it bound
+    // there, unless it just falls short of it: then extend it onto it. Decide
+    // for both ends as given, as moving either end of an elbow arrow reroutes
+    // it from both its bindings, which could move the other end onto its
+    // element
+    const extendedEnds: PointsPositionUpdates = new Map();
+    // by end, as rerouting elbow arrows can change their number of points
+    const isExtended = { start: false, end: false };
+    for (const startOrEnd of ["start", "end"] as const) {
+      if (
+        !isEndBoundBeyondBindingArea(
+          arrow,
+          startOrEnd,
+          elementsMap,
+          DEFAULT_ZOOM,
+        )
+      ) {
+        continue;
+      }
+      const extendedEnd = getBoundEndExtension(arrow, startOrEnd, elementsMap);
+      if (extendedEnd) {
+        extendedEnds.set(startOrEnd === "start" ? 0 : arrow.points.length - 1, {
+          point: LinearElementEditor.pointFromAbsoluteCoords(
+            arrow,
+            extendedEnd,
+            elementsMap,
+          ),
+        });
+        isExtended[startOrEnd] = true;
+        continue;
+      }
+      unbindBindingElement(arrow, startOrEnd, scene);
+    }
+    // once unbound, so elbow arrows aren't rerouted to what they were bound to
+    if (extendedEnds.size) {
+      LinearElementEditor.movePoints(arrow, scene, extendedEnds);
+    }
+
     for (const startOrEnd of ["start", "end"] as const) {
       const binding = arrow[`${startOrEnd}Binding`];
       const target = binding
@@ -2383,10 +2517,12 @@ export const repairBindings = (
         continue;
       }
 
-      // complete bindings are kept (normalized), incomplete ones are
-      // re-derived from the current endpoint (elbow arrows only ever orbit)
+      // complete bindings are kept (normalized), incomplete ones and those of
+      // extended ends are re-derived from the current endpoint (elbow arrows
+      // only ever orbit)
       const isValidMode = ["inside", "orbit", "skip"].includes(binding.mode);
       if (
+        !isExtended[startOrEnd] &&
         isFixedPoint(binding.fixedPoint) &&
         (isElbowArrow(arrow) ? binding.mode === "orbit" : isValidMode)
       ) {

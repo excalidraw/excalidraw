@@ -2,7 +2,11 @@ import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { repairBindings, unbindBindingElement } from "../src/binding";
+import {
+  getBindingGap,
+  repairBindings,
+  unbindBindingElement,
+} from "../src/binding";
 import { newArrowElement, newElement } from "../src/newElement";
 import { Scene } from "../src/Scene";
 
@@ -345,8 +349,9 @@ describe("repairBindings", () => {
   it("snaps a bound endpoint onto the moved target", () => {
     const { x } = byId(
       repairBindings([
+        // moved within binding distance of the endpoint
         rect("a", 1000),
-        arrow("x", [300, 50], [102, 50], {
+        arrow("x", [300, 50], [990, 50], {
           endBinding: {
             elementId: "a",
             mode: "orbit",
@@ -359,6 +364,81 @@ describe("repairBindings", () => {
     const endX = x.x + x.points[x.points.length - 1][0];
     expect(endX).toBeGreaterThan(990);
     expect(endX).toBeLessThan(1000);
+  });
+
+  it("extends a bound endpoint falling short of its target onto it", () => {
+    const { a, x } = byId(
+      repairBindings([
+        rect("a", 1000),
+        // ends 100px short of a: within its end segment's length
+        arrow("x", [300, 50], [900, 50], {
+          endBinding: {
+            elementId: "a",
+            mode: "orbit",
+            // not where the end reaches a, so re-derived from where it does
+            fixedPoint: [0, 0.2],
+          },
+        }),
+      ]),
+    );
+
+    expect(x.endBinding).toMatchObject({ elementId: "a", mode: "orbit" });
+    expect(x.endBinding.fixedPoint[1]).toBeCloseTo(0.5, 2);
+    const [endX, endY] = x.points[x.points.length - 1];
+    expect(x.x + endX).toBeCloseTo(1000 - getBindingGap(a));
+    expect(x.y + endY).toBeCloseTo(50, 1);
+    expect(a.boundElements).toEqual([{ id: "x", type: "arrow" }]);
+  });
+
+  it("unbinds a bound endpoint beyond reach of its target where given", () => {
+    const { a, x } = byId(
+      repairBindings([
+        // the end segment points away from it
+        rect("a", 1000),
+        arrow("x", [300, 50], [102, 50], {
+          endBinding: {
+            elementId: "a",
+            mode: "orbit",
+            fixedPoint: [0, 0.5001],
+          },
+        }),
+      ]),
+    );
+
+    expect(x).toMatchObject({
+      endBinding: null,
+      x: 300,
+      y: 50,
+      points: [
+        [0, 0],
+        [-198, 0],
+      ],
+    });
+    expect(a.boundElements).toEqual([]);
+  });
+
+  it("keeps the binding of the other end bound to the same element", () => {
+    const { a, x } = byId(
+      repairBindings([
+        rect("a"),
+        arrow("x", [102, 50], [600, 50], {
+          startBinding: {
+            elementId: "a",
+            mode: "orbit",
+            fixedPoint: [1, 0.5001],
+          },
+          endBinding: {
+            elementId: "a",
+            mode: "orbit",
+            fixedPoint: [0.5001, 1],
+          },
+        }),
+      ]),
+    );
+
+    expect(x.startBinding?.elementId).toBe("a");
+    expect(x.endBinding).toBeNull();
+    expect(a.boundElements).toEqual([{ id: "x", type: "arrow" }]);
   });
 
   describe("elbow arrows", () => {
@@ -403,7 +483,8 @@ describe("repairBindings", () => {
       (_, fixedSegments) => {
         const { x } = byId(
           repairBindings([
-            rect("a", 1000, { y: 200 }),
+            // moved within binding distance of the endpoint
+            rect("a", 505, { y: 230 }),
             elbow("x", [300, 50], [500, 250], {
               points: [P(0, 0), P(100, 0), P(100, 200), P(200, 200)],
               fixedSegments,
@@ -418,10 +499,63 @@ describe("repairBindings", () => {
 
         // elbow arrows end exactly at their fixed point
         const [endX, endY] = x.points[x.points.length - 1];
-        expect(x.x + endX).toBeCloseTo(1000, 0);
-        expect(x.y + endY).toBeCloseTo(250, 0);
+        expect(x.x + endX).toBeCloseTo(505, 0);
+        expect(x.y + endY).toBeCloseTo(280, 0);
         expect(isOrthogonal(x)).toBe(true);
         expect(x.fixedSegments ?? []).toHaveLength(fixedSegments?.length ?? 0);
+      },
+    );
+
+    it.each([
+      ["a to b", "start"],
+      ["b to a", "end"],
+    ] as const)(
+      "decides both end bindings before moving either, bound %s",
+      (_, aEnd) => {
+        const bEnd = aEnd === "start" ? "end" : "start";
+        // falls 50px short of a, and ends far below b
+        const route: [number, number][] = [
+          [150, 10],
+          [550, 10],
+          [550, 500],
+        ];
+        if (aEnd === "end") {
+          route.reverse();
+        }
+        const [[x0, y0]] = route;
+        const { a, b, x } = byId(
+          repairBindings([
+            rect("a", 0, { height: 20 }),
+            rect("b", 500, { height: 20 }),
+            elbow("x", route[0], route[2], {
+              points: route.map(([px, py]) => P(px - x0, py - y0)),
+              [`${aEnd}Binding`]: {
+                elementId: "a",
+                mode: "orbit",
+                fixedPoint: [1, 0.5001],
+              },
+              [`${bEnd}Binding`]: {
+                elementId: "b",
+                mode: "orbit",
+                fixedPoint: [0.5001, 1],
+              },
+            } as Partial<ExcalidrawElbowArrowElement>),
+          ]),
+        );
+        const point = (startOrEnd: "start" | "end") => {
+          const [px, py] =
+            x.points[startOrEnd === "start" ? 0 : x.points.length - 1];
+          return [x.x + px, x.y + py];
+        };
+
+        expect(x[`${aEnd}Binding`]?.elementId).toBe("a");
+        expect(point(aEnd)[0]).toBeCloseTo(100 + getBindingGap(a), 0);
+        expect(x[`${bEnd}Binding`]).toBeNull();
+        expect(point(bEnd)[0]).toBeCloseTo(550);
+        expect(point(bEnd)[1]).toBeCloseTo(500);
+        expect(a.boundElements).toEqual([{ id: "x", type: "arrow" }]);
+        expect(b.boundElements ?? []).toEqual([]);
+        expect(isOrthogonal(x)).toBe(true);
       },
     );
 
