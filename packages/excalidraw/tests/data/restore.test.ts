@@ -930,6 +930,42 @@ describe("restoreElements", () => {
     consoleError.mockRestore();
   });
 
+  it("should drop elbow arrow state of extremely large elbow arrows", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const hugeElbowArrow: any = API.createElement({
+      type: "arrow",
+      elbowed: true,
+    });
+    hugeElbowArrow.points = [
+      [0, 0],
+      [0, 100],
+      [900000, 100],
+      [900000, 200],
+      [900100, 200],
+    ];
+    hugeElbowArrow.fixedSegments = [
+      { index: 2, start: [0, 100], end: [900000, 100] },
+      { index: 3, start: [900000, 100], end: [900000, 200] },
+    ];
+    hugeElbowArrow.startIsSpecial = true;
+    hugeElbowArrow.endIsSpecial = true;
+
+    const [arrow] = restore.restoreElements([hugeElbowArrow], null) as [
+      ExcalidrawElbowArrowElement,
+    ];
+
+    expect(arrow.isDeleted).toBe(true);
+    expect(arrow.points).toEqual([pointFrom(0, 0), pointFrom(100, 100)]);
+    expect(arrow.fixedSegments).toBe(null);
+    expect(arrow.startIsSpecial).toBe(null);
+    expect(arrow.endIsSpecial).toBe(null);
+
+    consoleError.mockRestore();
+  });
+
   it("when the number of points of a line is greater or equal 2", () => {
     const lineElement_0 = API.createElement({
       type: "line",
@@ -1328,6 +1364,47 @@ describe("repairing malformed elements", () => {
     expect(text.isDeleted).toBe(false);
     expect(text.width).toBeGreaterThan(0);
     expect(text.height).toBeGreaterThan(0);
+  });
+
+  it("should wrap partially sized or recovered text only when it doesn't auto-resize", () => {
+    const longText = "lorem ipsum dolor sit amet consectetur adipiscing elit";
+    const [fixed, recoveredFixed, autoResized] = restoreImported([
+      // no height
+      {
+        type: "text",
+        id: "fixed",
+        text: longText,
+        width: 100,
+        autoResize: false,
+      },
+      {
+        type: "text",
+        id: "recoveredFixed",
+        originalText: longText,
+        width: 100,
+        height: 25,
+        autoResize: false,
+      },
+      // predates `autoResize`, when all free text grew with its content
+      {
+        type: "text",
+        id: "autoResized",
+        originalText: longText,
+        width: 100,
+        height: 25,
+      },
+    ]) as ExcalidrawTextElement[];
+
+    for (const text of [fixed, recoveredFixed]) {
+      expect(text.autoResize).toBe(false);
+      expect(text.text).toContain("\n");
+      expect(text.width).toBe(100);
+      expect(text.height).toBeGreaterThan(25);
+    }
+    expect(autoResized.autoResize).toBe(true);
+    expect(autoResized.text).toBe(longText);
+    expect(autoResized.width).toBeGreaterThan(100);
+    expect(autoResized.height).toBeGreaterThan(0);
   });
 
   it("should recover text from originalText", () => {
@@ -1734,7 +1811,7 @@ describe("repairing malformed elements", () => {
     expect(rect.version).toBe(1);
   });
 
-  it("should drop out of range, duplicate and unordered fixed segments", () => {
+  it("should drop out of range, endpoint, duplicate and unordered fixed segments", () => {
     const [arrow] = restoreImported([
       {
         type: "arrow",
@@ -1753,6 +1830,9 @@ describe("repairing malformed elements", () => {
           { start: [50, 0], end: [50, 50], index: 2 },
           { start: [0, 0], end: [0, 0], index: 50 },
           { start: [0, 0], end: [0, 0], index: 0 },
+          // the first and last segments can't be fixed
+          { start: [0, 0], end: [50, 0], index: 1 },
+          { start: [100, 50], end: [100, 100], index: 4 },
         ],
       },
     ]) as ExcalidrawElbowArrowElement[];
@@ -1760,6 +1840,308 @@ describe("repairing malformed elements", () => {
     expect(arrow.fixedSegments?.map((segment) => segment.index)).toEqual([
       2, 3,
     ]);
+  });
+
+  it("should rebuild fixed segments from the arrow's points", () => {
+    const [arrow] = restoreImported([
+      {
+        type: "arrow",
+        id: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        // normalized on restore, so the segments must follow
+        points: [
+          [10, 10],
+          [60, 10],
+          [60, 60],
+          [110, 60],
+          [110, 110],
+        ],
+        fixedSegments: [
+          { start: { x: 60, y: 10 }, end: { x: 65, y: 60 }, index: 2 },
+          { start: [50, 50], end: [100, 50.5], index: 3 },
+        ],
+      },
+    ]) as ExcalidrawElbowArrowElement[];
+
+    expect(arrow.x).toBe(10);
+    expect(arrow.fixedSegments).toEqual([
+      { start: [50, 0], end: [50, 50], index: 2 },
+      { start: [50, 50], end: [100, 50], index: 3 },
+    ]);
+  });
+
+  it("should keep and snap fixed segments within the elbow point tolerance", () => {
+    const [arrow] = restoreImported([
+      {
+        type: "arrow",
+        id: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [
+          [0, 0],
+          [50, 0],
+          [50.0000001, 50],
+          [100, 50.5],
+          [100, 100],
+        ],
+        fixedSegments: [
+          { start: [50, 0], end: [50.0000001, 50], index: 2 },
+          { start: [50.0000001, 50], end: [100, 50.5], index: 3 },
+        ],
+      },
+    ]) as ExcalidrawElbowArrowElement[];
+
+    expect(arrow.fixedSegments).toEqual([
+      { start: [50, 0], end: [50, 50], index: 2 },
+      { start: [50.0000001, 50], end: [100, 50], index: 3 },
+    ]);
+  });
+
+  it("should drop fixed segments where the arrow is diagonal", () => {
+    vi.stubEnv("MODE", "development");
+    try {
+      const [arrow] = restoreImported([
+        {
+          type: "arrow",
+          id: "arrow",
+          elbowed: true,
+          x: 0,
+          y: 0,
+          points: [
+            { x: 0, y: 0 },
+            { x: 50, y: 20 },
+            { x: 80, y: 70 },
+            { x: 100, y: 100 },
+          ],
+          fixedSegments: [
+            { start: { x: 50, y: 20 }, end: { x: 80, y: 70 }, index: 2 },
+          ],
+        },
+      ]) as ExcalidrawElbowArrowElement[];
+
+      expect(arrow.isDeleted).toBe(false);
+      expect(arrow.fixedSegments).toBe(null);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("should wrap and measure text recovered from originalText", () => {
+    const [container, label] = restoreImported([
+      {
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ type: "text", id: "label" }],
+      },
+      {
+        type: "text",
+        id: "label",
+        containerId: "rect",
+        x: 0,
+        y: 0,
+        width: 400,
+        height: 25,
+        text: null,
+        originalText: "lorem ipsum dolor sit amet consectetur adipiscing elit",
+      },
+    ]) as [ExcalidrawElement, ExcalidrawTextElement];
+
+    expect(label.text).toContain("\n");
+    expect(label.width).toBeLessThanOrEqual(
+      sizeHelpers.getBoundTextMaxWidth(container, label),
+    );
+    expect(label.height).toBeGreaterThan(25);
+  });
+
+  it("should keep the size of recovered text when measuring it fails", () => {
+    const refreshTextDimensions = vi
+      .spyOn(sizeHelpers, "refreshTextDimensions")
+      .mockImplementation(() => {
+        throw new Error("no canvas");
+      });
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    try {
+      const [container, label, text] = restoreImported([
+        {
+          type: "rectangle",
+          id: "rect",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          boundElements: [{ type: "text", id: "label" }],
+        },
+        {
+          type: "text",
+          id: "label",
+          containerId: "rect",
+          x: 5,
+          y: 35,
+          width: 90,
+          height: 25,
+          text: null,
+          originalText: "label",
+        },
+        {
+          type: "text",
+          id: "text",
+          x: 200,
+          y: 0,
+          width: 100,
+          height: 25,
+          text: null,
+          originalText: "hello",
+        },
+      ]) as [ExcalidrawElement, ExcalidrawTextElement, ExcalidrawTextElement];
+
+      expect(refreshTextDimensions).toHaveBeenCalled();
+      expect(container).toEqual(
+        expect.objectContaining({ width: 100, height: 100 }),
+      );
+      expect(label).toEqual(
+        expect.objectContaining({
+          text: "label",
+          x: 5,
+          y: 35,
+          width: 90,
+          height: 25,
+          isDeleted: false,
+        }),
+      );
+      expect(text).toEqual(
+        expect.objectContaining({
+          text: "hello",
+          width: 100,
+          height: 25,
+          isDeleted: false,
+        }),
+      );
+    } finally {
+      refreshTextDimensions.mockRestore();
+      consoleError.mockRestore();
+    }
+  });
+
+  it("should keep the size of recovered text restored on its own", () => {
+    // not measured, as only `restoreElements` sizes text
+    const text = restore.restoreElement(
+      {
+        type: "text",
+        id: "text",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 25,
+        text: null,
+        originalText: "hello",
+      } as any,
+      new Map(),
+      null,
+    ) as ExcalidrawTextElement;
+
+    expect(text).toEqual(
+      expect.objectContaining({ text: "hello", width: 100, height: 25 }),
+    );
+  });
+
+  it("should grow containers to fit labels without a size", () => {
+    const [container, label] = restoreImported([
+      {
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 30,
+        boundElements: [{ type: "text", id: "label" }],
+      },
+      {
+        type: "text",
+        id: "label",
+        containerId: "rect",
+        text: "lorem ipsum dolor sit amet consectetur adipiscing elit",
+      },
+    ]) as [ExcalidrawElement, ExcalidrawTextElement];
+
+    expect(label.height).toBeGreaterThan(30);
+    expect(label.y).toBeGreaterThanOrEqual(container.y);
+    expect(label.y + label.height).toBeLessThanOrEqual(
+      container.y + container.height,
+    );
+  });
+
+  it("should not grow containers for labels they don't own", () => {
+    const [container] = restore.restoreElements(
+      [
+        {
+          type: "rectangle",
+          id: "rect",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 30,
+          boundElements: null,
+        },
+        {
+          type: "text",
+          id: "label",
+          containerId: "rect",
+          text: "lorem ipsum dolor sit amet consectetur adipiscing elit",
+        },
+      ] as any[],
+      null,
+    );
+
+    expect(container).toEqual(
+      expect.objectContaining({ width: 100, height: 30 }),
+    );
+  });
+
+  it("should not resize arrows to fit their labels", () => {
+    // a non-RGI ZWJ chain is one unbreakable token, wider than any arrow
+    // label minimum
+    const [arrow, label] = restoreImported([
+      {
+        type: "arrow",
+        id: "arrow",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 0,
+        points: [
+          [0, 0],
+          [100, 0],
+        ],
+        boundElements: [{ type: "text", id: "label" }],
+      },
+      {
+        type: "text",
+        id: "label",
+        containerId: "arrow",
+        text: Array(40).fill("😀").join("\u200d"),
+      },
+    ]) as [ExcalidrawLinearElement, ExcalidrawTextElement];
+
+    expect(label.width).toBeGreaterThan(
+      sizeHelpers.getBoundTextMaxWidth(arrow, label),
+    );
+    expect(arrow).toEqual(
+      expect.objectContaining({
+        width: 100,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
+      }),
+    );
   });
 
   it("should drop untyped boundElements entries without repairing bindings", () => {

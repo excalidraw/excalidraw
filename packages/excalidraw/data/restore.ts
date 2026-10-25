@@ -68,7 +68,9 @@ import {
 import {
   computeBoundTextPosition,
   getBoundTextElement,
+  getBoundTextElementId,
   getContainerElement,
+  getContainerUpdatesToFitBoundText,
 } from "@excalidraw/element";
 import { isStickyNoteElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
@@ -177,6 +179,12 @@ const handleOversizedLinearElements = <T extends ExcalidrawLinearElement>(
     width: 100,
     height: 100,
     points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+    // elbow arrow state refers to the replaced points
+    ...(isElbowArrow(element) && {
+      fixedSegments: null,
+      startIsSpecial: null,
+      endIsSpecial: null,
+    }),
     isDeleted: true,
   };
 };
@@ -641,33 +649,48 @@ const restoreArrowhead = (arrowhead: unknown): Arrowhead | null => {
 };
 
 /**
- * A segment's `index` is that of its end point, so it must be within the
- * arrow's points. The elbow arrow code also expects the segments to be unique
- * and in ascending order.
+ * A segment spans the arrow's points at `index - 1` and `index`, so it is
+ * rebuilt from them rather than from its (possibly malformed) `start` and
+ * `end`. The elbow arrow code also expects the segments to be unique, in
+ * ascending order, and exactly horizontal or vertical, so a segment is kept
+ * only where the arrow itself is.
  */
 const restoreFixedSegments = (
   fixedSegments: unknown,
-  pointsCount: number,
+  points: readonly LocalPoint[],
 ): FixedSegment[] | null => {
-  if (!Array.isArray(fixedSegments)) {
+  // the first and last segments can't be fixed
+  if (!Array.isArray(fixedSegments) || points.length < 4) {
     return null;
   }
 
   const segments = new Map<number, FixedSegment>();
   for (const segment of fixedSegments) {
-    const start = isRecordLike(segment) ? restorePoint(segment.start) : null;
-    const end = isRecordLike(segment) ? restorePoint(segment.end) : null;
     const index = isRecordLike(segment) ? toFiniteNumber(segment.index) : null;
     if (
-      start &&
-      end &&
-      index !== null &&
-      Number.isInteger(index) &&
-      index >= 1 &&
-      index < pointsCount &&
-      !segments.has(index)
+      index === null ||
+      !Number.isInteger(index) ||
+      index < 2 ||
+      index >= points.length - 1 ||
+      segments.has(index)
     ) {
-      segments.set(index, { start, end, index } as FixedSegment);
+      continue;
+    }
+    const start = points[index - 1];
+    const end = points[index];
+    // with the same tolerance the points are validated with, but snapped as
+    // the elbow arrow code expects fixed segments to be exactly axis-aligned
+    if (validateElbowPoints([start, end])) {
+      const isVertical =
+        Math.abs(end[0] - start[0]) <= Math.abs(end[1] - start[1]);
+      segments.set(index, {
+        start: pointFrom<LocalPoint>(start[0], start[1]),
+        end: pointFrom<LocalPoint>(
+          isVertical ? start[0] : end[0],
+          isVertical ? end[1] : start[1],
+        ),
+        index,
+      } as FixedSegment);
     }
   }
 
@@ -1030,13 +1053,8 @@ export const restoreElement = (
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
-            fixedSegments:
-              base.points.length >= 4
-                ? restoreFixedSegments(
-                    (element as ExcalidrawElbowArrowElement).fixedSegments,
-                    base.points.length,
-                  )
-                : null,
+            // rebuilt from the normalized points below
+            fixedSegments: null,
             startIsSpecial: restoreBoolean(
               (element as ExcalidrawElbowArrowElement).startIsSpecial,
               null,
@@ -1068,12 +1086,24 @@ export const restoreElement = (
         ),
       };
 
-      return handleOversizedLinearElements({
+      const normalizedArrow = {
         ...arrowWithBindings,
         ...LinearElementEditor.getNormalizeElementPointsAndCoords(
           arrowWithBindings,
         ),
-      });
+      };
+
+      return handleOversizedLinearElements(
+        isElbowArrow(normalizedArrow)
+          ? {
+              ...normalizedArrow,
+              fixedSegments: restoreFixedSegments(
+                (element as ExcalidrawElbowArrowElement).fixedSegments,
+                normalizedArrow.points,
+              ),
+            }
+          : normalizedArrow,
+      );
     }
 
     // generic elements
@@ -1255,11 +1285,14 @@ const repairBoundTextElementOrder = (
 
 /** e.g. text created programmatically, whose size follows from its content */
 const isUnsizedText = (element: ExcalidrawElement | null) =>
-  isTextElement(element) && !!element.text && !element.width && !element.height;
+  isTextElement(element) &&
+  !!element.text &&
+  (!element.width || !element.height);
 
 /**
- * Sizes text elements restored without a size from their content, and all
- * of them with `refreshDimensions`. Labels are wrapped to and positioned in
+ * Sizes text elements restored without a size (or recovered from
+ * `originalText`) from their content, and all of them with
+ * `refreshDimensions`. Labels are wrapped to and positioned in
  * their container, and sticky notes are refitted together with their label.
  *
  * Runs once bindings are repaired, as the layout follows from them.
@@ -1269,8 +1302,15 @@ const isUnsizedText = (element: ExcalidrawElement | null) =>
 const restoreTextDimensions = (
   elements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
-  opts: { refreshDimensions: boolean },
+  opts: {
+    refreshDimensions: boolean;
+    /** text recovered from `originalText`, which isn't wrapped nor measured */
+    recoveredTexts: ReadonlySet<ExcalidrawElement>;
+  },
 ) => {
+  const needsSizing = (element: ExcalidrawElement | null) =>
+    isUnsizedText(element) || (!!element && opts.recoveredTexts.has(element));
+
   for (const element of elements) {
     if (element.isDeleted) {
       continue;
@@ -1278,7 +1318,7 @@ const restoreTextDimensions = (
     try {
       if (isStickyNoteElement(element)) {
         const textElement = getBoundTextElement(element, elementsMap);
-        if (opts.refreshDimensions || isUnsizedText(textElement)) {
+        if (opts.refreshDimensions || needsSizing(textElement)) {
           const layout = getStickyNoteLayout(element, textElement);
           Object.assign(element, layout.container);
           if (textElement && layout.text) {
@@ -1295,10 +1335,12 @@ const restoreTextDimensions = (
         const container = isTextBindableContainer(containerCandidate)
           ? containerCandidate
           : null;
-        if (isUnsizedText(element)) {
+        if (needsSizing(element)) {
           // without a width there's nothing to wrap free text to, so it grows
           // with its content instead
-          Object.assign(element, { autoResize: true });
+          if (!element.width) {
+            Object.assign(element, { autoResize: true });
+          }
           Object.assign(
             element,
             refreshTextDimensions(
@@ -1309,13 +1351,18 @@ const restoreTextDimensions = (
             ),
           );
           if (container) {
+            const label = element as ExcalidrawTextElementWithContainer;
+            // grow the container to fit, as when editing the label. Only for
+            // its own label, lest a stale `containerId` resizes another shape
+            if (getBoundTextElementId(container) === label.id) {
+              Object.assign(
+                container,
+                getContainerUpdatesToFitBoundText(container, label, label),
+              );
+            }
             Object.assign(
               element,
-              computeBoundTextPosition(
-                container,
-                element as ExcalidrawTextElementWithContainer,
-                elementsMap,
-              ),
+              computeBoundTextPosition(container, label, elementsMap),
             );
           }
         } else if (opts.refreshDimensions) {
@@ -1559,6 +1606,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
+  const recoveredTexts = new Set<ExcalidrawElement>();
   const restoredElements = syncInvalidIndices(
     sourceElements.reduce((elements, element) => {
       if (element.type === "selection") {
@@ -1587,6 +1635,15 @@ export const restoreElements = <T extends ExcalidrawElement>(
         }
         existingIds.add(migratedElement.id);
 
+        // recovered from `originalText`, so sized in `restoreTextDimensions`
+        if (
+          isTextElement(migratedElement) &&
+          migratedElement.text &&
+          !restoreString((element as { text?: unknown }).text)
+        ) {
+          recoveredTexts.add(migratedElement);
+        }
+
         elements.push(migratedElement);
       }
 
@@ -1599,6 +1656,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
   if (!opts?.repairBindings) {
     restoreTextDimensions(restoredElements, restoredElementsMap, {
       refreshDimensions: false,
+      recoveredTexts,
     });
     return restoredElements as CombineBrandsIfNeeded<
       T,
@@ -1647,6 +1705,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
   restoreStickyNotes(restoredElements, restoredElementsMap);
   restoreTextDimensions(restoredElements, restoredElementsMap, {
     refreshDimensions: !!opts.refreshDimensions,
+    recoveredTexts,
   });
 
   const repairedElements = repairBoundTextElementOrder(restoredElements);

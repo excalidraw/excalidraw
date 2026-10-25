@@ -2360,7 +2360,7 @@ exports[`Test Transform > should transform to text containers when label provide
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 4,
+  "version": 3,
   "versionNonce": Any<Number>,
   "width": 250,
   "x": 100,

@@ -48,6 +48,35 @@ import type {
   NonDeleted,
 } from "./types";
 
+/**
+ * The container dimensions needed to fit a label of the given size, for those
+ * it outgrows. Arrows are never resized, as their size derives from their
+ * points.
+ */
+export const getContainerUpdatesToFitBoundText = (
+  container: ExcalidrawElement,
+  boundTextElement: ExcalidrawTextElementWithContainer,
+  { width, height }: { width: number; height: number },
+) => {
+  const updates: { width?: number; height?: number } = {};
+  if (isArrowElement(container)) {
+    return updates;
+  }
+  if (height > getBoundTextMaxHeight(container, boundTextElement)) {
+    updates.height = computeContainerDimensionForBoundText(
+      height,
+      container.type,
+    );
+  }
+  if (width > getBoundTextMaxWidth(container, boundTextElement)) {
+    updates.width = computeContainerDimensionForBoundText(
+      width,
+      container.type,
+    );
+  }
+  return updates;
+};
+
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
@@ -111,27 +140,16 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.height = metrics.height;
 
   if (container) {
-    const maxContainerHeight = getBoundTextMaxHeight(
+    const containerUpdates = getContainerUpdatesToFitBoundText(
       container,
       textElement as ExcalidrawTextElementWithContainer,
+      metrics,
     );
-    const maxContainerWidth = getBoundTextMaxWidth(container, textElement);
-
-    if (!isArrowElement(container) && metrics.height > maxContainerHeight) {
-      const nextHeight = computeContainerDimensionForBoundText(
-        metrics.height,
-        container.type,
-      );
-      scene.mutateElement(container, { height: nextHeight });
-      updateOriginalContainerCache(container.id, nextHeight);
+    if (containerUpdates.width || containerUpdates.height) {
+      scene.mutateElement(container, containerUpdates);
     }
-
-    if (metrics.width > maxContainerWidth) {
-      const nextWidth = computeContainerDimensionForBoundText(
-        metrics.width,
-        container.type,
-      );
-      scene.mutateElement(container, { width: nextWidth });
+    if (containerUpdates.height) {
+      updateOriginalContainerCache(container.id, containerUpdates.height);
     }
 
     const updatedTextElement = {
