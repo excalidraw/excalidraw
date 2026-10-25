@@ -1217,23 +1217,22 @@ export const isEndBoundBeyondBindingArea = (
 };
 
 // how far at least to extend an arrow's end segment looking for what it's
-// bound to (see `extendBoundEndOntoElement`)
+// bound to (see `getBoundEndExtension`)
 const MIN_BOUND_END_EXTENSION = 100;
 
 /**
  * Extends the arrow's bound end along its end segment, by the segment's length
- * (at least MIN_BOUND_END_EXTENSION), and if that reaches the element it's
- * bound to, moves the end there, off the element by the binding gap. This
+ * (at least MIN_BOUND_END_EXTENSION), to find where it would reach the element
+ * it's bound to, off the element by the binding gap. Moving the end there
  * restores bindings given to arrows that just fall short of their elements.
  *
- * @returns whether the end was moved onto the element
+ * @returns where to move the end to, or null if it doesn't reach the element
  */
-export const extendBoundEndOntoElement = (
-  arrow: NonDeleted<ExcalidrawArrowElement>,
+export const getBoundEndExtension = (
+  arrow: ExcalidrawArrowElement,
   startOrEnd: "start" | "end",
-  scene: Scene,
-): boolean => {
-  const elementsMap = scene.getNonDeletedElementsMap();
+  elementsMap: NonDeletedSceneElementsMap,
+): GlobalPoint | null => {
   const binding =
     startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
   const bindableElement = binding && elementsMap.get(binding.elementId);
@@ -1242,13 +1241,12 @@ export const extendBoundEndOntoElement = (
     !isBindableElement(bindableElement) ||
     arrow.points.length < 2
   ) {
-    return false;
+    return null;
   }
 
-  const index = startOrEnd === "start" ? 0 : arrow.points.length - 1;
   const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     arrow,
-    index,
+    startOrEnd === "start" ? 0 : -1,
     elementsMap,
   );
   const adjacent = LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -1258,7 +1256,7 @@ export const extendBoundEndOntoElement = (
   );
   const segmentLength = pointDistance(adjacent, end);
   if (segmentLength < PRECISION) {
-    return false;
+    return null;
   }
 
   const extension = lineSegment(
@@ -1271,34 +1269,15 @@ export const extendBoundEndOntoElement = (
       end,
     ),
   );
-  const nextEnd = intersectElementWithLineSegment(
-    bindableElement,
-    elementsMap,
-    extension,
-    getBindingGap(bindableElement),
-  ).sort((a, b) => pointDistanceSq(a, end) - pointDistanceSq(b, end))[0];
-  if (!nextEnd) {
-    return false;
-  }
-
-  LinearElementEditor.movePoints(
-    arrow,
-    scene,
-    new Map([
-      [
-        index,
-        {
-          point: LinearElementEditor.pointFromAbsoluteCoords(
-            arrow,
-            nextEnd,
-            elementsMap,
-          ),
-        },
-      ],
-    ]),
+  return (
+    intersectElementWithLineSegment(
+      bindableElement,
+      elementsMap,
+      extension,
+      getBindingGap(bindableElement),
+    ).sort((a, b) => pointDistanceSq(a, end) - pointDistanceSq(b, end))[0] ??
+    null
   );
-
-  return true;
 };
 
 export const unbindBindingElement = (
