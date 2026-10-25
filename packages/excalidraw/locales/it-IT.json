@@ -1,7 +1,7 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Registrati",
+    "signIn": "Accedi",
     "paste": "Incolla",
     "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",

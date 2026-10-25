@@ -2,6 +2,9 @@
   "labels": {
     "signUp": "Sign up",
     "signIn": "Sign in",
+    "upgrade": "Upgrade",
+    "tryExcalidrawPlus": "Try Excalidraw+",
+    "plusFreeTrial": "14-day free trial",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
@@ -27,6 +30,7 @@
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
+    "textColor": "Text color",
     "changeStroke": "Change stroke color",
     "background": "Background",
     "changeBackground": "Change background color",
@@ -187,6 +191,8 @@
     "copyElementLink": "Copy link to object",
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
+    "removeFrame": "Remove frame",
+    "toggleWrap": "Wrap or unwrap selection",
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
@@ -195,7 +201,11 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "showHints": "Show hints",
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Link to object",
@@ -245,6 +255,7 @@
     "undo": "Undo",
     "redo": "Redo",
     "resetLibrary": "Reset library",
+    "reset": "Reset",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
@@ -332,6 +343,7 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
     "autoshape": "Draw to shape",
@@ -357,6 +369,7 @@
     "group": "Group",
     "frame": "Frame",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "selection": "Selection",
     "iframe": "IFrame"
@@ -375,6 +388,7 @@
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
+    "stickynote": "Click to place a note, or drag to size it",
     "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
@@ -382,6 +396,7 @@
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
     "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
     "resizeImage": "You can resize freely by holding {{shortcut_1}},\nhold {{shortcut_2}} to resize from the center",
+    "resizeStickyNote": "hold {{shortcut_1}} to resize freely, {{shortcut_2}} to resize from the center",
     "rotate": "You can constrain angles by holding {{shortcut}} while rotating",
     "toggleArrowhead": "Double-click to toggle the arrowhead",
     "lineEditor_info": "Hold {{shortcut_1}} and Double-click or press {{shortcut_2}} to edit points",
@@ -392,6 +407,7 @@
     "bindTextToElement": "{{shortcut}} to add text",
     "createFlowchart": "{{shortcut}} to create a flowchart",
     "deepBoxSelect": "Hold {{shortcut}} to deep select, and to prevent dragging",
+    "cycleSelection": "{{shortcut}}-click to cycle selection, or drag to duplicate",
     "eraserRevert": "Hold {{shortcut}} to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
     "disableSnapping": "Hold {{shortcut}} to disable snapping",
@@ -649,6 +665,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Drop to replace content",
+    "add": "Drop to add to canvas",
+    "importLibrary": "Drop to import library",
+    "replaceHint": "Hold <shift>Shift</shift> to keep existing content",
+    "keepHint": "Your existing content will be kept",
+    "libraryHint": "Library files will append",
+    "replacedToast": "Content replaced. {{shortcut}} to undo"
+  },
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
@@ -656,8 +681,11 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
-    "inputPlaceholder": "Write Mermaid diagram defintion here...",
-    "autoFixAvailable": "Auto-fix is available"
+    "inputPlaceholder": "Write Mermaid diagram definition here...",
+    "autoFixAvailable": "Auto-fix is available",
+    "loadError": "Couldn't load Mermaid. Check your internet connection and try again.",
+    "loadErrorReload": "Couldn't load Mermaid. Reload the page to try again.",
+    "reload": "Reload"
   },
   "ttd": {
     "error": "Error!"
@@ -714,7 +742,9 @@
     },
     "sceneFonts": "In this scene",
     "availableFonts": "Available fonts",
-    "empty": "No fonts found"
+    "empty": "No fonts found",
+    "topPicksTip": "Tip: drag any font onto your top picks to pin it",
+    "resetTopPicks": "Reset to default top picks"
   },
   "userList": {
     "empty": "No users found",

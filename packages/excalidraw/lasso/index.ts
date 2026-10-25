@@ -9,9 +9,13 @@ import { LinearElementEditor } from "@excalidraw/element";
 import { isFrameLikeElement, isLinearElement } from "@excalidraw/element";
 
 import { getFrameChildren } from "@excalidraw/element";
-import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
-import { arrayToMap, easeOut, isShallowEqual } from "@excalidraw/common";
+import {
+  arrayToMap,
+  easeOut,
+  isShallowEqual,
+  setColorAlpha,
+} from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -19,7 +23,10 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
+import { selectGroupsForSelectedElements } from "../components/App.selection";
+
 import { AnimatedTrail } from "../animatedTrail";
+import { getSelectionColor } from "../renderer/helpers";
 
 import { getLassoSelectedElementIds } from "./utils";
 
@@ -57,8 +64,9 @@ export class LassoTrail extends AnimatedTrail {
 
         return Math.min(easeOut(l), easeOut(t));
       },
-      fill: () => "rgba(105,101,219,0.05)",
-      stroke: () => "rgba(105,101,219)",
+      // same color as the marquee selection (theme-aware, host-overridable)
+      fill: () => setColorAlpha(getSelectionColor(app.interactiveCanvas), 0.05),
+      stroke: () => getSelectionColor(app.interactiveCanvas),
     });
   }
 

@@ -20,6 +20,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
+import { getSelectionColor } from "../../renderer/helpers";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import { AnimationController } from "../../renderer/animation";
@@ -82,11 +83,22 @@ type InteractiveCanvasProps = {
   >;
 };
 
-export const INTERACTIVE_SCENE_ANIMATION_KEY = "animateInteractiveScene";
-
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
   const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
+  // Unique per mounted instance so concurrent editors don't share the
+  // interactive scene animation slot.
+  const animationKeyRef = useRef<symbol | null>(null);
+  if (animationKeyRef.current === null) {
+    animationKeyRef.current = Symbol("interactiveSceneAnimation");
+  }
+  const animationKey = animationKeyRef.current;
+
+  useEffect(() => {
+    return () => {
+      AnimationController.cancel(animationKey);
+    };
+  }, [animationKey]);
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -136,12 +148,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       remotePointerButton.set(socketId, user.button);
     });
 
-    const selectionColor =
-      (props.containerRef?.current &&
-        getComputedStyle(props.containerRef.current).getPropertyValue(
-          "--color-selection",
-        )) ||
-      "#6965db";
+    const selectionColor = getSelectionColor(props.containerRef?.current);
 
     rendererParams.current = {
       app: props.app,
@@ -150,7 +157,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       visibleElements: props.visibleElements,
       selectedElements: props.selectedElements,
       allElementsMap: props.allElementsMap,
-      scale: window.devicePixelRatio,
+      scale: props.scale,
       appState: props.appState,
       renderConfig: {
         remotePointerViewportCoords,
@@ -171,9 +178,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       deltaTime: 0,
     };
 
-    if (!AnimationController.running(INTERACTIVE_SCENE_ANIMATION_KEY)) {
+    if (!AnimationController.running(animationKey)) {
       AnimationController.start<InteractiveSceneRenderAnimationState>(
-        INTERACTIVE_SCENE_ANIMATION_KEY,
+        animationKey,
         ({ deltaTime, state }) => {
           const nextAnimationState = renderInteractiveScene({
             ...rendererParams.current!,
@@ -195,6 +202,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
 
           return undefined;
         },
+        props.app.ownerWindow,
       );
     }
   });
@@ -258,7 +266,7 @@ const getRelevantAppStateProps = (
   isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
   gridModeEnabled: appState.gridModeEnabled,
   suggestedBinding: appState.suggestedBinding,
-  hoveredArrowTextAnchor: appState.hoveredArrowTextAnchor,
+  textToolHover: appState.textToolHover,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions

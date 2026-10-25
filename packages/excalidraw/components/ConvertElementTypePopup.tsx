@@ -56,7 +56,11 @@ import {
 
 import { ShapeCache } from "@excalidraw/element";
 
-import { updateBindings } from "@excalidraw/element";
+import {
+  isBindableElement,
+  reanchorBindingsToOutline,
+  updateBindings,
+} from "@excalidraw/element";
 
 import type {
   ConvertibleGenericTypes,
@@ -76,6 +80,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
+
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
@@ -367,6 +373,7 @@ export const adjustBoundTextSize = (
   container: ExcalidrawTextContainer,
   boundText: ExcalidrawTextElementWithContainer,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const maxWidth = getBoundTextMaxWidth(container, boundText);
   const maxHeight = getBoundTextMaxHeight(container, boundText);
@@ -375,12 +382,14 @@ export const adjustBoundTextSize = (
     boundText.text,
     getFontString(boundText),
     maxWidth,
+    renderEnvironment,
   );
 
   let metrics = measureText(
     wrappedText,
     getFontString(boundText),
     boundText.lineHeight,
+    renderEnvironment,
   );
 
   let nextFontSize = boundText.fontSize;
@@ -397,6 +406,7 @@ export const adjustBoundTextSize = (
       boundText.text,
       getFontString(_updatedTextElement),
       boundText.lineHeight,
+      renderEnvironment,
     );
   }
 
@@ -406,7 +416,7 @@ export const adjustBoundTextSize = (
     height: metrics.height,
   });
 
-  redrawTextBoundingBox(boundText, container, scene);
+  redrawTextBoundingBox(boundText, container, scene, renderEnvironment);
 };
 
 type ConversionType = "generic" | "linear" | null;
@@ -475,6 +485,11 @@ export const convertElementTypes = (
       app.scene.replaceAllElements(nextElements);
 
       for (const element of Object.values(convertedElements)) {
+        if (isBindableElement(element)) {
+          reanchorBindingsToOutline(element, app.scene, app.state.zoom);
+          updateBindings(element, app.scene, app.state);
+        }
+
         const boundText = getBoundTextElement(
           element,
           app.scene.getNonDeletedElementsMap(),
@@ -492,6 +507,7 @@ export const convertElementTypes = (
             element as ExcalidrawTextContainer,
             boundText,
             app.scene,
+            app.renderEnvironment,
           );
         }
       }
@@ -858,8 +874,6 @@ const convertElementType = <
           : element.roundness,
       }),
     ) as typeof element;
-
-    updateBindings(nextElement, app.scene, app.state);
 
     return nextElement;
   }

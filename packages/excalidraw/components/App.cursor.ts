@@ -1,4 +1,4 @@
-import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
+import { CURSOR_TYPE, KEYS, MIME_TYPES, THEME } from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "../appState";
 
@@ -160,6 +160,46 @@ export class AppCursor {
     };
   };
 
+  /**
+   * Re-runs the hover cursor logic at the last known pointer position by
+   * re-dispatching a synthetic pointermove — for state changes that alter
+   * what hovering means without the pointer moving (e.g. the tool reverting
+   * to selection after an element is created). Mouse only: touch and pen
+   * have no resting hover to restore.
+   */
+  refreshHover = () => {
+    const lastEvent =
+      this.app.lastPointerMoveEvent ?? this.app.lastPointerUpEvent;
+
+    if (!lastEvent || !this.canvas) {
+      return;
+    }
+
+    const pointerType = (lastEvent as PointerEvent).pointerType;
+    if (pointerType && pointerType !== "mouse") {
+      return;
+    }
+
+    // jsdom has no PointerEvent; a MouseEvent of type "pointermove" walks
+    // the identical dispatch path
+    const EventConstructor =
+      typeof PointerEvent !== "undefined" ? PointerEvent : MouseEvent;
+
+    // with the modifiers held now, which the move would otherwise release
+    const modifiers = this.app.modifiers.get();
+    this.canvas.dispatchEvent(
+      new EventConstructor("pointermove", {
+        bubbles: true,
+        cancelable: true,
+        clientX: lastEvent.clientX,
+        clientY: lastEvent.clientY,
+        altKey: modifiers.alt,
+        shiftKey: modifiers.shift,
+        [KEYS.CTRL_OR_CMD]: modifiers.ctrlOrCmd,
+      }),
+    );
+  };
+
   /** clears the inline cursor so the environment default (CSS) applies */
   private clear = () => {
     this.set("");
@@ -171,7 +211,7 @@ export class AppCursor {
 
     if (!this.eraserCanvasCache || this.eraserCanvasCache.theme !== theme) {
       const isDarkTheme = theme === THEME.DARK;
-      this.eraserCanvasCache = document.createElement("canvas");
+      this.eraserCanvasCache = this.app.ownerDocument.createElement("canvas");
       this.eraserCanvasCache.theme = theme;
       this.eraserCanvasCache.height = cursorImageSizePx;
       this.eraserCanvasCache.width = cursorImageSizePx;

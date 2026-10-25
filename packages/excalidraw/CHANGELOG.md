@@ -13,7 +13,69 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Export API: `exportScene` (2026-10-18) [#12347](https://github.com/excalidraw/excalidraw/pull/12347)
+
+Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidraw/excalidraw` and `@excalidraw/utils`) are replaced by a single `exportScene`, and every rendering option moved from `appState` into an explicit `config`.
+
+- `exportScene({ type, data, config })` with `type` `"canvas"`, `"png"`, `"jpeg"` or `"svg"` resolves to an `HTMLCanvasElement`, a `Blob` or an `SVGSVGElement`. `exportToClipboard({ type: "png" | "svg" | "json", data, config })` stays. Types: `ExportSceneData`, `ExportSceneConfig`, `ExportSceneOptions`.
+- `data` is `{ elements, appState?, files? }`, the shape of a `.excalidraw` file. Only the scene settings a file stores are read from `appState`: `viewBackgroundColor` as the default background, and the grid settings that `embedScene` embeds. Any other key is ignored, so passing a live `appState` can't affect the output.
+- Migration:
+
+  | Before | Now |
+  | --- | --- |
+  | `exportToCanvas({ elements, appState, files, … })` | `exportScene({ type: "canvas", data: { elements, appState, files }, config })` |
+  | `exportToBlob({ …, mimeType, quality })` | `exportScene({ type: "png" \| "jpeg", …, config })` — `quality` is JPEG-only |
+  | `exportToSvg({ … })` | `exportScene({ type: "svg", … })` |
+  | `appState.exportBackground: false` | `config.canvasBackgroundColor: false` (a color string overrides the background; JPEG always gets one) |
+  | `appState.exportWithDarkMode` | `config.theme: "dark"` |
+  | `appState.exportScale` | `config.scale` (also multiplies a `maxWidthOrHeight` result) |
+  | `appState.exportEmbedScene` | `config.embedScene` (png, svg) |
+  | `appState.frameRendering` | `config.frames: { name?, outline?, clip? }` |
+  | `exportPadding` | `config.padding` (default 10, as before) |
+  | `getDimensions: (w, h) => ({ width, height, scale })` | `config.width`/`height`, `maxWidthOrHeight` or `widthOrHeight`, plus `config.scale` — a number, or `(width, height) => number` receiving the export size at scale 1 (padding included), e.g. to cap the output by a pixel budget |
+  | `maxWidthOrHeight`, `exportingFrame`, `renderEmbeddables`, `skipInliningFonts`, `reuseImages` | same names, in `config` |
+
+- New sizing options: `width`/`height` (only one given: the other follows the content's aspect ratio), `widthOrHeight` (scales the longest side to exactly that size), `fit: "contain" | "none"` and `position: "center" | "topLeft"` within a `width`/`height` frame, and `x`/`y`/`origin` to export a region (cropped, with padding on all sides). The size options are mutually exclusive in the types, and `fit`, `position` and `x`/`y` only combine with `width`/`height`.
+- `config.environment` for non-browser hosts and other windows, the same for every format: `createCanvas` (e.g. `node-canvas`), `createImage`, `createPath`, `document` (the one SVG is built in, e.g. `linkedom`), `textMetrics` and `loadFonts`.
+- Canvas dimensions are rounded instead of truncated, so float noise no longer costs a pixel (a 20.5px frame-label band now rounds up), and are at least 1px (flat content with no padding used to produce an empty canvas that couldn't be encoded).
+- In dark exports, frame names now use the editor's dark frame-name color (they were dark-filtered twice and came out lighter).
+
+### Selection API (2026-10-10) [#12258](https://github.com/excalidraw/excalidraw/pull/12258)
+
+- New `excalidrawAPI.selection`: `select(elements, opts?)`, `add(elements, opts?)`, `remove(elements, opts?)` and `clear(opts?)`, taking elements or their ids, one or many. Missing and deleted elements are skipped.
+- It follows the editor's rules: an element is selected with its group, a frame and its children aren't selected at the same time, and locked elements are skipped. Text editing and cropping end, and the link popup of a lone selected element with a link shows.
+- Options: `deep` selects the elements themselves rather than their groups, editing their group if they share one (as Ctrl/Cmd+click does); `includeLocked` selects locked elements too; `captureUpdate` records the change for undo as for `updateScene()` — by default it's recorded along with the next undoable change.
+- Like `updateScene()`, the change applies on the next render: read it back through `onChange()` or `getAppState()` after that. It works in view mode too, where the selection shows without the transform handles.
+
+### Wheel navigation (2026-09-13) [#12099](https://github.com/excalidraw/excalidraw/pull/12099)
+
+- Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
+- New `appState.inputDevice` preference (`"auto" | "mouse" | "trackpad"`, default `"auto"`, persisted in browser storage) selecting the wheel mappings. With `"trackpad"` a plain wheel pans; with `"mouse"` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is delivered) zooms with either device. Shift+wheel pans horizontally, and ctrl/cmd+shift+wheel pans vertically. The wheel-button zoom above is unaffected. `"auto"` is reserved for detecting the device from the wheel events and resolves to `"trackpad"` until that is implemented (`resolveInputDevice()`). Set it from the new "Input device" radio in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.InputDevice`.
+
+### Sticky notes (2026-09-06) [#12064](https://github.com/excalidraw/excalidraw/pull/12064)
+
+- New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.
+- Element model: the note carries `baseHeight` (the user's height; `height ≥ baseHeight`), its label carries `baseFontSize` (the user's font ceiling, `null`/absent on any other text) while `fontSize` holds the fitted size. Read a text element's user-facing size through `getBaseFontSize(text, elementsMap)`.
+- Sticky notes are their own color domain: new `appState.currentItemStickynoteStrokeColor` (the note's text color) and `appState.currentItemStickynoteBackgroundColor` defaults, and new customizable top-pick slots `appState.colorTopPicks.stickyNoteStroke` / `stickyNoteBackground`. The stroke and background pickers, both eyedroppers and paste-styles resolve their target (regular / sticky / mixed) at execution time. A note and its label share one ink (the stroke picker reads "Text color" for notes): coloring the label while editing colors the note too, binding a colored text gives the note its color, and the creation-date footer always paints in that ink.
+- Skeleton API: `convertToExcalidrawElements([{ type: "stickynote", x, y, label?: { text, fontSize? } }])` creates a note (and fitted label); see the element-skeleton docs.
+- Tools can be dragged out of the toolbar: drag the sticky note button onto the canvas to drop a default-sized note where you release it, previewed translucently while dragging (nothing reaches the scene, history or collaborators until the drop; Escape cancels). The mechanism is generic — other tools can opt in.
+- Toolbar: on desktop and tablet the image tool moved into the "More tools" menu (still `9`; `UIOptions.tools.image` keeps hiding it; the mobile toolbar keeps its image slot), and tool badges now show the letter shortcuts (`R`, `T`, `N`, …) instead of the numbers, which are no longer contiguous. The number keys keep working.
+- Each note shows its creation date (`element.created`) in a footer band — "7 Sep", or "7 Sep 2025" once the year differs — on canvas and in SVG/PNG exports. The band is reserved in the note's layout, so the label never overlaps it; notes without a timestamp keep the band empty.
+- Resize semantics: a note's corners resize proportionally by default and scale the label's font ceiling with the note (Shift frees them); its edges resize freely by default (Shift constrains them). Drag-creation is proportional by default too (Shift frees it) and never touches the font ceiling. Width-only gestures keep the base height, height gestures set it, aspect-locked multi-select and Stats group edits scale the ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
+
 ## Excalidraw API
+
+### `setViewport` stops following a collaborator (2026-09-26) [#12184](https://github.com/excalidraw/excalidraw/pull/12184)
+
+- `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
+
+### `onDuplicate` can replace and veto duplicates (2026-09-18) [#12124](https://github.com/excalidraw/excalidraw/pull/12124)
+
+- `props.onDuplicate` may now return new objects for the duplicated elements in every duplication path. Previously the editor kept using the objects it created, so on paste (and library insert) the frame assignment and bound text redraw went to objects that were no longer in the scene, and alt-drag dragged an element that wasn't in the scene. The returned changes are now merged into the editor's duplicates, so they're part of the duplication's own undo entry and durable increment (no follow-up `updateScene` needed).
+- When pasting or inserting onto a frame, the duplicates passed to `onDuplicate` already have their `frameId` set (and are ordered under the frame).
+- Omitting a duplicate from the returned array (or returning it as deleted) now reliably prevents that element from being duplicated — previously pasting over a frame brought it back, and alt-drag broke. References to it from the remaining duplicates (bindings, `boundElements`, `frameId`) are cleared, and a bound text isn't duplicated without its container. If no duplicate remains, the duplication is cancelled and the returned elements are ignored: paste and the duplicate action do nothing, and alt-drag moves the original elements instead. When only some duplicates are vetoed during alt-drag, their originals stay where they were.
+- `onDuplicate` may return `false` to prevent the duplication as a whole (same as omitting every duplicate, without having to find them).
+- `onDuplicate` receives a third argument with lookups covering just the elements taking part in the duplication, so you don't have to derive them by scanning the scene: `{ duplicateElements, originalElements, origIdToDuplicateId, duplicateIdToOrigId }` — the duplicates by id, the elements they were made from by id, and their ids mapped in both directions (`duplicateIdToOrigId` to look up a duplicate's original while modifying it, `origIdToDuplicateId` e.g. for remapping element ids you keep in `customData`). On paste and library insert the originals are the inserted elements, which aren't part of the scene. The maps are read-only.
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 

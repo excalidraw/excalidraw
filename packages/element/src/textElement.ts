@@ -3,6 +3,8 @@ import {
   ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_SIZE,
+  STICKY_NOTE_BODY_INSET_Y,
+  STICKY_NOTE_PADDING,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   getFontString,
@@ -19,16 +21,22 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
+import { getPositionAfterHeightChange } from "./sizeHelpers";
 
+import { updateStickyNoteLayout } from "./stickyNote";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+
 import {
   isBoundToContainer,
   isArrowElement,
+  isStickyNoteElement,
   isTextElement,
 } from "./typeChecks";
 
 import { isNonDeletedElement } from ".";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type { Scene } from "./Scene";
 
@@ -47,8 +55,20 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (container && isStickyNoteElement(container)) {
+    // the sticky fit owns both halves (label + note geometry). `textElement`
+    // may be an uncommitted clone (font actions clone before install), so it
+    // is passed explicitly instead of looked up in the scene
+    updateStickyNoteLayout(container, scene, {
+      text: textElement,
+      renderEnvironment,
+    });
+    return;
+  }
 
   let maxWidth = undefined;
 
@@ -82,6 +102,7 @@ export const redrawTextBoundingBox = (
       textElement.originalText,
       getFontString(textElement),
       maxWidth,
+      renderEnvironment,
     );
   }
 
@@ -89,6 +110,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
+    renderEnvironment,
   );
 
   // Note: only update width for unwrapped text and bound texts (which always have autoResize set to true)
@@ -145,7 +167,18 @@ export const handleBindTextResize = (
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
   shouldResizeFromCenter = false,
+  flipByY = false,
+  renderEnvironment?: RenderEnvironment,
 ) => {
+  if (isStickyNoteElement(container)) {
+    // resize callers pass their intents to `updateStickyNoteLayout` directly
+    // and own the bound-arrow pass; this is the fallback for generic callers
+    updateStickyNoteLayout(container, scene, {
+      bindings: false,
+      renderEnvironment,
+    });
+    return;
+  }
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
@@ -173,12 +206,14 @@ export const handleBindTextResize = (
           textElement.originalText,
           getFontString(textElement),
           maxWidth,
+          renderEnvironment,
         );
       }
       const metrics = measureText(
         text,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
@@ -190,24 +225,24 @@ export const handleBindTextResize = (
         container.type,
       );
 
-      const diff = containerHeight - container.height;
-      // fix the y coord when resizing from ne/nw/n
+      // Crossing the opposite edge swaps the anchor for text-driven growth.
       const shouldResizeFromTop =
-        transformHandleType === "n" ||
-        transformHandleType === "ne" ||
-        transformHandleType === "nw";
+        (transformHandleType === "n" ||
+          transformHandleType === "ne" ||
+          transformHandleType === "nw") !== flipByY;
 
-      let offsetY = 0;
-      if (!isArrowElement(container)) {
-        if (shouldResizeFromCenter) {
-          offsetY = diff / 2;
-        } else if (shouldResizeFromTop) {
-          offsetY = diff;
-        }
-      }
       scene.mutateElement(container, {
         height: containerHeight,
-        y: container.y - offsetY,
+        ...(!isArrowElement(container) &&
+          getPositionAfterHeightChange(
+            container,
+            containerHeight,
+            shouldResizeFromCenter
+              ? "center"
+              : shouldResizeFromTop
+              ? "bottom"
+              : "top",
+          )),
       });
     }
 
@@ -248,6 +283,18 @@ export const computeBoundTextPosition = (
     y = containerCoords.y;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
     y = containerCoords.y + (maxContainerHeight - boundTextElement.height);
+  } else if (isStickyNoteElement(container)) {
+    // a note's label body ends above the creation-date footer, but a label
+    // centered in that body sits visibly high — center it in the whole
+    // padded note while it stays clear of the footer, and only push it up
+    // against the body's bottom once it would overlap
+    const paddedHeight = container.height - STICKY_NOTE_PADDING * 2;
+    y =
+      containerCoords.y +
+      Math.min(
+        (paddedHeight - boundTextElement.height) / 2,
+        maxContainerHeight - boundTextElement.height,
+      );
   } else {
     y =
       containerCoords.y +
@@ -264,10 +311,17 @@ export const computeBoundTextPosition = (
   const angle = (container.angle ?? 0) as Radians;
 
   if (angle !== 0) {
-    const contentCenter = pointFrom(
-      containerCoords.x + maxContainerWidth / 2,
-      containerCoords.y + maxContainerHeight / 2,
-    );
+    // A sticky's footer makes its body asymmetric. The body still rotates
+    // about the note's center, rather than about its own (higher) center.
+    const contentCenter = isStickyNoteElement(container)
+      ? pointFrom(
+          container.x + container.width / 2,
+          container.y + container.height / 2,
+        )
+      : pointFrom(
+          containerCoords.x + maxContainerWidth / 2,
+          containerCoords.y + maxContainerHeight / 2,
+        );
     const textCenter = pointFrom(
       x + boundTextElement.width / 2,
       y + boundTextElement.height / 2,
@@ -355,8 +409,11 @@ export const getContainerCenter = (
 };
 
 export const getContainerCoords = (container: ExcalidrawElement) => {
-  let offsetX = BOUND_TEXT_PADDING;
-  let offsetY = BOUND_TEXT_PADDING;
+  const padding = isStickyNoteElement(container)
+    ? STICKY_NOTE_PADDING
+    : BOUND_TEXT_PADDING;
+  let offsetX = padding;
+  let offsetY = padding;
 
   if (container.type === "ellipse") {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
@@ -401,6 +458,35 @@ export const getBoundTextElementPosition = (
   }
 };
 
+/**
+ * Returns the text element with its accurate coords. An arrow label's
+ * position is derived from the arrow at render time rather than kept in
+ * sync on the element itself (see getBoundTextElementPosition), so
+ * consumers reading a label's coords directly must go through this helper.
+ */
+export const getTextElementWithAccuratePosition = <
+  T extends ExcalidrawTextElement,
+>(
+  textElement: T,
+  elementsMap: ElementsMap,
+): T => {
+  if (!textElement.containerId) {
+    return textElement;
+  }
+  const container = elementsMap.get(textElement.containerId);
+  if (!container || !isArrowElement(container)) {
+    return textElement;
+  }
+  return {
+    ...textElement,
+    ...LinearElementEditor.getBoundTextElementPosition(
+      container,
+      textElement as ExcalidrawTextElementWithContainer,
+      elementsMap,
+    ),
+  };
+};
+
 export const shouldAllowVerticalAlign = (
   selectedElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
@@ -436,6 +522,7 @@ export const suppportsHorizontalAlign = (
 
 const VALID_CONTAINER_TYPES = new Set([
   "rectangle",
+  "stickynote",
   "ellipse",
   "diamond",
   "arrow",
@@ -487,7 +574,13 @@ export const getBoundTextMaxWidth = (
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
   }
-  return width - BOUND_TEXT_PADDING * 2;
+  return (
+    width -
+    (isStickyNoteElement(container)
+      ? STICKY_NOTE_PADDING
+      : BOUND_TEXT_PADDING) *
+      2
+  );
 };
 
 export const getBoundTextMaxHeight = (
@@ -495,6 +588,10 @@ export const getBoundTextMaxHeight = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   const { height } = container;
+  if (isStickyNoteElement(container)) {
+    // the label body ends above the creation-date footer
+    return Math.max(0, height - STICKY_NOTE_BODY_INSET_Y);
+  }
   if (isArrowElement(container)) {
     const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
     if (containerHeight <= 0) {
@@ -531,3 +628,5 @@ export const getTextFromElements = (
     .join(separator);
   return text;
 };
+
+export const DEFAULT_BOUND_TEXT_LABEL_POSITION = 0.5;

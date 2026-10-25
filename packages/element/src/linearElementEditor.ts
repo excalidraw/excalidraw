@@ -8,7 +8,14 @@ import {
   pointDistance,
   vectorFromPoint,
   curveLength,
+  curveLengthAtParameter,
   curvePointAtLength,
+  lineSegmentClosestParameter,
+  lineSegmentPointAt,
+  curveClosestParameter,
+  clamp,
+  bezierEquation,
+  isCurve,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -30,7 +37,10 @@ import {
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
   type Store,
+  getLinearElementPathSegments,
 } from "@excalidraw/element";
+
+import type { LinearPathSegment } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -48,7 +58,6 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
-  snapToMid,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -121,6 +130,15 @@ type PointMoveOtherUpdates = {
   moveMidPointsWithElement?: boolean | null;
   suggestedBinding?: AppState["suggestedBinding"] | null;
 };
+
+const BoundTextPositionCache = new WeakMap<
+  ExcalidrawTextElementWithContainer,
+  {
+    containerVersion: ExcalidrawElement["version"];
+    textVersion: ExcalidrawElement["version"];
+    position: { x: number; y: number };
+  }
+>();
 
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
@@ -346,7 +364,7 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    const { positions, updates } = pointDraggingUpdates(
+    const { positions, updates, hit } = pointDraggingUpdates(
       [idx],
       deltaX,
       deltaY,
@@ -388,17 +406,20 @@ export class LinearElementEditor {
 
     // Move the arrow over the bindable object in terms of z-index
     if (isBindingElement(element)) {
-      moveArrowAboveBindable(
-        LinearElementEditor.getPointGlobalCoordinates(
+      if (hit) {
+        moveArrowAboveBindable(
+          LinearElementEditor.getPointGlobalCoordinates(
+            element,
+            element.points[element.points.length - 1],
+            elementsMap,
+          ),
           element,
-          element.points[element.points.length - 1],
+          elements,
           elementsMap,
-        ),
-        element,
-        elements,
-        elementsMap,
-        app.scene,
-      );
+          app.scene,
+          hit,
+        );
+      }
     }
 
     // PERF: Avoid state updates if not absolutely necessary
@@ -547,7 +568,7 @@ export class LinearElementEditor {
 
     // Apply the point movement if needed
     let suggestedBinding: AppState["suggestedBinding"] = null;
-    const { positions, updates } = pointDraggingUpdates(
+    const { positions, updates, hit } = pointDraggingUpdates(
       selectedPointsIndices,
       deltaX,
       deltaY,
@@ -591,19 +612,22 @@ export class LinearElementEditor {
 
     // Move the arrow over the bindable object in terms of z-index
     if (isBindingElement(element) && startIsSelected !== endIsSelected) {
-      moveArrowAboveBindable(
-        LinearElementEditor.getPointGlobalCoordinates(
+      if (hit) {
+        moveArrowAboveBindable(
+          LinearElementEditor.getPointGlobalCoordinates(
+            element,
+            startIsSelected
+              ? element.points[0]
+              : element.points[element.points.length - 1],
+            elementsMap,
+          ),
           element,
-          startIsSelected
-            ? element.points[0]
-            : element.points[element.points.length - 1],
+          elements,
           elementsMap,
-        ),
-        element,
-        elements,
-        elementsMap,
-        app.scene,
-      );
+          app.scene,
+          hit,
+        );
+      }
     }
 
     // Attached text might need to update if arrow dimensions change
@@ -1031,6 +1055,8 @@ export class LinearElementEditor {
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
+    /** the pointer went down on the arrow's label, grabbing it for a drag */
+    hitBoundText: boolean;
     linearElementEditor: LinearElementEditor | null;
   } {
     const appState = app.state;
@@ -1039,6 +1065,7 @@ export class LinearElementEditor {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
+      hitBoundText: false,
       linearElementEditor: null,
     };
 
@@ -1112,16 +1139,51 @@ export class LinearElementEditor {
       return ret;
     }
 
-    const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+    const pointIndexUnderCursor = LinearElementEditor.getPointIndexUnderCursor(
       element,
       elementsMap,
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
     );
-    // if we clicked on a point, set the element as hitElement otherwise
-    // it would get deselected if the point is outside the hitbox area
-    if (clickedPointIndex >= 0 || segmentMidpoint) {
+    const clickedPointIsHandle = LinearElementEditor.isPointHandle(
+      element,
+      pointIndexUnderCursor,
+    );
+
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+    let boundTextGrabOffset: { x: number; y: number } | null = null;
+    if (
+      !clickedPointIsHandle &&
+      // the segment midpoint knob keeps precedence over the label sitting
+      // on top of it, so a labeled arrow can still be bent at its middle
+      !segmentMidpoint &&
+      boundTextElement &&
+      isArrowElement(element) &&
+      app.arrowText.isBoundTextGrabbable(
+        element,
+        scenePointer.x,
+        scenePointer.y,
+      )
+    ) {
+      const { x: textX, y: textY } =
+        LinearElementEditor.getBoundTextElementPosition(
+          element,
+          boundTextElement,
+          elementsMap,
+        );
+      boundTextGrabOffset = {
+        x: scenePointer.x - (textX + boundTextElement.width / 2),
+        y: scenePointer.y - (textY + boundTextElement.height / 2),
+      };
+    }
+
+    // when the label grab wins (possible over a non-interactive elbow route
+    // point), the click must not double as a point click
+    const clickedPointIndex = boundTextGrabOffset ? -1 : pointIndexUnderCursor;
+    ret.hitBoundText = !!boundTextGrabOffset;
+
+    if (clickedPointIndex >= 0 || segmentMidpoint || boundTextGrabOffset) {
       ret.hitElement = element;
     }
 
@@ -1174,7 +1236,7 @@ export class LinearElementEditor {
             x: scenePointer.x - targetPoint[0],
             y: scenePointer.y - targetPoint[1],
           }
-        : { x: 0, y: 0 },
+        : boundTextGrabOffset ?? { x: 0, y: 0 },
     };
 
     return ret;
@@ -1353,6 +1415,19 @@ export class LinearElementEditor {
       -element.angle as Radians,
     );
     return pointFrom(x - element.x, y - element.y);
+  }
+
+  /**
+   * Whether the point at `index` is an interactive handle. Elbow arrows only
+   * expose their endpoints; their intermediate route points are not draggable.
+   */
+  static isPointHandle(element: ExcalidrawLinearElement, index: number) {
+    return (
+      index >= 0 &&
+      (!isElbowArrow(element) ||
+        index === 0 ||
+        index === element.points.length - 1)
+    );
   }
 
   static getPointIndexUnderCursor(
@@ -1885,17 +1960,163 @@ export class LinearElementEditor {
     );
   };
 
+  static handleBoundTextDragging(
+    linearElementEditor: LinearElementEditor,
+    scene: Scene,
+    pointerX: number,
+    pointerY: number,
+  ): LinearElementEditor | null {
+    const elementsMap = scene.getNonDeletedElementsMap();
+    const element = LinearElementEditor.getElement(
+      linearElementEditor.elementId,
+      elementsMap,
+    );
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+    if (!element || !isArrowElement(element) || !boundTextElement) {
+      return null;
+    }
+    const pointerGlobalPoint = pointFrom<GlobalPoint>(
+      pointerX - linearElementEditor.pointerOffset.x,
+      pointerY - linearElementEditor.pointerOffset.y,
+    );
+    const { segments, lengths, prefixSums, totalLength } =
+      getLinearElementPathMetrics(element, elementsMap);
+    if (segments.length === 0 || totalLength === 0) {
+      return null;
+    }
+
+    let bestDistance = Infinity;
+    let bestSegmentIndex = 0;
+    let bestParameter = 0;
+
+    for (let i = 0; i < segments.length; i++) {
+      const { t, distance } = pathSegmentClosestParameter(
+        segments[i],
+        pointerGlobalPoint,
+      );
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSegmentIndex = i;
+        bestParameter = t;
+      }
+    }
+
+    const lengthWithinSegment = pathSegmentLengthAtParameter(
+      segments[bestSegmentIndex],
+      bestParameter,
+      lengths[bestSegmentIndex],
+    );
+
+    const labelPosition = clamp(
+      (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
+      0,
+      1,
+    );
+    const pathPoint = LinearElementEditor.getPointAtPathParameter(
+      element,
+      labelPosition,
+      elementsMap,
+    );
+    if (!pathPoint) {
+      return null;
+    }
+
+    scene.mutateElement(boundTextElement, {
+      labelPosition,
+      x: pathPoint[0] - boundTextElement.width / 2,
+      y: pathPoint[1] - boundTextElement.height / 2,
+    });
+
+    return {
+      ...linearElementEditor,
+      isDragging: true,
+    };
+  }
+
+  static getPointAtPathParameter(
+    container: ExcalidrawLinearElement,
+    pathParameter: number,
+    elementsMap: ElementsMap,
+  ): GlobalPoint | null {
+    if (!Number.isFinite(pathParameter)) {
+      return null;
+    }
+
+    const { segments, lengths, prefixSums, totalLength } =
+      getLinearElementPathMetrics(container, elementsMap);
+    if (segments.length === 0) {
+      return null;
+    }
+
+    const targetLength = clamp(pathParameter, 0, 1) * totalLength;
+
+    // the first segment whose end lies at or beyond the target; the last one
+    // catches a target that floating point pushed past the total length
+    const found = segments.findIndex(
+      (_, i) => targetLength <= prefixSums[i + 1],
+    );
+    const i = found === -1 ? segments.length - 1 : found;
+    const lengthFraction =
+      lengths[i] === 0
+        ? 0
+        : clamp((targetLength - prefixSums[i]) / lengths[i], 0, 1);
+
+    return pathSegmentPointAtLength(segments[i], lengthFraction, lengths[i]);
+  }
+
   static getBoundTextElementPosition = (
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
     elementsMap: ElementsMap,
   ): { x: number; y: number } => {
-    const points = LinearElementEditor.getPointsGlobalCoordinates(
+    // derived on every hit test, bounds query and render of the label, so
+    // memoize on the pair of versions the result depends on
+    const cached = BoundTextPositionCache.get(boundTextElement);
+    if (
+      cached &&
+      cached.containerVersion === element.version &&
+      cached.textVersion === boundTextElement.version
+    ) {
+      return cached.position;
+    }
+
+    const position = LinearElementEditor.computeBoundTextElementPosition(
       element,
+      boundTextElement,
       elementsMap,
     );
-    if (points.length < 2) {
-      mutateElement(boundTextElement, elementsMap, { isDeleted: true });
+
+    BoundTextPositionCache.set(boundTextElement, {
+      containerVersion: element.version,
+      textVersion: boundTextElement.version,
+      position,
+    });
+
+    return position;
+  };
+
+  private static computeBoundTextElementPosition = (
+    element: ExcalidrawLinearElement,
+    boundTextElement: ExcalidrawTextElementWithContainer,
+    elementsMap: ElementsMap,
+  ): { x: number; y: number } => {
+    if (element.points.length < 2) {
+      return { x: boundTextElement.x, y: boundTextElement.y };
+    }
+    if (isArrowElement(element) && boundTextElement.labelPosition != null) {
+      const pathPoint = LinearElementEditor.getPointAtPathParameter(
+        element,
+        boundTextElement.labelPosition,
+        elementsMap,
+      );
+
+      if (pathPoint) {
+        return {
+          x: pathPoint[0] - boundTextElement.width / 2,
+          y: pathPoint[1] - boundTextElement.height / 2,
+        };
+      }
     }
 
     const center = LinearElementEditor.getBoundTextElementCenter(
@@ -2169,6 +2390,7 @@ const pointDraggingUpdates = (
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
+  hit?: NonDeleted<ExcalidrawBindableElement> | null;
 } => {
   const naiveDraggingPoints = new Map(
     selectedPointsIndices.map((pointIndex) => {
@@ -2227,18 +2449,21 @@ const pointDraggingUpdates = (
           ? {
               element: suggestedBindingElement,
               midPoint: app.state.isMidpointSnappingEnabled
-                ? snapToMid(
-                    suggestedBindingElement,
-                    elementsMap,
+                ? getSnapOutlineMidPoint(
                     pointFrom<GlobalPoint>(
                       scenePointerX - linearElementEditor.pointerOffset.x,
                       scenePointerY - linearElementEditor.pointerOffset.y,
                     ),
+                    suggestedBindingElement,
+                    elementsMap,
+                    app.state.zoom,
+                    element,
                   )
                 : undefined,
             }
           : null,
       },
+      hit: suggestedBindingElement,
     };
   }
 
@@ -2340,6 +2565,7 @@ const pointDraggingUpdates = (
               start.element,
               elementsMap,
               app.state.zoom,
+              element,
             ),
           }
         : null;
@@ -2379,6 +2605,7 @@ const pointDraggingUpdates = (
               end.element,
               elementsMap,
               app.state.zoom,
+              element,
             ),
           }
         : null;
@@ -2528,6 +2755,7 @@ const pointDraggingUpdates = (
         ];
       }),
     ),
+    hit: startIsDragged ? start.element : end.element,
   };
 };
 
@@ -2536,3 +2764,93 @@ const determineCustomLinearAngle = (
   draggedPoint: LocalPoint,
 ) =>
   Math.atan2(draggedPoint[1] - pivotPoint[1], draggedPoint[0] - pivotPoint[0]);
+
+type LinearElementPathMetrics = {
+  segments: LinearPathSegment[];
+  lengths: number[];
+  prefixSums: number[];
+  totalLength: number;
+};
+
+const LinearElementPathMetricsCache = new WeakMap<
+  ExcalidrawElement,
+  { version: ExcalidrawElement["version"]; metrics: LinearElementPathMetrics }
+>();
+
+function getLinearElementPathMetrics(
+  element: ExcalidrawLinearElement,
+  elementsMap: ElementsMap,
+): LinearElementPathMetrics {
+  const cached = LinearElementPathMetricsCache.get(element);
+
+  if (cached) {
+    if (cached.version === element.version) {
+      return cached.metrics;
+    }
+
+    LinearElementPathMetricsCache.delete(element);
+  }
+
+  const segments = getLinearElementPathSegments(element, elementsMap);
+  const lengths = segments.map(pathSegmentLength);
+  const prefixSums = new Array<number>(lengths.length + 1);
+
+  prefixSums[0] = 0;
+  for (let i = 0; i < lengths.length; i++) {
+    prefixSums[i + 1] = prefixSums[i] + lengths[i];
+  }
+
+  const metrics: LinearElementPathMetrics = {
+    segments,
+    lengths,
+    prefixSums,
+    totalLength: prefixSums[lengths.length],
+  };
+
+  LinearElementPathMetricsCache.set(element, {
+    version: element.version,
+    metrics,
+  });
+
+  return metrics;
+}
+
+const pathSegmentLength = (segment: LinearPathSegment): number =>
+  isCurve(segment)
+    ? curveLength(segment)
+    : pointDistance(segment[0], segment[1]);
+
+/**
+ * The segment's parameter `t` (`0..1`) at the point closest to `point`, and
+ * how far that point is from `point`.
+ */
+const pathSegmentClosestParameter = (
+  segment: LinearPathSegment,
+  point: GlobalPoint,
+): { t: number; distance: number } => {
+  if (isCurve(segment)) {
+    const t = curveClosestParameter(segment, point);
+    return { t, distance: pointDistance(point, bezierEquation(segment, t)) };
+  }
+
+  const t = lineSegmentClosestParameter(point, segment);
+  return { t, distance: pointDistance(point, lineSegmentPointAt(segment, t)) };
+};
+
+/** arc length from the segment's start to its parameter `t` */
+const pathSegmentLengthAtParameter = (
+  segment: LinearPathSegment,
+  t: number,
+  segmentLength: number,
+): number =>
+  isCurve(segment) ? curveLengthAtParameter(segment, t) : t * segmentLength;
+
+/** point at `fraction` (`0..1`) of the segment's arc length */
+const pathSegmentPointAtLength = (
+  segment: LinearPathSegment,
+  fraction: number,
+  segmentLength: number,
+): GlobalPoint =>
+  isCurve(segment)
+    ? curvePointAtLength(segment, fraction, segmentLength)
+    : lineSegmentPointAt(segment, fraction);

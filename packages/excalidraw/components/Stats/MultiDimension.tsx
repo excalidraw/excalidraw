@@ -10,6 +10,12 @@ import {
   updateBoundElements,
 } from "@excalidraw/element";
 import {
+  getStickyNoteResizeIntent,
+  isStickyNoteBoundText,
+  isStickyNoteElement,
+  updateStickyNoteLayout,
+} from "@excalidraw/element";
+import {
   rescalePointsInElement,
   resizeSingleElement,
 } from "@excalidraw/element";
@@ -25,7 +31,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { Scene } from "@excalidraw/element";
+import type { RenderEnvironment, Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
@@ -83,11 +89,38 @@ const resizeElementInGroup = (
   origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (
+    isTextElement(latestElement) &&
+    isStickyNoteBoundText(latestElement, elementsMap)
+  ) {
+    // a group unit lists the note's label too; the note's layout owns it
+    // entirely (a direct scale here would overwrite the fitted size)
+    return;
+  }
+
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
   scene.mutateElement(latestElement, updates);
+
+  if (isStickyNoteElement(latestElement)) {
+    // group scaling is uniform: base height and font ceiling scale with the
+    // note (empty notes included); the layout runs the arrow pass itself
+    updateStickyNoteLayout(latestElement, scene, {
+      ...getStickyNoteResizeIntent(
+        latestElement,
+        originalElementsMap,
+        property === "width" ? "e" : "s",
+        { proportional: true, fromCenter: false },
+      ),
+      anchor: "top",
+      renderEnvironment,
+    });
+    return;
+  }
 
   const boundTextElement = getBoundTextElement(
     origElement,
@@ -106,6 +139,9 @@ const resizeElementInGroup = (
         scene,
         property === "width" ? "e" : "s",
         true,
+        false,
+        false,
+        renderEnvironment,
       );
     }
   }
@@ -122,6 +158,7 @@ const resizeGroup = (
   originalElements: NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -145,6 +182,7 @@ const resizeGroup = (
       origElement,
       originalElementsMap,
       scene,
+      renderEnvironment,
     );
   }
 };
@@ -200,6 +238,7 @@ const handleDimensionChange: DragInputCallbackType<
           originalElements,
           originalElementsMap,
           scene,
+          app.renderEnvironment,
         );
       } else {
         const [el] = elementsInUnit;
@@ -246,6 +285,7 @@ const handleDimensionChange: DragInputCallbackType<
             property === "width" ? "e" : "s",
             {
               shouldInformMutation: false,
+              renderEnvironment: app.renderEnvironment,
             },
           );
 
