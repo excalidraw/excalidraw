@@ -2,6 +2,7 @@ import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
+import { actionChangeArrowhead } from "@excalidraw/excalidraw/actions/actionProperties";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
@@ -13,7 +14,7 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 import "@excalidraw/utils/test-utils";
-import { bindBindingElement } from "@excalidraw/element";
+import { bindBindingElement, validateElbowPoints } from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
 
@@ -426,5 +427,112 @@ describe("elbow arrow ui", () => {
       [78, 100],
       [78, 200],
     ]);
+  });
+});
+
+describe("elbow arrow one-corner routes", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const connect = (diamondY: number) => {
+    // the rectangle's right side's middle is at y = 127.5
+    UI.createElement("rectangle", { x: 0, y: 100, width: 120, height: 55 });
+    UI.createElement("diamond", {
+      x: 220,
+      y: diamondY,
+      width: 200,
+      height: 124,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(120, 127.5);
+    mouse.click();
+    mouse.moveTo(320, diamondY);
+    mouse.click();
+
+    return h.elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawElbowArrowElement;
+  };
+
+  it("connects elements closer than the padding with a single corner", () => {
+    // 40px from the rectangle's side to the diamond's top: no step to the
+    // padding around the diamond on the way
+    const arrow = connect(167.5);
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [195, 0],
+      [195, 34.15],
+    ]);
+  });
+
+  it("routes around the elements when a single corner doesn't fit", () => {
+    const arrow = connect(167.5);
+
+    // the rectangle below the diamond's top: the corner would be inside it
+    UI.clickTool("selection");
+    mouse.reset();
+    mouse.moveTo(60, 100);
+    mouse.down();
+    mouse.moveTo(60, 180);
+    mouse.up();
+
+    expect(arrow.points.length).toBeGreaterThan(3);
+  });
+
+  it("doesn't put the arrowhead on a leg too short for it", () => {
+    // 25px from the rectangle's side to the diamond's top
+    const arrow = connect(152.5);
+
+    expect(arrow.points.length).toBeGreaterThan(3);
+  });
+
+  it("routes again to fit an arrowhead added to a short leg", () => {
+    API.setAppState({ currentItemEndArrowhead: null });
+    // about 10px from the rectangle's side to the diamond's top
+    const arrow = connect(143.5);
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [195, 0],
+      [195, 10.15],
+    ]);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeArrowhead, "ui", {
+        position: "end",
+        type: "arrow",
+      });
+    });
+
+    const updated = h.elements.find(
+      (element) => element.id === arrow.id,
+    ) as ExcalidrawElbowArrowElement;
+    const [corner, end] = updated.points.slice(-2);
+    expect(updated.endArrowhead).toBe("arrow");
+    expect(end[1] - corner[1]).toBeGreaterThanOrEqual(25);
+  });
+
+  it("doesn't route a leg too short to keep its corner", () => {
+    // the arrow leaves the box above at x = 134, and enters the one below
+    // at x = 135
+    UI.createElement("rectangle", { x: 0, y: 0, width: 128, height: 100 });
+    UI.createElement("rectangle", { x: 100, y: 200, width: 128, height: 100 });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(128, 50);
+    mouse.click();
+    mouse.moveTo(135, 200);
+    mouse.click();
+
+    const arrow = h.elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawElbowArrowElement;
+    expect(arrow.points.length).toBeGreaterThan(2);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
   });
 });

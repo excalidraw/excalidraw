@@ -72,6 +72,7 @@ import {
 
 import {
   updateElbowArrowPoints,
+  rerouteElbowArrow,
   CaptureUpdateAction,
   toggleLinePolygonState,
 } from "@excalidraw/element";
@@ -1961,7 +1962,7 @@ export const actionChangeArrowhead = register<{
   name: "changeArrowhead",
   label: "Change arrowheads",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeArrowhead: value must be defined");
 
     return {
@@ -1969,17 +1970,21 @@ export const actionChangeArrowhead = register<{
         if (isLinearElement(el)) {
           const { position, type } = value;
 
-          if (position === "start") {
-            const element: ExcalidrawLinearElement = newElementWith(el, {
-              startArrowhead: type,
-            });
-            return element;
-          } else if (position === "end") {
-            const element: ExcalidrawLinearElement = newElementWith(el, {
-              endArrowhead: type,
-            });
-            return element;
-          }
+          const element: ExcalidrawLinearElement = newElementWith(
+            el,
+            position === "start"
+              ? { startArrowhead: type }
+              : { endArrowhead: type },
+          );
+          return isElbowArrow(element)
+            ? newElementWith(
+                element,
+                rerouteElbowArrow(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ),
+              )
+            : element;
         }
 
         return el;

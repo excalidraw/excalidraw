@@ -52,7 +52,7 @@ import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
 } from "./types";
-import { aabbForElement, pointInsideBounds } from "./bounds";
+import { aabbForElement, getArrowheadSize, pointInsideBounds } from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
 
 import type { Heading } from "./heading";
@@ -1102,15 +1102,28 @@ export const updateElbowArrowPoints = (
     return normalizeArrowElementUpdate(
       getElbowArrowCornerPoints(
         removeElbowArrowShortSegments(
-          routeElbowArrow(arrow, {
-            startHeading,
-            endHeading,
-            startGlobalPoint,
-            endGlobalPoint,
-            hoveredStartElement,
-            hoveredEndElement,
-            ...rest,
-          }) ?? [],
+          getOneCornerRoute(
+            arrow,
+            {
+              startHeading,
+              endHeading,
+              startGlobalPoint,
+              endGlobalPoint,
+              hoveredStartElement,
+              hoveredEndElement,
+            },
+            elementsMap,
+          ) ??
+            routeElbowArrow(arrow, {
+              startHeading,
+              endHeading,
+              startGlobalPoint,
+              endGlobalPoint,
+              hoveredStartElement,
+              hoveredEndElement,
+              ...rest,
+            }) ??
+            [],
         ),
       ),
       fixedSegments,
@@ -1165,6 +1178,18 @@ export const updateElbowArrowPoints = (
     hoveredEndElement,
   );
 };
+
+/**
+ * The update routing an elbow arrow again where it is, e.g. once its
+ * arrowheads change, as its route makes room for them
+ */
+export const rerouteElbowArrow = <T extends ExcalidrawElbowArrowElement>(
+  arrow: Readonly<T>,
+  elementsMap: NonDeletedSceneElementsMap,
+) =>
+  updateElbowArrowPoints(arrow, elementsMap, {
+    points: [arrow.points[0], arrow.points[arrow.points.length - 1]],
+  }) as ElementUpdate<T>;
 
 /**
  * Retrieves data necessary for calculating the elbow arrow path.
@@ -1423,6 +1448,103 @@ const getElbowArrowData = (
     startElementBounds,
     endElementBounds,
   };
+};
+
+/** Whether an axis-aligned segment passes through `bounds` */
+const segmentCrossesBounds = (
+  a: GlobalPoint,
+  b: GlobalPoint,
+  [minX, minY, maxX, maxY]: Bounds,
+) =>
+  Math.max(a[0], b[0]) > minX &&
+  Math.min(a[0], b[0]) < maxX &&
+  Math.max(a[1], b[1]) > minY &&
+  Math.min(a[1], b[1]) < maxY;
+
+/**
+ * The route between two bound elements with a single corner, if they can be
+ * connected with one: leaving the start element and entering the end one the
+ * way their headings tell, clear of both. Routed on the grid, the arrow keeps
+ * a fixed padding to the elements instead, and steps aside to reach it when
+ * they're closer than that (e.g. when the end element is just below the
+ * start's side).
+ */
+const getOneCornerRoute = (
+  arrow: ElbowArrowState,
+  {
+    startHeading,
+    endHeading,
+    startGlobalPoint,
+    endGlobalPoint,
+    hoveredStartElement,
+    hoveredEndElement,
+  }: Pick<
+    ElbowArrowData,
+    | "startHeading"
+    | "endHeading"
+    | "startGlobalPoint"
+    | "endGlobalPoint"
+    | "hoveredStartElement"
+    | "hoveredEndElement"
+  >,
+  elementsMap: ElementsMap,
+): GlobalPoint[] | null => {
+  if (
+    !hoveredStartElement ||
+    !hoveredEndElement ||
+    hoveredStartElement.id === hoveredEndElement.id ||
+    headingIsHorizontal(startHeading) === headingIsHorizontal(endHeading)
+  ) {
+    return null;
+  }
+
+  const corner = headingIsHorizontal(startHeading)
+    ? pointFrom<GlobalPoint>(endGlobalPoint[0], startGlobalPoint[1])
+    : pointFrom<GlobalPoint>(startGlobalPoint[0], endGlobalPoint[1]);
+  // how far the corner is along the start's heading, and away from the end
+  // along its (headings point away from their element)
+  const firstLeg =
+    (corner[0] - startGlobalPoint[0]) * startHeading[0] +
+    (corner[1] - startGlobalPoint[1]) * startHeading[1];
+  const lastLeg =
+    (corner[0] - endGlobalPoint[0]) * endHeading[0] +
+    (corner[1] - endGlobalPoint[1]) * endHeading[1];
+  // a leg with an arrowhead is to fit it (not to have it reach around the
+  // corner), and any to outlast the cleanup of short segments
+  if (
+    firstLeg <=
+      (arrow.startArrowhead
+        ? getArrowheadSize(arrow.startArrowhead)
+        : DEDUP_TRESHOLD) ||
+    lastLeg <=
+      (arrow.endArrowhead
+        ? getArrowheadSize(arrow.endArrowhead)
+        : DEDUP_TRESHOLD)
+  ) {
+    return null;
+  }
+
+  const gap = BASE_BINDING_GAP;
+  const startBounds = aabbForElement(hoveredStartElement, elementsMap, [
+    gap,
+    gap,
+    gap,
+    gap,
+  ]);
+  const endBounds = aabbForElement(hoveredEndElement, elementsMap, [
+    gap,
+    gap,
+    gap,
+    gap,
+  ]);
+  if (
+    segmentCrossesBounds(startGlobalPoint, corner, endBounds) ||
+    segmentCrossesBounds(corner, endGlobalPoint, startBounds)
+  ) {
+    return null;
+  }
+
+  return [startGlobalPoint, corner, endGlobalPoint];
 };
 
 /**
