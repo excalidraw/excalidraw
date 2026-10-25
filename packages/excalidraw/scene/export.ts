@@ -9,6 +9,7 @@ import {
   EXPORT_DATA_TYPES,
   COLOR_WHITE,
   DEFAULT_EXPORT_PADDING,
+  DEFAULT_JPEG_QUALITY,
   arrayToMap,
   distance,
   getFontString,
@@ -1325,7 +1326,9 @@ const exportToBlob = async (
         resolve(blob);
       },
       opts.type === "png" ? MIME_TYPES.png : MIME_TYPES.jpg,
-      opts.type === "jpeg" ? opts.config?.quality || 0.92 : undefined,
+      opts.type === "jpeg"
+        ? opts.config?.quality ?? DEFAULT_JPEG_QUALITY
+        : undefined,
     );
   });
 };

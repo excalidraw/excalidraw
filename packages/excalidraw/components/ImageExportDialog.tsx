@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import {
   DEFAULT_EXPORT_PADDING,
+  DEFAULT_JPEG_QUALITY,
   EXPORT_IMAGE_TYPES,
   isFirefox,
   EXPORT_SCALES,
@@ -85,6 +86,7 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [jpegQuality, setJpegQuality] = useState(DEFAULT_JPEG_QUALITY);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
@@ -304,6 +306,27 @@ const ImageExportModal = ({
             }))}
           />
         </ExportSetting>
+        <ExportSetting
+          label={t("imageExportDialog.label.jpegQuality")}
+          tooltip={t("imageExportDialog.tooltip.jpegQuality")}
+          name="exportJpegQuality"
+        >
+          <div className="ImageExportModal__settings__setting__quality">
+            <input
+              id="exportJpegQuality"
+              type="range"
+              min={10}
+              max={100}
+              step={1}
+              value={Math.round(jpegQuality * 100)}
+              aria-label={t("imageExportDialog.label.jpegQuality")}
+              onChange={(event) => {
+                setJpegQuality(+event.target.value / 100);
+              }}
+            />
+            <span>{Math.round(jpegQuality * 100)}%</span>
+          </div>
+        </ExportSetting>
 
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
@@ -317,6 +340,19 @@ const ImageExportModal = ({
             icon={downloadIcon}
           >
             {t("imageExportDialog.button.exportToPng")}
+          </FilledButton>
+          <FilledButton
+            className="ImageExportModal__settings__buttons__button"
+            label={t("imageExportDialog.title.exportToJpeg")}
+            onClick={() =>
+              onExportImage(EXPORT_IMAGE_TYPES.jpeg, exportedElements, {
+                exportingFrame,
+                exportQuality: jpegQuality,
+              })
+            }
+            icon={downloadIcon}
+          >
+            {t("imageExportDialog.button.exportToJpeg")}
           </FilledButton>
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
