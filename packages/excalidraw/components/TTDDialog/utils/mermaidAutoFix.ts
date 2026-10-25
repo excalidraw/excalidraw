@@ -348,6 +348,88 @@ const fixFlowchartDirection = (line: string) =>
         : `${keyword}TD`,
   );
 
+const countMatches = (text: string, pattern: RegExp) =>
+  (text.match(pattern) || []).length;
+
+const DIRECTION_STATEMENT = /^(\s*direction\s+)(\S+)\s*$/;
+// `TD` is only one in a flowchart's header
+const DIRECTION_STATEMENT_DIRECTIONS = new Set(["TB", "BT", "RL", "LR"]);
+
+/**
+ * `direction lr` -> `direction LR` in a flowchart's subgraphs, without the
+ * statements that aren't any direction (for the subgraph to keep the
+ * flowchart's), or with `remove`, without any (sequence diagrams have none).
+ */
+const fixDirectionStatements = (lines: string[], { remove = false } = {}) => {
+  const result = lines.flatMap((line) => {
+    const match = line.match(DIRECTION_STATEMENT);
+    if (!match) {
+      return [line];
+    }
+    const direction = match[2].toUpperCase() === "TD" ? "TB" : match[2];
+    return !remove &&
+      DIRECTION_STATEMENT_DIRECTIONS.has(direction.toUpperCase())
+      ? [`${match[1]}${direction.toUpperCase()}`]
+      : [];
+  });
+  return result.join("\n");
+};
+
+/**
+ * A direction on the first line of a class (`classDiagram LR`), state or ER
+ * diagram (`erDiagram direction LR`), which they only take as a `direction`
+ * statement: `classDiagram` + `direction LR` on the next line (unless they
+ * have one already). Sequence diagrams have none.
+ */
+const fixHeaderDirection = (
+  sourceText: string,
+  type: MermaidDiagramType | null,
+) => {
+  const headerIndex = getMermaidHeaderLineIndex(sourceText);
+  if (
+    headerIndex === null ||
+    (type !== "class" &&
+      type !== "state" &&
+      type !== "er" &&
+      type !== "sequence")
+  ) {
+    return null;
+  }
+  const lines = sourceText.split(/\r?\n/);
+  const match = lines[headerIndex].match(/^(\s*\S+)\s+(.+?)\s*$/);
+  if (!match) {
+    return null;
+  }
+  const [, header, rest] = match;
+  const value = rest.match(/^(?:direction\s+)?(\S+)$/)?.[1];
+  if (!value && type !== "sequence") {
+    return null;
+  }
+  const direction = value?.toUpperCase() === "TD" ? "TB" : value?.toUpperCase();
+  const bodyLines = lines.slice(headerIndex + 1);
+  // the diagram's, not one of a composite state's (`state X {`)
+  let depth = 0;
+  const hasDirectionStatement = bodyLines.some((line) => {
+    const isTopLevel = depth === 0;
+    depth += countMatches(line, /\{/g) - countMatches(line, /\}/g);
+    return isTopLevel && DIRECTION_STATEMENT.test(line);
+  });
+  const body = bodyLines.find((line) => line.trim());
+  const statement =
+    type !== "sequence" &&
+    !hasDirectionStatement &&
+    direction &&
+    DIRECTION_STATEMENT_DIRECTIONS.has(direction)
+      ? [`${body?.match(/^\s*/)![0] || "  "}direction ${direction}`]
+      : [];
+  return [
+    ...lines.slice(0, headerIndex),
+    header,
+    ...statement,
+    ...lines.slice(headerIndex + 1),
+  ].join("\n");
+};
+
 const DIAGRAM_KEYWORDS = [
   "flowchart",
   "graph",
@@ -517,6 +599,14 @@ export const getMermaidAutoFixCandidates = (
     for (const fix of textFixes) {
       addCandidate(lines.map(fix).join("\n"));
     }
+
+    if (type === "flowchart" || type === "sequence") {
+      addCandidate(
+        fixDirectionStatements(lines, { remove: type === "sequence" }),
+      );
+    }
+
+    addCandidate(fixHeaderDirection(sourceText, type));
 
     getUnclosedBlockCandidates(sourceText, type).forEach(addCandidate);
 

@@ -270,6 +270,41 @@ Expecting 'SQE', 'UNICODE_TEXT', 'TEXT', 'TAGSTART', got 'PS'`,
     ]);
   });
 
+  it("explains invalid directions", () => {
+    const message = "Parse error on line 2:\n  direction LR\n----^";
+    expect(
+      getMermaidSyntaxErrorGuidance(
+        message,
+        "sequenceDiagram\n  direction LR\n  Alice->>Bob: hi",
+      )?.likelyCauses,
+    ).toContain("Sequence diagrams have no `direction`.");
+    expect(
+      getMermaidSyntaxErrorGuidance(
+        message,
+        "flowchart lr\n  subgraph A\n    direction TD\n  end",
+      )?.likelyCauses,
+    ).toEqual([
+      "The flowchart's direction must be `TB` (or `TD`), `BT`, `RL` or `LR`.",
+      "A subgraph's `direction` must be `TB`, `BT`, `RL` or `LR`.",
+    ]);
+  });
+
+  it("explains directions on the first line", () => {
+    const message = "Parse error on line 1:\nclassDiagram LR\n-------------^";
+    expect(
+      getMermaidSyntaxErrorGuidance(message, "classDiagram LR\n  A <|-- B")
+        ?.likelyCauses,
+    ).toContain(
+      "The diagram's direction goes on the next line, as a `direction` statement: e.g. `direction LR`.",
+    );
+    expect(
+      getMermaidSyntaxErrorGuidance(
+        message,
+        "sequenceDiagram LR\n  Alice->>Bob: hi",
+      )?.likelyCauses,
+    ).toContain("Sequence diagrams have no `direction`.");
+  });
+
   it("explains unknown diagram types, as Mermaid and Pele word them", () => {
     for (const message of [
       "No diagram type detected matching given configuration for text: flowchar TD",

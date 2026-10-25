@@ -269,6 +269,82 @@ Expecting 'end', got '$end'`;
     ).toContain("flowchart TD\n  A --> B");
   });
 
+  it("fixes flowchart subgraphs' directions, and drops sequence diagrams' ones", () => {
+    expect(
+      getMermaidAutoFixCandidates(
+        `flowchart LR
+  subgraph A
+    direction lr
+    a1 --> a2
+  end
+  subgraph B
+    direction TD
+    b1 --> b2
+  end
+  subgraph C
+    direction sideways
+    c1 --> c2
+  end`,
+        "Lexical error on line 3. Unrecognized text.\n    direction lr\n--------------^",
+      ),
+    ).toContain(`flowchart LR
+  subgraph A
+    direction LR
+    a1 --> a2
+  end
+  subgraph B
+    direction TB
+    b1 --> b2
+  end
+  subgraph C
+    c1 --> c2
+  end`);
+    expect(
+      getMermaidAutoFixCandidates(
+        "sequenceDiagram\n  direction LR\n  Alice->>Bob: hi",
+        "Parse error on line 2:\n  direction LR\n----^",
+      ),
+    ).toContain("sequenceDiagram\n  Alice->>Bob: hi");
+  });
+
+  it("moves a direction off the first line of class, state and ER diagrams", () => {
+    const fix = (sourceText: string) =>
+      getMermaidAutoFixCandidates(
+        sourceText,
+        "Parse error on line 1:\nclassDiagram TD\n-------------^",
+      );
+
+    expect(fix("classDiagram TD\n    A <|-- B")).toContain(
+      "classDiagram\n    direction TB\n    A <|-- B",
+    );
+    expect(fix("erDiagram direction LR\n  A ||--o{ B : x")).toContain(
+      "erDiagram\n  direction LR\n  A ||--o{ B : x",
+    );
+    // they have one already: theirs, not a second one
+    expect(fix("classDiagram TD\n    direction TB\n    A <|-- B")).toContain(
+      "classDiagram\n    direction TB\n    A <|-- B",
+    );
+    expect(
+      fix("classDiagram TD\n    direction TB\n    A <|-- B"),
+    ).not.toContainEqual(expect.stringMatching(/direction[^]*direction/));
+    // a composite state's isn't the diagram's
+    expect(
+      fix(
+        "stateDiagram-v2 direction LR\n  state X {\n    direction TB\n    [*] --> A\n  }",
+      ),
+    ).toContain(
+      "stateDiagram-v2\n  direction LR\n  state X {\n    direction TB\n    [*] --> A\n  }",
+    );
+    // not a direction
+    expect(fix("classDiagram sideways\n  A <|-- B")).toContain(
+      "classDiagram\n  A <|-- B",
+    );
+    // sequence diagrams have none
+    expect(fix("sequenceDiagram LR\n  Alice->>Bob: hi")).toContain(
+      "sequenceDiagram\n  Alice->>Bob: hi",
+    );
+  });
+
   it("fixes a misspelled or missing diagram type", () => {
     const errorMessage = "No diagram type detected for the given text.";
 

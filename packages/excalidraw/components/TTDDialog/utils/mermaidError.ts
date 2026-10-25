@@ -305,6 +305,49 @@ export const getMermaidSyntaxErrorGuidance = (
     }
   }
 
+  const header = sourceText
+    ? sourceText.split(/\r?\n/)[getMermaidHeaderLineIndex(sourceText) ?? 0]
+    : "";
+  // e.g. `sequenceDiagram LR`, `classDiagram direction LR`
+  const headerRest = header.match(/^\s*\S+\s+(?!%%)(.+?)\s*$/)?.[1];
+  if (
+    type === "sequence" &&
+    (headerRest || /^\s*direction\b/m.test(sourceText ?? ""))
+  ) {
+    likelyCauses.push("Sequence diagrams have no `direction`.");
+  }
+  if (
+    headerRest &&
+    ((type === "class" && /^(?:direction\s+)?\S+$/.test(headerRest)) ||
+      ((type === "state" || type === "er") && /^direction\b/.test(headerRest)))
+  ) {
+    likelyCauses.push(
+      "The diagram's direction goes on the next line, as a `direction` statement: e.g. `direction LR`.",
+    );
+  }
+  if (sourceText && type === "flowchart") {
+    const lines = sourceText.split(/\r?\n/);
+    const header = lines[getMermaidHeaderLineIndex(sourceText) ?? 0];
+    const headerDirection = header.match(
+      /^\s*(?:flowchart|graph)\s+(\S+)/,
+    )?.[1];
+    if (headerDirection && !/^(?:TB|TD|BT|RL|LR)$/.test(headerDirection)) {
+      likelyCauses.push(
+        "The flowchart's direction must be `TB` (or `TD`), `BT`, `RL` or `LR`.",
+      );
+    }
+    if (
+      lines.some((line) => {
+        const direction = line.match(/^\s*direction\s+(\S+)\s*$/)?.[1];
+        return direction && !/^(?:TB|BT|RL|LR)$/.test(direction);
+      })
+    ) {
+      likelyCauses.push(
+        "A subgraph's `direction` must be `TB`, `BT`, `RL` or `LR`.",
+      );
+    }
+  }
+
   if (/got '(?:PS|PE|SQS|SQE|DIAMOND_START|DIAMOND_STOP)'/.test(message)) {
     likelyCauses.push(
       'A label contains brackets or parentheses: wrap it in double quotes, e.g. `A["Label (detail)"]`.',
