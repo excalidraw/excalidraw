@@ -82,9 +82,9 @@ export const test = createExcalidrawTest(
 
 ## CI
 
-`.github/workflows/playwright.yml` is triggered manually with `workflow_dispatch`. Pass an optional `pr_number` input to post (or update) a detailed report comment on that PR; leave it empty to skip the comment. Artifacts (`playwright-report`, `test-results`) are uploaded on every run.
+`.github/workflows/playwright.yml` runs on pull requests (`opened`, `synchronize`, `reopened`) and can also be triggered manually with `workflow_dispatch`. Manual runs accept an optional `pr_number` input to post (or update) a detailed report comment on that PR; leave it empty to skip the comment. On pull requests the report comment is posted automatically. Artifacts (`playwright-report`, `test-results`) are uploaded on every run.
 
-The PR comment is generated from `playwright-report/results.json`, so it includes the same summary and failure details as `yarn playwright show-report`, plus direct links to the uploaded HTML report and raw artifacts.
+The PR comment is generated from `playwright-report/results.json`, so it includes the same summary and failure details as `yarn playwright show-report`, plus direct links to the uploaded HTML report and raw artifacts. Note that GitHub gives fork PRs a read-only `GITHUB_TOKEN`; commenting works for same-repo PRs, while fork PRs may need a write-token setting or a follow-up `workflow_run` workflow.
 
 The config currently records trace, screenshots, and video for **all** tests so the POC is easy to inspect. This is intentionally heavy; tighten it later.
 

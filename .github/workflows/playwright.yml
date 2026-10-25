@@ -1,8 +1,8 @@
 name: Playwright E2E
 
-# Proof of concept: browser tests are manually triggered for now. The
-# `pr_number` input is optional; when provided, the workflow posts (or updates)
-# a detailed report comment on that PR.
+# Proof of concept: runs on pull requests and can also be triggered manually.
+# Manual runs accept an optional `pr_number` to post (or update) a detailed
+# report comment on that PR.
 on:
   workflow_dispatch:
     inputs:
@@ -10,6 +10,8 @@ on:
         description: "PR number to comment on (optional; leave empty for no comment)"
         required: false
         type: string
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
@@ -18,7 +20,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: playwright-${{ github.workflow }}-${{ inputs.pr_number || github.run_id }}
+  group: playwright-${{ github.workflow }}-${{ github.event.pull_request.number || inputs.pr_number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -75,10 +77,13 @@ jobs:
           PLAYWRIGHT_ARTIFACTS_URL: ${{ steps.test-results.outputs.artifact-url }}
 
       - name: Comment on PR
-        if: always() && inputs.pr_number != ''
+        if: always() && (github.event_name == 'pull_request' || inputs.pr_number != '')
+        # PRs from forks get a read-only GITHUB_TOKEN, so commenting may be
+        # denied. Keep that from turning a passing test run red.
+        continue-on-error: true
         uses: actions/github-script@v7
         env:
-          PR_NUMBER: ${{ inputs.pr_number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
           COMMENT_FILE: playwright-comment.md
         with:
           script: |
