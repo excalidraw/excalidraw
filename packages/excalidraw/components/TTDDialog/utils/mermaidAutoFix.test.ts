@@ -113,4 +113,180 @@ Expecting 'NODE_STRING', got 'GT'`;
   participant QAEngineer as QA
   QA->>QA: Verifies Fix`);
   });
+
+  it("quotes node labels with brackets or parentheses in them", () => {
+    const sourceText = `flowchart TD
+  A[Process (main)] --> B{Valid (yes/no)?}
+  B --> C(Retry [x])`;
+
+    const errorMessage = `Parse error on line 2:
+  A[Process (main)] --> B{Valid (yes/no)?}
+------------^
+Expecting 'SQE', 'UNICODE_TEXT', 'TEXT', 'TAGSTART', got 'PS'`;
+
+    expect(getMermaidAutoFixCandidates(sourceText, errorMessage)).toContain(
+      `flowchart TD
+  A["Process (main)"] --> B{"Valid (yes/no)?"}
+  B --> C("Retry [x]")`,
+    );
+  });
+
+  it("closes a node label left open, before the edge after it", () => {
+    const sourceText = `flowchart TD
+  A[Start --> B
+  B --> C`;
+
+    const errorMessage = `Parse error on line 3:
+  B --> C
+-------^
+Expecting 'SQE', got '$end'`;
+
+    const candidates = getMermaidAutoFixCandidates(sourceText, errorMessage);
+    expect(candidates).toContain(`flowchart TD
+  A[Start] --> B
+  B --> C`);
+    // never by emptying the line
+    expect(candidates).not.toContain(`flowchart TD\n\n  B --> C`);
+    // before closing it at the end of the line
+    expect(
+      candidates.indexOf(`flowchart TD
+  A[Start] --> B
+  B --> C`),
+    ).toBeLessThan(
+      candidates.indexOf(`flowchart TD
+  A[Start --> B]
+  B --> C`),
+    );
+  });
+
+  it("drops closing brackets that close nothing", () => {
+    expect(
+      getMermaidAutoFixCandidates(
+        "flowchart TD\n  A --> B]\n  B --> C",
+        "Lexical error on line 2. Unrecognized text.\n  A --> B]\n---------^",
+      ),
+    ).toContain("flowchart TD\n  A --> B\n  B --> C");
+  });
+
+  it("turns flowchart and state diagram `->` into `-->`, outside labels", () => {
+    const errorMessage = `Parse error on line 2:
+  A -> B
+----^
+Expecting 'SEMI', 'NEWLINE', 'EOF', got 'MINUS'`;
+
+    expect(
+      getMermaidAutoFixCandidates(
+        `flowchart TD\n  A -> B["x -> y"]\n  B -> C`,
+        errorMessage,
+      ),
+    ).toContain(`flowchart TD\n  A --> B["x -> y"]\n  B --> C`);
+    expect(
+      getMermaidAutoFixCandidates(
+        "stateDiagram-v2\n  [*] -> Idle : go -> stop\n  Idle --> [*]",
+        errorMessage,
+      ),
+    ).toContain("stateDiagram-v2\n  [*] --> Idle : go -> stop\n  Idle --> [*]");
+  });
+
+  it("renames `end` used as a flowchart node", () => {
+    const sourceText = `flowchart TD
+  subgraph S
+    A --> end
+  end
+  end --> B`;
+
+    const errorMessage = `Parse error on line 3:
+    A --> end
+----------^
+Expecting 'NODE_STRING', got 'end'`;
+
+    expect(getMermaidAutoFixCandidates(sourceText, errorMessage)).toContain(
+      `flowchart TD
+  subgraph S
+    A --> End
+  end
+  End --> B`,
+    );
+  });
+
+  it("closes unclosed blocks where their indentation ends", () => {
+    const sourceText = `classDiagram
+  class Animal {
+    +int age
+  Animal <|-- Duck`;
+
+    const errorMessage = `Parse error on line 4:
+  Animal <|-- Duck
+------------------^
+Expecting 'STRUCT_STOP', got 'EOF_IN_STRUCT'`;
+
+    expect(getMermaidAutoFixCandidates(sourceText, errorMessage)[0]).toBe(
+      `classDiagram
+  class Animal {
+    +int age
+  }
+  Animal <|-- Duck`,
+    );
+  });
+
+  it("appends the `end`s of unclosed sequence blocks", () => {
+    const sourceText = `sequenceDiagram
+  Alice->>Bob: hi
+  loop Every minute
+    Bob->>Alice: ping`;
+
+    const errorMessage = `Parse error on line 4:
+    Bob->>Alice: ping
+---------------------^
+Expecting 'end', got '$end'`;
+
+    expect(getMermaidAutoFixCandidates(sourceText, errorMessage)).toContain(
+      `${sourceText}\n  end`,
+    );
+  });
+
+  it("adds the colon missing before a message or relationship label", () => {
+    expect(
+      getMermaidAutoFixCandidates(
+        "sequenceDiagram\n  Alice->>Bob hi there\n  Bob->>Alice: ok",
+        "Parse error on line 2:\n  Alice->>Bob hi there\n----------------------^\nExpecting 'TXT', got 'NEWLINE'",
+      ),
+    ).toContain("sequenceDiagram\n  Alice->>Bob: hi there\n  Bob->>Alice: ok");
+    expect(
+      getMermaidAutoFixCandidates(
+        "erDiagram\n  CUSTOMER ||--o{ ORDER places",
+        "Parse error on line 2:\n  CUSTOMER ||--o{ ORDER places\n------------------------^\nExpecting 'COLON', got 'UNICODE_TEXT'",
+      ),
+    ).toContain("erDiagram\n  CUSTOMER ||--o{ ORDER : places");
+  });
+
+  it("fixes an invalid flowchart direction", () => {
+    expect(
+      getMermaidAutoFixCandidates(
+        "flowchart XY\n  A --> B",
+        "Lexical error on line 1. Unrecognized text.\nflowchart XY\n---------^",
+      ),
+    ).toContain("flowchart TD\n  A --> B");
+  });
+
+  it("fixes a misspelled or missing diagram type", () => {
+    const errorMessage = "No diagram type detected for the given text.";
+
+    expect(
+      getMermaidAutoFixCandidates("flowchar TD\n  A --> B", errorMessage),
+    ).toEqual(["flowchart TD\n  A --> B"]);
+    expect(
+      getMermaidAutoFixCandidates(
+        "%% comment\nsequencediagram\n  Alice->>Bob: hi",
+        errorMessage,
+      ),
+    ).toEqual(["%% comment\nsequenceDiagram\n  Alice->>Bob: hi"]);
+    expect(
+      getMermaidAutoFixCandidates("A --> B\n  B --> C", errorMessage),
+    ).toEqual(["flowchart TD\nA --> B\n  B --> C"]);
+    // not anything
+    expect(
+      getMermaidAutoFixCandidates("gantt\n  title A", errorMessage),
+    ).toEqual([]);
+  });
 });
