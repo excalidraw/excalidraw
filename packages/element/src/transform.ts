@@ -7,6 +7,7 @@ import {
   vectorNormalize,
   type GlobalPoint,
   type LocalPoint,
+  type Radians,
 } from "@excalidraw/math";
 
 import {
@@ -317,6 +318,8 @@ const bindTextToContainer = (
         ? clamp(textProps.labelPosition, 0, 1)
         : DEFAULT_BOUND_TEXT_LABEL_POSITION
       : null,
+    // normalized as `restore` does: arrow labels aren't rotated
+    ...(isArrowElement(container) && { angle: 0 as Radians }),
     renderEnvironment,
   });
 
