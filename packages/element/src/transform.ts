@@ -33,6 +33,8 @@ import type { Zoom } from "@excalidraw/excalidraw/types";
 
 import {
   bindBindingElement,
+  bindBindingElementToFixedPoint,
+  calculateFixedPointForNonElbowArrowBinding,
   getBoundEndExtension,
   isEndBoundBeyondBindingArea,
   unbindBindingElement,
@@ -58,6 +60,7 @@ import { measureText, normalizeText } from "./textMeasurements";
 import {
   isArrowElement,
   isBindableElement,
+  isElbowArrow,
   isStickyNoteElement,
 } from "./typeChecks";
 
@@ -973,6 +976,7 @@ export const convertToExcalidrawElements = (
     // both ends as given, as moving either end of an elbow arrow reroutes it
     // from both its bindings, which could move the other end onto its element
     const extendedEnds: PointsPositionUpdates = new Map();
+    const extendedEndPoints = new Map<"start" | "end", GlobalPoint>();
     for (const startOrEnd of ["start", "end"] as const) {
       if (
         !isEndBoundBeyondBindingArea(
@@ -990,6 +994,7 @@ export const convertToExcalidrawElements = (
         placedElementsMap,
       );
       if (extendedEnd) {
+        extendedEndPoints.set(startOrEnd, extendedEnd);
         extendedEnds.set(startOrEnd === "start" ? 0 : arrow.points.length - 1, {
           point: LinearElementEditor.pointFromAbsoluteCoords(
             arrow,
@@ -1007,8 +1012,48 @@ export const convertToExcalidrawElements = (
         ]);
       }
     }
-    // once unbound, so elbow arrows aren't rerouted to what they were bound to
     if (extendedEnds.size) {
+      // moving an end reroutes elbow arrows from both their bindings, which
+      // may have been made before what they're bound to was sized (see below),
+      // so rebind them first: extended ends where they're extended to
+      if (isElbowArrow(arrow)) {
+        for (const startOrEnd of ["start", "end"] as const) {
+          const binding =
+            startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+          const bindableElement =
+            binding && placedElementsMap.get(binding.elementId);
+          if (!bindableElement || !isBindableElement(bindableElement)) {
+            continue;
+          }
+          const extendedEnd = extendedEndPoints.get(startOrEnd);
+          if (extendedEnd) {
+            bindBindingElementToFixedPoint(
+              arrow,
+              bindableElement,
+              startOrEnd,
+              calculateFixedPointForNonElbowArrowBinding(
+                arrow,
+                bindableElement,
+                startOrEnd,
+                placedElementsMap,
+                extendedEnd,
+              ).fixedPoint,
+              scene,
+            );
+          } else {
+            bindBindingElement(
+              arrow,
+              bindableElement,
+              binding.mode,
+              startOrEnd,
+              scene,
+              DEFAULT_ZOOM,
+            );
+          }
+        }
+      }
+      // once unbound, so elbow arrows aren't rerouted to what they were
+      // bound to
       LinearElementEditor.movePoints(arrow, scene, extendedEnds);
     }
     for (const startOrEnd of ["start", "end"] as const) {

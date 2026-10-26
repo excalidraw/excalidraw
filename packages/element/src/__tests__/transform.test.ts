@@ -1948,6 +1948,64 @@ describe("Test Transform", () => {
     expect(arrowFirst.height).toBe(0);
   });
 
+  it("should route elbow arrows extended onto elements as to elements sized to fit their labels after them as to those before them", () => {
+    // starting short of A, or ending short of B
+    for (const [startX, endX] of [
+      [150, 400],
+      [106, 330],
+    ]) {
+      const convert = (rectangleFirst: boolean) => {
+        const rectangleA = {
+          type: "rectangle",
+          id: "A",
+          x: 0,
+          y: 25,
+          width: 100,
+          height: 50,
+        } as const;
+        // sized to fit its label, after the arrows listed before it are bound
+        const rectangleB = {
+          type: "rectangle",
+          id: "B",
+          x: 400,
+          y: 25,
+          label: { text: "B" },
+        } as const;
+        const arrow = {
+          type: "arrow",
+          id: "arrow",
+          elbowed: true,
+          x: startX,
+          y: 50,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(endX - startX, 0),
+          ],
+          start: { id: "A" },
+          end: { id: "B" },
+        } as const;
+        const elements = convertToExcalidrawElements(
+          rectangleFirst
+            ? [rectangleA, rectangleB, arrow]
+            : [rectangleA, arrow, rectangleB],
+          opts,
+        );
+        return elements.find(
+          (element) => element.id === "arrow",
+        ) as ExcalidrawArrowElement;
+      };
+      const arrowFirst = convert(false);
+      const rectangleFirst = convert(true);
+
+      // into B's left side, not routed around it from its center as it was
+      // before being sized
+      expect(arrowFirst.endBinding?.fixedPoint[0]).toBeLessThan(0);
+      expect(arrowFirst.endBinding).toEqual(rectangleFirst.endBinding);
+      expect(arrowFirst.points).toEqual(rectangleFirst.points);
+      expect(arrowFirst.points).toHaveLength(2);
+    }
+  });
+
   it("should create shapes for start / end without ids where arrows in any direction start / end", () => {
     const arrows = {
       diagonal: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
