@@ -29,7 +29,9 @@ const DropdownMenuSubTrigger = ({
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
       </MenuItemContent>
-      <div className="dropdown-menu__submenu-trigger-icon">{chevronRight}</div>
+      <div className="dropdown-menu__submenu-trigger-icon rtl-mirror">
+        {chevronRight}
+      </div>
     </DropdownMenuPrimitive.SubTrigger>
   );
 };
