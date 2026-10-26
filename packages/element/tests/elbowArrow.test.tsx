@@ -311,10 +311,8 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [36, 0],
-      [36, 90],
-      [28, 90],
-      [28, 164],
+      [51, 0],
+      [51, 164],
       [101, 164],
     ]);
   });
@@ -430,7 +428,7 @@ describe("elbow arrow ui", () => {
   });
 });
 
-describe("elbow arrow one-corner routes", () => {
+describe("elbow arrow routes with one or two corners", () => {
   beforeEach(async () => {
     localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
@@ -534,5 +532,70 @@ describe("elbow arrow one-corner routes", () => {
     ) as ExcalidrawElbowArrowElement;
     expect(arrow.points.length).toBeGreaterThan(2);
     expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
+  // a box, and another one `gap` px below and to the right of it, connected
+  // from the bottom of one to the top of the other
+  const connectBelow = (gap: number) => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 278, height: 135 });
+    UI.createElement("rectangle", {
+      x: 518,
+      y: 135 + gap,
+      width: 278,
+      height: 135,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(139, 135);
+    mouse.click();
+    mouse.moveTo(657, 135 + gap);
+    mouse.click();
+
+    return h.elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawElbowArrowElement;
+  };
+
+  it("connects elements closer than the padding with two corners, turning halfway", () => {
+    API.setAppState({ currentItemEndArrowhead: null });
+    const arrow = connectBelow(84);
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [0, 36],
+      [518, 36],
+      [518, 72],
+    ]);
+  });
+
+  it("turns closer to the end without an arrowhead to leave the arrowhead the padding", () => {
+    const arrow = connectBelow(84);
+
+    // 72px apart: the leg to the arrowhead gets the padding, and the other
+    // leg the rest, still enough to round its corner
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [0, 32],
+      [518, 32],
+      [518, 72],
+    ]);
+  });
+
+  it("turns halfway as on the grid when there's room", () => {
+    const arrow = connectBelow(120);
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [0, 54],
+      [518, 54],
+      [518, 108],
+    ]);
+  });
+
+  it("doesn't put the arrowhead on a half too short for it", () => {
+    const arrow = connectBelow(40);
+
+    expect(arrow.points.length).toBeGreaterThan(4);
   });
 });

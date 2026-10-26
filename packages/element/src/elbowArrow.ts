@@ -54,6 +54,7 @@ import {
 } from "./types";
 import { aabbForElement, getArrowheadSize, pointInsideBounds } from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
+import { ELBOW_ARROW_CORNER_RADIUS } from "./shape";
 
 import type { Heading } from "./heading";
 import type {
@@ -1102,7 +1103,7 @@ export const updateElbowArrowPoints = (
     return normalizeArrowElementUpdate(
       getElbowArrowCornerPoints(
         removeElbowArrowShortSegments(
-          getOneCornerRoute(
+          getSimpleRoute(
             arrow,
             {
               startHeading,
@@ -1462,14 +1463,16 @@ const segmentCrossesBounds = (
   Math.min(a[1], b[1]) < maxY;
 
 /**
- * The route between two bound elements with a single corner, if they can be
- * connected with one: leaving the start element and entering the end one the
- * way their headings tell, clear of both. Routed on the grid, the arrow keeps
- * a fixed padding to the elements instead, and steps aside to reach it when
- * they're closer than that (e.g. when the end element is just below the
- * start's side).
+ * The route between two bound elements with one corner (when the arrow
+ * leaves one and enters the other at a right angle) or two (when it leaves
+ * and enters them heading the same way), if it fits: leaving the start
+ * element and entering the end one the way their headings tell, clear of
+ * both. Routed on the grid, the arrow keeps a fixed padding to the elements
+ * instead, and steps aside to reach it when they're closer than that (e.g.
+ * when the end element is just below the start's side, or just below the
+ * start).
  */
-const getOneCornerRoute = (
+const getSimpleRoute = (
   arrow: ElbowArrowState,
   {
     startHeading,
@@ -1489,26 +1492,44 @@ const getOneCornerRoute = (
   >,
   elementsMap: ElementsMap,
 ): GlobalPoint[] | null => {
+  const oneCorner =
+    headingIsHorizontal(startHeading) !== headingIsHorizontal(endHeading);
   if (
     !hoveredStartElement ||
     !hoveredEndElement ||
     hoveredStartElement.id === hoveredEndElement.id ||
-    headingIsHorizontal(startHeading) === headingIsHorizontal(endHeading)
+    (!oneCorner && !compareHeading(startHeading, flipHeading(endHeading)))
   ) {
     return null;
   }
 
-  const corner = headingIsHorizontal(startHeading)
-    ? pointFrom<GlobalPoint>(endGlobalPoint[0], startGlobalPoint[1])
-    : pointFrom<GlobalPoint>(startGlobalPoint[0], endGlobalPoint[1]);
-  // how far the corner is along the start's heading, and away from the end
-  // along its (headings point away from their element)
-  const firstLeg =
-    (corner[0] - startGlobalPoint[0]) * startHeading[0] +
-    (corner[1] - startGlobalPoint[1]) * startHeading[1];
-  const lastLeg =
-    (corner[0] - endGlobalPoint[0]) * endHeading[0] +
-    (corner[1] - endGlobalPoint[1]) * endHeading[1];
+  // with one corner, the legs are as long as the end is ahead of the start
+  // along the start's heading, and the start ahead of the end along the
+  // end's (headings point away from their element), and with two, they
+  // share the former
+  const ahead =
+    (endGlobalPoint[0] - startGlobalPoint[0]) * startHeading[0] +
+    (endGlobalPoint[1] - startGlobalPoint[1]) * startHeading[1];
+  let firstLeg = ahead;
+  let lastLeg =
+    (startGlobalPoint[0] - endGlobalPoint[0]) * endHeading[0] +
+    (startGlobalPoint[1] - endGlobalPoint[1]) * endHeading[1];
+  if (!oneCorner) {
+    // halfway, as the grid routing turns when there's room, unless that
+    // leaves an arrowhead a shorter leg than the padding, and the other end,
+    // without one, can spare some of its own (keeping enough to round its
+    // corner)
+    firstLeg = ahead / 2;
+    if (!arrow.startArrowhead !== !arrow.endArrowhead) {
+      const arrowheadLeg = Math.max(
+        ahead / 2,
+        Math.min(BASE_PADDING, ahead - ELBOW_ARROW_CORNER_RADIUS * 2),
+      );
+      firstLeg = arrow.startArrowhead ? arrowheadLeg : ahead - arrowheadLeg;
+    }
+    lastLeg = ahead - firstLeg;
+  }
+
   // a leg with an arrowhead is to fit it (not to have it reach around the
   // corner), and any to outlast the cleanup of short segments
   if (
@@ -1524,27 +1545,31 @@ const getOneCornerRoute = (
     return null;
   }
 
+  const firstTurn = pointFrom<GlobalPoint>(
+    startGlobalPoint[0] + startHeading[0] * firstLeg,
+    startGlobalPoint[1] + startHeading[1] * firstLeg,
+  );
+  const lastTurn = pointFrom<GlobalPoint>(
+    endGlobalPoint[0] + endHeading[0] * lastLeg,
+    endGlobalPoint[1] + endHeading[1] * lastLeg,
+  );
+
   const gap = BASE_BINDING_GAP;
-  const startBounds = aabbForElement(hoveredStartElement, elementsMap, [
-    gap,
-    gap,
-    gap,
-    gap,
-  ]);
-  const endBounds = aabbForElement(hoveredEndElement, elementsMap, [
-    gap,
-    gap,
-    gap,
-    gap,
-  ]);
+  const [startBounds, endBounds] = [hoveredStartElement, hoveredEndElement].map(
+    (element) => aabbForElement(element, elementsMap, [gap, gap, gap, gap]),
+  );
+  // (the first leg leaves the start, and the last enters the end)
   if (
-    segmentCrossesBounds(startGlobalPoint, corner, endBounds) ||
-    segmentCrossesBounds(corner, endGlobalPoint, startBounds)
+    segmentCrossesBounds(startGlobalPoint, firstTurn, endBounds) ||
+    segmentCrossesBounds(firstTurn, lastTurn, startBounds) ||
+    segmentCrossesBounds(firstTurn, lastTurn, endBounds) ||
+    segmentCrossesBounds(lastTurn, endGlobalPoint, startBounds)
   ) {
     return null;
   }
 
-  return [startGlobalPoint, corner, endGlobalPoint];
+  // (with one corner, both turns are at it, and merged later)
+  return [startGlobalPoint, firstTurn, lastTurn, endGlobalPoint];
 };
 
 /**
