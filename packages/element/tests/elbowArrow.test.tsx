@@ -534,6 +534,49 @@ describe("elbow arrow routes with one or two corners", () => {
     expect(validateElbowPoints(arrow.points)).toBe(true);
   });
 
+  it("connects elements with a single corner when a fixed segment lines up with the start", () => {
+    const arrow = connect(167.5);
+
+    // a step down, the arrow is routed around the diamond, and the segment
+    // above it is fixed at the rectangle's previous middle
+    UI.clickTool("selection");
+    mouse.reset();
+    mouse.moveTo(0, 120);
+    mouse.down();
+    mouse.moveTo(0, 140);
+    mouse.up();
+    h.app.scene.mutateElement(arrow, {
+      fixedSegments: [
+        {
+          index: 3,
+          start: pointFrom<LocalPoint>(44, -20),
+          end: pointFrom<LocalPoint>(195, -20),
+        },
+      ],
+    });
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [44, 0],
+      [44, -20],
+      [195, -20],
+      [195, 14.15],
+    ]);
+
+    // and back up, the first leg lines up with the fixed segment
+    mouse.reset();
+    mouse.moveTo(0, 140);
+    mouse.down();
+    mouse.moveTo(0, 120);
+    mouse.up();
+
+    expect(arrow.fixedSegments ?? []).toEqual([]);
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [195, 0],
+      [195, 34.15],
+    ]);
+  });
+
   // a box, and another one `gap` px below and to the right of it, connected
   // from the bottom of one to the top of the other
   const connectBelow = (gap: number) => {
