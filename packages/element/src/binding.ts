@@ -1425,6 +1425,12 @@ export const updateBoundArrow = (
   elementsMap: ElementsMap,
   /** measures the arrow's label */
   renderEnvironment?: RenderEnvironment,
+  /**
+   * whether it's placed as what it's bound to moved: an arrow bound to one
+   * element at both ends then moves with it whole (its midpoints with its
+   * start), rather than only at its ends
+   */
+  boundElementMoved = true,
 ) => {
   const startBindingElement = arrow.startBinding
     ? elementsMap.get(arrow.startBinding.elementId)
@@ -1469,6 +1475,7 @@ export const updateBoundArrow = (
 
   LinearElementEditor.movePoints(arrow, scene, new Map(updates), undefined, {
     moveMidPointsWithElement:
+      boundElementMoved &&
       !!startBindingElement &&
       startBindingElement?.id === endBindingElement?.id,
   });

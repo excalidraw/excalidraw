@@ -1090,8 +1090,16 @@ export const convertToExcalidrawElements = (
     ) {
       continue;
     }
-    // also wraps and measures its label, along it as placed
-    updateBoundArrow(arrow, scene, placedElementsMap, opts?.renderEnvironment);
+    // also wraps and measures its label, along it as placed. Nothing it's
+    // bound to moved, so it keeps its midpoints where given, even if it's
+    // bound to one element at both ends
+    updateBoundArrow(
+      arrow,
+      scene,
+      placedElementsMap,
+      opts?.renderEnvironment,
+      false,
+    );
 
     const label = getBoundTextElement(arrow, placedElementsMap);
     if (!label) {
