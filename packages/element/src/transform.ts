@@ -2,6 +2,7 @@ import {
   clamp,
   isFiniteNumber,
   pointFrom,
+  PRECISION,
   vectorFromPoint,
   vectorNormalize,
   type GlobalPoint,
@@ -640,6 +641,10 @@ const clampLabelPositionOffEnds = (
   labelPosition: number,
   elementsMap: ElementsMap,
 ) => {
+  // on the arrow as placed: keep it where it was put, as on unplaced arrows
+  if (labelPosition > PRECISION && labelPosition < 1 - PRECISION) {
+    return labelPosition;
+  }
   const length = LinearElementEditor.getPathLength(arrow, elementsMap);
   // how far the label's center has to stay from the end leaving `from` for
   // `to`: half the label along the arrow there, past its arrowhead

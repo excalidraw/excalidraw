@@ -537,7 +537,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "id": Any<String>,
   "index": "a1",
   "isDeleted": false,
-  "labelPosition": 0.5,
+  "labelPosition": 0.4999999949269481,
   "lineHeight": 1.25,
   "link": null,
   "locked": false,
@@ -553,11 +553,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "textAlign": "center",
   "type": "text",
   "updated": 1,
-  "version": 3,
+  "version": 4,
   "versionNonce": Any<Number>,
   "verticalAlign": "middle",
   "width": 130,
-  "x": 240.00000044642854,
+  "x": 240,
   "y": 226.51,
 }
 `;
