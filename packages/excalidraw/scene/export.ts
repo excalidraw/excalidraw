@@ -865,6 +865,13 @@ const exportToCanvas = async ({
 
   const canvas = renderEnvironment.createCanvas();
 
+  // Request a CPU-backed context before anything else (rough.canvas() below)
+  // creates one without options. Chrome's GPU canvas backend (Skia Graphite)
+  // antialiases paths with 4x MSAA, so GPU-backed exports come out jaggy, and
+  // large ones also allocate multisample buffers many times the bitmap's size
+  // in GPU memory. The pixels are read back to the CPU for encoding anyway.
+  canvas.getContext("2d", { willReadFrequently: true });
+
   // round rather than letting the canvas truncate, which would turn float
   // noise (e.g. 28.999999999999996) into a pixel lost
   canvas.width = Math.max(1, Math.round(exportWidth));

@@ -399,6 +399,26 @@ describe("exportToCanvas", () => {
       ),
     ).toEqual([]);
   });
+
+  it("renders on a CPU-backed canvas", async () => {
+    const getContextSpy = vi.spyOn(HTMLCanvasElement.prototype, "getContext");
+
+    const canvas = await exportScene({
+      type: "canvas",
+      data: {
+        elements: [API.createElement({ type: "rectangle" })],
+        files: null,
+      },
+    });
+
+    // only the first getContext() call's options take effect
+    const firstCall = getContextSpy.mock.contexts.indexOf(canvas);
+    expect(getContextSpy.mock.calls[firstCall]).toEqual([
+      "2d",
+      { willReadFrequently: true },
+    ]);
+    getContextSpy.mockRestore();
+  });
 });
 
 describe("export background", () => {
