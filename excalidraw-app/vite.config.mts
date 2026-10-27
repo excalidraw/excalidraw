@@ -9,6 +9,8 @@ import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
+import { MERMAID_CHUNKS_LIST_NAME } from "./data/cacheMermaidChunks";
+
 import type { Plugin, Rollup } from "vite";
 
 /**
@@ -16,10 +18,15 @@ import type { Plugin, Rollup } from "vite";
  * import of a module matching `moduleRegex`, so we can exclude them from the
  * PWA precache. Needed for large lazy deps that Rollup splits into many
  * arbitrarily named chunks (e.g. mermaid), which `globIgnores` can't target.
+ *
+ * With `listName`, their file names are also emitted as a JSON asset that
+ * index.html points to (`<meta name={listName} content={fileName}>`), for the
+ * app to cache them when it needs them.
  */
 const lazyChunksPlugin = (
   moduleRegex: RegExp,
   lazyChunkFileNames: Set<string>,
+  listName?: string,
 ): Plugin => ({
   name: "excalidraw-lazy-chunks",
   apply: "build",
@@ -95,6 +102,36 @@ const lazyChunksPlugin = (
         lazyChunkFileNames.add(fileName);
       }
     }
+
+    if (listName) {
+      this.emitFile({
+        type: "asset",
+        name: `${listName}.json`,
+        source: JSON.stringify([...lazyChunkFileNames]),
+      });
+    }
+  },
+  // "post" handlers run in Vite's HTML plugin's `generateBundle`, after ours
+  transformIndexHtml: {
+    order: "post",
+    handler: (_html, { bundle }) => {
+      if (!listName) {
+        return;
+      }
+      const list = Object.values(bundle ?? {}).find(
+        (file) => file.type === "asset" && file.name === `${listName}.json`,
+      );
+      if (!list) {
+        throw new Error(`${listName}.json wasn't emitted`);
+      }
+      return [
+        {
+          tag: "meta",
+          attrs: { name: listName, content: list.fileName },
+          injectTo: "head",
+        },
+      ];
+    },
   },
 });
 
@@ -102,7 +139,8 @@ export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
   // mermaid (+ its many deps & per-diagram chunks) is lazy-loaded and large,
-  // so we don't precache it. Populated at build time by `lazyChunksPlugin`.
+  // so we don't precache it (the app caches it once the TTD dialog is opened,
+  // see `cacheMermaidChunks`). Populated at build time by `lazyChunksPlugin`.
   const mermaidChunkFileNames = new Set<string>();
   // https://vitejs.dev/config/
   return {
@@ -244,6 +282,7 @@ export default defineConfig(({ mode }) => {
       lazyChunksPlugin(
         /[\\/]node_modules[\\/]@excalidraw[\\/]mermaid-to-excalidraw[\\/]/,
         mermaidChunkFileNames,
+        MERMAID_CHUNKS_LIST_NAME,
       ),
       react(),
       checker({
