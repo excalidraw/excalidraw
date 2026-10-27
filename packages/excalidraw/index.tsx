@@ -501,7 +501,7 @@ export type {
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 
-export type { FontProvider, FontProviders } from "./types";
+export type { FontProvider, FontProviders, FontSearchResult } from "./types";
 export type { CustomFontFamily, FontFamily } from "@excalidraw/common";
 export {
   isCustomFontFamily,

@@ -1272,8 +1272,13 @@ const restoreFontTopPicks = (value: unknown): readonly FontFamily[] | null => {
   for (const fontFamily of value) {
     const metadata =
       typeof fontFamily === "number" ? FONT_METADATA[fontFamily] : undefined;
-    // only families the font picker lists (no internal or fallback fonts)
-    if (!metadata || metadata.private || metadata.fallback) {
+    // only families the font picker lists (custom, or built-ins that are not
+    // internal or fallback fonts)
+    const isPickable =
+      typeof fontFamily === "string"
+        ? isProviderQualifiedFontFamily(fontFamily)
+        : !!metadata && !metadata.private && !metadata.fallback;
+    if (!isPickable) {
       continue;
     }
     fontFamilies.add(fontFamily as FontFamily);

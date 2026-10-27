@@ -1,8 +1,12 @@
 import { createContext, useContext } from "react";
 
+import { getFontFamilyString, isCustomFontFamily } from "@excalidraw/common";
+
 import type { FontFamily } from "@excalidraw/common";
 
 import { useTopPicksDnD } from "../TopPicksDnD/topPicksDnD";
+
+import { getFontPreviewText } from "./fontPreviewText";
 
 import type {
   CreateTopPicksGhost,
@@ -17,6 +21,7 @@ import type {
  * from a rendered strip button instead.
  */
 const createFontGhost: CreateTopPicksGhost<FontFamily> = ({
+  value,
   sourceEl,
   stripEl,
 }) => {
@@ -40,7 +45,20 @@ const createFontGhost: CreateTopPicksGhost<FontFamily> = ({
   tile.style.borderRadius = templateStyle.borderTopLeftRadius;
 
   const icon = sourceEl.querySelector("svg");
-  if (icon) {
+  // picks with a glyph sample, and custom fonts (pinned as a sample) dragged
+  // from the list
+  const hasSample = isPick
+    ? !!sourceEl.querySelector(".FontPicker__top-pick-sample")
+    : isCustomFontFamily(value);
+  if (hasSample) {
+    const sample = document.createElement("span");
+    sample.textContent = getFontPreviewText(value);
+    // the ghost is outside the editor's CSS scope
+    sample.style.fontFamily = getFontFamilyString({ fontFamily: value });
+    sample.style.fontSize = "1rem";
+    sample.style.lineHeight = "1";
+    tile.appendChild(sample);
+  } else if (icon) {
     const templateIconRect = template
       .querySelector("svg")
       ?.getBoundingClientRect();
@@ -50,18 +68,6 @@ const createFontGhost: CreateTopPicksGhost<FontFamily> = ({
       iconClone.style.height = `${templateIconRect.height}px`;
     }
     tile.appendChild(iconClone);
-  } else {
-    // a pick rendering a glyph sample instead of an icon
-    const sample = sourceEl.querySelector<HTMLElement>(
-      ".FontPicker__top-pick-sample",
-    );
-    if (sample) {
-      const sampleClone = sample.cloneNode(true) as HTMLElement;
-      // the ghost is outside the editor's CSS scope
-      sampleClone.style.fontSize = getComputedStyle(sample).fontSize;
-      sampleClone.style.lineHeight = "1";
-      tile.appendChild(sampleClone);
-    }
   }
 
   if (isPick) {

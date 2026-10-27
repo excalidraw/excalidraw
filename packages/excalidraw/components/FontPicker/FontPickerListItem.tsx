@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { getFontFamilyString, isCustomFontFamily } from "@excalidraw/common";
+import { getFontFamilyString } from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
@@ -95,8 +95,7 @@ export const FontPickerListItem = ({
         }
       }}
       onPointerDown={
-        // top picks are restored as built-in families only
-        dnd && !isCustomFontFamily(font.value)
+        dnd && !isUnsupported
           ? (event) => dnd.startSourceDrag(event, font.value)
           : undefined
       }

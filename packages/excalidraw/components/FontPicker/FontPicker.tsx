@@ -1,16 +1,25 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import React, { useCallback } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+} from "react";
 
 import {
   FONT_FAMILY,
   FONT_TOP_PICKS_SLOTS,
   getFontFamilyString,
+  isCustomFontFamily,
+  parseProviderFontFamily,
 } from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
 import { t } from "../../i18n";
+import { useApp, useAppProps } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import {
   FontFamilyCodeIcon,
@@ -25,6 +34,7 @@ import {
 
 import { FontPickerList, type FontSelectionOptions } from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
+import { getFontPreviewText, loadFontPreviewText } from "./fontPreviewText";
 import {
   FontPickerDnDContext,
   useFontPickerDnD,
@@ -95,6 +105,9 @@ const needsGlyphSample = (
   fontFamily: FontFamily,
   picks: readonly FontFamily[],
 ) => {
+  if (isCustomFontFamily(fontFamily)) {
+    return true;
+  }
   if (defaultFontFamilies.has(fontFamily as number)) {
     return false;
   }
@@ -120,6 +133,71 @@ const FontTopPicks = ({
 }) => {
   const dnd = useFontPickerDnD();
   const dragState = dnd?.dragState ?? null;
+  const fonts = useApp().fonts.instance;
+  const { fontProviders } = useAppProps();
+  const selectRequestIdRef = useRef(0);
+  const [, rerender] = useReducer((count: number) => count + 1, 0);
+
+  // layout effect: a synchronous answer lands before paint, without flashing
+  // the default first
+  useLayoutEffect(() => {
+    let isCurrent = true;
+    const onSettled = () => isCurrent && rerender();
+    let hasSyncAnswer = false;
+    for (const fontFamily of picks) {
+      const previousText = getFontPreviewText(fontFamily);
+      const pending = loadFontPreviewText(fontFamily, fontProviders);
+      if (pending) {
+        pending.then(onSettled);
+      } else if (getFontPreviewText(fontFamily) !== previousText) {
+        hasSyncAnswer = true;
+      }
+    }
+    if (hasSyncAnswer) {
+      rerender();
+    }
+    return () => {
+      isCurrent = false;
+    };
+  }, [picks, fontProviders]);
+
+  // custom picks render their sample in their own typeface
+  useEffect(() => {
+    void fonts.registerCustomFamilies(
+      picks.filter(
+        (fontFamily) =>
+          isCustomFontFamily(fontFamily) &&
+          fonts.getResolutionStatus(fontFamily) === "initial",
+      ),
+    );
+  }, [fonts, picks]);
+
+  const isUnsupported = (fontFamily: FontFamily) => {
+    if (!isCustomFontFamily(fontFamily)) {
+      return false;
+    }
+    const parsed = parseProviderFontFamily(fontFamily);
+    return (
+      !parsed ||
+      !fontProviders ||
+      !Object.hasOwn(fontProviders, parsed.providerId)
+    );
+  };
+
+  // last click wins, as in the list
+  const selectPick = async (fontFamily: FontFamily) => {
+    const requestId = ++selectRequestIdRef.current;
+    if (isCustomFontFamily(fontFamily) && !fonts.registered.has(fontFamily)) {
+      const result = await fonts.registerCustomFamily(fontFamily);
+      if (
+        result.status !== "success" ||
+        selectRequestIdRef.current !== requestId
+      ) {
+        return;
+      }
+    }
+    onSelect(fontFamily);
+  };
 
   return (
     <TopPicksContextMenu
@@ -161,7 +239,8 @@ const FontTopPicks = ({
                     ? { transform: `translateX(${reorderOffset}px)` }
                     : undefined
                 }
-                onClick={() => onSelect(fontFamily)}
+                disabled={isUnsupported(fontFamily)}
+                onClick={() => selectPick(fontFamily)}
                 onPointerDown={
                   dnd
                     ? (event) => dnd.startPickDrag(event, index, fontFamily)
@@ -174,7 +253,7 @@ const FontTopPicks = ({
                     className="FontPicker__top-pick-sample"
                     style={{ fontFamily: getFontFamilyString({ fontFamily }) }}
                   >
-                    Aa
+                    {getFontPreviewText(fontFamily)}
                   </span>
                 ) : (
                   font.icon

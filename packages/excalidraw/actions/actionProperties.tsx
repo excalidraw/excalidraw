@@ -1167,6 +1167,14 @@ type ChangeFontFamilyData = Partial<
   refreshCache?: (activeHoveredFontFamily?: FontFamily | null) => void;
 };
 
+// a revert must be a newer version, or collab never syncs it
+const withoutVersion = <T extends Partial<ExcalidrawElement>>({
+  version,
+  versionNonce,
+  updated,
+  ...rest
+}: T) => rest;
+
 export const actionChangeFontFamily = register<{
   currentItemFontFamily: any;
   currentHoveredFontFamily: any;
@@ -1184,23 +1192,16 @@ export const actionChangeFontFamily = register<{
     } = value as ChangeFontFamilyData;
 
     if (resetAll) {
-      const nextElements = changeProperty(
-        elements,
-        appState,
-        (element) => {
-          const cachedElement = cachedElements?.get(element.id);
-          if (cachedElement) {
-            const newElement = newElementWith(element, {
-              ...cachedElement,
-            } as ElementUpdate<NonDeletedExcalidrawElement>);
-
-            return newElement;
-          }
-
-          return element;
-        },
-        true,
-      );
+      // by id, not selection - a click outside the picker may have cleared it
+      const nextElements = elements.map((element) => {
+        const cachedElement = cachedElements?.get(element.id);
+        return cachedElement
+          ? newElementWith(
+              element,
+              withoutVersion(cachedElement) as ElementUpdate<typeof element>,
+            )
+          : element;
+      });
 
       return {
         elements: nextElements,
@@ -1308,8 +1309,9 @@ export const actionChangeFontFamily = register<{
                 },
               );
 
-              const cachedContainer =
-                cachedElements?.get(oldElement.containerId || "") || {};
+              const cachedContainer = withoutVersion(
+                cachedElements?.get(oldElement.containerId || "") || {},
+              );
 
               const container = app.scene.getContainerElement(oldElement);
 
@@ -1560,13 +1562,43 @@ export const actionChangeFontFamily = register<{
       };
     }, []);
 
+    const getResetData = (): ChangeFontFamilyData => ({
+      currentHoveredFontFamily: null,
+      cachedElements: new Map(cachedElementsRef.current),
+      resetAll: true,
+    });
+
+    const updateDataRef = useRef(updateData);
+    updateDataRef.current = updateData;
+    const isOpened = appState.openPopup === "fontFamily";
+
+    // the cache lives while the popup is open - `onPopupChange(false)` also
+    // fires when it stays open (i.e. StrictMode, compact mode refocusing the
+    // editor). A close from outside the picker may unmount us before batched
+    // data applies, so revert a live preview right away
+    useEffect(() => {
+      if (!isOpened) {
+        return;
+      }
+      const cachedElements = cachedElementsRef.current;
+      return () => {
+        if (cachedElements.size && app.state.currentHoveredFontFamily) {
+          updateDataRef.current(getResetData());
+          // a batched reset would only repeat this
+          setBatchedData({});
+        }
+        cachedElements.clear();
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpened, app]);
+
     return (
       <>
         {stylesPanelMode === "full" && (
           <legend>{t("labels.fontFamily")}</legend>
         )}
         <FontPicker
-          isOpened={appState.openPopup === "fontFamily"}
+          isOpened={isOpened}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
           topPicks={appState.fontTopPicks}
@@ -1596,11 +1628,7 @@ export const actionChangeFontFamily = register<{
             });
           }}
           onLeave={() => {
-            setBatchedData({
-              currentHoveredFontFamily: null,
-              cachedElements: new Map(cachedElementsRef.current),
-              resetAll: true,
-            });
+            setBatchedData(getResetData());
           }}
           onPopupChange={(open) => {
             // WARN: read state through the stable `app` handle, never the
@@ -1651,16 +1679,7 @@ export const actionChangeFontFamily = register<{
                 openPopup: "fontFamily",
               }));
             } else {
-              const fontFamilyData = {
-                currentHoveredFontFamily: null,
-                cachedElements: new Map(cachedElementsRef.current),
-                resetAll: true,
-              } as ChangeFontFamilyData;
-
-              setBatchedData({
-                ...fontFamilyData,
-              });
-              cachedElementsRef.current.clear();
+              setBatchedData(getResetData());
 
               // Refocus text editor when font picker closes if we were editing text
               if (

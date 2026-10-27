@@ -4,15 +4,17 @@ import { FONT_FAMILY, KEYS } from "@excalidraw/common";
 import { Scene } from "@excalidraw/element";
 
 import type { FontMetadata } from "@excalidraw/common";
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../../index";
 import { Fonts } from "../../fonts";
 import { API } from "../../tests/helpers/api";
 import { muteExpectedFontErrors } from "../../tests/helpers/mocks";
-import { Keyboard } from "../../tests/helpers/ui";
+import { Keyboard, Pointer } from "../../tests/helpers/ui";
 import { act, cleanup, render } from "../../tests/test-utils";
 
 import type { FontResolver } from "../../fonts";
+import type { FontProvider } from "../../types";
 
 const metadata: FontMetadata = {
   metrics: {
@@ -202,6 +204,100 @@ describe("FontPicker", () => {
     } finally {
       global.IntersectionObserver = originalIntersectionObserver;
     }
+  });
+
+  it("reverts a hover preview as a newer version, so collab syncs it", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const [container, boundText] = API.createTextContainer();
+    const text = boundText as ExcalidrawTextElement;
+    API.setElements([container, text]);
+    API.setSelectedElements([container]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+
+    const trigger = queryByTestId("font-family-show-fonts")!;
+    fireEvent.click(trigger);
+
+    let textVersion = API.getElement(text).version;
+    let containerVersion = API.getElement(container).version;
+    for (const fontName of ["Nunito", "Comic Shanns"] as const) {
+      fireEvent.mouseMove(
+        (await screen.findByText(fontName)).closest("button")!,
+      );
+      await waitFor(() =>
+        expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY[fontName]),
+      );
+      expect(API.getElement(text).version).toBeGreaterThan(textVersion);
+      expect(API.getElement(container).version).toBeGreaterThan(
+        containerVersion,
+      );
+      textVersion = API.getElement(text).version;
+      containerVersion = API.getElement(container).version;
+    }
+
+    fireEvent.click(trigger);
+
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
+    );
+    expect(API.getElement(text).version).toBeGreaterThan(textVersion);
+    expect(API.getElement(container).version).toBeGreaterThan(containerVersion);
+  });
+
+  it("reverts a hover preview when clicking outside the picker", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+
+    fireEvent.click(queryByTestId("font-family-show-fonts")!);
+    fireEvent.mouseMove(
+      (await screen.findByText("Comic Shanns")).closest("button")!,
+    );
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    // deselects, unmounting the panel
+    new Pointer("mouse").clickAt(1000, 1000);
+
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
+    );
+    expect(h.state.currentHoveredFontFamily).toBeNull();
+  });
+
+  it("reverts a hover preview after an Escape, which keeps the popup open", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+
+    fireEvent.click(queryByTestId("font-family-show-fonts")!);
+    const comicShanns = (await screen.findByText("Comic Shanns")).closest(
+      "button",
+    )!;
+
+    // as do compact mode refocusing the text editor and StrictMode
+    fireEvent.keyDown(
+      document.querySelector(".properties-content .QuickSearch__input")!,
+      { key: KEYS.ESCAPE },
+    );
+    expect(h.state.openPopup).toBe("fontFamily");
+
+    fireEvent.mouseMove(comicShanns);
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    // closed by the app, keeping the selection (and the panel)
+    act(() => h.setState({ openPopup: null }));
+
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
+    );
+    expect(h.state.currentHoveredFontFamily).toBeNull();
   });
 
   it("registers a visible available font before previewing it", async () => {
@@ -913,6 +1009,260 @@ describe("FontPicker", () => {
     }
   });
 
+  describe("provider search", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const resolve: FontResolver = async () => ({ fontFaces, metadata });
+
+    const openAndSearch = async (
+      providers: Record<string, FontProvider>,
+      query: string,
+    ) => {
+      const { queryByTestId } = await render(
+        <Excalidraw handleKeyboardGlobally={true} fontProviders={providers} />,
+      );
+      Keyboard.keyPress(KEYS.T);
+      fireEvent.click(queryByTestId("font-family-show-fonts")!);
+      const input = document.querySelector<HTMLInputElement>(
+        ".properties-content .QuickSearch__input",
+      )!;
+      fireEvent.input(input, { target: { value: query } });
+      return input;
+    };
+
+    const rowValues = () =>
+      Array.from(
+        document.querySelectorAll<HTMLButtonElement>(
+          ".properties-content .dropdown-menu.fonts button[value]",
+        ),
+        (button) => button.value,
+      );
+
+    it("lists the first matches, selecting one announces it", async () => {
+      vi.spyOn(document.fonts, "check").mockReturnValue(false);
+      vi.spyOn(document.fonts, "load").mockResolvedValue([]);
+      const onNewFontUsed = vi.fn();
+      const names = Array.from({ length: 12 }, (_, i) => `Sans ${i}`);
+      await openAndSearch(
+        {
+          provider: {
+            icon: <span />,
+            resolve,
+            availableFonts: ["Sans 0"],
+            search: async () => ({ kind: "match", names }),
+            onNewFontUsed,
+          },
+        },
+        "sans",
+      );
+
+      expect(await screen.findByText("Search results")).not.toBeNull();
+      // "Sans 0" is listed already, so 11 left - 10 shown
+      expect(rowValues()).toEqual([
+        "provider:Sans 0",
+        ...names.slice(1, 11).map((name) => `provider:${name}`),
+      ]);
+      expect(screen.getByText("+1 more, keep typing to narrow")).not.toBeNull();
+
+      await act(async () => {
+        fireEvent.click(screen.getByText("Sans 3").closest("button")!);
+      });
+
+      expect(window.h.state.currentItemFontFamily).toBe("provider:Sans 3");
+      expect(onNewFontUsed).toHaveBeenCalledWith("Sans 3");
+    });
+
+    const pressEnter = () =>
+      act(async () => {
+        fireEvent.keyDown(document.querySelector(".properties-content")!, {
+          key: KEYS.ENTER,
+        });
+      });
+
+    it("suggests only when nothing matches, never on a bare Enter", async () => {
+      const fuzzyResolve = vi.fn<FontResolver>(resolve);
+      await openAndSearch(
+        {
+          fuzzy: {
+            icon: <span />,
+            resolve: fuzzyResolve,
+            availableFonts: [],
+            search: async () => ({ kind: "suggestion", names: ["Roboto"] }),
+          },
+        },
+        "rovoto",
+      );
+
+      expect(await screen.findByText("Did you mean…")).not.toBeNull();
+      // the provider searched already - no point offering the typed name
+      expect(screen.queryByText("rovoto")).toBeNull();
+      expect(rowValues()).toEqual(["fuzzy:Roboto"]);
+
+      await pressEnter();
+
+      expect(fuzzyResolve).not.toHaveBeenCalled();
+    });
+
+    it("tries the typed name only with providers that couldn't search", async () => {
+      const plainResolve = vi
+        .fn<FontResolver>()
+        .mockRejectedValue(new Error("no"));
+      const brokenResolve = vi
+        .fn<FontResolver>()
+        .mockRejectedValue(new Error("no"));
+      const fuzzyResolve = vi.fn<FontResolver>(resolve);
+      await openAndSearch(
+        {
+          plain: { icon: <span />, resolve: plainResolve, availableFonts: [] },
+          broken: {
+            icon: <span />,
+            resolve: brokenResolve,
+            availableFonts: [],
+            search: async () => {
+              throw new Error("offline");
+            },
+          },
+          fuzzy: {
+            icon: <span />,
+            resolve: fuzzyResolve,
+            availableFonts: [],
+            search: async () => ({ kind: "suggestion", names: ["Roboto"] }),
+          },
+        },
+        "rovoto",
+      );
+
+      await screen.findByText("Did you mean…");
+      expect(screen.getByText("rovoto")).not.toBeNull();
+
+      await pressEnter();
+
+      await waitFor(() => expect(brokenResolve).toHaveBeenCalledWith("rovoto"));
+      expect(plainResolve).toHaveBeenCalledWith("rovoto");
+      expect(fuzzyResolve).not.toHaveBeenCalled();
+    });
+
+    it("shows a pending search as such", async () => {
+      await openAndSearch(
+        {
+          provider: {
+            icon: <span />,
+            resolve,
+            availableFonts: [],
+            search: () => new Promise(() => {}),
+          },
+        },
+        "rovoto",
+      );
+
+      expect(screen.getByText("Searching…")).not.toBeNull();
+    });
+
+    it("doesn't announce a suggested font that's already offered", async () => {
+      vi.spyOn(document.fonts, "check").mockReturnValue(false);
+      vi.spyOn(document.fonts, "load").mockResolvedValue([]);
+      const onNewFontUsed = vi.fn();
+      await openAndSearch(
+        {
+          provider: {
+            icon: <span />,
+            resolve,
+            availableFonts: ["Roboto"],
+            search: async () => ({ kind: "suggestion", names: ["Roboto"] }),
+            onNewFontUsed,
+          },
+        },
+        "rovoto",
+      );
+
+      await screen.findByText("Did you mean…");
+      await act(async () => {
+        fireEvent.click(screen.getByText("Roboto").closest("button")!);
+      });
+
+      expect(window.h.state.currentItemFontFamily).toBe("provider:Roboto");
+      expect(onNewFontUsed).not.toHaveBeenCalled();
+    });
+
+    it("shares the result slots between providers", async () => {
+      const names = (prefix: string, count: number) =>
+        Array.from({ length: count }, (_, i) => `${prefix} Sans ${i}`);
+      const provider = (familyNames: string[]): FontProvider => ({
+        icon: <span />,
+        resolve,
+        availableFonts: [],
+        search: async () => ({ kind: "match", names: familyNames }),
+      });
+      await openAndSearch(
+        {
+          big: provider(names("Big", 25)),
+          small: provider(names("Small", 3)),
+        },
+        "sans",
+      );
+
+      await screen.findByText("Search results");
+      // the short list's unused slots go to the long one, order kept
+      expect(rowValues()).toEqual([
+        ...names("Big", 7).map((name) => `big:${name}`),
+        ...names("Small", 3).map((name) => `small:${name}`),
+      ]);
+      expect(
+        screen.getByText("+18 more, keep typing to narrow"),
+      ).not.toBeNull();
+    });
+
+    it("drops suggestions while another provider matches", async () => {
+      await openAndSearch(
+        {
+          fuzzy: {
+            icon: <span />,
+            resolve,
+            availableFonts: [],
+            search: async () => ({ kind: "suggestion", names: ["Lobster"] }),
+          },
+          exact: {
+            icon: <span />,
+            resolve,
+            availableFonts: [],
+            search: async () => ({ kind: "match", names: ["Lobster Two"] }),
+          },
+        },
+        "lobster t",
+      );
+
+      await screen.findByText("Search results");
+      expect(rowValues()).toEqual(["exact:Lobster Two"]);
+      expect(screen.queryByText("Did you mean…")).toBeNull();
+    });
+
+    it("aborts a superseded search", async () => {
+      const signals: AbortSignal[] = [];
+      const input = await openAndSearch(
+        {
+          provider: {
+            icon: <span />,
+            resolve,
+            availableFonts: [],
+            search: (_query, { signal }) => {
+              signals.push(signal);
+              return new Promise(() => {});
+            },
+          },
+        },
+        "rob",
+      );
+
+      await waitFor(() => expect(signals).toHaveLength(1));
+      fireEvent.input(input, { target: { value: "robo" } });
+
+      expect(signals[0].aborted).toBe(true);
+      await waitFor(() => expect(signals).toHaveLength(2));
+    });
+  });
+
   describe("top picks drag & drop", () => {
     const SLOT_SIZE = 32;
     const SLOT_SPAN = 40;
@@ -1006,6 +1356,56 @@ describe("FontPicker", () => {
       ]);
       // pinning doesn't pick the font
       expect(h.state.currentItemFontFamily).not.toBe(FONT_FAMILY["Lilita One"]);
+    });
+
+    it("pins a custom font as its preview text, resolving it on select", async () => {
+      vi.spyOn(document.fonts, "check").mockReturnValue(false);
+      vi.spyOn(document.fonts, "load").mockResolvedValue([]);
+      const deferred = createDeferredResolver();
+      let resolvePreviewText!: (text: string) => void;
+      const { container, queryByTestId } = await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          fontProviders={{
+            provider: {
+              icon: <span />,
+              resolve: deferred.resolver,
+              availableFonts: ["Pinned"],
+              getPreviewText: () =>
+                new Promise((resolve) => (resolvePreviewText = resolve)),
+            },
+          }}
+        />,
+      );
+      Keyboard.keyPress(KEYS.T);
+      act(() => {
+        queryByTestId("font-family-show-fonts")!.click();
+      });
+
+      const row = (await screen.findByText("Pinned")).closest("button")!;
+      await drag(row, { clientX: 16, clientY: 316 }, slotCenter(1));
+
+      await waitFor(() =>
+        expect(h.state.fontTopPicks).toEqual([
+          FONT_FAMILY.Excalifont,
+          "provider:Pinned",
+          FONT_FAMILY["Comic Shanns"],
+        ]),
+      );
+      const pick = container.querySelector<HTMLElement>(
+        '.FontPicker__top-picks [data-top-pick-index="1"]',
+      )!;
+      expect(pick.querySelector("svg")).toBe(null);
+      expect(pick.textContent).toBe("Aa");
+      await act(async () => resolvePreviewText("あ"));
+      expect(pick.textContent).toBe("あ");
+
+      fireEvent.click(pick);
+      expect(h.state.currentItemFontFamily).not.toBe("provider:Pinned");
+      await act(async () => deferred.resolve());
+      await waitFor(() =>
+        expect(h.state.currentItemFontFamily).toBe("provider:Pinned"),
+      );
     });
 
     it("refuses pinning an already pinned font", async () => {

@@ -1,4 +1,4 @@
-import { useMemo, type JSX } from "react";
+import { useCallback, useMemo, type JSX } from "react";
 
 import {
   arrayToList,
@@ -25,6 +25,32 @@ import type { Fonts } from "../../fonts";
 
 import type { FontProviders } from "../../types";
 import type { ExcalidrawFontFace } from "../../fonts/ExcalidrawFontFace";
+
+import type { ProviderSearchResult } from "./useFontSearch";
+
+/** shared by all providers, the rest is left to narrowing down the search */
+const SEARCH_MATCHES_LIMIT = 10;
+const SEARCH_SUGGESTIONS_LIMIT = 5;
+
+/**
+ * Up to `total` items, slots dealt round-robin so every list gets an equal
+ * share - one running short passes its slots on to the rest. Each list keeps
+ * its own order and stays contiguous.
+ */
+const takeFairShare = <T,>(lists: readonly (readonly T[])[], total: number) => {
+  const slots = lists.map(() => 0);
+  for (let remaining = total, dealt = true; remaining > 0 && dealt; ) {
+    dealt = false;
+    for (let i = 0; i < lists.length && remaining > 0; i++) {
+      if (slots[i] < lists[i].length) {
+        slots[i]++;
+        remaining--;
+        dealt = true;
+      }
+    }
+  }
+  return lists.flatMap((list, i) => list.slice(0, slots[i]));
+};
 
 export interface FontDescriptor {
   value: FontFamily;
@@ -91,6 +117,7 @@ interface FontCatalogOptions {
   newSceneFamilies: ReadonlySet<FontFamily>;
   resolvingFamily: CustomFontFamily | null;
   searchTerm: string;
+  searchResults: readonly ProviderSearchResult[];
   showDeprecatedFonts: boolean;
 }
 
@@ -103,6 +130,7 @@ export const useFontCatalog = ({
   newSceneFamilies,
   resolvingFamily,
   searchTerm,
+  searchResults,
   showDeprecatedFonts,
 }: FontCatalogOptions) => {
   const sceneFamilies = useMemo(
@@ -122,10 +150,8 @@ export const useFontCatalog = ({
     [selectedFontFamily, newSceneFamilies, registeredFonts],
   );
 
-  const allFonts = useMemo(() => {
-    const descriptors = new Map<FontFamily, FontDescriptor>();
-
-    const getCustomFontStatus = (family: CustomFontFamily) => {
+  const getCustomFontStatus = useCallback(
+    (family: CustomFontFamily) => {
       if (resolvingFamily === family) {
         return "loading" as const;
       }
@@ -140,7 +166,22 @@ export const useFontCatalog = ({
         return "unsupported" as const;
       }
       return failedResolutions.has(family) ? ("failed" as const) : undefined;
-    };
+    },
+    [fontProviders, failedResolutions, resolvingFamily],
+  );
+
+  const searchFamilies = useMemo(
+    () =>
+      new Set(
+        searchResults.flatMap(({ providerId, names }) =>
+          names.map((name) => createProviderFontFamily(providerId, name)),
+        ),
+      ),
+    [searchResults],
+  );
+
+  const allFonts = useMemo(() => {
+    const descriptors = new Map<FontFamily, FontDescriptor>();
 
     for (const [providerId, provider] of Object.entries(fontProviders ?? {})) {
       for (const familyName of provider.availableFonts) {
@@ -156,7 +197,10 @@ export const useFontCatalog = ({
 
     for (const familyId of [
       ...sceneFamilies,
-      ...(resolvingFamily ? [resolvingFamily] : []),
+      // a search result resolves in place rather than jumping into the list
+      ...(resolvingFamily && !searchFamilies.has(resolvingFamily)
+        ? [resolvingFamily]
+        : []),
     ]) {
       if (!isCustomFontFamily(familyId) || descriptors.has(familyId)) {
         continue;
@@ -205,8 +249,9 @@ export const useFontCatalog = ({
   }, [
     registeredFonts,
     fontProviders,
-    failedResolutions,
+    getCustomFontStatus,
     resolvingFamily,
+    searchFamilies,
     sceneFamilies,
   ]);
 
@@ -230,31 +275,84 @@ export const useFontCatalog = ({
       ),
     [sceneFonts, availableFonts, searchTerm],
   );
-  const filteredFonts = useMemo(
-    () => arrayToList(filteredFontDescriptors),
-    [filteredFontDescriptors],
-  );
+  const { searchMatches, hiddenSearchMatchCount, searchSuggestions } =
+    useMemo(() => {
+      const listed = new Set(filteredFontDescriptors.map((font) => font.value));
+      const getDescriptors = (kind: ProviderSearchResult["kind"]) =>
+        searchResults
+          .filter((result) => result.kind === kind)
+          .map(({ providerId, names }) => {
+            const descriptors: FontDescriptor[] = [];
+            for (const name of names) {
+              if (typeof name !== "string" || !name) {
+                continue;
+              }
+              const familyId = createProviderFontFamily(providerId, name);
+              if (listed.has(familyId)) {
+                continue;
+              }
+              listed.add(familyId);
+              descriptors.push({
+                value: familyId,
+                icon: getFontFamilyIcon(familyId, fontProviders),
+                text: name,
+                status: getCustomFontStatus(familyId),
+              });
+            }
+            return descriptors;
+          });
+
+      const matches = getDescriptors("match");
+      const searchMatches = takeFairShare(matches, SEARCH_MATCHES_LIMIT);
+
+      return {
+        searchMatches,
+        hiddenSearchMatchCount: matches.flat().length - searchMatches.length,
+        searchSuggestions:
+          filteredFontDescriptors.length || searchMatches.length
+            ? []
+            : takeFairShare(
+                getDescriptors("suggestion"),
+                SEARCH_SUGGESTIONS_LIMIT,
+              ),
+      };
+    }, [
+      filteredFontDescriptors,
+      searchResults,
+      fontProviders,
+      getCustomFontStatus,
+    ]);
+
   const selectableFonts = useMemo(
     () =>
       arrayToList(
-        filteredFontDescriptors.filter((font) => font.status !== "unsupported"),
+        [
+          ...filteredFontDescriptors,
+          ...searchMatches,
+          ...searchSuggestions,
+        ].filter((font) => font.status !== "unsupported"),
       ),
-    [filteredFontDescriptors],
+    [filteredFontDescriptors, searchMatches, searchSuggestions],
   );
   const sceneFilteredFonts = useMemo(
-    () => filteredFonts.filter((font) => sceneFamilies.has(font.value)),
-    [filteredFonts, sceneFamilies],
+    () =>
+      filteredFontDescriptors.filter((font) => sceneFamilies.has(font.value)),
+    [filteredFontDescriptors, sceneFamilies],
   );
   const availableFilteredFonts = useMemo(
-    () => filteredFonts.filter((font) => !sceneFamilies.has(font.value)),
-    [filteredFonts, sceneFamilies],
+    () =>
+      filteredFontDescriptors.filter((font) => !sceneFamilies.has(font.value)),
+    [filteredFontDescriptors, sceneFamilies],
   );
 
   return {
     filteredFontDescriptors,
-    filteredFonts,
     selectableFonts,
     sceneFilteredFonts,
     availableFilteredFonts,
+    searchMatches,
+    hiddenSearchMatchCount,
+    searchSuggestions,
+    searchFamilies,
   };
 };

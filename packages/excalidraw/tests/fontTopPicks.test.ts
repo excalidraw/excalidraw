@@ -25,6 +25,7 @@ describe("restore appState.fontTopPicks", () => {
           FONT_FAMILY.Assistant, // private
           FONT_FAMILY_FALLBACKS.Xiaolai,
           FONT_FAMILY.Virgil, // deprecated, but still pickable
+          "google:Roboto",
         ],
       } as any,
       null,
@@ -32,6 +33,7 @@ describe("restore appState.fontTopPicks", () => {
     expect(restored.fontTopPicks).toEqual([
       FONT_FAMILY["Lilita One"],
       FONT_FAMILY.Virgil,
+      "google:Roboto",
     ]);
   });
 
@@ -50,7 +52,8 @@ describe("restore appState.fontTopPicks", () => {
       restoreAppState({ fontTopPicks: "junk" } as any, null).fontTopPicks,
     ).toBe(null);
     expect(
-      restoreAppState({ fontTopPicks: [4, "5"] } as any, null).fontTopPicks,
+      restoreAppState({ fontTopPicks: [4, "5", ":Roboto"] } as any, null)
+        .fontTopPicks,
     ).toBe(null);
   });
 });

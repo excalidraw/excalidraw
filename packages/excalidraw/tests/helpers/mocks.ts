@@ -55,6 +55,7 @@ export const mockMermaidToExcalidraw = (opts: {
 const EXPECTED_FONT_ERRORS = [
   "Failed to resolve custom font", // the resolver rejected
   "Failed to load font", // the font file didn't fetch
+  "font search failed", // the provider's search rejected
 ];
 
 /**

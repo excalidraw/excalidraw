@@ -746,7 +746,44 @@ export interface FontProvider {
    * "google:Roboto" - so it can be fed straight back into `availableFonts`
    */
   onNewFontUsed?(fontFamily: string): void;
+  /**
+   * Text previewing a family when pinned to the font picker's top picks,
+   * written in that family - "Aa" when omitted, empty or failed, and while a
+   * returned promise is pending. Return a sample in the family's script, i.e.
+   * "あ" for a Japanese font, as "Aa" falls back to another font where the
+   * family has no Latin glyphs.
+   *
+   * Asked once per family, the answer is kept for the session.
+   *
+   * @param fontFamily bare family name, i.e. "Roboto"
+   */
+  getPreviewText?(fontFamily: string): string | Promise<string>;
+  /**
+   * Find families beyond `availableFonts` as the user types into the font
+   * picker's search (debounced, and aborted via `signal` once superseded).
+   *
+   * Return every hit, most relevant first - the picker lists only the first
+   * few, so the user narrows down by typing more. Names follow `resolve`'s
+   * exactness rule: return the canonical spelling.
+   *
+   * @param query trimmed search text, i.e. "rob"
+   */
+  search?(
+    query: string,
+    opts: { signal: AbortSignal },
+  ): Promise<FontSearchResult>;
 }
+
+export type FontSearchResult = {
+  /**
+   * "match" when every name contains the query (case-insensitive substring),
+   * "suggestion" when none does and the names are merely similar, i.e.
+   * "Roboto" for "rovoto" - listed only while nothing matches
+   */
+  kind: "match" | "suggestion";
+  /** bare family names, i.e. "Roboto" */
+  names: readonly string[];
+};
 
 /**
  * Provider keys are persisted as part of the font family id:

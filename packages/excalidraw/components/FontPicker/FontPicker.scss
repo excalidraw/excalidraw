@@ -32,6 +32,12 @@
     opacity: 0.5;
   }
 
+  .FontPicker__more-results {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-gray-50);
+  }
+
   .FontPicker__retry-icon {
     display: inline-flex;
     align-items: center;
