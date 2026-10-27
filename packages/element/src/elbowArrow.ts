@@ -236,20 +236,16 @@ const handleSegmentRenormalization = (
     );
     if (filteredNextFixedSegments.length === 0) {
       return normalizeArrowElementUpdate(
-        getElbowArrowCornerPoints(
-          removeElbowArrowShortSegments(
-            routeElbowArrow(
-              arrow,
-              getElbowArrowData(
-                arrow,
-                elementsMap,
-                nextPoints.map((p) =>
-                  pointFrom<LocalPoint>(p[0] - arrow.x, p[1] - arrow.y),
-                ),
-              ),
-              elementsMap,
-            ) ?? [],
+        routeElbowArrow(
+          arrow,
+          getElbowArrowData(
+            arrow,
+            elementsMap,
+            nextPoints.map((p) =>
+              pointFrom<LocalPoint>(p[0] - arrow.x, p[1] - arrow.y),
+            ),
           ),
+          elementsMap,
         ),
         filteredNextFixedSegments,
         null,
@@ -310,15 +306,7 @@ const handleSegmentRelease = (
   const y = arrow.y + (prevSegment ? prevSegment.end[1] : 0);
   const startBinding = prevSegment ? null : arrow.startBinding;
   const endBinding = nextSegment ? null : arrow.endBinding;
-  const {
-    startHeading,
-    endHeading,
-    startGlobalPoint,
-    endGlobalPoint,
-    hoveredStartElement,
-    hoveredEndElement,
-    ...rest
-  } = getElbowArrowData(
+  const elbowArrowData = getElbowArrowData(
     {
       x,
       y,
@@ -344,23 +332,7 @@ const handleSegmentRelease = (
   );
 
   const { points: restoredPoints } = normalizeArrowElementUpdate(
-    getElbowArrowCornerPoints(
-      removeElbowArrowShortSegments(
-        routeElbowArrow(
-          arrow,
-          {
-            startHeading,
-            endHeading,
-            startGlobalPoint,
-            endGlobalPoint,
-            hoveredStartElement,
-            hoveredEndElement,
-            ...rest,
-          },
-          elementsMap,
-        ) ?? [],
-      ),
-    ),
+    routeElbowArrow(arrow, elbowArrowData, elementsMap),
     fixedSegments,
     null,
     null,
@@ -1037,15 +1009,7 @@ export const updateElbowArrowPoints = (
     );
   }
 
-  const {
-    startHeading,
-    endHeading,
-    startGlobalPoint,
-    endGlobalPoint,
-    hoveredStartElement,
-    hoveredEndElement,
-    ...rest
-  } = getElbowArrowData(
+  const elbowArrowData = getElbowArrowData(
     {
       x: arrow.x,
       y: arrow.y,
@@ -1059,6 +1023,14 @@ export const updateElbowArrowPoints = (
     updatedPoints,
     options,
   );
+  const {
+    startHeading,
+    endHeading,
+    startGlobalPoint,
+    endGlobalPoint,
+    hoveredStartElement,
+    hoveredEndElement,
+  } = elbowArrowData;
 
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
@@ -1106,23 +1078,7 @@ export const updateElbowArrowPoints = (
   ////
   if (fixedSegments.length === 0) {
     return normalizeArrowElementUpdate(
-      getElbowArrowCornerPoints(
-        removeElbowArrowShortSegments(
-          routeElbowArrow(
-            arrow,
-            {
-              startHeading,
-              endHeading,
-              startGlobalPoint,
-              endGlobalPoint,
-              hoveredStartElement,
-              hoveredEndElement,
-              ...rest,
-            },
-            elementsMap,
-          ) ?? [],
-        ),
-      ),
+      routeElbowArrow(arrow, elbowArrowData, elementsMap),
       fixedSegments,
       null,
       null,
@@ -1569,6 +1525,24 @@ const getSimpleRoute = (
 };
 
 /**
+ * The elbow arrow's route: with one or two corners if that fits, or on the
+ * grid otherwise, without short segments and the points between collinear
+ * ones
+ */
+const routeElbowArrow = (
+  arrow: ElbowArrowState,
+  elbowArrowData: ElbowArrowData,
+  elementsMap: ElementsMap,
+): GlobalPoint[] =>
+  getElbowArrowCornerPoints(
+    removeElbowArrowShortSegments(
+      getSimpleRoute(arrow, elbowArrowData, elementsMap) ??
+        routeElbowArrowOnGrid(arrow, elbowArrowData) ??
+        [],
+    ),
+  );
+
+/**
  * Generate the elbow arrow segments
  *
  * @param arrow
@@ -1577,16 +1551,10 @@ const getSimpleRoute = (
  * @param options
  * @returns
  */
-const routeElbowArrow = (
+const routeElbowArrowOnGrid = (
   arrow: ElbowArrowState,
   elbowArrowData: ElbowArrowData,
-  elementsMap: ElementsMap,
 ): GlobalPoint[] | null => {
-  const simpleRoute = getSimpleRoute(arrow, elbowArrowData, elementsMap);
-  if (simpleRoute) {
-    return simpleRoute;
-  }
-
   const {
     dynamicAABBs,
     startDonglePosition,
