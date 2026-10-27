@@ -162,6 +162,8 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 
 ### Other Breaking changes
 
+- `convertToExcalidrawElements()` places bound arrows where their bindings put them, as the editor does whenever it updates their bindings (e.g. on undo/redo, or moving what they're bound to), instead of keeping their ends exactly where given. An end given just short of what it's bound to is extended onto it, and one beyond its binding area is unbound. Shapes created from an arrow's `start`/`end` are placed along its end segment. [#12425](https://github.com/excalidraw/excalidraw/pull/12425)
+
 - `UIAppState` no longer includes `zoom`, `shouldCacheIgnoreZoom`, and the canvas-interaction transients `snapLines`, `originSnapOffset`, `suggestedBinding`, `frameToHighlight`, and `elementsToHighlight`. These update per pointermove or per animation frame and no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
 
   ```tsx
@@ -194,6 +196,10 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
   - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUnmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
 ### Other Features
+
+- Mermaid diagrams (in the TTD dialog and on paste) are converted with `@excalidraw/mermaid-to-excalidraw` v3, which lays them out with [Pele](https://pele.run) instead of Mermaid, no longer bundled. Layouts differ from before, and `swimlane-beta` diagrams are supported. [#12480](https://github.com/excalidraw/excalidraw/pull/12480)
+
+- `label.labelPosition` (0–1) of skeleton arrows places their label along the arrow, instead of halfway. [#12425](https://github.com/excalidraw/excalidraw/pull/12425)
 
 - Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on unmount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 

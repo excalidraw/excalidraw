@@ -23,6 +23,8 @@
       "@excalidraw/common/*": ["./packages/common/src/*"],
       "@excalidraw/excalidraw": ["./packages/excalidraw/index.tsx"],
       "@excalidraw/excalidraw/*": ["./packages/excalidraw/*"],
+      "@excalidraw/excalidraw/common/*": ["./packages/common/src/*"],
+      "@excalidraw/excalidraw/element/*": ["./packages/element/src/*"],
       "@excalidraw/element": ["./packages/element/src/index.ts"],
       "@excalidraw/element/*": ["./packages/element/src/*"],
       "@excalidraw/fractional-indexing": ["./packages/fractional-indexing/src/index.ts"],

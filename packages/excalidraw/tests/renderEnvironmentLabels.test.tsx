@@ -3,6 +3,7 @@ import { KEYS, reseed } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
 import type { RenderEnvironment } from "@excalidraw/element";
+import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawTextElement,
@@ -182,8 +183,8 @@ describe("mermaid labels measured with the host's render environment", () => {
             x: 100,
             y: 50,
             points: [
-              [0, 0],
-              [300, 0],
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(300, 0),
             ],
             start: { id: "A" },
             end: { id: "B" },
