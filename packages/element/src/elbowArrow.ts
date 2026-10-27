@@ -52,7 +52,12 @@ import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
 } from "./types";
-import { aabbForElement, getArrowheadSize, pointInsideBounds } from "./bounds";
+import {
+  aabbForElement,
+  doBoundsIntersect,
+  getArrowheadSize,
+  pointInsideBounds,
+} from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
 import { ELBOW_ARROW_CORNER_RADIUS } from "./shape";
 
@@ -1404,15 +1409,16 @@ const getElbowArrowData = (
 };
 
 /** Whether an axis-aligned segment passes through `bounds` */
-const segmentCrossesBounds = (
-  a: GlobalPoint,
-  b: GlobalPoint,
-  [minX, minY, maxX, maxY]: Bounds,
-) =>
-  Math.max(a[0], b[0]) > minX &&
-  Math.min(a[0], b[0]) < maxX &&
-  Math.max(a[1], b[1]) > minY &&
-  Math.min(a[1], b[1]) < maxY;
+const segmentCrossesBounds = (a: GlobalPoint, b: GlobalPoint, bounds: Bounds) =>
+  doBoundsIntersect(
+    [
+      Math.min(a[0], b[0]),
+      Math.min(a[1], b[1]),
+      Math.max(a[0], b[0]),
+      Math.max(a[1], b[1]),
+    ],
+    bounds,
+  );
 
 /**
  * The route between two bound elements with one corner (when the arrow
