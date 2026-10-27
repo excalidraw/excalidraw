@@ -142,6 +142,9 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
+import { PdfImportDialog } from "./components/PdfImport";
+import { PanelClases } from "./components/clases/PanelClases";
+import { PanelPaginas } from "./components/clases/PanelPaginas";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 import "./index.scss";
@@ -1068,6 +1071,9 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && <PdfImportDialog excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && <PanelClases excalidrawAPI={excalidrawAPI} />}
+        {excalidrawAPI && <PanelPaginas excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />
         {isCollaborating && isOffline && (

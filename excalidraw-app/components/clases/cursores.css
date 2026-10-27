@@ -1,0 +1,10 @@
+/* Cursor en forma de lápiz (solo estética, no cambia el trazo).
+   Se activa con la clase `clases-cursor-lapiz` en <body>, controlada
+   desde Panel de clase → Tools. El hotspot (3 21) es la punta. */
+
+body.clases-cursor-lapiz .excalidraw-container canvas,
+body.clases-cursor-lapiz .excalidraw-container .excalidraw__canvas {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 21l1-4L16.5 4.5a1.4 1.4 0 0 1 2 0l1 1a1.4 1.4 0 0 1 0 2L7 20l-4 1z' fill='%231e1e1e'/%3E%3Cpath d='M14.5 6.5l3 3' stroke='%23ffffff' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E")
+      3 21,
+    crosshair !important;
+}
