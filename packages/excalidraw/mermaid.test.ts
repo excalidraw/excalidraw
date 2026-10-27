@@ -7,6 +7,9 @@ describe("isMaybeMermaidDefinition", () => {
     expect(isMaybeMermaidDefinition("flowchart LR\nola")).toBe(true);
     expect(isMaybeMermaidDefinition("%%{}%%flowchart")).toBe(true);
     expect(isMaybeMermaidDefinition("%%{}%% flowchart")).toBe(true);
+    expect(
+      isMaybeMermaidDefinition("swimlane-beta LR\n  subgraph Customer"),
+    ).toBe(true);
 
     expect(isMaybeMermaidDefinition("graphs")).toBe(false);
     expect(isMaybeMermaidDefinition("this flowchart")).toBe(false);
