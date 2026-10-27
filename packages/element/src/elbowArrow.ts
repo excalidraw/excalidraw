@@ -1439,15 +1439,7 @@ const getSimpleRoute = (
     endGlobalPoint,
     hoveredStartElement,
     hoveredEndElement,
-  }: Pick<
-    ElbowArrowData,
-    | "startHeading"
-    | "endHeading"
-    | "startGlobalPoint"
-    | "endGlobalPoint"
-    | "hoveredStartElement"
-    | "hoveredEndElement"
-  >,
+  }: ElbowArrowData,
   elementsMap: ElementsMap,
 ): GlobalPoint[] | null => {
   const oneCorner =
@@ -1468,11 +1460,14 @@ const getSimpleRoute = (
   const ahead =
     (endGlobalPoint[0] - startGlobalPoint[0]) * startHeading[0] +
     (endGlobalPoint[1] - startGlobalPoint[1]) * startHeading[1];
-  let firstLeg = ahead;
-  let lastLeg =
-    (startGlobalPoint[0] - endGlobalPoint[0]) * endHeading[0] +
-    (startGlobalPoint[1] - endGlobalPoint[1]) * endHeading[1];
-  if (!oneCorner) {
+  let firstLeg: number;
+  let lastLeg: number;
+  if (oneCorner) {
+    firstLeg = ahead;
+    lastLeg =
+      (startGlobalPoint[0] - endGlobalPoint[0]) * endHeading[0] +
+      (startGlobalPoint[1] - endGlobalPoint[1]) * endHeading[1];
+  } else {
     // halfway, as the grid routing turns when there's room, unless that
     // leaves an arrowhead a shorter leg than the padding, and the other end,
     // without one, can spare some of its own (keeping enough to round its
@@ -1554,13 +1549,8 @@ const getElbowArrowRoute = (
   );
 
 /**
- * Generate the elbow arrow segments
- *
- * @param arrow
- * @param elementsMap
- * @param nextPoints
- * @param options
- * @returns
+ * The elbow arrow's route on the grid, keeping a padding around the elements
+ * it connects, or null if there's none
  */
 const getElbowArrowGridRoute = (
   arrow: ElbowArrowState,
