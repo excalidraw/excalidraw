@@ -534,6 +534,40 @@ describe("elbow arrow routes with one or two corners", () => {
     expect(validateElbowPoints(arrow.points)).toBe(true);
   });
 
+  it("keeps clear of an element by its binding gap, thick strokes included", () => {
+    const connectEllipse = (strokeWidth: number) => {
+      API.setAppState({ currentItemEndArrowhead: null });
+      // the ellipse's top is 12px below the rectangle's side's middle, and
+      // the arrow enters its upper left, below its top
+      UI.createElement("rectangle", { x: 0, y: 100, width: 120, height: 55 });
+      UI.createElement("ellipse", {
+        x: 220,
+        y: 139.5,
+        width: 200,
+        height: 124,
+      });
+      API.updateElement(h.elements[1], { strokeWidth });
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.moveTo(120, 127.5);
+      mouse.click();
+      mouse.moveTo(260, 151.9);
+      mouse.click();
+
+      return h.elements.find(
+        (element) => element.type === "arrow",
+      ) as ExcalidrawElbowArrowElement;
+    };
+
+    // a binding gap of 6px: the corner above the ellipse fits
+    expect(connectEllipse(2).points.length).toBe(3);
+
+    API.setElements([]);
+    // 15px: the first leg would run over the stroke
+    expect(connectEllipse(20).points.length).toBeGreaterThan(3);
+  });
+
   it("connects elements with a single corner when a fixed segment lines up with the start", () => {
     const arrow = connect(167.5);
 

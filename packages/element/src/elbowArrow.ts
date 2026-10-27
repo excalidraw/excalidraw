@@ -1509,9 +1509,11 @@ const getSimpleRoute = (
     endGlobalPoint[1] + endHeading[1] * lastLeg,
   );
 
-  const gap = BASE_BINDING_GAP;
   const [startBounds, endBounds] = [hoveredStartElement, hoveredEndElement].map(
-    (element) => aabbForElement(element, elementsMap, [gap, gap, gap, gap]),
+    (element) => {
+      const gap = getBindingGap(element);
+      return aabbForElement(element, elementsMap, [gap, gap, gap, gap]);
+    },
   );
   // (the first leg leaves the start, and the last enters the end)
   if (
