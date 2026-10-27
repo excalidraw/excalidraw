@@ -7,7 +7,7 @@ import { resizeMultipleElements } from "@excalidraw/element";
 import {
   isArrowElement,
   isElbowArrow,
-  rerouteElbowArrow,
+  updateElbowArrowRoute,
 } from "@excalidraw/element";
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
@@ -130,7 +130,7 @@ const flipElements = (
         endArrowhead: _element.startArrowhead,
       });
       return isElbowArrow(flipped)
-        ? newElementWith(flipped, rerouteElbowArrow(flipped, elementsMap))
+        ? newElementWith(flipped, updateElbowArrowRoute(flipped, elementsMap))
         : flipped;
     });
   }

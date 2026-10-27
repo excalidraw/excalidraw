@@ -236,7 +236,7 @@ const handleSegmentRenormalization = (
     );
     if (filteredNextFixedSegments.length === 0) {
       return normalizeArrowElementUpdate(
-        routeElbowArrow(
+        getElbowArrowRoute(
           arrow,
           getElbowArrowData(
             arrow,
@@ -332,7 +332,7 @@ const handleSegmentRelease = (
   );
 
   const { points: restoredPoints } = normalizeArrowElementUpdate(
-    routeElbowArrow(arrow, elbowArrowData, elementsMap),
+    getElbowArrowRoute(arrow, elbowArrowData, elementsMap),
     fixedSegments,
     null,
     null,
@@ -1078,7 +1078,7 @@ export const updateElbowArrowPoints = (
   ////
   if (fixedSegments.length === 0) {
     return normalizeArrowElementUpdate(
-      routeElbowArrow(arrow, elbowArrowData, elementsMap),
+      getElbowArrowRoute(arrow, elbowArrowData, elementsMap),
       fixedSegments,
       null,
       null,
@@ -1136,7 +1136,7 @@ export const updateElbowArrowPoints = (
  * The update routing an elbow arrow again where it is, e.g. once its
  * arrowheads change, as its route makes room for them
  */
-export const rerouteElbowArrow = <T extends ExcalidrawElbowArrowElement>(
+export const updateElbowArrowRoute = <T extends ExcalidrawElbowArrowElement>(
   arrow: Readonly<T>,
   elementsMap: NonDeletedSceneElementsMap,
 ) =>
@@ -1529,7 +1529,7 @@ const getSimpleRoute = (
  * grid otherwise, without short segments and the points between collinear
  * ones
  */
-const routeElbowArrow = (
+const getElbowArrowRoute = (
   arrow: ElbowArrowState,
   elbowArrowData: ElbowArrowData,
   elementsMap: ElementsMap,
@@ -1537,7 +1537,7 @@ const routeElbowArrow = (
   getElbowArrowCornerPoints(
     removeElbowArrowShortSegments(
       getSimpleRoute(arrow, elbowArrowData, elementsMap) ??
-        routeElbowArrowOnGrid(arrow, elbowArrowData) ??
+        getElbowArrowGridRoute(arrow, elbowArrowData) ??
         [],
     ),
   );
@@ -1551,7 +1551,7 @@ const routeElbowArrow = (
  * @param options
  * @returns
  */
-const routeElbowArrowOnGrid = (
+const getElbowArrowGridRoute = (
   arrow: ElbowArrowState,
   elbowArrowData: ElbowArrowData,
 ): GlobalPoint[] | null => {

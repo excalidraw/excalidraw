@@ -27,7 +27,7 @@ import {
   getBaseFontSize,
   getBaseFontSizeUpdate,
   relayoutStickyNotes,
-  rerouteElbowArrow,
+  updateElbowArrowRoute,
   updateBoundElements,
 } from "@excalidraw/element";
 
@@ -193,7 +193,7 @@ export const actionPasteStyles = register({
               if (isElbowArrow(newElement)) {
                 newElement = newElementWith(
                   newElement,
-                  rerouteElbowArrow(
+                  updateElbowArrowRoute(
                     newElement,
                     app.scene.getNonDeletedElementsMap(),
                   ),

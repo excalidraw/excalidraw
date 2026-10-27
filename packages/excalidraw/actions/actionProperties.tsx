@@ -72,7 +72,7 @@ import {
 
 import {
   updateElbowArrowPoints,
-  rerouteElbowArrow,
+  updateElbowArrowRoute,
   CaptureUpdateAction,
   toggleLinePolygonState,
 } from "@excalidraw/element";
@@ -1979,7 +1979,7 @@ export const actionChangeArrowhead = register<{
           return isElbowArrow(element)
             ? newElementWith(
                 element,
-                rerouteElbowArrow(
+                updateElbowArrowRoute(
                   element,
                   app.scene.getNonDeletedElementsMap(),
                 ),
