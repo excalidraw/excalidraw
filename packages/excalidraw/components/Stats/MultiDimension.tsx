@@ -128,7 +128,7 @@ const resizeElementInGroup = (
   );
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
-    updateBoundElements(latestElement, scene);
+    updateBoundElements(latestElement, scene, { renderEnvironment });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
       scene.mutateElement(latestBoundTextElement, {

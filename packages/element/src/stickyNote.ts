@@ -867,11 +867,10 @@ export const updateStickyNoteLayout = (
     scene.mutateElement(textElement, layout.text);
   }
   if (bindings !== false && !container.isDeleted) {
-    updateBoundElements(
-      container as NonDeletedExcalidrawElement,
-      scene,
-      bindings || undefined,
-    );
+    updateBoundElements(container as NonDeletedExcalidrawElement, scene, {
+      ...bindings,
+      renderEnvironment: layoutOpts.renderEnvironment,
+    });
   }
 
   return layout;

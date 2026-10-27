@@ -136,6 +136,7 @@ const TextToDiagramContent = ({
       setError,
       mermaidDefinition: mermaidContent,
       theme: app.state.theme,
+      renderEnvironment: app.renderEnvironment,
     });
 
     if (result.success) {
