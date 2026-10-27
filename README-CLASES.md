@@ -46,3 +46,24 @@ Panel de clase → pestaña **Ficha**: Estudiante, Materia (libre), Tema(s), Ses
 - Límite de importación: 50 MB y 30 primeras páginas por PDF.
 - `pdfjs-dist` se carga de forma perezosa (solo al importar), no afecta la carga inicial.
 - Rama de la función: `feature/pdf-import`.
+
+## Páginas de clase 📄 (estilo Zoom Whiteboard / OneNote)
+
+Panel **Páginas**, a la izquierda de la pizarra. Sin scroll largo y sin
+gestionar frames a mano: la lista solo muestra páginas con nombre.
+
+- **Crear las 4 páginas de clase**: Teoría, Ejemplos, Ejercicios y
+  Soluciones. Si alguna ya existe, no se duplica.
+- **+ Nueva**: escribe un nombre y crea otra página cuando haga falta.
+- **Tocar una página**: salta a ella en pantalla completa.
+- **← Anterior / Siguiente →**: pasa de página en orden.
+- **✎**: cambia el nombre de una página.
+- El panel se puede ocultar con la × y volver a mostrar con el botón
+  “📄 Páginas”.
+
+Las páginas se guardan con la pizarra (igual que el resto de la escena),
+así que también quedan en el Historial y en el `.excalidraw` exportado.
+Saltar de página mueve solo tu vista; no fuerza la vista de los demás
+en una sesión colaborativa. Código nuevo, sin tocar los features
+existentes: `excalidraw-app/components/clases/paginas.ts` y
+`excalidraw-app/components/clases/PanelPaginas.tsx`.
