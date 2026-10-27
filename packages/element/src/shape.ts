@@ -1076,10 +1076,28 @@ const _generateElementShape = (
 
 export const ELBOW_ARROW_CORNER_RADIUS = 16;
 
-const generateElbowArrowShape = (
-  points: readonly LocalPoint[],
+export const generateElbowArrowShape = (
+  routePoints: readonly LocalPoint[],
   radius: number,
 ) => {
+  // a jog too short to see (e.g. a fixed segment lined up with the ones
+  // around it, while dragging an element the arrow is bound to) is drawn
+  // straight, as rough.js draws its two corners as a knot: a segment shorter
+  // than 1px between two longer ones heading the same way (not a U-turn, nor
+  // a corner of short segments)
+  const isJog = (i: number) => {
+    if (i < 2 || i > routePoints.length - 2) {
+      return false;
+    }
+    const [a, b, c, d] = routePoints.slice(i - 2, i + 2);
+    return (
+      pointDistance(b, c) < 1 &&
+      pointDistance(a, b) >= 1 &&
+      pointDistance(c, d) >= 1 &&
+      (b[0] - a[0]) * (d[0] - c[0]) + (b[1] - a[1]) * (d[1] - c[1]) > 0
+    );
+  };
+  const points = routePoints.filter((_, i) => !isJog(i) && !isJog(i + 1));
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
