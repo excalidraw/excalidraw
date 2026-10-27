@@ -54,6 +54,7 @@ import {
 
 import {
   isArrowElement,
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
@@ -289,6 +290,37 @@ const offsetElementAfterFontResize = (
     // it makes sense
     y: prevElement.y + (prevElement.height - nextElement.height) / 2,
   });
+};
+
+// re-routes the arrows bound to shapes whose outline changed. They're routed
+// against the scene, so the changed shapes have to be in it first.
+const updateArrowsBoundToChangedShapes = (
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+  app: AppClassProperties,
+) => {
+  const changedShapeIds = nextElements
+    .filter(
+      (element, index) =>
+        element !== prevElements[index] &&
+        isBindableElement(element) &&
+        element.boundElements?.some(({ type }) => type === "arrow"),
+    )
+    .map((element) => element.id);
+
+  if (!changedShapeIds.length) {
+    return nextElements;
+  }
+
+  app.scene.replaceAllElements(nextElements);
+  for (const id of changedShapeIds) {
+    const shape = app.scene.getNonDeletedElement(id);
+    if (shape) {
+      updateBoundElements(shape, app.scene);
+    }
+  }
+
+  return app.scene.getElementsIncludingDeleted();
 };
 
 const changeFontSize = (
@@ -714,14 +746,19 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeStrokeWidth: value must be defined");
 
+    // the stroke width sets the gap between a shape and its bound arrows
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeWidth: getStrokeWidthForElement(el, value),
-        }),
+      elements: updateArrowsBoundToChangedShapes(
+        elements,
+        changeProperty(elements, appState, (el) =>
+          newElementWith(el, {
+            strokeWidth: getStrokeWidthForElement(el, value),
+          }),
+        ),
+        app,
       ),
       appState: { ...appState, currentItemStrokeWidthKey: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -1762,26 +1799,30 @@ export const actionChangeRoundness = register<"sharp" | "round">({
   name: "changeRoundness",
   label: "Change edge roundness",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isElbowArrow(el)) {
-          return el;
-        }
+      elements: updateArrowsBoundToChangedShapes(
+        elements,
+        changeProperty(elements, appState, (el) => {
+          if (isElbowArrow(el)) {
+            return el;
+          }
 
-        const nextElement = newElementWith(el, {
-          roundness:
-            value === "round"
-              ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
-        });
+          const nextElement = newElementWith(el, {
+            roundness:
+              value === "round"
+                ? {
+                    type: isUsingAdaptiveRadius(el.type)
+                      ? ROUNDNESS.ADAPTIVE_RADIUS
+                      : ROUNDNESS.PROPORTIONAL_RADIUS,
+                  }
+                : null,
+          });
 
-        return nextElement;
-      }),
+          return nextElement;
+        }),
+        app,
+      ),
       appState: {
         ...appState,
         currentItemRoundness: value,
