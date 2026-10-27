@@ -2,6 +2,7 @@ import { flushSync } from "react-dom";
 
 import {
   DEFAULT_VERTICAL_ALIGN,
+  TEXT_ALIGN,
   TEXT_MAX_WRAP_WIDTH,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TEXT_VIEWPORT_PADDING,
@@ -622,6 +623,7 @@ export class AppText {
     initialSelection,
     arrowEndpoint,
     textElement,
+    styleFrom,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -646,6 +648,8 @@ export class AppText {
      * selected or passed arrow container, else the text at (sceneX, sceneY)
      */
     textElement?: NonDeleted<ExcalidrawTextElement> | null;
+    /** a text to style a new text after, instead of the current item */
+    styleFrom?: ExcalidrawTextElement;
   }) => {
     let shouldBindToContainer = false;
 
@@ -701,11 +705,15 @@ export class AppText {
         this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
-      existingTextElement?.fontFamily || this.app.state.currentItemFontFamily;
+      existingTextElement?.fontFamily ||
+      styleFrom?.fontFamily ||
+      this.app.state.currentItemFontFamily;
 
     const lineHeight =
-      existingTextElement?.lineHeight || getLineHeight(fontFamily);
-    const fontSize = this.app.state.currentItemFontSize;
+      existingTextElement?.lineHeight ||
+      styleFrom?.lineHeight ||
+      getLineHeight(fontFamily);
+    const fontSize = styleFrom?.fontSize ?? this.app.state.currentItemFontSize;
 
     if (
       !existingTextElement &&
@@ -790,13 +798,17 @@ export class AppText {
         strokeColor:
           shouldBindToContainer && isStickyNoteElement(container)
             ? container.strokeColor
-            : this.app.state.currentItemStrokeColor,
-        backgroundColor: this.app.state.currentItemBackgroundColor,
-        fillStyle: this.app.state.currentItemFillStyle,
-        strokeWidth: this.app.getCurrentItemStrokeWidth("text"),
-        strokeStyle: this.app.state.currentItemStrokeStyle,
-        roughness: this.app.state.currentItemRoughness,
-        opacity: this.app.state.currentItemOpacity,
+            : styleFrom?.strokeColor ?? this.app.state.currentItemStrokeColor,
+        backgroundColor:
+          styleFrom?.backgroundColor ??
+          this.app.state.currentItemBackgroundColor,
+        fillStyle: styleFrom?.fillStyle ?? this.app.state.currentItemFillStyle,
+        strokeWidth:
+          styleFrom?.strokeWidth ?? this.app.getCurrentItemStrokeWidth("text"),
+        strokeStyle:
+          styleFrom?.strokeStyle ?? this.app.state.currentItemStrokeStyle,
+        roughness: styleFrom?.roughness ?? this.app.state.currentItemRoughness,
+        opacity: styleFrom?.opacity ?? this.app.state.currentItemOpacity,
         text: "",
         fontSize,
         baseFontSize:
@@ -808,7 +820,7 @@ export class AppText {
           arrowEndpointBinding?.textAlign ??
           (parentCenterPosition
             ? "center"
-            : this.app.state.currentItemTextAlign),
+            : styleFrom?.textAlign ?? this.app.state.currentItemTextAlign),
         verticalAlign:
           arrowEndpointBinding?.verticalAlign ??
           (parentCenterPosition
@@ -874,6 +886,63 @@ export class AppText {
         multiElement: null,
       });
     }
+  };
+
+  /**
+   * Starts a new text below a free text (the text editor's Alt+Enter), half
+   * a line apart, in its style and anchored at the same side, so that a run
+   * of texts can be typed without reaching for the pointer. Labels (texts in
+   * a container) have nowhere to put a next one, and are left alone.
+   */
+  public startNextTextEditing = (prevTextElementId: string) => {
+    const prevTextElement =
+      this.app.scene.getNonDeletedElement(prevTextElementId);
+
+    if (
+      !prevTextElement ||
+      !isTextElement(prevTextElement) ||
+      prevTextElement.containerId
+    ) {
+      return;
+    }
+
+    const [x1, , x2, y2] = getElementBounds(
+      prevTextElement,
+      this.app.scene.getNonDeletedElementsMap(),
+    );
+    const lineHeightPx = getLineHeightInPx(
+      prevTextElement.fontSize,
+      prevTextElement.lineHeight,
+    );
+    // an empty text grows away from its x as its alignment dictates
+    const sceneX =
+      prevTextElement.textAlign === TEXT_ALIGN.CENTER
+        ? (x1 + x2) / 2
+        : prevTextElement.textAlign === TEXT_ALIGN.RIGHT
+        ? x2
+        : x1;
+    const top = y2 + lineHeightPx / 2;
+
+    // the new text may start past the viewport's edge: bring its first line
+    // into view, between the side panels
+    const scroll = scrollBoundsIntoView({
+      bounds: [sceneX, top, sceneX, top + lineHeightPx],
+      appState: this.app.state,
+      offsets: this.getTextViewportOffsets(),
+      tooLarge: "leave",
+    });
+    if (scroll) {
+      this.app.viewport.translate(scroll);
+    }
+
+    this.startTextEditing({
+      sceneX,
+      // a free text centers its first line on sceneY
+      sceneY: top + lineHeightPx / 2,
+      insertAtParentCenter: false,
+      textElement: null,
+      styleFrom: prevTextElement,
+    });
   };
 
   getTextWysiwygSnappedToCenterPosition(
