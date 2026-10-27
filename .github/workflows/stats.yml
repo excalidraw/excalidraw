@@ -38,7 +38,9 @@ jobs:
 
   perf:
     name: Performance
-    runs-on: ubuntu-latest
+    # a fixed image, so the runs stay comparable; Playwright 1.58 can't install
+    # its browser on ubuntu-latest's 26.04 either
+    runs-on: ubuntu-24.04
     environment: stats
     # staging serves only the latest commit, so a newer push takes over
     concurrency:
