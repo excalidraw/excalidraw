@@ -42,7 +42,7 @@ import { generateLinearCollisionShape } from "./shape";
 import { hitElementItself, isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isElbowArrow, isRectangularElement } from "./typeChecks";
-import { getBindingGap, maxBindingDistance_simple } from "./binding";
+import { getBindingGap, maxBindingDistance } from "./binding";
 
 import {
   getGlobalFixedPointForBindableElement,
@@ -773,7 +773,7 @@ export const getElbowArrowSnapMidPoint = (
   zoom: AppState["zoom"],
 ) => {
   const TOLERANCE = 0.05;
-  const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
+  const maxDistance = maxBindingDistance(zoom) + element.strokeWidth / 2;
 
   return getSnappedMidpointForElbowArrow(
     element,
@@ -796,7 +796,7 @@ export const getSnapOutlineMidPoint = (
     return getElbowArrowSnapMidPoint(point, element, elementsMap, zoom)?.point;
   }
 
-  const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
+  const maxDistance = maxBindingDistance(zoom) + element.strokeWidth / 2;
   const idx = getSnappedMidpointIndexForSimpleArrow(
     element,
     point,

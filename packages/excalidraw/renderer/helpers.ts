@@ -126,7 +126,7 @@ export const bootstrapCanvas = ({
   return context;
 };
 
-export const strokeRectWithRotation_simple = (
+export const strokeRectWithRotation = (
   context: CanvasRenderingContext2D,
   x: number,
   y: number,

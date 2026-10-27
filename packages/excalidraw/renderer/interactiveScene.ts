@@ -6,16 +6,12 @@ import {
   type GlobalPoint,
   type LocalPoint,
   type Radians,
-  bezierEquation,
-  pointRotateRads,
 } from "@excalidraw/math";
 
 import {
   arrayToMap,
-  BIND_MODE_TIMEOUT,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
-  getFeatureFlag,
   invariant,
   shouldRotateWithDiscreteAngle,
   THEME,
@@ -43,7 +39,7 @@ import {
   isTextElement,
   getTextElementWithAccuratePosition,
   LinearElementEditor,
-  maxBindingDistance_simple,
+  maxBindingDistance,
   getActiveTextElement,
   getElementsInGroup,
   getSelectedGroupIds,
@@ -69,7 +65,6 @@ import type {
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
-  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
@@ -99,7 +94,7 @@ import {
   bootstrapCanvas,
   fillCircle,
   getNormalizedCanvasDimensions,
-  strokeRectWithRotation_simple,
+  strokeRectWithRotation,
   snapScrollToDevicePixels,
 } from "./helpers";
 
@@ -255,7 +250,7 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   );
 };
 
-const renderBindingHighlightForBindableElement_simple = (
+const renderBindingHighlightForBindableElement = (
   context: CanvasRenderingContext2D,
   suggestedBinding: NonNullable<AppState["suggestedBinding"]>,
   elementsMap: ElementsMap,
@@ -479,7 +474,7 @@ const renderBindingHighlightForBindableElement_simple = (
       let shownMidpoints = midpoints;
       if (!isElbow) {
         const threshold =
-          maxBindingDistance_simple(appState.zoom) +
+          maxBindingDistance(appState.zoom) +
           suggestedBinding.element.strokeWidth / 2;
         const closest =
           pointerCoords &&
@@ -522,365 +517,13 @@ const renderBindingHighlightForBindableElement_simple = (
   }
 };
 
-const renderBindingHighlightForBindableElement_complex = (
+const renderSuggestedBindingHighlight = (
   app: AppClassProperties,
   context: CanvasRenderingContext2D,
-  element: ExcalidrawBindableElement,
+  suggestedBinding: NonNullable<AppState["suggestedBinding"]>,
   allElementsMap: NonDeletedSceneElementsMap,
   appState: InteractiveCanvasAppState,
-  deltaTime: number,
-  state?: { runtime: number },
 ) => {
-  const countdownInProgress =
-    app.state.bindMode === "orbit" && app.bindModeHandler !== null;
-
-  const remainingTime =
-    BIND_MODE_TIMEOUT -
-    (state?.runtime ?? (countdownInProgress ? 0 : BIND_MODE_TIMEOUT));
-  const opacity = clamp((1 / BIND_MODE_TIMEOUT) * remainingTime, 0.0001, 1);
-  const offset = element.strokeWidth / 2;
-
-  const enclosingFrame = element.frameId && allElementsMap.get(element.frameId);
-  if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-    context.translate(enclosingFrame.x, enclosingFrame.y);
-
-    context.beginPath();
-
-    if (FRAME_STYLE.radius && context.roundRect) {
-      context.roundRect(
-        -1,
-        -1,
-        enclosingFrame.width + 1,
-        enclosingFrame.height + 1,
-        FRAME_STYLE.radius / appState.zoom.value,
-      );
-    } else {
-      context.rect(-1, -1, enclosingFrame.width + 1, enclosingFrame.height + 1);
-    }
-
-    context.clip();
-
-    context.translate(-enclosingFrame.x, -enclosingFrame.y);
-  }
-
-  switch (element.type) {
-    case "magicframe":
-    case "frame":
-      context.save();
-
-      context.translate(element.x, element.y);
-
-      context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle = `rgba(${
-        BINDING_HIGHLIGHT_RGB[appState.theme]
-      }, ${opacity})`;
-
-      if (FRAME_STYLE.radius && context.roundRect) {
-        context.beginPath();
-        context.roundRect(
-          0,
-          0,
-          element.width,
-          element.height,
-          FRAME_STYLE.radius / appState.zoom.value,
-        );
-        context.stroke();
-        context.closePath();
-      } else {
-        context.strokeRect(0, 0, element.width, element.height);
-      }
-
-      context.restore();
-      break;
-    default:
-      context.save();
-
-      const center = elementCenterPoint(element, allElementsMap);
-      const cx = center[0] + appState.scrollX;
-      const cy = center[1] + appState.scrollY;
-
-      context.translate(cx, cy);
-      context.rotate(element.angle as Radians);
-      context.translate(-cx, -cy);
-
-      context.translate(
-        element.x + appState.scrollX - offset,
-        element.y + appState.scrollY - offset,
-      );
-
-      context.lineWidth =
-        clamp(2.5, element.strokeWidth * 1.75, 4) /
-        Math.max(0.25, appState.zoom.value);
-      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, ${
-        opacity / 2
-      })`;
-
-      switch (element.type) {
-        case "ellipse":
-          context.beginPath();
-          context.ellipse(
-            (element.width + offset * 2) / 2,
-            (element.height + offset * 2) / 2,
-            (element.width + offset * 2) / 2,
-            (element.height + offset * 2) / 2,
-            0,
-            0,
-            2 * Math.PI,
-          );
-          context.closePath();
-          context.stroke();
-          break;
-        case "diamond":
-          {
-            const [segments, curves] = deconstructDiamondElement(
-              element,
-              offset,
-            );
-
-            // Draw each line segment individually
-            segments.forEach((segment) => {
-              context.beginPath();
-              context.moveTo(
-                segment[0][0] - element.x + offset,
-                segment[0][1] - element.y + offset,
-              );
-              context.lineTo(
-                segment[1][0] - element.x + offset,
-                segment[1][1] - element.y + offset,
-              );
-              context.stroke();
-            });
-
-            // Draw each curve individually (for rounded corners)
-            curves.forEach((curve) => {
-              const [start, control1, control2, end] = curve;
-              context.beginPath();
-              context.moveTo(
-                start[0] - element.x + offset,
-                start[1] - element.y + offset,
-              );
-              context.bezierCurveTo(
-                control1[0] - element.x + offset,
-                control1[1] - element.y + offset,
-                control2[0] - element.x + offset,
-                control2[1] - element.y + offset,
-                end[0] - element.x + offset,
-                end[1] - element.y + offset,
-              );
-              context.stroke();
-            });
-          }
-
-          break;
-        default:
-          {
-            const [segments, curves] = deconstructRectanguloidElement(
-              element,
-              offset,
-            );
-
-            // Draw each line segment individually
-            segments.forEach((segment) => {
-              context.beginPath();
-              context.moveTo(
-                segment[0][0] - element.x + offset,
-                segment[0][1] - element.y + offset,
-              );
-              context.lineTo(
-                segment[1][0] - element.x + offset,
-                segment[1][1] - element.y + offset,
-              );
-              context.stroke();
-            });
-
-            // Draw each curve individually (for rounded corners)
-            curves.forEach((curve) => {
-              const [start, control1, control2, end] = curve;
-              context.beginPath();
-              context.moveTo(
-                start[0] - element.x + offset,
-                start[1] - element.y + offset,
-              );
-              context.bezierCurveTo(
-                control1[0] - element.x + offset,
-                control1[1] - element.y + offset,
-                control2[0] - element.x + offset,
-                control2[1] - element.y + offset,
-                end[0] - element.x + offset,
-                end[1] - element.y + offset,
-              );
-              context.stroke();
-            });
-          }
-
-          break;
-      }
-
-      context.restore();
-
-      break;
-  }
-
-  // Middle indicator is not rendered after it expired
-  if (!countdownInProgress || (state?.runtime ?? 0) > BIND_MODE_TIMEOUT) {
-    return;
-  }
-
-  const radius = 0.5 * (Math.min(element.width, element.height) / 2);
-
-  // Draw center snap area
-  if (!isFrameLikeElement(element)) {
-    context.save();
-    context.translate(
-      element.x + appState.scrollX,
-      element.y + appState.scrollY,
-    );
-
-    const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
-
-    context.strokeStyle = getThemedColor("rgba(0, 0, 0, 0.2)", appState.theme);
-    context.lineWidth = 1 / appState.zoom.value;
-    context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
-    context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
-
-    context.beginPath();
-    context.ellipse(
-      element.width / 2,
-      element.height / 2,
-      radius,
-      radius,
-      0,
-      0,
-      2 * Math.PI,
-    );
-    context.stroke();
-
-    // context.strokeStyle = "transparent";
-    context.fillStyle = getThemedColor("rgba(0, 0, 0, 0.04)", appState.theme);
-    context.beginPath();
-    context.ellipse(
-      element.width / 2,
-      element.height / 2,
-      radius * (1 - opacity),
-      radius * (1 - opacity),
-      0,
-      0,
-      2 * Math.PI,
-    );
-
-    context.fill();
-
-    context.restore();
-
-    if (
-      appState.isMidpointSnappingEnabled &&
-      !appState.gridModeEnabled &&
-      (!app.lastPointerMoveEvent ||
-        !shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent))
-    ) {
-      // Draw midpoint indicators
-      context.save();
-      context.translate(
-        element.x + appState.scrollX,
-        element.y + appState.scrollY,
-      );
-
-      const midpointRadius = 5 / appState.zoom.value;
-      const cutoutPadding = 5 / appState.zoom.value;
-      const cutoutRadius = midpointRadius + cutoutPadding;
-
-      let midpoints;
-      if (element.type === "diamond") {
-        const [, curves] = deconstructDiamondElement(element);
-        const center = elementCenterPoint(element, allElementsMap);
-
-        midpoints = curves.map((curve) => {
-          const point = bezierEquation(curve, 0.5);
-          const rotatedPoint = pointRotateRads(point, center, element.angle);
-          return {
-            x: rotatedPoint[0] - element.x,
-            y: rotatedPoint[1] - element.y,
-          };
-        });
-      } else {
-        const center = elementCenterPoint(element, allElementsMap);
-        const basePoints = [
-          { x: element.width / 2, y: 0 }, // TOP
-          { x: element.width, y: element.height / 2 }, // RIGHT
-          { x: element.width / 2, y: element.height }, // BOTTOM
-          { x: 0, y: element.height / 2 }, // LEFT
-        ];
-        midpoints = basePoints.map((point) => {
-          const globalPoint = pointFrom<GlobalPoint>(
-            point.x + element.x,
-            point.y + element.y,
-          );
-          const rotatedPoint = pointRotateRads(
-            globalPoint,
-            center,
-            element.angle,
-          );
-          return {
-            x: rotatedPoint[0] - element.x,
-            y: rotatedPoint[1] - element.y,
-          };
-        });
-      }
-
-      // Clear cutouts around midpoints
-      midpoints.forEach((midpoint) => {
-        context.clearRect(
-          midpoint.x - cutoutRadius,
-          midpoint.y - cutoutRadius,
-          cutoutRadius * 2,
-          cutoutRadius * 2,
-        );
-      });
-
-      context.fillStyle = `rgba(${
-        BINDING_HIGHLIGHT_RGB[appState.theme]
-      }, ${opacity})`;
-
-      midpoints.forEach((midpoint) => {
-        context.beginPath();
-        context.arc(midpoint.x, midpoint.y, midpointRadius, 0, 2 * Math.PI);
-        context.fill();
-      });
-
-      context.restore();
-    }
-  }
-
-  return {
-    runtime: (state?.runtime ?? 0) + deltaTime,
-  };
-};
-
-const renderBindingHighlightForBindableElement = (
-  app: AppClassProperties,
-  context: CanvasRenderingContext2D,
-  suggestedBinding: AppState["suggestedBinding"],
-  allElementsMap: NonDeletedSceneElementsMap,
-  appState: InteractiveCanvasAppState,
-  deltaTime: number,
-  state?: { runtime: number },
-) => {
-  if (suggestedBinding === null) {
-    return;
-  }
-
-  if (getFeatureFlag("COMPLEX_BINDINGS")) {
-    return renderBindingHighlightForBindableElement_complex(
-      app,
-      context,
-      suggestedBinding.element,
-      allElementsMap,
-      appState,
-      deltaTime,
-      state,
-    );
-  }
-
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
   const pointerCoords = app.lastPointerMoveCoords
@@ -892,7 +535,7 @@ const renderBindingHighlightForBindableElement = (
   const angleLocked =
     !!app.lastPointerMoveEvent &&
     shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent);
-  renderBindingHighlightForBindableElement_simple(
+  renderBindingHighlightForBindableElement(
     context,
     suggestedBinding,
     allElementsMap,
@@ -958,7 +601,7 @@ const renderSelectionBorder = (
       ]);
     }
     context.lineDashOffset = (lineWidth + spaceWidth) * index;
-    strokeRectWithRotation_simple(
+    strokeRectWithRotation(
       context,
       x1 - linePadding,
       y1 - linePadding,
@@ -987,7 +630,7 @@ const renderFrameHighlight = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  strokeRectWithRotation_simple(
+  strokeRectWithRotation(
     context,
     x1,
     y1,
@@ -1351,7 +994,7 @@ const renderTransformHandles = (
         context.fill();
         context.stroke();
       } else {
-        strokeRectWithRotation_simple(
+        strokeRectWithRotation(
           context,
           x,
           y,
@@ -1536,12 +1179,12 @@ const renderTextToolHover = (
     }
     case "container": {
       if (isBindableElement(element)) {
-        // the outline arrow binding shows, minus its animation and its
-        // `isBindingEnabled` gate: the resolved target already accounts for
-        // the modifier, independently of the arrow-binding preference
+        // the outline arrow binding shows, minus its `isBindingEnabled`
+        // gate: the resolved target already accounts for the modifier,
+        // independently of the arrow-binding preference
         context.save();
         context.translate(appState.scrollX, appState.scrollY);
-        renderBindingHighlightForBindableElement_simple(
+        renderBindingHighlightForBindableElement(
           context,
           { element },
           elementsMap,
@@ -1622,11 +1265,8 @@ const _renderInteractiveScene = ({
   appState: unsnappedAppState,
   renderConfig,
   editorInterface,
-  animationState,
-  deltaTime,
 }: InteractiveSceneRenderConfig): {
   scrollBars?: ReturnType<typeof getScrollBars>;
-  animationState?: typeof animationState;
 } => {
   if (canvas === null) {
     return {};
@@ -1640,8 +1280,6 @@ const _renderInteractiveScene = ({
     canvas,
     scale,
   );
-  let nextAnimationState = animationState;
-
   const context = bootstrapCanvas({
     canvas,
     scale,
@@ -1720,23 +1358,13 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.isBindingEnabled && appState.suggestedBinding) {
-    nextAnimationState = {
-      ...animationState,
-      bindingHighlight: renderBindingHighlightForBindableElement(
-        app,
-        context,
-        appState.suggestedBinding,
-        allElementsMap,
-        appState,
-        deltaTime,
-        animationState?.bindingHighlight,
-      ),
-    };
-  } else {
-    nextAnimationState = {
-      ...animationState,
-      bindingHighlight: undefined,
-    };
+    renderSuggestedBindingHighlight(
+      app,
+      context,
+      appState.suggestedBinding,
+      allElementsMap,
+      appState,
+    );
   }
 
   if (appState.textToolHover) {
@@ -2031,7 +1659,7 @@ const _renderInteractiveScene = ({
       const lineWidth = context.lineWidth;
       context.lineWidth = 1 / appState.zoom.value;
       context.strokeStyle = selectionColor;
-      strokeRectWithRotation_simple(
+      strokeRectWithRotation(
         context,
         x1 - dashedLinePadding,
         y1 - dashedLinePadding,
@@ -2147,7 +1775,6 @@ const _renderInteractiveScene = ({
 
   return {
     scrollBars,
-    animationState: nextAnimationState,
   };
 };
 
