@@ -17,6 +17,7 @@ import {
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
+  isElbowArrow,
   isExcalidrawElement,
   getColorUpdate,
   isNonDeletedElement,
@@ -26,6 +27,7 @@ import {
   getBaseFontSize,
   getBaseFontSizeUpdate,
   relayoutStickyNotes,
+  updateElbowArrowRoute,
   updateBoundElements,
 } from "@excalidraw/element";
 
@@ -171,7 +173,12 @@ export const actionPasteStyles = register({
               } else {
                 // sticky labels are laid out together with their (possibly
                 // also restyled) note in the post-pass below
-                redrawTextBoundingBox(newTextElement, container, app.scene);
+                redrawTextBoundingBox(
+                  newTextElement,
+                  container,
+                  app.scene,
+                  app.renderEnvironment,
+                );
               }
             }
 
@@ -183,6 +190,15 @@ export const actionPasteStyles = register({
                 startArrowhead: elementStylesToCopyFrom.startArrowhead,
                 endArrowhead: elementStylesToCopyFrom.endArrowhead,
               });
+              if (isElbowArrow(newElement)) {
+                newElement = newElementWith(
+                  newElement,
+                  updateElbowArrowRoute(
+                    newElement,
+                    app.scene.getNonDeletedElementsMap(),
+                  ),
+                );
+              }
             }
 
             if (isFrameLikeElement(element)) {
@@ -203,7 +219,10 @@ export const actionPasteStyles = register({
         elementsMap,
       ),
       new Set(selectedElementIds),
-      { prevElementsMap: elementsMap },
+      {
+        prevElementsMap: elementsMap,
+        renderEnvironment: app.renderEnvironment,
+      },
     );
 
     // a restyled note may have grown or shrunk — arrows bound to it follow
@@ -217,7 +236,9 @@ export const actionPasteStyles = register({
           prev.x !== element.x ||
           prev.y !== element.y)
       ) {
-        updateBoundElements(element, app.scene);
+        updateBoundElements(element, app.scene, {
+          renderEnvironment: app.renderEnvironment,
+        });
       }
     }
 

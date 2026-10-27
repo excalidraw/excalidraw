@@ -25,6 +25,9 @@ const createFontGhost: CreateTopPicksGhost<FontFamily> = ({
   sourceEl,
   stripEl,
 }) => {
+  // the source may live in another window's document (e.g. a popout)
+  const ownerDocument = sourceEl.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   const isPick = sourceEl.dataset.topPickIndex != null;
   const template =
     (isPick
@@ -32,10 +35,10 @@ const createFontGhost: CreateTopPicksGhost<FontFamily> = ({
       : stripEl.querySelector<HTMLElement>(
           "[data-top-pick-index]:not(.active)",
         )) ?? stripEl.querySelector<HTMLElement>("[data-top-pick-index]")!;
-  const templateStyle = getComputedStyle(template);
+  const templateStyle = ownerWindow.getComputedStyle(template);
   const templateRect = template.getBoundingClientRect();
 
-  const tile = document.createElement("div");
+  const tile = ownerDocument.createElement("div");
   tile.className = "excalidraw-font-dnd-ghost-tile";
   tile.style.backgroundColor = templateStyle.backgroundColor;
   tile.style.color = templateStyle.color;
@@ -51,7 +54,7 @@ const createFontGhost: CreateTopPicksGhost<FontFamily> = ({
     ? !!sourceEl.querySelector(".FontPicker__top-pick-sample")
     : isCustomFontFamily(value);
   if (hasSample) {
-    const sample = document.createElement("span");
+    const sample = ownerDocument.createElement("span");
     sample.textContent = getFontPreviewText(value);
     // the ghost is outside the editor's CSS scope
     sample.style.fontFamily = getFontFamilyString({ fontFamily: value });

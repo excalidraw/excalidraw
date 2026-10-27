@@ -127,7 +127,6 @@ const getNormalizedPoints = ({
 type PointMoveOtherUpdates = {
   startBinding?: FixedPointBinding | null;
   endBinding?: FixedPointBinding | null;
-  moveMidPointsWithElement?: boolean | null;
   suggestedBinding?: AppState["suggestedBinding"] | null;
 };
 
@@ -387,7 +386,6 @@ export class LinearElementEditor {
       {
         startBinding: updates?.startBinding,
         endBinding: updates?.endBinding,
-        moveMidPointsWithElement: updates?.moveMidPointsWithElement,
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
@@ -592,7 +590,6 @@ export class LinearElementEditor {
       {
         startBinding: updates?.startBinding,
         endBinding: updates?.endBinding,
-        moveMidPointsWithElement: updates?.moveMidPointsWithElement,
       },
       {
         isBindingEnabled: app.state.isBindingEnabled,
@@ -633,7 +630,15 @@ export class LinearElementEditor {
     // Attached text might need to update if arrow dimensions change
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
-      handleBindTextResize(element, app.scene, false);
+      handleBindTextResize(
+        element,
+        app.scene,
+        false,
+        false,
+        false,
+        false,
+        app.renderEnvironment,
+      );
     }
 
     // Update selected points for elbow arrows because elbow arrows add and
@@ -1653,11 +1658,11 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: FixedPointBinding | null;
       endBinding?: FixedPointBinding | null;
-      moveMidPointsWithElement?: boolean | null;
     },
     options?: {
       isBindingEnabled?: boolean;
       isMidpointSnappingEnabled?: boolean;
+      moveMidPointsWithElement?: boolean;
     },
   ) {
     const { points } = element;
@@ -1704,7 +1709,7 @@ export class LinearElementEditor {
           const current = pointUpdates.get(idx)?.point ?? p;
 
           if (
-            otherUpdates?.moveMidPointsWithElement &&
+            options?.moveMidPointsWithElement &&
             idx !== 0 &&
             idx !== points.length - 1 &&
             !pointUpdates.has(idx)
@@ -1979,40 +1984,14 @@ export class LinearElementEditor {
       pointerX - linearElementEditor.pointerOffset.x,
       pointerY - linearElementEditor.pointerOffset.y,
     );
-    const { segments, lengths, prefixSums, totalLength } =
-      getLinearElementPathMetrics(element, elementsMap);
-    if (segments.length === 0 || totalLength === 0) {
+    const labelPosition = LinearElementEditor.getPathParameterAtPoint(
+      element,
+      pointerGlobalPoint,
+      elementsMap,
+    );
+    if (labelPosition === null) {
       return null;
     }
-
-    let bestDistance = Infinity;
-    let bestSegmentIndex = 0;
-    let bestParameter = 0;
-
-    for (let i = 0; i < segments.length; i++) {
-      const { t, distance } = pathSegmentClosestParameter(
-        segments[i],
-        pointerGlobalPoint,
-      );
-
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestSegmentIndex = i;
-        bestParameter = t;
-      }
-    }
-
-    const lengthWithinSegment = pathSegmentLengthAtParameter(
-      segments[bestSegmentIndex],
-      bestParameter,
-      lengths[bestSegmentIndex],
-    );
-
-    const labelPosition = clamp(
-      (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
-      0,
-      1,
-    );
     const pathPoint = LinearElementEditor.getPointAtPathParameter(
       element,
       labelPosition,
@@ -2032,6 +2011,52 @@ export class LinearElementEditor {
       ...linearElementEditor,
       isDragging: true,
     };
+  }
+
+  static getPathLength(
+    element: ExcalidrawLinearElement,
+    elementsMap: ElementsMap,
+  ): number {
+    return getLinearElementPathMetrics(element, elementsMap).totalLength;
+  }
+
+  /** the path parameter (0-1) of the point on the path closest to `point` */
+  static getPathParameterAtPoint(
+    element: ExcalidrawLinearElement,
+    point: GlobalPoint,
+    elementsMap: ElementsMap,
+  ): number | null {
+    const { segments, lengths, prefixSums, totalLength } =
+      getLinearElementPathMetrics(element, elementsMap);
+    if (segments.length === 0 || totalLength === 0) {
+      return null;
+    }
+
+    let bestDistance = Infinity;
+    let bestSegmentIndex = 0;
+    let bestParameter = 0;
+
+    for (let i = 0; i < segments.length; i++) {
+      const { t, distance } = pathSegmentClosestParameter(segments[i], point);
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestSegmentIndex = i;
+        bestParameter = t;
+      }
+    }
+
+    const lengthWithinSegment = pathSegmentLengthAtParameter(
+      segments[bestSegmentIndex],
+      bestParameter,
+      lengths[bestSegmentIndex],
+    );
+
+    return clamp(
+      (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
+      0,
+      1,
+    );
   }
 
   static getPointAtPathParameter(

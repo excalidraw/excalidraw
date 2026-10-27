@@ -82,6 +82,7 @@ export class AppFonts {
         // by `onStateUpdated` once the gesture ends)
         shouldDeferSceneMutation: () => this.isGestureInFlight(this.app.state),
         ownerDocument: this.app.ownerDocument,
+        getRenderEnvironment: () => this.app.renderEnvironment,
       },
     );
 
@@ -271,7 +272,12 @@ export class AppFonts {
           element,
           this.app.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(element, container, this.app.scene);
+        redrawTextBoundingBox(
+          element,
+          container,
+          this.app.scene,
+          this.app.renderEnvironment,
+        );
       }
     }
 
@@ -311,7 +317,12 @@ export class AppFonts {
 
             const container = getContainerElement(latestElement, elementsMap);
             if (container) {
-              redrawTextBoundingBox(latestElement, container, this.app.scene);
+              redrawTextBoundingBox(
+                latestElement,
+                container,
+                this.app.scene,
+                this.app.renderEnvironment,
+              );
             }
           }
         });

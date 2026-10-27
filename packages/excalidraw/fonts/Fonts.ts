@@ -31,6 +31,8 @@ import { isTextElement } from "@excalidraw/element";
 
 import { Scene } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type { CustomFontFamily, FontFamily } from "@excalidraw/common";
 
 import type {
@@ -39,9 +41,12 @@ import type {
 } from "@excalidraw/element/types";
 
 import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
-import { defaultFontRegistry } from "./FontRegistry";
+import { defaultFontRegistry, getFontFaceSet } from "./FontRegistry";
 
 import type { FontRegistry, RegisteredFont } from "./FontRegistry";
+
+/** warned once per process, not per export (e.g. on a server) */
+let warnedNoFontFaceSet = false;
 
 /** definition of a custom font, returned by a font resolver */
 export interface FontDefinition {
@@ -191,8 +196,10 @@ export class Fonts {
 
   private readonly scene: Scene;
 
-  /** the document whose `fonts` set this editor installs & loads faces into */
-  private readonly ownerDocument: Document;
+  /** the font set this editor installs & loads faces into */
+  private readonly fontFaceSet: FontFaceSet | null;
+
+  private readonly getRenderEnvironment: () => RenderEnvironment | undefined;
 
   /**
    * The page-global font state this editor reads & writes - the shared
@@ -238,6 +245,8 @@ export class Fonts {
       shouldDeferSceneMutation?: () => boolean;
       /** defaults to the global `document` - see `ExcalidrawProps.ownerDocument` */
       ownerDocument?: Document;
+      /** what reflows measure with - see `App.renderEnvironment` */
+      getRenderEnvironment?: () => RenderEnvironment | undefined;
     },
   ) {
     for (const provider of Object.keys(fontResolvers)) {
@@ -246,7 +255,9 @@ export class Fonts {
     this.scene = scene;
     this.fontResolvers = fontResolvers;
     this.registry = registry;
-    this.ownerDocument = options?.ownerDocument ?? document;
+    this.fontFaceSet = getFontFaceSet(options?.ownerDocument);
+    this.getRenderEnvironment =
+      options?.getRenderEnvironment ?? (() => undefined);
     this.hasResolvers = Object.keys(fontResolvers).length > 0;
     this.onBeforeSceneMutation = options?.onBeforeSceneMutation ?? (() => {});
     this.shouldDeferSceneMutation =
@@ -442,6 +453,7 @@ export class Fonts {
             latest,
             getContainerElement(latest, latestElementsMap),
             this.scene,
+            this.getRenderEnvironment(),
           );
         }
       });
@@ -465,7 +477,7 @@ export class Fonts {
     if (registeredFont) {
       this.registry.installFontFaces(
         registeredFont.fontFaces,
-        this.ownerDocument,
+        this.fontFaceSet,
       );
       this.registry.cache.clearFailed(family);
       return { family, status: "success" };
@@ -499,7 +511,7 @@ export class Fonts {
       if (registeredFont) {
         this.registry.installFontFaces(
           registeredFont.fontFaces,
-          this.ownerDocument,
+          this.fontFaceSet,
         );
         this.registry.cache.clearFailed(family);
         return { family, status: "success" };
@@ -514,7 +526,7 @@ export class Fonts {
       };
       this.registry.installFontFaces(
         nextRegisteredFont.fontFaces,
-        this.ownerDocument,
+        this.fontFaceSet,
       );
       // also publish the metrics so getLineHeight / getVerticalOffset work
       setCustomFontMetadata(family, definition.metadata);
@@ -641,6 +653,12 @@ export class Fonts {
       this.scene.getNonDeletedElements(),
     );
 
+    // prewarm families no element uses yet (i.e. the default font), so that
+    // the first text element is not rendered with a fallback font
+    for (const family of additionalFamilies) {
+      charsPerFamily[family] ??= new Set("Excalidraw");
+    }
+
     return this.splitLoadFontFaces(sceneFamilies, charsPerFamily);
   };
 
@@ -652,6 +670,25 @@ export class Fonts {
     fonts: Fonts = new Fonts(new Scene()),
     options?: Pick<RegistrationOptions, "recordFailure">,
   ): Promise<FontFace[]> => {
+    if (!fonts.fontFaceSet) {
+      // local fonts (e.g. Helvetica) are never loaded anyway
+      if (
+        !warnedNoFontFaceSet &&
+        Fonts.getUniqueFamilies(elements).some(
+          (family) => !fonts.registry.registered.get(family)?.metadata.local,
+        )
+      ) {
+        warnedNoFontFaceSet = true;
+        console.warn(
+          "Excalidraw: there is no font set (`document.fonts`, or a worker's " +
+            "`self.fonts`) to load the exported fonts into, so text is " +
+            "measured and drawn with whatever fonts this environment has. " +
+            "Load them yourself in `config.environment.loadFonts`.",
+        );
+      }
+      return [];
+    }
+
     // an attempt which doesn't record failures doesn't consult them either -
     // an export retries a page-failed family, in-editor callers don't
     const ignoreFailures = options?.recordFailure === false;
@@ -738,11 +775,19 @@ export class Fonts {
         continue;
       }
 
-      this.registry.installFontFaces(fontFaces, this.ownerDocument);
+      this.registry.installFontFaces(fontFaces, this.fontFaceSet);
+    }
+
+    if (!this.fontFaceSet) {
+      return [];
     }
 
     // loading 10 font faces at a time, in a controlled manner
-    const iterator = this.fontFacesLoader(fontFamilies, charsPerFamily);
+    const iterator = this.fontFacesLoader(
+      fontFamilies,
+      charsPerFamily,
+      this.fontFaceSet,
+    );
     const concurrency = 10;
     const fontFaces = await new PromisePool(iterator, concurrency).all();
 
@@ -771,6 +816,7 @@ export class Fonts {
   private *fontFacesLoader(
     fontFamilies: FontFamily[],
     charsPerFamily: Record<FontFamily, Set<string>>,
+    fontFaceSet: FontFaceSet,
   ): Generator<Promise<void | readonly [number, FontFace[]]>> {
     for (const [index, fontFamily] of fontFamilies.entries()) {
       const font = getFontString({
@@ -784,12 +830,12 @@ export class Fonts {
       // empty string makes `check` pass vacuously, skipping the load
       const text = Fonts.getCharacters(charsPerFamily, fontFamily) || " ";
 
-      if (!this.ownerDocument.fonts.check(font, text)) {
+      if (!fontFaceSet.check(font, text)) {
         yield promiseTry(async () => {
           try {
             // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
             // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
-            const fontFaces = await this.ownerDocument.fonts.load(font, text);
+            const fontFaces = await fontFaceSet.load(font, text);
 
             return [index, fontFaces];
           } catch (e) {

@@ -1,0 +1,67 @@
+name: Stats
+
+# Posts every master commit's production build (bundle size) and, once
+# staging.excalidraw.com serves the commit, its page-load measurements to the
+# Excalidraw+ admin's Bundle size and Performance pages (scripts/stats/).
+# OSS_STATS_TOKEN lives in the `stats` environment, which only master can use.
+
+on:
+  push:
+    branches: master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Bundle size
+    runs-on: ubuntu-latest
+    environment: stats
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20.x
+      - name: Install
+        run: yarn install --frozen-lockfile
+      - name: Build with bundle stats
+        run: yarn stats:bundle
+        env:
+          VITE_APP_GIT_SHA: ${{ github.sha }}
+          VITE_APP_ENABLE_ESLINT: "false"
+      - name: Post to the Excalidraw+ admin
+        run: node scripts/stats/post.mjs bundle excalidraw-app/build/bundle-stats.json
+        env:
+          OSS_STATS_TOKEN: ${{ secrets.OSS_STATS_TOKEN }}
+
+  perf:
+    name: Performance
+    # a fixed image, so the runs stay comparable; Playwright 1.58 can't install
+    # its browser on ubuntu-latest's 26.04 either
+    runs-on: ubuntu-24.04
+    environment: stats
+    # staging serves only the latest commit, so a newer push takes over
+    concurrency:
+      group: stats-perf
+      cancel-in-progress: true
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20.x
+      - name: Install
+        run: |
+          yarn install --frozen-lockfile
+          npx playwright install --with-deps chromium
+      - name: Measure staging once it serves this commit
+        run: yarn stats:perf --wait-for ${{ github.sha }} --out perf.json
+      - name: Post to the Excalidraw+ admin
+        # not measured when staging didn't serve the commit in time
+        if: hashFiles('perf.json') != ''
+        run: node scripts/stats/post.mjs perf perf.json
+        env:
+          OSS_STATS_TOKEN: ${{ secrets.OSS_STATS_TOKEN }}

@@ -24,6 +24,18 @@ import { XiaolaiFontFaces } from "./Xiaolai";
 
 import type { ExcalidrawFontFaceDescriptor } from "./Fonts";
 
+/**
+ * The font set faces are installed & loaded into: the document's, or in a
+ * worker its own (`self.fonts`, what an `OffscreenCanvas` there measures
+ * with). `null` where there is neither, e.g. Node or `linkedom`.
+ */
+export const getFontFaceSet = (ownerDocument?: Document): FontFaceSet | null =>
+  (ownerDocument ?? (typeof document !== "undefined" ? document : null))
+    ?.fonts ??
+  (typeof self !== "undefined" && "fonts" in self
+    ? (self as unknown as { fonts: FontFaceSet }).fonts
+    : null);
+
 /** a registered font, as held by {@link Fonts.registered} */
 export type RegisteredFont = {
   metadata: FontMetadata;
@@ -141,17 +153,16 @@ export class FontRegistry {
   }
 
   /**
-   * add the given font faces into the document's `fonts` (if not added
-   * already) - the global `document` unless the editor renders into another
-   * one (see `ExcalidrawProps.ownerDocument`)
+   * add the given font faces into the font set (if not added already) - see
+   * {@link getFontFaceSet}
    */
   public installFontFaces(
     fontFaces: readonly ExcalidrawFontFace[],
-    ownerDocument: Document = document,
+    fontFaceSet: FontFaceSet | null = getFontFaceSet(),
   ) {
     for (const { fontFace } of fontFaces) {
-      if (!ownerDocument.fonts.has(fontFace)) {
-        ownerDocument.fonts.add(fontFace);
+      if (fontFaceSet && !fontFaceSet.has(fontFace)) {
+        fontFaceSet.add(fontFace);
       }
     }
   }

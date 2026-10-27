@@ -479,6 +479,8 @@ const restoreElementWithProperties = <
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
     strokeSharpness?: StrokeRoundness;
+    /** @deprecated `movePoints()` option wrongly persisted on linear elements */
+    moveMidPointsWithElement?: boolean | null;
   },
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
@@ -555,6 +557,8 @@ const restoreElementWithProperties = <
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;
   delete ret.boundElementIds;
+  // not an element prop, but used to leak onto linear elements
+  delete ret.moveMidPointsWithElement;
 
   return ret;
 };

@@ -36,6 +36,8 @@ import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -346,6 +348,7 @@ export const newTextElement = (
     autoResize?: ExcalidrawTextElement["autoResize"];
     labelPosition?: ExcalidrawTextElement["labelPosition"];
     baseFontSize?: ExcalidrawTextElement["baseFontSize"];
+    renderEnvironment?: RenderEnvironment;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -356,6 +359,7 @@ export const newTextElement = (
     text,
     getFontString({ fontFamily, fontSize }),
     lineHeight,
+    opts.renderEnvironment,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
@@ -397,6 +401,7 @@ const getAdjustedDimensions = (
   nextText: string,
   /** the width the text is to take regardless of its content */
   nextFixedWidth?: number,
+  renderEnvironment?: RenderEnvironment,
 ): {
   x: number;
   y: number;
@@ -407,6 +412,7 @@ const getAdjustedDimensions = (
     nextText,
     getFontString(element),
     element.lineHeight,
+    renderEnvironment,
   );
 
   // wrapped text
@@ -429,6 +435,7 @@ const getAdjustedDimensions = (
       element.text,
       getFontString(element),
       element.lineHeight,
+      renderEnvironment,
     );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
@@ -543,6 +550,7 @@ export const refreshTextDimensions = (
    * text that is already wider keeps growing.
    */
   maxWidth?: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (textElement.isDeleted) {
     return;
@@ -554,8 +562,11 @@ export const refreshTextDimensions = (
     textElement.width <= maxWidth
   ) {
     const font = getFontString(textElement);
-    if (measureText(text, font, textElement.lineHeight).width > maxWidth) {
-      const wrappedText = wrapText(text, font, maxWidth);
+    if (
+      measureText(text, font, textElement.lineHeight, renderEnvironment).width >
+      maxWidth
+    ) {
+      const wrappedText = wrapText(text, font, maxWidth, renderEnvironment);
       return {
         text: wrappedText,
         autoResize: false,
@@ -564,6 +575,7 @@ export const refreshTextDimensions = (
           elementsMap,
           wrappedText,
           maxWidth,
+          renderEnvironment,
         ),
       };
     }
@@ -575,9 +587,16 @@ export const refreshTextDimensions = (
       container
         ? getBoundTextMaxWidth(container, textElement)
         : textElement.width,
+      renderEnvironment,
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
+  const dimensions = getAdjustedDimensions(
+    textElement,
+    elementsMap,
+    text,
+    undefined,
+    renderEnvironment,
+  );
   return { text, ...dimensions };
 };
 
