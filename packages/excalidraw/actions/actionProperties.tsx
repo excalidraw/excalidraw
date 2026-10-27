@@ -291,6 +291,28 @@ const offsetElementAfterFontResize = (
   });
 };
 
+// arrows are re-routed against the scene (elbow arrows always are), so the
+// resized texts have to be in it first
+const updateArrowsBoundToTexts = (
+  nextElements: readonly ExcalidrawElement[],
+  textIds: readonly ExcalidrawElement["id"][],
+  app: AppClassProperties,
+) => {
+  if (!textIds.length) {
+    return nextElements;
+  }
+
+  app.scene.replaceAllElements(nextElements);
+  for (const id of textIds) {
+    const text = app.scene.getNonDeletedElement(id);
+    if (text) {
+      updateBoundElements(text, app.scene);
+    }
+  }
+
+  return app.scene.getElementsIncludingDeleted();
+};
+
 const changeFontSize = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -300,6 +322,7 @@ const changeFontSize = (
 ) => {
   const newFontSizes = new Set<number>();
   const elementsMap = app.scene.getNonDeletedElementsMap();
+  const resizedTextIds: ExcalidrawElement["id"][] = [];
 
   const updatedElements = changeProperty(
     elements,
@@ -327,6 +350,7 @@ const changeFontSize = (
           app.scene,
         );
 
+        resizedTextIds.push(newElement.id);
         return newElement;
       }
       return oldElement;
@@ -334,17 +358,14 @@ const changeFontSize = (
     true,
   );
 
-  // Update arrow elements after text elements have been updated
-  getSelectedElements(elements, appState, {
-    includeBoundTextElement: true,
-  }).forEach((element) => {
-    if (isTextElement(element)) {
-      updateBoundElements(element, app.scene);
-    }
-  });
+  const nextElements = updateArrowsBoundToTexts(
+    updatedElements,
+    resizedTextIds,
+    app,
+  );
 
   return {
-    elements: updatedElements,
+    elements: nextElements,
     appState: {
       ...appState,
       // update state only if we've set all select text elements to
@@ -1340,9 +1361,22 @@ export const actionChangeFontFamily = register<{
             app.renderEnvironment,
           );
         }
+
+        // not while hovering, as the preview reset restores only the texts
+        if (currentItemFontFamily) {
+          Object.assign(result, {
+            elements: updateArrowsBoundToTexts(
+              (result as typeof result & { elements: ExcalidrawElement[] })
+                .elements,
+              Array.from(elementContainerMapping.keys(), (text) => text.id),
+              app,
+            ),
+          });
+        }
       } else {
         // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
         ownerDocument.fonts.load(fontString, chars).then((fontFaces) => {
+          const redrawnTexts: NonDeleted<ExcalidrawTextElement>[] = [];
           for (const [element, container] of elementContainerMapping) {
             // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
             const latestElement = app.scene.getElement(element.id);
@@ -1358,6 +1392,16 @@ export const actionChangeFontFamily = register<{
                 app.scene,
                 app.renderEnvironment,
               );
+              redrawnTexts.push(
+                latestElement as NonDeleted<ExcalidrawTextElement>,
+              );
+            }
+          }
+
+          // the texts are in the scene already
+          if (currentItemFontFamily) {
+            for (const text of redrawnTexts) {
+              updateBoundElements(text, app.scene);
             }
           }
 
