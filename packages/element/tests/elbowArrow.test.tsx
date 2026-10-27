@@ -516,7 +516,7 @@ describe("elbow arrow routes with one or two corners", () => {
 
   it("doesn't route a leg too short to keep its corner", () => {
     // the arrow leaves the box above at x = 134, and enters the one below
-    // at x = 135
+    // at x = 139, a leg too short to round its corner
     UI.createElement("rectangle", { x: 0, y: 0, width: 128, height: 100 });
     UI.createElement("rectangle", { x: 100, y: 200, width: 128, height: 100 });
     UI.clickTool("arrow");
@@ -524,13 +524,13 @@ describe("elbow arrow routes with one or two corners", () => {
     mouse.reset();
     mouse.moveTo(128, 50);
     mouse.click();
-    mouse.moveTo(135, 200);
+    mouse.moveTo(139, 200);
     mouse.click();
 
     const arrow = h.elements.find(
       (element) => element.type === "arrow",
     ) as ExcalidrawElbowArrowElement;
-    expect(arrow.points.length).toBeGreaterThan(2);
+    expect(arrow.points.length).toBeGreaterThan(3);
     expect(validateElbowPoints(arrow.points)).toBe(true);
   });
 

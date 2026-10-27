@@ -1482,17 +1482,20 @@ const getSimpleRoute = (
     lastLeg = ahead - firstLeg;
   }
 
-  // a leg with an arrowhead is to fit it (not to have it reach around the
-  // corner), and any to outlast the cleanup of short segments
+  // a leg is to keep its corner rounded (at least a quarter of the radius,
+  // rather than a stub hugging the element), and one with an arrowhead to
+  // fit it too (not to have it reach around the corner)
   if (
     firstLeg <=
-      (arrow.startArrowhead
-        ? getArrowheadSize(arrow.startArrowhead)
-        : DEDUP_TRESHOLD) ||
+      Math.max(
+        ELBOW_ARROW_CORNER_RADIUS / 2,
+        arrow.startArrowhead ? getArrowheadSize(arrow.startArrowhead) : 0,
+      ) ||
     lastLeg <=
-      (arrow.endArrowhead
-        ? getArrowheadSize(arrow.endArrowhead)
-        : DEDUP_TRESHOLD)
+      Math.max(
+        ELBOW_ARROW_CORNER_RADIUS / 2,
+        arrow.endArrowhead ? getArrowheadSize(arrow.endArrowhead) : 0,
+      )
   ) {
     return null;
   }
