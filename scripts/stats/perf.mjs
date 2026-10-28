@@ -5,26 +5,27 @@
  * Excalidraw+ admin's Performance page — page loads, and panning and zooming
  * a large scene: every scenario `--iterations` times, each in a fresh browser
  * context (cold HTTP cache) on a throttled fast-desktop connection — the
- * conditions of Excalidraw+'s own runs, so the apps' numbers compare. Master
- * CI runs it once staging serves the merged commit (`--wait-for`), and
- * `post.mjs` stores the result.
+ * conditions of Excalidraw+'s own runs, so the apps' numbers compare.
  *
- * `--compare` (`yarn stats:compare`) instead measures two builds on this
- * machine, alternating them, and prints a table of their differences (a CSV
- * with `--out`): this checkout's production build — built and served locally
- * — or `--url`, against `--base` (staging by default). The machine's speed
- * shows in every timing, so only builds measured side by side compare.
+ * `--compare` (`yarn stats:compare`) measures two builds on this machine,
+ * alternating them, and prints a table of their differences: this checkout's
+ * production build — built and served locally — or `--url`, against `--base`,
+ * a url (staging by default) or a commit, checked out and built the same way.
+ * The machine's speed shows in every timing, so only builds measured side by
+ * side compare. Master CI compares every commit with the one before it, and
+ * `post.mjs` stores both builds' loads.
  *
  *   node scripts/stats/perf.mjs --url http://localhost:3000 --iterations 3
  *   node scripts/stats/perf.mjs --scenario oss-pan-zoom --iterations 1
- *   node scripts/stats/perf.mjs --wait-for <sha> --out perf.json
  *   yarn stats:compare [--iterations 10] [--out diff.csv]
+ *   yarn stats:compare --base master --out perf.json
  *   yarn stats:compare --url http://localhost:3000 --base https://excalidraw.com
  */
 
 import { execFileSync, spawn } from "node:child_process";
 import fs from "node:fs";
 import net from "node:net";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -39,13 +40,13 @@ const { values: args } = parseArgs({
     // the app to measure — staging by default; with --compare, this checkout's build
     url: { type: "string" },
     iterations: { type: "string", default: "5" },
-    // the JSON file to write the run to (printed when left out); with --compare, a CSV
+    // the JSON file to write the run to (printed when left out); with --compare, a
+    // `.csv` gets the table of differences, a JSON file both builds' loads
     out: { type: "string" },
     // compare --url (this checkout's build by default) with --base, measured alternately
     compare: { type: "boolean", default: false },
+    // a url, or a commit to build
     base: { type: "string", default: STAGING_URL },
-    // a commit: wait until the url serves it (its version.json) before measuring
-    "wait-for": { type: "string" },
     // only these scenarios (comma-separated ids)
     scenario: { type: "string" },
   },
@@ -67,8 +68,6 @@ const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
-const APP_DIR = path.join(REPO_ROOT, "excalidraw-app");
-const VITE = path.join(REPO_ROOT, "node_modules/vite/bin/vite.js");
 
 /** Same as Excalidraw+'s runs (`PERF_ENVIRONMENT` there), close to Lighthouse's desktop preset. */
 const PERF_ENVIRONMENT = {
@@ -83,9 +82,6 @@ const PAINT_SETTLE_MS = 1_000;
 
 /** Between loads, so the browser's work in the background after one (closing it, a renderer for the next) is done. */
 const BETWEEN_LOADS_MS = 1_000;
-
-const WAIT_FOR_DEPLOY_MS = 20 * 60_000;
-const WAIT_FOR_DEPLOY_INTERVAL_MS = 30_000;
 
 /** Analytics and error reporting stay out of the measured loads (and out of the stats). */
 const BLOCKED_URLS = [
@@ -568,29 +564,14 @@ const getFreePort = () =>
     });
   });
 
-/**
- * Builds this checkout's app for production — as Vercel does (`build:app`),
- * minus linting — and serves it with `vite preview`: its url, the commit (and
- * whether the checkout has changes on top), and how to stop the server.
- */
-async function serveLocalBuild() {
-  const git = (...gitArgs) =>
-    execFileSync("git", gitArgs, { cwd: REPO_ROOT, encoding: "utf8" }).trim();
-  const sha = git("rev-parse", "HEAD");
-  const label = `this checkout (${sha.slice(0, 7)}${
-    git("status", "--porcelain") ? " + uncommitted changes" : ""
-  })`;
+const git = (...gitArgs) =>
+  execFileSync("git", gitArgs, { cwd: REPO_ROOT, encoding: "utf8" }).trim();
 
-  console.info(`⏱️ Building ${label}…`);
+/** Runs a command with its output kept back, but for the end of it when it fails. */
+function runQuietly(command, commandArgs, options, failure) {
   try {
-    execFileSync(process.execPath, [VITE, "build"], {
-      cwd: APP_DIR,
-      env: {
-        ...process.env,
-        VITE_APP_GIT_SHA: sha,
-        VITE_APP_ENABLE_TRACKING: "true",
-        VITE_APP_ENABLE_ESLINT: "false",
-      },
+    execFileSync(command, commandArgs, {
+      ...options,
       stdio: "pipe",
       maxBuffer: 256 * 1024 * 1024,
     });
@@ -602,14 +583,88 @@ async function serveLocalBuild() {
         .slice(-20)
         .join("\n"),
     );
-    throw new Error("The build failed (`yarn build:app` shows why)");
+    throw new Error(failure);
   }
+}
+
+/** This checkout: its commit, and whether it has changes on top. */
+function getThisCheckout() {
+  const sha = git("rev-parse", "HEAD");
+  return {
+    dir: REPO_ROOT,
+    sha,
+    label: `this checkout (${sha.slice(0, 7)}${
+      git("status", "--porcelain") ? " + uncommitted changes" : ""
+    })`,
+  };
+}
+
+/**
+ * `revision` checked out into a temporary worktree with its own dependencies
+ * (they may differ from this checkout's), removed when the script ends.
+ */
+function checkOut(revision) {
+  const sha = git("rev-parse", "--verify", `${revision}^{commit}`);
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "excalidraw-perf-"));
+  const dir = path.join(tmpDir, "excalidraw");
+  const label = sha.startsWith(revision)
+    ? sha.slice(0, 7)
+    : `${revision} (${sha.slice(0, 7)})`;
+
+  console.info(`⏱️ Checking out ${label} and installing its dependencies…`);
+  process.on("exit", () => {
+    try {
+      execFileSync("git", ["worktree", "remove", "--force", dir], {
+        cwd: REPO_ROOT,
+        stdio: "ignore",
+      });
+    } catch {
+      // the script ended before git created it
+    }
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+  git("worktree", "add", "--quiet", "--detach", dir, sha);
+  runQuietly(
+    "yarn",
+    ["install", "--frozen-lockfile", "--prefer-offline"],
+    // no git hooks for the worktree
+    { cwd: dir, env: { ...process.env, HUSKY: "0" } },
+    `Installing the dependencies of ${label} failed`,
+  );
+
+  return { dir, sha, label };
+}
+
+/**
+ * Builds a checkout's app for production — as Vercel does (`build:app`),
+ * minus linting — and serves it with `vite preview`: its url, and how to stop
+ * the server.
+ */
+async function serveLocalBuild({ dir, sha, label }) {
+  const appDir = path.join(dir, "excalidraw-app");
+  const vite = path.join(dir, "node_modules/vite/bin/vite.js");
+
+  console.info(`⏱️ Building ${label}…`);
+  runQuietly(
+    process.execPath,
+    [vite, "build"],
+    {
+      cwd: appDir,
+      env: {
+        ...process.env,
+        VITE_APP_GIT_SHA: sha,
+        VITE_APP_ENABLE_TRACKING: "true",
+        VITE_APP_ENABLE_ESLINT: "false",
+      },
+    },
+    `Building ${label} failed (\`yarn build:app\` shows why)`,
+  );
 
   const port = await getFreePort();
   const server = spawn(
     process.execPath,
-    [VITE, "preview", "--port", String(port), "--strictPort"],
-    { cwd: APP_DIR, stdio: "ignore" },
+    [vite, "preview", "--port", String(port), "--strictPort"],
+    { cwd: appDir, stdio: "ignore" },
   );
   // however the script ends
   process.on("exit", () => server.kill());
@@ -619,7 +674,7 @@ async function serveLocalBuild() {
       .then((response) => response.ok)
       .catch(() => false);
     if (isUp) {
-      return { url, label, stop: () => server.kill() };
+      return { url, stop: () => server.kill() };
     }
     if (attempt > 60 || server.exitCode !== null) {
       server.kill();
@@ -629,37 +684,9 @@ async function serveLocalBuild() {
   }
 }
 
-/** Whether the app serves `sha` (its version.json ends with the short hash) within the wait. */
-async function waitForDeploy(sha) {
-  const deadline = Date.now() + WAIT_FOR_DEPLOY_MS;
-
-  while (Date.now() < deadline) {
-    const deployed = await fetch(`${APP_URL}/version.json?t=${Date.now()}`, {
-      cache: "no-store",
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => data?.version?.split("-").at(-1))
-      .catch(() => null);
-    if (deployed && sha.startsWith(deployed)) {
-      return true;
-    }
-    console.info(
-      `⏱️ ${APP_URL} serves ${
-        deployed ?? "nothing yet"
-      }, waiting for ${sha.slice(0, 7)}…`,
-    );
-    await sleep(WAIT_FOR_DEPLOY_INTERVAL_MS);
-  }
-
-  return false;
-}
-
-if (args["wait-for"] && !(await waitForDeploy(args["wait-for"]))) {
-  // a later commit's run measures it instead
-  console.warn(
-    `⏱️ ${APP_URL} didn't serve ${args["wait-for"]} in time — not measured`,
-  );
-  process.exit(0);
+// so a stopped run still removes its worktree and servers
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.once(signal, () => process.exit(1));
 }
 
 /** The metrics the runner records, in the admin's order (`PERF_METRICS` in Excalidraw+), and their units. */
@@ -948,33 +975,48 @@ const scenarios = args.scenario
   ? SCENARIOS.filter(({ id }) => args.scenario.split(",").includes(id))
   : SCENARIOS;
 
-// with --compare, the base and the new build alternate: whichever loads first
-// switches every iteration, so the machine drifting (warming up, other work)
-// weighs on both alike
-const localBuild = args.compare && !args.url ? await serveLocalBuild() : null;
-const target = (name, url, label = url) => ({
+/** A build to measure: its url, its commit when it's built here, and its loads. */
+const target = (name, { url, label = url, commitSha = null }) => ({
   name,
   url,
   label,
+  commitSha,
   samples: [],
   buildSha: null,
 });
+
+const stopServers = [];
+
+/** A checkout's build, served here. */
+async function localTarget(name, checkout) {
+  const { url, stop } = await serveLocalBuild(checkout);
+  stopServers.push(stop);
+  return target(name, {
+    url,
+    label: `${checkout.label} at ${url}`,
+    commitSha: checkout.sha,
+  });
+}
+
+const isUrl = (value) => /^https?:\/\//.test(value);
+
+// with --compare, the base and the new build alternate: whichever loads first
+// switches every iteration, so the machine drifting (warming up, other work)
+// weighs on both alike
 const targets = args.compare
   ? [
-      target("base", withoutSlash(args.base)),
-      localBuild
-        ? target(
-            "new",
-            localBuild.url,
-            `${localBuild.label} at ${localBuild.url}`,
-          )
-        : target("new", APP_URL),
+      isUrl(args.base)
+        ? target("base", { url: withoutSlash(args.base) })
+        : await localTarget("base", checkOut(args.base)),
+      args.url
+        ? target("new", { url: APP_URL })
+        : await localTarget("new", getThisCheckout()),
     ]
-  : [target(null, APP_URL)];
+  : [target(null, { url: APP_URL })];
 
 console.info(
   args.compare
-    ? `⏱️ Comparing ${targets[1].url} with ${targets[0].url}, ${ITERATIONS} loads each per scenario, alternating…`
+    ? `⏱️ Comparing ${targets[1].label} with ${targets[0].label}, ${ITERATIONS} loads each per scenario, alternating…`
     : `⏱️ Measuring ${APP_URL}, ${ITERATIONS} loads per scenario…`,
 );
 
@@ -982,6 +1024,10 @@ const browser = await chromium.launch();
 const browserVersion = browser.version();
 
 try {
+  // the browser's first load is slower than the next ones: one of each build, not recorded
+  for (const target of targets) {
+    await measureOnce(browser, scenarios[0], target.url).catch(() => {});
+  }
   for (const scenario of scenarios) {
     for (let iteration = 1; iteration <= ITERATIONS; iteration++) {
       const order = iteration % 2 ? targets : [...targets].reverse();
@@ -1030,7 +1076,7 @@ try {
   }
 } finally {
   await browser.close();
-  localBuild?.stop();
+  stopServers.forEach((stop) => stop());
 }
 
 if (targets.some(({ samples }) => !samples.some(({ error }) => !error))) {
@@ -1038,8 +1084,30 @@ if (targets.some(({ samples }) => !samples.some(({ error }) => !error))) {
   process.exit(1);
 }
 
+const [base, next] = args.compare ? targets : [null, targets[0]];
+// with --compare, the base build's loads too (`post.mjs` stores them with the run)
+const run = {
+  appUrl: next.url,
+  buildSha: next.buildSha,
+  environment: {
+    ...PERF_ENVIRONMENT,
+    runner: process.env.RUNNER_NAME ?? null,
+    cpu: os.cpus()[0]?.model ?? null,
+    browser: `chromium ${browserVersion}`,
+    iterations: ITERATIONS,
+  },
+  samples: next.samples,
+  ...(base && {
+    base: {
+      // a url's: the build it served
+      commitSha: base.commitSha ?? base.buildSha,
+      buildSha: base.buildSha,
+      samples: base.samples,
+    },
+  }),
+};
+
 if (args.compare) {
-  const [base, next] = targets;
   const rows = compareTargets(scenarios, base, next);
   const describe = ({ label, buildSha }) =>
     `${label}${buildSha ? ` (build ${buildSha.slice(0, 7)})` : ""}`;
@@ -1056,26 +1124,16 @@ if (args.compare) {
     );
   }
   if (args.out) {
-    fs.writeFileSync(args.out, `${toCsv(rows)}\n`);
+    fs.writeFileSync(
+      args.out,
+      args.out.endsWith(".csv")
+        ? `${toCsv(rows)}\n`
+        : JSON.stringify(run, null, 2),
+    );
     console.info(`\nWrote ${args.out}`);
   }
+} else if (args.out) {
+  fs.writeFileSync(args.out, JSON.stringify(run, null, 2));
 } else {
-  const [{ samples, buildSha }] = targets;
-  const run = {
-    appUrl: APP_URL,
-    buildSha,
-    environment: {
-      ...PERF_ENVIRONMENT,
-      runner: process.env.RUNNER_NAME ?? null,
-      browser: `chromium ${browserVersion}`,
-      iterations: ITERATIONS,
-    },
-    samples,
-  };
-
-  if (args.out) {
-    fs.writeFileSync(args.out, JSON.stringify(run, null, 2));
-  } else {
-    console.info(JSON.stringify(run, null, 2));
-  }
+  console.info(JSON.stringify(run, null, 2));
 }
