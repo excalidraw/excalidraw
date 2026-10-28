@@ -71,7 +71,9 @@ export const useFontResolution = ({
 
   const select = useCallback(
     (fontFamily: FontFamily, options?: FontSelectionOptions) => {
-      const savedCaret = isEditingText ? saveCaretPosition() : null;
+      // an open popup keeps the focus
+      const savedCaret =
+        isEditingText && !options?.keepOpen ? saveCaretPosition() : null;
 
       onSelect(fontFamily, options);
 

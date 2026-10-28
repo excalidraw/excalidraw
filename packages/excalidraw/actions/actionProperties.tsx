@@ -1200,10 +1200,11 @@ export const actionChangeFontFamily = register<{
     } = value as ChangeFontFamilyData;
 
     if (resetAll) {
-      // by id, not selection - a click outside the picker may have cleared it
+      // by id, not selection - a click outside the picker may have cleared it.
+      // A deleted one stays so, i.e. when deleted by a collaborator meanwhile
       const nextElements = elements.map((element) => {
         const cachedElement = cachedElements?.get(element.id);
-        return cachedElement
+        return cachedElement && !element.isDeleted
           ? newElementWith(
               element,
               withoutVersion(cachedElement) as ElementUpdate<typeof element>,

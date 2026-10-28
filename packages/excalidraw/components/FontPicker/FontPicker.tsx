@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useReducer,
   useRef,
 } from "react";
@@ -306,9 +307,11 @@ export const FontPicker = React.memo(
     // the strip (and thus its customization) is hidden in compact mode
     const isTopPicksCustomizable = !compactMode;
     const isCustomized = !!topPicks?.length;
-    const picks = topPicks?.length
-      ? getFontTopPicks(topPicks)
-      : DEFAULT_FONT_TOP_PICKS;
+    const picks = useMemo(
+      () =>
+        topPicks?.length ? getFontTopPicks(topPicks) : DEFAULT_FONT_TOP_PICKS,
+      [topPicks],
+    );
 
     const resetTopPicks = () => onTopPicksChange(null);
 

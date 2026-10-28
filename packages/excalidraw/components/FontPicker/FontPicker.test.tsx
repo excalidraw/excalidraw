@@ -4,7 +4,10 @@ import { FONT_FAMILY, KEYS } from "@excalidraw/common";
 import { Scene } from "@excalidraw/element";
 
 import type { FontMetadata } from "@excalidraw/common";
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { Excalidraw } from "../../index";
 import { Fonts } from "../../fonts";
@@ -265,6 +268,29 @@ describe("FontPicker", () => {
       expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
     );
     expect(h.state.currentHoveredFontFamily).toBeNull();
+  });
+
+  it("doesn't restore an element deleted during a hover preview", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    fireEvent.click(queryByTestId("font-family-show-fonts")!);
+    fireEvent.mouseMove(
+      (await screen.findByText("Comic Shanns")).closest("button")!,
+    );
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    // i.e. by a collaborator
+    API.updateElement(API.getElement(text) as ExcalidrawTextElement, {
+      isDeleted: true,
+    });
+
+    await waitFor(() => expect(h.state.currentHoveredFontFamily).toBeNull());
+    expect(API.getElement(text).isDeleted).toBe(true);
   });
 
   it("reverts a hover preview after an Escape, which keeps the popup open", async () => {
@@ -761,6 +787,64 @@ describe("FontPicker", () => {
     expect(await screen.findByText("CollabArrived")).toBeInTheDocument();
   });
 
+  it("keeps scene groups free of a hover preview while fonts register", async () => {
+    const getSceneGroupFonts = () =>
+      Array.from(
+        Array.from(document.querySelectorAll(".dropdown-menu-group-title"))
+          .find((title) => title.textContent === "In this scene")!
+          .parentElement!.querySelectorAll("button"),
+      ).map((button) => button.textContent);
+
+    const { queryByTestId } = await render(
+      <Excalidraw
+        fontProviders={{
+          provider: {
+            icon: <span />,
+            resolve: vi.fn<FontResolver>(),
+            availableFonts: [],
+          },
+        }}
+      />,
+    );
+    const check = vi.spyOn(document.fonts, "check").mockReturnValue(true);
+    try {
+      const text = API.createElement({
+        type: "text",
+        text: "Hello",
+        fontFamily: FONT_FAMILY.Nunito,
+      });
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+
+      fireEvent.click(queryByTestId("font-family-show-fonts")!);
+      fireEvent.mouseMove(
+        (await screen.findByText("Comic Shanns")).closest("button")!,
+      );
+      await waitFor(() =>
+        expect(API.getElement(text).fontFamily).toBe(
+          FONT_FAMILY["Comic Shanns"],
+        ),
+      );
+
+      // i.e. a visible row registering its font for the preview
+      act(() => {
+        Fonts.registerCustomFont("provider:DuringPreview", metadata, {
+          uri: "https://example.com/font.woff2",
+        });
+      });
+
+      expect(getSceneGroupFonts()).toEqual(["Nunito"]);
+
+      fireEvent.pointerLeave(document.querySelector(".properties-content")!);
+      await waitFor(() =>
+        expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY.Nunito),
+      );
+      expect(getSceneGroupFonts()).toEqual(["Nunito"]);
+    } finally {
+      check.mockRestore();
+    }
+  });
+
   it("lists the current default family even when no element uses it", async () => {
     // a family searched & selected with nothing on canvas lives in no
     // element - reopening the picker must still list it (the transient
@@ -1019,9 +1103,14 @@ describe("FontPicker", () => {
     const openAndSearch = async (
       providers: Record<string, FontProvider>,
       query: string,
+      elements?: ExcalidrawElement[],
     ) => {
       const { queryByTestId } = await render(
-        <Excalidraw handleKeyboardGlobally={true} fontProviders={providers} />,
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          fontProviders={providers}
+          initialData={{ elements }}
+        />,
       );
       Keyboard.keyPress(KEYS.T);
       fireEvent.click(queryByTestId("font-family-show-fonts")!);
@@ -1184,6 +1273,89 @@ describe("FontPicker", () => {
 
       expect(window.h.state.currentItemFontFamily).toBe("provider:Roboto");
       expect(onNewFontUsed).not.toHaveBeenCalled();
+    });
+
+    it("doesn't announce a searched font that's listed already", async () => {
+      vi.spyOn(document.fonts, "check").mockReturnValue(false);
+      vi.spyOn(document.fonts, "load").mockResolvedValue([]);
+      const onNewFontUsed = vi.fn();
+      await openAndSearch(
+        {
+          provider: {
+            icon: <span />,
+            resolve,
+            availableFonts: [],
+            search: async () => ({
+              kind: "match",
+              names: ["Lobster", "Lobster Two"],
+            }),
+            onNewFontUsed,
+          },
+        },
+        "lob",
+        [
+          API.createElement({
+            type: "text",
+            text: "Hello",
+            fontFamily: "provider:Lobster",
+          }),
+        ],
+      );
+
+      await screen.findByText("Lobster Two");
+      expect(rowValues()).toEqual(["provider:Lobster", "provider:Lobster Two"]);
+      await act(async () => {
+        fireEvent.click(screen.getByText("Lobster").closest("button")!);
+      });
+
+      expect(onNewFontUsed).not.toHaveBeenCalled();
+    });
+
+    it("keeps focus in the popup after a keep-open selection while editing", async () => {
+      vi.spyOn(document.fonts, "check").mockReturnValue(false);
+      vi.spyOn(document.fonts, "load").mockResolvedValue([]);
+      const { queryByTestId } = await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          fontProviders={{
+            provider: { icon: <span />, resolve, availableFonts: [] },
+          }}
+        />,
+      );
+      const flushTimers = () =>
+        act(() => new Promise((resolve) => setTimeout(resolve, 10)));
+      // as a real click, which the text editor tells apart from leaving it
+      const press = (target: Element) => {
+        fireEvent.pointerDown(target);
+        fireEvent.pointerUp(target);
+        fireEvent.click(target);
+      };
+      Keyboard.keyPress(KEYS.T);
+      new Pointer("mouse").clickAt(100, 100);
+      await flushTimers();
+      expect(h.state.editingTextElement).not.toBeNull();
+
+      press(queryByTestId("font-family-show-fonts")!);
+      const input = await waitFor(() => {
+        const input = document.querySelector<HTMLInputElement>(
+          ".properties-content .QuickSearch__input",
+        );
+        expect(input).not.toBeNull();
+        return input!;
+      });
+      press(input);
+      input.focus();
+      await flushTimers();
+      fireEvent.input(input, { target: { value: "Foo" } });
+      await pressEnter();
+
+      await waitFor(() =>
+        expect(h.state.currentItemFontFamily).toBe("provider:Foo"),
+      );
+      await flushTimers();
+      expect(h.state.editingTextElement).not.toBeNull();
+      expect(h.state.openPopup).toBe("fontFamily");
+      expect(document.activeElement).toBe(input);
     });
 
     it("shares the result slots between providers", async () => {

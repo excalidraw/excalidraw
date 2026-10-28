@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type JSX } from "react";
+import { useCallback, useMemo, useState, type JSX } from "react";
 
 import {
   arrayToList,
@@ -114,6 +114,7 @@ interface FontCatalogOptions {
   registeredFonts: Fonts["registered"];
   failedResolutions: ReadonlyMap<string, unknown>;
   selectedFontFamily: FontFamily | null;
+  hoveredFontFamily: FontFamily | null;
   newSceneFamilies: ReadonlySet<FontFamily>;
   resolvingFamily: CustomFontFamily | null;
   searchTerm: string;
@@ -127,12 +128,21 @@ export const useFontCatalog = ({
   registeredFonts,
   failedResolutions,
   selectedFontFamily,
+  hoveredFontFamily,
   newSceneFamilies,
   resolvingFamily,
   searchTerm,
   searchResults,
   showDeprecatedFonts,
 }: FontCatalogOptions) => {
+  // a hover preview rewrites the selection's family, so the scene groups follow
+  // the registry only while there is none (and catch up once it ends)
+  const [sceneRegisteredFonts, setSceneRegisteredFonts] =
+    useState(registeredFonts);
+  if (hoveredFontFamily == null && sceneRegisteredFonts !== registeredFonts) {
+    setSceneRegisteredFonts(registeredFonts);
+  }
+
   const sceneFamilies = useMemo(
     () =>
       new Set([
@@ -147,7 +157,7 @@ export const useFontCatalog = ({
     // additionally refreshes the groups when a scene-only custom family arrives
     // while the picker is open (i.e. collab, paste), registering on load
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedFontFamily, newSceneFamilies, registeredFonts],
+    [selectedFontFamily, newSceneFamilies, sceneRegisteredFonts],
   );
 
   const getCustomFontStatus = useCallback(
@@ -170,7 +180,7 @@ export const useFontCatalog = ({
     [fontProviders, failedResolutions, resolvingFamily],
   );
 
-  const searchFamilies = useMemo(
+  const resultFamilies = useMemo(
     () =>
       new Set(
         searchResults.flatMap(({ providerId, names }) =>
@@ -198,7 +208,7 @@ export const useFontCatalog = ({
     for (const familyId of [
       ...sceneFamilies,
       // a search result resolves in place rather than jumping into the list
-      ...(resolvingFamily && !searchFamilies.has(resolvingFamily)
+      ...(resolvingFamily && !resultFamilies.has(resolvingFamily)
         ? [resolvingFamily]
         : []),
     ]) {
@@ -251,7 +261,7 @@ export const useFontCatalog = ({
     fontProviders,
     getCustomFontStatus,
     resolvingFamily,
-    searchFamilies,
+    resultFamilies,
     sceneFamilies,
   ]);
 
@@ -322,6 +332,15 @@ export const useFontCatalog = ({
       fontProviders,
       getCustomFontStatus,
     ]);
+
+  // only the rows listed as results - a family listed already isn't news
+  const searchFamilies = useMemo(
+    () =>
+      new Set(
+        [...searchMatches, ...searchSuggestions].map((font) => font.value),
+      ),
+    [searchMatches, searchSuggestions],
+  );
 
   const selectableFonts = useMemo(
     () =>

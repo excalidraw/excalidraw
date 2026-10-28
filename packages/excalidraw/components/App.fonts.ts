@@ -96,9 +96,11 @@ export class AppFonts {
     // captured, as a `fontProviders` swap replaces the instance mid-flight
     const fonts = this.instance;
 
-    fonts
-      .loadSceneFonts(additionalFamilies)
-      .then((fontFaces) => fonts.onLoaded(fontFaces));
+    fonts.loadSceneFonts(additionalFamilies).then((fontFaces) => {
+      if (!this.app.unmounted) {
+        fonts.onLoaded(fontFaces);
+      }
+    });
   };
 
   /**

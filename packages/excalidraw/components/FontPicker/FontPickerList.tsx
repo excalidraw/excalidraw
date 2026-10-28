@@ -144,6 +144,7 @@ export const FontPickerList = React.memo(
       registeredFonts,
       failedResolutions,
       selectedFontFamily,
+      hoveredFontFamily,
       newSceneFamilies,
       resolvingFamily,
       searchTerm,
