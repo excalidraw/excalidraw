@@ -65,6 +65,20 @@ Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidr
 
 ## Excalidraw API
 
+### `window.EXCALIDRAW_ASSET_PATH` resolution (2026-10-29) [#11966](https://github.com/excalidraw/excalidraw/pull/11966)
+
+An `EXCALIDRAW_ASSET_PATH` entry that can't be resolved into a base url no longer throws `TypeError: Failed to construct 'URL': Invalid URL` during font registration, which used to take down the whole editor on mount. Such entries are now skipped with a `console.warn` (once per asset path value), and fonts load from the remaining entries or from the CDN fallback. Asset paths which worked before (`"/"`, `"/path"`, `"./path"`, `"https://..."`, `"file:///..."`, `location.origin`) resolve to the same urls as before, except for the cases listed below.
+
+#### Behavior changes
+
+- Protocol-relative urls (`"//cdn.example.com/fonts"`) now resolve to that host, using the page's protocol. Previously the leading slashes were stripped and the value was resolved as a path on the current origin (`https://your.app/cdn.example.com/fonts/`). If your asset path starts with `//` unintentionally, e.g. when built as `` `${base}/fonts` `` with `base = "/"`, it now points at the host `fonts` — remove the extra slash.
+- Relative paths without a leading slash (`"assets"`, `"../assets"`) are resolved against `location.origin`, the same way `"/assets"` and `"./assets"` already were (i.e. regardless of the page path or `<base href>`). Previously they threw.
+- Blank entries (`""`, `" "`), typically an unset env var, are treated as not set. Previously they threw.
+- Surrounding whitespace is trimmed. Previously it threw for relative paths, and was percent-encoded into the path for absolute urls.
+- A base url with a query or hash (`"https://cdn.example.com/fonts?v=1"`) keeps its last path segment. Previously the trailing slash was appended after the query or hash, so fonts were requested from `https://cdn.example.com/` instead of `https://cdn.example.com/fonts/`. The query and hash are still not forwarded to the font requests.
+- Entries which can't be fetched from — Windows drive paths (`"C:/fonts"`) and urls with an opaque path (`"mailto:fonts"`, `"localhost:3000/fonts"` without a scheme) — are skipped with a warning. Previously they either threw, or produced urls which failed on fetch. Hierarchical custom schemes (`"app://bundle/fonts"`) still work.
+- With an array asset path, an invalid entry no longer prevents the other entries from being used.
+
 ### `setViewport` stops following a collaborator (2026-09-26) [#12184](https://github.com/excalidraw/excalidraw/pull/12184)
 
 - `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
