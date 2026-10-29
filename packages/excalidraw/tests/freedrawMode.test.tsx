@@ -63,6 +63,37 @@ describe("freedraw mode action", () => {
     );
   });
 
+  it.each(Array.from({ length: 24 }, (_, index) => (index - 12) * 15))(
+    "snaps free-draw to the nearest %s-degree angle",
+    (angleDegrees) => {
+      UI.clickTool("freedraw");
+
+      const snappedAngle = (angleDegrees * Math.PI) / 180;
+      const inputAngle = snappedAngle + (7 * Math.PI) / 180;
+      const projectedDistance = 100 * Math.cos((7 * Math.PI) / 180);
+      const pointer = new Pointer("mouse");
+      const endX = 100 + 100 * Math.cos(inputAngle);
+      const endY = 100 + 100 * Math.sin(inputAngle);
+
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        pointer.downAt(100, 100);
+        pointer.moveTo(endX, endY);
+        pointer.upAt(endX, endY);
+      });
+
+      const element = h.elements[0] as ExcalidrawFreeDrawElement;
+      const endpoint = element.points.at(-1)!;
+      expect(endpoint[0]).toBeCloseTo(
+        projectedDistance * Math.cos(snappedAngle),
+        3,
+      );
+      expect(endpoint[1]).toBeCloseTo(
+        projectedDistance * Math.sin(snappedAngle),
+        3,
+      );
+    },
+  );
+
   it("constrains an existing stroke when Shift is pressed at its last point", () => {
     UI.clickTool("freedraw");
 
@@ -111,6 +142,24 @@ describe("freedraw mode action", () => {
     expect(element.points[3][1]).toBe(50);
 
     pointer.upAt(170, 150);
+  });
+
+  it("keeps a repeated-point Shift stroke finite on finalization", () => {
+    UI.clickTool("freedraw");
+
+    const pointer = new Pointer("mouse");
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      pointer.downAt(100, 100);
+      pointer.moveTo(100, 100);
+      pointer.upAt(100, 100);
+    });
+
+    const element = h.elements[0] as ExcalidrawFreeDrawElement;
+    expect(element.points).toHaveLength(2);
+    expect(Number.isFinite(element.points[1][0])).toBe(true);
+    expect(Number.isFinite(element.points[1][1])).toBe(true);
+    expect(element.points[1][0]).toBeGreaterThan(0);
+    expect(element.points[1][1]).toBe(0);
   });
 
   it.each([
