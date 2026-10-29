@@ -21,7 +21,12 @@ const urlsFor = (assetPath: string | string[] | undefined) => {
 
 describe("ExcalidrawFontFace", () => {
   afterEach(() => {
-    setAssetPath(DEFAULT_ASSET_PATH);
+    // also re-resolves the memoized base urls, so that each test resolves its
+    // asset path anew, regardless of what the previous test ended with
+    urlsFor(DEFAULT_ASSET_PATH);
+    document.querySelectorAll("base").forEach((base) => base.remove());
+    window.history.replaceState(null, "", window.location.origin);
+    vi.restoreAllMocks();
   });
 
   describe("resolves EXCALIDRAW_ASSET_PATH without throwing", () => {
@@ -35,7 +40,6 @@ describe("ExcalidrawFontFace", () => {
         "assets/fonts",
         "http://localhost:3000/assets/fonts/",
       ],
-      ["empty string", "", "http://localhost:3000/"],
       ["root-relative path", "/assets", "http://localhost:3000/assets/"],
       ["dot-relative path", "./assets", "http://localhost:3000/assets/"],
       [
@@ -53,6 +57,11 @@ describe("ExcalidrawFontFace", () => {
         "https://cdn.example.com/fonts/",
         "https://cdn.example.com/fonts/",
       ],
+      [
+        "protocol-relative url",
+        "//cdn.example.com/fonts",
+        "http://cdn.example.com/fonts/",
+      ],
     ];
 
     for (const [name, assetPath, expected] of cases) {
@@ -66,6 +75,62 @@ describe("ExcalidrawFontFace", () => {
         expect(urls[0]).toBe(`${expected}Excalifont/Excalifont-Regular.woff2`);
       });
     }
+  });
+
+  describe("resolves relative paths against the page origin", () => {
+    it("regardless of the page path", () => {
+      window.history.replaceState(null, "", "/app/editor");
+
+      expect(urlsFor("subpath-assets")[0]).toBe(
+        "http://localhost:3000/subpath-assets/Excalifont/Excalifont-Regular.woff2",
+      );
+      expect(urlsFor("./subpath-assets")[0]).toBe(
+        "http://localhost:3000/subpath-assets/Excalifont/Excalifont-Regular.woff2",
+      );
+      expect(urlsFor("../subpath-assets")[0]).toBe(
+        "http://localhost:3000/subpath-assets/Excalifont/Excalifont-Regular.woff2",
+      );
+      expect(urlsFor("/subpath-assets")[0]).toBe(
+        "http://localhost:3000/subpath-assets/Excalifont/Excalifont-Regular.woff2",
+      );
+    });
+
+    it("ignoring <base href>", () => {
+      const base = document.createElement("base");
+      base.href = "https://static.example.com/build/index.html";
+      document.head.appendChild(base);
+
+      expect(urlsFor("./base-fonts/")[0]).toBe(
+        "http://localhost:3000/base-fonts/Excalifont/Excalifont-Regular.woff2",
+      );
+      expect(urlsFor("/")[0]).toBe(
+        "http://localhost:3000/Excalifont/Excalifont-Regular.woff2",
+      );
+    });
+  });
+
+  it("treats blank entries as not set", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    window.history.replaceState(null, "", "/app/editor");
+
+    const fallbackOnly = urlsFor(undefined);
+
+    expect(urlsFor("")).toEqual(fallbackOnly);
+    expect(urlsFor("  ")).toEqual(fallbackOnly);
+    expect(urlsFor(["", "https://cdn.example.com/fonts"])).toEqual([
+      "https://cdn.example.com/fonts/Excalifont/Excalifont-Regular.woff2",
+      ...fallbackOnly,
+    ]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("keeps the last path segment of a base url with a query or a hash", () => {
+    expect(urlsFor("https://cdn.example.com/fonts?v=1")[0]).toBe(
+      "https://cdn.example.com/fonts/Excalifont/Excalifont-Regular.woff2",
+    );
+    expect(urlsFor("assets#x")[0]).toBe(
+      "http://localhost:3000/assets/Excalifont/Excalifont-Regular.woff2",
+    );
   });
 
   it("resolves every entry of an array asset path", () => {
@@ -99,9 +164,32 @@ describe("ExcalidrawFontFace", () => {
 
     expect(urls).toHaveLength(1);
     expect(urls[0]).toContain("Excalifont/Excalifont-Regular.woff2");
-    expect(warn).toHaveBeenCalled();
 
-    warn.mockRestore();
+    // names where the fonts come from instead, i.e. the CDN
+    expect(warn.mock.calls[0][0]).toContain("https://esm.sh/");
+
+    // warned once per asset path, not per font face
+    urlsFor("http://");
+    expect(warn).toHaveBeenCalledTimes(1);
+
+    // a changed asset path is resolved again
+    urlsFor(["https://cdn.example.com/fonts", "http://"]);
+    expect(warn).toHaveBeenCalledTimes(2);
+  });
+
+  it("skips entries which can't be fetched from, keeps custom protocols", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fallbackOnly = urlsFor(undefined);
+
+    expect(urlsFor("C:/fonts")).toEqual(fallbackOnly);
+    expect(urlsFor("c:\\fonts")).toEqual(fallbackOnly);
+    expect(urlsFor("localhost:3000/fonts")).toEqual(fallbackOnly);
+    expect(urlsFor("mailto:fonts")).toEqual(fallbackOnly);
+    expect(warn).toHaveBeenCalledTimes(4);
+
+    expect(urlsFor("app://bundle/fonts")[0]).toBe(
+      "app://bundle/fonts/Excalifont/Excalifont-Regular.woff2",
+    );
   });
 
   it("does not build a url for data and local sources", () => {

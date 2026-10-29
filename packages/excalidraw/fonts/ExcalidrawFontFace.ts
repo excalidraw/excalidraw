@@ -148,9 +148,36 @@ export class ExcalidrawFontFace {
 
     // absolute assets paths, which are found in tests and excalidraw-app build, won't work with base url, so we are stripping initial slash away
     const assetUrl: string = uri.replace(/^\/+/, "");
-    const urls: URL[] = [];
+    const urls = ExcalidrawFontFace.getBaseUrls().map(
+      (baseUrl) => new URL(assetUrl, baseUrl),
+    );
 
+    // fallback url for bundled fonts
+    urls.push(new URL(assetUrl, ExcalidrawFontFace.ASSETS_FALLBACK_URL));
+
+    return urls;
+  }
+
+  /** resolved once per `EXCALIDRAW_ASSET_PATH` value, rather than per font face */
+  private static baseUrlsCache: {
+    assetPath: Window["EXCALIDRAW_ASSET_PATH"];
+    baseUrls: string[];
+  } | null = null;
+
+  /**
+   * Resolves `EXCALIDRAW_ASSET_PATH` entries into absolute base urls.
+   *
+   * Never throws, so that a malformed custom asset path degrades to the other
+   * entries and the CDN fallback instead of taking down the whole editor on mount.
+   */
+  private static getBaseUrls(): string[] {
     const assetPath = window.EXCALIDRAW_ASSET_PATH;
+    const cache = ExcalidrawFontFace.baseUrlsCache;
+
+    if (cache && cache.assetPath === assetPath) {
+      return cache.baseUrls;
+    }
+
     const basePaths =
       typeof assetPath === "string"
         ? [assetPath]
@@ -158,18 +185,28 @@ export class ExcalidrawFontFace {
         ? assetPath
         : [];
 
-    for (const basePath of basePaths) {
-      const url = ExcalidrawFontFace.createUrl(assetUrl, basePath);
+    const baseUrls: string[] = [];
 
-      if (url) {
-        urls.push(url);
+    for (const basePath of basePaths) {
+      // treat blank entries as not set (i.e. an unset env var rendered as ""),
+      // otherwise they would resolve to the origin root
+      if (!basePath.trim()) {
+        continue;
+      }
+
+      try {
+        baseUrls.push(ExcalidrawFontFace.normalizeBaseUrl(basePath));
+      } catch (error) {
+        console.warn(
+          `Skipping invalid EXCALIDRAW_ASSET_PATH entry "${basePath}". Fonts will be loaded from the other entries, if any, or from "${ExcalidrawFontFace.ASSETS_FALLBACK_URL}".`,
+          error,
+        );
       }
     }
 
-    // fallback url for bundled fonts
-    urls.push(new URL(assetUrl, ExcalidrawFontFace.ASSETS_FALLBACK_URL));
+    ExcalidrawFontFace.baseUrlsCache = { assetPath, baseUrls };
 
-    return urls;
+    return baseUrls;
   }
 
   private static getFormat(url: URL | DataURL) {
@@ -191,43 +228,22 @@ export class ExcalidrawFontFace {
     }
   }
 
-  /**
-   * Resolves a single `EXCALIDRAW_ASSET_PATH` entry into an absolute font url.
-   *
-   * Never throws, so that a malformed custom asset path degrades to the bundled
-   * font fallback instead of taking down the whole editor on mount.
-   */
-  private static createUrl(assetUrl: string, basePath: string): URL | null {
-    try {
-      return new URL(assetUrl, ExcalidrawFontFace.normalizeBaseUrl(basePath));
-    } catch (error) {
-      console.warn(
-        `Skipping invalid EXCALIDRAW_ASSET_PATH entry "${basePath}", falling back to the bundled fonts.`,
-        error,
-      );
-
-      return null;
-    }
-  }
-
   private static normalizeBaseUrl(baseUrl: string) {
-    let result = baseUrl.trim();
-
-    // `new URL(asset, base)` requires `base` to be an absolute url, so anything
-    // without a protocol gets resolved against `location.origin` first. that
-    // covers root-relative paths ("/" or "/some/path"), dot-relative ones
-    // ("./some/path"), and bare relative ones ("some/path"), the last of which
-    // used to throw `TypeError: Failed to construct 'URL': Invalid URL`.
-    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(result)) {
-      result = new URL(
-        result.replace(/^\.?\/+/, ""),
-        window?.location?.origin,
-      ).toString();
+    // `new URL(asset, base)` requires `base` to be an absolute url, so relative
+    // paths ("/", "./assets", "assets") are resolved against `location.origin`,
+    // i.e. the same way no matter which page the editor is mounted on
+    const url = new URL(baseUrl.trim(), window.location.origin);
+    if (/^[a-z]:$/i.test(url.protocol)) {
+      throw new Error(`"${baseUrl}" is a file path, not an url`);
     }
 
     // ensure there is a trailing slash, otherwise url won't be correctly concatenated
-    result = `${result.replace(/\/+$/, "")}/`;
+    url.pathname = `${url.pathname.replace(/\/+$/, "")}/`;
 
-    return result;
+    if (!url.pathname.startsWith("/")) {
+      throw new Error(`"${baseUrl}" can't be used as a base url`);
+    }
+
+    return url.toString();
   }
 }
