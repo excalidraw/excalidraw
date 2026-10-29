@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import throttle from "lodash.throttle";
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
@@ -25,7 +24,6 @@ import {
   EVENT,
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
-  IMAGE_RENDER_TIMEOUT,
   LINE_CONFIRM_THRESHOLD,
   MIME_TYPES,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
@@ -111,7 +109,6 @@ import {
   newIframeElement,
   newArrowElement,
   newElement,
-  newImageElement,
   newLinearElement,
   deepCopyElement,
   duplicateElements,
@@ -144,9 +141,7 @@ import {
   createSrcDoc,
   embeddableURLValidator,
   getEmbedLink,
-  getInitializedImageElements,
   normalizeSVG,
-  updateImageCache as _updateImageCache,
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
@@ -192,7 +187,6 @@ import {
   isSimpleArrow,
   StoreDelta,
   type ApplyToOptions,
-  positionElementsOnGrid,
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
   mutateElement,
@@ -217,9 +211,7 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   NonDeleted,
-  InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
-  FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawFrameLikeElement,
@@ -320,16 +312,12 @@ import {
 } from "../scene";
 import {
   dataURLToString,
-  generateIdFromFile,
-  getDataURL,
   getDataURL_sync,
   isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
   normalizeFile,
   parseLibraryJSON,
-  resizeImageFile,
-  SVGStringToFile,
 } from "../data/blob";
 
 import { fileOpen } from "../data/filesystem";
@@ -414,6 +402,7 @@ import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { AppHost } from "./App.host";
+import { AppImages } from "./App.images";
 import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
@@ -675,6 +664,11 @@ class App extends React.Component<AppProps, AppState> {
   public bucketFill: AppBucketFill = new AppBucketFill(this);
   public duplicate: AppDuplicate = new AppDuplicate(this, {
     getPointerCount: () => gesture.pointers.size,
+  });
+  public images: AppImages = new AppImages(this, {
+    addMissingFiles: (files) => {
+      this.addMissingFiles(files);
+    },
   });
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
@@ -3143,7 +3137,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (actionResult.files) {
       this.addMissingFiles(actionResult.files, actionResult.replaceFiles);
-      this.addNewImagesToImageCache();
+      this.images.addNewImagesToImageCache();
     }
 
     if (actionResult.appState || editingTextElement || this.state.contextMenu) {
@@ -3701,7 +3695,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
-    this.clearImageShapeCache();
+    this.images.clearImageShapeCache();
 
     // manually loading the font faces seems faster even in browsers that do
     // fire the loadingdone event. Prewarming the default font family, so that
@@ -3791,16 +3785,6 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.reconcileStylesPanelMode(this.editorInterface);
   };
-
-  private clearImageShapeCache(filesMap?: BinaryFiles) {
-    const files = filesMap ?? this.files;
-    this.scene.getNonDeletedElements().forEach((element) => {
-      if (isInitializedImageElement(element) && files[element.fileId]) {
-        this.imageCache.delete(element.fileId);
-        ShapeCache.delete(element);
-      }
-    });
-  }
 
   public async componentDidMount() {
     this.unmounted = false;
@@ -4513,7 +4497,7 @@ class App extends React.Component<AppProps, AppState> {
       currentScrollBars = scrollBars;
     }
 
-    this.scheduleImageRefresh();
+    this.images.scheduleImageRefresh();
   };
 
   private onScroll = debounce(() => {
@@ -4709,7 +4693,7 @@ class App extends React.Component<AppProps, AppState> {
       },
       () => {
         if (opts.files) {
-          this.addNewImagesToImageCache();
+          this.images.addNewImagesToImageCache();
         }
       },
     );
@@ -4925,10 +4909,10 @@ class App extends React.Component<AppProps, AppState> {
     (files) => {
       const { addedFiles } = this.addMissingFiles(files);
 
-      this.clearImageShapeCache(addedFiles);
+      this.images.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
 
-      this.addNewImagesToImageCache();
+      this.images.addNewImagesToImageCache();
     },
   );
 
@@ -8430,51 +8414,6 @@ class App extends React.Component<AppProps, AppState> {
     return element;
   };
 
-  private newImagePlaceholder = ({
-    sceneX,
-    sceneY,
-    addToFrameUnderCursor = true,
-  }: {
-    sceneX: number;
-    sceneY: number;
-    addToFrameUnderCursor?: boolean;
-  }) => {
-    const [gridX, gridY] = getGridPoint(
-      sceneX,
-      sceneY,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.getEffectiveGridSize(),
-    );
-
-    const topLayerFrame = addToFrameUnderCursor
-      ? this.getTopLayerFrameAtSceneCoords({
-          x: gridX,
-          y: gridY,
-        })
-      : null;
-
-    const placeholderSize = 100 / this.state.zoom.value;
-
-    return newImageElement({
-      type: "image",
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth("image"),
-      strokeStyle: this.state.currentItemStrokeStyle,
-      roughness: this.state.currentItemRoughness,
-      roundness: null,
-      opacity: this.state.currentItemOpacity,
-      locked: false,
-      frameId: topLayerFrame ? topLayerFrame.id : null,
-      x: gridX - placeholderSize / 2,
-      y: gridY - placeholderSize / 2,
-      width: placeholderSize,
-      height: placeholderSize,
-    });
-  };
-
   private handleLinearElementOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
     elementType: ExcalidrawLinearElement["type"],
@@ -10387,150 +10326,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private initializeImage = async (
-    placeholderImageElement: ExcalidrawImageElement,
-    imageFile: File,
-  ) => {
-    // at this point this should be guaranteed image file, but we do this check
-    // to satisfy TS down the line
-    if (!isSupportedImageFile(imageFile)) {
-      throw new Error(t("errors.unsupportedFileType"));
-    }
-    const mimeType = imageFile.type;
-
-    this.cursor.set("wait");
-
-    if (mimeType === MIME_TYPES.svg) {
-      try {
-        imageFile = SVGStringToFile(
-          normalizeSVG(await imageFile.text()),
-          imageFile.name,
-        );
-      } catch (error: any) {
-        console.warn(error);
-        throw new Error(t("errors.svgImageInsertError"));
-      }
-    }
-
-    // generate image id (by default the file digest) before any
-    // resizing/compression takes place to keep it more portable
-    const fileId = await ((this.props.generateIdForFile?.(
-      imageFile,
-    ) as Promise<FileId>) || generateIdFromFile(imageFile));
-
-    if (!fileId) {
-      console.warn(
-        "Couldn't generate file id or the supplied `generateIdForFile` didn't resolve to one.",
-      );
-      throw new Error(t("errors.imageInsertError"));
-    }
-
-    const existingFileData = this.files[fileId];
-    if (!existingFileData?.dataURL) {
-      const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
-
-      try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight,
-        });
-      } catch (error: any) {
-        console.error(
-          "Error trying to resizing image file on insertion",
-          error,
-        );
-      }
-
-      if (imageFile.size > maxFileSizeBytes) {
-        throw new Error(
-          t("errors.fileTooBig", {
-            maxSize: `${Math.trunc(maxFileSizeBytes / 1024 / 1024)}MB`,
-          }),
-        );
-      }
-    }
-
-    const dataURL =
-      this.files[fileId]?.dataURL || (await getDataURL(imageFile));
-
-    return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
-      async (resolve, reject) => {
-        try {
-          let initializedImageElement = this.getLatestInitializedImageElement(
-            placeholderImageElement,
-            fileId,
-          );
-
-          this.addMissingFiles([
-            {
-              mimeType,
-              id: fileId,
-              dataURL,
-              created: Date.now(),
-              lastRetrieved: Date.now(),
-            },
-          ]);
-
-          if (!this.imageCache.get(fileId)) {
-            this.addNewImagesToImageCache();
-
-            const { erroredFiles } = await this.updateImageCache([
-              initializedImageElement,
-            ]);
-
-            if (erroredFiles.size) {
-              throw new Error("Image cache update resulted with an error.");
-            }
-          }
-
-          const imageHTML = await this.imageCache.get(fileId)?.image;
-
-          if (
-            imageHTML &&
-            this.state.newElement?.id !== initializedImageElement.id
-          ) {
-            initializedImageElement = this.getLatestInitializedImageElement(
-              placeholderImageElement,
-              fileId,
-            );
-
-            const naturalDimensions = this.getImageNaturalDimensions(
-              initializedImageElement,
-              imageHTML,
-            );
-
-            // no need to create a new instance anymore, just assign the natural dimensions
-            Object.assign(initializedImageElement, naturalDimensions);
-          }
-
-          resolve(initializedImageElement);
-        } catch (error: any) {
-          console.error(error);
-          reject(new Error(t("errors.imageInsertError")));
-        }
-      },
-    );
-  };
-
-  /**
-   * use during async image initialization,
-   * when the placeholder image could have been modified in the meantime,
-   * and when you don't want to loose those modifications
-   */
-  private getLatestInitializedImageElement = (
-    imagePlaceholder: ExcalidrawImageElement,
-    fileId: FileId,
-  ) => {
-    const latestImageElement =
-      this.scene.getElement(imagePlaceholder.id) ?? imagePlaceholder;
-
-    return newElementWith(
-      latestImageElement as NonDeleted<InitializedExcalidrawImageElement>,
-      {
-        fileId,
-      },
-    );
-  };
-
   private onImageToolbarButtonClick = async () => {
     try {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
@@ -10570,104 +10365,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getImageNaturalDimensions = (
-    imageElement: ExcalidrawImageElement,
-    imageHTML: HTMLImageElement,
-  ) => {
-    const minHeight = Math.max(this.state.height - 120, 160);
-    // max 65% of canvas height, clamped to <300px, vh - 120px>
-    const maxHeight = Math.min(
-      minHeight,
-      Math.floor(this.state.height * 0.5) / this.state.zoom.value,
-    );
-
-    const height = Math.min(imageHTML.naturalHeight, maxHeight);
-    const width = height * (imageHTML.naturalWidth / imageHTML.naturalHeight);
-
-    // add current imageElement width/height to account for previous centering
-    // of the placeholder image
-    const x = imageElement.x + imageElement.width / 2 - width / 2;
-    const y = imageElement.y + imageElement.height / 2 - height / 2;
-
-    return {
-      x,
-      y,
-      width,
-      height,
-      crop: null,
-    };
-  };
-
-  /** updates image cache, refreshing updated elements and/or setting status
-      to error for images that fail during <img> element creation */
-  private updateImageCache = async (
-    elements: readonly InitializedExcalidrawImageElement[],
-    files = this.files,
-  ) => {
-    const { updatedFiles, erroredFiles } = await _updateImageCache({
-      imageCache: this.imageCache,
-      fileIds: elements.map((element) => element.fileId),
-      files,
-      createImage: () => this.renderEnvironment.createImage(),
-    });
-
-    if (erroredFiles.size) {
-      this.store.scheduleAction(CaptureUpdateAction.NEVER);
-      this.scene.replaceAllElements(
-        this.scene.getElementsIncludingDeleted().map((element) => {
-          if (
-            isInitializedImageElement(element) &&
-            erroredFiles.has(element.fileId)
-          ) {
-            return newElementWith(element, {
-              status: "error",
-            });
-          }
-          return element;
-        }),
-      );
-    }
-
-    return { updatedFiles, erroredFiles };
-  };
-
-  /** adds new images to imageCache and re-renders if needed */
-  private addNewImagesToImageCache = async (
-    imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
-      this.scene.getNonDeletedElements(),
-    ),
-    files: BinaryFiles = this.files,
-  ) => {
-    const uncachedImageElements = imageElements.filter(
-      (element) => !element.isDeleted && !this.imageCache.has(element.fileId),
-    );
-
-    if (uncachedImageElements.length) {
-      const { updatedFiles } = await this.updateImageCache(
-        uncachedImageElements,
-        files,
-      );
-
-      if (updatedFiles.size) {
-        for (const element of uncachedImageElements) {
-          if (updatedFiles.has(element.fileId)) {
-            ShapeCache.delete(element);
-          }
-        }
-      }
-
-      if (updatedFiles.size) {
-        this.scene.triggerUpdate();
-      }
-    }
-  };
-
-  /** generally you should use `addNewImagesToImageCache()` directly if you need
-   *  to render new images. This is just a failsafe  */
-  private scheduleImageRefresh = throttle(() => {
-    this.addNewImagesToImageCache();
-  }, IMAGE_RENDER_TIMEOUT);
-
   private handleInteractiveCanvasRef = (canvas: HTMLCanvasElement | null) => {
     // canvas is null when unmounting
     if (canvas !== null) {
@@ -10701,69 +10398,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  public insertImages = async (
-    imageFiles: File[],
-    sceneX: number,
-    sceneY: number,
-  ) => {
-    const gridPadding = 50 / this.state.zoom.value;
-    // Create, position, and insert placeholders
-    const placeholders = positionElementsOnGrid(
-      imageFiles.map(() => this.newImagePlaceholder({ sceneX, sceneY })),
-      sceneX,
-      sceneY,
-      gridPadding,
-    );
-    this.insertNewElements(placeholders);
-
-    // Create, position, insert and select initialized (replacing placeholders)
-    const initialized = await Promise.all(
-      placeholders.map(async (placeholder, i) => {
-        try {
-          return await this.initializeImage(
-            placeholder,
-            await normalizeFile(imageFiles[i]),
-          );
-        } catch (error: any) {
-          this.setState({
-            errorMessage: error.message || t("errors.imageInsertError"),
-          });
-          return newElementWith(placeholder as ExcalidrawImageElement, {
-            isDeleted: true,
-          });
-        }
-      }),
-    );
-    const initializedMap = arrayToMap(initialized);
-
-    const positioned = positionElementsOnGrid(
-      initialized.filter((el) => !el.isDeleted),
-      sceneX,
-      sceneY,
-      gridPadding,
-    );
-    const positionedMap = arrayToMap(positioned);
-
-    const nextElements = this.scene
-      .getElementsIncludingDeleted()
-      .map((el) => positionedMap.get(el.id) ?? initializedMap.get(el.id) ?? el);
-
-    this.updateScene({
-      appState: {
-        selectedElementIds: makeNextSelectedElementIds(
-          Object.fromEntries(positioned.map((el) => [el.id, true])),
-          this.state,
-        ),
-      },
-      elements: nextElements,
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    });
-
-    this.setState({}, () => {
-      // actionFinalize after all state values have been updated
-      this.actionManager.executeAction(actionFinalize);
-    });
-  };
+  public insertImages = (imageFiles: File[], sceneX: number, sceneY: number) =>
+    this.images.insertImages(imageFiles, sceneX, sceneY);
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     if (!this.isFileDropEnabled()) {

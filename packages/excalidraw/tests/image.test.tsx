@@ -1,4 +1,9 @@
-import { MIME_TYPES, randomId, reseed } from "@excalidraw/common";
+import {
+  MIME_TYPES,
+  randomId,
+  reseed,
+  resolvablePromise,
+} from "@excalidraw/common";
 
 import type { FileId } from "@excalidraw/element/types";
 
@@ -10,7 +15,7 @@ import { createPasteEvent } from "../clipboard";
 import { API } from "./helpers/api";
 import { mockMultipleHTMLImageElements } from "./helpers/mocks";
 import { UI } from "./helpers/ui";
-import { GlobalTestState, render, waitFor } from "./test-utils";
+import { act, GlobalTestState, render, waitFor } from "./test-utils";
 import {
   DEER_IMAGE_DIMENSIONS,
   SMILEY_IMAGE_DIMENSIONS,
@@ -172,5 +177,94 @@ describe("image insertion", () => {
         "File is too big. Maximum allowed size is 1MB.",
       );
     });
+  });
+
+  it("reuses the registered file and decoded image when inserting the same file again", async () => {
+    const fileId = "repeated-image" as FileId;
+    await setupImageTest([DEER_IMAGE_DIMENSIONS], {
+      generateIdForFile: async () => fileId,
+    });
+    const file = await API.loadFile("./fixtures/deer.png");
+
+    await act(async () => {
+      await h.app.insertImages([file], 200, 200);
+    });
+    const cachedImage = h.app.imageCache.get(fileId);
+    expect(cachedImage?.image).toBeDefined();
+    const fileData = h.app.files[fileId];
+
+    await act(async () => {
+      await h.app.insertImages([file], 500, 200);
+    });
+
+    expect(h.elements.filter((element) => !element.isDeleted)).toHaveLength(2);
+    expect(Object.keys(h.app.files)).toEqual([fileId]);
+    expect(h.app.files[fileId]).toBe(fileData);
+    expect(h.app.imageCache.get(fileId)).toBe(cachedImage);
+    expect(blobModule.resizeImageFile).toHaveBeenCalledTimes(1);
+    expect(API.getSelectedElements()).toEqual([h.elements[1]]);
+  });
+
+  it.each([false, true])(
+    "preserves placeholder changes while initialization is pending (deleted: %s)",
+    async (isDeleted) => {
+      await setupImageTest([DEER_IMAGE_DIMENSIONS]);
+      const fileId = resolvablePromise<FileId>();
+      vi.mocked(blobModule.generateIdFromFile).mockReturnValueOnce(fileId);
+      const file = await API.loadFile("./fixtures/deer.png");
+      let insertion!: Promise<void>;
+      act(() => {
+        insertion = h.app.insertImages([file], 200, 200);
+      });
+      await waitFor(() =>
+        expect(blobModule.generateIdFromFile).toHaveBeenCalledTimes(1),
+      );
+      const placeholder = h.elements[0];
+      expect(placeholder).toMatchObject({ type: "image", fileId: null });
+
+      act(() => {
+        API.updateElement(placeholder, { opacity: 35, isDeleted });
+      });
+      await act(async () => {
+        fileId.resolve("pending-image" as FileId);
+        await insertion;
+      });
+
+      expect(h.elements).toHaveLength(1);
+      expect(h.elements[0]).toMatchObject({
+        id: placeholder.id,
+        fileId: "pending-image",
+        opacity: 35,
+        isDeleted,
+      });
+      expect(API.getSelectedElements()).toEqual(
+        isDeleted ? [] : [h.elements[0]],
+      );
+    },
+  );
+
+  it("removes failed placeholders while keeping successfully initialized images", async () => {
+    await setupImageTest([SMILEY_IMAGE_DIMENSIONS]);
+    vi.mocked(blobModule.generateIdFromFile).mockRejectedValueOnce(
+      new Error("Cannot read image"),
+    );
+    const files = await Promise.all([
+      API.loadFile("./fixtures/deer.png"),
+      API.loadFile("./fixtures/smiley.png"),
+    ]);
+
+    await act(async () => {
+      await h.app.insertImages(files, 200, 200);
+    });
+
+    expect(h.elements).toHaveLength(2);
+    expect(h.elements[0].isDeleted).toBe(true);
+    expect(h.elements[1]).toMatchObject({
+      type: "image",
+      isDeleted: false,
+      ...SMILEY_IMAGE_DIMENSIONS,
+    });
+    expect(h.state.errorMessage).toBe("Cannot read image");
+    expect(API.getSelectedElements()).toEqual([h.elements[1]]);
   });
 });
