@@ -4485,6 +4485,22 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    // the editing ended in the state without going through the editor (the
+    // failsafe above, or a host's updateScene with an appState, which is how
+    // excalidraw-app syncs its tabs): end the edit in the editor too, else
+    // it outlives its state as a ghost. After the current update, as the
+    // editor submits with a flushSync, unless another session started since.
+    if (prevState.editingTextElement && !this.state.editingTextElement) {
+      const submit = this.text.textWysiwygSubmitHandler;
+      if (submit) {
+        queueMicrotask(() => {
+          if (this.text.textWysiwygSubmitHandler === submit) {
+            submit();
+          }
+        });
+      }
+    }
+
     // Forced false while a viewport animation runs — the scroll-back-to-content
     // button must not render mid-animation (clicking it would fight the
     // animation, which overwrites the viewport every frame). The animation's

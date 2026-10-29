@@ -1414,6 +1414,104 @@ describe("textWysiwyg", () => {
       );
     });
 
+    describe("the edit ended from outside the editor", () => {
+      const nextTick = () =>
+        act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+
+      beforeEach(async () => {
+        await nextTick();
+        updateTextEditor(textarea, "Hello");
+        // the window loses the focus, the edit stays open
+        fireEvent.blur(textarea);
+        fireEvent.blur(window);
+        expect(document.activeElement).toBe(textarea);
+        expect(h.state.editingTextElement?.id).toBe(textElement.id);
+      });
+
+      const expectEnded = async () => {
+        await nextTick();
+        expect(h.state.editingTextElement).toBeNull();
+        expect(h.app.text.textWysiwygSubmitHandler).toBeNull();
+        expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+        expect(textarea.isConnected).toBe(false);
+      };
+
+      it("should end when a sync ends it in the state, with the synced text", async () => {
+        // excalidraw-app's tab sync: the other tab's elements and app state
+        const synced = {
+          ...(h.elements[0] as ExcalidrawTextElement),
+          text: "Hello there",
+          originalText: "Hello there",
+        };
+        act(() =>
+          h.app.updateScene({
+            elements: [synced],
+            appState: { editingTextElement: null },
+          }),
+        );
+        await expectEnded();
+        expect((h.elements[0] as ExcalidrawTextElement).text).toBe(
+          "Hello there",
+        );
+      });
+
+      it("should end when a sync removes the element", async () => {
+        act(() => h.app.updateScene({ elements: [] }));
+        await expectEnded();
+        expect(h.elements).toEqual([]);
+      });
+
+      it("should end when a sync deletes the element, without bringing it back", async () => {
+        const deleted = { ...h.elements[0], isDeleted: true };
+        act(() => h.app.updateScene({ elements: [deleted] }));
+        await expectEnded();
+        expect(h.elements.map((element) => element.isDeleted)).toEqual([true]);
+        expect(h.elements[0].version).toBe(deleted.version);
+      });
+    });
+
+    it("should submit when the focus moves into an iframe in the document", async () => {
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      updateTextEditor(textarea, "Hello");
+      // an embeddable, or a host's widget: the focus moving into it blurs
+      // the textarea like any focus move in the document (the textarea is
+      // not the active element anymore, the iframe is), and then blurs the
+      // window too, like a switch to another app would
+      const iframe = document.createElement("iframe");
+      document.body.appendChild(iframe);
+      try {
+        act(() => {
+          iframe.focus();
+          fireEvent.blur(window);
+        });
+      } finally {
+        iframe.remove();
+      }
+      expect(h.state.editingTextElement).toBeNull();
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+    });
+
+    it("should still submit on window blur when collaborating", async () => {
+      unmountComponent();
+      await render(
+        <Excalidraw handleKeyboardGlobally={true} isCollaborating={true} />,
+      );
+      textElement = UI.createElement("text");
+      mouse.clickOn(textElement);
+      textarea = await getTextEditor();
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      updateTextEditor(textarea, "Hello");
+
+      act(() => {
+        fireEvent.blur(textarea);
+        fireEvent.blur(window);
+      });
+      expect(h.state.editingTextElement).toBeNull();
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+    });
+
     it("should still submit on window blur inside an iframe", async () => {
       await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
       updateTextEditor(textarea, "Hello");
@@ -1600,6 +1698,44 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
+    });
+
+    it("should end the edit of a label a sync deleted, leaving the container alone", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+      });
+      API.setElements([rectangle]);
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.containerId).toBe(rectangle.id);
+      mouse.down();
+      const editor = await getTextEditor();
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      updateTextEditor(editor, "Hello");
+      // the window loses the focus, the edit stays open
+      fireEvent.blur(editor);
+      fireEvent.blur(window);
+      expect(document.activeElement).toBe(editor);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      // a sync from another tab deleted the label and unbound it
+      const syncedContainer = { ...h.elements[0], boundElements: [] };
+      const syncedText = { ...h.elements[1], isDeleted: true };
+      act(() => h.app.updateScene({ elements: [syncedContainer, syncedText] }));
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+
+      expect(h.state.editingTextElement).toBeNull();
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect(h.elements[1].id).toBe(text.id);
+      expect(h.elements[1].isDeleted).toBe(true);
+      expect(h.elements[1].version).toBe(syncedText.version);
+      expect(h.elements[0].boundElements).toEqual([]);
+      expect(h.elements[0].version).toBe(syncedContainer.version);
     });
 
     it("should not add bound text to a frame when its container is not a frame child", async () => {

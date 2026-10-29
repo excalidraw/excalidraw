@@ -188,7 +188,13 @@ export class AppText {
       const latestTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
 
-      if (!latestTextElement || !isTextElement(latestTextElement)) {
+      if (
+        !latestTextElement ||
+        !isTextElement(latestTextElement) ||
+        // deleted from under the edit (by a sync from another tab, or the
+        // host's updateScene): the edit's submit doesn't bring it back
+        latestTextElement.isDeleted
+      ) {
         return;
       }
 

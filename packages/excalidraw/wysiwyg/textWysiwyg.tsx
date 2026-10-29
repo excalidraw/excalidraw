@@ -1034,18 +1034,21 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = app.scene.getElement(
+    // the element can be gone from the scene by now (a sync from another
+    // tab, or the host's updateScene, removed or deleted it): the edit still
+    // ends, and leaves the container alone
+    const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
-    ) as ExcalidrawTextElement;
-    if (!updateElement) {
-      return;
-    }
-    const container = getContainerElement(
-      updateElement,
-      app.scene.getNonDeletedElementsMap(),
     );
+    const container =
+      updateElement && !updateElement.isDeleted
+        ? getContainerElement(
+            updateElement,
+            app.scene.getNonDeletedElementsMap(),
+          )
+        : null;
 
-    if (container) {
+    if (updateElement && container) {
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -1089,8 +1092,12 @@ export const textWysiwyg = ({
   // window returns, so keep editing then: only submit when focus actually
   // moved to something else in the document. Not in an iframe though: there
   // a click on the embedding page blurs the window the same way, and can't
-  // be told from switching apps, so the edit still ends on any blur.
+  // be told from switching apps, so the edit still ends on any blur. Nor
+  // when collaborating: an open edit keeps the collaborators' changes to
+  // the text out (see reconcileElements), which shouldn't outlast the tab
+  // being looked at.
   const keepsFocusOnWindowBlur = () =>
+    !app.props.isCollaborating &&
     ownerWindow.parent === ownerWindow &&
     ownerDocument.activeElement === editable;
 
