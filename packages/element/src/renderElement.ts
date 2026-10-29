@@ -896,9 +896,14 @@ const drawElementFromCanvas = (
     let drawY =
       (y1 + positionOffset.y + appState.scrollY) * devicePixelRatio - padding;
 
-    const transform = context.getTransform();
+    const shouldRenderDebugOverlay =
+      import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
+        "true" && hasBoundTextElement(element);
+    const shouldSnap = canSnapElement(element, appState);
+    const transform =
+      shouldSnap || shouldRenderDebugOverlay ? context.getTransform() : null;
 
-    if (canSnapElement(element, appState)) {
+    if (shouldSnap && transform) {
       // blit the cached bitmap on whole device pixels. Nearest-neighbor at a
       // fractional offset is a pixel-exact copy shifted to the nearest pixel
       // — except at an exact half pixel, where a GPU-accelerated canvas
@@ -964,13 +969,10 @@ const drawElementFromCanvas = (
       elementWithCanvas.canvas!.height / elementWithCanvas.scale,
     );
 
-    context.setTransform(transform);
-
-    if (
-      import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
-        "true" &&
-      hasBoundTextElement(element)
-    ) {
+    if (shouldRenderDebugOverlay) {
+      // The debug overlay uses scene coordinates. The normal path relies on
+      // withSavedContext to restore the transform after this blit.
+      context.setTransform(transform!);
       const textElement = getBoundTextElement(
         element,
         allElementsMap,
