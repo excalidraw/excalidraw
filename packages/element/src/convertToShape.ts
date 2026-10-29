@@ -769,7 +769,7 @@ export const convertToShapeHandlePointerMoveFromPointerDown = (
   pointerCoords: GlobalPoint,
 ) => {
   if (app.state.activeTool.type === "autoshape") {
-    app.drawShape.trail.addPointToPath(pointerCoords.x, pointerCoords.y);
+    app.drawShape.trail.addPointToPath(pointerCoords[0], pointerCoords[1]);
 
     const drawShapeTrailPoints = app.drawShape.trail.getCurrentPoints();
     // note: size gate inside recognizeShape

@@ -4,6 +4,7 @@ import {
   EVENT,
   KEYS,
   getGridPoint,
+  tupleToCoors,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
@@ -16,7 +17,7 @@ import type {
 
 import { trackEvent } from "../analytics";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import type App from "./App";
 import type { ToolType } from "../types";
 
@@ -37,8 +38,8 @@ type DraggableTool = {
 };
 
 const centered = (center: ScenePoint, width: number, height: number) => ({
-  x: center.x - width / 2,
-  y: center.y - height / 2,
+  x: center[0] - width / 2,
+  y: center[1] - height / 2,
   width,
   height,
 });
@@ -65,7 +66,7 @@ export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
         opacity: state.currentItemOpacity,
         roundness: app.getCurrentItemRoundness("stickynote"),
         locked: false,
-        frameId: app.getTopLayerFrameAtSceneCoords(center)?.id ?? null,
+        frameId: app.getTopLayerFrameAtSceneCoords(tupleToCoors(center))?.id ?? null,
       });
     },
     onDrop: (app, element) => {
@@ -153,7 +154,9 @@ export class AppToolDrag {
     }
     const preview = this.tool!.createElement(
       this.app,
-      viewportCoordsToSceneCoords(event, this.app.state),
+      pointFrom<GlobalPoint>(
+        viewportCoordsToSceneCoords(event, this.app.state),
+      ),
     );
     // Snap after the tool centers its element, just like click-to-place.
     const [x, y] = getGridPoint(

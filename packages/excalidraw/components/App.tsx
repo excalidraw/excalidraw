@@ -7988,7 +7988,9 @@ class App extends React.Component<AppProps, AppState> {
       // missing-pointer-up cleanup — runs for bucket clicks too. In view
       // mode this branch is unreachable:
       // `pan.start` swallows the pointer-down.
-      this.bucketFill.handlePointerDown(scenePointer);
+      this.bucketFill.handlePointerDown(
+        pointFrom<GlobalPoint>(scenePointer),
+      );
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -9179,7 +9181,9 @@ class App extends React.Component<AppProps, AppState> {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
-      if (this.drawShape.handlePointerMove(pointerCoords)) {
+      if (
+        this.drawShape.handlePointerMove(pointFrom<GlobalPoint>(pointerCoords))
+      ) {
         return;
       }
 

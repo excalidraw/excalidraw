@@ -1,4 +1,5 @@
 import * as common from "@excalidraw/common";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import { getTargetElements, isArrowElement } from "@excalidraw/element";
 
@@ -376,7 +377,7 @@ describe("autoshape styles panel & selection (preview path)", () => {
     act(() => {
       for (const [x, y] of points.slice(1)) {
         h.app.drawShape.trail.addPointToPath(x, y);
-        h.app.drawShape.handlePointerMove({ x, y });
+        h.app.drawShape.handlePointerMove(pointFrom<GlobalPoint>(x, y));
       }
     });
     const [endX, endY] = points[points.length - 1];
@@ -413,7 +414,7 @@ describe("autoshape styles panel & selection (preview path)", () => {
     act(() => {
       for (const [x, y] of linePoints.slice(1)) {
         h.app.drawShape.trail.addPointToPath(x, y);
-        h.app.drawShape.handlePointerMove({ x, y });
+        h.app.drawShape.handlePointerMove(pointFrom<GlobalPoint>(x, y));
       }
     });
 
@@ -456,7 +457,7 @@ describe("autoshape styles panel & selection (preview path)", () => {
     act(() => {
       for (const [x, y] of rectanglePath(100, 100, 200, 120).slice(1)) {
         h.app.drawShape.trail.addPointToPath(x, y);
-        h.app.drawShape.handlePointerMove({ x, y });
+        h.app.drawShape.handlePointerMove(pointFrom<GlobalPoint>(x, y));
       }
     });
 
@@ -515,7 +516,7 @@ describe("autoshape finalize funnel", () => {
     act(() => {
       for (const [x, y] of points.slice(1)) {
         h.app.drawShape.trail.addPointToPath(x, y);
-        h.app.drawShape.handlePointerMove({ x, y });
+        h.app.drawShape.handlePointerMove(pointFrom<GlobalPoint>(x, y));
       }
     });
   };
