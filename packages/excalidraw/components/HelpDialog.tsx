@@ -1,8 +1,13 @@
 import React from "react";
 
-import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
-
-import { KEYS } from "@excalidraw/common";
+import {
+  EVENT,
+  KEYS,
+  addEventListener,
+  isDarwin,
+  isFirefox,
+  isWindows,
+} from "@excalidraw/common";
 
 import { actionToggleTheme } from "../actions";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
@@ -103,9 +108,12 @@ const Shortcut = ({
   shortcuts: string[];
   isOr?: boolean;
 }) => {
-  const searchQuery = React.useContext(HelpDialogSearchContext);
+  const searchQuery = React.useContext(HelpDialogSearchContext).trim();
 
-  if (searchQuery && !label.toLowerCase().includes(searchQuery.toLowerCase())) {
+  if (
+    searchQuery !== "" &&
+    !label.toLowerCase().includes(searchQuery.toLowerCase())
+  ) {
     return null;
   }
 
@@ -135,12 +143,32 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
 
 export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
   const actionManager = useExcalidrawActionManager();
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
     }
   }, [onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === KEYS.F.toLowerCase()
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    return addEventListener(window, EVENT.KEYDOWN, handleKeyDown, {
+      capture: true,
+      passive: false,
+    });
+  }, []);
 
   return (
     <>
@@ -152,9 +180,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         <HelpDialogSearchContext.Provider value={searchQuery}>
           <Header />
           <input
+            ref={searchInputRef}
             type="search"
-            placeholder="Search keyboard shortcuts..."
-            aria-label="Search keyboard shortcuts"
+            placeholder={t("helpDialog.search")}
+            aria-label={t("helpDialog.search")}
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
           />
