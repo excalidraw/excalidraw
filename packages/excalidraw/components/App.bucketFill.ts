@@ -31,10 +31,7 @@ import { activeEyeDropperAtom, type EyeDropperProperties } from "./EyeDropper";
 
 import type App from "./App";
 
-type ScenePoint = {
-  x: number;
-  y: number;
-};
+type ScenePoint = GlobalPoint;
 
 const BUCKET_FILL_KEYBOARD_COLOR_PICKS = BUCKET_FILL_BACKGROUND_PICKS.filter(
   (color) => color !== COLOR_PALETTE.white,

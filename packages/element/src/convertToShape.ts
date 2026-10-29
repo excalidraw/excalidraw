@@ -766,7 +766,7 @@ const isDrawShapePreviewEqual = (
 // animation frame regardless of raw pointermove rate.
 export const convertToShapeHandlePointerMoveFromPointerDown = (
   app: App,
-  pointerCoords: { x: number; y: number },
+  pointerCoords: GlobalPoint,
 ) => {
   if (app.state.activeTool.type === "autoshape") {
     app.drawShape.trail.addPointToPath(pointerCoords.x, pointerCoords.y);

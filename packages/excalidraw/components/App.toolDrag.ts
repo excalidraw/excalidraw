@@ -16,10 +16,11 @@ import type {
 
 import { trackEvent } from "../analytics";
 
+import type { GlobalPoint } from "@excalidraw/math";
 import type App from "./App";
 import type { ToolType } from "../types";
 
-type ScenePoint = { x: number; y: number };
+type ScenePoint = GlobalPoint;
 
 /** what a drag places: any element the new-element canvas can preview */
 type DraggedElement = NonDeleted<ExcalidrawNonSelectionElement>;
