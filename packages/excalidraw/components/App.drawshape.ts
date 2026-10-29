@@ -1,5 +1,4 @@
 import { randomInteger } from "@excalidraw/common";
-import type { GlobalPoint } from "@excalidraw/math";
 
 import {
   bindBindingElement,
@@ -12,6 +11,8 @@ import {
   newArrowElement,
   updateBoundPoint,
 } from "@excalidraw/element";
+
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawArrowElement,

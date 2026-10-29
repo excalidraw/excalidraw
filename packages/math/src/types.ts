@@ -118,11 +118,7 @@ export type Vector = [u: number, v: number] & {
 /**
  * A triangle represented by 3 points
  */
-export type Triangle<P extends GenericPoint> = [
-  a: P,
-  b: P,
-  c: P,
-] & {
+export type Triangle<P extends GenericPoint> = [a: P, b: P, c: P] & {
   _brand: "excalimath__triangle";
 };
 
@@ -152,12 +148,7 @@ export type Polygon<Point extends GenericPoint> = Point[] & {
 /**
  * Cubic bezier curve with four control points
  */
-export type Curve<Point extends GenericPoint> = [
-  Point,
-  Point,
-  Point,
-  Point,
-] & {
+export type Curve<Point extends GenericPoint> = [Point, Point, Point, Point] & {
   _brand: "excalimath_curve";
 };
 

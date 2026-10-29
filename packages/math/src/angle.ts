@@ -1,11 +1,6 @@
 import { PRECISION } from "./utils";
 
-import type {
-  Degrees,
-  GenericPoint,
-  PolarCoords,
-  Radians,
-} from "./types";
+import type { Degrees, GenericPoint, PolarCoords, Radians } from "./types";
 
 export const normalizeRadians = (angle: Radians): Radians =>
   angle < 0

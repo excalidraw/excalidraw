@@ -5,7 +5,6 @@ import { vectorFromPoint, vectorScale } from "./vector";
 import type {
   LocalPoint,
   GlobalPoint,
-  ViewportPoint,
   GenericPoint,
   Radians,
   Degrees,
@@ -194,10 +193,7 @@ export function pointCenter<P extends GenericPoint>(a: P, b: P): P {
  * @param b Second point
  * @returns The euclidean distance between the two points.
  */
-export function pointDistance<P extends GenericPoint>(
-  a: P,
-  b: P,
-): number {
+export function pointDistance<P extends GenericPoint>(a: P, b: P): number {
   return Math.hypot(b[0] - a[0], b[1] - a[1]);
 }
 
@@ -210,10 +206,7 @@ export function pointDistance<P extends GenericPoint>(
  * @param b Second point
  * @returns The euclidean distance between the two points.
  */
-export function pointDistanceSq<P extends GenericPoint>(
-  a: P,
-  b: P,
-): number {
+export function pointDistanceSq<P extends GenericPoint>(a: P, b: P): number {
   const xDiff = b[0] - a[0];
   const yDiff = b[1] - a[1];
 

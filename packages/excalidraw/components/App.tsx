@@ -7988,9 +7988,7 @@ class App extends React.Component<AppProps, AppState> {
       // missing-pointer-up cleanup — runs for bucket clicks too. In view
       // mode this branch is unreachable:
       // `pan.start` swallows the pointer-down.
-      this.bucketFill.handlePointerDown(
-        pointFrom<GlobalPoint>(scenePointer),
-      );
+      this.bucketFill.handlePointerDown(pointFrom<GlobalPoint>(scenePointer));
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&

@@ -10,6 +10,8 @@ import {
 
 import { isStickyNoteElement, newStickyNoteElement } from "@excalidraw/element";
 
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
+
 import type {
   ExcalidrawNonSelectionElement,
   NonDeleted,
@@ -17,11 +19,8 @@ import type {
 
 import { trackEvent } from "../analytics";
 
-import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import type App from "./App";
 import type { ToolType } from "../types";
-
-type ScenePoint = GlobalPoint;
 
 /** what a drag places: any element the new-element canvas can preview */
 type DraggedElement = NonDeleted<ExcalidrawNonSelectionElement>;
@@ -32,12 +31,12 @@ type DraggedElement = NonDeleted<ExcalidrawNonSelectionElement>;
  */
 type DraggableTool = {
   /** the element the drop creates, centered on the pointer */
-  createElement: (app: App, center: ScenePoint) => DraggedElement;
+  createElement: (app: App, center: GlobalPoint) => DraggedElement;
   /** what the tool does once its element is on the canvas (e.g. start editing) */
   onDrop?: (app: App, element: DraggedElement) => void;
 };
 
-const centered = (center: ScenePoint, width: number, height: number) => ({
+const centered = (center: GlobalPoint, width: number, height: number) => ({
   x: center[0] - width / 2,
   y: center[1] - height / 2,
   width,
@@ -66,7 +65,8 @@ export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
         opacity: state.currentItemOpacity,
         roundness: app.getCurrentItemRoundness("stickynote"),
         locked: false,
-        frameId: app.getTopLayerFrameAtSceneCoords(tupleToCoors(center))?.id ?? null,
+        frameId:
+          app.getTopLayerFrameAtSceneCoords(tupleToCoors(center))?.id ?? null,
       });
     },
     onDrop: (app, element) => {

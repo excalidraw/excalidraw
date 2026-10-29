@@ -146,9 +146,7 @@ export function lineSegmentPointAt<Point extends GenericPoint>(
  * @param s
  * @returns
  */
-export function lineSegmentIntersectionPoints<
-  Point extends GenericPoint,
->(
+export function lineSegmentIntersectionPoints<Point extends GenericPoint>(
   l: LineSegment<Point>,
   s: LineSegment<Point>,
   threshold?: number,
@@ -182,9 +180,10 @@ export function lineSegmentsDistance<Point extends GenericPoint>(
   );
 }
 
-export function lineSegmentClosestParameter<
-  Point extends GenericPoint,
->(point: Point, line: LineSegment<Point>): number {
+export function lineSegmentClosestParameter<Point extends GenericPoint>(
+  point: Point,
+  line: LineSegment<Point>,
+): number {
   const [x, y] = point;
   const [[x1, y1], [x2, y2]] = line;
 

@@ -1,17 +1,13 @@
 import { pointsEqual } from "./point";
 import { PRECISION } from "./utils";
 
-import type { GenericPoint, GlobalPoint, LocalPoint, Polygon } from "./types";
+import type { GenericPoint, Polygon } from "./types";
 
-export function polygon<Point extends GenericPoint>(
-  ...points: Point[]
-) {
+export function polygon<Point extends GenericPoint>(...points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export function polygonFromPoints<Point extends GenericPoint>(
-  points: Point[],
-) {
+export function polygonFromPoints<Point extends GenericPoint>(points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
@@ -68,9 +64,7 @@ export const polygonIncludesPointNonZero = <Point extends [number, number]>(
   return windingNumber !== 0;
 };
 
-function polygonClose<Point extends GenericPoint>(
-  polygon: Point[],
-) {
+function polygonClose<Point extends GenericPoint>(polygon: Point[]) {
   return polygonIsClosed(polygon)
     ? polygon
     : ([...polygon, polygon[0]] as Polygon<Point>);

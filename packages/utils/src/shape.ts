@@ -61,8 +61,7 @@ import type { Drawable, Op } from "roughjs/bin/core";
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
 // be used to model other elements
-export type Polyline<Point extends GenericPoint> =
-  LineSegment<Point>[];
+export type Polyline<Point extends GenericPoint> = LineSegment<Point>[];
 
 // a polycurve is a curve consisting of ther curves, this corresponds to a complex
 // curve on the canvas
@@ -362,9 +361,7 @@ export const getClosedCurveShape = <Point extends GenericPoint>(
  * @returns An array of intersections
  */
 // TODO: Replace with final rounded rectangle code
-export const segmentIntersectRectangleElement = <
-  Point extends GenericPoint,
->(
+export const segmentIntersectRectangleElement = <Point extends GenericPoint>(
   element: ExcalidrawBindableElement,
   segment: LineSegment<Point>,
   gap: number = 0,
@@ -382,20 +379,52 @@ export const segmentIntersectRectangleElement = <
 
   return [
     lineSegment<Point>(
-      pointRotateRads(pointFrom<Point>(bounds[0], bounds[1]), center, element.angle),
-      pointRotateRads(pointFrom<Point>(bounds[2], bounds[1]), center, element.angle),
+      pointRotateRads(
+        pointFrom<Point>(bounds[0], bounds[1]),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<Point>(bounds[2], bounds[1]),
+        center,
+        element.angle,
+      ),
     ),
     lineSegment<Point>(
-      pointRotateRads(pointFrom<Point>(bounds[2], bounds[1]), center, element.angle),
-      pointRotateRads(pointFrom<Point>(bounds[2], bounds[3]), center, element.angle),
+      pointRotateRads(
+        pointFrom<Point>(bounds[2], bounds[1]),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<Point>(bounds[2], bounds[3]),
+        center,
+        element.angle,
+      ),
     ),
     lineSegment<Point>(
-      pointRotateRads(pointFrom<Point>(bounds[2], bounds[3]), center, element.angle),
-      pointRotateRads(pointFrom<Point>(bounds[0], bounds[3]), center, element.angle),
+      pointRotateRads(
+        pointFrom<Point>(bounds[2], bounds[3]),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<Point>(bounds[0], bounds[3]),
+        center,
+        element.angle,
+      ),
     ),
     lineSegment<Point>(
-      pointRotateRads(pointFrom<Point>(bounds[0], bounds[3]), center, element.angle),
-      pointRotateRads(pointFrom<Point>(bounds[0], bounds[1]), center, element.angle),
+      pointRotateRads(
+        pointFrom<Point>(bounds[0], bounds[3]),
+        center,
+        element.angle,
+      ),
+      pointRotateRads(
+        pointFrom<Point>(bounds[0], bounds[1]),
+        center,
+        element.angle,
+      ),
     ),
   ]
     .map((s) => segmentsIntersectAt(segment, s))
