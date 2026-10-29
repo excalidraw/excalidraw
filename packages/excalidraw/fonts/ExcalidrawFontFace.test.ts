@@ -192,6 +192,22 @@ describe("ExcalidrawFontFace", () => {
     );
   });
 
+  it("resolves absolute urls in an opaque origin", () => {
+    // i.e. sandboxed iframes, where `location.origin` is "null"
+    vi.stubGlobal("location", { ...window.location, origin: "null" });
+
+    try {
+      expect(urlsFor("https://cdn.example.com/fonts")[0]).toBe(
+        "https://cdn.example.com/fonts/Excalifont/Excalifont-Regular.woff2",
+      );
+      expect(urlsFor("file:///app/fonts")[0]).toBe(
+        "file:///app/fonts/Excalifont/Excalifont-Regular.woff2",
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("does not build a url for data and local sources", () => {
     expect(
       new ExcalidrawFontFace("Excalifont", "data:font/woff2;base64,AAA").urls,

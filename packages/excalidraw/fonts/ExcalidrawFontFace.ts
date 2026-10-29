@@ -232,7 +232,7 @@ export class ExcalidrawFontFace {
     // `new URL(asset, base)` requires `base` to be an absolute url, so relative
     // paths ("/", "./assets", "assets") are resolved against `location.origin`,
     // i.e. the same way no matter which page the editor is mounted on
-    const url = new URL(baseUrl.trim(), window.location.origin);
+    const url = ExcalidrawFontFace.parseUrl(baseUrl.trim());
     if (/^[a-z]:$/i.test(url.protocol)) {
       throw new Error(`"${baseUrl}" is a file path, not an url`);
     }
@@ -245,5 +245,16 @@ export class ExcalidrawFontFace {
     }
 
     return url.toString();
+  }
+
+  private static parseUrl(baseUrl: string) {
+    try {
+      // absolute urls are parsed on their own, as `new URL()` throws on an
+      // invalid base even when it's not used, and the origin is "null" in
+      // opaque origins (i.e. sandboxed iframes, `file://` pages in Firefox)
+      return new URL(baseUrl);
+    } catch {
+      return new URL(baseUrl, window.location.origin);
+    }
   }
 }
