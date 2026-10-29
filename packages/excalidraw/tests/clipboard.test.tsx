@@ -868,6 +868,46 @@ describe("copy and cut events", () => {
 });
 
 describe("paste routing", () => {
+  it("handles a paste event inside a shadow root", async () => {
+    unmountComponent();
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const shadowRoot = host.attachShadow({ mode: "open" });
+    const mount = document.createElement("div");
+    shadowRoot.appendChild(mount);
+    const onPaste = vi.fn(() => false);
+
+    try {
+      const { container, unmount } = await render(
+        <Excalidraw autoFocus handleKeyboardGlobally onPaste={onPaste} />,
+        { container: mount },
+      );
+      const canvas =
+        container.querySelector<HTMLCanvasElement>("canvas.interactive")!;
+      canvas.tabIndex = 0;
+      canvas.focus();
+      expect(shadowRoot.activeElement).toBe(canvas);
+      expect(document.activeElement).toBe(host);
+      Object.defineProperty(shadowRoot, "elementFromPoint", {
+        configurable: true,
+        value: () => canvas,
+      });
+
+      const clipboardData = new DataTransfer();
+      clipboardData.setData("text/plain", "hello");
+      canvas.dispatchEvent(
+        Object.assign(new Event("paste", { bubbles: true, cancelable: true }), {
+          clipboardData,
+        }),
+      );
+
+      await waitFor(() => expect(onPaste).toHaveBeenCalledTimes(1));
+      unmount();
+    } finally {
+      host.remove();
+    }
+  });
+
   it("should paste embed code with its loader <script> on a separate line as an embeddable", async () => {
     pasteWithCtrlCmdV(
       `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"><div style="padding:16px;"> <a href="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">View this post on Instagram</a></div></blockquote>

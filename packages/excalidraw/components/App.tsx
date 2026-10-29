@@ -4220,7 +4220,10 @@ class App extends React.Component<AppProps, AppState> {
         { passive: false },
       ),
       addEventListener(
-        this.ownerDocument,
+        this.excalidrawContainerRef.current?.getRootNode() instanceof
+          this.ownerWindow.ShadowRoot
+          ? this.excalidrawContainerRef.current
+          : this.ownerDocument,
         EVENT.PASTE,
         this.clipboard.pasteFromClipboard,
         {
