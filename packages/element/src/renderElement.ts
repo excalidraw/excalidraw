@@ -110,7 +110,7 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
     case "text":
       return element.fontSize / 2;
     case "arrow":
-      if (element.endArrowhead || element.endArrowhead) {
+      if (element.startArrowhead || element.endArrowhead) {
         return 40;
       }
       return 20;
