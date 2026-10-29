@@ -3902,6 +3902,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.unmounted = true;
+    // an open text editor listens on the window and keeps its textarea in
+    // the document: submit it so it goes with the editor (and before the
+    // scene it is subscribed to is destroyed)
+    this.text.textWysiwygSubmitHandler?.();
+
     // we're recreating the api object reference so that the
     // <ExcalidrawAPIContext.Provider/> picks up on it
     this.api = { ...this.api, isDestroyed: true };
@@ -3941,7 +3947,6 @@ class App extends React.Component<AppProps, AppState> {
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
-    this.unmounted = true;
     this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();

@@ -303,6 +303,11 @@ export class AppText {
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
 
+        // submitted by the unmount: the state goes with the component
+        if (this.app.unmounted) {
+          return;
+        }
+
         // keyboard-submit keeps focus on the edited object. For bound text, keep
         // the container selected even if the text becomes empty and is deleted.
         // The autoshape tool stays active through the editing session and never

@@ -1087,10 +1087,30 @@ export const textWysiwyg = ({
   // The textarea also blurs when the whole window loses focus (switching
   // apps/tabs). It stays the active element and gets focus back when the
   // window returns, so keep editing then: only submit when focus actually
-  // moved to something else in the document. Same for the window blur that
-  // temporarilyDisableSubmit() listens to.
+  // moved to something else in the document. Not in an iframe though: there
+  // a click on the embedding page blurs the window the same way, and can't
+  // be told from switching apps, so the edit still ends on any blur.
+  const keepsFocusOnWindowBlur = () =>
+    ownerWindow.parent === ownerWindow &&
+    ownerDocument.activeElement === editable;
+
   const handleBlur = () => {
-    if (ownerDocument.activeElement === editable) {
+    if (keepsFocusOnWindowBlur()) {
+      return;
+    }
+    handleSubmit();
+  };
+
+  // While submit is disabled for a press (see temporarilyDisableSubmit), the
+  // window losing focus means the pointerup that would re-enable it may never
+  // come (alt-tab mid-press). Settle the press here: submit if focus moved
+  // away, else re-arm submit on blur right away, so that the next focus move
+  // submits and no late pointerup steals the focus back to the textarea.
+  const onWindowBlur = () => {
+    ownerWindow.removeEventListener("blur", onWindowBlur);
+    ownerWindow.removeEventListener("pointerup", bindBlurEvent);
+    if (keepsFocusOnWindowBlur()) {
+      editable.onblur = handleBlur;
       return;
     }
     handleSubmit();
@@ -1112,7 +1132,7 @@ export const textWysiwyg = ({
       capture: true,
     });
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
-    ownerWindow.removeEventListener("blur", handleBlur);
+    ownerWindow.removeEventListener("blur", onWindowBlur);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -1173,7 +1193,7 @@ export const textWysiwyg = ({
     ownerWindow.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    ownerWindow.addEventListener("blur", handleBlur);
+    ownerWindow.addEventListener("blur", onWindowBlur);
   };
 
   // prevent blur when changing properties from the menu
@@ -1258,6 +1278,24 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
+    // the text changed under the editor, which the edit kept open through a
+    // sync from another tab, or the host's updateScene: show that text, the
+    // draft it replaced is gone from the scene
+    const latestTextElement = app.scene.getElement<ExcalidrawTextElement>(
+      element.id,
+    );
+    if (
+      latestTextElement &&
+      isTextElement(latestTextElement) &&
+      latestTextElement.originalText !== editable.value
+    ) {
+      const { selectionStart, selectionEnd } = editable;
+      editable.value = latestTextElement.originalText;
+      editable.setSelectionRange(
+        Math.min(selectionStart, editable.value.length),
+        Math.min(selectionEnd, editable.value.length),
+      );
+    }
     updateWysiwygStyle();
     const isPopupOpened = !!ownerDocument.activeElement?.closest(
       ".properties-content",
