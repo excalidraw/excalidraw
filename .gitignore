@@ -27,3 +27,7 @@ dev-dist
 html
 meta*.json
 .claude
+blob-report
+playwright-report
+test-results
+playwright-comment.md
