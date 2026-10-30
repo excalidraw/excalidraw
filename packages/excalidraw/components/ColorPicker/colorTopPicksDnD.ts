@@ -1,28 +1,22 @@
 import { createContext, useContext } from "react";
 
-import { colorToHex, isTransparent } from "@excalidraw/common";
+import { isTransparent } from "@excalidraw/common";
 
 import { useTopPicksDnD } from "../TopPicksDnD/topPicksDnD";
+
+import { getTopPickColor, isSameTopPick } from "./colorTopPickUtils";
 
 import type {
   CreateTopPicksGhost,
   TopPicksDnD,
 } from "../TopPicksDnD/topPicksDnD";
+import type { ColorTopPick } from "../../types";
 
-/** value-equality of colors — normalizes notation (`#fff` vs `#ffffff` vs
- * `white`) so visually identical colors can't occupy multiple pick slots */
-const isSameColor = (a: string, b: string) => {
-  if (a.toLowerCase() === b.toLowerCase()) {
-    return true;
-  }
-  const aHex = colorToHex(a);
-  return aHex !== null && aHex === colorToHex(b);
-};
-
-const createColorGhost: CreateTopPicksGhost<string> = ({
-  value: color,
+const createColorGhost: CreateTopPicksGhost<ColorTopPick> = ({
+  value,
   sourceEl,
 }) => {
+  const color = getTopPickColor(value);
   // the source may live in another window's document (e.g. a popout)
   const ownerDocument = sourceEl.ownerDocument;
   const swatch = ownerDocument.createElement("div");
@@ -33,16 +27,15 @@ const createColorGhost: CreateTopPicksGhost<string> = ({
     // swatches render the theme-adjusted color (dark mode remaps colors
     // rather than CSS-filtering them) — sample the rendered color so the
     // ghost matches what the user picked up
-    const rendered = (ownerDocument.defaultView ?? window).getComputedStyle(
-      sourceEl,
-    ).backgroundColor;
+    const rendered =
+      ownerDocument.defaultView?.getComputedStyle(sourceEl).backgroundColor;
     swatch.style.backgroundColor =
       rendered && rendered !== "rgba(0, 0, 0, 0)" ? rendered : color;
   }
   return { content: swatch, rect: sourceEl.getBoundingClientRect() };
 };
 
-export type ColorPickerDnD = TopPicksDnD<string>;
+export type ColorPickerDnD = TopPicksDnD<ColorTopPick>;
 
 export const ColorPickerDnDContext = createContext<ColorPickerDnD | null>(null);
 
@@ -56,13 +49,13 @@ export const useColorTopPicksDnD = ({
   onPicksChange,
 }: {
   enabled: boolean;
-  picks: readonly string[];
-  onPicksChange: (picks: string[]) => void;
+  picks: readonly ColorTopPick[];
+  onPicksChange: (picks: ColorTopPick[]) => void;
 }): ColorPickerDnD =>
   useTopPicksDnD({
     enabled,
     picks,
     onPicksChange,
-    isSamePick: isSameColor,
+    isSamePick: isSameTopPick,
     createGhost: createColorGhost,
   });
