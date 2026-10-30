@@ -896,6 +896,24 @@ export const textWysiwyg = ({
       event.preventDefault();
       handleSubmit();
       app.actionManager.executeAction(actionSaveFileToDisk, "keyboard");
+    } else if (
+      event.key === KEYS.ENTER &&
+      event.altKey &&
+      // AltGr is reported as Ctrl+Alt on Windows
+      !event[KEYS.CTRL_OR_CMD]
+    ) {
+      // submit, and go on typing in a new text below, unless this one's
+      // empty (it's removed on submit, as with Escape)
+      event.preventDefault();
+      if (event.isComposing || event.keyCode === 229) {
+        return;
+      }
+      const hasText = !!editable.value.trim();
+      submittedViaKeyboard = true;
+      handleSubmit();
+      if (hasText) {
+        app.text.startNextTextEditing(element.id);
+      }
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
