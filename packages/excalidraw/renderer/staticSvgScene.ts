@@ -806,12 +806,13 @@ const renderElementToSvg = (
           lineHeightPx,
         );
         const direction = isRTL(element.text) ? "rtl" : "ltr";
+        // `text-anchor` is logical: `start` is the right edge of RTL text
         const textAnchor =
           element.textAlign === "center"
             ? "middle"
-            : element.textAlign === "right" || direction === "rtl"
-            ? "end"
-            : "start";
+            : (element.textAlign === "right") === (direction === "rtl")
+            ? "start"
+            : "end";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
