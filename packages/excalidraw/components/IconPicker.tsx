@@ -99,6 +99,12 @@ function Picker<T>({
 
       event.preventDefault();
     } else if (event.key === KEYS.TAB) {
+      if (hiddenSections.length > 0) {
+        // Let Tab reach the collapsible header without moving focus back to an option.
+        event.nativeEvent.stopImmediatePropagation();
+        event.stopPropagation();
+        return;
+      }
       const index = allOptions.findIndex((option) => option.value === value);
       const nextIndex = event.shiftKey
         ? (allOptions.length + index - 1) % allOptions.length
