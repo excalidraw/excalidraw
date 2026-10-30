@@ -177,6 +177,7 @@ import {
   getRenderElementWithPositionOverride,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
+  getSelectedGroupIdToEdit,
   syncInvalidIndices,
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
@@ -5487,6 +5488,33 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = this.scene.getSelectedElements(this.state);
+        const groupIdToEdit = event[KEYS.CTRL_OR_CMD]
+          ? null
+          : getSelectedGroupIdToEdit(this.state, selectedElements);
+        if (groupIdToEdit) {
+          // enter the group (same as double-clicking it) and select all of
+          // its elements, so they can be edited individually
+          const selectedElementIds = selectedElements.reduce(
+            (acc: Record<ExcalidrawElement["id"], true>, element) => {
+              if (!isBoundToContainer(element) && !element.locked) {
+                acc[element.id] = true;
+              }
+              return acc;
+            },
+            {},
+          );
+          this.store.scheduleCapture();
+          this.setState((prevState) => ({
+            ...selectGroupsForSelectedElements(
+              { editingGroupId: groupIdToEdit, selectedElementIds },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ),
+          }));
+          event.preventDefault();
+          return;
+        }
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD] || isLineElement(selectedElement)) {
