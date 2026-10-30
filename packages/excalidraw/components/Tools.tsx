@@ -155,6 +155,7 @@ export const TOOLS = defineTools({
   },
   lasso: {
     icon: LassoIcon,
+    letterKey: KEYS.C,
     fillable: false,
   },
 });
@@ -360,11 +361,9 @@ export const SelectionToolButton = createToolButton("selection", {
 
 /**
  * Rendered in place of the selection button when lasso is the preferred
- * selection tool; the selection shortcut activates it then.
+ * selection tool.
  */
-export const LassoToolButton = createToolButton("lasso", {
-  shortcutType: "selection",
-});
+export const LassoToolButton = createToolButton("lasso");
 
 /**
  * The selection ⇄ lasso popover used in compact (tablet) and mobile
