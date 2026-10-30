@@ -538,6 +538,10 @@ body.excalidraw-cursor-resize * {
 
     :root[dir="rtl"] & {
       background-position: left 0.7rem top 50%, 0 0;
+      padding-inline-start: 0rem;
+      padding-inline-end: 2rem;
+      text-align: right;
+      padding-right: 0.75rem;
     }
 
     background-size: 0.65em auto, 100%;
