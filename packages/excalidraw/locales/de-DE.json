@@ -197,9 +197,9 @@
     "shapeSwitch": "Form wechseln",
     "preferences": "Einstellungen",
     "preferences_toolLock": "Werkzeug sperren",
-    "boxSelectionMode": "Auswählen wenn",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Auswählen bei",
+    "boxSelectionContain": "Umfassung",
+    "boxSelectionOverlap": "Überlappung",
     "arrowBinding": "Pfeilbindung",
     "midpointSnapping": "An Mittelpunkten einrasten",
     "showHints": "Hinweise anzeigen",
@@ -631,8 +631,8 @@
     "noShades": "Keine Schattierungen für diese Farbe verfügbar",
     "invalidColor": "Keine gültige Farbe",
     "invalidHexLength": "Hex-Code muss 3, 4, 6 oder 8 Zeichen lang sein",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Tipp: Ziehe eine Farbe zu deinen Top-Picks um sie anzupinnen",
+    "resetTopPicks": "Setze deine Top-Picks zurück"
   },
   "overwriteConfirm": {
     "action": {
