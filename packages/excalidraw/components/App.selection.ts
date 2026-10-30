@@ -345,7 +345,7 @@ export const getSelectionStateForElements = (
  *
  * @param allElements the (non-deleted) elements the selection is in
  */
-export const getSelectionStateAddingElements = (
+const getSelectionStateAddingElements = (
   targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -452,7 +452,7 @@ export const getSelectionStateAddingElements = (
  *
  * @param allElements the (non-deleted) elements the selection is in
  */
-export const getSelectionStateRemovingElements = (
+const getSelectionStateRemovingElements = (
   targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -742,9 +742,9 @@ export class AppSelection {
       ExcalidrawElement["id"],
       NonDeletedExcalidrawElement
     >();
-    for (const elementOrId of (isReadonlyArray(elementsOrIds)
+    for (const elementOrId of isReadonlyArray(elementsOrIds)
       ? elementsOrIds
-      : [elementsOrIds]) as readonly (ExcalidrawElement | string)[]) {
+      : [elementsOrIds]) {
       const id = typeof elementOrId === "string" ? elementOrId : elementOrId.id;
       const element = elementsMap.get(id);
       if (element && (includeLocked || !element.locked)) {

@@ -188,7 +188,7 @@ export const uncropElementSides = (
   }
   const { width, height } = getUncroppedWidthAndHeight(element);
   const { x: left, y: top } = getFlipAdjustedCropPosition(element)!;
-  const uncrops = (side: string, opposite: string) =>
+  const uncrops = (side: "n" | "s" | "e" | "w", opposite: typeof side) =>
     handle.includes(side) || (mirrored && handle.includes(opposite));
 
   return cropElementToBounds(
