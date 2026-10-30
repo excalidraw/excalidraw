@@ -4,6 +4,8 @@ import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import { colorPickerKeyNavHandler } from "../components/ColorPicker/keyboardNavHandlers";
 
+import * as i18n from "../i18n";
+
 const handlerArgs = (
   key: string,
   palette: ColorPaletteCustom,
@@ -124,5 +126,36 @@ describe("color picker hotkeys", () => {
       }),
     ).toBe(true);
     expect(onChange).toHaveBeenCalledWith("#r1");
+  });
+
+ it("flips left/right arrow direction in RTL", () => {
+    const palette = {
+      red: "#r1",
+      green: "#g1",
+      blue: "#b1",
+    } as unknown as ColorPaletteCustom;
+
+    const languageSpy = vi.spyOn(i18n, "getLanguage");
+    try {
+      languageSpy.mockReturnValue({ ...i18n.getLanguage(), rtl: true });
+
+      let onChange = vi.fn();
+      colorPickerKeyNavHandler({
+        ...handlerArgs("ArrowLeft", palette, onChange),
+        activeColorPickerSection: "baseColors",
+        color: "#r1",
+      });
+      expect(onChange).toHaveBeenCalledWith("#g1");
+
+      onChange = vi.fn();
+      colorPickerKeyNavHandler({
+        ...handlerArgs("ArrowRight", palette, onChange),
+        activeColorPickerSection: "baseColors",
+        color: "#g1",
+      });
+      expect(onChange).toHaveBeenCalledWith("#r1");
+    } finally {
+      languageSpy.mockRestore();
+    }
   });
 });
