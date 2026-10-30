@@ -9,7 +9,7 @@ const MERMAID_UNKNOWN_DIAGRAM_ERROR = /No diagram type detected/i;
 const MODULE_LOAD_ERROR =
   /Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed/i;
 
-/** a lazy-loaded chunk (e.g. one of mermaid's diagram chunks) failed to load */
+/** a lazy-loaded chunk (e.g. one of Pele's diagram chunks) failed to load */
 export const isModuleLoadError = (error: unknown) =>
   error instanceof Error && MODULE_LOAD_ERROR.test(error.message);
 

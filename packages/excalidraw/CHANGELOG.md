@@ -197,7 +197,7 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 
 ### Other Features
 
-- Mermaid diagrams (in the TTD dialog and on paste) are converted with `@excalidraw/mermaid-to-excalidraw` v3, which lays them out with [Pele](https://pele.run) instead of Mermaid, no longer bundled. Layouts differ from before, and `swimlane-beta` diagrams are supported. [#12480](https://github.com/excalidraw/excalidraw/pull/12480)
+- Mermaid diagrams (in the TTD dialog and on paste) are converted with `@excalidraw/mermaid-to-excalidraw` v3, which lays them out with [Pele](https://pele.run) instead of Mermaid, no longer bundled. Layouts differ from before, and `swimlane-beta` diagrams are supported. Each diagram type's code is loaded the first time one is converted. [#12480](https://github.com/excalidraw/excalidraw/pull/12480), [#12481](https://github.com/excalidraw/excalidraw/pull/12481)
 
 - `label.labelPosition` (0–1) of skeleton arrows places their label along the arrow, instead of halfway. [#12425](https://github.com/excalidraw/excalidraw/pull/12425)
 
