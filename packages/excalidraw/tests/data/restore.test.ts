@@ -6,6 +6,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_SIDEBAR,
   FONT_FAMILY,
+  getLineHeight,
   ROUNDNESS,
   STICKY_NOTE_MAX_FONT_SIZE,
   DEFAULT_STICKY_NOTE_BG,
@@ -210,6 +211,49 @@ describe("restoreElements", () => {
       seed: expect.any(Number),
       versionNonce: expect.any(Number),
     });
+  });
+
+  it("should detect the line height of a text element that only has the legacy font prop", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      id: "id-text-legacy-font",
+    });
+
+    // a diagram old enough to carry `font` has none of the props that
+    // replaced it
+    delete textElement.fontSize;
+    delete textElement.fontFamily;
+    delete textElement.lineHeight;
+    textElement.font = "20px Virgil";
+    textElement.text = "hi";
+    textElement.height = 50;
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.fontSize).toBe(20);
+    expect(restoredText.fontFamily).toBe(FONT_FAMILY.Virgil);
+    expect(restoredText.lineHeight).toBe(2.5);
+  });
+
+  it("should fall back to the font line height when it can't be detected", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      id: "id-text-unusable-height",
+    });
+
+    delete textElement.lineHeight;
+    textElement.text = "hi";
+    textElement.height = "unknown";
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.lineHeight).toBe(getLineHeight(textElement.fontFamily));
   });
 
   it("should sanitize non-finite font sizes on text elements", () => {
@@ -534,6 +578,24 @@ describe("restoreElements", () => {
 
     expect(restoredArrow.startArrowhead).toBe("cardinality_one");
     expect(restoredArrow.endArrowhead).toBe("cardinality_one_or_many");
+  });
+
+  it("should strip the leaked `moveMidPointsWithElement` prop from linear elements", () => {
+    const arrowElement = API.createElement({ type: "arrow" });
+    const lineElement = API.createElement({ type: "line" });
+
+    const restoredElements = restore.restoreElements(
+      [
+        { ...arrowElement, moveMidPointsWithElement: false } as any,
+        { ...lineElement, moveMidPointsWithElement: true } as any,
+      ],
+      null,
+    );
+
+    expect(restoredElements).toHaveLength(2);
+    for (const element of restoredElements) {
+      expect(element).not.toHaveProperty("moveMidPointsWithElement");
+    }
   });
 
   it("should strip element if restore fails", () => {

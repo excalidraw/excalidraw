@@ -116,7 +116,13 @@ export const actionCut = register<ClipboardEvent | null>({
   trackEvent: { category: "element" },
   perform: (elements, appState, event, app) => {
     actionCopy.perform(elements, appState, event, app);
-    return actionDeleteSelected.perform(elements, appState, null, app);
+    // the cut frame's children are on the clipboard with it, so go with it
+    return actionDeleteSelected.perform(
+      elements,
+      appState,
+      { withFrameChildren: true },
+      app,
+    );
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
@@ -146,9 +152,9 @@ export const actionCopyAsSvg = register({
         appState,
         app.files,
         {
-          ...appState,
           exportingFrame,
           name: app.getName(),
+          renderEnvironment: app.renderEnvironment,
         },
       );
 
@@ -213,9 +219,9 @@ export const actionCopyAsPng = register({
     );
     try {
       await exportCanvas("clipboard", exportedElements, appState, app.files, {
-        ...appState,
         exportingFrame,
         name: app.getName(),
+        renderEnvironment: app.renderEnvironment,
       });
       return {
         appState: {

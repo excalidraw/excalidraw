@@ -295,6 +295,26 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
+/**
+ * Line-height might not be specified either when creating elements
+ * programmatically, or when importing old diagrams. For the latter we want to
+ * detect the original line height, which will likely differ from our per-font
+ * fixed line height we now use, to maintain backward compatibility.
+ *
+ * Takes the element with the font properties already migrated: a diagram old
+ * enough to carry the legacy `font` prop has neither `fontSize` nor
+ * `fontFamily`, so detecting off the raw element divides by `undefined`.
+ */
+const restoreLineHeight = (
+  element: ExcalidrawTextElement,
+): ExcalidrawTextElement["lineHeight"] => {
+  const detected = element.height ? detectLineHeight(element) : null;
+
+  return isFiniteNumber(detected) && detected > 0
+    ? detected
+    : getLineHeight(element.fontFamily);
+};
+
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
   binding: FixedPointBinding | null,
@@ -434,6 +454,8 @@ const restoreElementWithProperties = <
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
     strokeSharpness?: StrokeRoundness;
+    /** @deprecated `movePoints()` option wrongly persisted on linear elements */
+    moveMidPointsWithElement?: boolean | null;
   },
   K extends Pick<T, keyof Omit<Required<T>, keyof ExcalidrawElement>>,
 >(
@@ -510,6 +532,8 @@ const restoreElementWithProperties = <
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;
   delete ret.boundElementIds;
+  // not an element prop, but used to leak onto linear elements
+  delete ret.moveMidPointsWithElement;
 
   return ret;
 };
@@ -547,19 +571,9 @@ export const restoreElement = (
       }
       const text = (typeof element.text === "string" && element.text) || "";
 
-      // line-height might not be specified either when creating elements
-      // programmatically, or when importing old diagrams.
-      // For the latter we want to detect the original line height which
-      // will likely differ from our per-font fixed line height we now use,
-      // to maintain backward compatibility.
       const lineHeight =
         element.lineHeight ||
-        (element.height
-          ? // detect line-height from current element height and font-size
-            detectLineHeight(element)
-          : // no element height likely means programmatic use, so default
-            // to a fixed line height
-            getLineHeight(element.fontFamily));
+        restoreLineHeight({ ...element, fontSize, fontFamily, text });
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,

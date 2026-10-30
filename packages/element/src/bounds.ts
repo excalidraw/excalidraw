@@ -7,11 +7,15 @@ import {
   sizeOf,
 } from "@excalidraw/common";
 import {
+  clamp,
   degreesToRadians,
   lineSegment,
   pointFrom,
+  pointDistance,
   pointFromArray,
   pointRotateRads,
+  vectorDot,
+  vectorFromPoint,
 } from "@excalidraw/math";
 import { getCurvePathOps } from "@excalidraw/utils/shape";
 import { pointsOnBezierCurves } from "points-on-curve";
@@ -27,13 +31,14 @@ import type {
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { generateRoughOptions } from "./shape";
+import { ELBOW_ARROW_CORNER_RADIUS, generateRoughOptions } from "./shape";
 import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isLinearElement,
@@ -53,6 +58,7 @@ import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type {
   Arrowhead,
+  CardinalityArrowhead,
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
@@ -710,6 +716,13 @@ const getFreeDrawElementAbsoluteCoords = (
 const CARDINALITY_MARKER_SIZE = 20;
 const CROWFOOT_ARROWHEAD_SIZE = 15;
 
+// layout of the parts of composite cardinality markers, in multiples of
+// the part's size (negative offsets move a part toward the tip)
+export const CARDINALITY_ONE_OR_MANY_BAR_OFFSET = -0.25;
+export const CARDINALITY_INNER_BAR_OFFSET = -0.5;
+export const CARDINALITY_ZERO_CIRCLE_OFFSET = 1.5;
+export const CARDINALITY_ZERO_CIRCLE_SCALE = 0.8;
+
 /** @returns number in pixels */
 export const getArrowheadSize = (arrowhead: Arrowhead): number => {
   switch (arrowhead) {
@@ -731,15 +744,248 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
   }
 };
 
+const ARROW_ARROWHEAD_ANGLE = 20;
+// scaled down `arrow` arrowheads open up to this angle so that they don't
+// collapse into the line, reaching it at ARROW_ARROWHEAD_WIDEST_SIZE
+const ARROW_ARROWHEAD_WIDEST_ANGLE = 30;
+const ARROW_ARROWHEAD_WIDEST_SIZE = 10;
+
 /** @returns number in degrees */
-export const getArrowheadAngle = (arrowhead: Arrowhead): Degrees => {
+export const getArrowheadAngle = (
+  arrowhead: Arrowhead,
+  /** size the arrowhead is drawn at, if scaled down */
+  size = getArrowheadSize(arrowhead),
+): Degrees => {
   switch (arrowhead) {
     case "bar":
       return 90 as Degrees;
-    case "arrow":
-      return 20 as Degrees;
+    case "arrow": {
+      const fullSize = getArrowheadSize(arrowhead);
+      const shrinkage = clamp(
+        (fullSize - size) / (fullSize - ARROW_ARROWHEAD_WIDEST_SIZE),
+        0,
+        1,
+      );
+      return (ARROW_ARROWHEAD_ANGLE +
+        (ARROW_ARROWHEAD_WIDEST_ANGLE - ARROW_ARROWHEAD_ANGLE) *
+          shrinkage) as Degrees;
+    }
     default:
       return 25 as Degrees;
+  }
+};
+
+/**
+ * The arrow's last segment at the arrowhead's end, and how much the arrow
+ * turns into it from the previous segment (0 if it continues straight).
+ *
+ * @returns null if there's no previous segment
+ */
+const getArrowheadCorner = (
+  element: ExcalidrawLinearElement,
+  position: "start" | "end",
+) => {
+  const { points } = element;
+  const [tip, corner, prev] =
+    position === "end"
+      ? [points.at(-1), points.at(-2), points.at(-3)]
+      : [points[0], points[1], points[2]];
+
+  if (!tip || !corner || !prev) {
+    return null;
+  }
+
+  let length = pointDistance(tip, corner);
+  let prevLength = pointDistance(corner, prev);
+
+  if (length === 0 || prevLength === 0) {
+    return null;
+  }
+
+  // elbow arrows round their corners off, the arrow effectively turns
+  // halfway into the rounding
+  if (isElbowArrow(element)) {
+    const rounding =
+      Math.min(ELBOW_ARROW_CORNER_RADIUS, length / 2, prevLength / 2) / 2;
+    length -= rounding;
+    prevLength -= rounding;
+  }
+
+  const turn = Math.acos(
+    clamp(
+      vectorDot(vectorFromPoint(tip, corner), vectorFromPoint(corner, prev)) /
+        (length * prevLength),
+      -1,
+      1,
+    ),
+  );
+
+  return { length, prevLength, turn };
+};
+
+type ArrowheadCorner = NonNullable<ReturnType<typeof getArrowheadCorner>>;
+
+/**
+ * Size up to which an arrowhead extending past the last segment's start
+ * keeps its sides (at `sideAngle` to the last segment) `clearance` away
+ * from the previous segment.
+ */
+const getSidesClearSize = (
+  { length, turn }: ArrowheadCorner,
+  sideAngle: Degrees,
+  clearance: number,
+) => {
+  const angle = degreesToRadians(sideAngle);
+
+  // the previous segment stays between the sides
+  if (turn <= angle) {
+    return Infinity;
+  }
+
+  // in the tip-corner-side-end triangle, the side end is
+  // `length * sin(turn)` away from the previous segment at size 0,
+  // and every unit of size takes it `sin(turn - angle)` closer
+  return (length * Math.sin(turn) - clearance) / Math.sin(turn - angle);
+};
+
+const isCardinalityArrowhead = (
+  arrowhead: Arrowhead,
+): arrowhead is CardinalityArrowhead => arrowhead.startsWith("cardinality_");
+
+/**
+ * Scale (at most 1) at which all parts of a cardinality marker fit on the
+ * last segment: the crow's foot reaches back at most to the corner, the
+ * circle stays clear of it, and the bars' ends stay closer to the arrow than
+ * to the previous segment.
+ */
+const getCardinalityMarkerScale = (
+  marker: CardinalityArrowhead,
+  { length, turn }: ArrowheadCorner,
+  strokeWidth: number,
+) => {
+  // scales at which each part reaches back from the tip at most to the corner
+  const bar = (offset: number) => {
+    const angle = degreesToRadians(getArrowheadAngle("cardinality_one"));
+    return (
+      length /
+      (getArrowheadSize("cardinality_one") *
+        (offset +
+          Math.cos(angle) +
+          // the bar's ends stay closer to the arrow than to the previous
+          // segment, which (other than when going straight) is at an angle
+          Math.sin(angle) * Math.tan(turn / 2)))
+    );
+  };
+  const crowsFoot = () => length / getArrowheadSize("cardinality_many");
+  // see generateArrowheadOutlineCircle() for the diameter
+  const circle = () =>
+    (length -
+      ((strokeWidth - 2) * CARDINALITY_ZERO_CIRCLE_SCALE) / 2 -
+      strokeWidth) /
+    (getArrowheadSize("circle_outline") *
+      (CARDINALITY_ZERO_CIRCLE_OFFSET + CARDINALITY_ZERO_CIRCLE_SCALE / 2));
+
+  switch (marker) {
+    case "cardinality_one":
+      return Math.min(1, bar(0));
+    case "cardinality_many":
+      return Math.min(1, crowsFoot());
+    case "cardinality_one_or_many":
+      return Math.min(1, crowsFoot(), bar(CARDINALITY_ONE_OR_MANY_BAR_OFFSET));
+    case "cardinality_exactly_one":
+      return Math.min(1, bar(CARDINALITY_INNER_BAR_OFFSET), bar(0));
+    case "cardinality_zero_or_one":
+      return Math.min(1, circle(), bar(CARDINALITY_INNER_BAR_OFFSET));
+    case "cardinality_zero_or_many":
+      return Math.min(1, crowsFoot(), circle());
+  }
+};
+
+/**
+ * Size an arrowhead may grow to when the last segment of an arrow is too
+ * short to fit it, by using up the whole segment or extending past its start.
+ *
+ * @param arrowhead the arrowhead, or the part of a composite marker, to size
+ * @returns 0 if the arrowhead shouldn't grow
+ */
+const getArrowheadSizeBeyondLastSegment = (
+  element: ExcalidrawLinearElement,
+  position: "start" | "end",
+  arrowhead: Arrowhead,
+): number => {
+  const corner = getArrowheadCorner(element, position);
+
+  if (!corner) {
+    return 0;
+  }
+
+  const { length, prevLength, turn } = corner;
+  // don't take up more than half of the last two segments
+  const maxSize = (length + prevLength) / 2;
+  // the end of curved arrows bends away from a longer arrowhead, and its
+  // direction is too unreliable for a wider one
+  const isCurved = !!element.roundness && !isElbowArrow(element);
+  const marker =
+    position === "start" ? element.startArrowhead : element.endArrowhead;
+
+  // all parts of cardinality markers scale together, and the marker has to
+  // stay on the last segment to be read along it
+  if (marker && isCardinalityArrowhead(marker)) {
+    return isCurved
+      ? 0
+      : getArrowheadSize(arrowhead) *
+          getCardinalityMarkerScale(marker, corner, element.strokeWidth);
+  }
+
+  // circles have no direction, the previous segment can run into them
+  if (arrowhead === "circle" || arrowhead === "circle_outline") {
+    return maxSize;
+  }
+
+  if (isCurved) {
+    return 0;
+  }
+
+  switch (arrowhead) {
+    case "bar":
+      // keep the bar's ends closer to the tip than to the previous segment,
+      // which (other than when going straight) runs at an angle to the bar
+      return Math.min(maxSize, length / Math.tan(turn / 2));
+    case "diamond":
+    case "diamond_outline":
+      // the diamond can reach back to the corner (at twice its size), past
+      // it the previous segment would cut through the diamond
+      return length / 2;
+    case "triangle":
+    case "triangle_outline":
+      // the triangle's base may sit on the previous segment
+      return Math.min(
+        maxSize,
+        getSidesClearSize(corner, getArrowheadAngle(arrowhead), 0),
+      );
+    case "arrow": {
+      // only grow as much as legibility needs, a full-size arrowhead past
+      // a sharp turn looks like an outline triangle
+      const legibleSize = getArrowheadSize(arrowhead) / 2;
+      // keep the open sides' strokes off the previous segment's. Smaller
+      // arrowheads are wider, so check the angles at both ends of the range.
+      return Math.min(
+        legibleSize,
+        maxSize,
+        getSidesClearSize(
+          corner,
+          getArrowheadAngle(arrowhead, legibleSize),
+          element.strokeWidth,
+        ),
+        getSidesClearSize(
+          corner,
+          getArrowheadAngle(arrowhead, 0),
+          element.strokeWidth,
+        ),
+      );
+    }
+    default:
+      return 0;
   }
 };
 
@@ -833,7 +1079,16 @@ export const getArrowheadPoints = (
   // This value is selected by minimizing a minimum size with the last segment of the arrowhead
   const lengthMultiplier =
     arrowhead === "diamond" || arrowhead === "diamond_outline" ? 0.25 : 0.5;
-  const minSize = Math.min(size, length * lengthMultiplier);
+  let minSize = Math.min(size, length * lengthMultiplier);
+  if (minSize < size) {
+    minSize = Math.min(
+      size,
+      Math.max(
+        minSize,
+        getArrowheadSizeBeyondLastSegment(element, position, arrowhead),
+      ),
+    );
+  }
   const tx = x2 - nx * minSize * offsetMultiplier;
   const ty = y2 - ny * minSize * offsetMultiplier;
   const xs = tx - nx * minSize;
@@ -844,7 +1099,7 @@ export const getArrowheadPoints = (
     return [tx, ty, diameter];
   }
 
-  const angle = getArrowheadAngle(arrowhead);
+  const angle = getArrowheadAngle(arrowhead, minSize);
 
   if (
     arrowhead === "cardinality_many" ||
@@ -1277,6 +1532,7 @@ export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
   type,
   excludeElementsInFrames,
   shouldIgnoreElementFromSelection,
+  includeStroke = true,
 }: {
   elements: readonly T[];
   elementsMap?: ElementsMap;
@@ -1288,6 +1544,8 @@ export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
   type: "contain" | "overlap";
   excludeElementsInFrames?: boolean;
   shouldIgnoreElementFromSelection?: (element: T) => boolean;
+  /** whether elements extend by their stroke, as they render */
+  includeStroke?: boolean;
 }) => {
   if (!elementsMap) {
     elementsMap = arrayToMap(elements) as ElementsMap;
@@ -1336,7 +1594,7 @@ export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
       groups[groupId].push(element);
     }
 
-    const strokeWidth = element.strokeWidth;
+    const strokeWidth = includeStroke ? element.strokeWidth : 0;
     let labelAABB: Bounds | null = null;
     let elementAABB = getElementBounds(element, elementsMap);
 
