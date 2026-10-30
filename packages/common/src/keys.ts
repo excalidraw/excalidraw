@@ -17,14 +17,23 @@ export const CODES = {
   QUOTE: "Quote",
   ZERO: "Digit0",
   SLASH: "Slash",
+  A: "KeyA",
   C: "KeyC",
   D: "KeyD",
+  E: "KeyE",
   H: "KeyH",
-  V: "KeyV",
-  Z: "KeyZ",
-  Y: "KeyY",
+  L: "KeyL",
+  O: "KeyO",
+  P: "KeyP",
+  Q: "KeyQ",
   R: "KeyR",
   S: "KeyS",
+  T: "KeyT",
+  V: "KeyV",
+  W: "KeyW",
+  X: "KeyX",
+  Y: "KeyY",
+  Z: "KeyZ",
 } as const;
 
 export const KEYS = {
@@ -92,6 +101,20 @@ export type Key = keyof typeof KEYS;
 export const KeyCodeMap = new Map<ValueOf<typeof KEYS>, ValueOf<typeof CODES>>([
   [KEYS.Z, CODES.Z],
   [KEYS.Y, CODES.Y],
+  [KEYS.R, CODES.R],
+  [KEYS.V, CODES.V],
+  [KEYS.A, CODES.A],
+  [KEYS.O, CODES.O],
+  [KEYS.D, CODES.D],
+  [KEYS.L, CODES.L],
+  [KEYS.P, CODES.P],
+  [KEYS.T, CODES.T],
+  [KEYS.E, CODES.E],
+  [KEYS.H, CODES.H],
+  [KEYS.Q, CODES.Q],
+  [KEYS.W, CODES.W],
+  [KEYS.S, CODES.S],
+  [KEYS.X, CODES.X],
 ]);
 
 export const isLatinChar = (key: string) => /^[a-z]$/.test(key.toLowerCase());
