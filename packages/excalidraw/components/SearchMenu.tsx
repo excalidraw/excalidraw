@@ -3,11 +3,11 @@ import debounce from "lodash.debounce";
 import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  CLASSES,
-  EVENT,
-  FONT_FAMILY,
-  FRAME_STYLE,
-  getLineHeight,
+    CLASSES,
+    EVENT,
+    FONT_FAMILY,
+    FRAME_STYLE,
+    getLineHeight,
 } from "@excalidraw/common";
 
 import {
@@ -18,21 +18,20 @@ import {
 import { measureText } from "@excalidraw/element";
 
 import {
-  KEYS,
-  randomInteger,
-  addEventListener,
-  getFontString,
+    addEventListener,
+    getFontString,
+    KEYS,
+    randomInteger,
 } from "@excalidraw/common";
 
-import { newTextElement } from "@excalidraw/element";
-import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
+import { isFrameLikeElement, isTextElement, newTextElement } from "@excalidraw/element";
 
 import { getDefaultFrameName } from "@excalidraw/element/frame";
 
 import type { RenderEnvironment } from "@excalidraw/element";
 import type {
-  ExcalidrawFrameLikeElement,
-  ExcalidrawTextElement,
+    ExcalidrawFrameLikeElement,
+    ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
 import { atom, useAtom } from "../editor-jotai";
@@ -44,12 +43,14 @@ import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
 import { TextField } from "./TextField";
 import {
-  collapseDownIcon,
-  upIcon,
-  searchIcon,
-  frameToolIcon,
-  TextIcon,
+    collapseDownIcon,
+    frameToolIcon,
+    searchIcon,
+    TextIcon,
+    upIcon,
 } from "./icons";
+
+import { getStableMatches } from "./SearchMenu.utils";
 
 import "./SearchMenu.scss";
 
@@ -72,6 +73,8 @@ type SearchMatchItem = {
   };
   matchedLines: SearchMatch["matchedLines"];
 };
+
+export type { SearchMatchItem };
 
 type SearchMatches = {
   nonce: number | null;
@@ -113,7 +116,7 @@ export const SearchMenu = () => {
       handleSearch(searchQuery, app, (matchItems, index) => {
         setSearchMatches({
           nonce: randomInteger(),
-          items: matchItems,
+          items: getStableMatches(matchItems),
         });
         searchedQueryRef.current = searchQuery;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
@@ -358,7 +361,7 @@ export const SearchMenu = () => {
             handleSearch(searchQuery, app, (matchItems, index) => {
               setSearchMatches({
                 nonce: randomInteger(),
-                items: matchItems,
+                items: getStableMatches(matchItems),
               });
               setFocusIndex(index);
               searchedQueryRef.current = searchQuery;
@@ -501,7 +504,7 @@ const MatchListBase = (props: MatchListProps) => {
           </div>
           {frameNameMatches.map((searchMatch, index) => (
             <ListItem
-              key={searchMatch.element.id + searchMatch.index}
+              key={`${searchMatch.element.id}_${searchMatch.index ?? 0}`}
               searchQuery={props.searchQuery}
               preview={searchMatch.preview}
               highlighted={index === props.focusIndex}
@@ -521,7 +524,7 @@ const MatchListBase = (props: MatchListProps) => {
           </div>
           {textMatches.map((searchMatch, index) => (
             <ListItem
-              key={searchMatch.element.id + searchMatch.index}
+              key={`${searchMatch.element.id}_${searchMatch.index ?? 0}`}
               searchQuery={props.searchQuery}
               preview={searchMatch.preview}
               highlighted={index + frameNameMatches.length === props.focusIndex}
