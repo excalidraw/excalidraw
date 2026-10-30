@@ -741,10 +741,6 @@ body.excalidraw-cursor-resize * {
     // shift into the hidden zoom-out button's place
     .reset-zoom-button-wrapper {
       transform: translateX(calc(-1 * var(--lg-button-size)));
-
-      :root[dir="rtl"] & {
-        transform: translateX(var(--lg-button-size));
-      }
     }
   }
 
