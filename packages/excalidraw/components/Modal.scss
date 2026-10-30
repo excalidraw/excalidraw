@@ -122,6 +122,13 @@
       padding: 0;
     }
 
+    .Modal__content .Island {
+      // keep the dialog content clear of notches, status bars and
+      // home indicators; env() resolves to 0 on non-notched devices
+      padding: calc(2.5rem + var(--sat, 0)) calc(2.5rem + var(--sar, 0))
+        calc(2.5rem + var(--sab, 0)) calc(2.5rem + var(--sal, 0));
+    }
+
     .Modal__content {
       position: absolute;
       top: 0;

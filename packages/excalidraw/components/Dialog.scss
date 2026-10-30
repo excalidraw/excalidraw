@@ -47,8 +47,8 @@
 
   .Dialog--fullscreen {
     .Dialog__close {
-      top: 1.25rem;
-      right: 1.25rem;
+      top: calc(1.25rem + var(--sat, 0));
+      right: calc(1.25rem + var(--sar, 0));
     }
   }
 }
