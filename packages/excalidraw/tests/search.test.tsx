@@ -194,4 +194,44 @@ describe("search", () => {
       expect(h.app.state.searchMatches?.matches.length).toBe(3);
     });
   });
+
+  it("should keep the results order stable while elements move on canvas", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    const first = API.createElement({ type: "text", text: "test 1", y: 0 });
+    const second = API.createElement({ type: "text", text: "test 2", y: 100 });
+    API.setElements([first, second]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    const getMatchIds = () =>
+      h.app.state.searchMatches?.matches.map((match) => match.id);
+
+    await waitFor(() => {
+      expect(getMatchIds()).toEqual([first.id, second.id]);
+    });
+
+    // move the first result below the second one and add a new match
+    // in between: the existing results must not reorder
+    const third = API.createElement({ type: "text", text: "test 3", y: 200 });
+    API.updateElement(h.elements[0], { y: 300 });
+    API.setElements([...h.elements, third]);
+
+    await waitFor(() => {
+      expect(getMatchIds()).toEqual([first.id, second.id, third.id]);
+    });
+
+    // a new query starts over in canvas order
+    updateTextEditor(searchInput, "tes");
+
+    await waitFor(() => {
+      expect(getMatchIds()).toEqual([second.id, third.id, first.id]);
+    });
+  });
 });
