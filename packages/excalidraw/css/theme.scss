@@ -3,6 +3,13 @@
 @forward "./variables.module";
 
 .excalidraw {
+  // Prevent browser auto dark mode (e.g. Chrome's "Auto Dark Mode for Web
+  // Contents") from inverting colors on the canvas. Excalidraw manages its own
+  // dark theme via custom properties and CSS filters, so browser-level color
+  // overrides cause visual glitches such as invisible text during editing.
+  // See https://github.com/excalidraw/excalidraw/issues/9263
+  color-scheme: only light;
+
   --theme-filter: none;
   --button-destructive-bg-color: #{$color-red-1};
   --button-destructive-color: #{$color-red-9};
