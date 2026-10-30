@@ -1,13 +1,16 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
+  lineSegment,
+  pointDistance,
+  pointFrom,
   pointRotateRads,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
-import type { GlobalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
 import {
   deconstructDiamondElement,
@@ -15,7 +18,15 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import { elementCenterPoint } from "./bounds";
+import {
+  elementCenterPoint,
+  getArrowheadAnchorOnCurve,
+  getArrowheadPointsAt,
+} from "./bounds";
+import { getArrowheadParts } from "./arrowheads";
+import { isElbowArrow } from "./typeChecks";
+
+import type { ArrowheadPart } from "./arrowheads";
 
 import type {
   ElementsMap,
@@ -142,7 +153,128 @@ const distanceToLinearOrFreeDraElement = (
   return Math.min(
     ...lines.map((s) => distanceToLineSegment(p, s)),
     ...curves.map((a) => curvePointDistance(a, p)),
+    element.type === "arrow"
+      ? distanceToArrowheads(element, elementsMap, p)
+      : Infinity,
   );
+};
+
+const arrowheadsCollisionCache = new WeakMap<
+  ExcalidrawLinearElement,
+  { version: number; parts: ArrowheadPart<GlobalPoint>[] }
+>();
+
+/**
+ * The parts of an arrow's arrowheads in (rotated) scene coordinates, placed
+ * on the arrow's path rather than on its rough shape.
+ */
+export const getArrowheadsCollisionParts = (
+  element: ExcalidrawLinearElement,
+  elementsMap: ElementsMap,
+): ArrowheadPart<GlobalPoint>[] => {
+  const cached = arrowheadsCollisionCache.get(element);
+  if (cached?.version === element.version) {
+    return cached.parts;
+  }
+
+  const parts: ArrowheadPart<GlobalPoint>[] = [];
+  const { points } = element;
+
+  if (points.length > 1) {
+    const center = elementCenterPoint(element, elementsMap);
+    const toScene = (point: LocalPoint) =>
+      pointRotateRads(
+        pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+        center,
+        element.angle,
+      );
+    // curved arrowheads point along the curve's end, like when rendered
+    const curves =
+      element.roundness && !isElbowArrow(element)
+        ? deconstructLinearOrFreeDrawElement(element, elementsMap)[1]
+        : [];
+
+    for (const position of ["start", "end"] as const) {
+      const arrowhead =
+        position === "start" ? element.startArrowhead : element.endArrowhead;
+      if (!arrowhead) {
+        continue;
+      }
+
+      const [tip, prev] = (
+        position === "start"
+          ? [points[0], points[1]]
+          : [points[points.length - 1], points[points.length - 2]]
+      ).map(toScene);
+      const curve = position === "start" ? curves[0] : curves.at(-1);
+      const anchor = curve
+        ? getArrowheadAnchorOnCurve(curve, position, prev)
+        : { tip, along: prev, prev };
+
+      parts.push(
+        ...getArrowheadParts<GlobalPoint>(arrowhead, (part, offsetMultiplier) =>
+          getArrowheadPointsAt(
+            element,
+            position,
+            part,
+            anchor,
+            offsetMultiplier,
+          ),
+        ),
+      );
+    }
+  }
+
+  arrowheadsCollisionCache.set(element, { version: element.version, parts });
+
+  return parts;
+};
+
+/**
+ * @returns 0 inside filled arrowheads
+ */
+const distanceToArrowheads = (
+  element: ExcalidrawLinearElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+) => {
+  let distance = Infinity;
+
+  for (const part of getArrowheadsCollisionParts(element, elementsMap)) {
+    switch (part.type) {
+      case "line":
+        distance = Math.min(
+          distance,
+          distanceToLineSegment(p, lineSegment(part.start, part.end)),
+        );
+        break;
+      case "circle":
+        distance = Math.min(
+          distance,
+          Math.max(0, pointDistance(p, part.center) - part.diameter / 2),
+        );
+        break;
+      case "polygon":
+        if (polygonIncludesPointNonZero(p, part.points)) {
+          return 0;
+        }
+        for (let i = 0; i < part.points.length; i++) {
+          distance = Math.min(
+            distance,
+            distanceToLineSegment(
+              p,
+              lineSegment(
+                part.points[i],
+                part.points[(i + 1) % part.points.length],
+              ),
+            ),
+          );
+        }
+        break;
+    }
+  }
+
+  return distance;
 };
 
 /**

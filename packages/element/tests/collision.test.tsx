@@ -7,13 +7,14 @@ import {
 import {
   type GlobalPoint,
   type LocalPoint,
+  type Radians,
   lineSegment,
   pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import "@excalidraw/utils/test-utils";
 import { render } from "@excalidraw/excalidraw/tests/test-utils";
 
@@ -29,10 +30,12 @@ import {
   isPointInElement,
 } from "../src/collision";
 import { mutateElement } from "../src/mutateElement";
+import { ShapeCache } from "../src/shape";
 import { newFreeDrawElement } from "../src/newElement";
 import { getAllMidpoints } from "../src/utils";
 
 import type {
+  Arrowhead,
   ExcalidrawDiamondElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -66,6 +69,111 @@ describe("check rotated elements can be hit:", () => {
       elementsMap: window.h.scene.getNonDeletedElementsMap(),
     });
     expect(hit).toBe(true);
+  });
+});
+
+describe("arrowheads can be hit", () => {
+  // a horizontal arrow, so its bounds have no height
+  const createArrow = (endArrowhead: Arrowhead, angle = 0) =>
+    API.createElement({
+      type: "arrow",
+      x: 0,
+      y: 0,
+      angle: angle as Radians,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+      startArrowhead: null,
+      endArrowhead,
+      roughness: 0,
+      strokeWidth: 2,
+    });
+
+  const hitAt = (arrow: ReturnType<typeof createArrow>, x: number, y: number) =>
+    hitElementItself({
+      element: arrow,
+      elementsMap: arrayToMap([arrow]),
+      point: pointFrom<GlobalPoint>(x, y),
+      threshold: 1,
+    });
+
+  it("hits the inside of filled arrowheads", () => {
+    // the triangle's base corners are ~6.3px off the line, ~13.6px back
+    const arrow = createArrow("triangle");
+
+    expect(hitAt(arrow, 88, 4)).toBe(true);
+    expect(hitAt(arrow, 88, -4)).toBe(true);
+    expect(hitAt(arrow, 88, 9)).toBe(false);
+  });
+
+  it("hits circle arrowheads past the arrow's end", () => {
+    // 15px across, centered on the arrow's end
+    const arrow = createArrow("circle");
+
+    expect(hitAt(arrow, 106, 0)).toBe(true);
+    expect(hitAt(arrow, 100, 6)).toBe(true);
+    expect(hitAt(arrow, 110, 0)).toBe(false);
+  });
+
+  it("hits the sides of open arrowheads", () => {
+    // the sides end ~8.6px off the line, ~23.5px back
+    const arrow = createArrow("arrow");
+
+    expect(hitAt(arrow, 77, 8.4)).toBe(true);
+    expect(hitAt(arrow, 90, 7)).toBe(false);
+  });
+
+  it("skips arrowheads without a direction", () => {
+    // the last segment has no length
+    const arrow = API.createElement({
+      type: "arrow",
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(100, 0),
+      ],
+      endArrowhead: "triangle",
+      roughness: 0,
+    });
+
+    expect(hitAt(arrow, 50, 0)).toBe(true);
+    // no (NaN) arrowhead drawn either, only the line
+    expect(ShapeCache.generateElementShape(arrow, null)).toHaveLength(1);
+  });
+
+  it("hits arrowheads of rotated arrows", () => {
+    // rotated around (50, 0), so (88, 4) moves to (46, 38)
+    const arrow = createArrow("triangle", Math.PI / 2);
+
+    expect(hitAt(arrow, 46, 38)).toBe(true);
+    expect(hitAt(arrow, 88, 4)).toBe(false);
+  });
+});
+
+describe("erasing arrowheads", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("erases an arrow when only its arrowhead is crossed", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+      endArrowhead: "triangle",
+      roughness: 0,
+    });
+    API.setElements([arrow]);
+
+    UI.clickTool("eraser");
+    // into the triangle, staying further from the line than the eraser reaches
+    const mouse = new Pointer("mouse");
+    mouse.downAt(88, 14);
+    mouse.moveTo(88, 9);
+    mouse.moveTo(88, 5);
+    mouse.upAt(88, 5);
+
+    expect(window.h.elements[0].isDeleted).toBe(true);
   });
 });
 
