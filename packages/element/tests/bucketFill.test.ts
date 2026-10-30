@@ -59,6 +59,28 @@ const isClosed = (pts: GlobalPoint[]): boolean =>
   pts[0][1] === pts[pts.length - 1][1];
 
 describe("computeBucketFillPolygon", () => {
+  it.each(["frame", "magicframe"] as const)(
+    "does not fill blank space inside an empty %s",
+    (type) => {
+      const frame = API.createElement({
+        type,
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const { elements, elementsMap } = setup([frame]);
+
+      expect(
+        computeBucketFillPolygon({
+          point: pointFrom<GlobalPoint>(50, 50),
+          elements,
+          elementsMap,
+        }),
+      ).toEqual({ ok: false, reason: "no_owner" });
+    },
+  );
+
   it("fills a simple rectangle and returns a closed polygon", () => {
     const rect = API.createElement({
       type: "rectangle",
