@@ -153,7 +153,7 @@ export class AppFlowchart {
     // both can finalize on the same event
     const navigationEnded = !event.altKey && navigator.isExploring;
     if (navigationEnded) {
-      navigator.clear();
+      navigator.endExploring();
     }
 
     if (!event[KEYS.CTRL_OR_CMD] && creator.isCreatingChart) {

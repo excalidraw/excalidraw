@@ -1,12 +1,6 @@
 import { invariant, toBrandedType, type Bounds } from "@excalidraw/common";
 
-import {
-  clamp,
-  type GlobalPoint,
-  pointFrom,
-  PRECISION,
-  type LocalPoint,
-} from "@excalidraw/math";
+import { clamp, pointFrom, PRECISION } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -15,15 +9,6 @@ import type {
 
 import { bindBindingElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
-import {
-  HEADING_DOWN,
-  HEADING_LEFT,
-  HEADING_RIGHT,
-  HEADING_UP,
-  compareHeading,
-  headingForPointFromElement,
-  type Heading,
-} from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import {
@@ -462,22 +447,50 @@ const createBindingArrow = (
   };
 };
 
+// Alt+arrow navigation moves to whichever node of the flowchart *looks* next
+// in the pressed direction, picking the nearest node of the first non-empty
+// tier:
+// 1. nodes in line with the current one (sharing its row for left/right, its
+//    column for up/down)
+// 2. nodes linked to the current one whose center lies past its edge in the
+//    pressed direction, at any angle
+// 3. nodes whose center lies within the 45° cone of the pressed direction
+//    (an X through the current node's center)
+// 4. any other node whose center lies past the current one's edge, so a
+//    direction only does nothing when there's nothing that way at all
+// Near-ties (within 10%) go to a node the current one links to, then to one
+// linking to it, then reading order (the upper one for left/right, the left
+// one for up/down). Pressing the opposite of the last move overrides all of
+// this and goes back where it came from, as long as that node still lies that
+// way.
+const NAVIGATION_TIE_TOLERANCE = 0.1;
+
+const OPPOSITE_DIRECTION: Record<LinkDirection, LinkDirection> = {
+  up: "down",
+  down: "up",
+  left: "right",
+  right: "left",
+};
+
 export class FlowChartNavigator {
   isExploring: boolean = false;
-  // nodes that are ONE link away (successor and predecessor both included)
-  private sameLevelNodes: ExcalidrawElement[] = [];
-  private sameLevelIndex: number = 0;
-  // set it to the opposite of the defalut creation direction
-  private direction: LinkDirection | null = null;
-  // for speedier navigation
-  private visitedNodes: Set<ExcalidrawElement["id"]> = new Set();
+  private lastMove: {
+    from: ExcalidrawElement["id"];
+    to: ExcalidrawElement["id"];
+    direction: LinkDirection;
+  } | null = null;
 
   clear() {
     this.isExploring = false;
-    this.sameLevelNodes = [];
-    this.sameLevelIndex = 0;
-    this.direction = null;
-    this.visitedNodes.clear();
+    this.lastMove = null;
+  }
+
+  /**
+   * Ends the keyboard session but keeps the last move, so a later session
+   * that starts on the node we landed on can still undo it.
+   */
+  endExploring() {
+    this.isExploring = false;
   }
 
   exploreByDirection(
@@ -489,206 +502,145 @@ export class FlowChartNavigator {
       return null;
     }
 
-    // clear if going at a different direction
-    if (direction !== this.direction) {
-      this.clear();
+    const cameFrom =
+      this.lastMove?.to === element.id &&
+      this.lastMove.direction === OPPOSITE_DIRECTION[direction]
+        ? this.lastMove.from
+        : null;
+
+    const next = FlowChartNavigator.findNodeInDirection(
+      element,
+      elementsMap,
+      direction,
+      cameFrom,
+    );
+
+    if (!next) {
+      return null;
     }
 
-    // add the current node to the visited
-    if (!this.visitedNodes.has(element.id)) {
-      this.visitedNodes.add(element.id);
-    }
+    this.isExploring = true;
+    this.lastMove = { from: element.id, to: next.id, direction };
 
-    /**
-     * CASE:
-     * - already started exploring, AND
-     * - there are multiple nodes at the same level, AND
-     * - still going at the same direction, AND
-     *
-     * RESULT:
-     * - loop through nodes at the same level
-     *
-     * WHY:
-     * - provides user the capability to loop through nodes at the same level
-     */
-    if (
-      this.isExploring &&
-      direction === this.direction &&
-      this.sameLevelNodes.length > 1
-    ) {
-      this.sameLevelIndex =
-        (this.sameLevelIndex + 1) % this.sameLevelNodes.length;
-
-      return this.sameLevelNodes[this.sameLevelIndex].id;
-    }
-
-    const nodes = [
-      ...FlowChartNavigator.getSuccessors(element, elementsMap, direction),
-      ...FlowChartNavigator.getPredecessors(element, elementsMap, direction),
-    ];
-
-    /**
-     * CASE:
-     * - just started exploring at the given direction
-     *
-     * RESULT:
-     * - go to the first node in the given direction
-     */
-    if (nodes.length > 0) {
-      this.sameLevelIndex = 0;
-      this.isExploring = true;
-      this.sameLevelNodes = nodes;
-      this.direction = direction;
-      this.visitedNodes.add(nodes[0].id);
-
-      return nodes[0].id;
-    }
-
-    /**
-     * CASE:
-     * - (just started exploring or still going at the same direction) OR
-     * - there're no nodes at the given direction
-     *
-     * RESULT:
-     * - go to some other unvisited linked node
-     *
-     * WHY:
-     * - provide a speedier navigation from a given node to some predecessor
-     *   without the user having to change arrow key
-     */
-    if (direction === this.direction || !this.isExploring) {
-      if (!this.isExploring) {
-        // just started and no other nodes at the given direction
-        // so the current node is technically the first visited node
-        // (this is needed so that we don't get stuck between looping through )
-        this.visitedNodes.add(element.id);
-      }
-
-      const otherDirections: LinkDirection[] = [
-        "up",
-        "right",
-        "down",
-        "left",
-      ].filter((dir): dir is LinkDirection => dir !== direction);
-
-      const otherLinkedNodes = otherDirections
-        .map((dir) => [
-          ...FlowChartNavigator.getSuccessors(element, elementsMap, dir),
-          ...FlowChartNavigator.getPredecessors(element, elementsMap, dir),
-        ])
-        .flat()
-        .filter((linkedNode) => !this.visitedNodes.has(linkedNode.id));
-
-      for (const linkedNode of otherLinkedNodes) {
-        if (!this.visitedNodes.has(linkedNode.id)) {
-          this.visitedNodes.add(linkedNode.id);
-          this.isExploring = true;
-          this.direction = direction;
-          return linkedNode.id;
-        }
-      }
-    }
-
-    return null;
+    return next.id;
   }
 
-  private static getNodeRelatives(
-    type: "predecessors" | "successors",
+  private static findNodeInDirection(
     node: ExcalidrawBindableElement,
     elementsMap: ElementsMap,
     direction: LinkDirection,
+    cameFrom: ExcalidrawElement["id"] | null,
   ) {
-    const items = [...elementsMap.values()].reduce(
-      (
-        acc: { relative: ExcalidrawBindableElement; heading: Heading }[],
-        el,
-      ) => {
-        let oppositeBinding;
-        if (
-          isElbowArrow(el) &&
-          // we want check existence of the opposite binding, in the direction
-          // we're interested in
-          (oppositeBinding =
-            el[type === "predecessors" ? "startBinding" : "endBinding"]) &&
-          // similarly, we need to filter only arrows bound to target node
-          el[type === "predecessors" ? "endBinding" : "startBinding"]
-            ?.elementId === node.id
-        ) {
-          const relative = elementsMap.get(oppositeBinding.elementId);
+    const horizontal = direction === "left" || direction === "right";
+    const sign = direction === "right" || direction === "down" ? 1 : -1;
+    const [minX, minY, maxX, maxY] = aabbForElement(node, elementsMap);
+    const [nodeMainStart, nodeMainEnd, nodeCrossStart, nodeCrossEnd] =
+      horizontal ? [minX, maxX, minY, maxY] : [minY, maxY, minX, maxX];
+    const nodeMainCenter = (nodeMainStart + nodeMainEnd) / 2;
+    const nodeCrossCenter = (nodeCrossStart + nodeCrossEnd) / 2;
+    const nodeEdge = sign > 0 ? nodeMainEnd : nodeMainStart;
 
-          if (!relative) {
-            return acc;
-          }
-
-          invariant(
-            isBindableElement(relative),
-            "not an ExcalidrawBindableElement",
-          );
-
-          const edgePoint = (
-            type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
-          ) as Readonly<LocalPoint>;
-
-          const heading = headingForPointFromElement(
-            node,
-            aabbForElement(node, elementsMap),
-            [edgePoint[0] + el.x, edgePoint[1] + el.y] as Readonly<GlobalPoint>,
-          );
-
-          acc.push({
-            relative,
-            heading,
-          });
+    const successors = new Set<string>();
+    const predecessors = new Set<string>();
+    for (const element of elementsMap.values()) {
+      if (isElbowArrow(element) && element.startBinding && element.endBinding) {
+        if (element.startBinding.elementId === node.id) {
+          successors.add(element.endBinding.elementId);
         }
-        return acc;
+        if (element.endBinding.elementId === node.id) {
+          predecessors.add(element.startBinding.elementId);
+        }
+      }
+    }
+    const linkRank = (id: string) =>
+      successors.has(id) ? 0 : predecessors.has(id) ? 1 : 2;
+
+    const candidates = getConnectedFlowchartNodes(node, elementsMap).flatMap(
+      (candidate) => {
+        const bounds = aabbForElement(candidate, elementsMap);
+        const [mainStart, mainEnd, crossStart, crossEnd] = horizontal
+          ? [bounds[0], bounds[2], bounds[1], bounds[3]]
+          : [bounds[1], bounds[3], bounds[0], bounds[2]];
+        const mainCenter = (mainStart + mainEnd) / 2;
+        const crossCenter = (crossStart + crossEnd) / 2;
+
+        if ((mainCenter - nodeMainCenter) * sign <= 0) {
+          return [];
+        }
+
+        // positive when the boxes are apart along that axis, negative when
+        // they overlap
+        const mainGap = Math.max(
+          mainStart - nodeMainEnd,
+          nodeMainStart - mainEnd,
+        );
+        const crossGap = Math.max(
+          crossStart - nodeCrossEnd,
+          nodeCrossStart - crossEnd,
+        );
+        const inCone =
+          Math.abs(mainCenter - nodeMainCenter) >=
+          Math.abs(crossCenter - nodeCrossCenter);
+        // either center falls within the other node's span, so the two mostly
+        // share a row (column) — a sliver of overlap between neighboring rows
+        // doesn't count
+        const inLine =
+          (nodeCrossStart < crossCenter && crossCenter < nodeCrossEnd) ||
+          (crossStart < nodeCrossCenter && nodeCrossCenter < crossEnd);
+        const pastEdge = (mainCenter - nodeEdge) * sign > 0;
+
+        const tier = inLine
+          ? 0
+          : pastEdge && linkRank(candidate.id) < 2
+          ? 1
+          : inCone
+          ? 2
+          : pastEdge
+          ? 3
+          : null;
+
+        if (tier === null) {
+          return [];
+        }
+
+        return [
+          {
+            node: candidate,
+            tier,
+            distance:
+              tier === 0
+                ? Math.max(mainGap, 0)
+                : Math.hypot(Math.max(mainGap, 0), Math.max(crossGap, 0)),
+            crossCenter,
+          },
+        ];
       },
-      [],
     );
 
-    switch (direction) {
-      case "up":
-        return items
-          .filter((item) => compareHeading(item.heading, HEADING_UP))
-          .map((item) => item.relative);
-      case "down":
-        return items
-          .filter((item) => compareHeading(item.heading, HEADING_DOWN))
-          .map((item) => item.relative);
-      case "right":
-        return items
-          .filter((item) => compareHeading(item.heading, HEADING_RIGHT))
-          .map((item) => item.relative);
-      case "left":
-        return items
-          .filter((item) => compareHeading(item.heading, HEADING_LEFT))
-          .map((item) => item.relative);
+    const wayBack = candidates.find(
+      (candidate) => candidate.node.id === cameFrom,
+    );
+    if (wayBack) {
+      return wayBack.node;
     }
-  }
 
-  private static getSuccessors(
-    node: ExcalidrawBindableElement,
-    elementsMap: ElementsMap,
-    direction: LinkDirection,
-  ) {
-    return FlowChartNavigator.getNodeRelatives(
-      "successors",
-      node,
-      elementsMap,
-      direction,
-    );
-  }
+    if (!candidates.length) {
+      return null;
+    }
 
-  private static getPredecessors(
-    node: ExcalidrawBindableElement,
-    elementsMap: ElementsMap,
-    direction: LinkDirection,
-  ) {
-    return FlowChartNavigator.getNodeRelatives(
-      "predecessors",
-      node,
-      elementsMap,
-      direction,
-    );
+    const topTier = Math.min(...candidates.map((candidate) => candidate.tier));
+    const pool = candidates.filter((candidate) => candidate.tier === topTier);
+    const nearest = Math.min(...pool.map((candidate) => candidate.distance));
+    const tolerance = Math.max(nearest * NAVIGATION_TIE_TOLERANCE, 1);
+
+    return pool
+      .filter((candidate) => candidate.distance <= nearest + tolerance)
+      .sort(
+        (a, b) =>
+          linkRank(a.node.id) - linkRank(b.node.id) ||
+          a.crossCenter - b.crossCenter ||
+          a.distance - b.distance,
+      )[0].node;
   }
 }
 
