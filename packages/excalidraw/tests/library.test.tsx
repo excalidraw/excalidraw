@@ -170,6 +170,42 @@ describe("library", () => {
     });
   });
 
+  it("import library with malformed items via drag&drop", async () => {
+    const libraryJSON = JSON.stringify({
+      type: "excalidrawlib",
+      version: 2,
+      libraryItems: [
+        null,
+        1,
+        { id: "malformed", elements: "abc" },
+        {
+          id: "item",
+          status: "unpublished",
+          created: 1,
+          elements: [API.createElement({ type: "rectangle", id: "A" })],
+        },
+      ],
+    });
+
+    await API.drop([
+      {
+        kind: "file",
+        type: MIME_TYPES.excalidrawlib,
+        file: new File([libraryJSON], "library.excalidrawlib", {
+          type: MIME_TYPES.excalidrawlib,
+        }),
+      },
+    ]);
+    await waitFor(async () => {
+      expect(await h.app.library.getLatestLibrary()).toEqual([
+        expect.objectContaining({
+          id: "item",
+          elements: [expect.objectContaining({ id: "A" })],
+        }),
+      ]);
+    });
+  });
+
   // NOTE: mocked to test logic, not actual drag&drop via UI
   it("drop library item onto canvas", async () => {
     expect(h.elements).toEqual([]);

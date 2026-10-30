@@ -1,4 +1,4 @@
-import { average } from "@excalidraw/math";
+import { average, isFiniteNumber } from "@excalidraw/math";
 
 import type { GlobalCoord } from "@excalidraw/math";
 
@@ -1165,6 +1165,36 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+/** Non-null, non-array object whose keys can be safely read. */
+export const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === "object" && !Array.isArray(value);
+
+// the whole string must be the number, so that e.g. dates or lists of numbers
+// aren't truncated to their leading number. Each part can only match one way,
+// so that it runs in linear time on untrusted input
+const NUMERIC_STRING_RE =
+  /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[-+]?\d+)?(?:px)?$/i;
+
+/** Also accepts numeric strings (e.g. `"20"` or `"20px"`). */
+export const toFiniteNumber = (value: unknown): number | null => {
+  if (isFiniteNumber(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (NUMERIC_STRING_RE.test(trimmed)) {
+      const parsed = parseFloat(trimmed);
+      return isFiniteNumber(parsed) ? parsed : null;
+    }
+  }
+  return null;
+};
+
+export const toPositiveNumber = (value: unknown): number | null => {
+  const number = toFiniteNumber(value);
+  return number !== null && number > 0 ? number : null;
+};
 
 /** hack for Array.isArray type guard not working with readonly value[] */
 export const isReadonlyArray = (value?: any): value is readonly any[] => {
