@@ -1,6 +1,13 @@
 import { vi } from "vitest";
 
-import { getPerfectElementSize } from "../src/sizeHelpers";
+import { pointFrom } from "@excalidraw/math";
+
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+
+import {
+  getPerfectElementSize,
+  isInvisiblySmallElement,
+} from "../src/sizeHelpers";
 
 const EPSILON_DIGITS = 3;
 // Needed so that we can mock the value of constants which is done in
@@ -54,5 +61,41 @@ describe("getPerfectElementSize", () => {
     const { height, width } = getPerfectElementSize("arrow", 0, 0);
     expect(width).toBeCloseTo(0, EPSILON_DIGITS);
     expect(height).toBeCloseTo(0, EPSILON_DIGITS);
+  });
+});
+
+describe("isInvisiblySmallElement", () => {
+  it("should not treat a single-point free draw element as invisible", () => {
+    // a free draw element with a single point renders as a dot
+    expect(
+      isInvisiblySmallElement(
+        API.createElement({
+          type: "freedraw",
+          points: [pointFrom(0, 0)],
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it("should treat a free draw element without any points as invisible", () => {
+    expect(
+      isInvisiblySmallElement(
+        API.createElement({
+          type: "freedraw",
+          points: [],
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it("should treat a single-point line as invisible", () => {
+    expect(
+      isInvisiblySmallElement(
+        API.createElement({
+          type: "line",
+          points: [pointFrom(0, 0)],
+        }),
+      ),
+    ).toBe(true);
   });
 });

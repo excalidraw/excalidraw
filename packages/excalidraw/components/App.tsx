@@ -139,6 +139,7 @@ import {
   isElementCompletelyInViewport,
   isElementInViewport,
   isInvisiblySmallElement,
+  arePointsCoincident,
   getCornerRadius,
   isPathALoop,
   createSrcDoc,
@@ -9726,22 +9727,27 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const points = newElement.points;
-        let dx = pointerCoords.x - newElement.x;
-        let dy = pointerCoords.y - newElement.y;
+        const dx = pointerCoords.x - newElement.x;
+        const dy = pointerCoords.y - newElement.y;
 
-        // Allows dots to avoid being flagged as infinitely small
-        if (dx === points[0][0] && dy === points[0][1]) {
-          dy += 0.0001;
-          dx += 0.0001;
-        }
+        // A tap (rather than a drag) leaves a dot. Keep it as a single-point
+        // element, so that it has no extent to be resized — a dot that is
+        // technically a two-point element could otherwise be resized into a
+        // line.
+        const isDot = arePointsCoincident([
+          ...points,
+          pointFrom<LocalPoint>(dx, dy),
+        ]);
 
         const pressures = newElement.simulatePressure
           ? []
           : [...newElement.pressures, childEvent.pressure];
 
         this.scene.mutateElement(newElement, {
-          points: [...points, pointFrom<LocalPoint>(dx, dy)],
-          pressures,
+          points: isDot
+            ? [pointFrom<LocalPoint>(0, 0)]
+            : [...points, pointFrom<LocalPoint>(dx, dy)],
+          pressures: isDot ? newElement.pressures.slice(0, 1) : pressures,
         });
 
         this.actionManager.executeAction(actionFinalize);
