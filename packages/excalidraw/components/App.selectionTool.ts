@@ -620,7 +620,9 @@ export class AppSelectionTool {
     let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.app.getEffectiveGridSize(),
+      event[KEYS.CTRL_OR_CMD] || transformHandleType === "rotation" 
+        ? null 
+        : this.app.getEffectiveGridSize(),
     );
 
     const frameElementsOffsetsMap = new Map<
