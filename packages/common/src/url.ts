@@ -11,7 +11,30 @@ export const normalizeLink = (link: string) => {
 };
 
 export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
+  if (!link) {
+    return false;
+  }
+
+  // Protocol-relative URLs (e.g. `//example.com`) point to another origin, so
+  // they must not be treated as local even though they start with a slash.
+  if (link.startsWith("//")) {
+    return false;
+  }
+
+  // Root-relative links always stay on the current origin.
+  if (link.startsWith("/")) {
+    return true;
+  }
+
+  // For absolute links, compare the actual origin. A plain `includes` check
+  // would wrongly match external links that merely contain the origin
+  // somewhere (e.g. `https://evil.com/?next=<origin>`) or look-alike hosts
+  // (e.g. `<origin>.evil.com`).
+  try {
+    return new URL(link).origin === location.origin;
+  } catch {
+    return false;
+  }
 };
 
 /**
