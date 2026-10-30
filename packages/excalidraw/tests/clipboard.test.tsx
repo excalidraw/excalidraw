@@ -818,6 +818,51 @@ describe("clipboard - pasting mermaid definition", () => {
     });
   });
 
+  it("should support front matter", async () => {
+    const text = "---\ntitle: Example\n---\nflowchart TD\nA";
+
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
+  it("should support comments", async () => {
+    const text = "%% a comment\nflowchart TD\nA";
+
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
+  it("should support multi-line directives", async () => {
+    const text = '%%{init: {\n  "theme": "dark"\n}}%%\nflowchart TD\nA';
+
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
   it("should paste as normal text if invalid mermaid", async () => {
     const text = "flowchart TD xx\nA";
     pasteWithCtrlCmdV(text);

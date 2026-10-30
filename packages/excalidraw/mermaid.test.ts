@@ -10,9 +10,26 @@ describe("isMaybeMermaidDefinition", () => {
     expect(
       isMaybeMermaidDefinition("swimlane-beta LR\n  subgraph Customer"),
     ).toBe(true);
+    expect(
+      isMaybeMermaidDefinition(
+        "---\ntitle: Example\n---\nflowchart TD\n  A --> B",
+      ),
+    ).toBe(true);
+    expect(
+      isMaybeMermaidDefinition("%% a comment\nflowchart TD\n  A --> B"),
+    ).toBe(true);
+    expect(
+      isMaybeMermaidDefinition(
+        '%%{init: {\n  "theme": "dark"\n}}%%\nflowchart TD\n  A --> B',
+      ),
+    ).toBe(true);
+    expect(isMaybeMermaidDefinition("%%{init: {}}%%flowchart TD")).toBe(true);
 
     expect(isMaybeMermaidDefinition("graphs")).toBe(false);
     expect(isMaybeMermaidDefinition("this flowchart")).toBe(false);
     expect(isMaybeMermaidDefinition("this\nflowchart")).toBe(false);
+    expect(
+      isMaybeMermaidDefinition("---\ntitle: Example\n---\nnot a diagram"),
+    ).toBe(false);
   });
 });
