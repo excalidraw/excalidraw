@@ -59,6 +59,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { HideCollaboratorsCursorButton } from "./HideCollaboratorsCursorButton";
 import { Toast } from "./Toast";
 import { Toolbar } from "./Toolbar";
 import {
@@ -90,6 +91,7 @@ interface LayerUIProps {
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
+  onCollaboratorsCursorsHiddenToggle: () => void;
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   renderTopLeftUI?: ExcalidrawProps["renderTopLeftUI"];
@@ -153,6 +155,7 @@ const LayerUI = ({
   canvas,
   onLockToggle,
   onPenModeToggle,
+  onCollaboratorsCursorsHiddenToggle,
   showExitZenModeBtn,
   renderTopLeftUI,
   renderTopRightUI,
@@ -372,24 +375,41 @@ const LayerUI = ({
                           heading={heading}
                         />
                         {isCollaborating && (
-                          <Island
-                            style={{
-                              marginLeft: spacing.collabMarginLeft,
-                              alignSelf: "center",
-                              height: "fit-content",
-                            }}
-                          >
-                            <LaserPointerButton
-                              title={t("toolBar.laser")}
-                              checked={
-                                appState.activeTool.type === TOOL_TYPE.laser
-                              }
-                              onChange={() =>
-                                app.setActiveTool({ type: TOOL_TYPE.laser })
-                              }
-                              isMobile
-                            />
-                          </Island>
+                          <>
+                            <Island
+                              style={{
+                                marginLeft: spacing.collabMarginLeft,
+                                alignSelf: "center",
+                                height: "fit-content",
+                              }}
+                            >
+                              <LaserPointerButton
+                                title={t("toolBar.laser")}
+                                checked={
+                                  appState.activeTool.type === TOOL_TYPE.laser
+                                }
+                                onChange={() =>
+                                  app.setActiveTool({ type: TOOL_TYPE.laser })
+                                }
+                                isMobile
+                              />
+                            </Island>
+                            <Island
+                              style={{
+                                marginLeft: spacing.collabMarginLeft,
+                                alignSelf: "center",
+                                height: "fit-content",
+                              }}
+                            >
+                              <HideCollaboratorsCursorButton
+                                title={t("toolBar.hideCollaborators")}
+                                checked={appState.collaboratorsCursorsHidden}
+                                onChange={onCollaboratorsCursorsHiddenToggle}
+                                isHidden={appState.collaboratorsCursorsHidden}
+                                isMobile
+                              />
+                            </Island>
+                          </>
                         )}
                       </Stack.Row>
                     </Stack.Col>

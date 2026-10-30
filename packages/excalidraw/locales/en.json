@@ -346,6 +346,7 @@
     "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
+    "hideCollaborators": "Hide collaborators' cursors",
     "autoshape": "Draw to shape",
     "bucketfill": "Bucket fill",
     "hand": "Hand (panning tool)",
