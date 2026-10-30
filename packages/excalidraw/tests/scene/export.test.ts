@@ -399,6 +399,26 @@ describe("exportToCanvas", () => {
       ),
     ).toEqual([]);
   });
+
+  it("renders on a CPU-backed canvas", async () => {
+    const getContextSpy = vi.spyOn(HTMLCanvasElement.prototype, "getContext");
+
+    const canvas = await exportScene({
+      type: "canvas",
+      data: {
+        elements: [API.createElement({ type: "rectangle" })],
+        files: null,
+      },
+    });
+
+    // only the first getContext() call's options take effect
+    const firstCall = getContextSpy.mock.contexts.indexOf(canvas);
+    expect(getContextSpy.mock.calls[firstCall]).toEqual([
+      "2d",
+      { willReadFrequently: true },
+    ]);
+    getContextSpy.mockRestore();
+  });
 });
 
 describe("export background", () => {
@@ -531,6 +551,89 @@ describe("export inputs", () => {
     expect(loadFonts).toHaveBeenCalledTimes(1);
   });
 
+  it("measures text through environment.textMetrics", async () => {
+    const getLineWidth = vi.fn((text: string) => text.length * 100);
+    const frame = API.createElement({ type: "frame", width: 450 });
+
+    const svg = await exportScene({
+      type: "svg",
+      data: { elements: [frame] },
+      config: { environment: { textMetrics: { getLineWidth } } },
+    });
+
+    // "Frame" is 500 wide by these metrics, so the label is truncated to fit
+    // the 450 wide frame
+    expect(getLineWidth).toHaveBeenCalledWith("Frame", expect.any(String));
+    expect(
+      Array.from(svg.querySelectorAll("text")).map((text) => text.textContent),
+    ).toContain("F...");
+  });
+
+  describe("without a document font set (e.g. a DOM shim like linkedom)", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("exports without loading fonts, warning once", async () => {
+      const consoleWarn = vi
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      // jsdom implements no `document.fonts`; only the test document is mocked
+      vi.stubGlobal("document", document.implementation.createHTMLDocument());
+
+      // a local font is never loaded, so nothing is missing
+      await exportScene({
+        type: "svg",
+        data: {
+          elements: [
+            API.createElement({
+              type: "text",
+              text: "hi",
+              fontFamily: FONT_FAMILY.Helvetica,
+            }),
+          ],
+        },
+      });
+      expect(consoleWarn).not.toHaveBeenCalled();
+
+      for (let i = 0; i < 2; i++) {
+        const svg = await exportScene({
+          type: "svg",
+          data: {
+            elements: [API.createElement({ type: "text", text: "hi" })],
+          },
+        });
+        expect(svg.querySelector("text")?.textContent).toBe("hi");
+      }
+      expect(consoleWarn).toHaveBeenCalledTimes(1);
+      expect(consoleWarn).toHaveBeenCalledWith(
+        expect.stringContaining("config.environment.loadFonts"),
+      );
+      consoleWarn.mockRestore();
+    });
+
+    it("loads fonts into a worker's own font set", async () => {
+      const fonts = {
+        has: () => true,
+        add: vi.fn(),
+        check: () => false,
+        load: vi.fn(async () => []),
+      };
+      vi.stubGlobal("document", document.implementation.createHTMLDocument());
+      vi.stubGlobal("self", { fonts });
+
+      await exportScene({
+        type: "svg",
+        data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      });
+
+      expect(fonts.load).toHaveBeenCalledWith(
+        expect.stringContaining("Excalifont"),
+        "hi",
+      );
+    });
+  });
+
   it("renders frame decorations per config.frames", async () => {
     const elements = [API.createElement({ type: "frame" })];
     const countFrameNames = (svg: SVGSVGElement) =>
@@ -653,6 +756,25 @@ describe("exporting frames", () => {
         (text) => text.textContent === "Frame",
       );
       expect(label).toHaveAttribute("fill", FRAME_STYLE.nameColorDarkTheme);
+    });
+
+    it("truncates frame names to what fits, down to no name at all", async () => {
+      // 10px per character in tests, so "..." is 30 wide
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: [
+            API.createElement({ type: "frame", x: 0, width: 20 }),
+            API.createElement({ type: "frame", x: 100, width: 35 }),
+          ],
+        },
+      });
+
+      expect(
+        Array.from(svg.querySelectorAll("text"))
+          .map((text) => text.textContent)
+          .filter(Boolean),
+      ).toEqual(["..."]);
     });
 
     it("clips a frame export larger than the frame to the frame", async () => {

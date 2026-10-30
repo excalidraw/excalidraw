@@ -545,6 +545,18 @@ describe("setElementRenderOverrides", () => {
 });
 
 describe("render override geometry", () => {
+  // link icons are drawn only once their image decoded, which jsdom never
+  // does on its own
+  const renderEnvironment: Element.RenderEnvironment = {
+    createCanvas: () => document.createElement("canvas"),
+    createImage: () => {
+      const image = document.createElement("img");
+      Object.defineProperty(image, "complete", { value: true });
+      Object.defineProperty(image, "naturalWidth", { value: 16 });
+      return image;
+    },
+  };
+
   const setup = (elements: NonDeletedExcalidrawElement[]) => {
     const scene = new Element.Scene(elements, { skipValidation: true });
     const renderer = new Renderer(scene);
@@ -568,6 +580,8 @@ describe("render override geometry", () => {
       imageCache: new Map(),
       renderGrid: false,
       isExporting: false,
+      scale: 1,
+      renderEnvironment,
       canvasBackgroundColor: "#fff",
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),

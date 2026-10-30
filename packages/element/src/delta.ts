@@ -62,6 +62,7 @@ import { Scene } from "./Scene";
 import type { BindableProp, BindingProp } from "./binding";
 
 import type { ElementUpdate } from "./mutateElement";
+import type { RenderEnvironment } from "./renderEnvironment";
 
 /**
  * Represents the difference between two objects of the same type.
@@ -1017,6 +1018,11 @@ type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
 
 export type ApplyToOptions = {
   excludedProperties?: Set<keyof ElementPartial>;
+  /**
+   * measures the labels re-laid out after applying (bound texts, and the
+   * labels of bound arrows) -- the editor passes the host's
+   */
+  renderEnvironment?: RenderEnvironment;
 };
 
 type ApplyToFlags = {
@@ -1506,7 +1512,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
             )
           : undefined;
 
-      ElementsDelta.redrawElements(nextElements, changedElements);
+      ElementsDelta.redrawElements(
+        nextElements,
+        changedElements,
+        options?.renderEnvironment,
+      );
 
       if (versionsBeforeRedraw) {
         for (const [id, element] of nextElements) {
@@ -2029,6 +2039,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   public static redrawElements(
     nextElements: SceneElementsMap,
     changedElements: Map<string, ExcalidrawElement>,
+    renderEnvironment?: RenderEnvironment,
   ) {
     try {
       // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
@@ -2036,10 +2047,18 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       // so we are creating a temp scene just to query and mutate elements
       const tempScene = new Scene(nextElements, { skipValidation: true });
 
-      ElementsDelta.redrawTextBoundingBoxes(tempScene, changedElements);
+      ElementsDelta.redrawTextBoundingBoxes(
+        tempScene,
+        changedElements,
+        renderEnvironment,
+      );
 
       // needs ordered nextElements to avoid z-index binding issues
-      ElementsDelta.redrawBoundArrows(tempScene, changedElements);
+      ElementsDelta.redrawBoundArrows(
+        tempScene,
+        changedElements,
+        renderEnvironment,
+      );
     } catch (e) {
       console.error(`Couldn't redraw elements`, e);
 
@@ -2054,6 +2073,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static redrawTextBoundingBoxes(
     scene: Scene,
     changed: Map<string, ExcalidrawElement>,
+    renderEnvironment?: RenderEnvironment,
   ) {
     const elements = scene.getNonDeletedElementsMap();
     const boxesToRedraw = new Map<
@@ -2095,13 +2115,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         continue;
       }
 
-      redrawTextBoundingBox(boundText, container, scene);
+      redrawTextBoundingBox(boundText, container, scene, renderEnvironment);
     }
   }
 
   private static redrawBoundArrows(
     scene: Scene,
     changed: Map<string, ExcalidrawElement>,
+    renderEnvironment?: RenderEnvironment,
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
@@ -2111,6 +2132,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           scene,
           {
             changedElements: changed,
+            renderEnvironment,
           },
         );
       }
