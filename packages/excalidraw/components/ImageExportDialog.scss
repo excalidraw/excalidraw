@@ -152,6 +152,25 @@
           height: 100%;
           align-items: center;
         }
+
+        &__quality {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          font-family: "Assistant";
+          font-size: 0.875rem;
+
+          & input[type="range"] {
+            width: 90px;
+            accent-color: var(--color-primary);
+          }
+
+          & span {
+            min-width: 4ch;
+            text-align: right;
+          }
+        }
       }
 
       &__buttons {
