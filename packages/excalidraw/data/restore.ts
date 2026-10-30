@@ -1001,7 +1001,8 @@ export const restoreElements = <T extends ExcalidrawElement>(
         const localElement = existingElementsMap?.get(element.id);
 
         const shouldMarkAsDeleted =
-          opts?.deleteInvisibleElements && isInvisiblySmallElement(element);
+          opts?.deleteInvisibleElements &&
+          isInvisiblySmallElement(migratedElement);
 
         if (shouldMarkAsDeleted) {
           migratedElement = bumpVersion(migratedElement, localElement?.version);
