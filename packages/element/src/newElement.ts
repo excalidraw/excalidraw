@@ -58,16 +58,19 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
+  FractionalIndex,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
-  Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
+  Omit<
+    ExcalidrawGenericElement,
+    "id" | "type" | "isDeleted" | "updated" | "index"
+  >,
   | "width"
   | "height"
   | "angle"
   | "groupIds"
   | "frameId"
-  | "index"
   | "boundElements"
   | "seed"
   | "version"
@@ -84,7 +87,10 @@ export type ElementConstructorOpts = MarkOptional<
   | "opacity"
   | "customData"
   | "created"
->;
+> & {
+  /** new elements are usually not ordered yet, see `_newElementBase` */
+  index?: FractionalIndex | null;
+};
 
 const _newElementBase = <T extends ExcalidrawElement>(
   type: T["type"],
@@ -109,7 +115,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link = null,
     locked = DEFAULT_ELEMENT_PROPS.locked,
     ...rest
-  }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
+  }: ElementConstructorOpts &
+    Omit<Partial<ExcalidrawGenericElement>, "type" | "index">,
 ) => {
   // NOTE (mtolmacs): This is a temporary check to detect extremely large
   // element position or sizing
@@ -156,7 +163,12 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     frameId,
-    index,
+    // NOTE: elements are created outside of the scene, so they usually aren't
+    // ordered yet. They get a valid fractional index as soon as they're
+    // inserted into the scene (`Scene` runs `syncInvalidIndices`), hence we
+    // type them as ordered right away. This is the only place where an
+    // unordered element is typed as `ExcalidrawElement` (see #7941).
+    index: index as FractionalIndex,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,

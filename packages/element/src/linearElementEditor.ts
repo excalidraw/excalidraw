@@ -91,7 +91,6 @@ import type {
   ExcalidrawElbowArrowElement,
   PointsPositionUpdates,
   NonDeletedExcalidrawElement,
-  Ordered,
   ExcalidrawBindableElement,
 } from "./types";
 
@@ -2407,7 +2406,7 @@ const pointDraggingUpdates = (
   scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   element: NonDeleted<ExcalidrawLinearElement>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   app: AppClassProperties,
   angleLocked: boolean,
   altKey: boolean,

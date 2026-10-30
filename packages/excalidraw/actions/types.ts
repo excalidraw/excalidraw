@@ -1,7 +1,4 @@
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { CaptureUpdateActionType } from "@excalidraw/element";
 
@@ -33,7 +30,7 @@ export type ActionResult =
   | false;
 
 type ActionFn<TData = any> = (
-  elements: readonly OrderedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: TData | undefined,
   app: AppClassProperties,

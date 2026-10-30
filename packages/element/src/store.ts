@@ -29,11 +29,7 @@ import {
 
 import type { ApplyToOptions } from "./delta";
 
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-  SceneElementsMap,
-} from "./types";
+import type { ExcalidrawElement, SceneElementsMap } from "./types";
 
 export const CaptureUpdateAction = {
   /**
@@ -433,7 +429,7 @@ export class StoreChange {
   // so figuring out what has changed should ideally be just quick reference checks
   // TODO: we might need to have binary files here as well, in order to be drop-in replacement for `onChange`
   private constructor(
-    public readonly elements: Record<string, OrderedExcalidrawElement>,
+    public readonly elements: Record<string, ExcalidrawElement>,
     public readonly appState: Partial<ObservedAppState>,
   ) {}
 
@@ -689,7 +685,7 @@ export class StoreSnapshot {
   }
 
   public getChangedElements(prevSnapshot: StoreSnapshot) {
-    const changedElements: Record<string, OrderedExcalidrawElement> = {};
+    const changedElements: Record<string, ExcalidrawElement> = {};
 
     for (const prevElement of toIterable(prevSnapshot.elements)) {
       const nextElement = this.elements.get(prevElement.id);
