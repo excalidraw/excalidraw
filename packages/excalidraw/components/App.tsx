@@ -5694,7 +5694,7 @@ class App extends React.Component<AppProps, AppState> {
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
-    if (isArrowKey(event.key)) {
+    if (isArrowKey(event.key) && !isInputLike(event.target)) {
       bindOrUnbindBindingElements(
         this.scene.getSelectedElements(this.state).filter(isArrowElement),
         this.scene,
