@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Flowchart navigation (2026-10-30) [#12502](https://github.com/excalidraw/excalidraw/pull/12502)
+
+- Alt+arrow keys move the selection to the flowchart node that's visually next in that direction, whether or not it's linked to the selected node. They used to follow only the arrows bound to the pressed side, cycle through siblings on repeated presses, and fall back to any linked node when nothing was that way.
+- The nearest node of the first non-empty tier wins: nodes in line (sharing the row for ←/→, the column for ↑/↓), then linked nodes whose center lies past the selected node's edge, then nodes whose center lies within the 45° cone of the pressed direction, then any node whose center lies past that edge. Near-ties go to linked nodes, then reading order. Pressing the opposite of the last move goes back where it came from.
+
 ### Export API: `exportScene` (2026-10-18) [#12347](https://github.com/excalidraw/excalidraw/pull/12347)
 
 Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidraw/excalidraw` and `@excalidraw/utils`) are replaced by a single `exportScene`, and every rendering option moved from `appState` into an explicit `config`.
