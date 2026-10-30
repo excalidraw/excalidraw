@@ -194,4 +194,66 @@ describe("search", () => {
       expect(h.app.state.searchMatches?.matches.length).toBe(3);
     });
   });
+
+  it("should preserve search result order when elements are moved", async () => {
+    API.setElements([
+      API.createElement({
+        type: "text",
+        text: "test 1",
+        x: 100,
+        y: 200,
+      }),
+      API.createElement({
+        type: "text",
+        text: "test 2",
+        x: 100,
+        y: 400,
+      }),
+    ]);
+
+    expect(h.app.state.openSidebar).toBeNull();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    expect(h.app.state.openSidebar).not.toBeNull();
+    expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+    const searchInput = await querySearchInput();
+
+    expect(searchInput.matches(":focus")).toBe(true);
+
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+   const initialOrder = h.elements.map((element) => element.id);
+
+
+    expect(initialOrder).toHaveLength(2);
+
+    const testTwo = h.elements.find(
+      (element) =>
+        element.type === "text" &&
+        (element as ExcalidrawTextElement).text === "test 2",
+    );
+
+    expect(testTwo).toBeDefined();
+
+    API.updateElement(testTwo!, {
+      y: 50,
+    });
+
+  await waitFor(() => {
+  const matches = h.app.state.searchMatches?.matches;
+
+  expect(matches?.length).toBe(2);
+
+  expect(matches?.map((match) => match.id)).toEqual(initialOrder);
+});
+  });
 });
