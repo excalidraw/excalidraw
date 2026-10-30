@@ -363,7 +363,7 @@ describe("flow chart band-search placement", () => {
     expect({ x: c2.x, y: c2.y }).toEqual({ x: 600, y: 200 });
   });
 
-  it("keeps pending nodes in place while the cluster grows", () => {
+  it("centers the pending cluster on the parent while it grows", () => {
     API.clearSelection();
     const parent = API.createElement({
       type: "rectangle",
@@ -379,8 +379,8 @@ describe("flow chart band-search placement", () => {
 
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
       expect(pendingRects()).toEqual([
-        { x: 300, y: 0 },
-        { x: 300, y: 200 },
+        { x: 300, y: -100 },
+        { x: 300, y: 100 },
       ]);
 
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
@@ -392,6 +392,102 @@ describe("flow chart band-search placement", () => {
     });
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
   });
+
+  it("keeps pending nodes in place while an obstacle blocks the centered slot", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+
+    // an obstacle above the band leaves room for the first node only
+    addChild(parent, KEYS.ARROW_RIGHT);
+    const [c1] = children(parent);
+    API.updateElement(c1, { y: -250 });
+
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([{ x: 300, y: 0 }]);
+
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: 0 },
+        { x: 300, y: 200 },
+      ]);
+
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: 0 },
+        { x: 300, y: 200 },
+        { x: 300, y: 400 },
+      ]);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+  });
+
+  it("keeps a gap from nodes between the parent's row and the band", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+    API.setSelectedElements([parent]);
+
+    // the centered right children: the lower one ends exactly where the
+    // band below the parent begins (y: 100..200)
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_DOWN);
+      Keyboard.keyPress(KEYS.ARROW_DOWN);
+      // the centered slot (x: -150..350) would sit flush under the lower
+      // right child (x: 300..500)
+      expect(pendingRects()).toEqual([
+        { x: -300, y: 200 },
+        { x: 0, y: 200 },
+      ]);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+  });
+
+  it.each([
+    { key: KEYS.ARROW_UP, y: -0.1, height: 100 },
+    { key: KEYS.ARROW_DOWN, y: 0.1, height: 100.3 },
+  ])(
+    "keeps children centered beside a node in the parent's row ($key, y=$y)",
+    ({ key, y, height }) => {
+      API.clearSelection();
+      const parent = API.createElement({
+        type: "rectangle",
+        y,
+        width: 200,
+        height,
+      });
+      API.setElements([parent]);
+
+      // Centering the right child can round its top or bottom edge slightly
+      // past the parent's, even though both nodes occupy the same row.
+      addChild(parent, KEYS.ARROW_RIGHT);
+
+      API.setSelectedElements([parent]);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(key);
+        Keyboard.keyPress(key);
+        expect(pendingRects().map(({ x }) => x)).toEqual([-150, 150]);
+      });
+      Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    },
+  );
 
   it("repositions the whole pending cluster when it no longer fits", () => {
     API.clearSelection();

@@ -4,6 +4,7 @@ import {
   clamp,
   type GlobalPoint,
   pointFrom,
+  PRECISION,
   type LocalPoint,
 } from "@excalidraw/math";
 
@@ -155,9 +156,10 @@ const getConnectedFlowchartNodes = (
 //   away from the parent, forming a search band the cluster will occupy
 // - along the cross axis the cluster slides into the free slot nearest the
 //   parent-centered ideal, treating band obstacles as immovable
-// - `stickyCrossStart` anchors an already-visible pending cluster: growing it
-//   extends it at either end so the existing pending nodes keep their
-//   positions, unless the grown cluster no longer fits there
+// - `stickyCrossStart` anchors an already-visible pending cluster that an
+//   obstacle pushed off-center: growing it extends it at either end so the
+//   existing pending nodes keep their positions, unless the grown cluster
+//   centers on the parent again or no longer fits there
 const placeCluster = (
   parent: ExcalidrawFlowchartNodeElement,
   direction: LinkDirection,
@@ -182,14 +184,26 @@ const placeCluster = (
       ? parentPrimaryStart + nodePrimarySize + primaryGap
       : parentPrimaryStart - primaryGap - nodePrimarySize;
 
-  // cross-axis intervals of the obstacles sharing the band, inflated so the
+  // the band widened by one gap on both sides, so nodes the cluster would end
+  // up closer than a gap to count as obstacles too; the near side stops
+  // exactly at the parent's facing edge, keeping the parent's row out
+  const [zoneStart, zoneEnd] =
+    direction === "right" || direction === "down"
+      ? [
+          parentPrimaryStart + nodePrimarySize,
+          primaryStart + nodePrimarySize + primaryGap,
+        ]
+      : [primaryStart - primaryGap, parentPrimaryStart];
+
+  // cross-axis intervals of the obstacles in that zone, inflated so the
   // cluster keeps at least one gap of clearance
   const occupied = mergeIntervals(
     obstacles
       .filter((bounds) => {
         const start = horizontal ? bounds[0] : bounds[1];
         const end = horizontal ? bounds[2] : bounds[3];
-        return start < primaryStart + nodePrimarySize && end > primaryStart;
+        // Ignore rounding noise so nodes a full gap away stay out of the zone.
+        return start < zoneEnd - PRECISION && end > zoneStart + PRECISION;
       })
       .map((bounds) => ({
         start: (horizontal ? bounds[1] : bounds[0]) - crossGap,
@@ -199,11 +213,14 @@ const placeCluster = (
 
   const step = nodeCrossSize + crossGap;
   const clusterCrossSize = count * nodeCrossSize + (count - 1) * crossGap;
+  const centeredStart = parentCrossCenter - clusterCrossSize / 2;
 
+  // the centered slot sorts first (zero distance), so the cluster re-centers
+  // whenever it fits there
   const anchoredStart =
     stickyCrossStart === null
       ? null
-      : [stickyCrossStart, stickyCrossStart - step]
+      : [centeredStart, stickyCrossStart, stickyCrossStart - step]
           .filter((start) => intervalIsFree(start, clusterCrossSize, occupied))
           .sort(
             (a, b) =>
@@ -213,11 +230,7 @@ const placeCluster = (
 
   const crossStart =
     anchoredStart ??
-    findNearestFreeSlot(
-      parentCrossCenter - clusterCrossSize / 2,
-      clusterCrossSize,
-      occupied,
-    );
+    findNearestFreeSlot(centeredStart, clusterCrossSize, occupied);
 
   const positions = Array.from({ length: count }, (_, index) => {
     const cross = crossStart + index * step;
