@@ -61,6 +61,7 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 import { Toolbar } from "./Toolbar";
+import { ClearAnnotationsButton } from "./ClearAnnotationsButton";
 import {
   ViewportStatusBadge,
   ViewportStatusBorder,
@@ -347,7 +348,6 @@ const LayerUI = ({
               )}
           </Stack.Col>
           {defaultUIEnabled &&
-            !appState.viewModeEnabled &&
             appState.openDialog?.name !== "elementLinkSelector" && (
               <Section heading="shapes" className="shapes-section">
                 {(heading: React.ReactNode) => (
@@ -362,16 +362,19 @@ const LayerUI = ({
                           "zen-mode": appState.zenModeEnabled,
                         })}
                       >
-                        <Toolbar
-                          app={app}
-                          appState={appState}
-                          setAppState={setAppState}
-                          UIOptions={UIOptions}
-                          onPenModeToggle={onPenModeToggle}
-                          onLockToggle={onLockToggle}
-                          heading={heading}
-                        />
-                        {isCollaborating && (
+                        {!appState.viewModeEnabled && (
+                          <Toolbar
+                            app={app}
+                            appState={appState}
+                            setAppState={setAppState}
+                            UIOptions={UIOptions}
+                            onPenModeToggle={onPenModeToggle}
+                            onLockToggle={onLockToggle}
+                            heading={heading}
+                          />
+                        )}
+                        <ClearAnnotationsButton />
+                        {isCollaborating && !appState.viewModeEnabled && (
                           <Island
                             style={{
                               marginLeft: spacing.collabMarginLeft,
@@ -382,7 +385,8 @@ const LayerUI = ({
                             <LaserPointerButton
                               title={t("toolBar.laser")}
                               checked={
-                                appState.activeTool.type === TOOL_TYPE.laser
+                                appState.activeTool.type === TOOL_TYPE.laser &&
+                                !appState.activeTool.laserPersistent
                               }
                               onChange={() =>
                                 app.setActiveTool({ type: TOOL_TYPE.laser })

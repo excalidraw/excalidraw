@@ -1354,6 +1354,7 @@ export const restoreAppState = (
           : { type: "selection" },
       ),
       lastActiveTool: null,
+      laserPersistent: false,
       locked: nextAppState.activeTool.locked ?? false,
     },
     // Migrates from previous version where appState.zoom was a number
