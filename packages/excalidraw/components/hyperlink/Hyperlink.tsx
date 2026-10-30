@@ -21,7 +21,11 @@ import { hitElementBoundingBox } from "@excalidraw/element";
 
 import { isElementLink } from "@excalidraw/element";
 
-import { getEmbedLink, embeddableURLValidator } from "@excalidraw/element";
+import {
+  getEmbedLink,
+  embeddableURLValidator,
+  maybeParseEmbedSrc,
+} from "@excalidraw/element";
 
 import {
   sceneCoordsToViewportCoords,
@@ -152,7 +156,11 @@ export const Hyperlink = ({
       return;
     }
 
-    const link = normalizeLink(inputRef.current.value) || null;
+    const input = inputRef.current.value.trim();
+    const link =
+      normalizeLink(
+        isEmbeddableElement(element) ? maybeParseEmbedSrc(input) : input,
+      ) || null;
 
     if (!element.link && link) {
       trackEvent("hyperlink", "create");
