@@ -500,6 +500,29 @@ describe("bucket fill tool", () => {
     expect(h.state.openPopup).toBe("elementBackground");
   });
 
+  it.each([
+    { key: "b", shiftKey: false },
+    { key: "B", shiftKey: false },
+    { key: "B", shiftKey: true },
+  ])(
+    "selects a stroke color with $key (shift: $shiftKey) without switching to bucket fill",
+    ({ key, shiftKey }) => {
+      act(() => {
+        h.app.setActiveTool({ type: "freedraw" });
+      });
+      Keyboard.keyPress(KEYS.S);
+      expect(h.state.openPopup).toBe("elementStroke");
+
+      const target = h.app.ownerDocument.activeElement!;
+      expect(target.closest(".color-picker-content")).not.toBeNull();
+      fireEvent.keyDown(target, { key, shiftKey });
+
+      expect(h.state.activeTool.type).toBe("freedraw");
+      expect(h.state.currentItemStrokeColor).toBe(COLOR_PALETTE.red[4]);
+      expect(h.state.openPopup).toBe("elementStroke");
+    },
+  );
+
   it("swallows the hidden transparent entry's hotkey (q) inside the picker", () => {
     // regression: the hidden transparent entry's `q` returned "unhandled",
     // so the picker didn't stop propagation and App.onKeyDown toggled the
