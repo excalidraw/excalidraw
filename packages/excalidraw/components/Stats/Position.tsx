@@ -137,6 +137,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       scene,
       app.state,
       originalElementsMap,
+      true,
+      app.renderEnvironment,
     );
     return;
   }
@@ -169,6 +171,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     scene,
     app.state,
     originalElementsMap,
+    true,
+    app.renderEnvironment,
   );
 };
 

@@ -4,8 +4,6 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   arrayToMap,
-  getFontString,
-  getStrokeWidthByKey,
   isTransparent,
 } from "@excalidraw/common";
 import {
@@ -34,7 +32,7 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { measureText } from "@excalidraw/element";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 import { syncMovedIndices } from "@excalidraw/element";
 
@@ -42,20 +40,58 @@ import { newElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import type { Scene } from "@excalidraw/element";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { Radians } from "@excalidraw/math";
 
+import { getDefaultAppState } from "../appState";
+import { getSelectionStateForElements } from "../components/App.selection";
+
 import { register } from "./register";
 
-import type { AppState } from "../types";
+import type { ActionResult } from "./types";
+import type { AppClassProperties, AppState } from "../types";
+
+/**
+ * Frees the container's text as it rendered: wrapped the same, at a fixed
+ * width.
+ */
+export const unbindTextFromContainer = (
+  container: ExcalidrawElement,
+  boundTextElement: ExcalidrawTextElementWithContainer,
+  scene: Scene,
+) => {
+  const { x, y } = computeBoundTextPosition(
+    container,
+    boundTextElement,
+    scene.getNonDeletedElementsMap(),
+  );
+  scene.mutateElement(boundTextElement as ExcalidrawTextElement, {
+    containerId: null,
+    autoResize: false,
+    baseFontSize: null,
+    x,
+    y,
+    labelPosition: null,
+  });
+  scene.mutateElement(container, {
+    boundElements: container.boundElements?.filter(
+      (ele) => ele.id !== boundTextElement.id,
+    ),
+  });
+};
 
 export const actionUnbindText = register({
   name: "unbindText",
@@ -69,41 +105,21 @@ export const actionUnbindText = register({
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const elementsMap = app.scene.getNonDeletedElementsMap();
+    const freedTextElements: NonDeletedExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        const { width, height } = measureText(
-          boundTextElement.originalText,
-          getFontString(boundTextElement),
-          boundTextElement.lineHeight,
-        );
+        freedTextElements.push(boundTextElement);
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
         );
         resetOriginalContainerCache(element.id);
-        const { x, y } = computeBoundTextPosition(
-          element,
-          boundTextElement,
-          elementsMap,
-        );
-        app.scene.mutateElement(boundTextElement as ExcalidrawTextElement, {
-          containerId: null,
-          width,
-          height,
-          text: boundTextElement.originalText,
-          baseFontSize: null,
-          x,
-          y,
-          labelPosition: null,
-        });
-        app.scene.mutateElement(element, {
-          boundElements: element.boundElements?.filter(
-            (ele) => ele.id !== boundTextElement.id,
-          ),
-        });
+        unbindTextFromContainer(element, boundTextElement, app.scene);
         if (isStickyNoteElement(element)) {
           // an empty note sits at its base height; bound arrows follow
-          updateStickyNoteLayout(element, app.scene);
+          updateStickyNoteLayout(element, app.scene, {
+            renderEnvironment: app.renderEnvironment,
+          });
         } else {
           app.scene.mutateElement(element, {
             height: originalContainerHeight
@@ -115,7 +131,15 @@ export const actionUnbindText = register({
     });
     return {
       elements,
-      appState,
+      appState: {
+        ...appState,
+        // the freed texts stay selected along with their former containers
+        ...getSelectionStateForElements(
+          [...selectedElements, ...freedTextElements],
+          getNonDeletedElements(elements),
+          appState,
+        ),
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -156,7 +180,7 @@ export const actionBindText = register({
     const selectedElements = app.scene.getSelectedElements(appState);
 
     let textElement: ExcalidrawTextElement;
-    let container: ExcalidrawTextContainer;
+    let container: NonDeleted<ExcalidrawTextContainer>;
 
     if (
       isTextElement(selectedElements[0]) &&
@@ -166,54 +190,89 @@ export const actionBindText = register({
       container = selectedElements[1];
     } else {
       textElement = selectedElements[1] as ExcalidrawTextElement;
-      container = selectedElements[0] as ExcalidrawTextContainer;
+      container = selectedElements[0] as NonDeleted<ExcalidrawTextContainer>;
     }
-    // a note and its label share one ink: the text the user styled wins,
-    // unless it is transparent (a note's label never is)
-    const stickyInk = isStickyNoteElement(container)
-      ? isTransparent(textElement.strokeColor)
-        ? container.strokeColor
-        : textElement.strokeColor
-      : null;
-    app.scene.mutateElement(textElement, {
-      containerId: container.id,
-      verticalAlign: VERTICAL_ALIGN.MIDDLE,
-      textAlign: TEXT_ALIGN.CENTER,
-      autoResize: true,
-      angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
-      labelPosition: isArrowElement(container)
-        ? DEFAULT_BOUND_TEXT_LABEL_POSITION
-        : null,
-      ...(stickyInk
-        ? {
-            baseFontSize: normalizeStickyNoteFontSize(
-              textElement.baseFontSize ?? textElement.fontSize,
-            ),
-            strokeColor: stickyInk,
-          }
-        : null),
-    });
-    app.scene.mutateElement(container, {
-      boundElements: (container.boundElements || []).concat({
-        type: "text",
-        id: textElement.id,
-      }),
-      // the footer paints with the note's ink
-      ...(stickyInk ? { strokeColor: stickyInk } : null),
-    });
-    const originalContainerHeight = container.height;
-    redrawTextBoundingBox(textElement, container, app.scene);
-    // overwritting the cache with original container height so
-    // it can be restored when unbind
-    updateOriginalContainerCache(container.id, originalContainerHeight);
 
-    return {
-      elements: pushTextAboveContainer(elements, container, textElement),
-      appState: { ...appState, selectedElementIds: { [container.id]: true } },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
+    return bindTextToContainer(elements, appState, textElement, container, app);
   },
 });
+
+/**
+ * A note and its label share one ink: the text the user styled wins, unless it
+ * is transparent (a note's label never is).
+ */
+export const getStickyNoteInk = (
+  textElement: ExcalidrawTextElement,
+  container: ExcalidrawElement,
+) =>
+  isStickyNoteElement(container)
+    ? isTransparent(textElement.strokeColor)
+      ? container.strokeColor
+      : textElement.strokeColor
+    : null;
+
+/** binds the text to the (label-less) container, selecting the container */
+export const bindTextToContainer = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  textElement: ExcalidrawTextElement,
+  container: NonDeleted<ExcalidrawTextContainer>,
+  app: AppClassProperties,
+): ActionResult => {
+  const stickyInk = getStickyNoteInk(textElement, container);
+  app.scene.mutateElement(textElement, {
+    containerId: container.id,
+    verticalAlign: VERTICAL_ALIGN.MIDDLE,
+    textAlign: TEXT_ALIGN.CENTER,
+    autoResize: true,
+    angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
+    labelPosition: isArrowElement(container)
+      ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+      : null,
+    ...(stickyInk
+      ? {
+          baseFontSize: normalizeStickyNoteFontSize(
+            textElement.baseFontSize ?? textElement.fontSize,
+          ),
+          strokeColor: stickyInk,
+        }
+      : null),
+  });
+  app.scene.mutateElement(container, {
+    boundElements: (container.boundElements || []).concat({
+      type: "text",
+      id: textElement.id,
+    }),
+    // the footer paints with the note's ink
+    ...(stickyInk ? { strokeColor: stickyInk } : null),
+  });
+  const originalContainerHeight = container.height;
+  redrawTextBoundingBox(
+    textElement,
+    container,
+    app.scene,
+    app.renderEnvironment,
+  );
+  // overwritting the cache with original container height so
+  // it can be restored when unbind
+  updateOriginalContainerCache(container.id, originalContainerHeight);
+
+  const nextElements = pushTextAboveContainer(elements, container, textElement);
+
+  return {
+    elements: nextElements,
+    appState: {
+      ...appState,
+      // with the line editor of an arrow
+      ...getSelectionStateForElements(
+        [container],
+        getNonDeletedElements(nextElements),
+        appState,
+      ),
+    },
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+  };
+};
 
 const pushTextAboveContainer = (
   elements: readonly ExcalidrawElement[],
@@ -235,7 +294,7 @@ const pushTextAboveContainer = (
   return updatedElements;
 };
 
-const pushContainerBelowText = (
+export const pushContainerBelowText = (
   elements: readonly ExcalidrawElement[],
   container: ExcalidrawElement,
   textElement: ExcalidrawTextElement,
@@ -266,112 +325,125 @@ export const actionWrapTextInContainer = register({
     );
     return selectedElements.length > 0 && someTextElements;
   },
-  perform: (elements, appState, _, app) => {
-    const selectedElements = app.scene.getSelectedElements(appState);
-    let updatedElements: readonly ExcalidrawElement[] = elements.slice();
-    const containerIds: Mutable<AppState["selectedElementIds"]> = {};
+  perform: (elements, appState, _, app) =>
+    wrapTextsInContainers(
+      elements,
+      appState,
+      app.scene
+        .getSelectedElements(appState)
+        .filter(
+          (element): element is NonDeleted<ExcalidrawTextElement> =>
+            isTextElement(element) && !isBoundToContainer(element),
+        ),
+      app,
+    ),
+});
 
-    for (const textElement of selectedElements) {
-      if (isTextElement(textElement) && !isBoundToContainer(textElement)) {
-        const container = newElement({
-          type: "rectangle",
-          backgroundColor: appState.currentItemBackgroundColor,
-          boundElements: [
-            ...(textElement.boundElements || []),
-            { id: textElement.id, type: "text" },
-          ],
-          angle: textElement.angle,
-          fillStyle: appState.currentItemFillStyle,
-          strokeColor: appState.currentItemStrokeColor,
-          roughness: appState.currentItemRoughness,
-          strokeWidth: getStrokeWidthByKey(
-            "rectangle",
-            appState.currentItemStrokeWidthKey,
-          ),
-          strokeStyle: appState.currentItemStrokeStyle,
-          roundness:
-            appState.currentItemRoundness === "round"
-              ? {
-                  type: isUsingAdaptiveRadius("rectangle")
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
-          opacity: 100,
-          locked: false,
-          x: textElement.x - BOUND_TEXT_PADDING,
-          y: textElement.y - BOUND_TEXT_PADDING,
-          width: computeContainerDimensionForBoundText(
-            textElement.width,
-            "rectangle",
-          ),
-          height: computeContainerDimensionForBoundText(
-            textElement.height,
-            "rectangle",
-          ),
-          groupIds: textElement.groupIds,
-          frameId: textElement.frameId,
-        });
+/** wraps each (unbound) text in a new container, selecting the containers */
+export const wrapTextsInContainers = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  textElements: readonly ExcalidrawTextElement[],
+  app: AppClassProperties,
+): ActionResult => {
+  let updatedElements: readonly ExcalidrawElement[] = elements.slice();
+  const containerIds: Mutable<AppState["selectedElementIds"]> = {};
 
-        // update bindings
-        if (textElement.boundElements?.length) {
-          const linearElementIds = textElement.boundElements
-            .filter((ele) => ele.type === "arrow")
-            .map((el) => el.id);
-          const linearElements = updatedElements.filter((ele) =>
-            linearElementIds.includes(ele.id),
-          ) as ExcalidrawLinearElement[];
-          linearElements.forEach((ele) => {
-            let startBinding = ele.startBinding;
-            let endBinding = ele.endBinding;
-
-            if (startBinding?.elementId === textElement.id) {
-              startBinding = {
-                ...startBinding,
-                elementId: container.id,
-              };
+  for (const textElement of textElements) {
+    // a default rectangle (not the current item's style), drawn in the
+    // text's color
+    const container = newElement({
+      type: "rectangle",
+      boundElements: [
+        ...(textElement.boundElements || []),
+        { id: textElement.id, type: "text" },
+      ],
+      angle: textElement.angle,
+      strokeColor: textElement.strokeColor,
+      roundness:
+        getDefaultAppState().currentItemRoundness === "round"
+          ? {
+              type: isUsingAdaptiveRadius("rectangle")
+                ? ROUNDNESS.ADAPTIVE_RADIUS
+                : ROUNDNESS.PROPORTIONAL_RADIUS,
             }
+          : null,
+      x: textElement.x - BOUND_TEXT_PADDING,
+      y: textElement.y - BOUND_TEXT_PADDING,
+      width: computeContainerDimensionForBoundText(
+        textElement.width,
+        "rectangle",
+      ),
+      height: computeContainerDimensionForBoundText(
+        textElement.height,
+        "rectangle",
+      ),
+      groupIds: textElement.groupIds,
+      frameId: textElement.frameId,
+    });
 
-            if (endBinding?.elementId === textElement.id) {
-              endBinding = { ...endBinding, elementId: container.id };
-            }
+    // update bindings
+    if (textElement.boundElements?.length) {
+      const linearElementIds = textElement.boundElements
+        .filter((ele) => ele.type === "arrow")
+        .map((el) => el.id);
+      const linearElements = updatedElements.filter((ele) =>
+        linearElementIds.includes(ele.id),
+      ) as ExcalidrawLinearElement[];
+      linearElements.forEach((ele) => {
+        let startBinding = ele.startBinding;
+        let endBinding = ele.endBinding;
 
-            if (startBinding || endBinding) {
-              app.scene.mutateElement(ele, {
-                startBinding,
-                endBinding,
-              });
-            }
-          });
+        if (startBinding?.elementId === textElement.id) {
+          startBinding = {
+            ...startBinding,
+            elementId: container.id,
+          };
         }
 
-        app.scene.mutateElement(textElement, {
-          containerId: container.id,
-          verticalAlign: VERTICAL_ALIGN.MIDDLE,
-          boundElements: null,
-          textAlign: TEXT_ALIGN.CENTER,
-          autoResize: true,
-        });
+        if (endBinding?.elementId === textElement.id) {
+          endBinding = { ...endBinding, elementId: container.id };
+        }
 
-        redrawTextBoundingBox(textElement, container, app.scene);
-
-        updatedElements = pushContainerBelowText(
-          [...updatedElements, container],
-          container,
-          textElement,
-        );
-
-        containerIds[container.id] = true;
-      }
+        if (startBinding || endBinding) {
+          app.scene.mutateElement(ele, {
+            startBinding,
+            endBinding,
+          });
+        }
+      });
     }
 
-    return {
-      elements: updatedElements,
-      appState: {
-        ...appState,
-        selectedElementIds: containerIds,
-      },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
-  },
-});
+    app.scene.mutateElement(textElement, {
+      containerId: container.id,
+      verticalAlign: VERTICAL_ALIGN.MIDDLE,
+      boundElements: null,
+      textAlign: TEXT_ALIGN.CENTER,
+      autoResize: true,
+    });
+
+    redrawTextBoundingBox(
+      textElement,
+      container,
+      app.scene,
+      app.renderEnvironment,
+    );
+
+    updatedElements = pushContainerBelowText(
+      [...updatedElements, container],
+      container,
+      textElement,
+    );
+
+    containerIds[container.id] = true;
+  }
+
+  return {
+    elements: updatedElements,
+    appState: {
+      ...appState,
+      selectedElementIds: containerIds,
+    },
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+  };
+};

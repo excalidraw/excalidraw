@@ -426,6 +426,40 @@ describe("Test Linear Elements", () => {
     await getTextEditor();
   });
 
+  it("updates the hovered handles together (midpoint, then endpoint)", () => {
+    createTwoPointerLinearElement("arrow");
+    mouse.moveTo(midpoint[0], midpoint[1]);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+
+    mouse.moveTo(p2[0], p2[1]);
+    expect(h.state.selectedLinearElement).toMatchObject({
+      hoverPointIndex: 1,
+      segmentMidPointHoveredCoords: null,
+    });
+  });
+
+  it("doesn't highlight the arrow's midpoint while its label is edited", async () => {
+    createTwoPointerLinearElement("arrow");
+    mouse.moveTo(midpoint[0], midpoint[1]);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+
+    mouse.doubleClickAt(midpoint[0], midpoint[1]);
+    await getTextEditor();
+    expect(h.state.selectedLinearElement?.segmentMidPointHoveredCoords).toBe(
+      null,
+    );
+
+    // (beside the editor)
+    mouse.moveTo(midpoint[0] + 8, midpoint[1]);
+    expect(h.state.selectedLinearElement?.segmentMidPointHoveredCoords).toBe(
+      null,
+    );
+  });
+
   it.each([
     ["start", null],
     ["start", "triangle"],
@@ -1483,7 +1517,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
           {
-            "height": 130,
+            "height": 0,
             "width": 340,
           }
         `);
@@ -1561,6 +1595,7 @@ describe("Test Linear Elements", () => {
         false,
         false,
         false,
+        h.app.renderEnvironment,
       );
       expect(
         wrapText(
@@ -1635,6 +1670,8 @@ describe("Test Linear Elements", () => {
       contextMenu = document.querySelector(".context-menu");
       fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
       expect(container.boundElements).toEqual([]);
+      // the arrow is selected along with the freed label
+      expect(h.state.selectedLinearElement).toBe(null);
       expect(text).toEqual(
         expect.objectContaining({
           containerId: null,
@@ -1867,7 +1904,9 @@ describe("Test Linear Elements", () => {
         ]);
 
         mouse.reset();
-        mouse.clickAt(0, 0);
+        // (not by a click, whose pointerup would normalize — reroute — this
+        // hand-built elbow arrow)
+        act(() => h.app.selection.select(arrow.id));
         expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
 
         // inside the label AND within the hit radius of the route point at
@@ -1971,6 +2010,41 @@ describe("Test Linear Elements", () => {
 
       expect(line.points[line.points.length - 1][0]).toBe(20);
       expect(line.points[line.points.length - 1][1]).toBe(-20);
+    });
+
+    it("should move midpoints with the element via the `moveMidPointsWithElement` option without storing it", () => {
+      const line = createThreePointerLinearElement("arrow");
+      const [origX, origY] = [line.x, line.y];
+      const origMidPoint = line.points[1];
+      const origEndPoint = line.points[2];
+
+      act(() => {
+        LinearElementEditor.movePoints(
+          line,
+          h.app.scene,
+          new Map([
+            [0, { point: pointFrom<LocalPoint>(10, 10) }],
+            [
+              2,
+              {
+                point: pointFrom<LocalPoint>(
+                  origEndPoint[0] + 10,
+                  origEndPoint[1] + 10,
+                ),
+              },
+            ],
+          ]),
+          undefined,
+          { moveMidPointsWithElement: true },
+        );
+      });
+
+      expect(line.x).toBe(origX + 10);
+      expect(line.y).toBe(origY + 10);
+      // local coords unchanged => the midpoint moved along with the element
+      expect(line.points[1]).toEqual(origMidPoint);
+      expect(line.points[2]).toEqual(origEndPoint);
+      expect(line).not.toHaveProperty("moveMidPointsWithElement");
     });
 
     it("should preserve original angle when dragging endpoint with SHIFT key", () => {

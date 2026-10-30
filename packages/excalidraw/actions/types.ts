@@ -141,6 +141,7 @@ export type ActionName =
   | "linkToElement"
   | "cropEditor"
   | "wrapSelectionInFrame"
+  | "toggleWrap"
   | "toggleShapeSwitch"
   | "togglePolygon";
 

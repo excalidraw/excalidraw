@@ -32,6 +32,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { ExcalidrawElement, ExcalidrawTextElement } from "./types";
@@ -46,6 +47,8 @@ export const dragSelectedElements = (
     y: number;
   },
   gridSize: NullableGridSize,
+  /** measures the labels of the bound arrows the drag moves */
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (
     _selectedElements.length === 1 &&
@@ -133,6 +136,7 @@ export const dragSelectedElements = (
       }
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdateArray,
+        renderEnvironment,
       });
     } else if (
       // NOTE: Add a little initial drag to the arrow dragging when the arrow
@@ -247,6 +251,7 @@ export const dragNewTextElement = ({
   nextY,
   zoom,
   scene,
+  renderEnvironment,
   informMutation = true,
 }: {
   newElement: ExcalidrawTextElement;
@@ -258,6 +263,7 @@ export const dragNewTextElement = ({
   nextY?: number;
   zoom: NormalizedZoomValue;
   scene: Scene;
+  renderEnvironment?: RenderEnvironment;
   informMutation?: boolean;
 }) => {
   const offset = pointerX - anchorX;
@@ -276,6 +282,7 @@ export const dragNewTextElement = ({
         fontFamily: newElement.fontFamily,
       }),
       newElement.lineHeight,
+      renderEnvironment,
     ),
   );
 
@@ -304,6 +311,7 @@ export const dragNewElement = ({
   shouldResizeFromCenter,
   zoom,
   scene,
+  renderEnvironment,
   widthAspectRatio = null,
   originOffset = null,
   informMutation = true,
@@ -320,6 +328,7 @@ export const dragNewElement = ({
   shouldResizeFromCenter: boolean;
   zoom: NormalizedZoomValue;
   scene: Scene;
+  renderEnvironment?: RenderEnvironment;
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null;
@@ -367,6 +376,7 @@ export const dragNewElement = ({
       nextY: originY + (originOffset?.y ?? 0),
       zoom,
       scene,
+      renderEnvironment,
       informMutation,
     });
     return;

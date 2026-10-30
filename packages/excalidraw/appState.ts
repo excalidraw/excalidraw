@@ -17,9 +17,15 @@ import {
 
 import type { AppState, InputDevice, NormalizedZoomValue } from "./types";
 
-const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
-  ? devicePixelRatio
-  : 1;
+/**
+ * Resolved lazily rather than at module scope: this module is pulled in by the
+ * export pipeline, which must be importable outside a browser realm.
+ */
+const getDefaultExportScale = () => {
+  const devicePixelRatio =
+    typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+  return EXPORT_SCALES.includes(devicePixelRatio) ? devicePixelRatio : 1;
+};
 
 export const getDefaultAppState = (): Omit<
   AppState,
@@ -67,7 +73,7 @@ export const getDefaultAppState = (): Omit<
     penDetected: false,
     errorMessage: null,
     exportBackground: true,
-    exportScale: defaultExportScale,
+    exportScale: getDefaultExportScale(),
     exportEmbedScene: false,
     exportWithDarkMode: false,
     fileHandle: null,

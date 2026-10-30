@@ -42,6 +42,7 @@ import { LinearElementEditor } from "../src/linearElementEditor";
 import { mutateElement } from "../src/mutateElement";
 import { newArrowElement, newElement } from "../src/newElement";
 import { Scene } from "../src/Scene";
+import { convertToExcalidrawElements } from "../src/transform";
 import { getAllMidpoints } from "../src/utils";
 import { getTransformHandles } from "../src/transformHandles";
 import {
@@ -49,11 +50,13 @@ import {
   TEXT_EDITOR_SELECTOR,
 } from "../../excalidraw/tests/queries/dom";
 
+import type { RenderEnvironment } from "../src/renderEnvironment";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
   FixedPointBinding,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -1786,5 +1789,51 @@ describe("grid mode binding near a rectangle corner", () => {
     expect(end).toMatchObject({ mode: "orbit", element: b });
     expect(end.focusPoint![0]).toBeCloseTo(340);
     expect(end.focusPoint![1]).toBeCloseTo(-getBindingGap(b));
+  });
+});
+
+describe("updateBoundElements with a render environment", () => {
+  it("re-measures bound arrow labels with the given environment", () => {
+    const renderEnvironment: RenderEnvironment = {
+      createCanvas: () => document.createElement("canvas"),
+      createImage: () => ({} as HTMLImageElement),
+      textMetrics: { getLineWidth: (text) => text.length * 5 },
+    };
+    const scene = new Scene(
+      convertToExcalidrawElements(
+        [
+          { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+          { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+          {
+            type: "arrow",
+            x: 100,
+            y: 50,
+            points: [pointFrom(0, 0), pointFrom(300, 0)],
+            start: { id: "A" },
+            end: { id: "B" },
+            label: { text: "aaaa bbbb cccc dddd eeee ffff" },
+          },
+        ],
+        { regenerateIds: false, renderEnvironment },
+      ),
+      { skipValidation: true },
+    );
+    const label = scene
+      .getNonDeletedElements()
+      .find((element) => element.type === "text") as ExcalidrawTextElement;
+    const rectB = scene.getElement(
+      "B",
+    ) as NonDeleted<ExcalidrawBindableElement>;
+
+    expect(label.text).toBe("aaaa bbbb cccc dddd eeee ffff");
+    expect(label.width).toBe(145);
+
+    // as the drag does: move a bound shape, then its arrows (whose label the
+    // default metrics would wrap after "dddd", 190px wide)
+    scene.mutateElement(rectB, { x: rectB.x + 1 });
+    updateBoundElements(rectB, scene, { renderEnvironment });
+
+    expect(label.text).toBe("aaaa bbbb cccc dddd eeee ffff");
+    expect(label.width).toBe(145);
   });
 });

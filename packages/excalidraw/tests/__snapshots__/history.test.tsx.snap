@@ -217,7 +217,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -240,7 +239,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 22,
+  "version": 21,
   "width": "94.00000",
   "x": 0,
   "y": 0,
@@ -367,7 +366,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               "mode": "orbit",
             },
-            "version": 21,
+            "version": 20,
             "width": "88.00000",
             "y": "7.20923",
           },
@@ -399,7 +398,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               "mode": "orbit",
             },
-            "version": 20,
+            "version": 19,
             "width": "88.00000",
             "y": "0.01000",
           },
@@ -456,7 +455,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
             ],
             "startBinding": null,
-            "version": 22,
+            "version": 21,
             "width": "94.00000",
             "x": 0,
             "y": 0,
@@ -481,7 +480,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               "mode": "orbit",
             },
-            "version": 21,
+            "version": 20,
             "width": "88.00000",
             "x": 6,
             "y": "7.20923",
@@ -863,7 +862,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -886,7 +884,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 25,
+  "version": 24,
   "width": 100,
   "x": 150,
   "y": 0,
@@ -955,7 +953,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               "mode": "orbit",
             },
-            "version": 24,
+            "version": 23,
             "width": 44,
             "y": "0.01000",
           },
@@ -987,7 +985,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               "mode": "orbit",
             },
-            "version": 23,
+            "version": 22,
             "width": 100,
             "y": "0.01000",
           },
@@ -1036,7 +1034,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
             ],
             "startBinding": null,
-            "version": 25,
+            "version": 24,
             "width": 100,
             "x": 150,
             "y": 0,
@@ -1061,7 +1059,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
               ],
               "mode": "orbit",
             },
-            "version": 24,
+            "version": 23,
             "width": 44,
             "x": 250,
             "y": "0.01000",
@@ -1387,7 +1385,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -1765,7 +1762,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -2495,7 +2491,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -17673,7 +17668,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -17703,7 +17697,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
+  "version": 9,
   "width": "88.00000",
   "x": 6,
   "y": "0.01000",
@@ -17756,7 +17750,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 10,
+            "version": 9,
           },
           "inserted": {
             "endBinding": {
@@ -18446,7 +18440,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -18476,7 +18469,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
+  "version": 9,
   "width": "88.00000",
   "x": 6,
   "y": "0.01000",
@@ -18787,7 +18780,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 10,
+            "version": 9,
             "width": "88.00000",
             "x": 6,
             "y": "0.01000",
@@ -19117,7 +19110,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -19147,7 +19139,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
+  "version": 9,
   "width": "88.00000",
   "x": 6,
   "y": "0.01000",
@@ -19458,7 +19450,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "strokeStyle": "solid",
             "strokeWidth": 2,
             "type": "arrow",
-            "version": 10,
+            "version": 9,
             "width": "88.00000",
             "x": 6,
             "y": "0.01000",
@@ -19786,7 +19778,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -19816,7 +19807,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
+  "version": 9,
   "width": "88.00000",
   "x": 6,
   "y": "0.01000",
@@ -19885,7 +19876,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 10,
+            "version": 9,
           },
           "inserted": {
             "endBinding": {
@@ -20563,7 +20554,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "isDeleted": false,
   "link": null,
   "locked": false,
-  "moveMidPointsWithElement": false,
   "opacity": 100,
   "points": [
     [
@@ -20593,7 +20583,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
+  "version": 10,
   "width": "88.00000",
   "x": 6,
   "y": "0.01000",
@@ -20673,7 +20663,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
               ],
               "mode": "orbit",
             },
-            "version": 11,
+            "version": 10,
           },
           "inserted": {
             "endBinding": null,
