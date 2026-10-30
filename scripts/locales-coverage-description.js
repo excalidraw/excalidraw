@@ -55,6 +55,7 @@ const crowdinMap = {
   "kk-KZ": "en-kk",
   "vi-VN": "en-vi",
   "mr-IN": "en-mr",
+  "mn-MN": "en-mn",
   "th-TH": "en-th",
 };
 
@@ -108,6 +109,7 @@ const flags = {
   "eu-ES": "🇪🇦",
   "vi-VN": "🇻🇳",
   "mr-IN": "🇮🇳",
+  "mn-MN": "🇲🇳",
   "th-TH": "🇹🇭",
 };
 
@@ -161,6 +163,7 @@ const languages = {
   "zh-TW": "繁體中文",
   "vi-VN": "Tiếng Việt",
   "mr-IN": "मराठी",
+  "mn-MN": "Монгол",
   "th-TH": "ภาษาไทย",
 };
 
