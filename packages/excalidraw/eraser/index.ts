@@ -177,7 +177,9 @@ export class EraserTrail extends AnimatedTrail {
             this.elementsToErase.add(element.containerId);
           }
 
-          this.elementsToErase.add(element.id);
+          if (element.type !== "image") {
+            this.elementsToErase.add(element.id);
+          }
         }
       }
     }
