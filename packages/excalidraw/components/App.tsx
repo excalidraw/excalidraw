@@ -301,7 +301,10 @@ import {
 } from "../clipboard";
 
 import { exportCanvas, loadFromBlob } from "../data";
-import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import Library, {
+  distributeLibraryItemsOnSquareGrid,
+  loadLibraryFromBlobs,
+} from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -323,6 +326,7 @@ import {
   generateIdFromFile,
   getDataURL,
   getDataURL_sync,
+  getMimeType,
   isImageFileHandle,
   isSupportedImageFile,
   loadSceneOrLibraryFromBlob,
@@ -444,6 +448,7 @@ import type {
   Gesture,
   GestureEvent,
   LibraryItems,
+  LibraryItemsSource,
   PointerDownState,
   SceneData,
   FrameNameBoundsCache,
@@ -10879,6 +10884,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    const libraryFiles = fileItems
+      .map((data) => data.file)
+      .filter((file) => getMimeType(file) === MIME_TYPES.excalidrawlib);
+
+    if (libraryFiles.length > 1) {
+      await this.importLibrary(loadLibraryFromBlobs(libraryFiles));
+      return;
+    }
+
     if (fileItems.length > 0) {
       const { file, fileHandle } = fileItems[0];
       if (file) {
@@ -10988,21 +11002,21 @@ class App extends React.Component<AppProps, AppState> {
         });
         return true;
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
-        await this.library
-          .updateLibrary({
-            libraryItems: file,
-            merge: true,
-            openLibraryMenu: true,
-          })
-          .catch((error) => {
-            console.error(error);
-            this.setState({ errorMessage: t("errors.importLibraryError") });
-          });
+        await this.importLibrary(file);
       }
     } catch (error: any) {
       this.setState({ isLoading: false, errorMessage: error.message });
     }
   };
+
+  /** merges the items into the library, showing an error if they're invalid */
+  private importLibrary = (libraryItems: LibraryItemsSource) =>
+    this.library
+      .updateLibrary({ libraryItems, merge: true, openLibraryMenu: true })
+      .catch((error) => {
+        console.error(error);
+        this.setState({ errorMessage: t("errors.importLibraryError") });
+      });
 
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
