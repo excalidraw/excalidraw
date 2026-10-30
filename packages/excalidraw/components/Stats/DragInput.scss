@@ -20,8 +20,11 @@
     flex-shrink: 0;
     border: 0;
     padding: 0 0.5rem 0 0.25rem;
-    min-width: 1rem;
-    width: 1.5rem;
+    // size to the label so multi-word (and translated) labels like
+    // "Grid step" don't overflow; single-letter labels keep the 1.5rem width
+    min-width: 1.5rem;
+    width: auto;
+    white-space: nowrap;
     height: 2rem;
     box-sizing: content-box;
     color: var(--popup-text-color);
