@@ -32,6 +32,37 @@
     }
   }
 
+  .layer-ui__search-replace {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.75rem;
+    flex-direction: column;
+
+    .layer-ui__search-replace-input {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+
+    .layer-ui__search-replace-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      width: 100%;
+
+      .layer-ui__search-replace-btn {
+        --button-border: transparent;
+        &:active {
+          background-color: var(--color-surface-high);
+        }
+      }
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+
   .layer-ui__search-count {
     display: flex;
     justify-content: space-between;
