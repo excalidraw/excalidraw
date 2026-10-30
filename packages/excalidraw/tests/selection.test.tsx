@@ -743,6 +743,31 @@ describe("box-selection overlap mode", () => {
     assertSelectedElements([]);
   });
 
+  it("should not select a rotated rectangle when the selection box misses its outline", () => {
+    // 200x20, centered at 200,200, lying along the diagonal
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 190,
+      width: 200,
+      height: 20,
+      angle: Math.PI / 4,
+    });
+
+    API.setElements([rect]);
+
+    // ~25px off the outline, around where the right side midpoint would be
+    // if rotated by 90° instead of 45°
+    boxSelect(190, 260, 210, 310);
+
+    assertSelectedElements([]);
+
+    // around the right side midpoint
+    boxSelect(265, 265, 275, 275);
+
+    assertSelectedElements([rect.id]);
+  });
+
   it("should not select a filled ellipse when the selection box only overlaps its bounds corner", () => {
     const ellipse = API.createElement({
       type: "ellipse",
