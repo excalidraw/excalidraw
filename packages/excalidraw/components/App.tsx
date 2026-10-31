@@ -3142,7 +3142,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (actionResult.files) {
-      this.addMissingFiles(actionResult.files, actionResult.replaceFiles);
+      this.addMissingFiles(actionResult.files);
       this.addNewImagesToImageCache();
     }
 
@@ -4932,11 +4932,13 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private addMissingFiles = (
-    files: BinaryFiles | BinaryFileData[],
-    replace = false,
-  ) => {
-    const nextFiles = replace ? {} : { ...this.files };
+  /**
+   * Adds to the current files rather than replacing them: history doesn't
+   * track files, so undoing e.g. a scene replace brings back elements that
+   * still need theirs.
+   */
+  private addMissingFiles = (files: BinaryFiles | BinaryFileData[]) => {
+    const nextFiles = { ...this.files };
     const addedFiles: BinaryFiles = {};
 
     const _files = Array.isArray(files) ? files : Object.values(files);
@@ -10818,7 +10820,6 @@ class App extends React.Component<AppProps, AppState> {
               ...(scene.appState || this.state),
               isLoading: false,
             },
-            replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
           this.showSceneReplacedToast();
@@ -10983,7 +10984,6 @@ class App extends React.Component<AppProps, AppState> {
             ...(ret.data.appState || this.state),
             isLoading: false,
           },
-          replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
         return true;
