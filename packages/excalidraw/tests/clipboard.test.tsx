@@ -16,6 +16,7 @@ import { getElementBounds } from "@excalidraw/element";
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+import { serializeAsJSON } from "../data/json";
 
 import { Excalidraw } from "../index";
 
@@ -129,6 +130,28 @@ describe("general paste behavior", () => {
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].seed).toBe(rectangle.seed);
     });
+  });
+
+  it("should not paste the deleted elements of a pasted scene", async () => {
+    mouse.moveTo(200, 200);
+    pasteWithCtrlCmdV(
+      serializeAsJSON(
+        [
+          API.createElement({ type: "ellipse" }),
+          API.createElement({ type: "rectangle", x: 5000, isDeleted: true }),
+        ],
+        h.state,
+        {},
+        "local",
+      ),
+    );
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "ellipse", x: 150, y: 150 }),
+      ]);
+    });
+    expect(h.state.selectedElementIds).toEqual({ [h.elements[0].id]: true });
   });
 });
 
