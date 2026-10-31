@@ -11,7 +11,7 @@ import { orderByFractionalIndex } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
@@ -35,7 +35,11 @@ const executeHistoryAction = (
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
     !appState.selectionElement &&
-    !app.flowChartCreator.isCreatingChart
+    !app.flowchart.isCreatingChart &&
+    // a drawShape sketch in progress isn't visible via `newElement` while
+    // the stroke is still unrecognized — block history mid-gesture the same
+    // way as for the other in-progress interactions above
+    !app.drawShape.hasPendingGesture()
   ) {
     const result = updater();
 
@@ -70,7 +74,11 @@ export const createUndoAction: ActionCreator = (history) => ({
   viewMode: false,
   perform: (elements, appState, value, app) =>
     executeHistoryAction(app, appState, () =>
-      history.undo(arrayToMap(elements) as SceneElementsMap, appState),
+      history.undo(
+        arrayToMap(elements) as SceneElementsMap,
+        appState,
+        app.renderEnvironment,
+      ),
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
@@ -85,7 +93,7 @@ export const createUndoAction: ActionCreator = (history) => ({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={UndoIcon}
         aria-label={t("buttons.undo")}
@@ -109,7 +117,11 @@ export const createRedoAction: ActionCreator = (history) => ({
   viewMode: false,
   perform: (elements, appState, __, app) =>
     executeHistoryAction(app, appState, () =>
-      history.redo(arrayToMap(elements) as SceneElementsMap, appState),
+      history.redo(
+        arrayToMap(elements) as SceneElementsMap,
+        appState,
+        app.renderEnvironment,
+      ),
     ),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||
@@ -125,7 +137,7 @@ export const createRedoAction: ActionCreator = (history) => ({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={RedoIcon}
         aria-label={t("buttons.redo")}

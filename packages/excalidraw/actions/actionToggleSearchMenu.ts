@@ -11,8 +11,6 @@ import { searchIcon } from "../components/icons";
 
 import { register } from "./register";
 
-import type { AppState } from "../types";
-
 export const actionToggleSearchMenu = register({
   name: "searchMenu",
   icon: searchIcon,
@@ -52,7 +50,7 @@ export const actionToggleSearchMenu = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  checked: (appState: AppState) => appState.gridModeEnabled,
+  checked: (appState) => appState.gridModeEnabled,
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },

@@ -4,7 +4,7 @@ import type { Theme } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 
 import "./ToolIcon.scss";
 
@@ -22,7 +22,7 @@ export const DarkModeToggle = (props: {
       : t("buttons.darkMode"));
 
   return (
-    <ToolButton
+    <IconButton
       type="icon"
       icon={props.value === THEME.LIGHT ? ICONS.MOON : ICONS.SUN}
       title={title}

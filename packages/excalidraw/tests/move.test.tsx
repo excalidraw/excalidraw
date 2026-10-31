@@ -1,11 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
-import { KEYS, reseed } from "@excalidraw/common";
+import { KEYS, reseed, DEFAULT_ZOOM } from "@excalidraw/common";
 import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   NonDeleted,
 } from "@excalidraw/element/types";
 
@@ -13,6 +14,7 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { render, fireEvent, act, unmountComponent } from "./test-utils";
 
@@ -72,6 +74,28 @@ describe("move element", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
+  it("shift-drag moves along one axis only", async () => {
+    await render(<Excalidraw />);
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const mouse = new Pointer("mouse");
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.downAt(50, 50);
+      mouse.moveTo(90, 60);
+      mouse.upAt();
+    });
+
+    expect(API.getElement(rectangle)).toMatchObject({ x: 40, y: 0 });
+  });
+
   it("rectangles with binding arrow", async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
 
@@ -84,17 +108,19 @@ describe("move element", () => {
       // bind line to two rectangles
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
-        rectA.get(),
+        rectA.get() as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "start",
         h.app.scene,
+        DEFAULT_ZOOM,
       );
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
-        rectB.get(),
+        rectB.get() as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "end",
         h.app.scene,
+        DEFAULT_ZOOM,
       );
     });
 

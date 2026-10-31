@@ -4,6 +4,7 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  DEFAULT_ELEMENT_STROKE_WIDTH_KEY,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_GRID_SIZE,
   EXPORT_SCALES,
@@ -11,13 +12,20 @@ import {
   THEME,
   DEFAULT_GRID_STEP,
   isTestEnv,
+  DEFAULT_STICKY_NOTE_BG,
 } from "@excalidraw/common";
 
-import type { AppState, NormalizedZoomValue } from "./types";
+import type { AppState, InputDevice, NormalizedZoomValue } from "./types";
 
-const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
-  ? devicePixelRatio
-  : 1;
+/**
+ * Resolved lazily rather than at module scope: this module is pulled in by the
+ * export pipeline, which must be importable outside a browser realm.
+ */
+const getDefaultExportScale = () => {
+  const devicePixelRatio =
+    typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+  return EXPORT_SCALES.includes(devicePixelRatio) ? devicePixelRatio : 1;
+};
 
 export const getDefaultAppState = (): Omit<
   AppState,
@@ -34,12 +42,15 @@ export const getDefaultAppState = (): Omit<
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
+    currentItemStrokeVariability: "constant",
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
+    currentItemStickynoteStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
+    currentItemStickynoteBackgroundColor: DEFAULT_STICKY_NOTE_BG,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
-    currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
+    currentItemStrokeWidthKey: DEFAULT_ELEMENT_STROKE_WIDTH_KEY,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentHoveredFontFamily: null,
     cursorButton: "up",
@@ -62,7 +73,7 @@ export const getDefaultAppState = (): Omit<
     penDetected: false,
     errorMessage: null,
     exportBackground: true,
-    exportScale: defaultExportScale,
+    exportScale: getDefaultExportScale(),
     exportEmbedScene: false,
     exportWithDarkMode: false,
     fileHandle: null,
@@ -72,6 +83,8 @@ export const getDefaultAppState = (): Omit<
     isBindingEnabled: true,
     bindingPreference: "enabled",
     isMidpointSnappingEnabled: true,
+    showHints: true,
+    inputDevice: "auto",
     defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
@@ -89,6 +102,7 @@ export const getDefaultAppState = (): Omit<
     scrolledOutside: false,
     scrollX: 0,
     scrollY: 0,
+    scrollConstraints: null,
     selectedElementIds: {},
     hoveredElementIds: {},
     selectedGroupIds: {},
@@ -100,6 +114,7 @@ export const getDefaultAppState = (): Omit<
       panels: STATS_PANELS.generalStats | STATS_PANELS.elementProperties,
     },
     suggestedBinding: null,
+    textToolHover: null,
     frameRendering: { enabled: true, clip: true, name: true, outline: true },
     frameToHighlight: null,
     editingFrame: null,
@@ -119,8 +134,6 @@ export const getDefaultAppState = (): Omit<
       y: 0,
     },
     objectsSnapModeEnabled: false,
-    userToFollow: null,
-    followedBy: new Set(),
     isCropping: false,
     croppingElementId: null,
     searchMatches: null,
@@ -128,6 +141,14 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    colorTopPicks: {
+      elementStroke: null,
+      elementBackground: null,
+      bucketFill: null,
+      stickyNoteStroke: null,
+      stickyNoteBackground: null,
+    },
+    fontTopPicks: null,
   };
 };
 
@@ -167,10 +188,25 @@ const APP_STATE_STORAGE_CONF = (<
   },
   currentItemOpacity: { browser: true, export: false, server: false },
   currentItemRoughness: { browser: true, export: false, server: false },
+  currentItemStrokeVariability: {
+    browser: true,
+    export: false,
+    server: false,
+  },
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
+  currentItemStickynoteStrokeColor: {
+    browser: true,
+    export: false,
+    server: false,
+  },
+  currentItemStickynoteBackgroundColor: {
+    browser: true,
+    export: false,
+    server: false,
+  },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
-  currentItemStrokeWidth: { browser: true, export: false, server: false },
+  currentItemStrokeWidthKey: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
   currentHoveredFontFamily: { browser: false, export: false, server: false },
   cursorButton: { browser: true, export: false, server: false },
@@ -196,6 +232,8 @@ const APP_STATE_STORAGE_CONF = (<
   boxSelectionMode: { browser: true, export: false, server: false },
   bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
+  showHints: { browser: true, export: false, server: false },
+  inputDevice: { browser: true, export: false, server: false },
   defaultSidebarDockedPreference: {
     browser: true,
     export: false,
@@ -219,6 +257,7 @@ const APP_STATE_STORAGE_CONF = (<
   scrolledOutside: { browser: true, export: false, server: false },
   scrollX: { browser: true, export: false, server: false },
   scrollY: { browser: true, export: false, server: false },
+  scrollConstraints: { browser: false, export: false, server: false },
   selectedElementIds: { browser: true, export: false, server: false },
   hoveredElementIds: { browser: false, export: false, server: false },
   selectedGroupIds: { browser: true, export: false, server: false },
@@ -231,6 +270,7 @@ const APP_STATE_STORAGE_CONF = (<
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
   stats: { browser: true, export: false, server: false },
   suggestedBinding: { browser: false, export: false, server: false },
+  textToolHover: { browser: false, export: false, server: false },
   frameRendering: { browser: false, export: false, server: false },
   frameToHighlight: { browser: false, export: false, server: false },
   editingFrame: { browser: false, export: false, server: false },
@@ -246,14 +286,14 @@ const APP_STATE_STORAGE_CONF = (<
   snapLines: { browser: false, export: false, server: false },
   originSnapOffset: { browser: false, export: false, server: false },
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
-  userToFollow: { browser: false, export: false, server: false },
-  followedBy: { browser: false, export: false, server: false },
   isCropping: { browser: false, export: false, server: false },
   croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  colorTopPicks: { browser: true, export: false, server: false },
+  fontTopPicks: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
@@ -305,3 +345,17 @@ export const isHandToolActive = ({
 }) => {
   return activeTool.type === "hand";
 };
+
+/**
+ * The device the wheel mappings follow for the given preference.
+ *
+ * `auto` is meant to detect the device from the wheel events themselves
+ * (line vs. pixel delta modes, whole vs. fractional deltas, one vs. two axes
+ * moving, event cadence and momentum tails). That is not implemented yet, so
+ * it resolves to `trackpad` — the mapping the editor has always had, and the
+ * default to keep until detection exists.
+ */
+export const resolveInputDevice = (
+  inputDevice: InputDevice,
+): Exclude<InputDevice, "auto"> =>
+  inputDevice === "auto" ? "trackpad" : inputDevice;

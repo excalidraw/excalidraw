@@ -41,27 +41,24 @@
       }
     }
 
+    // UI hidden in zen mode fades out in place. `visibility` flips at the end
+    // of the fade-out (and immediately on fade-in), and makes the hidden UI
+    // non-interactive & unfocusable.
     .zen-mode-transition {
-      transition: transform 0.5s ease-in-out;
+      transition: opacity var(--zen-mode-transition-duration) ease-in-out,
+        visibility var(--zen-mode-transition-duration);
 
-      :root[dir="ltr"] &.transition-left {
-        transform: translate(-999px, 0);
-      }
-
-      :root[dir="ltr"] &.transition-right {
-        transform: translate(999px, 0);
-      }
-
-      :root[dir="rtl"] &.transition-left {
-        transform: translate(999px, 0);
-      }
-
-      :root[dir="rtl"] &.transition-right {
-        transform: translate(-999px, 0);
-      }
-
+      &.transition-left,
+      &.transition-right,
       &.layer-ui__wrapper__footer-left--transition-bottom {
-        transform: translate(0, 92px);
+        opacity: 0;
+        visibility: hidden;
+
+        // disable interaction immediately, not only once faded out
+        &,
+        * {
+          pointer-events: none !important;
+        }
       }
     }
 
@@ -117,6 +114,30 @@
     .layer-ui__wrapper__footer-right {
       margin-top: auto;
       margin-bottom: auto;
+    }
+  }
+
+  // on tablet, the pen mode button is rendered as a separate floating button
+  // below the compact actions menu (see LayerUI.tsx)
+  .App-menu_top__left > .ToolIcon__penMode {
+    // NOTE: not `justify-self: center` — that centers against the grid
+    // column's track width, which (see above) can be inflated by unrelated
+    // content, visibly shifting this button off from the icon stack above
+    // it. Nudge by hand instead, against the fixed-width compact actions
+    // column (see .selected-shape-actions-container--compact's min-width).
+    justify-self: start;
+    margin-left: calc((48px - var(--lg-button-size)) / 2);
+
+    .ToolIcon__icon {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      background-color: var(--island-bg-color);
+      box-shadow: var(--shadow-island);
+    }
+
+    // no shadow while pen mode is active (the active fill is enough)
+    &.ToolIcon--checked .ToolIcon__icon {
+      box-shadow: none;
     }
   }
 

@@ -10,9 +10,11 @@ export { actionDuplicateSelection } from "./actionDuplicateSelection";
 export {
   actionChangeStrokeColor,
   actionChangeBackgroundColor,
+  actionChangeBucketFillBackgroundColor,
   actionChangeStrokeWidth,
   actionChangeFillStyle,
   actionChangeSloppiness,
+  actionChangeFreedrawMode,
   actionChangeOpacity,
   actionChangeFontSize,
   actionChangeFontFamily,
@@ -31,8 +33,6 @@ export {
   actionZoomToFit,
   actionToggleTheme,
 } from "./actionCanvas";
-
-export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
 
 export { actionFinalize } from "./actionFinalize";
 export { actionDeselect } from "./actionDeselect";
@@ -83,9 +83,11 @@ export { actionToggleZenMode } from "./actionToggleZenMode";
 export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
+export { actionToggleShowHints } from "./actionToggleShowHints";
 
 export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
+export { actionToggleWrap } from "./actionToggleWrap";
 export { actionLink } from "./actionLink";
 export { actionToggleElementLock } from "./actionElementLock";
 export { actionToggleLinearEditor } from "./actionLinearEditor";

@@ -18,8 +18,10 @@ import { getElementsOverlappingFrame } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+import type { RenderEnvironment } from "@excalidraw/element";
 
 import {
   copyBlobToClipboardAsPng,
@@ -28,7 +30,7 @@ import {
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportToCanvas, exportToSvg } from "../scene/export";
+import { exportScene, getExportConfigFromAppState } from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
@@ -45,18 +47,18 @@ export type ExportedElements = readonly NonDeletedExcalidrawElement[] & {
 };
 
 export const prepareElementsForExport = (
-  elements: readonly ExcalidrawElement[],
+  allElements: readonly ExcalidrawElement[],
   { selectedElementIds }: Pick<AppState, "selectedElementIds">,
   exportSelectionOnly: boolean,
 ) => {
-  elements = getNonDeletedElements(elements);
+  const elements = getNonDeletedElements(allElements);
   const elementsMap = arrayToMap(elements);
 
   const isExportingSelection =
     exportSelectionOnly &&
     isSomeElementSelected(elements, { selectedElementIds });
 
-  let exportingFrame: ExcalidrawFrameLikeElement | null = null;
+  let exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null = null;
   let exportedElements = isExportingSelection
     ? getSelectedElements(
         elements,
@@ -68,14 +70,12 @@ export const prepareElementsForExport = (
     : elements;
 
   if (isExportingSelection) {
-    if (
-      exportedElements.length === 1 &&
-      isFrameLikeElement(exportedElements[0])
-    ) {
-      exportingFrame = exportedElements[0];
+    const firstElement = exportedElements[0];
+    if (exportedElements.length === 1 && isFrameLikeElement(firstElement)) {
+      exportingFrame = firstElement;
       exportedElements = getElementsOverlappingFrame(
         elements,
-        exportingFrame,
+        firstElement,
         elementsMap,
       );
     } else if (exportedElements.length > 1) {
@@ -102,39 +102,44 @@ export const exportCanvas = async (
   appState: AppState,
   files: BinaryFiles,
   {
-    exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
-    viewBackgroundColor,
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    renderEnvironment,
   }: {
-    exportBackground: boolean;
     exportPadding?: number;
-    viewBackgroundColor: string;
     /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
-    exportingFrame: ExcalidrawFrameLikeElement | null;
+    exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
   },
 ) => {
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
+
+  const config = {
+    ...getExportConfigFromAppState(appState),
+    padding: exportPadding,
+    exportingFrame,
+  };
+
   if (type === "svg" || type === "clipboard-svg") {
-    const svgPromise = exportToSvg(
-      elements,
-      {
-        exportBackground,
-        exportWithDarkMode: appState.exportWithDarkMode,
-        viewBackgroundColor,
-        exportPadding,
-        exportScale: appState.exportScale,
-        exportEmbedScene: appState.exportEmbedScene && type === "svg",
+    const svgPromise = exportScene({
+      type: "svg",
+      data: {
+        elements,
+        appState,
+        files,
       },
-      files,
-      { exportingFrame },
-    );
+      config: {
+        ...config,
+        embedScene: appState.exportEmbedScene && type === "svg",
+        environment: renderEnvironment,
+      },
+    });
 
     if (type === "svg") {
       return fileSave(
@@ -164,11 +169,14 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, files, {
-    exportBackground,
-    viewBackgroundColor,
-    exportPadding,
-    exportingFrame,
+  const tempCanvas = exportScene({
+    type: "canvas",
+    data: {
+      elements,
+      appState,
+      files,
+    },
+    config: { ...config, environment: renderEnvironment },
   });
 
   if (type === "png") {

@@ -1,5 +1,4 @@
 {
-  "public": true,
   "headers": [
     {
       "source": "/(.*)",

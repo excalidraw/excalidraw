@@ -1,5 +1,6 @@
 import {
   clamp,
+  pointDistance,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -7,7 +8,6 @@ import {
   type Radians,
   bezierEquation,
   pointRotateRads,
-  pointDistance,
 } from "@excalidraw/math";
 
 import {
@@ -17,14 +17,16 @@ import {
   FRAME_STYLE,
   getFeatureFlag,
   invariant,
+  shouldRotateWithDiscreteAngle,
   THEME,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
-  getDiamondBaseCorners,
+  getAllMidpoints,
   FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
@@ -38,20 +40,18 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
-  maxBindingDistance_simple,
   isTextElement,
+  getTextElementWithAccuratePosition,
   LinearElementEditor,
+  maxBindingDistance_simple,
   getActiveTextElement,
-} from "@excalidraw/element";
-
-import { renderSelectionElement } from "@excalidraw/element";
-
-import {
   getElementsInGroup,
   getSelectedGroupIds,
   isSelectedViaGroup,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
+
+import { renderSelectionElement } from "@excalidraw/element";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 import {
@@ -77,6 +77,7 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
@@ -99,6 +100,7 @@ import {
   fillCircle,
   getNormalizedCanvasDimensions,
   strokeRectWithRotation_simple,
+  snapScrollToDevicePixels,
 } from "./helpers";
 
 import type {
@@ -112,6 +114,40 @@ import type {
   RenderableElementsMap,
 } from "../scene/types";
 
+// The interactive canvas used to be inverted in dark mode via a CSS filter
+// (`invert(93%) hue-rotate(180deg)`), which is prohibitively slow in browsers
+// that composite in software (e.g. Firefox on software WebRender). We now map
+// the colors in JS instead (see `applyDarkModeFilter`), so the dark-mode
+// values below are the post-filter equivalents of the previous ones.
+// ---------------------------------------------------------------------------
+
+const BINDING_HIGHLIGHT_RGB = {
+  [THEME.LIGHT]: "106, 189, 252",
+  [THEME.DARK]: "104, 182, 240",
+} as const;
+
+const BINDING_MIDPOINT_COLOR = {
+  [THEME.LIGHT]: "rgba(65, 65, 65, 0.5)",
+  [THEME.DARK]: "rgba(237, 237, 237, 0.8)",
+} as const;
+
+const SEARCH_MATCH_COLOR = {
+  [THEME.LIGHT]: {
+    focus: "rgba(255, 124, 0, 0.4)",
+    match: "rgba(255, 226, 0, 0.4)",
+  },
+  [THEME.DARK]: {
+    focus: "rgba(250, 123, 53, 0.4)",
+    match: "rgba(221, 181, 136, 0.4)",
+  },
+} as const;
+
+/** maps a light-mode UI color to its dark-mode counterpart when in dark mode */
+const getThemedColor = (
+  color: string,
+  theme: InteractiveCanvasAppState["theme"],
+) => applyDarkModeFilter(color, theme === THEME.DARK);
+
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -122,12 +158,7 @@ const renderElbowArrowMidPointHighlight = (
 
   invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
 
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(segmentMidPointHoveredCoords, context, appState);
-
-  context.restore();
 };
 
 const renderLinearElementPointHighlight = (
@@ -157,19 +188,22 @@ const renderLinearElementPointHighlight = (
     hoverPointIndex,
     elementsMap,
   );
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(point, context, appState);
-  context.restore();
 };
 
+/** draws the point marker in scene coordinates */
 const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
-  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  context.fillStyle = getThemedColor(
+    "rgba(105, 101, 219, 0.4)",
+    appState.theme,
+  );
 
   fillCircle(
     context,
@@ -178,17 +212,6 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
-};
-
-const renderFocusPointHighlight = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  focusPoint: GlobalPoint,
-) => {
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
-  highlightPoint(focusPoint, context, appState);
 
   context.restore();
 };
@@ -202,13 +225,22 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   isPhantomPoint: boolean,
   isOverlappingPoint: boolean,
 ) => {
-  context.strokeStyle = "#5e5ad8";
+  context.strokeStyle = getThemedColor("#5e5ad8", appState.theme);
   context.setLineDash([]);
-  context.fillStyle = "rgba(255, 255, 255, 0.9)";
+  context.fillStyle = getThemedColor(
+    "rgba(255, 255, 255, 0.9)",
+    appState.theme,
+  );
   if (isSelected) {
-    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+    context.fillStyle = getThemedColor(
+      "rgba(134, 131, 226, 0.9)",
+      appState.theme,
+    );
   } else if (isPhantomPoint) {
-    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+    context.fillStyle = getThemedColor(
+      "rgba(177, 151, 252, 0.7)",
+      appState.theme,
+    );
   }
 
   fillCircle(
@@ -229,6 +261,7 @@ const renderBindingHighlightForBindableElement_simple = (
   elementsMap: ElementsMap,
   appState: InteractiveCanvasAppState,
   pointerCoords: GlobalPoint | null,
+  angleLocked = false,
 ) => {
   const enclosingFrame =
     suggestedBinding.element.frameId &&
@@ -263,10 +296,7 @@ const renderBindingHighlightForBindableElement_simple = (
       context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`;
+      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`;
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -304,10 +334,7 @@ const renderBindingHighlightForBindableElement_simple = (
       context.lineWidth =
         clamp(1.75, suggestedBinding.element.strokeWidth, 4) /
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`;
+      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`;
 
       switch (suggestedBinding.element.type) {
         case "ellipse":
@@ -413,16 +440,22 @@ const renderBindingHighlightForBindableElement_simple = (
       break;
   }
 
+  // Draw midpoint indicators
   if (
     appState.isMidpointSnappingEnabled &&
+    !appState.gridModeEnabled &&
+    !angleLocked &&
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
-    // Draw midpoint indicators
     const linearElement = appState.selectedLinearElement;
     const arrow =
       linearElement?.elementId &&
-      LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
+      LinearElementEditor.getElement(linearElement.elementId, elementsMap);
+    const isElbow =
+      (arrow && isElbowArrow(arrow)) ||
+      (appState.activeTool.type === "arrow" &&
+        appState.currentItemArrowType === "elbow");
     const cursorIsInsideBindable =
       pointerCoords &&
       hitElementItself({
@@ -433,122 +466,56 @@ const renderBindingHighlightForBindableElement_simple = (
         overrideShouldTestInside: true,
       });
 
-    const isElbow =
-      (arrow && isElbowArrow(arrow)) ||
-      (appState.activeTool.type === "arrow" &&
-        appState.currentItemArrowType === "elbow");
-
+    // Simple arrows only snap to midpoints from outside the element
     if (!cursorIsInsideBindable || isElbow) {
       context.save();
 
-      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
+      const midpointRadius = 4 / appState.zoom.value;
+      const highlightedMidpoint = suggestedBinding.midPoint;
+      const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
 
-      let midpoints: GlobalPoint[];
-      if (suggestedBinding.element.type === "diamond") {
-        const center = elementCenterPoint(
-          suggestedBinding.element,
-          elementsMap,
-        );
-        midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
-          (curve) => {
-            const point = bezierEquation(curve, 0.5);
-            const rotatedPoint = pointRotateRads(
-              point,
-              center,
-              suggestedBinding.element.angle,
-            );
-
-            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-          },
-        );
-      } else {
-        const basePoints = [
-          {
-            x: suggestedBinding.element.width,
-            y: suggestedBinding.element.height / 2,
-          }, // RIGHT
-          {
-            x: suggestedBinding.element.width / 2,
-            y: suggestedBinding.element.height,
-          }, // BOTTOM
-          { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
-          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
-        ];
-        midpoints = basePoints.map((point) => {
-          const globalPoint = pointFrom<GlobalPoint>(
-            point.x + suggestedBinding.element.x,
-            point.y + suggestedBinding.element.y,
+      // Elbow arrows show all midpoints, simple arrows only the one closest to
+      // the pointer, once the pointer gets near it
+      let shownMidpoints = midpoints;
+      if (!isElbow) {
+        const threshold =
+          maxBindingDistance_simple(appState.zoom) +
+          suggestedBinding.element.strokeWidth / 2;
+        const closest =
+          pointerCoords &&
+          midpoints.reduce((a, b) =>
+            pointDistance(a, pointerCoords) <= pointDistance(b, pointerCoords)
+              ? a
+              : b,
           );
-          const rotatedPoint = pointRotateRads(
-            globalPoint,
-            center,
-            suggestedBinding.element.angle,
-          );
-          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-        });
+        shownMidpoints =
+          closest && pointDistance(closest, pointerCoords) <= threshold * 2
+            ? [closest]
+            : [];
       }
 
-      const hoveredMidpoint =
-        pointerCoords &&
-        midpoints.reduce(
-          (
-            closestIdx: {
-              idx: number;
-              distance: number;
-            },
-            point,
-            idx,
-          ) => {
-            const distance = pointDistance(point, pointerCoords);
-            if (idx === -1 || distance < closestIdx.distance) {
-              return { idx, distance };
-            }
-            return closestIdx;
-          },
-          {
-            idx: -1,
-            distance: Infinity,
-          },
-        );
-
-      const midpointRadius = 4 / appState.zoom.value;
-      const highlightThreshold =
-        maxBindingDistance_simple(appState.zoom) +
-        suggestedBinding.element.strokeWidth / 2;
-
-      midpoints.forEach((midpoint, idx) => {
-        const isHighlighted =
-          (!cursorIsInsideBindable || isElbow) &&
-          hoveredMidpoint?.idx === idx &&
-          hoveredMidpoint.distance <= highlightThreshold;
-
-        // also render midpoint if cursor close but not highlighted
-        // (for elbows, always show all points)
-        const isShown =
-          !isHighlighted &&
-          (isElbow ||
-            (idx === hoveredMidpoint?.idx &&
-              hoveredMidpoint.distance <= highlightThreshold * 2));
-
-        if (isHighlighted) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(3, 93, 161, 1)`
-              : `rgba(106, 189, 252, 1)`;
-
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        } else if (isShown) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.8)`
-              : `rgba(65, 65, 65, 0.5)`;
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
+      context.fillStyle = BINDING_MIDPOINT_COLOR[appState.theme];
+      for (const midpoint of shownMidpoints) {
+        if (highlightedMidpoint && pointsEqual(midpoint, highlightedMidpoint)) {
+          continue;
         }
-      });
+        context.beginPath();
+        context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+        context.fill();
+      }
+
+      if (highlightedMidpoint) {
+        context.fillStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`;
+        context.beginPath();
+        context.arc(
+          highlightedMidpoint[0],
+          highlightedMidpoint[1],
+          midpointRadius,
+          0,
+          2 * Math.PI,
+        );
+        context.fill();
+      }
 
       context.restore();
     }
@@ -604,10 +571,9 @@ const renderBindingHighlightForBindableElement_complex = (
       context.translate(element.x, element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${opacity})`
-          : `rgba(106, 189, 252, ${opacity})`;
+      context.strokeStyle = `rgba(${
+        BINDING_HIGHLIGHT_RGB[appState.theme]
+      }, ${opacity})`;
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -645,10 +611,9 @@ const renderBindingHighlightForBindableElement_complex = (
       context.lineWidth =
         clamp(2.5, element.strokeWidth * 1.75, 4) /
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${opacity / 2})`
-          : `rgba(106, 189, 252, ${opacity / 2})`;
+      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, ${
+        opacity / 2
+      })`;
 
       switch (element.type) {
         case "ellipse":
@@ -773,7 +738,7 @@ const renderBindingHighlightForBindableElement_complex = (
 
     const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
 
-    context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+    context.strokeStyle = getThemedColor("rgba(0, 0, 0, 0.2)", appState.theme);
     context.lineWidth = 1 / appState.zoom.value;
     context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
     context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
@@ -791,7 +756,7 @@ const renderBindingHighlightForBindableElement_complex = (
     context.stroke();
 
     // context.strokeStyle = "transparent";
-    context.fillStyle = "rgba(0, 0, 0, 0.04)";
+    context.fillStyle = getThemedColor("rgba(0, 0, 0, 0.04)", appState.theme);
     context.beginPath();
     context.ellipse(
       element.width / 2,
@@ -807,7 +772,12 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.restore();
 
-    if (appState.isMidpointSnappingEnabled) {
+    if (
+      appState.isMidpointSnappingEnabled &&
+      !appState.gridModeEnabled &&
+      (!app.lastPointerMoveEvent ||
+        !shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent))
+    ) {
       // Draw midpoint indicators
       context.save();
       context.translate(
@@ -867,10 +837,9 @@ const renderBindingHighlightForBindableElement_complex = (
         );
       });
 
-      context.fillStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${opacity})`
-          : `rgba(106, 189, 252, ${opacity})`;
+      context.fillStyle = `rgba(${
+        BINDING_HIGHLIGHT_RGB[appState.theme]
+      }, ${opacity})`;
 
       midpoints.forEach((midpoint) => {
         context.beginPath();
@@ -920,12 +889,16 @@ const renderBindingHighlightForBindableElement = (
         app.lastPointerMoveCoords.y,
       )
     : null;
+  const angleLocked =
+    !!app.lastPointerMoveEvent &&
+    shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent);
   renderBindingHighlightForBindableElement_simple(
     context,
     suggestedBinding,
     allElementsMap,
     appState,
     pointerCoords,
+    angleLocked,
   );
   context.restore();
 };
@@ -1009,7 +982,7 @@ const renderFrameHighlight = (
   const width = x2 - x1;
   const height = y2 - y1;
 
-  context.strokeStyle = "rgb(0,118,255)";
+  context.strokeStyle = getThemedColor("rgb(0,118,255)", appState.theme);
   context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
 
   context.save();
@@ -1032,10 +1005,13 @@ const renderFrameHighlight = (
 const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  elements: NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
-  const { colors = ["rgb(0,118,255)"], dashed = false } = config || {};
+  const {
+    colors = [getThemedColor("rgb(0,118,255)", appState.theme)],
+    dashed = false,
+  } = config || {};
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
   );
@@ -1211,7 +1187,10 @@ const renderFocusPointConnectionLine = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle = getThemedColor(
+    "rgba(134, 131, 226, 0.6)",
+    appState.theme,
+  );
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
 
@@ -1232,12 +1211,16 @@ const renderFocusPointCicle = (
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle = getThemedColor(
+    "rgba(134, 131, 226, 0.6)",
+    appState.theme,
+  );
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
-  context.fillStyle = isHovered
-    ? "rgba(134, 131, 226, 0.9)"
-    : "rgba(255, 255, 255, 0.9)";
+  context.fillStyle = getThemedColor(
+    isHovered ? "rgba(134, 131, 226, 0.9)" : "rgba(255, 255, 255, 0.9)",
+    appState.theme,
+  );
 
   fillCircle(
     context,
@@ -1308,7 +1291,7 @@ const renderFocusPointIndicator = ({
     linearState?.hoveredFocusPointBinding === type &&
     !linearState.draggedFocusPointBinding
   ) {
-    renderFocusPointHighlight(context, appState, focusPoint);
+    highlightPoint(focusPoint, context, appState);
   }
 
   // render focus point
@@ -1491,7 +1474,7 @@ const renderCropHandles = (
 };
 
 const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
@@ -1514,8 +1497,87 @@ const renderTextBox = (
   context.restore();
 };
 
+/**
+ * The text tool's hover affordance — what a click would act on (see
+ * `AppTextTool`): a dashed box around the text it would edit, the binding
+ * outline around the empty container it would label, or a point on the arrow
+ * anchor (free endpoint / midpoint label) it would attach text to.
+ *
+ * Purely presentational: `AppTextTool` keeps the state current at every event
+ * that can change it. The element lookup only guards against the element
+ * vanishing through channels no local event covers, e.g. a collaborator
+ * deleting it.
+ */
+const renderTextToolHover = (
+  app: AppClassProperties,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: NonDeletedSceneElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+) => {
+  const hover = appState.textToolHover!;
+  const element = elementsMap.get(hover.elementId);
+  if (!element || element.isDeleted) {
+    return;
+  }
+  switch (hover.type) {
+    case "text": {
+      if (isTextElement(element)) {
+        // the same subtle box as around a wrapped text being edited; a
+        // label's stored coords can be stale, so derive them
+        renderTextBox(
+          getTextElementWithAccuratePosition(element, elementsMap),
+          context,
+          appState,
+          selectionColor,
+        );
+      }
+      return;
+    }
+    case "container": {
+      if (isBindableElement(element)) {
+        // the outline arrow binding shows, minus its animation and its
+        // `isBindingEnabled` gate: the resolved target already accounts for
+        // the modifier, independently of the arrow-binding preference
+        context.save();
+        context.translate(appState.scrollX, appState.scrollY);
+        renderBindingHighlightForBindableElement_simple(
+          context,
+          { element },
+          elementsMap,
+          appState,
+          app.lastPointerMoveCoords
+            ? pointFrom<GlobalPoint>(
+                app.lastPointerMoveCoords.x,
+                app.lastPointerMoveCoords.y,
+              )
+            : null,
+        );
+        context.restore();
+      }
+      return;
+    }
+    case "arrow": {
+      if (isArrowElement(element)) {
+        const point =
+          hover.anchor === "label"
+            ? LinearElementEditor.getBoundTextElementCenter(
+                element,
+                elementsMap,
+              )
+            : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                hover.anchor === "start" ? 0 : -1,
+                elementsMap,
+              );
+        highlightPoint(point, context, appState);
+      }
+    }
+  }
+};
+
 const renderResetAutoResizeHandle = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
@@ -1557,20 +1619,22 @@ const _renderInteractiveScene = ({
   selectedElements,
   allElementsMap,
   scale,
-  appState,
+  appState: unsnappedAppState,
   renderConfig,
   editorInterface,
   animationState,
   deltaTime,
 }: InteractiveSceneRenderConfig): {
   scrollBars?: ReturnType<typeof getScrollBars>;
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   animationState?: typeof animationState;
 } => {
   if (canvas === null) {
-    return { atLeastOneVisibleElement: false, elementsMap };
+    return {};
   }
+
+  // the same whole-device-pixel scroll the static scene draws at, so the
+  // overlays sit exactly on the content
+  const appState = snapScrollToDevicePixels(unsnappedAppState, scale);
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -1675,6 +1739,16 @@ const _renderInteractiveScene = ({
     };
   }
 
+  if (appState.textToolHover) {
+    renderTextToolHover(
+      app,
+      context,
+      appState,
+      allElementsMap,
+      renderConfig.selectionColor,
+    );
+  }
+
   if (appState.frameToHighlight) {
     renderFrameHighlight(
       context,
@@ -1693,10 +1767,15 @@ const _renderInteractiveScene = ({
     const elements = element
       ? [element]
       : getElementsInGroup(allElementsMap, appState.activeLockedId);
-    renderElementsBoxHighlight(context, appState, elements, {
-      colors: ["#ced4da"],
-      dashed: true,
-    });
+    renderElementsBoxHighlight(
+      context,
+      appState,
+      elements as NonDeletedExcalidrawElement[], // We don't typecheck runtime because of performance
+      {
+        colors: [getThemedColor("#ced4da", appState.theme)],
+        dashed: true,
+      },
+    );
   }
 
   const isFrameSelected = selectedElements.some((element) =>
@@ -1782,11 +1861,14 @@ const _renderInteractiveScene = ({
       renderLinearPointHandles(
         context,
         appState,
-        selectedElements[0] as ExcalidrawLinearElement,
+        selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
         elementsMap,
       );
     }
-    const selectionColor = renderConfig.selectionColor || "#000";
+    const selectionColor =
+      renderConfig.selectionColor || getThemedColor("#000", appState.theme);
+    const lockedSelectionColor = getThemedColor("#ced4da", appState.theme);
+    const groupSelectionColor = getThemedColor("#000", appState.theme);
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
@@ -1842,7 +1924,9 @@ const _renderInteractiveScene = ({
             y1,
             x2,
             y2,
-            selectionColors: element.locked ? ["#ced4da"] : selectionColors,
+            selectionColors: element.locked
+              ? [lockedSelectionColor]
+              : selectionColors,
             dashed: !!remoteClients || element.locked,
             cx,
             cy,
@@ -1868,8 +1952,8 @@ const _renderInteractiveScene = ({
           y1,
           y2,
           selectionColors: groupElements.some((el) => el.locked)
-            ? ["#ced4da"]
-            : ["#000"],
+            ? [lockedSelectionColor]
+            : [groupSelectionColor],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
@@ -1895,7 +1979,7 @@ const _renderInteractiveScene = ({
     context.translate(appState.scrollX, appState.scrollY);
 
     if (selectedElements.length === 1) {
-      context.fillStyle = "#fff";
+      context.fillStyle = getThemedColor("#fff", appState.theme);
       const transformHandles = getTransformHandles(
         selectedElements[0],
         appState.zoom,
@@ -1940,7 +2024,7 @@ const _renderInteractiveScene = ({
     ) {
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
-      context.fillStyle = "#fff";
+      context.fillStyle = getThemedColor("#fff", appState.theme);
       const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
@@ -1995,17 +2079,8 @@ const _renderInteractiveScene = ({
       );
 
       context.save();
-      if (appState.theme === THEME.LIGHT) {
-        if (focus) {
-          context.fillStyle = "rgba(255, 124, 0, 0.4)";
-        } else {
-          context.fillStyle = "rgba(255, 226, 0, 0.4)";
-        }
-      } else if (focus) {
-        context.fillStyle = "rgba(229, 82, 0, 0.4)";
-      } else {
-        context.fillStyle = "rgba(99, 52, 0, 0.4)";
-      }
+      context.fillStyle =
+        SEARCH_MATCH_COLOR[appState.theme][focus ? "focus" : "match"];
 
       const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
 
@@ -2050,8 +2125,11 @@ const _renderInteractiveScene = ({
     );
 
     context.save();
-    context.fillStyle = SCROLLBAR_COLOR;
-    context.strokeStyle = "rgba(255,255,255,0.8)";
+    context.fillStyle = getThemedColor(SCROLLBAR_COLOR, appState.theme);
+    context.strokeStyle = getThemedColor(
+      "rgba(255,255,255,0.8)",
+      appState.theme,
+    );
     [scrollBars.horizontal, scrollBars.vertical].forEach((scrollBar) => {
       if (scrollBar) {
         roundRect(
@@ -2069,8 +2147,6 @@ const _renderInteractiveScene = ({
 
   return {
     scrollBars,
-    atLeastOneVisibleElement: visibleElements.length > 0,
-    elementsMap,
     animationState: nextAnimationState,
   };
 };

@@ -5,9 +5,12 @@ import { getCommonBoundingBox } from "./bounds";
 
 import { getSelectedElementsByGroup } from "./groups";
 
+import { getNonDeletedElements } from ".";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
-import type { ElementsMap, ExcalidrawElement } from "./types";
+import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
 
 export interface Distribution {
   space: "between";
@@ -15,12 +18,14 @@ export interface Distribution {
 }
 
 export const distributeElements = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   distribution: Distribution,
   appState: Readonly<AppState>,
   scene: Scene,
-): ExcalidrawElement[] => {
+  /** measures the labels of the bound arrows the distribution moves */
+  renderEnvironment?: RenderEnvironment,
+): NonDeletedExcalidrawElement[] => {
   const [start, mid, end, extent] =
     distribution.axis === "x"
       ? (["minX", "midX", "maxX", "width"] as const)
@@ -32,6 +37,7 @@ export const distributeElements = (
     elementsMap,
     appState,
   )
+    .map(getNonDeletedElements) // Nothing to distribute on deleted elements
     .map((group) => [group, getCommonBoundingBox(group)] as const)
     .sort((a, b) => a[1][mid] - b[1][mid]);
 
@@ -76,6 +82,7 @@ export const distributeElements = (
         });
         updateBoundElements(element, scene, {
           simultaneouslyUpdated: group,
+          renderEnvironment,
         });
         return updatedElement;
       });
@@ -104,6 +111,7 @@ export const distributeElements = (
       });
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: group,
+        renderEnvironment,
       });
       return updatedElement;
     });

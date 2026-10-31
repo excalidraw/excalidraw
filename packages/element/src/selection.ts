@@ -1,4 +1,4 @@
-import { arrayToMap, isShallowEqual, type Bounds } from "@excalidraw/common";
+import { isShallowEqual, type Bounds } from "@excalidraw/common";
 
 import type {
   AppState,
@@ -11,13 +11,11 @@ import { isElementInViewport } from "./sizeHelpers";
 import {
   isBoundToContainer,
   isFrameLikeElement,
-  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import { getFrameChildren } from "./frame";
 
-import { LinearElementEditor } from "./linearElementEditor";
-import { selectGroupsForSelectedElements } from "./groups";
+import { isNonDeletedElement } from ".";
 
 import type {
   ElementsMap,
@@ -28,9 +26,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
-const shouldIgnoreElementFromSelection = (
-  element: NonDeletedExcalidrawElement,
-) => element.locked || isBoundToContainer(element);
+export const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
+  element.locked || isBoundToContainer(element);
 
 const excludeElementsFromFrames = <T extends ExcalidrawElement>(
   selectedElements: readonly T[],
@@ -66,14 +63,14 @@ export const excludeElementsInFramesFromSelection = <
   return excludeElementsFromFrames(selectedElements, framesInSelection);
 };
 
-export const getElementsWithinSelection = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  selection: NonDeletedExcalidrawElement,
+export const getElementsWithinSelection = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+  selection: ExcalidrawElement,
   elementsMap: ElementsMap,
   // TODO remove (this flag is effectively unused AFAIK)
   excludeElementsInFrames: boolean = true,
   boxSelectionMode: BoxSelectionMode = "contain",
-): NonDeletedExcalidrawElement[] => {
+): T[] => {
   const [selectionStartX, selectionStartY, selectionEndX, selectionEndY] =
     getElementAbsoluteCoords(selection, elementsMap);
   const selectionX1 = Math.min(selectionStartX, selectionEndX);
@@ -97,9 +94,11 @@ export const getElementsWithinSelection = (
   });
 };
 
-export const getVisibleAndNonSelectedElements = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  selectedElements: readonly NonDeletedExcalidrawElement[],
+export const getVisibleAndNonSelectedElements = <
+  T extends NonDeletedExcalidrawElement,
+>(
+  elements: readonly T[],
+  selectedElements: readonly ExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
@@ -164,30 +163,40 @@ export const getSelectedElements = (
   },
 ) => {
   const addedElements = new Set<ExcalidrawElement["id"]>();
-  const selectedElements: ExcalidrawElement[] = [];
+  // selection can only contain non-deleted elements
+  const selectedElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements.values()) {
     if (appState.selectedElementIds[element.id]) {
-      selectedElements.push(element);
-      addedElements.add(element.id);
+      if (isNonDeletedElement(element)) {
+        selectedElements.push(element as NonDeletedExcalidrawElement);
+        addedElements.add(element.id);
+      } else {
+        console.error(
+          "[NONDELETED][INVARIANT] getSelectedElements skipping deleted selected element which should not be in the selection",
+        );
+      }
       continue;
     }
     if (
       opts?.includeBoundTextElement &&
       isBoundToContainer(element) &&
+      isNonDeletedElement(element) &&
       appState.selectedElementIds[element?.containerId]
     ) {
-      selectedElements.push(element);
+      selectedElements.push(element as NonDeletedExcalidrawElement);
       addedElements.add(element.id);
       continue;
     }
   }
 
   if (opts?.includeElementsInFrames) {
-    const elementsToInclude: ExcalidrawElement[] = [];
+    const elementsToInclude: NonDeletedExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       if (isFrameLikeElement(element)) {
         getFrameChildren(elements, element.id).forEach(
-          (e) => !addedElements.has(e.id) && elementsToInclude.push(e),
+          (e) =>
+            !addedElements.has(e.id) &&
+            elementsToInclude.push(e as NonDeletedExcalidrawElement),
         );
       }
       elementsToInclude.push(element);
@@ -203,12 +212,15 @@ export const getTargetElements = (
   elements: ElementsMapOrArray,
   appState: Pick<
     AppState,
-    "selectedElementIds" | "editingTextElement" | "newElement"
+    "selectedElementIds" | "editingTextElement" | "newElement" | "activeTool"
   >,
 ) =>
   appState.editingTextElement
     ? [appState.editingTextElement]
-    : appState.newElement
+    : // the drawShape recognition preview in `newElement` is not a real
+    // in-progress element — targeting it would make the styles panel track
+    // whatever shape is currently recognized instead of the tool defaults
+    appState.newElement && appState.activeTool.type !== "autoshape"
     ? [appState.newElement]
     : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
@@ -227,52 +239,6 @@ export const makeNextSelectedElementIds = (
   }
 
   return nextSelectedElementIds;
-};
-
-const _getLinearElementEditor = (
-  targetElements: readonly ExcalidrawElement[],
-  allElements: readonly NonDeletedExcalidrawElement[],
-) => {
-  const linears = targetElements.filter(isLinearElement);
-  if (linears.length === 1) {
-    const linear = linears[0];
-    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
-    const onlySingleLinearSelected = targetElements.every(
-      (el) => el.id === linear.id || boundElements.includes(el.id),
-    );
-
-    if (onlySingleLinearSelected) {
-      return new LinearElementEditor(linear, arrayToMap(allElements));
-    }
-  }
-
-  return null;
-};
-
-export const getSelectionStateForElements = (
-  targetElements: readonly ExcalidrawElement[],
-  allElements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-) => {
-  return {
-    selectedLinearElement: _getLinearElementEditor(targetElements, allElements),
-    ...selectGroupsForSelectedElements(
-      {
-        editingGroupId: appState.editingGroupId,
-        selectedElementIds: excludeElementsInFramesFromSelection(
-          targetElements,
-        ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
-          if (!isBoundToContainer(element)) {
-            acc[element.id] = true;
-          }
-          return acc;
-        }, {}),
-      },
-      allElements,
-      appState,
-      null,
-    ),
-  };
 };
 
 /**

@@ -20,6 +20,8 @@ interface NewElementCanvasProps {
   scale: number;
   rc: RoughCanvas;
   renderConfig: StaticCanvasRenderConfig;
+  /** CSS opacity of the whole canvas — a translucent preview of a finished element */
+  opacity?: number;
 }
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
@@ -49,6 +51,7 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       style={{
         width: props.appState.width,
         height: props.appState.height,
+        opacity: props.opacity,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}

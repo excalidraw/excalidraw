@@ -10,7 +10,6 @@ import {
   getBindingGap,
   getGlobalFixedPointForBindableElement,
   isBindingEnabled,
-  maxBindingDistance_simple,
   unbindBindingElement,
   updateBoundPoint,
 } from "../binding";
@@ -20,13 +19,15 @@ import {
   isElbowArrow,
 } from "../typeChecks";
 import { LinearElementEditor } from "../linearElementEditor";
-import { getHoveredElementForFocusPoint, hitElementItself } from "../collision";
+import { getHoveredElementForBinding, hitElementItself } from "../collision";
 import { moveArrowAboveBindable } from "../zindex";
 
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
+  NonDeleted,
+  FixedPointBinding,
   NonDeletedSceneElementsMap,
   PointsPositionUpdates,
 } from "../types";
@@ -92,7 +93,7 @@ export const isFocusPointVisible = (
       element: bindableElement,
       elementsMap,
       point: focusPoint,
-      threshold: getBindingGap(bindableElement, arrow),
+      threshold: getBindingGap(bindableElement),
       overrideShouldTestInside: true,
     })
   );
@@ -100,7 +101,7 @@ export const isFocusPointVisible = (
 
 // Updates the arrow endpoints in "orbit" configuration
 const focusPointUpdate = (
-  arrow: ExcalidrawArrowElement,
+  arrow: NonDeleted<ExcalidrawArrowElement>,
   bindableElement: ExcalidrawBindableElement | null,
   isStartBinding: boolean,
   elementsMap: NonDeletedSceneElementsMap,
@@ -110,10 +111,17 @@ const focusPointUpdate = (
 ) => {
   const pointUpdates = new Map();
 
+  const originalAdjacentBinding =
+    appState.selectedLinearElement?.initialState
+      .arrowOtherEndpointInitialBinding;
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
   const adjacentBindingField = isStartBinding ? "endBinding" : "startBinding";
   let currentBinding = arrow[bindingField];
-  let adjacentBinding = arrow[adjacentBindingField];
+  let adjacentBinding =
+    originalAdjacentBinding?.mode === "orbit" &&
+    arrow[adjacentBindingField]?.mode === "inside"
+      ? originalAdjacentBinding
+      : arrow[adjacentBindingField];
 
   // Update the dragged focus point related end
   if (currentBinding && bindableElement) {
@@ -163,7 +171,7 @@ const focusPointUpdate = (
       // Same shape bound on both ends
       const boundToSameElementAfterUpdate =
         bindableElement && adjacentBinding.elementId === bindableElement.id;
-      if (switchToInsideBinding || boundToSameElementAfterUpdate) {
+      if (boundToSameElementAfterUpdate) {
         adjacentBinding = {
           ...adjacentBinding,
           mode: "inside",
@@ -212,7 +220,7 @@ export const handleFocusPointDrag = (
   const arrow = LinearElementEditor.getElement(
     linearElementEditor.elementId,
     elementsMap,
-  ) as any;
+  );
 
   // Sanity checks
   if (
@@ -234,12 +242,11 @@ export const handleFocusPointDrag = (
     pointerCoords.y - offsetY,
   );
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
-  const hit = getHoveredElementForFocusPoint(
+  const hit = getHoveredElementForBinding(
     point,
-    arrow,
     scene.getNonDeletedElements(),
     elementsMap,
-    maxBindingDistance_simple(appState.zoom),
+    appState.zoom,
   );
 
   // Hovering a bindable element
@@ -270,6 +277,7 @@ export const handleFocusPointDrag = (
         newMode || "orbit",
         linearElementEditor.draggedFocusPointBinding,
         scene,
+        appState.zoom,
         point,
       );
     }
@@ -339,6 +347,7 @@ export const handleFocusPointPointerDown = (
 ): {
   hitFocusPoint: "start" | "end" | null;
   pointerOffset: { x: number; y: number };
+  arrowOtherEndpointInitialBinding: FixedPointBinding | null;
 } => {
   const pointerPos = pointFrom(
     pointerDownState.origin.x,
@@ -376,6 +385,7 @@ export const handleFocusPointPointerDown = (
             x: pointerPos[0] - focusPoint[0],
             y: pointerPos[1] - focusPoint[1],
           },
+          arrowOtherEndpointInitialBinding: arrow.endBinding,
         };
       }
     }
@@ -411,6 +421,7 @@ export const handleFocusPointPointerDown = (
             x: pointerPos[0] - focusPoint[0],
             y: pointerPos[1] - focusPoint[1],
           },
+          arrowOtherEndpointInitialBinding: arrow.startBinding,
         };
       }
     }
@@ -419,6 +430,7 @@ export const handleFocusPointPointerDown = (
   return {
     hitFocusPoint: null,
     pointerOffset: { x: 0, y: 0 },
+    arrowOtherEndpointInitialBinding: null,
   };
 };
 
@@ -483,6 +495,10 @@ export const handleFocusPointPointerUp = (
       ],
     });
   }
+
+  return {
+    arrowOtherEndpointInitialBinding: null,
+  };
 };
 
 export const handleFocusPointHover = (

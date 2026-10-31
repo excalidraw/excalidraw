@@ -62,12 +62,12 @@ const defragmentGroups = (elements: readonly ExcalidrawElement[]) => {
  * original z-index of container (i.e. it moves bound text elements after
  * containers).
  */
-const normalizeBoundElementsOrder = (
-  elements: readonly ExcalidrawElement[],
+export const normalizeBoundElementsOrder = <T extends ExcalidrawElement>(
+  elements: readonly T[],
 ) => {
   const elementsMap = arrayToMap(elements);
 
-  const sortedElements = new Set<ExcalidrawElement>();
+  const sortedElements = new Set<T>();
 
   for (const element of elements) {
     if (sortedElements.has(element)) {

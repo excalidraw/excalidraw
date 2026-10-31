@@ -2,13 +2,12 @@ import { Popover } from "radix-ui";
 import clsx from "clsx";
 import React, { useLayoutEffect } from "react";
 
-import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
-
-import type { MarkRequired } from "@excalidraw/common/utility-types";
+import { isShallowEqual } from "@excalidraw/common";
 
 import { t } from "../i18n";
 
 import { useExcalidrawActionManager } from "./App";
+import { chevronDownIcon } from "./icons";
 import { Island } from "./Island";
 import { QuickSearch } from "./QuickSearch";
 import { ScrollableList } from "./ScrollableList";
@@ -26,11 +25,16 @@ export type GoToCollaboratorComponentProps = {
   isBeingFollowed: boolean;
 };
 
-/** collaborator user id or socket id (fallback) */
-type ClientId = string & { _brand: "UserId" };
-
 const DEFAULT_MAX_AVATARS = 4;
 const SHOW_COLLABORATORS_FILTER_AT = 8;
+
+// avatar (28px) + gap (10px)
+const AVATAR_SLOT_WIDTH = 38;
+// the current user's pill (avatar + chevron + its own padding/border) is
+// wider than a plain avatar — reserving this extra width for it keeps it
+// from ever being the item that tips the row over and wraps onto its own
+// line (chevron 15px + pill's right padding 4px + pill's border 2px)
+const PILL_EXTRA_WIDTH = 21;
 
 const ConditionalTooltipWrapper = ({
   shouldWrap,
@@ -90,6 +94,7 @@ type UserListUserObject = Pick<
   | "isInCall"
   | "isSpeaking"
   | "isMuted"
+  | "isCurrentUser"
 >;
 
 type UserListProps = {
@@ -97,6 +102,9 @@ type UserListProps = {
   mobile?: boolean;
   collaborators: Map<SocketId, UserListUserObject>;
   userToFollow: SocketId | null;
+  currentUserControls?:
+    | React.ReactNode
+    | ((isMobile: boolean) => React.ReactNode);
 };
 
 const collaboratorComparatorKeys = [
@@ -107,55 +115,60 @@ const collaboratorComparatorKeys = [
   "isInCall",
   "isSpeaking",
   "isMuted",
+  "isCurrentUser",
 ] as const;
 
 export const UserList = React.memo(
-  ({ className, mobile, collaborators, userToFollow }: UserListProps) => {
+  ({
+    className,
+    mobile,
+    collaborators,
+    userToFollow,
+    currentUserControls,
+  }: UserListProps) => {
     const actionManager = useExcalidrawActionManager();
 
-    const uniqueCollaboratorsMap = new Map<
-      ClientId,
-      MarkRequired<Collaborator, "socketId">
-    >();
+    const resolvedCurrentUserControls =
+      typeof currentUserControls === "function"
+        ? currentUserControls(!!mobile)
+        : currentUserControls;
 
-    collaborators.forEach((collaborator, socketId) => {
-      const userId = (collaborator.id || socketId) as ClientId;
-      uniqueCollaboratorsMap.set(
-        // filter on user id, else fall back on unique socketId
-        userId,
-        { ...collaborator, socketId },
-      );
-    });
-
-    const uniqueCollaboratorsArray = Array.from(
-      uniqueCollaboratorsMap.values(),
+    const collaboratorsArray = Array.from(
+      collaborators,
+      ([socketId, collaborator]) => ({
+        ...collaborator,
+        socketId,
+      }),
     ).filter((collaborator) => collaborator.username?.trim());
+    const currentUser = collaboratorsArray.find((c) => c.isCurrentUser);
+    const otherCollaborators = collaboratorsArray.filter(
+      (c) => !c.isCurrentUser,
+    );
 
     const [searchTerm, setSearchTerm] = React.useState("");
-    const filteredCollaborators = uniqueCollaboratorsArray.filter(
-      (collaborator) =>
-        collaborator.username?.toLowerCase().includes(searchTerm),
+    const filteredCollaborators = collaboratorsArray.filter((collaborator) =>
+      collaborator.username?.toLowerCase().includes(searchTerm),
     );
 
     const userListWrapper = React.useRef<HTMLDivElement | null>(null);
 
     useLayoutEffect(() => {
       if (userListWrapper.current) {
-        const updateMaxAvatars = (width: number) => {
-          const maxAvatars = Math.max(1, Math.min(8, Math.floor(width / 38)));
-          setMaxAvatars(maxAvatars);
+        const ownerWindow = userListWrapper.current.ownerDocument.defaultView;
+        const updateWrapperWidth = (width: number) => {
+          setWrapperWidth(width);
         };
 
-        updateMaxAvatars(userListWrapper.current.clientWidth);
+        updateWrapperWidth(userListWrapper.current.clientWidth);
 
-        if (!supportsResizeObserver) {
+        if (!ownerWindow || typeof ownerWindow.ResizeObserver !== "function") {
           return;
         }
 
-        const resizeObserver = new ResizeObserver((entries) => {
+        const resizeObserver = new ownerWindow.ResizeObserver((entries) => {
           for (const entry of entries) {
             const { width } = entry.contentRect;
-            updateMaxAvatars(width);
+            updateWrapperWidth(width);
           }
         });
 
@@ -167,98 +180,148 @@ export const UserList = React.memo(
       }
     }, []);
 
-    const [maxAvatars, setMaxAvatars] = React.useState(DEFAULT_MAX_AVATARS);
-
-    const firstNCollaborators = uniqueCollaboratorsArray.slice(
-      0,
-      maxAvatars - 1,
+    const [wrapperWidth, setWrapperWidth] = React.useState(
+      DEFAULT_MAX_AVATARS * AVATAR_SLOT_WIDTH,
     );
 
-    const firstNAvatarsJSX = firstNCollaborators.map((collaborator) =>
-      renderCollaborator({
+    // the current user's avatar is always shown, reserved as the last
+    // slot — it's the single entry point for the collaborators +
+    // currentUserControls dropdown, so it's never hidden by/counted in
+    // overflow. Its width (wider than a plain avatar) is carved out of the
+    // available width up front so it always shares a row with the other
+    // avatars — if there's only room for the pill itself, it renders alone
+    // rather than wrapping onto its own line.
+    const availableWidth = currentUser
+      ? wrapperWidth - PILL_EXTRA_WIDTH
+      : wrapperWidth;
+    const totalSlots = Math.max(
+      1,
+      Math.min(8, Math.floor(availableWidth / AVATAR_SLOT_WIDTH)),
+    );
+    const otherSlots = currentUser ? Math.max(0, totalSlots - 1) : totalSlots;
+    const visibleOthers = otherCollaborators.slice(0, otherSlots);
+
+    const firstNCollaborators = currentUser
+      ? [...visibleOthers, currentUser]
+      : visibleOthers;
+
+    const firstNAvatarsJSX = firstNCollaborators.map((collaborator) => {
+      const avatarJSX = renderCollaborator({
         actionManager,
         collaborator,
         socketId: collaborator.socketId,
         shouldWrapWithTooltip: true,
         isBeingFollowed: collaborator.socketId === userToFollow,
-      }),
-    );
+      });
+
+      if (!collaborator.isCurrentUser) {
+        return avatarJSX;
+      }
+
+      // current user's avatar is the single entry point for the "who's
+      // here" list + currentUserControls dropdown
+      return (
+        <Popover.Root key={collaborator.socketId}>
+          <Popover.Trigger asChild>
+            <div className="UserList__pill">
+              {avatarJSX}
+              <div className="UserList__pill-chevron">{chevronDownIcon}</div>
+            </div>
+          </Popover.Trigger>
+          <Popover.Content
+            className="focus-visible-none"
+            style={{
+              zIndex: 2,
+              width: "15rem",
+              textAlign: "left",
+            }}
+            align="end"
+            sideOffset={10}
+          >
+            <Island padding={2}>
+              {collaboratorsArray.length >= SHOW_COLLABORATORS_FILTER_AT && (
+                <QuickSearch
+                  placeholder={t("quickSearch.placeholder")}
+                  onChange={setSearchTerm}
+                />
+              )}
+              <ScrollableList
+                className={"dropdown-menu UserList__collaborators"}
+                placeholder={t("userList.empty")}
+              >
+                {/* The list checks for `Children.count()`, hence defensively returning empty list */}
+                {filteredCollaborators.length > 0
+                  ? [
+                      <div key="hint" className="hint">
+                        {t("userList.hint.text")}
+                      </div>,
+                      filteredCollaborators.map((c) =>
+                        renderCollaborator({
+                          actionManager,
+                          collaborator: c,
+                          socketId: c.socketId,
+                          withName: true,
+                          isBeingFollowed: c.socketId === userToFollow,
+                        }),
+                      ),
+                    ]
+                  : []}
+              </ScrollableList>
+              {resolvedCurrentUserControls && (
+                <>
+                  <div className="UserList__menu-divider" />
+                  <Popover.Close asChild>
+                    <div className="dropdown-menu">
+                      {resolvedCurrentUserControls}
+                    </div>
+                  </Popover.Close>
+                </>
+              )}
+              <Popover.Arrow
+                width={20}
+                height={10}
+                style={{
+                  fill: "var(--popup-bg-color)",
+                  filter: "drop-shadow(rgba(0, 0, 0, 0.05) 0px 3px 2px)",
+                }}
+              />
+            </Island>
+          </Popover.Content>
+        </Popover.Root>
+      );
+    });
 
     return mobile ? (
       <div className={clsx("UserList UserList_mobile", className)}>
-        {uniqueCollaboratorsArray.map((collaborator) =>
-          renderCollaborator({
-            actionManager,
-            collaborator,
-            socketId: collaborator.socketId,
-            shouldWrapWithTooltip: true,
-            isBeingFollowed: collaborator.socketId === userToFollow,
-          }),
+        <div className="UserList_mobile__avatars">
+          {collaboratorsArray.map((collaborator) =>
+            renderCollaborator({
+              actionManager,
+              collaborator,
+              socketId: collaborator.socketId,
+              shouldWrapWithTooltip: true,
+              isBeingFollowed: collaborator.socketId === userToFollow,
+            }),
+          )}
+        </div>
+        {resolvedCurrentUserControls && (
+          <>
+            <div className="UserList__menu-divider" />
+            {resolvedCurrentUserControls}
+          </>
         )}
       </div>
     ) : (
       <div className="UserList__wrapper" ref={userListWrapper}>
         <div
           className={clsx("UserList", className)}
-          style={{ [`--max-avatars` as any]: maxAvatars }}
+          style={{
+            [`--max-avatars` as any]:
+              firstNCollaborators.length +
+              (currentUser ? PILL_EXTRA_WIDTH / AVATAR_SLOT_WIDTH : 0),
+          }}
         >
           {firstNAvatarsJSX}
-
-          {uniqueCollaboratorsArray.length > maxAvatars - 1 && (
-            <Popover.Root>
-              <Popover.Trigger className="UserList__more">
-                +{uniqueCollaboratorsArray.length - maxAvatars + 1}
-              </Popover.Trigger>
-              <Popover.Content
-                style={{
-                  zIndex: 2,
-                  width: "15rem",
-                  textAlign: "left",
-                }}
-                align="end"
-                sideOffset={10}
-              >
-                <Island padding={2}>
-                  {uniqueCollaboratorsArray.length >=
-                    SHOW_COLLABORATORS_FILTER_AT && (
-                    <QuickSearch
-                      placeholder={t("quickSearch.placeholder")}
-                      onChange={setSearchTerm}
-                    />
-                  )}
-                  <ScrollableList
-                    className={"dropdown-menu UserList__collaborators"}
-                    placeholder={t("userList.empty")}
-                  >
-                    {/* The list checks for `Children.count()`, hence defensively returning empty list */}
-                    {filteredCollaborators.length > 0
-                      ? [
-                          <div className="hint">{t("userList.hint.text")}</div>,
-                          filteredCollaborators.map((collaborator) =>
-                            renderCollaborator({
-                              actionManager,
-                              collaborator,
-                              socketId: collaborator.socketId,
-                              withName: true,
-                              isBeingFollowed:
-                                collaborator.socketId === userToFollow,
-                            }),
-                          ),
-                        ]
-                      : []}
-                  </ScrollableList>
-                  <Popover.Arrow
-                    width={20}
-                    height={10}
-                    style={{
-                      fill: "var(--popup-bg-color)",
-                      filter: "drop-shadow(rgba(0, 0, 0, 0.05) 0px 3px 2px)",
-                    }}
-                  />
-                </Island>
-              </Popover.Content>
-            </Popover.Root>
-          )}
         </div>
       </div>
     );
@@ -268,7 +331,8 @@ export const UserList = React.memo(
       prev.collaborators.size !== next.collaborators.size ||
       prev.mobile !== next.mobile ||
       prev.className !== next.className ||
-      prev.userToFollow !== next.userToFollow
+      prev.userToFollow !== next.userToFollow ||
+      prev.currentUserControls !== next.currentUserControls
     ) {
       return false;
     }

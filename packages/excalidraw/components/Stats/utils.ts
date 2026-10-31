@@ -2,6 +2,7 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
   getBoundTextElement,
+  getNonDeletedElements,
   isBindingElement,
   unbindBindingElement,
 } from "@excalidraw/element";
@@ -26,7 +27,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { Scene } from "@excalidraw/element";
+import type { RenderEnvironment, Scene } from "@excalidraw/element";
 
 import type { AppState } from "../../types";
 
@@ -113,11 +114,13 @@ export const newOrigin = (
 export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
-  originalElement: ExcalidrawElement,
+  originalElement: NonDeletedExcalidrawElement,
   scene: Scene,
   appState: AppState,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
+  /** measures the labels of the bound arrows the move moves */
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (
     isBindingElement(originalElement) &&
@@ -166,7 +169,7 @@ export const moveElement = (
     },
     { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, scene, appState);
+  updateBindings(latestElement, scene, appState, { renderEnvironment });
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -225,7 +228,8 @@ export const moveElement = (
         { informMutation: shouldInformMutation, isDragging: false },
       );
       updateBindings(latestChildElement, scene, appState, {
-        simultaneouslyUpdated: originalChildren,
+        simultaneouslyUpdated: getNonDeletedElements(originalChildren),
+        renderEnvironment,
       });
     });
   }

@@ -1,6 +1,6 @@
-import { KEYS, invariant, toBrandedType } from "@excalidraw/common";
+import { invariant, toBrandedType, type Bounds } from "@excalidraw/common";
 
-import { type GlobalPoint, pointFrom, type LocalPoint } from "@excalidraw/math";
+import { clamp, pointFrom, PRECISION } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -9,31 +9,28 @@ import type {
 
 import { bindBindingElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
-import {
-  HEADING_DOWN,
-  HEADING_LEFT,
-  HEADING_RIGHT,
-  HEADING_UP,
-  compareHeading,
-  headingForPointFromElement,
-  type Heading,
-} from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
-import { newArrowElement, newElement } from "./newElement";
+import {
+  newArrowElement,
+  newElement,
+  newStickyNoteElement,
+} from "./newElement";
 import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,
-  isElbowArrow,
+  isArrowElement,
   isFrameElement,
   isFlowchartNodeElement,
 } from "./typeChecks";
 import {
+  type NonDeleted,
   type ElementsMap,
   type ExcalidrawBindableElement,
   type ExcalidrawElement,
   type ExcalidrawFlowchartNodeElement,
+  type NonDeletedExcalidrawElement,
   type NonDeletedSceneElementsMap,
   type Ordered,
   type OrderedExcalidrawElement,
@@ -41,318 +38,265 @@ import {
 
 import type { Scene } from "./Scene";
 
-type LinkDirection = "up" | "right" | "down" | "left";
+export type LinkDirection = "up" | "right" | "down" | "left";
 
 const VERTICAL_OFFSET = 100;
 const HORIZONTAL_OFFSET = 100;
 
-export const getLinkDirectionFromKey = (key: string): LinkDirection => {
-  switch (key) {
-    case KEYS.ARROW_UP:
-      return "up";
-    case KEYS.ARROW_DOWN:
-      return "down";
-    case KEYS.ARROW_RIGHT:
-      return "right";
-    case KEYS.ARROW_LEFT:
-      return "left";
-    default:
-      return "right";
-  }
-};
+type Interval = { start: number; end: number };
 
-const getNodeRelatives = (
-  type: "predecessors" | "successors",
-  node: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  direction: LinkDirection,
-) => {
-  const items = [...elementsMap.values()].reduce(
-    (acc: { relative: ExcalidrawBindableElement; heading: Heading }[], el) => {
-      let oppositeBinding;
-      if (
-        isElbowArrow(el) &&
-        // we want check existence of the opposite binding, in the direction
-        // we're interested in
-        (oppositeBinding =
-          el[type === "predecessors" ? "startBinding" : "endBinding"]) &&
-        // similarly, we need to filter only arrows bound to target node
-        el[type === "predecessors" ? "endBinding" : "startBinding"]
-          ?.elementId === node.id
-      ) {
-        const relative = elementsMap.get(oppositeBinding.elementId);
+const mergeIntervals = (intervals: Interval[]): Interval[] => {
+  const sorted = [...intervals].sort((a, b) => a.start - b.start);
+  const merged: Interval[] = [];
 
-        if (!relative) {
-          return acc;
-        }
-
-        invariant(
-          isBindableElement(relative),
-          "not an ExcalidrawBindableElement",
-        );
-
-        const edgePoint = (
-          type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
-        ) as Readonly<LocalPoint>;
-
-        const heading = headingForPointFromElement(
-          node,
-          aabbForElement(node, elementsMap),
-          [edgePoint[0] + el.x, edgePoint[1] + el.y] as Readonly<GlobalPoint>,
-        );
-
-        acc.push({
-          relative,
-          heading,
-        });
-      }
-      return acc;
-    },
-    [],
-  );
-
-  switch (direction) {
-    case "up":
-      return items
-        .filter((item) => compareHeading(item.heading, HEADING_UP))
-        .map((item) => item.relative);
-    case "down":
-      return items
-        .filter((item) => compareHeading(item.heading, HEADING_DOWN))
-        .map((item) => item.relative);
-    case "right":
-      return items
-        .filter((item) => compareHeading(item.heading, HEADING_RIGHT))
-        .map((item) => item.relative);
-    case "left":
-      return items
-        .filter((item) => compareHeading(item.heading, HEADING_LEFT))
-        .map((item) => item.relative);
-  }
-};
-
-const getSuccessors = (
-  node: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  direction: LinkDirection,
-) => {
-  return getNodeRelatives("successors", node, elementsMap, direction);
-};
-
-export const getPredecessors = (
-  node: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  direction: LinkDirection,
-) => {
-  return getNodeRelatives("predecessors", node, elementsMap, direction);
-};
-
-const getOffsets = (
-  element: ExcalidrawFlowchartNodeElement,
-  linkedNodes: ExcalidrawElement[],
-  direction: LinkDirection,
-) => {
-  const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
-
-  // check if vertical space or horizontal space is available first
-  if (direction === "up" || direction === "down") {
-    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-    // check vertical space
-    const minX = element.x;
-    const maxX = element.x + element.width;
-
-    // vertical space is available
-    if (
-      linkedNodes.every(
-        (linkedNode) =>
-          linkedNode.x + linkedNode.width < minX || linkedNode.x > maxX,
-      )
-    ) {
-      return {
-        x: 0,
-        y: _VERTICAL_OFFSET * (direction === "up" ? -1 : 1),
-      };
-    }
-  } else if (direction === "right" || direction === "left") {
-    const minY = element.y;
-    const maxY = element.y + element.height;
-
-    if (
-      linkedNodes.every(
-        (linkedNode) =>
-          linkedNode.y + linkedNode.height < minY || linkedNode.y > maxY,
-      )
-    ) {
-      return {
-        x:
-          (HORIZONTAL_OFFSET + element.width) * (direction === "left" ? -1 : 1),
-        y: 0,
-      };
+  for (const interval of sorted) {
+    const last = merged[merged.length - 1];
+    if (last && interval.start <= last.end) {
+      last.end = Math.max(last.end, interval.end);
+    } else {
+      merged.push({ ...interval });
     }
   }
 
-  if (direction === "up" || direction === "down") {
-    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-    const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
-    const x =
-      linkedNodes.length === 0
-        ? 0
-        : (linkedNodes.length + 1) % 2 === 0
-        ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
-        : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+  return merged;
+};
 
-    if (direction === "up") {
-      return {
-        x,
-        y: y * -1,
-      };
+const intervalIsFree = (start: number, size: number, occupied: Interval[]) =>
+  occupied.every((o) => start + size <= o.start || start >= o.end);
+
+// Nearest `start` for a segment of `size` avoiding every occupied interval,
+// searching both sides of `ideal`; a tie resolves toward the positive side.
+const findNearestFreeSlot = (
+  ideal: number,
+  size: number,
+  occupied: Interval[],
+): number => {
+  if (intervalIsFree(ideal, size, occupied)) {
+    return ideal;
+  }
+
+  const gapStarts = [-Infinity, ...occupied.map((o) => o.end)];
+  const gapEnds = [...occupied.map((o) => o.start), Infinity];
+
+  let best = ideal;
+  let bestDistance = Infinity;
+  for (let i = 0; i < gapStarts.length; i++) {
+    if (gapEnds[i] - gapStarts[i] < size) {
+      continue;
     }
-
-    return {
-      x,
-      y,
-    };
+    const start = clamp(ideal, gapStarts[i], gapEnds[i] - size);
+    const distance = Math.abs(start - ideal);
+    if (distance <= bestDistance) {
+      best = start;
+      bestDistance = distance;
+    }
   }
 
-  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-  const x =
-    (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
-    element.width;
-  const y =
-    linkedNodes.length === 0
-      ? 0
-      : (linkedNodes.length + 1) % 2 === 0
-      ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
-      : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
+  return best;
+};
 
-  if (direction === "left") {
-    return {
-      x: x * -1,
-      y,
-    };
-  }
-  return {
-    x,
-    y,
+// Walk the arrow bindings to collect every node that belongs to the same
+// flowchart as `node` — the whole connected component acts as the obstacle
+// set during placement (#8518).
+const getConnectedFlowchartNodes = (
+  node: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): ExcalidrawBindableElement[] => {
+  // one pass over the scene, so the walk below costs the size of the chart,
+  // not chart nodes × all arrows in the scene
+  const neighbors = new Map<string, string[]>();
+  const addNeighbor = (from: string, to: string) => {
+    const list = neighbors.get(from);
+    if (list) {
+      list.push(to);
+    } else {
+      neighbors.set(from, [to]);
+    }
   };
+  for (const element of elementsMap.values()) {
+    if (isArrowElement(element) && element.startBinding && element.endBinding) {
+      addNeighbor(element.startBinding.elementId, element.endBinding.elementId);
+      addNeighbor(element.endBinding.elementId, element.startBinding.elementId);
+    }
+  }
+
+  const visited = new Set<string>([node.id]);
+  const queue: string[] = [node.id];
+  const connected: ExcalidrawBindableElement[] = [];
+
+  for (let i = 0; i < queue.length; i++) {
+    for (const neighborId of neighbors.get(queue[i]) ?? []) {
+      if (visited.has(neighborId)) {
+        continue;
+      }
+
+      visited.add(neighborId);
+      const neighbor = elementsMap.get(neighborId);
+      if (neighbor && isBindableElement(neighbor)) {
+        connected.push(neighbor);
+        queue.push(neighborId);
+      }
+    }
+  }
+
+  return connected;
 };
 
-const addNewNode = (
-  element: ExcalidrawFlowchartNodeElement,
-  appState: AppState,
+// Place a cluster of `count` equally-sized nodes next to `parent`:
+// - the primary axis (the creation direction) is fixed at exactly one gap
+//   away from the parent, forming a search band the cluster will occupy
+// - along the cross axis the cluster slides into the free slot nearest the
+//   parent-centered ideal, treating band obstacles as immovable
+// - `stickyCrossStart` anchors an already-visible pending cluster that an
+//   obstacle pushed off-center: growing it extends it at either end so the
+//   existing pending nodes keep their positions, unless the grown cluster
+//   centers on the parent again or no longer fits there
+const placeCluster = (
+  parent: ExcalidrawFlowchartNodeElement,
   direction: LinkDirection,
-  scene: Scene,
-) => {
-  const elementsMap = scene.getNonDeletedElementsMap();
-  const successors = getSuccessors(element, elementsMap, direction);
-  const predeccessors = getPredecessors(element, elementsMap, direction);
+  count: number,
+  obstacles: readonly Bounds[],
+  stickyCrossStart: number | null,
+): { positions: { x: number; y: number }[]; crossStart: number } => {
+  const horizontal = direction === "left" || direction === "right";
+  // INSIGHT: new nodes copy the parent's dimensions
+  const nodePrimarySize = horizontal ? parent.width : parent.height;
+  const nodeCrossSize = horizontal ? parent.height : parent.width;
+  const primaryGap = horizontal ? HORIZONTAL_OFFSET : VERTICAL_OFFSET;
+  const crossGap = horizontal ? VERTICAL_OFFSET : HORIZONTAL_OFFSET;
 
-  const offsets = getOffsets(
-    element,
-    [...successors, ...predeccessors],
-    direction,
+  const parentPrimaryStart = horizontal ? parent.x : parent.y;
+  const parentCrossCenter = horizontal
+    ? parent.y + parent.height / 2
+    : parent.x + parent.width / 2;
+
+  const primaryStart =
+    direction === "right" || direction === "down"
+      ? parentPrimaryStart + nodePrimarySize + primaryGap
+      : parentPrimaryStart - primaryGap - nodePrimarySize;
+
+  // the band widened by one gap on both sides, so nodes the cluster would end
+  // up closer than a gap to count as obstacles too; the near side stops
+  // exactly at the parent's facing edge, keeping the parent's row out
+  const [zoneStart, zoneEnd] =
+    direction === "right" || direction === "down"
+      ? [
+          parentPrimaryStart + nodePrimarySize,
+          primaryStart + nodePrimarySize + primaryGap,
+        ]
+      : [primaryStart - primaryGap, parentPrimaryStart];
+
+  // cross-axis intervals of the obstacles in that zone, inflated so the
+  // cluster keeps at least one gap of clearance
+  const occupied = mergeIntervals(
+    obstacles
+      .filter((bounds) => {
+        const start = horizontal ? bounds[0] : bounds[1];
+        const end = horizontal ? bounds[2] : bounds[3];
+        // Ignore rounding noise so nodes a full gap away stay out of the zone.
+        return start < zoneEnd - PRECISION && end > zoneStart + PRECISION;
+      })
+      .map((bounds) => ({
+        start: (horizontal ? bounds[1] : bounds[0]) - crossGap,
+        end: (horizontal ? bounds[3] : bounds[2]) + crossGap,
+      })),
   );
 
-  const nextNode = newElement({
-    type: element.type,
-    x: element.x + offsets.x,
-    y: element.y + offsets.y,
-    // TODO: extract this to a util
-    width: element.width,
-    height: element.height,
-    roundness: element.roundness,
-    roughness: element.roughness,
-    backgroundColor: element.backgroundColor,
-    strokeColor: element.strokeColor,
-    strokeWidth: element.strokeWidth,
-    opacity: element.opacity,
-    fillStyle: element.fillStyle,
-    strokeStyle: element.strokeStyle,
+  const step = nodeCrossSize + crossGap;
+  const clusterCrossSize = count * nodeCrossSize + (count - 1) * crossGap;
+  const centeredStart = parentCrossCenter - clusterCrossSize / 2;
+
+  // the centered slot sorts first (zero distance), so the cluster re-centers
+  // whenever it fits there
+  const anchoredStart =
+    stickyCrossStart === null
+      ? null
+      : [centeredStart, stickyCrossStart, stickyCrossStart - step]
+          .filter((start) => intervalIsFree(start, clusterCrossSize, occupied))
+          .sort(
+            (a, b) =>
+              Math.abs(a + clusterCrossSize / 2 - parentCrossCenter) -
+              Math.abs(b + clusterCrossSize / 2 - parentCrossCenter),
+          )[0] ?? null;
+
+  const crossStart =
+    anchoredStart ??
+    findNearestFreeSlot(centeredStart, clusterCrossSize, occupied);
+
+  const positions = Array.from({ length: count }, (_, index) => {
+    const cross = crossStart + index * step;
+    return horizontal
+      ? { x: primaryStart, y: cross }
+      : { x: cross, y: primaryStart };
   });
 
+  return { positions, crossStart };
+};
+
+const cloneFlowchartNode = (
+  template: ExcalidrawFlowchartNodeElement,
+  x: number,
+  y: number,
+) => {
+  const commonNodeProps = {
+    x,
+    y,
+    width: template.width,
+    height: template.height,
+    roundness: template.roundness,
+    roughness: template.roughness,
+    backgroundColor: template.backgroundColor,
+    strokeColor: template.strokeColor,
+    strokeWidth: template.strokeWidth,
+    opacity: template.opacity,
+    fillStyle: template.fillStyle,
+    strokeStyle: template.strokeStyle,
+  };
+
+  const node =
+    template.type === "stickynote"
+      ? newStickyNoteElement({
+          type: "stickynote",
+          ...commonNodeProps,
+          baseHeight: template.baseHeight,
+        })
+      : newElement({
+          type: template.type,
+          ...commonNodeProps,
+        });
+
   invariant(
-    isFlowchartNodeElement(nextNode),
+    isFlowchartNodeElement(node),
     "not an ExcalidrawFlowchartNodeElement",
   );
 
-  const bindingArrow = createBindingArrow(
-    element,
-    nextNode,
-    direction,
-    appState,
-    scene,
-  );
-
-  return {
-    nextNode,
-    bindingArrow,
-  };
+  return node;
 };
 
 export const addNewNodes = (
-  startNode: ExcalidrawFlowchartNodeElement,
+  startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,
   scene: Scene,
   numberOfNodes: number,
+  stickyCrossStart: number | null = null,
 ) => {
-  // always start from 0 and distribute evenly
-  const newNodes: ExcalidrawElement[] = [];
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const obstacles = getConnectedFlowchartNodes(startNode, elementsMap).map(
+    (node) => aabbForElement(node, elementsMap),
+  );
 
-  for (let i = 0; i < numberOfNodes; i++) {
-    let nextX: number;
-    let nextY: number;
-    if (direction === "left" || direction === "right") {
-      const totalHeight =
-        VERTICAL_OFFSET * (numberOfNodes - 1) +
-        numberOfNodes * startNode.height;
+  const { positions, crossStart } = placeCluster(
+    startNode,
+    direction,
+    numberOfNodes,
+    obstacles,
+    stickyCrossStart,
+  );
 
-      const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
-
-      let offsetX = HORIZONTAL_OFFSET + startNode.width;
-      if (direction === "left") {
-        offsetX *= -1;
-      }
-      nextX = startNode.x + offsetX;
-      const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
-      nextY = startY + offsetY;
-    } else {
-      const totalWidth =
-        HORIZONTAL_OFFSET * (numberOfNodes - 1) +
-        numberOfNodes * startNode.width;
-      const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
-      let offsetY = VERTICAL_OFFSET + startNode.height;
-
-      if (direction === "up") {
-        offsetY *= -1;
-      }
-      nextY = startNode.y + offsetY;
-      const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
-      nextX = startX + offsetX;
-    }
-
-    const nextNode = newElement({
-      type: startNode.type,
-      x: nextX,
-      y: nextY,
-      // TODO: extract this to a util
-      width: startNode.width,
-      height: startNode.height,
-      roundness: startNode.roundness,
-      roughness: startNode.roughness,
-      backgroundColor: startNode.backgroundColor,
-      strokeColor: startNode.strokeColor,
-      strokeWidth: startNode.strokeWidth,
-      opacity: startNode.opacity,
-      fillStyle: startNode.fillStyle,
-      strokeStyle: startNode.strokeStyle,
-    });
-
-    invariant(
-      isFlowchartNodeElement(nextNode),
-      "not an ExcalidrawFlowchartNodeElement",
-    );
-
+  const nodes: NonDeletedExcalidrawElement[] = [];
+  for (const position of positions) {
+    const nextNode = cloneFlowchartNode(startNode, position.x, position.y);
     const bindingArrow = createBindingArrow(
       startNode,
       nextNode,
@@ -361,16 +305,15 @@ export const addNewNodes = (
       scene,
     );
 
-    newNodes.push(nextNode);
-    newNodes.push(bindingArrow);
+    nodes.push(nextNode, bindingArrow);
   }
 
-  return newNodes;
+  return { nodes, crossStart };
 };
 
 const createBindingArrow = (
-  startBindingElement: ExcalidrawFlowchartNodeElement,
-  endBindingElement: ExcalidrawFlowchartNodeElement,
+  startBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
+  endBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   direction: LinkDirection,
   appState: AppState,
   scene: Scene,
@@ -452,8 +395,16 @@ const createBindingArrow = (
     "orbit",
     "start",
     scene,
+    appState.zoom,
   );
-  bindBindingElement(bindingArrow, endBindingElement, "orbit", "end", scene);
+  bindBindingElement(
+    bindingArrow,
+    endBindingElement,
+    "orbit",
+    "end",
+    scene,
+    appState.zoom,
+  );
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(
@@ -490,7 +441,7 @@ const createBindingArrow = (
         [startBindingElement.id, startBindingElement],
         [endBindingElement.id, endBindingElement],
         [bindingArrow.id, bindingArrow],
-      ] as [string, Ordered<ExcalidrawElement>][]),
+      ] as [string, Ordered<NonDeletedExcalidrawElement>][]),
     ),
     { points: bindingArrow.points },
   );
@@ -498,25 +449,32 @@ const createBindingArrow = (
   return {
     ...bindingArrow,
     ...update,
+    isDeleted: bindingArrow.isDeleted,
   };
 };
 
+// Alt+arrow navigation moves to whichever node of the flowchart *looks* next
+// in the pressed direction, picking the nearest node of the first non-empty
+// tier:
+// 1. nodes in line with the current one (sharing its row for left/right, its
+//    column for up/down)
+// 2. nodes linked to the current one whose center lies past its edge in the
+//    pressed direction, at any angle
+// 3. nodes whose center lies within the 45° cone of the pressed direction
+//    (an X through the current node's center)
+// 4. any other node whose center lies past the current one's edge, so a
+//    direction only does nothing when there's nothing that way at all
+// Near-ties (within 10%) go to a node the current one links to, then to one
+// linking to it, then to the one more level with the current one's center,
+// then reading order (the upper one for left/right, the left one for
+// up/down).
+const NAVIGATION_TIE_TOLERANCE = 0.1;
+
 export class FlowChartNavigator {
   isExploring: boolean = false;
-  // nodes that are ONE link away (successor and predecessor both included)
-  private sameLevelNodes: ExcalidrawElement[] = [];
-  private sameLevelIndex: number = 0;
-  // set it to the opposite of the defalut creation direction
-  private direction: LinkDirection | null = null;
-  // for speedier navigation
-  private visitedNodes: Set<ExcalidrawElement["id"]> = new Set();
 
   clear() {
     this.isExploring = false;
-    this.sameLevelNodes = [];
-    this.sameLevelIndex = 0;
-    this.direction = null;
-    this.visitedNodes.clear();
   }
 
   exploreByDirection(
@@ -528,149 +486,180 @@ export class FlowChartNavigator {
       return null;
     }
 
-    // clear if going at a different direction
-    if (direction !== this.direction) {
-      this.clear();
+    const next = FlowChartNavigator.findNodeInDirection(
+      element,
+      elementsMap,
+      direction,
+    );
+
+    if (!next) {
+      return null;
     }
 
-    // add the current node to the visited
-    if (!this.visitedNodes.has(element.id)) {
-      this.visitedNodes.add(element.id);
-    }
+    this.isExploring = true;
 
-    /**
-     * CASE:
-     * - already started exploring, AND
-     * - there are multiple nodes at the same level, AND
-     * - still going at the same direction, AND
-     *
-     * RESULT:
-     * - loop through nodes at the same level
-     *
-     * WHY:
-     * - provides user the capability to loop through nodes at the same level
-     */
-    if (
-      this.isExploring &&
-      direction === this.direction &&
-      this.sameLevelNodes.length > 1
-    ) {
-      this.sameLevelIndex =
-        (this.sameLevelIndex + 1) % this.sameLevelNodes.length;
+    return next.id;
+  }
 
-      return this.sameLevelNodes[this.sameLevelIndex].id;
-    }
+  private static findNodeInDirection(
+    node: ExcalidrawBindableElement,
+    elementsMap: ElementsMap,
+    direction: LinkDirection,
+  ) {
+    const horizontal = direction === "left" || direction === "right";
+    const sign = direction === "right" || direction === "down" ? 1 : -1;
+    const [minX, minY, maxX, maxY] = aabbForElement(node, elementsMap);
+    const [nodeMainStart, nodeMainEnd, nodeCrossStart, nodeCrossEnd] =
+      horizontal ? [minX, maxX, minY, maxY] : [minY, maxY, minX, maxX];
+    const nodeMainCenter = (nodeMainStart + nodeMainEnd) / 2;
+    const nodeCrossCenter = (nodeCrossStart + nodeCrossEnd) / 2;
+    const nodeEdge = sign > 0 ? nodeMainEnd : nodeMainStart;
 
-    const nodes = [
-      ...getSuccessors(element, elementsMap, direction),
-      ...getPredecessors(element, elementsMap, direction),
-    ];
-
-    /**
-     * CASE:
-     * - just started exploring at the given direction
-     *
-     * RESULT:
-     * - go to the first node in the given direction
-     */
-    if (nodes.length > 0) {
-      this.sameLevelIndex = 0;
-      this.isExploring = true;
-      this.sameLevelNodes = nodes;
-      this.direction = direction;
-      this.visitedNodes.add(nodes[0].id);
-
-      return nodes[0].id;
-    }
-
-    /**
-     * CASE:
-     * - (just started exploring or still going at the same direction) OR
-     * - there're no nodes at the given direction
-     *
-     * RESULT:
-     * - go to some other unvisited linked node
-     *
-     * WHY:
-     * - provide a speedier navigation from a given node to some predecessor
-     *   without the user having to change arrow key
-     */
-    if (direction === this.direction || !this.isExploring) {
-      if (!this.isExploring) {
-        // just started and no other nodes at the given direction
-        // so the current node is technically the first visited node
-        // (this is needed so that we don't get stuck between looping through )
-        this.visitedNodes.add(element.id);
-      }
-
-      const otherDirections: LinkDirection[] = [
-        "up",
-        "right",
-        "down",
-        "left",
-      ].filter((dir): dir is LinkDirection => dir !== direction);
-
-      const otherLinkedNodes = otherDirections
-        .map((dir) => [
-          ...getSuccessors(element, elementsMap, dir),
-          ...getPredecessors(element, elementsMap, dir),
-        ])
-        .flat()
-        .filter((linkedNode) => !this.visitedNodes.has(linkedNode.id));
-
-      for (const linkedNode of otherLinkedNodes) {
-        if (!this.visitedNodes.has(linkedNode.id)) {
-          this.visitedNodes.add(linkedNode.id);
-          this.isExploring = true;
-          this.direction = direction;
-          return linkedNode.id;
+    const successors = new Set<string>();
+    const predecessors = new Set<string>();
+    for (const element of elementsMap.values()) {
+      if (
+        isArrowElement(element) &&
+        element.startBinding &&
+        element.endBinding
+      ) {
+        if (element.startBinding.elementId === node.id) {
+          successors.add(element.endBinding.elementId);
+        }
+        if (element.endBinding.elementId === node.id) {
+          predecessors.add(element.startBinding.elementId);
         }
       }
     }
+    const linkRank = (id: string) =>
+      successors.has(id) ? 0 : predecessors.has(id) ? 1 : 2;
 
-    return null;
+    const candidates = getConnectedFlowchartNodes(node, elementsMap).flatMap(
+      (candidate) => {
+        const bounds = aabbForElement(candidate, elementsMap);
+        const [mainStart, mainEnd, crossStart, crossEnd] = horizontal
+          ? [bounds[0], bounds[2], bounds[1], bounds[3]]
+          : [bounds[1], bounds[3], bounds[0], bounds[2]];
+        const mainCenter = (mainStart + mainEnd) / 2;
+        const crossCenter = (crossStart + crossEnd) / 2;
+
+        if ((mainCenter - nodeMainCenter) * sign <= 0) {
+          return [];
+        }
+
+        // positive when the boxes are apart along that axis, negative when
+        // they overlap
+        const mainGap = Math.max(
+          mainStart - nodeMainEnd,
+          nodeMainStart - mainEnd,
+        );
+        const crossGap = Math.max(
+          crossStart - nodeCrossEnd,
+          nodeCrossStart - crossEnd,
+        );
+        const inCone =
+          Math.abs(mainCenter - nodeMainCenter) >=
+          Math.abs(crossCenter - nodeCrossCenter);
+        // either center falls within the other node's span, so the two mostly
+        // share a row (column) — a sliver of overlap between neighboring rows
+        // doesn't count
+        const inLine =
+          (nodeCrossStart < crossCenter && crossCenter < nodeCrossEnd) ||
+          (crossStart < nodeCrossCenter && nodeCrossCenter < crossEnd);
+        const pastEdge = (mainCenter - nodeEdge) * sign > 0;
+
+        const tier = inLine
+          ? 0
+          : pastEdge && linkRank(candidate.id) < 2
+          ? 1
+          : inCone
+          ? 2
+          : pastEdge
+          ? 3
+          : null;
+
+        if (tier === null) {
+          return [];
+        }
+
+        return [
+          {
+            node: candidate,
+            tier,
+            distance:
+              tier === 0
+                ? Math.max(mainGap, 0)
+                : Math.hypot(Math.max(mainGap, 0), Math.max(crossGap, 0)),
+            crossCenter,
+          },
+        ];
+      },
+    );
+
+    if (!candidates.length) {
+      return null;
+    }
+
+    const topTier = Math.min(...candidates.map((candidate) => candidate.tier));
+    const pool = candidates.filter((candidate) => candidate.tier === topTier);
+    const nearest = Math.min(...pool.map((candidate) => candidate.distance));
+    const tolerance = Math.max(nearest * NAVIGATION_TIE_TOLERANCE, 1);
+    // how far a candidate's center is off the current node's center line;
+    // within a pixel it's a tie (symmetric layouts), left to reading order
+    const offset = (candidate: typeof pool[number]) =>
+      Math.abs(candidate.crossCenter - nodeCrossCenter);
+    const compareOffsets = (a: typeof pool[number], b: typeof pool[number]) =>
+      Math.abs(offset(a) - offset(b)) > 1 ? offset(a) - offset(b) : 0;
+
+    return pool
+      .filter((candidate) => candidate.distance <= nearest + tolerance)
+      .sort(
+        (a, b) =>
+          linkRank(a.node.id) - linkRank(b.node.id) ||
+          compareOffsets(a, b) ||
+          a.crossCenter - b.crossCenter ||
+          a.distance - b.distance,
+      )[0].node;
   }
 }
 
 export class FlowChartCreator {
   isCreatingChart: boolean = false;
   private numberOfNodes: number = 0;
-  private direction: LinkDirection | null = "right";
+  private direction: LinkDirection | null = null;
+  // cross-axis anchor of the pending cluster, so growing it keeps the
+  // already-visible pending nodes in place
+  private clusterCrossStart: number | null = null;
   pendingNodes: PendingExcalidrawElements | null = null;
 
   createNodes(
-    startNode: ExcalidrawFlowchartNodeElement,
+    startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
     appState: AppState,
     direction: LinkDirection,
     scene: Scene,
   ) {
     const elementsMap = scene.getNonDeletedElementsMap();
-    if (direction !== this.direction) {
-      const { nextNode, bindingArrow } = addNewNode(
-        startNode,
-        appState,
-        direction,
-        scene,
-      );
 
+    if (direction !== this.direction) {
       this.numberOfNodes = 1;
-      this.isCreatingChart = true;
-      this.direction = direction;
-      this.pendingNodes = [nextNode, bindingArrow];
+      this.clusterCrossStart = null;
     } else {
       this.numberOfNodes += 1;
-      const newNodes = addNewNodes(
-        startNode,
-        appState,
-        direction,
-        scene,
-        this.numberOfNodes,
-      );
-
-      this.isCreatingChart = true;
-      this.direction = direction;
-      this.pendingNodes = newNodes;
     }
+
+    const { nodes, crossStart } = addNewNodes(
+      startNode,
+      appState,
+      direction,
+      scene,
+      this.numberOfNodes,
+      this.clusterCrossStart,
+    );
+
+    this.isCreatingChart = true;
+    this.direction = direction;
+    this.clusterCrossStart = crossStart;
+    this.pendingNodes = nodes;
 
     // add pending nodes to the same frame as the start node
     // if every pending node is at least intersecting with the frame
@@ -704,6 +693,7 @@ export class FlowChartCreator {
     this.pendingNodes = null;
     this.direction = null;
     this.numberOfNodes = 0;
+    this.clusterCrossStart = null;
   }
 }
 

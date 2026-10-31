@@ -7,13 +7,15 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
+import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
 import { cleanAppStateForExport } from "../appState";
 
 import { CanvasError, ImageSceneDataError } from "../errors";
-import { calculateScrollCenter } from "../scene";
+import { getScrollToContentState } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
 
 import { base64ToString, stringToBase64, toByteString } from "./encode";
@@ -158,20 +160,21 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
+      const elements = restoreElements(data.elements, localElements, {
+        repairBindings: true,
+        deleteInvisibleElements: true,
+      });
       return {
         type: MIME_TYPES.excalidraw,
         data: {
-          elements: restoreElements(data.elements, localElements, {
-            repairBindings: true,
-            deleteInvisibleElements: true,
-          }),
+          elements,
           appState: restoreAppState(
             {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
               ...(localAppState
-                ? calculateScrollCenter(data.elements || [], localAppState)
+                ? getScrollToContentState(elements, localAppState)
                 : {}),
             },
             localAppState,
@@ -326,7 +329,7 @@ const getImageFileDimensions = async (file: File) => {
   }
 
   return new Promise<{ width: number; height: number }>((resolve, reject) => {
-    const image = new Image();
+    const image = getRenderEnvironment().createImage();
 
     const cleanup = () => {
       image.onload = null;

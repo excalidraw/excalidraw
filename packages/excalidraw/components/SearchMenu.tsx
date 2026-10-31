@@ -1,4 +1,3 @@
-import { round } from "@excalidraw/math";
 import clsx from "clsx";
 import debounce from "lodash.debounce";
 import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
@@ -11,7 +10,10 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { isElementCompletelyInViewport } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  isElementCompletelyInViewport,
+} from "@excalidraw/element";
 
 import { measureText } from "@excalidraw/element";
 
@@ -27,6 +29,7 @@ import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
 
 import { getDefaultFrameName } from "@excalidraw/element/frame";
 
+import type { RenderEnvironment } from "@excalidraw/element";
 import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
@@ -219,8 +222,8 @@ export const SearchMenu = () => {
         if (
           !isElementCompletelyInViewport(
             [matchAsElement],
-            app.canvas.width / window.devicePixelRatio,
-            app.canvas.height / window.devicePixelRatio,
+            app.canvas.width / app.ownerWindow.devicePixelRatio,
+            app.canvas.height / app.ownerWindow.devicePixelRatio,
             {
               offsetLeft: app.state.offsetLeft,
               offsetTop: app.state.offsetTop,
@@ -229,31 +232,22 @@ export const SearchMenu = () => {
               zoom: app.state.zoom,
             },
             app.scene.getNonDeletedElementsMap(),
-            app.getEditorUIOffsets(),
+            app.viewport.getOffsets(),
           ) ||
           isTextTiny
         ) {
-          let zoomOptions: Parameters<AppClassProperties["scrollToContent"]>[1];
+          // tiny, illegible text fills the viewport so it becomes readable;
+          // otherwise just fit the match into view (capped at 100%)
+          const behavior =
+            isTextTiny && fontSize < FONT_SIZE_LEGIBILITY_THRESHOLD
+              ? "contain"
+              : "scale-down";
 
-          if (isTextTiny) {
-            if (fontSize >= FONT_SIZE_LEGIBILITY_THRESHOLD) {
-              zoomOptions = { fitToContent: true };
-            } else {
-              zoomOptions = {
-                fitToViewport: true,
-                // calculate zoom level to make the fontSize ~equal to FONT_SIZE_THRESHOLD, rounded to nearest 10%
-                maxZoom: round(FONT_SIZE_LEGIBILITY_THRESHOLD / fontSize, 1),
-              };
-            }
-          } else {
-            zoomOptions = { fitToContent: true };
-          }
-
-          app.scrollToContent(matchAsElement, {
-            animate: true,
-            duration: 300,
-            ...zoomOptions,
-            canvasOffsets: app.getEditorUIOffsets(),
+          app.viewport.setViewport({
+            target: getCommonBounds([matchAsElement]),
+            fit: behavior,
+            animation: { duration: 300 },
+            offsets: { ui: true },
           });
         }
       }
@@ -280,6 +274,7 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
+      const target = event.target;
       if (
         event.key === KEYS.ESCAPE &&
         !app.state.openDialog &&
@@ -313,8 +308,8 @@ export const SearchMenu = () => {
       }
 
       if (
-        event.target instanceof HTMLElement &&
-        event.target.closest(".layer-ui__search")
+        target instanceof app.ownerWindow.HTMLElement &&
+        target.closest(".layer-ui__search")
       ) {
         if (stableState.searchMatches.items.length) {
           if (event.key === KEYS.ENTER) {
@@ -335,7 +330,7 @@ export const SearchMenu = () => {
 
     // `capture` needed to prevent firing on initial open from App.tsx,
     // as well as to handle events before App ones
-    return addEventListener(window, EVENT.KEYDOWN, eventHandler, {
+    return addEventListener(app.ownerWindow, EVENT.KEYDOWN, eventHandler, {
       capture: true,
       passive: false,
     });
@@ -636,6 +631,7 @@ const getMatchedLines = (
   textElement: ExcalidrawTextElement,
   searchQuery: SearchQuery,
   index: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const normalizedText = normalizeWrappedText(
     textElement.text,
@@ -693,6 +689,7 @@ const getMatchedLines = (
         textToStart,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
 
       // measureText returns a non-zero width for the empty string
@@ -706,6 +703,7 @@ const getMatchedLines = (
           lineIndexRange.line,
           getFontString(textElement),
           textElement.lineHeight,
+          renderEnvironment,
         );
 
         const spaceToStart =
@@ -719,6 +717,7 @@ const getMatchedLines = (
         matchedWord,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
 
       const offsetX = offset.width;
@@ -744,6 +743,7 @@ const getMatchInFrame = (
   searchQuery: SearchQuery,
   index: number,
   zoomValue: number,
+  renderEnvironment?: RenderEnvironment,
 ): SearchMatch["matchedLines"] => {
   const text = frame.name ?? getDefaultFrameName(frame);
   const matchedText = text.slice(index, index + searchQuery.length);
@@ -756,14 +756,19 @@ const getMatchInFrame = (
 
   const lineHeight = getLineHeight(FONT_FAMILY.Assistant);
 
-  const offset = measureText(prefixText, font, lineHeight);
+  const offset = measureText(prefixText, font, lineHeight, renderEnvironment);
 
   // Correct non-zero width for empty string
   if (prefixText === "") {
     offset.width = 0;
   }
 
-  const matchedMetrics = measureText(matchedText, font, lineHeight);
+  const matchedMetrics = measureText(
+    matchedText,
+    font,
+    lineHeight,
+    renderEnvironment,
+  );
 
   const offsetX = offset.width;
   const offsetY = -offset.height - FRAME_STYLE.strokeWidth;
@@ -817,7 +822,12 @@ const handleSearch = debounce(
 
       while ((match = regex.exec(text)) !== null) {
         const preview = getMatchPreview(text, match.index, searchQuery);
-        const matchedLines = getMatchedLines(textEl, searchQuery, match.index);
+        const matchedLines = getMatchedLines(
+          textEl,
+          searchQuery,
+          match.index,
+          app.renderEnvironment,
+        );
 
         if (matchedLines.length > 0) {
           textMatches.push({
@@ -844,6 +854,7 @@ const handleSearch = debounce(
           searchQuery,
           match.index,
           app.state.zoom.value,
+          app.renderEnvironment,
         );
 
         if (matchedLines.length > 0) {

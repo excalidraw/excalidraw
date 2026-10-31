@@ -7,7 +7,7 @@ import { updateBindings } from "@excalidraw/element";
 
 import type { Degrees } from "@excalidraw/math";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -20,7 +20,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
 
 interface AngleProps {
-  element: ExcalidrawElement;
+  element: NonDeletedExcalidrawElement;
   scene: Scene;
   appState: AppState;
   property: "angle";
@@ -49,7 +49,9 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       scene.mutateElement(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, scene, app.state);
+      updateBindings(latestElement, scene, app.state, {
+        renderEnvironment: app.renderEnvironment,
+      });
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -75,7 +77,9 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     scene.mutateElement(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, scene, app.state);
+    updateBindings(latestElement, scene, app.state, {
+      renderEnvironment: app.renderEnvironment,
+    });
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {

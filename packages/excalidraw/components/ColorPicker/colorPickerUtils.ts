@@ -1,4 +1,7 @@
-import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "@excalidraw/common";
+import {
+  isTransparent,
+  MAX_CUSTOM_COLORS_USED_IN_CANVAS,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -67,7 +70,9 @@ export const getMostUsedCustomColors = (
     const color =
       element[elementColorTypeMap[type] as "backgroundColor" | "strokeColor"];
 
-    return isCustomColor({ color, palette });
+    // fully-transparent colors are "no color", not a reusable custom color
+    // (matters for palettes that exclude `transparent`, e.g. bucket fill)
+    return !isTransparent(color) && isCustomColor({ color, palette });
   });
 
   const colorCountMap = new Map<string, number>();

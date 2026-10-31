@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Vložit",
     "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Vybrat vše",
     "multiSelect": "Přidat prvek do výběru",
     "moveCanvas": "Posunout plátno",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Čárkovaný",
     "strokeStyle_dotted": "Tečkovaný",
     "sloppiness": "Stylizace",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Průhlednost",
     "textAlign": "Zarovnání textu",
     "edges": "Hrany",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "Typ šipky",
     "arrowtype_sharp": "Ostrá šipka",
     "arrowtype_round": "Zakřivená šipka",
@@ -95,6 +111,7 @@
     "group": "Sloučit výběr do skupiny",
     "ungroup": "Zrušit sloučení skupiny",
     "collaborators": "Spolupracovníci",
+    "you": "",
     "toggleGrid": "Přepínač mřížky",
     "addToLibrary": "Přidat do knihovny",
     "removeFromLibrary": "Odebrat z knihovny",
@@ -171,7 +188,14 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -310,10 +334,16 @@
     "magicframe": "Z wireframu na kód",
     "embeddable": "Web Embed",
     "laser": "Laserové ukazovátko",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": "Více nástrojů",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Obdélník",
@@ -345,6 +375,7 @@
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Chyba"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Uložit na disk",
@@ -576,7 +612,11 @@
     "colors": "Barvy",
     "shades": "Stíny",
     "hexCode": "Hex kód",
-    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny"
+    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +656,8 @@
     "syntax": "Mermaid syntaxe",
     "preview": "Náhled",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -1,27 +1,43 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
+import {
+  COLOR_PALETTE,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_SIDEBAR,
+  FONT_FAMILY,
+  getLineHeight,
+  ROUNDNESS,
+  STICKY_NOTE_MAX_FONT_SIZE,
+  DEFAULT_STICKY_NOTE_BG,
+  STICKY_NOTE_MIN_FONT_SIZE,
+} from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
+import { getStickyNoteLayout } from "@excalidraw/element";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
+  ExcalidrawStickyNoteElement,
   ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FractionalIndex,
 } from "@excalidraw/element/types";
 import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
 import { getDefaultAppState } from "../../appState";
+import { serializeAsJSON } from "../../data/json";
 
 import type { ImportedDataState } from "../../data/types";
+import type { LibraryItem, LibraryItem_v1, LibraryItems } from "../../types";
 
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");
@@ -41,6 +57,61 @@ describe("restoreElements", () => {
 
     const restoredElements = restore.restoreElements(elements, null);
     expect(restoredElements.length).toBe(elements.length);
+  });
+
+  it.each([123, 0, null, undefined])(
+    "restores created=%s without substituting load or last-update time",
+    (created) => {
+      const element = {
+        ...API.createElement({
+          type: "rectangle",
+          index: "a0" as FractionalIndex,
+        }),
+        created,
+        updated: 456,
+      };
+      // JSON removes undefined, matching files from clients predating created.
+      const input: ImportedDataState = JSON.parse(
+        JSON.stringify({ elements: [element] }),
+      );
+      const restored = restore.restoreElements(input.elements, null);
+
+      expect(restored[0]).toMatchObject({
+        id: element.id,
+        created: created ?? null,
+        updated: 456,
+      });
+
+      const exported: ImportedDataState = JSON.parse(
+        serializeAsJSON(restored, getDefaultAppState(), {}, "local"),
+      );
+      expect(exported.elements?.[0]).toHaveProperty("created", created ?? null);
+      expect(restore.restoreElements(exported.elements, null)).toEqual(
+        restored,
+      );
+    },
+  );
+
+  it("preserves creation metadata when repairing duplicate element IDs", () => {
+    const element = API.createElement({ type: "rectangle", created: 123 });
+    const restored = restore.restoreElements(
+      [element, { ...element, created: null }],
+      null,
+    );
+
+    expect(restored.map(({ created }) => created)).toEqual([123, null]);
+    expect(restored[0].id).not.toBe(restored[1].id);
+  });
+
+  it("should restore transparent sticky note stroke as black", () => {
+    const stickyNote = {
+      ...API.createElement({ type: "stickynote" }),
+      strokeColor: COLOR_PALETTE.transparent,
+    };
+
+    const restoredElement = restore.restoreElements([stickyNote], null)[0];
+
+    expect(restoredElement.strokeColor).toBe(COLOR_PALETTE.black);
   });
 
   it("when imported data state is null it should return an empty array of elements", () => {
@@ -142,6 +213,215 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should detect the line height of a text element that only has the legacy font prop", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      id: "id-text-legacy-font",
+    });
+
+    // a diagram old enough to carry `font` has none of the props that
+    // replaced it
+    delete textElement.fontSize;
+    delete textElement.fontFamily;
+    delete textElement.lineHeight;
+    textElement.font = "20px Virgil";
+    textElement.text = "hi";
+    textElement.height = 50;
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.fontSize).toBe(20);
+    expect(restoredText.fontFamily).toBe(FONT_FAMILY.Virgil);
+    expect(restoredText.lineHeight).toBe(2.5);
+  });
+
+  it("should fall back to the font line height when it can't be detected", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      id: "id-text-unusable-height",
+    });
+
+    delete textElement.lineHeight;
+    textElement.text = "hi";
+    textElement.height = "unknown";
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.lineHeight).toBe(getLineHeight(textElement.fontFamily));
+  });
+
+  it("should sanitize non-finite font sizes on text elements", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      text: "text",
+    });
+    textElement.fontSize = NaN;
+    textElement.baseFontSize = "abc";
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.fontSize).toBe(DEFAULT_FONT_SIZE);
+    expect(restoredText.baseFontSize).toBe(null);
+  });
+
+  it("should clamp restored font ceilings to the sticky note maximum", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      text: "text",
+    });
+    textElement.baseFontSize = 1e20;
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.baseFontSize).toBe(STICKY_NOTE_MAX_FONT_SIZE);
+  });
+
+  it("should clear a font ceiling on text that is not bound to a sticky note", () => {
+    // generic binding repair (duplication, history) can detach a label without
+    // touching its ceiling; restore reconciles it against the container
+    const textElement: any = API.createElement({
+      type: "text",
+      text: "text",
+      fontSize: 20,
+    });
+    textElement.baseFontSize = 28;
+
+    const restoredText = restore.restoreElements([textElement], null, {
+      repairBindings: true,
+    })[0] as ExcalidrawTextElement;
+
+    expect(restoredText.baseFontSize).toBe(null);
+  });
+
+  it("should seed the font ceiling and a visible stroke on a sticky note label", () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      id: "sticky",
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label: any = {
+      ...API.createElement({
+        type: "text",
+        id: "label",
+        text: "text",
+        fontSize: 20,
+        containerId: "sticky",
+      }),
+      strokeColor: COLOR_PALETTE.transparent,
+    };
+    delete label.baseFontSize;
+
+    const restored = restore.restoreElements([stickyNote, label], null, {
+      repairBindings: true,
+    });
+    const restoredLabel = restored.find(
+      (element) => element.id === "label",
+    ) as ExcalidrawTextElement;
+
+    expect(restoredLabel.baseFontSize).toBe(20);
+    expect(restoredLabel.strokeColor).toBe(COLOR_PALETTE.black);
+  });
+
+  it("should give a note its label's color when the two drifted apart", () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      id: "sticky",
+      strokeColor: COLOR_PALETTE.black,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      text: "text",
+      fontSize: 20,
+      containerId: "sticky",
+      strokeColor: COLOR_PALETTE.red[4],
+    });
+
+    const restored = restore.restoreElements([stickyNote, label], null, {
+      repairBindings: true,
+    });
+
+    expect(
+      restored.find((element) => element.id === "sticky")!.strokeColor,
+    ).toBe(COLOR_PALETTE.red[4]);
+    expect(
+      restored.find((element) => element.id === "label")!.strokeColor,
+    ).toBe(COLOR_PALETTE.red[4]);
+  });
+
+  it("should restore the sticky note defaults and top-pick slots", () => {
+    const restored = restore.restoreAppState(
+      {
+        currentItemStickynoteBackgroundColor: COLOR_PALETTE.transparent,
+        currentItemStickynoteStrokeColor: COLOR_PALETTE.transparent,
+        colorTopPicks: { stickyNoteBackground: ["#fcc2d7", "#b2f2bb"] },
+      } as any,
+      null,
+    );
+
+    expect(restored.currentItemStickynoteBackgroundColor).toBe(
+      DEFAULT_STICKY_NOTE_BG,
+    );
+    expect(restored.currentItemStickynoteStrokeColor).toBe(COLOR_PALETTE.black);
+    expect(restored.colorTopPicks.stickyNoteBackground).toEqual([
+      "#fcc2d7",
+      "#b2f2bb",
+    ]);
+    expect(restored.colorTopPicks.stickyNoteStroke).toBe(null);
+  });
+
+  it("should refit a sticky note together with its label when refreshing dimensions", () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      id: "sticky",
+      width: 250,
+      height: 250,
+      baseHeight: 250,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      text: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+      fontSize: 28,
+      containerId: "sticky",
+    });
+
+    const restored = restore.restoreElements([stickyNote, label], null, {
+      repairBindings: true,
+      refreshDimensions: true,
+    });
+    const note = restored.find(
+      (element) => element.id === "sticky",
+    ) as ExcalidrawStickyNoteElement;
+    const text = restored.find(
+      (element) => element.id === "label",
+    ) as ExcalidrawTextElement;
+
+    // both halves: the note grew for the text at the minimum font, the base
+    // is untouched, and the pair agrees with the layout
+    expect(note.baseHeight).toBe(250);
+    expect(note.height).toBeGreaterThan(250);
+    expect(text.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
+    expect(text.baseFontSize).toBe(28);
+    expect(note.height).toBeCloseTo(
+      getStickyNoteLayout(note, text).container.height,
+    );
+  });
+
   it("should restore freedraw element correctly", () => {
     const freedrawElement = API.createElement({
       type: "freedraw",
@@ -191,6 +471,53 @@ describe("restoreElements", () => {
       pointFrom(20, 20),
     ]);
     expect(restoredFreedraw.pressures).toEqual([0.1, 0.4]);
+  });
+
+  it("should restore freedraw stroke variability", () => {
+    const freedrawElement = API.createElement({
+      type: "freedraw",
+      id: "id-freedraw-mode",
+      points: [pointFrom(0, 0), pointFrom(10, 10)],
+    });
+
+    const [missing, bogusString, bogusNumber, valid, variable] =
+      restore.restoreElements(
+        [
+          { ...freedrawElement, id: "missing", strokeOptions: undefined },
+          {
+            ...freedrawElement,
+            id: "bogusString",
+            strokeOptions: { variability: "scribble" },
+          },
+          {
+            ...freedrawElement,
+            id: "bogusNumber",
+            strokeOptions: { variability: 42 },
+          },
+          {
+            ...freedrawElement,
+            id: "valid",
+            strokeOptions: { variability: "constant", streamline: 0.8 },
+          },
+          {
+            ...freedrawElement,
+            id: "variable",
+            strokeOptions: { variability: "variable", streamline: 0.8 },
+          },
+        ] as any,
+        null,
+      ) as ExcalidrawFreeDrawElement[];
+
+    expect(missing.strokeOptions?.variability).toBe("variable");
+    expect(bogusString.strokeOptions?.variability).toBe("variable");
+    expect(bogusNumber.strokeOptions?.variability).toBe("variable");
+    expect(valid.strokeOptions?.variability).toBe("constant");
+    expect(variable.strokeOptions?.variability).toBe("variable");
+    expect(missing.strokeOptions?.streamline).toBe(0.5);
+    expect(bogusString.strokeOptions?.streamline).toBe(0.5);
+    expect(bogusNumber.strokeOptions?.streamline).toBe(0.5);
+    expect(valid.strokeOptions?.streamline).toBe(0.8);
+    expect(variable.strokeOptions?.streamline).toBe(0.8);
   });
 
   it("should restore line and draw elements correctly", () => {
@@ -251,6 +578,24 @@ describe("restoreElements", () => {
 
     expect(restoredArrow.startArrowhead).toBe("cardinality_one");
     expect(restoredArrow.endArrowhead).toBe("cardinality_one_or_many");
+  });
+
+  it("should strip the leaked `moveMidPointsWithElement` prop from linear elements", () => {
+    const arrowElement = API.createElement({ type: "arrow" });
+    const lineElement = API.createElement({ type: "line" });
+
+    const restoredElements = restore.restoreElements(
+      [
+        { ...arrowElement, moveMidPointsWithElement: false } as any,
+        { ...lineElement, moveMidPointsWithElement: true } as any,
+      ],
+      null,
+    );
+
+    expect(restoredElements).toHaveLength(2);
+    for (const element of restoredElements) {
+      expect(element).not.toHaveProperty("moveMidPointsWithElement");
+    }
   });
 
   it("should strip element if restore fails", () => {
@@ -479,6 +824,53 @@ describe("restoreElements", () => {
     ]);
   });
 
+  it("should mark extremely large linear elements as deleted to avoid freezing", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    // a degenerate line with astronomical coordinates (see #11497)
+    const hugeLine: any = API.createElement({
+      type: "line",
+      x: 419048829414166,
+      y: 8484,
+    });
+    hugeLine.points = [
+      [0, 0],
+      [-302985021938436, 0],
+      [-838097658820234, 30],
+    ];
+
+    const hugeArrow: any = API.createElement({ type: "arrow" });
+    hugeArrow.points = [
+      [0, 0],
+      [900000, 0],
+    ];
+
+    const normalLine: any = API.createElement({ type: "line" });
+    normalLine.points = [
+      [0, 0],
+      [100, 200],
+    ];
+
+    const [restoredLine, restoredArrow, restoredNormal] =
+      restore.restoreElements([hugeLine, hugeArrow, normalLine], null);
+
+    expect(restoredLine.isDeleted).toBe(true);
+    expect(restoredLine.width).toBe(100);
+    expect(restoredLine.height).toBe(100);
+
+    expect(restoredArrow.isDeleted).toBe(true);
+    expect(restoredArrow.width).toBe(100);
+    expect(restoredArrow.height).toBe(100);
+
+    expect(restoredNormal.isDeleted).toBe(false);
+    expect(restoredNormal.width).toBe(100);
+    expect(restoredNormal.height).toBe(200);
+
+    consoleError.mockRestore();
+  });
+
   it("when the number of points of a line is greater or equal 2", () => {
     const lineElement_0 = API.createElement({
       type: "line",
@@ -579,7 +971,9 @@ describe("restoreElements", () => {
   it("bump versions of local duplicate elements when supplied", () => {
     const rectangle = API.createElement({ type: "rectangle" }); // version=1
     const ellipse = API.createElement({ type: "ellipse" });
-    const rectangle_modified = newElementWith(rectangle, { isDeleted: true }); // version=2
+    const rectangle_modified = newElementWith(rectangle as ExcalidrawElement, {
+      isDeleted: true,
+    }); // version=2
 
     const restoredElements = restore.bumpElementVersions(
       restore.restoreElements([rectangle, ellipse], null),
@@ -640,6 +1034,21 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("should restore freedraw mode app state values", () => {
+    expect(
+      restore.restoreAppState(
+        { currentItemStrokeVariability: "constant" } as any,
+        null,
+      ).currentItemStrokeVariability,
+    ).toBe("constant");
+    expect(
+      restore.restoreAppState(
+        { currentItemStrokeVariability: "variable" } as any,
+        null,
+      ).currentItemStrokeVariability,
+    ).toBe("variable");
+  });
+
   it("when appState is null it should return the local app state property", () => {
     const stubLocalAppState = getDefaultAppState();
     stubLocalAppState.cursorButton = "down";
@@ -686,6 +1095,34 @@ describe("restoreAppState", () => {
     );
     expect(restoredAppState.cursorButton).toBe("up");
     expect(restoredAppState.name).toBe(stubImportedAppState.name);
+  });
+
+  it("should migrate legacy current item stroke width to stroke width key", () => {
+    const stubImportedAppState = {
+      ...getDefaultAppState(),
+      currentItemStrokeWidth: 4,
+      currentItemStrokeWidthKey: undefined,
+    } as any;
+
+    const restoredAppState = restore.restoreAppState(
+      stubImportedAppState,
+      null,
+    );
+
+    expect(restoredAppState.currentItemStrokeWidthKey).toBe("bold");
+  });
+
+  it("should restore transparent current sticky note stroke as black", () => {
+    const restoredAppState = restore.restoreAppState(
+      {
+        currentItemStickynoteStrokeColor: COLOR_PALETTE.transparent,
+      } as any,
+      null,
+    );
+
+    expect(restoredAppState.currentItemStickynoteStrokeColor).toBe(
+      COLOR_PALETTE.black,
+    );
   });
 
   it("should restore with current app state when imported data state is undefined", () => {
@@ -846,6 +1283,41 @@ describe("restoreAppState", () => {
 });
 
 describe("repairing bindings", () => {
+  it.each(["arrow", "rectangle"] as const)(
+    "should repair bound %s label order and fractional index",
+    (containerType) => {
+      const container = API.createElement({
+        type: containerType,
+        id: "container",
+        index: "b2f" as ExcalidrawElement["index"],
+        boundElements: [{ type: "text", id: "label" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        index: "b2a" as ExcalidrawElement["index"],
+        containerId: container.id,
+      });
+
+      const restoredElements = restore.restoreElements(
+        [label, container],
+        null,
+        {
+          repairBindings: true,
+        },
+      );
+
+      expect(restoredElements.map((element) => element.id)).toEqual([
+        container.id,
+        label.id,
+      ]);
+      expect(restoredElements[0].index).toBe(container.index);
+      expect(restoredElements[1].index! > restoredElements[0].index!).toBe(
+        true,
+      );
+    },
+  );
+
   it("should strip arrow binding if repair throws", () => {
     const container = API.createElement({
       type: "rectangle",
@@ -1139,4 +1611,49 @@ describe("repairing bindings", () => {
       }),
     ]);
   });
+});
+
+describe("restoreLibraryItems creation timestamps", () => {
+  it.each([1, 2])(
+    "accepts v%s input with missing creation metadata",
+    (version) => {
+      const { created, ...legacyElement } = API.createElement({
+        type: "rectangle",
+      });
+      // models library data persisted before `created` existed; the declared
+      // input type is a complete element, restore fills the field at runtime
+      const elements = [
+        legacyElement,
+        API.createElement({ type: "rectangle", created: 123 }),
+        API.createElement({ type: "rectangle", created: null }),
+      ] as unknown as LibraryItem["elements"];
+      const legacyItem: LibraryItem_v1 = elements;
+      const currentItem: LibraryItem = {
+        id: "library-item",
+        status: "unpublished",
+        created: 456,
+        elements,
+      };
+      const imported: ImportedDataState = {
+        libraryItems: version === 1 ? [legacyItem] : [currentItem],
+      };
+
+      const restoredItems: LibraryItems = restore.restoreLibraryItems(
+        imported.libraryItems,
+        "unpublished",
+      );
+
+      expect(restoredItems).toHaveLength(1);
+      expect(
+        restoredItems[0].elements.map((element) => element.created),
+      ).toEqual([null, 123, null]);
+      expect(restoredItems[0].elements.map((element) => element.id)).toEqual(
+        elements.map((element) => element.id),
+      );
+      expect(legacyElement).not.toHaveProperty("created");
+      if (version === 2) {
+        expect(restoredItems[0].created).toBe(456);
+      }
+    },
+  );
 });

@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
+    "chartType_bar": "Stĺpcový graf",
+    "chartType_line": "Čiarový graf",
+    "chartType_radar": "Radarový graf",
+    "chartType_plaintext": "Čistý text",
     "selectAll": "Vybrať všetko",
     "multiSelect": "Pridať prvok do výberu",
     "moveCanvas": "Pohyb plátna",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Čiarkovaný",
     "strokeStyle_dotted": "Bodkovaný",
     "sloppiness": "Štylizácia",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Priehľadnosť",
     "textAlign": "Zarovnanie textu",
     "edges": "Okraje",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "Crow's foot (viacero)",
     "arrowhead_crowfoot_one": "Crow's foot (jedna)",
     "arrowhead_crowfoot_one_or_many": "Crow's foot (jedna k viacero)",
+    "arrowhead_cardinality_one": "Kardinalita (jeden)",
+    "arrowhead_cardinality_many": "Kardinalita (mnoho)",
+    "arrowhead_cardinality_one_or_many": "Kardinalita (jeden alebo mnoho)",
+    "arrowhead_cardinality_exactly_one": "Kardinalita (presne jeden)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalita (žiaden alebo jeden)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalita (žiaden alebo mnoho)",
     "more_options": "Ďalšie možnosti",
+    "cardinality": "Kardinalita",
     "arrowtypes": "Typ šípky",
     "arrowtype_sharp": "Ostrá šípka",
     "arrowtype_round": "Zakrivená šípka",
@@ -95,6 +111,7 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
+    "you": "",
     "toggleGrid": "Prepnúť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
@@ -171,7 +188,14 @@
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "Zabaliť výber do rámu",
     "tab": "Tab",
-    "shapeSwitch": "Zmeniť tvar"
+    "shapeSwitch": "Zmeniť tvar",
+    "preferences": "Nastavenia",
+    "preferences_toolLock": "Uzamknutie nástroja",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "Pripájanie šípky",
+    "midpointSnapping": "Prichytiť k bodom"
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -310,10 +334,16 @@
     "magicframe": "Drôtený model na kód",
     "embeddable": "Web Embed",
     "laser": "Laserový ukazovateľ",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje",
     "mermaidToExcalidraw": "Mermaid do Excalidraw",
     "convertElementType": "Prepnúť typ tvaru"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Obdĺžnik",
@@ -345,6 +375,7 @@
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
+    "autoshape": "",
     "text_selected": "Použite dvojklik alebo stlačte {{shortcut}} na editovanie textu",
     "text_editing": "Stlačte {{shortcut_1}} alebo {{shortcut_2}} pre ukončenie editovania",
     "linearElementMulti": "Kliknite na posledný bod alebo stačte {{shortcut_1}} alebo {{shortcut_2}} pre ukončenie",
@@ -352,6 +383,7 @@
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním {{shortcut_1}}, podržaním {{shortcut_2}} meníte veľkosť so zachovaním stredu",
     "resizeImage": "Podržte {{shortcut_1}} pre voľnú zmenu veľkosti, podržte {{shortcut_2}} pre zmenu veľkosti od stredu",
     "rotate": "Počas rotácie obmedzíte uhol podržaním {{shortcut}}",
+    "toggleArrowhead": "",
     "lineEditor_info": "Podržte {{shortcut_1}} a spravte dvojklik alebo stačte {{shortcut_2}} na editovanie bodov",
     "lineEditor_line_info": "Použite dvojklik alebo stlačte {{shortcut}} na editovanie textu",
     "lineEditor_pointSelected": "Stačte {{shortcut_1}} pre vymazanie bodov, {{shortcut_2}} pre ich duplikovanie alebo potiahnite pre ich posunutie",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Chyba"
+  },
+  "progressDialog": {
+    "title": "Ukladanie",
+    "defaultMessage": "Príprava na uloženie..."
   },
   "exportDialog": {
     "disk_title": "Uložiť na disk",
@@ -557,9 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Vaše kresby sú uložené v pamäti vášho prehliadača.",
+      "center_heading_line2": "Pamäť prehliadača môže byť neočakávane vymazaná.",
+      "center_heading_line3": "Pravidelne si ukladajte si vašu prácu do súboru, aby ste ju nestratili.",
       "center_heading_plus": "Chceli ste namiesto toho prejsť do Excalidraw+?",
       "menuHint": "Exportovanie, nastavenia, jazyky, ..."
     },
@@ -576,7 +612,11 @@
     "colors": "Farby",
     "shades": "Odtiene",
     "hexCode": "Hex kód",
-    "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene"
+    "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,57 +652,58 @@
   "mermaid": {
     "title": "Mermaid do Excalidraw",
     "button": "Vložiť",
-    "description": "Aktuálne sú podporované iba <flowchartLink>vývojové diagramy</flowchartLink>, <sequenceLink>sekvenčné diagramy</sequenceLink> a <classLink>diagramy tried</classLink>. Ostatné typy budú v Excalidraw vykreslené ako obrázky.",
+    "description": "Aktuálne sú podporované iba <flowchartLink>vývojové diagramy</flowchartLink>, <sequenceLink>sekvenčné diagramy</sequenceLink>, <classLink>diagramy tried</classLink> a <erdLink>vzťahové diagramy</erdLink>. Ostatné typy budú v Excalidraw vykreslené ako obrázky.",
     "syntax": "Mermaid syntax",
     "preview": "Ukážka",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Sem napíšte definíciu Mermaid diagramu...",
+    "autoFixAvailable": "Automatická oprava je dostupná"
   },
   "ttd": {
-    "error": ""
+    "error": "Chyba!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Sem opíšte váš diagram... ({{shortcut}} pre nový riadok)",
+    "inputPlaceholderWithMessages": "Pokračujte vylepšovaním vášho diagramu...",
+    "generating": "Generovanie...",
+    "rateLimitRemaining": "Pre dnešok zostáva {{count}} dopytov",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Vy",
+      "assistant": "AI asistent",
+      "system": "Systém"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI beta",
+    "label": "Chat",
+    "menu": "Ponuka",
+    "newChat": "Nový chat",
+    "deleteChat": "Vymazať konverzáciu",
+    "deleteMessage": "Vymazať správu",
+    "viewAsMermaid": "Zobraziť ako Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "Poďme navrhnúť váš diagram",
+      "description": "Opíšte diagram, ktorý chcete vytvoriť a my ho pre vás vygenerujeme.",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Ukážka",
+    "insert": "Vložiť",
+    "retry": "Skúsiť znova",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Príkaz je príliš krátky (min {{min}} znakov)",
+      "promptTooLong": "Príkaz je príliš dlhý (max {{max}} znakov)",
+      "generationFailed": "Generovanie zlyhalo",
+      "invalidDiagram": "Bol vygenerovaný nevalidný diagram :( Môžete ho skúsiť upraviť manuálne, skúsiť to znovu s automatickou opravou alebo skúsiť iný príkaz.",
+      "fixInMermaid": "Upraviť Mermaid manuálne →",
+      "aiRepair": "Vygenerovať znovu (automatická oprava) →",
+      "requestAborted": "Dopyt prerušený",
+      "requestFailed": "Dopyt zlyhal",
+      "mermaidParseError": "Chyba syntax Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Dosiahli ste limit pre AI v pláne zadarmo. Vyskúšajte viac s Excalidraw+ alebo sa vráťte opäť zajtra.",
+      "generalRateLimit": "Spomaľte, ste príliš rýchly! Prosím počkajte chvíľu predtým ako to skúsite znovu.",
+      "messageLimitInputPlaceholder": "Dosiali ste denný limit správ"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Vylepšiť na Plus"
   },
   "quickSearch": {
     "placeholder": "Rýchle vyhľadávanie"

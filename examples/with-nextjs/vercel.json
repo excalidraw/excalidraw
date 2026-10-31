@@ -1,3 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "master": true,
+      "**": false
+    }
+  },
   "outputDirectory": "build"
 }
