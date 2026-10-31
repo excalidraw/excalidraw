@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### `UIOptions.dockedSidebarWidth`
+
+New option, sibling of `dockedSidebarBreakpoint`: the width in px of the docked sidebar. It sets the `--right-sidebar-width` CSS variable and the viewport offset the editor reserves for a docked sidebar, so host apps with a wider sidebar no longer have to override an inline style. Defaults to the previous constant (302).
+
 ### Flowchart navigation (2026-10-30) [#12502](https://github.com/excalidraw/excalidraw/pull/12502)
 
 - Alt+arrow keys move the selection to the flowchart node that's visually next in that direction, whether or not it's linked to the selected node. They used to follow only the arrows bound to the pressed side, cycle through siblings on repeated presses, and fall back to any linked node when nothing was that way.

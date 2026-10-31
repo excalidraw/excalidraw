@@ -1166,6 +1166,8 @@ export type CanvasActions = Partial<{
 
 export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
+  /** width in px of the docked sidebar (default 302) */
+  dockedSidebarWidth: number;
   canvasActions: CanvasActions;
   tools: {
     image: boolean;

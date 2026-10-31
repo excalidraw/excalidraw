@@ -1,12 +1,12 @@
 # UIOptions
 
-This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions), [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint) [`welcomeScreen`](#welcmescreen) and [`tools`](#tools).
+This prop can be used to customise UI of Excalidraw. Currently we support customising [`canvasActions`](#canvasactions), [`dockedSidebarBreakpoint`](#dockedsidebarbreakpoint), [`dockedSidebarWidth`](#dockedsidebarwidth), [`welcomeScreen`](#welcmescreen) and [`tools`](#tools).
 
 <pre>
   &#123;
   <br /> canvasActions?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L372">
     CanvasActions
-  </a>, <br /> dockedSidebarBreakpoint?: number, <br /> welcomeScreen?: boolean <br />
+  </a>, <br /> dockedSidebarBreakpoint?: number, <br /> dockedSidebarWidth?: number, <br /> welcomeScreen?: boolean <br />
 
   }
 </pre>
@@ -70,6 +70,10 @@ function App() {
   );
 }
 ```
+
+## dockedSidebarWidth
+
+This prop sets the width, in pixels, of the sidebar when it is docked. It drives the `--right-sidebar-width` CSS variable and the space the editor reserves for the docked sidebar when it computes the visible viewport, so both stay in sync. Defaults to `302`.
 
 ## tools
 

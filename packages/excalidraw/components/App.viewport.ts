@@ -520,7 +520,9 @@ export class AppViewport {
           }
         : {
             side: isRTL ? ("left" as const) : ("right" as const),
-            offset: RIGHT_SIDEBAR_WIDTH,
+            offset:
+              this.app.props.UIOptions.dockedSidebarWidth ??
+              RIGHT_SIDEBAR_WIDTH,
           })
     );
   };
