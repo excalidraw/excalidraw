@@ -711,10 +711,14 @@ describe("flow chart navigation", () => {
   it("prefers nodes in line, then linked, then in the cone, then any ahead", () => {
     const node = (x: number, y: number) =>
       API.createElement({ type: "rectangle", x, y, width: 200, height: 80 });
-    const link = (from: ExcalidrawElement, to: ExcalidrawElement) =>
+    const link = (
+      from: ExcalidrawElement,
+      to: ExcalidrawElement,
+      elbowed = true,
+    ) =>
       API.createElement({
         type: "arrow",
-        elbowed: true,
+        elbowed,
         startBinding: {
           elementId: from.id,
           fixedPoint: [0.5, 0.5],
@@ -735,12 +739,20 @@ describe("flow chart navigation", () => {
 
     // nothing shares S's row: A, linked to S, lies past S's right edge (if
     // mostly above it) and wins over B, which is more to the right but isn't
-    // linked
+    // linked (through plain arrows, which link nodes just like elbow ones)
     const d = node(300, 80);
     a = node(300, 260);
     b = node(580, 520);
     s = node(0, 620);
-    API.setElements([d, a, b, s, link(d, a), link(d, b), link(a, s)]);
+    API.setElements([
+      d,
+      a,
+      b,
+      s,
+      link(d, a, false),
+      link(d, b, false),
+      link(a, s, false),
+    ]);
     API.setSelectedElements([s]);
     navigate(KEYS.ARROW_RIGHT);
     expectSelected(a);

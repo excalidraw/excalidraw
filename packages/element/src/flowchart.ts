@@ -20,7 +20,7 @@ import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,
-  isElbowArrow,
+  isArrowElement,
   isFrameElement,
   isFlowchartNodeElement,
 } from "./typeChecks";
@@ -102,7 +102,7 @@ const getConnectedFlowchartNodes = (
   node: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): ExcalidrawBindableElement[] => {
-  const arrows = [...elementsMap.values()].filter(isElbowArrow);
+  const arrows = [...elementsMap.values()].filter(isArrowElement);
   const visited = new Set<string>([node.id]);
   const queue: string[] = [node.id];
   const connected: ExcalidrawBindableElement[] = [];
@@ -511,7 +511,11 @@ export class FlowChartNavigator {
     const successors = new Set<string>();
     const predecessors = new Set<string>();
     for (const element of elementsMap.values()) {
-      if (isElbowArrow(element) && element.startBinding && element.endBinding) {
+      if (
+        isArrowElement(element) &&
+        element.startBinding &&
+        element.endBinding
+      ) {
         if (element.startBinding.elementId === node.id) {
           successors.add(element.endBinding.elementId);
         }
