@@ -459,8 +459,9 @@ const createBindingArrow = (
 // 4. any other node whose center lies past the current one's edge, so a
 //    direction only does nothing when there's nothing that way at all
 // Near-ties (within 10%) go to a node the current one links to, then to one
-// linking to it, then reading order (the upper one for left/right, the left
-// one for up/down).
+// linking to it, then to the one more level with the current one's center,
+// then reading order (the upper one for left/right, the left one for
+// up/down).
 const NAVIGATION_TIE_TOLERANCE = 0.1;
 
 export class FlowChartNavigator {
@@ -597,12 +598,19 @@ export class FlowChartNavigator {
     const pool = candidates.filter((candidate) => candidate.tier === topTier);
     const nearest = Math.min(...pool.map((candidate) => candidate.distance));
     const tolerance = Math.max(nearest * NAVIGATION_TIE_TOLERANCE, 1);
+    // how far a candidate's center is off the current node's center line;
+    // within a pixel it's a tie (symmetric layouts), left to reading order
+    const offset = (candidate: typeof pool[number]) =>
+      Math.abs(candidate.crossCenter - nodeCrossCenter);
+    const compareOffsets = (a: typeof pool[number], b: typeof pool[number]) =>
+      Math.abs(offset(a) - offset(b)) > 1 ? offset(a) - offset(b) : 0;
 
     return pool
       .filter((candidate) => candidate.distance <= nearest + tolerance)
       .sort(
         (a, b) =>
           linkRank(a.node.id) - linkRank(b.node.id) ||
+          compareOffsets(a, b) ||
           a.crossCenter - b.crossCenter ||
           a.distance - b.distance,
       )[0].node;

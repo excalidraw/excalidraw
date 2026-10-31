@@ -615,6 +615,25 @@ describe("flow chart navigation", () => {
     expect(Object.keys(h.state.selectedElementIds)).toEqual([element.id]);
   };
 
+  const node = (x: number, y: number, width = 200, height = 80) =>
+    API.createElement({ type: "rectangle", x, y, width, height });
+
+  const link = (
+    from: ExcalidrawElement,
+    to: ExcalidrawElement,
+    elbowed = true,
+  ) =>
+    API.createElement({
+      type: "arrow",
+      elbowed,
+      startBinding: {
+        elementId: from.id,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
+      },
+      endBinding: { elementId: to.id, fixedPoint: [0.5, 0.5], mode: "orbit" },
+    });
+
   it("moves to the node that's visually in that direction", () => {
     /**
      * A → B → C
@@ -660,7 +679,7 @@ describe("flow chart navigation", () => {
     expectSelected(b);
   });
 
-  it("breaks ties by links and reading order", () => {
+  it("breaks ties by links, alignment and reading order", () => {
     /**
      * X ←┐
      *    B
@@ -668,7 +687,14 @@ describe("flow chart navigation", () => {
      *    C
      * Y ←┘
      */
-    const a = API.createElement({ type: "rectangle", width: 200, height: 100 });
+    // at a fractional y, B and C are equally level with A only up to float
+    // noise, which mustn't decide between them
+    const a = API.createElement({
+      type: "rectangle",
+      y: 0.7,
+      width: 200,
+      height: 100,
+    });
     API.setElements([a]);
     API.setSelectedElements([a]);
 
@@ -697,7 +723,8 @@ describe("flow chart navigation", () => {
     navigate(KEYS.ARROW_LEFT);
     expectSelected(y);
 
-    // B and C are equally far and both linked: the upper one wins
+    // B and C are equally far, both linked and equally level: the upper one
+    // wins
     API.setSelectedElements([a]);
     navigate(KEYS.ARROW_RIGHT);
     expectSelected(b);
@@ -706,27 +733,25 @@ describe("flow chart navigation", () => {
     API.setSelectedElements([a]);
     navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
     expectSelected(x);
+
+    // P and Q are both in line with N, equally far and linked from it: P is
+    // level with N's center, Q is higher
+    const n = node(0, 0, 200, 200);
+    const q = node(300, -30);
+    const p = node(300, 60);
+    API.setElements([n, q, p, link(n, q), link(n, p)]);
+    API.setSelectedElements([n]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(p);
+
+    // links still come first
+    API.setElements([n, q, p, link(n, q)]);
+    API.setSelectedElements([n]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(q);
   });
 
   it("prefers nodes in line, then linked, then in the cone, then any ahead", () => {
-    const node = (x: number, y: number) =>
-      API.createElement({ type: "rectangle", x, y, width: 200, height: 80 });
-    const link = (
-      from: ExcalidrawElement,
-      to: ExcalidrawElement,
-      elbowed = true,
-    ) =>
-      API.createElement({
-        type: "arrow",
-        elbowed,
-        startBinding: {
-          elementId: from.id,
-          fixedPoint: [0.5, 0.5],
-          mode: "orbit",
-        },
-        endBinding: { elementId: to.id, fixedPoint: [0.5, 0.5], mode: "orbit" },
-      });
-
     // to the left of S, A shares its row while B is linked to S but lower
     let s = node(450, 170);
     let a = node(0, 170);
