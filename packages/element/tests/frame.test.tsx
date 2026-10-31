@@ -1285,4 +1285,93 @@ describe("adding elements to frames", () => {
       expect(h.elements.length).toBe(4);
     });
   });
+
+  describe("dragging an edited group member out of the frame", () => {
+    const setupGroupInFrame = () => {
+      const frame = API.createElement({
+        id: "frame",
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const container = API.createElement({
+        id: "container",
+        type: "rectangle",
+        x: 20,
+        y: 20,
+        width: 40,
+        height: 40,
+        groupIds: ["group"],
+        frameId: frame.id,
+        boundElements: [{ id: "boundText", type: "text" }],
+      });
+      const boundText = API.createElement({
+        id: "boundText",
+        type: "text",
+        x: 25,
+        y: 30,
+        width: 30,
+        height: 20,
+        groupIds: ["group"],
+        frameId: frame.id,
+        containerId: container.id,
+      });
+      const sibling = API.createElement({
+        id: "sibling",
+        type: "rectangle",
+        x: 100,
+        y: 20,
+        width: 40,
+        height: 40,
+        groupIds: ["group"],
+        frameId: frame.id,
+      });
+
+      API.setElements([frame, container, boundText, sibling]);
+      API.setAppState({
+        editingGroupId: "group",
+        selectedElementIds: { [container.id]: true },
+        selectedGroupIds: {},
+      });
+
+      return { container, boundText, sibling };
+    };
+
+    it("should remove the bound text from the group along with its container", () => {
+      const { container, boundText } = setupGroupInFrame();
+
+      mouse.downAt(40, 40);
+      mouse.moveTo(400, 40);
+      mouse.up();
+
+      expect(container.frameId).toBe(null);
+      expect(container.groupIds).toEqual([]);
+      expect(boundText.frameId).toBe(null);
+      expect(boundText.groupIds).toEqual([]);
+    });
+
+    it("should remove the duplicated bound text from the group when alt-duplicating", () => {
+      const { container, boundText } = setupGroupInFrame();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.downAt(40, 40);
+        mouse.moveTo(400, 40);
+        mouse.up();
+      });
+
+      const containerClone = getCloneByOrigId(container.id);
+      const boundTextClone = getCloneByOrigId(boundText.id);
+
+      expect(containerClone.frameId).toBe(null);
+      expect(containerClone.groupIds).toEqual([]);
+      expect(boundTextClone.frameId).toBe(null);
+      expect(boundTextClone.groupIds).toEqual([]);
+
+      // originals stay grouped in the frame
+      expect(container.groupIds).toEqual(["group"]);
+      expect(boundText.groupIds).toEqual(["group"]);
+    });
+  });
 });
