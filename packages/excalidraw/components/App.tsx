@@ -3277,23 +3277,22 @@ class App extends React.Component<AppProps, AppState> {
 
     const step = 20 / this.state.zoom.value;
 
-    if (event.key === KEYS.ARROW_LEFT) {
-      this.viewport.translate((state) => ({
-        scrollX: state.scrollX + step,
-      }));
-    } else if (event.key === KEYS.ARROW_RIGHT) {
-      this.viewport.translate((state) => ({
-        scrollX: state.scrollX - step,
-      }));
-    } else if (event.key === KEYS.ARROW_UP) {
-      this.viewport.translate((state) => ({
-        scrollY: state.scrollY + step,
-      }));
-    } else if (event.key === KEYS.ARROW_DOWN) {
-      this.viewport.translate((state) => ({
-        scrollY: state.scrollY - step,
-      }));
-    }
+    // Use setState directly instead of viewport.translate because onKeyDown
+    // is wrapped in withBatchedUpdates, and viewport.translate's internal
+    // setState can be clobbered by the batching.
+    this.setState((state) => {
+      let { scrollX, scrollY } = state;
+      if (event.key === KEYS.ARROW_LEFT) {
+        scrollX = scrollX + step;
+      } else if (event.key === KEYS.ARROW_RIGHT) {
+        scrollX = scrollX - step;
+      } else if (event.key === KEYS.ARROW_UP) {
+        scrollY = scrollY + step;
+      } else if (event.key === KEYS.ARROW_DOWN) {
+        scrollY = scrollY - step;
+      }
+      return { scrollX, scrollY };
+    });
 
     return true;
   };
@@ -5351,6 +5350,13 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // Arrow-key panning in view mode — checked before the tool-switching
+      // guard below, which returns early for all non-tool keys in view mode.
+      if (this.state.viewModeEnabled && this.maybeHandleArrowKeyPan(event)) {
+        event.preventDefault();
+        return;
+      }
+
       // view mode hardcoded from upstream -> disable tool switching for now
       const shouldPreventToolSwitching = this.props.viewModeEnabled === true;
 
@@ -5433,9 +5439,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.viewModeEnabled) {
-        if (this.maybeHandleArrowKeyPan(event)) {
-          event.preventDefault();
-        }
         return;
       }
 
