@@ -439,6 +439,50 @@ describe("adding elements to frames", () => {
     ]);
   });
 
+  it("should insert a newly created frame child below its frame despite deleted frame children above it", () => {
+    const frameChild = API.createElement({
+      id: "frameChild",
+      type: "rectangle",
+      x: 100,
+      y: 20,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+    const deletedFrameChild = API.createElement({
+      id: "deletedFrameChild",
+      type: "rectangle",
+      x: 100,
+      y: 60,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+      isDeleted: true,
+    });
+
+    API.setElements([frameChild, frame, deletedFrameChild]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) =>
+        element.id !== frame.id &&
+        element.id !== frameChild.id &&
+        element.id !== deletedFrameChild.id,
+    );
+
+    expect(createdElement?.frameId).toBe(frame.id);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      frameChild.id,
+      createdElement?.id,
+      frame.id,
+      deletedFrameChild.id,
+    ]);
+  });
+
   it("should insert a newly created frame child above the highest frame child", () => {
     const frameChildUnderCursor = API.createElement({
       id: "frameChildUnderCursor",
