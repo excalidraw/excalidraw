@@ -33,6 +33,7 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { syncMovedIndices } from "./fractionalIndex";
 import {
+  isArrowElement,
   isFrameElement,
   isFrameLikeElement,
   isTextElement,
@@ -468,6 +469,24 @@ export const getContainingFrame = (
   }
   return (elementsMap.get(element.frameId) ||
     null) as null | ExcalidrawFrameLikeElement;
+};
+
+/**
+ * Whether frames clip the element to their bounds (as their child, or when
+ * dragged into them). Arrows (with their labels) aren't, so that they can
+ * connect elements across and out of frames.
+ */
+export const isFrameClippable = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  if (isArrowElement(element)) {
+    return false;
+  }
+  if (isTextElement(element) && element.containerId) {
+    return !isArrowElement(elementsMap.get(element.containerId));
+  }
+  return true;
 };
 
 // --------------------------- Frame Operations -------------------------------
@@ -943,7 +962,11 @@ export const shouldApplyFrameClip = (
   elementsMap: ElementsMap,
   checkedGroups?: Map<string, boolean>,
 ) => {
-  if (!appState.frameRendering || !appState.frameRendering.clip) {
+  if (
+    !appState.frameRendering ||
+    !appState.frameRendering.clip ||
+    !isFrameClippable(element, elementsMap)
+  ) {
     return false;
   }
 
@@ -1017,16 +1040,25 @@ export const getElementsOverlappingFrame = <T extends ExcalidrawElement>(
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  return elements.filter(
-    (el) =>
+  const frameBounds = getElementBounds(frame, elementsMap);
+
+  return elements.filter((el) => {
+    const container =
+      isTextElement(el) && el.containerId
+        ? elementsMap.get(el.containerId)
+        : null;
+    // an arrow's label is placed, and thus shown, with its arrow
+    const target = isArrowElement(container) ? container : el;
+
+    return (
       // exclude elements which are overlapping, but are in a different frame,
-      // and thus invisible in target frame
-      (!el.frameId || el.frameId === frame.id) &&
-      doBoundsIntersect(
-        getElementBounds(el, elementsMap),
-        getElementBounds(frame, elementsMap),
-      ),
-  );
+      // and thus invisible in target frame (unless not clipped by theirs)
+      (!target.frameId ||
+        target.frameId === frame.id ||
+        !isFrameClippable(target, elementsMap)) &&
+      doBoundsIntersect(getElementBounds(target, elementsMap), frameBounds)
+    );
+  });
 };
 
 export const frameAndChildrenSelectedTogether = (
