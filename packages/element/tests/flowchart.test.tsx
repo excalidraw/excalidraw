@@ -683,7 +683,7 @@ describe("flow chart navigation", () => {
       .sort((el1, el2) => el1.y - el2.y);
 
     API.setSelectedElements([b]);
-    createNode(KEYS.ARROW_LEFT);
+    const x = createNode(KEYS.ARROW_LEFT);
     API.setSelectedElements([c]);
     const y = createNode(KEYS.ARROW_LEFT);
     API.updateElement(y, { y: y.y + 10 });
@@ -702,9 +702,13 @@ describe("flow chart navigation", () => {
     navigate(KEYS.ARROW_RIGHT);
     expectSelected(b);
 
-    // B links to X, which is as near as A, but we came from A (and the way
-    // back survives releasing Alt in between)
+    // A and X are equally far: B links to X
     navigate(KEYS.ARROW_LEFT);
+    expectSelected(x);
+
+    // but while Alt is held, we go back where we came from
+    API.setSelectedElements([a]);
+    navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
     expectSelected(a);
   });
 
@@ -783,8 +787,7 @@ describe("flow chart navigation", () => {
 
     // left of A, D is linked to it, but we came from S
     API.setSelectedElements([s]);
-    navigate(KEYS.ARROW_RIGHT);
-    navigate(KEYS.ARROW_LEFT);
+    navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
     expectSelected(s);
   });
 });

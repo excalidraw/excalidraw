@@ -460,9 +460,9 @@ const createBindingArrow = (
 //    direction only does nothing when there's nothing that way at all
 // Near-ties (within 10%) go to a node the current one links to, then to one
 // linking to it, then reading order (the upper one for left/right, the left
-// one for up/down). Pressing the opposite of the last move overrides all of
-// this and goes back where it came from, as long as that node still lies that
-// way.
+// one for up/down). While Alt is held, pressing the opposite of the last move
+// overrides all of this and goes back where it came from, as long as that node
+// still lies that way.
 const NAVIGATION_TIE_TOLERANCE = 0.1;
 
 const OPPOSITE_DIRECTION: Record<LinkDirection, LinkDirection> = {
@@ -483,14 +483,6 @@ export class FlowChartNavigator {
   clear() {
     this.isExploring = false;
     this.lastMove = null;
-  }
-
-  /**
-   * Ends the keyboard session but keeps the last move, so a later session
-   * that starts on the node we landed on can still undo it.
-   */
-  endExploring() {
-    this.isExploring = false;
   }
 
   exploreByDirection(
