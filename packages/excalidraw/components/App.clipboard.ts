@@ -39,6 +39,7 @@ import { tryParseSpreadsheet } from "../charts";
 import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import { ImageURLToFile, SVGStringToFile } from "../data/blob";
 import { t } from "../i18n";
+import { convertMarkdownToElements, isMaybeMarkdown } from "../markdown";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { withBatchedUpdates } from "../reactUtils";
 import { getShortcutKey } from "../shortcut";
@@ -149,6 +150,22 @@ export class AppClipboard {
             data: result.data,
             rawText: data.text,
           },
+        });
+        return;
+      }
+    }
+
+    // ------------------- Markdown -------------------
+    if (!isPlainPaste && data.text && isMaybeMarkdown(data.text)) {
+      // anchor the flow at the origin; addElementsFromPasteOrLibrary centers
+      // the whole column at the paste cursor
+      const markdownElements = convertMarkdownToElements(data.text, 0, 0);
+      if (markdownElements.length > 0) {
+        this.app.addElementsFromPasteOrLibrary({
+          elements: markdownElements,
+          files: null,
+          position: "cursor",
+          retainSeed: false,
         });
         return;
       }
