@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import fuzzy from "fuzzy";
 import { useEffect, useRef, useMemo, useState } from "react";
 
 import {
@@ -29,6 +28,7 @@ import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { deburr } from "../../deburr";
+import { fuzzyFilter } from "../../fuzzySearch";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
 import { t } from "../../i18n";
 import {
@@ -860,15 +860,11 @@ function CommandPaletteInner({
       return;
     }
 
-    const _query = deburr(
-      commandSearch.toLocaleLowerCase().replace(/[<>_| -]/g, ""),
+    matchingCommands = fuzzyFilter(
+      commandSearch,
+      matchingCommands,
+      (command) => command.haystack ?? "",
     );
-    matchingCommands = fuzzy
-      .filter(_query, matchingCommands, {
-        extract: (command) => command.haystack ?? "",
-      })
-      .sort((a, b) => b.score - a.score)
-      .map((item) => item.original);
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0] ?? null);

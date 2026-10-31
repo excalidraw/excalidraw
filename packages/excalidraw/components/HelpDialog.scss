@@ -12,6 +12,31 @@
       font-size: 1.125rem;
     }
 
+    &__section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      column-gap: 1.5rem;
+      row-gap: 0.75rem;
+      margin: 1.5rem 0;
+
+      h3 {
+        margin: 0;
+      }
+    }
+
+    &__search {
+      flex: 1 1 16rem;
+      max-width: 24rem;
+    }
+
+    &__no-results {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--color-gray-50);
+    }
+
     &__header {
       display: flex;
       flex-wrap: wrap;
@@ -77,6 +102,11 @@
       }
       &__island--editor {
         grid-area: 1 / 2 / 3 / 3;
+      }
+
+      // filtered results just flow into the grid
+      &__islands-container--filtered &__island {
+        grid-area: auto;
       }
     }
 
