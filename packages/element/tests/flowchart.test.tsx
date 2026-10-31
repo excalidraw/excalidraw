@@ -660,7 +660,7 @@ describe("flow chart navigation", () => {
     expectSelected(b);
   });
 
-  it("goes back the way it came, else breaks ties by links and reading order", () => {
+  it("breaks ties by links and reading order", () => {
     /**
      * X ←┐
      *    B
@@ -702,14 +702,10 @@ describe("flow chart navigation", () => {
     navigate(KEYS.ARROW_RIGHT);
     expectSelected(b);
 
-    // A and X are equally far: B links to X
-    navigate(KEYS.ARROW_LEFT);
-    expectSelected(x);
-
-    // but while Alt is held, we go back where we came from
+    // A and X are equally far: B links to X, even right after coming from A
     API.setSelectedElements([a]);
     navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
-    expectSelected(a);
+    expectSelected(x);
   });
 
   it("prefers nodes in line, then linked, then in the cone, then any ahead", () => {
@@ -784,10 +780,5 @@ describe("flow chart navigation", () => {
     API.setSelectedElements([s]);
     navigate(KEYS.ARROW_DOWN);
     expectSelected(b);
-
-    // left of A, D is linked to it, but we came from S
-    API.setSelectedElements([s]);
-    navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
-    expectSelected(s);
   });
 });

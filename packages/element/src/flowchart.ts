@@ -460,29 +460,14 @@ const createBindingArrow = (
 //    direction only does nothing when there's nothing that way at all
 // Near-ties (within 10%) go to a node the current one links to, then to one
 // linking to it, then reading order (the upper one for left/right, the left
-// one for up/down). While Alt is held, pressing the opposite of the last move
-// overrides all of this and goes back where it came from, as long as that node
-// still lies that way.
+// one for up/down).
 const NAVIGATION_TIE_TOLERANCE = 0.1;
-
-const OPPOSITE_DIRECTION: Record<LinkDirection, LinkDirection> = {
-  up: "down",
-  down: "up",
-  left: "right",
-  right: "left",
-};
 
 export class FlowChartNavigator {
   isExploring: boolean = false;
-  private lastMove: {
-    from: ExcalidrawElement["id"];
-    to: ExcalidrawElement["id"];
-    direction: LinkDirection;
-  } | null = null;
 
   clear() {
     this.isExploring = false;
-    this.lastMove = null;
   }
 
   exploreByDirection(
@@ -494,17 +479,10 @@ export class FlowChartNavigator {
       return null;
     }
 
-    const cameFrom =
-      this.lastMove?.to === element.id &&
-      this.lastMove.direction === OPPOSITE_DIRECTION[direction]
-        ? this.lastMove.from
-        : null;
-
     const next = FlowChartNavigator.findNodeInDirection(
       element,
       elementsMap,
       direction,
-      cameFrom,
     );
 
     if (!next) {
@@ -512,7 +490,6 @@ export class FlowChartNavigator {
     }
 
     this.isExploring = true;
-    this.lastMove = { from: element.id, to: next.id, direction };
 
     return next.id;
   }
@@ -521,7 +498,6 @@ export class FlowChartNavigator {
     node: ExcalidrawBindableElement,
     elementsMap: ElementsMap,
     direction: LinkDirection,
-    cameFrom: ExcalidrawElement["id"] | null,
   ) {
     const horizontal = direction === "left" || direction === "right";
     const sign = direction === "right" || direction === "down" ? 1 : -1;
@@ -608,13 +584,6 @@ export class FlowChartNavigator {
         ];
       },
     );
-
-    const wayBack = candidates.find(
-      (candidate) => candidate.node.id === cameFrom,
-    );
-    if (wayBack) {
-      return wayBack.node;
-    }
 
     if (!candidates.length) {
       return null;
