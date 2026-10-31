@@ -2,6 +2,9 @@
   "labels": {
     "signUp": "Registrati",
     "signIn": "Accedi",
+    "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Incolla",
     "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",
@@ -27,6 +30,7 @@
     "copyStyles": "Copia stili",
     "pasteStyles": "Incolla stili",
     "stroke": "Tratto",
+    "textColor": "Colore del testo",
     "changeStroke": "Cambia il colore del tratto",
     "background": "Sfondo",
     "changeBackground": "Cambia il colore dello sfondo",
@@ -187,6 +191,8 @@
     "copyElementLink": "Copia il link all'oggetto",
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Scheda",
     "shapeSwitch": "Cambia forma",
     "preferences": "Preferenze",
@@ -195,7 +201,11 @@
     "boxSelectionContain": "Avvolgi",
     "boxSelectionOverlap": "Sovrapponi",
     "arrowBinding": "Legatura a freccia",
-    "midpointSnapping": "Aggancia ai punti medi"
+    "midpointSnapping": "Aggancia ai punti medi",
+    "showHints": "",
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Link all'oggetto",
@@ -245,6 +255,7 @@
     "undo": "Annulla",
     "redo": "Ripeti",
     "resetLibrary": "Ripristina libreria",
+    "reset": "",
     "createNewRoom": "Crea nuova stanza",
     "fullScreen": "Schermo intero",
     "darkMode": "Tema scuro",
@@ -332,6 +343,7 @@
     "eraser": "Gomma",
     "frame": "Strumento riquadro",
     "magicframe": "Dal wireframe al codice",
+    "stickynote": "Post-it",
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
     "autoshape": "Disegna per la forma",
@@ -357,6 +369,7 @@
     "group": "Gruppo",
     "frame": "Cornice",
     "magicframe": "Dal wireframe al codice",
+    "stickynote": "Post-it",
     "embeddable": "Incorporamento Web",
     "selection": "Selezione",
     "iframe": "IFrame"
@@ -375,6 +388,7 @@
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "embeddable": "Fare click e trascina per creare un incorporamento web",
+    "stickynote": "Fare clic per posizionare una nota o trascinarla per dimensionarla",
     "autoshape": "Disegna rettangoli, cerchi, diamanti, linee e frecce",
     "text_selected": "Fare doppio clic o premere {{shortcut}} per modificare il testo",
     "text_editing": "Premi {{shortcut_1}} o {{shortcut_2}} per terminare la modifica",
@@ -382,6 +396,7 @@
     "lockAngle": "Puoi limitare l'angolo tenendo premuto {{shortcut}}",
     "resize": "Puoi limitare le proporzioni tenendo premuto {{shortcut_1}} durante il ridimensionamento,\ntenendo premuto {{shortcut_2}} per ridimensionare dal centro",
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto {{shortcut_1}},\ntenendo premuto {{shortcut_2}} per ridimensionare dal centro",
+    "resizeStickyNote": "tieni premuto {{shortcut_1}} per ridimensionare liberamente, {{shortcut_2}} per ridimensionare dal centro",
     "rotate": "Puoi limitare gli angoli tenendo premuto {{shortcut}} durante la rotazione",
     "toggleArrowhead": "Doppio clic per attivare o disattivare la freccia",
     "lineEditor_info": "Tieni premuto {{shortcut_1}} e fai doppio clic oppure premi {{shortcut_2}} per modificare i punti",
@@ -392,6 +407,7 @@
     "bindTextToElement": "{{shortcut}} per aggiungere testo",
     "createFlowchart": "{{shortcut}} per creare un diagramma di flusso",
     "deepBoxSelect": "Tieni premuto {{shortcut}} per selezionare in profondità e per evitare il trascinamento",
+    "cycleSelection": "",
     "eraserRevert": "Tieni premuto {{shortcut}} per ripristinare gli elementi contrassegnati per l'eliminazione",
     "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\".",
     "disableSnapping": "Tieni premuto {{shortcut}} per disattivare lo snap",
@@ -649,6 +665,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Da Mermaid a Excalidraw",
     "button": "Inserisci",
@@ -656,8 +681,11 @@
     "syntax": "Sintassi Mermaid",
     "preview": "Anteprima",
     "label": "Mermaid",
-    "inputPlaceholder": "Scrivi qui la definizione del diagramma Mermaid...",
-    "autoFixAvailable": "Correzione automatica disponibile"
+    "inputPlaceholder": "",
+    "autoFixAvailable": "Correzione automatica disponibile",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Errore!"
@@ -714,7 +742,9 @@
     },
     "sceneFonts": "In questa scena",
     "availableFonts": "Font disponibili",
-    "empty": "Nessun font trovato"
+    "empty": "Nessun font trovato",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nessun utente trovato",

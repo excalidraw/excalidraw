@@ -1,7 +1,10 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Registrieren",
+    "signIn": "Login",
+    "upgrade": "Upgrade",
+    "tryExcalidrawPlus": "Versuche Excalidraw+",
+    "plusFreeTrial": "14 Tage gratis testen",
     "paste": "Einfügen",
     "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
@@ -27,6 +30,7 @@
     "copyStyles": "Formatierung kopieren",
     "pasteStyles": "Formatierung übernehmen",
     "stroke": "Strich",
+    "textColor": "Textfarbe",
     "changeStroke": "Strichfarbe ändern",
     "background": "Hintergrund",
     "changeBackground": "Hintergrundfarbe ändern",
@@ -37,9 +41,9 @@
     "strokeStyle_dashed": "Gestrichelt",
     "strokeStyle_dotted": "Gepunktet",
     "sloppiness": "Sauberkeit",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Druck",
+    "pressure_constant": "Konstant",
+    "pressure_variable": "Variabel",
     "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
     "edges": "Kanten",
@@ -111,7 +115,7 @@
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
-    "you": "",
+    "you": "Du",
     "toggleGrid": "Raster umschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
@@ -187,15 +191,21 @@
     "copyElementLink": "Link zum Objekt kopieren",
     "linkToElement": "Link zum Objekt",
     "wrapSelectionInFrame": "Auswahl in Rahmen einbetten",
+    "removeFrame": "Rahmen entfernen",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Form wechseln",
     "preferences": "Einstellungen",
     "preferences_toolLock": "Werkzeug sperren",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Auswählen bei",
+    "boxSelectionContain": "Umfassung",
+    "boxSelectionOverlap": "Überlappung",
     "arrowBinding": "Pfeilbindung",
-    "midpointSnapping": "An Mittelpunkten einrasten"
+    "midpointSnapping": "An Mittelpunkten einrasten",
+    "showHints": "Hinweise anzeigen",
+    "inputDevice": "Eingabegerät",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Maus"
   },
   "elementLink": {
     "title": "Link zum Objekt",
@@ -245,6 +255,7 @@
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
     "resetLibrary": "Bibliothek zurücksetzen",
+    "reset": "Zurücksetzen",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
@@ -332,10 +343,11 @@
     "eraser": "Radierer",
     "frame": "Rahmenwerkzeug",
     "magicframe": "Wireframe zu Code",
+    "stickynote": "Haftnotiz",
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "Zeichnung zu Form",
+    "bucketfill": "Fülleimer",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
     "mermaidToExcalidraw": "Mermaid zu Excalidraw",
@@ -357,6 +369,7 @@
     "group": "Gruppe",
     "frame": "Rahmen",
     "magicframe": "Wireframe zu Code",
+    "stickynote": "Haftnotiz",
     "embeddable": "Web-Einbettung",
     "selection": "Auswahl",
     "iframe": "IFrame"
@@ -375,6 +388,7 @@
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Doppelklicken oder {{shortcut}} drücken, um Text zu bearbeiten",
     "text_editing": "Drücke {{shortcut_1}} oder {{shortcut_2}}, um die Bearbeitung abzuschließen",
@@ -382,6 +396,7 @@
     "lockAngle": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
     "resize": "Halte {{shortcut_1}} gedrückt, um die Proportionen beizubehalten.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
     "resizeImage": "Halte {{shortcut_1}} gedrückt, um frei zu skalieren.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
+    "resizeStickyNote": "",
     "rotate": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
     "toggleArrowhead": "",
     "lineEditor_info": "Halte {{shortcut_1}} gedrückt und doppelklicke oder drücke {{shortcut_2}}, um Punkte zu bearbeiten",
@@ -392,6 +407,7 @@
     "bindTextToElement": "{{shortcut}} zum Hinzufügen von Text",
     "createFlowchart": "{{shortcut}} zum Erstellen eines Flussdiagramms",
     "deepBoxSelect": "Halte {{shortcut}} gedrückt für Tiefenauswahl und um Ziehen zu verhindern",
+    "cycleSelection": "",
     "eraserRevert": "Halte {{shortcut}} gedrückt, um zum Löschen markierte Elemente wiederherzustellen",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
     "disableSnapping": "Halte {{shortcut}} gedrückt, um Einrasten zu deaktivieren",
@@ -613,10 +629,10 @@
     "shades": "Schattierungen",
     "hexCode": "Hex-Code",
     "noShades": "Keine Schattierungen für diese Farbe verfügbar",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "Keine gültige Farbe",
+    "invalidHexLength": "Hex-Code muss 3, 4, 6 oder 8 Zeichen lang sein",
+    "topPicksTip": "Tipp: Ziehe eine Farbe zu deinen Top-Picks um sie anzupinnen",
+    "resetTopPicks": "Setze deine Top-Picks zurück"
   },
   "overwriteConfirm": {
     "action": {
@@ -649,6 +665,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid zu Excalidraw",
     "button": "Einfügen",
@@ -656,8 +681,11 @@
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau",
     "label": "Mermaid",
-    "inputPlaceholder": "Mermaid-Diagrammdefinition hier eingeben...",
-    "autoFixAvailable": "Automatische Korrektur verfügbar"
+    "inputPlaceholder": "",
+    "autoFixAvailable": "Automatische Korrektur verfügbar",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": "Erneut laden"
   },
   "ttd": {
     "error": "Fehler!"
@@ -714,7 +742,9 @@
     },
     "sceneFonts": "In dieser Szene",
     "availableFonts": "Verfügbare Schriftarten",
-    "empty": "Keine Schriftarten gefunden"
+    "empty": "Keine Schriftarten gefunden",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Keine Benutzer gefunden",
