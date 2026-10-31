@@ -102,25 +102,31 @@ const getConnectedFlowchartNodes = (
   node: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ): ExcalidrawBindableElement[] => {
-  const arrows = [...elementsMap.values()].filter(isArrowElement);
+  // one pass over the scene, so the walk below costs the size of the chart,
+  // not chart nodes × all arrows in the scene
+  const neighbors = new Map<string, string[]>();
+  const addNeighbor = (from: string, to: string) => {
+    const list = neighbors.get(from);
+    if (list) {
+      list.push(to);
+    } else {
+      neighbors.set(from, [to]);
+    }
+  };
+  for (const element of elementsMap.values()) {
+    if (isArrowElement(element) && element.startBinding && element.endBinding) {
+      addNeighbor(element.startBinding.elementId, element.endBinding.elementId);
+      addNeighbor(element.endBinding.elementId, element.startBinding.elementId);
+    }
+  }
+
   const visited = new Set<string>([node.id]);
   const queue: string[] = [node.id];
   const connected: ExcalidrawBindableElement[] = [];
 
-  while (queue.length > 0) {
-    const currentId = queue.shift()!;
-    for (const arrow of arrows) {
-      const startId = arrow.startBinding?.elementId;
-      const endId = arrow.endBinding?.elementId;
-
-      let neighborId: string | undefined;
-      if (startId === currentId) {
-        neighborId = endId;
-      } else if (endId === currentId) {
-        neighborId = startId;
-      }
-
-      if (!neighborId || visited.has(neighborId)) {
+  for (let i = 0; i < queue.length; i++) {
+    for (const neighborId of neighbors.get(queue[i]) ?? []) {
+      if (visited.has(neighborId)) {
         continue;
       }
 
