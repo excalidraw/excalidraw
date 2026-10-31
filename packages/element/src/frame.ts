@@ -553,7 +553,9 @@ export const getFrameChildrenInsertionIndex = (
 
     if (element.id === frameId) {
       return index;
-    } else if (element.frameId === frameId) {
+    } else if (element.frameId === frameId && !element.isDeleted) {
+      // deleted children keep their frameId (and index), but don't count:
+      // they'd place the new ones as high as they were
       return index + 1;
     }
   }
