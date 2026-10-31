@@ -304,6 +304,25 @@ export class AppText {
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         this.textWysiwygSubmitHandler = null;
 
+        // the container may have been deleted while editing its label (e.g.
+        // by a collaborator): the text then outlives it as a free text, rather
+        // than as a label of nothing, which can't be selected
+        const latestTextElement = this.app.scene.getElement(element.id);
+        if (
+          latestTextElement &&
+          isTextElement(latestTextElement) &&
+          latestTextElement.containerId &&
+          !this.app.scene.getNonDeletedElement(latestTextElement.containerId)
+        ) {
+          this.app.scene.mutateElement(latestTextElement, {
+            containerId: null,
+          });
+        }
+        const containerId =
+          latestTextElement && isTextElement(latestTextElement)
+            ? latestTextElement.containerId
+            : element.containerId;
+
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
 
@@ -315,7 +334,7 @@ export class AppText {
           viaKeyboard &&
           !this.app.isToolLocked() &&
           this.app.state.activeTool.type !== "autoshape"
-            ? element.containerId || (!isDeleted ? element.id : null)
+            ? containerId || (!isDeleted ? element.id : null)
             : null;
 
         if (elementIdToSelect) {
