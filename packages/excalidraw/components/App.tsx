@@ -3902,6 +3902,12 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.unmounted = true;
+    // an open text editor listens on the window and keeps its textarea in
+    // the document: submit it so it goes with the editor (and before the
+    // scene it is subscribed to is destroyed)
+    this.text.textWysiwygSubmitHandler?.();
+
     // we're recreating the api object reference so that the
     // <ExcalidrawAPIContext.Provider/> picks up on it
     this.api = { ...this.api, isDestroyed: true };
@@ -3941,7 +3947,6 @@ class App extends React.Component<AppProps, AppState> {
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
-    this.unmounted = true;
     this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();
@@ -4477,6 +4482,22 @@ class App extends React.Component<AppProps, AppState> {
       );
       if (!sceneElement || sceneElement.isDeleted) {
         this.setState({ editingTextElement: null });
+      }
+    }
+
+    // the editing ended in the state without going through the editor (the
+    // failsafe above, or a host's updateScene with an appState, which is how
+    // excalidraw-app syncs its tabs): end the edit in the editor too, else
+    // it outlives its state as a ghost. After the current update, as the
+    // editor submits with a flushSync, unless another session started since.
+    if (prevState.editingTextElement && !this.state.editingTextElement) {
+      const submit = this.text.textWysiwygSubmitHandler;
+      if (submit) {
+        queueMicrotask(() => {
+          if (this.text.textWysiwygSubmitHandler === submit) {
+            submit();
+          }
+        });
       }
     }
 

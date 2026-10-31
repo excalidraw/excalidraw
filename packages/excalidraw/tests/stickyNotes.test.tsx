@@ -907,8 +907,8 @@ describe("sticky notes", () => {
       // a click on empty canvas blurs the editor (submitting it), then its
       // pointer-up records — which used to leave the empty label's deletion
       // as a second, invisible entry. The wysiwyg's own outside-pointerdown
-      // submit is disabled under vitest, so the blur is fired explicitly.
-      fireEvent.blur(editor);
+      // submit is disabled under vitest, so the editor is blurred explicitly.
+      editor.blur();
       mouse.downAt(900, 800);
       mouse.up();
 
@@ -930,7 +930,7 @@ describe("sticky notes", () => {
       });
       expect(h.state.editingTextElement).not.toBeNull();
 
-      fireEvent.blur(editor);
+      editor.blur();
       mouse.downAt(900, 800);
       mouse.up();
 

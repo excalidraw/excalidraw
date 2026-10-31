@@ -188,7 +188,13 @@ export class AppText {
       const latestTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
 
-      if (!latestTextElement || !isTextElement(latestTextElement)) {
+      if (
+        !latestTextElement ||
+        !isTextElement(latestTextElement) ||
+        // deleted from under the edit (by a sync from another tab, or the
+        // host's updateScene): the edit's submit doesn't bring it back
+        latestTextElement.isDeleted
+      ) {
         return;
       }
 
@@ -306,6 +312,11 @@ export class AppText {
 
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
+
+        // submitted by the unmount: the state goes with the component
+        if (this.app.unmounted) {
+          return;
+        }
 
         // keyboard-submit keeps focus on the edited object. For bound text, keep
         // the container selected even if the text becomes empty and is deleted.
