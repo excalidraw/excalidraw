@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Children } from "react";
+import { Children, forwardRef } from "react";
 
 import "./ScrollableList.scss";
 
@@ -9,16 +9,18 @@ interface ScrollableListProps {
   children: React.ReactNode;
 }
 
-export const ScrollableList = ({
-  className,
-  placeholder,
-  children,
-}: ScrollableListProps) => {
-  const isEmpty = !Children.count(children);
+export const ScrollableList = forwardRef<HTMLDivElement, ScrollableListProps>(
+  ({ className, placeholder, children }, ref) => {
+    const isEmpty = !Children.count(children);
 
-  return (
-    <div className={clsx("ScrollableList__wrapper", className)} role="menu">
-      {isEmpty ? <div className="empty">{placeholder}</div> : children}
-    </div>
-  );
-};
+    return (
+      <div
+        ref={ref}
+        className={clsx("ScrollableList__wrapper", className)}
+        role="menu"
+      >
+        {isEmpty ? <div className="empty">{placeholder}</div> : children}
+      </div>
+    );
+  },
+);

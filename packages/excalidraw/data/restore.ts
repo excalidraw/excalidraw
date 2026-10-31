@@ -29,12 +29,14 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  isProviderQualifiedFontFamily,
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
   isTransparent,
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
+
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
@@ -84,6 +86,8 @@ import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
+import type { FontFamily } from "@excalidraw/common";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -97,7 +101,6 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FixedPointBinding,
-  FontFamilyValues,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -286,13 +289,35 @@ const restoreFreedrawStrokeOptions = (
   };
 };
 
-const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
+const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
     return FONT_FAMILY[
       fontFamilyName as keyof typeof FONT_FAMILY
-    ] as FontFamilyValues;
+    ] as FontFamily;
   }
+
+  // Keep only provider-qualified custom families.
+  // Any other unknown name falls back to the default family for compatibility.
+  if (isProviderQualifiedFontFamily(fontFamilyName)) {
+    return fontFamilyName;
+  }
+
   return DEFAULT_FONT_FAMILY;
+};
+
+/**
+ * Normalize a restored `fontFamily`. Built-in (numeric) families pass through
+ * untouched, so a file written by a newer version keeps its id. String
+ * families are only kept when provider-qualified - a bare local font name
+ * would render with whatever the host's CSS resolves, which differs per
+ * machine and is nothing we can load or export.
+ */
+const restoreFontFamily = (fontFamily: unknown): FontFamily => {
+  if (typeof fontFamily === "string") {
+    return getFontFamilyByName(fontFamily);
+  }
+
+  return isFiniteNumber(fontFamily) ? fontFamily : DEFAULT_FONT_FAMILY;
 };
 
 /**
@@ -558,7 +583,7 @@ export const restoreElement = (
       delete (element as any).rawText;
 
       let fontSize = element.fontSize;
-      let fontFamily = element.fontFamily;
+      let fontFamily = restoreFontFamily(element.fontFamily);
       if ("font" in element) {
         const [fontPx, _fontFamily]: [string, string] = (
           element as any
@@ -1243,21 +1268,24 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
   return colors.size ? [...colors.values()] : null;
 };
 
-const restoreFontTopPicks = (
-  value: unknown,
-): readonly FontFamilyValues[] | null => {
+const restoreFontTopPicks = (value: unknown): readonly FontFamily[] | null => {
   if (!Array.isArray(value)) {
     return null;
   }
-  const fontFamilies = new Set<FontFamilyValues>();
+  const fontFamilies = new Set<FontFamily>();
   for (const fontFamily of value) {
     const metadata =
       typeof fontFamily === "number" ? FONT_METADATA[fontFamily] : undefined;
-    // only families the font picker lists (no internal or fallback fonts)
-    if (!metadata || metadata.private || metadata.fallback) {
+    // only families the font picker lists (custom, or built-ins that are not
+    // internal or fallback fonts)
+    const isPickable =
+      typeof fontFamily === "string"
+        ? isProviderQualifiedFontFamily(fontFamily)
+        : !!metadata && !metadata.private && !metadata.fallback;
+    if (!isPickable) {
       continue;
     }
-    fontFamilies.add(fontFamily as FontFamilyValues);
+    fontFamilies.add(fontFamily as FontFamily);
     if (fontFamilies.size >= FONT_TOP_PICKS_SLOTS) {
       break;
     }
@@ -1340,6 +1368,11 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
+    // normalize the default font like element `fontFamily`, or a bare name
+    // from persisted data leaks into every newly created text element
+    currentItemFontFamily: restoreFontFamily(
+      nextAppState.currentItemFontFamily,
+    ),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:

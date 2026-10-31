@@ -17,7 +17,11 @@ import {
   removeDarkModeFilter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  Scene,
+} from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
@@ -71,6 +75,8 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "../clipboard";
+
+import type { FontResolvers } from "../fonts";
 
 import type { RenderableElementsMap } from "./types";
 
@@ -346,6 +352,19 @@ type ExportSceneBaseConfig = {
    * Host environment overrides, e.g. for test environments or Node.js.
    */
   environment?: ExportEnvironment;
+  /**
+   * Resolvers for custom (provider-qualified) font families, keyed by provider
+   * id - without the matching resolver that text falls back to a generic font.
+   * Pass the same resolvers given to `fontProviders`.
+   *
+   * Required even when an editor on the page has the fonts registered, if
+   * exporting through `@excalidraw/utils` - it ships its own copy of the font
+   * registry.
+   *
+   * Exports render persisted geometry as-is - text measured before its font
+   * loaded keeps those (fallback-derived) measurements.
+   */
+  fontResolvers?: FontResolvers;
 
   exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   /**
@@ -564,6 +583,19 @@ const configExportDimension = async ({
 
   const { exportingFrame } = cfg;
 
+  // exports never record resolution failures - a transient one must not mark
+  // the family failed for a live editor sharing the page-scoped failure set
+  const fonts = new Fonts(new Scene(), cfg.fontResolvers);
+
+  // resolve custom families before `restore` - a programmatic text element
+  // (one without `lineHeight`/`height`) derives its line height from the
+  // family metrics, which only exist once registered
+  if (cfg.fontResolvers) {
+    await Fonts.registerElementsFonts(data.elements, fonts, {
+      recordFailure: false,
+    });
+  }
+
   // restore elements (normalizes & drops invisible elements) and filter out
   // deleted ones. The type contract requires non-deleted elements already,
   // but types alone don't protect JS consumers passing raw scene data.
@@ -673,7 +705,7 @@ const configExportDimension = async ({
   if (cfg.environment?.loadFonts) {
     await cfg.environment.loadFonts();
   } else {
-    await Fonts.loadElementsFonts(elements);
+    await Fonts.loadElementsFonts(elements, fonts, { recordFailure: false });
   }
 
   // value used to scale the canvas context. By default, we use this to
@@ -828,6 +860,7 @@ const configExportDimension = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
+    fonts,
   };
 };
 
@@ -944,6 +977,7 @@ type ExportToSvgConfig = Pick<
   | "scale"
   | "frames"
   | "environment"
+  | "fontResolvers"
 > &
   ExportSizeConfig & {
     /**
@@ -1001,6 +1035,7 @@ const exportToSvg = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
+    fonts,
   } = await configExportDimension({ data, config, renderEnvironment });
 
   const offsetX = -(x - normalizedPadding);
@@ -1107,7 +1142,9 @@ const exportToSvg = async ({
 
   const fontFaces =
     config?.skipInliningFonts !== true
-      ? await Fonts.generateFontFaceDeclarations(elements)
+      ? await Fonts.generateFontFaceDeclarations(elements, fonts, {
+          recordFailure: false,
+        })
       : [];
 
   const delimiter = "\n      "; // 6 spaces

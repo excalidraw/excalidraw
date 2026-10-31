@@ -21,7 +21,7 @@ export const QuickSearch = React.forwardRef<HTMLInputElement, QuickSearchProps>(
           className="QuickSearch__input"
           type="text"
           placeholder={placeholder}
-          onChange={(e) => onChange(e.target.value.trim().toLowerCase())}
+          onChange={(e) => onChange(e.target.value.trim())}
         />
       </div>
     );

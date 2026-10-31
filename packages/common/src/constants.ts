@@ -1,7 +1,4 @@
-import type {
-  ExcalidrawElement,
-  FontFamilyValues,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type {
   AppProps,
   AppState,
@@ -153,6 +150,75 @@ export const FONT_FAMILY = {
   Assistant: 10,
 };
 
+/** separates the provider id from the family name, i.e. "google:Roboto" */
+export const FONT_PROVIDER_SEPARATOR = ":";
+
+/**
+ * A custom font family, qualified by the provider able to resolve it.
+ *
+ * WARN: the type only enforces the separator's presence - either side may
+ * still be empty (i.e. ":Roboto"), so anything trusting the parts has to go
+ * through {@link parseProviderFontFamily} regardless.
+ */
+export type CustomFontFamily =
+  `${string}${typeof FONT_PROVIDER_SEPARATOR}${string}`;
+
+/** numeric id for built-ins ({@link FONT_FAMILY}), qualified name for custom */
+export type FontFamily = number | CustomFontFamily;
+
+/**
+ * Whether the family is a custom one, i.e. "google:Roboto".
+ *
+ * WARN: only tells built-in from custom - not whether the family is
+ * well-formed, let alone resolvable. Use {@link parseProviderFontFamily} for
+ * anything which needs the provider.
+ */
+export const isCustomFontFamily = (
+  fontFamily: FontFamily,
+): fontFamily is CustomFontFamily => typeof fontFamily === "string";
+
+/** whether the family is a built-in one (see {@link FONT_FAMILY}) */
+export const isBuiltInFontFamily = (
+  fontFamily: FontFamily,
+): fontFamily is number => typeof fontFamily === "number";
+
+/**
+ * Parse a provider-qualified custom font family, i.e. "google:Roboto". Splits
+ * on the first separator, so family names may contain one themselves.
+ *
+ * @returns `null` when the separator is missing, leading (":Roboto") or
+ * trailing ("google:")
+ */
+export const parseProviderFontFamily = (
+  fontFamily: string,
+): { providerId: string; familyName: string } | null => {
+  const separatorIndex = fontFamily.indexOf(FONT_PROVIDER_SEPARATOR);
+
+  if (separatorIndex <= 0 || separatorIndex === fontFamily.length - 1) {
+    return null;
+  }
+
+  return {
+    providerId: fontFamily.slice(0, separatorIndex),
+    familyName: fontFamily.slice(separatorIndex + 1),
+  };
+};
+
+/**
+ * Type-guard flavor of {@link parseProviderFontFamily}, for narrowing plain
+ * strings at data boundaries (i.e. restored documents, DOM round-trips).
+ */
+export const isProviderQualifiedFontFamily = (
+  fontFamily: string,
+): fontFamily is CustomFontFamily =>
+  parseProviderFontFamily(fontFamily) !== null;
+
+/** build a provider-qualified custom font family from its parts */
+export const createProviderFontFamily = (
+  providerId: string,
+  familyName: string,
+): CustomFontFamily => `${providerId}${FONT_PROVIDER_SEPARATOR}${familyName}`;
+
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it
 export const SANS_SERIF_GENERIC_FONT = "sans-serif";
@@ -170,7 +236,7 @@ export const FONT_FAMILY_FALLBACKS = {
 };
 
 export function getGenericFontFamilyFallback(
-  fontFamily: number,
+  fontFamily: FontFamily,
 ): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
   switch (fontFamily) {
     case FONT_FAMILY.Cascadia:
@@ -183,7 +249,7 @@ export function getGenericFontFamilyFallback(
 }
 
 export const getFontFamilyFallbacks = (
-  fontFamily: number,
+  fontFamily: FontFamily,
 ): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
   const genericFallbackFont = getGenericFontFamilyFallback(fontFamily);
 
@@ -268,7 +334,7 @@ export const STICKY_NOTE_SHADOW_OFFSET = 3;
 export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
 export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
 export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+export const DEFAULT_FONT_FAMILY = FONT_FAMILY.Excalifont;
 /** number of slots in the font-picker top-picks strip — pick customization
  * (replace / reorder) preserves it. Must equal `DEFAULT_FONTS.length` in
  * `packages/excalidraw/components/FontPicker/FontPicker.tsx` (enforced by

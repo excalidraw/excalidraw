@@ -742,7 +742,11 @@
     },
     "sceneFonts": "In this scene",
     "availableFonts": "Available fonts",
+    "searchResults": "Search results",
+    "moreResults": "+{{count}} more, keep typing to narrow",
+    "didYouMean": "Did you mean…",
     "empty": "No fonts found",
+    "searching": "Searching…",
     "topPicksTip": "Tip: drag any font onto your top picks to pin it",
     "resetTopPicks": "Reset to default top picks"
   },

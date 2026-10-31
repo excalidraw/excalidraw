@@ -154,6 +154,7 @@ export const actionCopyAsSvg = register({
         {
           exportingFrame,
           name: app.getName(),
+          fontResolvers: app.fonts.instance.fontResolvers,
           renderEnvironment: app.renderEnvironment,
         },
       );
@@ -221,6 +222,7 @@ export const actionCopyAsPng = register({
       await exportCanvas("clipboard", exportedElements, appState, app.files, {
         exportingFrame,
         name: app.getName(),
+        fontResolvers: app.fonts.instance.fontResolvers,
         renderEnvironment: app.renderEnvironment,
       });
       return {
