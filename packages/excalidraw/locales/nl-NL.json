@@ -57,8 +57,8 @@
     "arrowhead_circle_outline": "Rond (omtrek)",
     "arrowhead_triangle": "Driehoek",
     "arrowhead_triangle_outline": "Driehoek (omtrek)",
-    "arrowhead_diamond": "Diamant",
-    "arrowhead_diamond_outline": "Diamant (omtrek)",
+    "arrowhead_diamond": "Ruit",
+    "arrowhead_diamond_outline": "Ruit (contour)",
     "arrowhead_crowfoot_many": "Kraaienpoot (veel)",
     "arrowhead_crowfoot_one": "Kraaienpoot (enkel)",
     "arrowhead_crowfoot_one_or_many": "Kraaienpoot (enkel of veel)",
@@ -174,8 +174,8 @@
     },
     "statusPublished": "Gepubliceerd",
     "sidebarLock": "Zijbalk open houden",
-    "selectAllElementsInFrame": "Selecteer alle elementen in het frame",
-    "removeAllElementsFromFrame": "Verwijder alle elementen in het frame",
+    "selectAllElementsInFrame": "Selecteer alle elementen in het kader",
+    "removeAllElementsFromFrame": "Verwijder alle elementen in het kader",
     "eyeDropper": "Kies kleur van canvas",
     "textToDiagram": "Tekst naar diagram",
     "prompt": "Prompt",
@@ -190,7 +190,7 @@
     "unCroppedDimension": "Niet bijgesneden dimensie",
     "copyElementLink": "Kopieer link naar object",
     "linkToElement": "Link naar object",
-    "wrapSelectionInFrame": "Selectie omslaan in frame",
+    "wrapSelectionInFrame": "Selectie omslaan binnen kader",
     "removeFrame": "Kader verwijderen",
     "toggleWrap": "",
     "tab": "Tab",
@@ -198,7 +198,7 @@
     "preferences": "Voorkeuren",
     "preferences_toolLock": "Tool vergrendelen",
     "boxSelectionMode": "Selecteren aan",
-    "boxSelectionContain": "Inpakken",
+    "boxSelectionContain": "Regelterugloop",
     "boxSelectionOverlap": "Overlappen",
     "arrowBinding": "Pijlverbinding",
     "midpointSnapping": "Vastklikken op middelpunt",
@@ -229,7 +229,7 @@
     "singleResult": "resultaat",
     "multipleResults": "resultaten",
     "placeholder": "Zoek text op canvas...",
-    "frames": "Frames",
+    "frames": "Kaders",
     "texts": "Teksten"
   },
   "buttons": {
@@ -347,19 +347,19 @@
     "embeddable": "Web Embed",
     "laser": "Laseraanwijzer",
     "autoshape": "",
-    "bucketfill": "",
+    "bucketfill": "Emmervulling",
     "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
     "mermaidToExcalidraw": "Mermaid naar Excalidraw",
     "convertElementType": "Vorm type in-/uitschakelen"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Ik kon hier geen afgesloten gebied vinden om te vullen.",
+    "tooComplex": "Deze regio is te complex om te vullen."
   },
   "element": {
     "rectangle": "Rechthoek",
-    "diamond": "Diamant",
+    "diamond": "Ruit",
     "ellipse": "Ovaal",
     "arrow": "Pijl",
     "line": "Lijn",
@@ -369,7 +369,7 @@
     "group": "Groep",
     "frame": "Kader",
     "magicframe": "Wireframe naar code",
-    "stickynote": "",
+    "stickynote": "Plaknotitie",
     "embeddable": "Web Embed",
     "selection": "Selectie",
     "iframe": "IFrame"
@@ -388,17 +388,17 @@
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",
-    "stickynote": "",
-    "autoshape": "",
+    "stickynote": "Klik om een notitie te plaatsen, of sleep om de grootte aan te passen",
+    "autoshape": "Rechthoeken, cirkels, ruiten, lijnen en pijlen tekenen",
     "text_selected": "Dubbelklik of druk op {{shortcut}} om de tekst te bewerken",
     "text_editing": "Druk op {{shortcut_1}} of {{shortcut_2}} om het bewerken te voltooien",
     "linearElementMulti": "Klik op het laatste punt of druk op {{shortcut_1}} of {{shortcut_2}} om te voltooien",
     "lockAngle": "Je kan hoek beperken door {{shortcut}} ingedrukt te houden",
     "resize": "Je kunt de verhoudingen behouden door {{shortcut_1}} ingedrukt te houden tijdens het schalen,\nhoud {{shortcut_2}} ingedrukt om vanuit het midden te schalen",
     "resizeImage": "Je kunt vrij vergroten of verkleinen door {{shortcut_1}} ingedrukt te houden,\nhoud {{shortcut_2}} ingedrukt om vanuit het midden te schalen",
-    "resizeStickyNote": "",
+    "resizeStickyNote": "houd {{shortcut_1}} om de grootte vrijelijk aan te passen, {{shortcut_2}} om te verkleinen vanuit het midden",
     "rotate": "Je kan hoeken beperken door {{shortcut}} ingedrukt te houden tijdens het draaien",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Dubbelklik om de pijl om te keren",
     "lineEditor_info": "Houd {{shortcut_1}} en Dubbelklik of druk op {{shortcut_2}} om punten te bewerken",
     "lineEditor_line_info": "Dubbelklik of druk op {{shortcut}} om punten te bewerken",
     "lineEditor_pointSelected": "Druk op {{shortcut_1}} om punt(en) te verwijderen,\n{{shortcut_2}} om te dupliceren, of sleep om te verplaatsen",
@@ -407,7 +407,7 @@
     "bindTextToElement": "{{shortcut}} om tekst toe te voegen",
     "createFlowchart": "{{shortcut}} voor het maken van een flowchart",
     "deepBoxSelect": "Houd {{shortcut}} ingedrukt om diep te selecteren, en om slepen te voorkomen",
-    "cycleSelection": "",
+    "cycleSelection": "{{shortcut}}- klik om de selectie te wijzigen, of sleep om te dupliceren",
     "eraserRevert": "Houd {{shortcut}} ingedrukt om de elementen die voor verwijdering zijn gemarkeerd te herstellen",
     "firefox_clipboard_write": "Deze functie kan waarschijnlijk worden ingeschakeld door de vlag \"dom.events.asyncClipboard.clipboardItem\" op \"true\" te zetten. Om de browser flags in Firefox te wijzigen, ga naar de pagina \"about:config\".",
     "disableSnapping": "Houd {{shortcut}} ingedrukt om uitlijnen uit te schakelen",
@@ -629,10 +629,10 @@
     "shades": "Tinten",
     "hexCode": "HEX-code",
     "noShades": "Geen tinten beschikbaar voor deze kleur",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "Geen geldige kleur",
+    "invalidHexLength": "Hex code moet 3, 4, 6 of 8 tekens zijn",
+    "topPicksTip": "Tip: sleep een kleur naar je topkiezer om deze vast te zetten",
+    "resetTopPicks": "Standaard topkiezer herstellen"
   },
   "overwriteConfirm": {
     "action": {
@@ -685,7 +685,7 @@
     "autoFixAvailable": "Auto-correctie is beschikbaar",
     "loadError": "",
     "loadErrorReload": "",
-    "reload": ""
+    "reload": "Opnieuw laden"
   },
   "ttd": {
     "error": "Fout!"
@@ -743,8 +743,8 @@
     "sceneFonts": "In deze scène",
     "availableFonts": "Beschikbare lettertypen",
     "empty": "Geen lettertypes gevonden",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Tip: sleep een lettertype naar je topkiezer om deze vast te zetten",
+    "resetTopPicks": "Standaard topkiezer herstellen"
   },
   "userList": {
     "empty": "Geen gebruikers gevonden",
