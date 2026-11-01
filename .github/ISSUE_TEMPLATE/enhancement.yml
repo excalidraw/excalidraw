@@ -1,0 +1,106 @@
+name: 🚀 Enhancement
+description: Suggest an improvement to existing functionality
+title: "[Enhancement]: "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an enhancement! This template is for improving existing functionality rather than adding completely new features.
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behavior
+      description: Describe how the current functionality works.
+      placeholder: Describe the current behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: enhancement-description
+    attributes:
+      label: Enhancement Description
+      description: A clear and concise description of the enhancement you'd like to see.
+      placeholder: Describe the enhancement...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why would this enhancement be useful? What problem does it solve?
+      placeholder: |
+        Why is this enhancement needed? What problem does it solve?
+        How would this improve the user experience?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-changes
+    attributes:
+      label: Proposed Changes
+      description: Describe the specific changes you'd like to see implemented.
+      placeholder: |
+        Be specific about what should change:
+        - What should be modified?
+        - How should it behave differently?
+        - What should the new user experience be like?
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Provide examples of how this enhancement would work in practice.
+      placeholder: |
+        Show examples of:
+        - Current behavior vs. proposed behavior
+        - Use cases where this enhancement would be helpful
+        - Any mockups or sketches if applicable
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact Level
+      description: What is the expected impact of this enhancement?
+      options:
+        - Low - Minor improvement
+        - Medium - Noticeable improvement
+        - High - Significant improvement
+        - Critical - Major workflow improvement
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Implementation Complexity
+      description: How complex do you think this enhancement would be to implement?
+      options:
+        - Low - Simple change
+        - Medium - Moderate complexity
+        - High - Complex implementation
+        - Unknown - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the enhancement here.
+      placeholder: Any additional information that might be helpful...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/excalidraw/excalidraw/blob/master/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
