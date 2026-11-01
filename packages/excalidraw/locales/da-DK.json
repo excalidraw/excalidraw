@@ -1,17 +1,17 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
-    "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
+    "signUp": "Tilmeld dig",
+    "signIn": "Log ind",
+    "upgrade": "Opgrader",
+    "tryExcalidrawPlus": "Prøv Excalidraw+",
+    "plusFreeTrial": "Gratis prøveperiode i 14 dage",
     "paste": "Indsæt",
     "pasteAsPlaintext": "Indsæt som ren tekst",
     "pasteCharts": "Indsæt diagrammer",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Søjlediagram",
+    "chartType_line": "Kurvediagram",
+    "chartType_radar": "Radardiagram",
+    "chartType_plaintext": "Ren tekst",
     "selectAll": "Markér alle",
     "multiSelect": "Tilføj element til markering",
     "moveCanvas": "Flyt lærred",
@@ -30,7 +30,7 @@
     "copyStyles": "Kopiér stil",
     "pasteStyles": "Indsæt stil",
     "stroke": "Streg",
-    "textColor": "",
+    "textColor": "Tekstfarve",
     "changeStroke": "Ændr stregfarve",
     "background": "Baggrund",
     "changeBackground": "Ændr baggrundsfarve",
@@ -41,9 +41,9 @@
     "strokeStyle_dashed": "Stiplet",
     "strokeStyle_dotted": "Prikket",
     "sloppiness": "Sjuskethed",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Tryk",
+    "pressure_constant": "Konstant",
+    "pressure_variable": "Variabelt",
     "opacity": "Uigennemsigtighed",
     "textAlign": "Tekstjustering",
     "edges": "Kanter",
@@ -62,14 +62,14 @@
     "arrowhead_crowfoot_many": "Kragefod (mange)",
     "arrowhead_crowfoot_one": "Kragefod (én)",
     "arrowhead_crowfoot_one_or_many": "Kragefod (én eller mange)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Kardinalitet (én)",
+    "arrowhead_cardinality_many": "Kardinalitet (mange)",
+    "arrowhead_cardinality_one_or_many": "Kardinalitet (én eller mange)",
+    "arrowhead_cardinality_exactly_one": "Kardinalitet (præcis én)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalitet (nul eller én)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalitet (nul eller mange)",
     "more_options": "Flere muligheder",
-    "cardinality": "",
+    "cardinality": "Kardinalitet",
     "arrowtypes": "Piltype",
     "arrowtype_sharp": "Skarp pil",
     "arrowtype_round": "Buet pil",
@@ -115,7 +115,7 @@
     "group": "Gruppér markering",
     "ungroup": "Ophæv gruppering",
     "collaborators": "Samarbejdspartnere",
-    "you": "",
+    "you": "Dig",
     "toggleGrid": "Slå gitter til/fra",
     "addToLibrary": "Føj til bibliotek",
     "removeFromLibrary": "Fjern fra biblioteket",
@@ -150,21 +150,21 @@
     "createContainerFromText": "Placer tekst i en beholder",
     "link": {
       "edit": "Redigér link",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Redigér indlejrbart link",
+      "create": "Tilføj link",
       "label": "Link",
       "labelEmbed": "Link og indlejring",
       "empty": "Der er ikke angivet et link",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Skriv eller indsæt dit link her",
+      "goToElement": "Gå til målelementet"
     },
     "lineEditor": {
       "edit": "Redigér linje",
       "editArrow": "Redigér pil"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Opdel polygon",
+      "convertToPolygon": "Konvertér til polygon"
     },
     "elementLock": {
       "lock": "Lås",
@@ -186,51 +186,51 @@
     "zoomToFit": "Zoom, så alle elementer kan ses",
     "installPWA": "Installer Excalidraw lokalt (PWA)",
     "autoResize": "Slå automatisk tilpasning af tekststørrelse til",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": "",
-    "removeFrame": "",
-    "toggleWrap": "",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
-    "arrowBinding": "",
-    "midpointSnapping": "",
-    "showHints": "",
-    "inputDevice": "",
-    "inputDeviceTrackpad": "",
-    "inputDeviceMouse": ""
+    "imageCropping": "Beskæring af billede",
+    "unCroppedDimension": "Ubeskåret størrelse",
+    "copyElementLink": "Kopiér link til objektet",
+    "linkToElement": "Link til objektet",
+    "wrapSelectionInFrame": "Placer markeringen i en ramme",
+    "removeFrame": "Fjern ramme",
+    "toggleWrap": "Placer markeringen i en ramme, eller fjern rammen",
+    "tab": "Fane",
+    "shapeSwitch": "Skift figur",
+    "preferences": "Indstillinger",
+    "preferences_toolLock": "Lås værktøj",
+    "boxSelectionMode": "Markér ved",
+    "boxSelectionContain": "Helt omsluttet",
+    "boxSelectionOverlap": "Overlap",
+    "arrowBinding": "Binding af pile",
+    "midpointSnapping": "Fastgør til midtpunkter",
+    "showHints": "Vis tip",
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Pegefelt",
+    "inputDeviceMouse": "Mus"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Link til objektet",
+    "desc": "Klik på en figur på lærredet, eller indsæt et link.",
+    "notFound": "Det linkede objekt blev ikke fundet på lærredet."
   },
   "library": {
     "noItems": "Der er ikke tilføjet nogen elementer endnu...",
     "hint_emptyLibrary": "Markér et element på lærredet for at tilføje det her, eller installer et bibliotek fra det offentlige arkiv nedenfor.",
     "hint_emptyPrivateLibrary": "Markér et element på lærredet for at tilføje det her.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Søg i biblioteket",
+      "heading": "Resultater i biblioteket",
+      "noResults": "Der blev ikke fundet nogen elementer...",
+      "clearSearch": "Ryd søgning"
     }
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": "",
-    "frames": "",
-    "texts": ""
+    "title": "Find på lærredet",
+    "noMatch": "Ingen resultater...",
+    "singleResult": "resultat",
+    "multipleResults": "resultater",
+    "placeholder": "Find tekst på lærredet...",
+    "frames": "Rammer",
+    "texts": "Tekster"
   },
   "buttons": {
     "clearReset": "Nulstil lærredet",
@@ -238,7 +238,7 @@
     "exportImage": "Eksportér billede...",
     "export": "Gem i...",
     "copyToClipboard": "Kopiér til udklipsholder",
-    "copyLink": "",
+    "copyLink": "Kopiér link",
     "save": "Gem i den aktuelle fil",
     "saveAs": "Gem som",
     "load": "Åbn",
@@ -255,7 +255,7 @@
     "undo": "Fortryd",
     "redo": "Gentag",
     "resetLibrary": "Nulstil bibliotek",
-    "reset": "",
+    "reset": "Nulstil",
     "createNewRoom": "Opret nyt rum",
     "fullScreen": "Fuld skærm",
     "darkMode": "Mørk tilstand",
@@ -265,11 +265,11 @@
     "objectsSnapMode": "Fastgør til objekter",
     "exitZenMode": "Afslut zentilstand",
     "cancel": "Annuller",
-    "saveLibNames": "",
+    "saveLibNames": "Gem navne, og afslut",
     "clear": "Ryd",
     "remove": "Fjern",
     "embed": "Slå indlejring til/fra",
-    "publishLibrary": "",
+    "publishLibrary": "Omdøb eller udgiv",
     "submit": "Send",
     "confirm": "Bekræft",
     "embeddableInteractionButton": "Klik for at interagere"
@@ -296,7 +296,7 @@
     "removeItemsFromsLibrary": "Vil du slette {{count}} element(er) fra biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøglen skal være på 22 tegn. Livesamarbejde er slået fra.",
     "collabOfflineWarning": "Der er ingen internetforbindelse.\nDine ændringer bliver ikke gemt!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Browserens lagerkvote er opbrugt. Ændringer bliver ikke gemt."
   },
   "errors": {
     "unsupportedFileType": "Filtypen understøttes ikke.",
@@ -327,7 +327,7 @@
   },
   "toolBar": {
     "selection": "Markering",
-    "lasso": "",
+    "lasso": "Lassomarkering",
     "image": "Indsæt billede",
     "rectangle": "Rektangel",
     "diamond": "Rombe",
@@ -343,19 +343,19 @@
     "eraser": "Viskelæder",
     "frame": "Rammeværktøj",
     "magicframe": "Wireframe til kode",
-    "stickynote": "",
+    "stickynote": "Notesseddel",
     "embeddable": "Indlejring fra nettet",
     "laser": "Laserpointer",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "Tegn til figur",
+    "bucketfill": "Fyld område",
     "hand": "Hånd (panoreringsværktøj)",
     "extraTools": "Flere værktøjer",
     "mermaidToExcalidraw": "Mermaid til Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Skift figurtype"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Der blev ikke fundet et lukket område at fylde her.",
+    "tooComplex": "Området er for komplekst til at blive fyldt."
   },
   "element": {
     "rectangle": "Rektangel",
@@ -369,7 +369,7 @@
     "group": "Gruppe",
     "frame": "Ramme",
     "magicframe": "Wireframe til kode",
-    "stickynote": "",
+    "stickynote": "Notesseddel",
     "embeddable": "Indlejring fra nettet",
     "selection": "Markering",
     "iframe": "IFrame"
@@ -380,39 +380,39 @@
     "shapes": "Figurer"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} for at lukke søgningen",
+    "canvasPanning": "Hold {{shortcut_1}} eller {{shortcut_2}} nede, mens du trækker, eller brug håndværktøjet for at flytte lærredet",
     "linearElement": "Klik for at sætte flere punkter, træk for en enkelt linje",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Klik for at sætte flere punkter, træk for en enkelt linje. Tryk på {{shortcut}} igen for at skifte piltype.",
+    "arrowBindModifiers": "Hold {{shortcut_1}} nede for at slå binding fra, eller {{shortcut_2}} for at binde til et fast punkt",
     "freeDraw": "Klik og træk, slip når du er færdig",
     "text": "Tip: Du kan også tilføje tekst ved at dobbeltklikke hvor som helst med markeringsværktøjet",
     "embeddable": "Klik og træk for at indlejre et websted",
-    "stickynote": "",
-    "autoshape": "",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "resizeStickyNote": "",
-    "rotate": "",
-    "toggleArrowhead": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "stickynote": "Klik for at placere en note, eller træk for at bestemme størrelsen",
+    "autoshape": "Tegn rektangler, cirkler, romber, linjer og pile",
+    "text_selected": "Dobbeltklik, eller tryk på {{shortcut}} for at redigere teksten",
+    "text_editing": "Tryk på {{shortcut_1}} eller {{shortcut_2}} for at afslutte redigeringen",
+    "linearElementMulti": "Klik på det sidste punkt, eller tryk på {{shortcut_1}} eller {{shortcut_2}} for at afslutte",
+    "lockAngle": "Du kan låse vinklen ved at holde {{shortcut}} nede",
+    "resize": "Du kan bevare proportionerne ved at holde {{shortcut_1}} nede, mens du ændrer størrelse,\nhold {{shortcut_2}} nede for at ændre størrelse ud fra midten",
+    "resizeImage": "Du kan ændre størrelsen frit ved at holde {{shortcut_1}} nede,\nhold {{shortcut_2}} nede for at ændre størrelse ud fra midten",
+    "resizeStickyNote": "hold {{shortcut_1}} nede for at ændre størrelsen frit, {{shortcut_2}} for at ændre størrelse ud fra midten",
+    "rotate": "Du kan låse vinklerne ved at holde {{shortcut}} nede, mens du roterer",
+    "toggleArrowhead": "Dobbeltklik for at skifte pilehoved",
+    "lineEditor_info": "Hold {{shortcut_1}} nede, og dobbeltklik, eller tryk på {{shortcut_2}} for at redigere punkter",
+    "lineEditor_line_info": "Dobbeltklik, eller tryk på {{shortcut}} for at redigere punkter",
+    "lineEditor_pointSelected": "Tryk på {{shortcut_1}} for at fjerne punkt(er),\n{{shortcut_2}} for at duplikere, eller træk for at flytte",
+    "lineEditor_nothingSelected": "Vælg et punkt, du vil redigere (hold {{shortcut_1}} nede for at vælge flere),\neller hold {{shortcut_2}} nede, og klik for at tilføje nye punkter",
     "publishLibrary": "Udgiv dit eget bibliotek",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "cycleSelection": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} for at tilføje tekst",
+    "createFlowchart": "{{shortcut}} for at oprette et rutediagram",
+    "deepBoxSelect": "Hold {{shortcut}} nede for at dybdemarkere og undgå at trække",
+    "cycleSelection": "{{shortcut}}-klik for at skifte mellem markeringer, eller træk for at duplikere",
+    "eraserRevert": "Hold {{shortcut}} nede for at fortryde sletning af de markerede elementer",
     "firefox_clipboard_write": "Funktionen kan sandsynligvis slås til ved at sætte flaget \"dom.events.asyncClipboard.clipboardItem\" til \"true\". Du ændrer browserens flag i Firefox på siden \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Hold {{shortcut}} nede for at slå fastgørelse fra",
+    "enterCropEditor": "Dobbeltklik på billedet, eller tryk på {{shortcut}} for at beskære det",
+    "leaveCropEditor": "Klik uden for billedet, eller tryk på {{shortcut_1}} eller {{shortcut_2}} for at afslutte beskæringen"
   },
   "canvasError": {
     "cannotShowPreview": "Forhåndsvisningen kan ikke vises",
@@ -444,8 +444,8 @@
     "title": "Fejl"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Gemmer",
+    "defaultMessage": "Forbereder at gemme ..."
   },
   "exportDialog": {
     "disk_title": "Gem til disk",
@@ -488,8 +488,8 @@
     "toggleElementLock": "Lås/lås op for markeringen",
     "movePageUpDown": "Flyt siden op/ned",
     "movePageLeftRight": "Flyt siden til venstre/højre",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Beskær billede",
+    "cropFinish": "Afslut beskæring af billedet"
   },
   "clearCanvasDialog": {
     "title": "Ryd lærred"
@@ -567,8 +567,8 @@
     "storage": "Lagerplads",
     "fullTitle": "Egenskaber for lærred og figur",
     "title": "Egenskaber",
-    "generalStats": "",
-    "elementProperties": "",
+    "generalStats": "Generelt",
+    "elementProperties": "Figurens egenskaber",
     "total": "I alt",
     "version": "Version",
     "versionCopy": "Klik for at kopiere",
@@ -580,7 +580,7 @@
     "copyStyles": "Stil kopieret.",
     "copyToClipboard": "Kopieret til udklipsholderen.",
     "copyToClipboardAsPng": "{{exportSelection}} er kopieret til udklipsholderen som PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} er kopieret til udklipsholderen som SVG\n({{exportColorScheme}})",
     "fileSaved": "Fil gemt.",
     "fileSavedToFilename": "Gemt i {filename}",
     "canvas": "lærred",
@@ -588,7 +588,7 @@
     "pasteAsSingleElement": "Brug {{shortcut}} for at indsætte som ét element,\neller indsæt i en eksisterende teksteditor",
     "unableToEmbed": "Det er i øjeblikket ikke tilladt at indlejre denne URL. Opret et issue på GitHub for at få URL'en sat på tilladelseslisten",
     "unrecognizedLinkFormat": "Det link, du har indlejret, har ikke det forventede format. Prøv at indsætte den »embed«-streng, som kildewebstedet stiller til rådighed",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Linket er kopieret til udklipsholderen"
   },
   "colors": {
     "transparent": "Gennemsigtig",
@@ -609,9 +609,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Dine tegninger gemmes i browserens lager.",
+      "center_heading_line2": "Browserens lager kan blive ryddet uventet.",
+      "center_heading_line3": "Gem dit arbejde i en fil med jævne mellemrum, så du ikke mister det.",
       "center_heading_plus": "Ville du hellere gå til Excalidraw+?",
       "menuHint": "Eksport, indstillinger, sprog ..."
     },
@@ -623,16 +623,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Farve",
     "mostUsedCustomColors": "Mest brugte brugerdefinerede farver",
     "colors": "Farver",
     "shades": "Nuancer",
     "hexCode": "Hex-kode",
     "noShades": "Der er ingen nuancer til denne farve",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "Det er ikke en gyldig farve",
+    "invalidHexLength": "Hex-koden skal være på 3, 4, 6 eller 8 tegn",
+    "topPicksTip": "Tip: Træk en farve over på dine favoritter for at fastgøre den",
+    "resetTopPicks": "Nulstil til standardfavoritter"
   },
   "overwriteConfirm": {
     "action": {
@@ -666,72 +666,72 @@
     }
   },
   "fileDrop": {
-    "replace": "",
-    "add": "",
-    "importLibrary": "",
-    "replaceHint": "",
-    "keepHint": "",
-    "libraryHint": "",
-    "replacedToast": ""
+    "replace": "Slip for at erstatte indholdet",
+    "add": "Slip for at føje til lærredet",
+    "importLibrary": "Slip for at importere bibliotek",
+    "replaceHint": "Hold <shift>Skift</shift> nede for at beholde det eksisterende indhold",
+    "keepHint": "Dit eksisterende indhold bevares",
+    "libraryHint": "Biblioteksfiler bliver tilføjet",
+    "replacedToast": "Indholdet er erstattet. {{shortcut}} for at fortryde"
   },
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Indsæt",
-    "description": "",
+    "description": "I øjeblikket understøttes kun <flowchartLink>rutediagrammer</flowchartLink>, <sequenceLink>sekvensdiagrammer</sequenceLink>, <classLink>klassediagrammer</classLink> og <erdLink>ER-diagrammer</erdLink>. Andre typer vises som billeder i Excalidraw.",
     "syntax": "Mermaid-syntaks",
     "preview": "Forhåndsvisning",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": "",
-    "loadError": "",
-    "loadErrorReload": "",
-    "reload": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Skriv definitionen af Mermaid-diagrammet her...",
+    "autoFixAvailable": "Automatisk rettelse er tilgængelig",
+    "loadError": "Mermaid kunne ikke indlæses. Tjek din internetforbindelse, og prøv igen.",
+    "loadErrorReload": "Mermaid kunne ikke indlæses. Genindlæs siden for at prøve igen.",
+    "reload": "Genindlæs"
   },
   "ttd": {
-    "error": ""
+    "error": "Fejl!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Begynd at skrive din idé til et diagram her ... ({{shortcut}} for ny linje)",
+    "inputPlaceholderWithMessages": "Bliv ved med at forfine dit diagram ...",
+    "generating": "Genererer ...",
+    "rateLimitRemaining": "{{count}} anmodninger tilbage i dag",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Dig",
+      "assistant": "AI-assistent",
+      "system": "System"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI-beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "Ny chat",
+    "deleteChat": "Slet chat",
+    "deleteMessage": "Slet besked",
+    "viewAsMermaid": "Vis som Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Lad os designe dit diagram",
+      "description": "Beskriv det diagram, du vil oprette, så genererer vi det for dig.",
+      "hint": "Lige nu kender vi rutediagrammer, sekvensdiagrammer, klassediagrammer, tilstandsdiagrammer og ER-diagrammer."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Forhåndsvisning",
+    "insert": "Indsæt",
+    "retry": "Prøv igen",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Prompten er for kort (mindst {{min}} tegn)",
+      "promptTooLong": "Prompten er for lang (højst {{max}} tegn)",
+      "generationFailed": "Genereringen mislykkedes",
+      "invalidDiagram": "Der blev genereret et ugyldigt diagram :(. Du kan redigere manuelt, prøve igen med automatisk rettelse eller prøve en anden prompt.",
+      "fixInMermaid": "Redigér Mermaid manuelt →",
+      "aiRepair": "Generér igen (ret automatisk) →",
+      "requestAborted": "Anmodningen blev afbrudt",
+      "requestFailed": "Anmodningen mislykkedes",
+      "mermaidParseError": "Syntaksfejl i Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Du har nået din AI-grænse i det gratis abonnement. Prøv Excalidraw+ for at få mere, eller kom tilbage i morgen.",
+      "generalRateLimit": "Hov, ikke så hurtigt! Vent et øjeblik, før du prøver igen.",
+      "messageLimitInputPlaceholder": "Du har nået din grænse for beskeder"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Opgrader til Plus"
   },
   "quickSearch": {
     "placeholder": "Hurtig søgning"
@@ -743,8 +743,8 @@
     "sceneFonts": "I denne scene",
     "availableFonts": "Tilgængelige skrifttyper",
     "empty": "Der blev ikke fundet nogen skrifttyper",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Tip: Træk en skrifttype over på dine favoritter for at fastgøre den",
+    "resetTopPicks": "Nulstil til standardfavoritter"
   },
   "userList": {
     "empty": "Der blev ikke fundet nogen brugere",
@@ -772,15 +772,15 @@
     "shortcutHint": "Brug {{shortcut}} for at åbne kommandopaletten"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Skift",
+    "spacebar": "Mellemrum",
+    "delete": "Delete",
+    "mmb": "Rullehjul"
   }
 }
