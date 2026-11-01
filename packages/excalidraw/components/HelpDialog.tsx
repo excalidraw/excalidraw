@@ -114,7 +114,8 @@ const Shortcut = ({
   return (
     <div className="HelpDialog__shortcut">
       <div>{label}</div>
-      <div className="HelpDialog__key-container">
+      {/* shortcut order is meaningful (Ctrl+X): isolate from RTL layout */}
+      <div className="HelpDialog__key-container" dir="ltr">
         {[...intersperse(splitShortcutKeys, isOr ? t("helpDialog.or") : "")]}
       </div>
     </div>
