@@ -54,9 +54,9 @@
     "arrowhead_arrow": "Pijl",
     "arrowhead_bar": "Balk",
     "arrowhead_circle": "Rond",
-    "arrowhead_circle_outline": "Rond (omtrek)",
+    "arrowhead_circle_outline": "Cirkel (contour)",
     "arrowhead_triangle": "Driehoek",
-    "arrowhead_triangle_outline": "Driehoek (omtrek)",
+    "arrowhead_triangle_outline": "Driehoek (contour)",
     "arrowhead_diamond": "Ruit",
     "arrowhead_diamond_outline": "Ruit (contour)",
     "arrowhead_crowfoot_many": "Kraaienpoot (veel)",
@@ -135,7 +135,7 @@
     "flipHorizontal": "Horizontaal spiegelen",
     "flipVertical": "Verticaal spiegelen",
     "viewMode": "Weergavemodus",
-    "share": "Deel",
+    "share": "Delen",
     "showStroke": "Toon lijn kleur kiezer",
     "showBackground": "Toon achtergrondkleur kiezer",
     "showFonts": "Lettertype kiezer weergeven",
@@ -147,7 +147,7 @@
     "increaseFontSize": "Letters vergroten",
     "unbindText": "Ontkoppel tekst",
     "bindText": "Koppel tekst aan de container",
-    "createContainerFromText": "Tekst in een container laten doorlopen",
+    "createContainerFromText": "Regelterugloop binnen een container",
     "link": {
       "edit": "Wijzig link",
       "editEmbed": "Bewerken van insluitbare link",
@@ -190,9 +190,9 @@
     "unCroppedDimension": "Niet bijgesneden dimensie",
     "copyElementLink": "Kopieer link naar object",
     "linkToElement": "Link naar object",
-    "wrapSelectionInFrame": "Selectie omslaan binnen kader",
+    "wrapSelectionInFrame": "Regelterugloop selectie binnen kader",
     "removeFrame": "Kader verwijderen",
-    "toggleWrap": "",
+    "toggleWrap": "Regelterugloop selectie aan/uit",
     "tab": "Tab",
     "shapeSwitch": "Verander vorm",
     "preferences": "Voorkeuren",
@@ -236,12 +236,12 @@
     "clearReset": "Canvas opnieuw instellen",
     "exportJSON": "Exporteren naar bestand",
     "exportImage": "Exporteer afbeelding...",
-    "export": "Sla op...",
+    "export": "Opslaan in...",
     "copyToClipboard": "Kopieer",
     "copyLink": "Link kopiëren",
     "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
-    "load": "Open",
+    "load": "Openen",
     "getShareableLink": "Maak een deelbare link",
     "close": "Sluiten",
     "selectLanguage": "Taal selecteren",
@@ -331,10 +331,10 @@
     "image": "Voeg afbeelding in",
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
-    "ellipse": "Ovaal",
+    "ellipse": "Ellips",
     "arrow": "Pijl",
     "line": "Lijn",
-    "freedraw": "Teken",
+    "freedraw": "Tekenen",
     "text": "Tekst",
     "library": "Bibliotheek",
     "lock": "Geselecteerde tool actief houden na tekenen",
@@ -346,7 +346,7 @@
     "stickynote": "Plaknotitie",
     "embeddable": "Web Embed",
     "laser": "Laseraanwijzer",
-    "autoshape": "",
+    "autoshape": "Tekenen naar vorm",
     "bucketfill": "Emmervulling",
     "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
@@ -360,7 +360,7 @@
   "element": {
     "rectangle": "Rechthoek",
     "diamond": "Ruit",
-    "ellipse": "Ovaal",
+    "ellipse": "Ellips",
     "arrow": "Pijl",
     "line": "Lijn",
     "freedraw": "Los tekenen",
@@ -654,25 +654,25 @@
     },
     "modal": {
       "loadFromFile": {
-        "title": "Laad vanuit bestand",
-        "button": "Laad vanuit bestand",
+        "title": "Laden uit bestand",
+        "button": "Laden uit bestand",
         "description": "Het laden van een bestand zal <bold>je bestaande inhoud vervangen</bold>.<br></br>Je kunt eerst een back-up van je tekening maken via een van de onderstaande opties."
       },
       "shareableLink": {
-        "title": "Laad vanuit link",
+        "title": "Laden van link",
         "button": "Vervang mijn inhoud",
         "description": "Het laden van externe tekening zal <bold>je bestaande inhoud vervangen</bold>.<br></br>Je kunt eerst een back-up van je tekening maken via een van de onderstaande opties."
       }
     }
   },
   "fileDrop": {
-    "replace": "",
-    "add": "",
-    "importLibrary": "",
-    "replaceHint": "",
-    "keepHint": "",
-    "libraryHint": "",
-    "replacedToast": ""
+    "replace": "Neerzetten om inhoud te vervangen",
+    "add": "Neerzetten om aan canvas toe te voegen",
+    "importLibrary": "Neerzetten om bibliotheek te importeren",
+    "replaceHint": "Houd <shift>Shift</shift> om bestaande inhoud te behouden",
+    "keepHint": "De bestaande inhoud blijft behouden",
+    "libraryHint": "Bibliotheekbestanden worden toegevoegd",
+    "replacedToast": "Inhoud vervangen. {{shortcut}} om ongedaan te maken"
   },
   "mermaid": {
     "title": "Mermaid naar Excalidraw",
@@ -681,10 +681,10 @@
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
-    "inputPlaceholder": "",
+    "inputPlaceholder": "Schrijf hier de definitie van het Mermaid-diagram...",
     "autoFixAvailable": "Auto-correctie is beschikbaar",
-    "loadError": "",
-    "loadErrorReload": "",
+    "loadError": "Kan Mermaid niet laden. Controleer uw internetverbinding en probeer het opnieuw.",
+    "loadErrorReload": "Kan Mermaid niet laden. Herlaad de pagina om het opnieuw te proberen.",
     "reload": "Opnieuw laden"
   },
   "ttd": {
@@ -710,7 +710,7 @@
     "placeholder": {
       "title": "Laten we jouw diagram ontwerpen",
       "description": "Beschrijf het diagram dat je wilt aanmaken, en we genereren het voor je.",
-      "hint": ""
+      "hint": "Op dit moment kennen we stroomschema's, sequentie-, klasse-, toestands- en entiteit-relatiediagrammen."
     },
     "preview": "Voorbeeld",
     "insert": "Invoegen",
