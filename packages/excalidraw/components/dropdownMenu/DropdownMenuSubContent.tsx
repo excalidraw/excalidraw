@@ -49,7 +49,7 @@ const DropdownMenuSubContent = ({
         }
       }
     },
-    [langCode, isRTL],
+    [isRTL],
   );
 
   const [sideOffset, setSideOffset] = useState(BASE_SIDE_OFFSET);
