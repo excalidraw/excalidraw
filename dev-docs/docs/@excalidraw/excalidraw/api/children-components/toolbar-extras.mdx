@@ -1,0 +1,27 @@
+# ToolbarExtras
+
+`ToolbarExtras` lets you add your own tool buttons to the native toolbar. Whatever you render inside it appears in the toolbar island, after the eraser and before the "more tools" menu. It uses the same mechanism as [Footer](/docs/@excalidraw/excalidraw/api/children-components/footer) and [MainMenu](/docs/@excalidraw/excalidraw/api/children-components/main-menu): the children are tunneled into the toolbar, so you keep every native tool and only add yours.
+
+**Usage**
+
+```jsx live
+function App() {
+  return (
+    <div style={{ height: "500px" }}>
+      <Excalidraw>
+        <ToolbarExtras>
+          <button
+            className="ToolIcon_type_button"
+            title="Insert a GIF"
+            onClick={() => alert("host tool clicked")}
+          >
+            GIF
+          </button>
+        </ToolbarExtras>
+      </Excalidraw>
+    </div>
+  );
+}
+```
+
+Style your buttons like the native ones (`ToolIcon` classes) so they align with the rest of the island. The slot is rendered on desktop and tablet layouts; on phones the toolbar is the mobile one, which has no extras slot yet.

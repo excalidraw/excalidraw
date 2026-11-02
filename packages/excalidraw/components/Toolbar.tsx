@@ -239,6 +239,7 @@ export const Toolbar = ({
 }) => {
   const editorInterface = useEditorInterface();
   const isCompactStylesPanel = useStylesPanelMode() === "compact";
+  const { ToolbarExtrasTunnel } = useTunnels();
 
   const activeTool = appState.activeTool;
   const toolProps = { app, activeTool };
@@ -308,6 +309,8 @@ export const Toolbar = ({
         <TextToolButton {...toolProps} />
         <StickyNoteToolButton {...toolProps} />
         <EraserToolButton {...toolProps} />
+        {/* host tool buttons, see <ToolbarExtras> */}
+        <ToolbarExtrasTunnel.Out />
 
         <div
           className="App-toolbar__divider"
