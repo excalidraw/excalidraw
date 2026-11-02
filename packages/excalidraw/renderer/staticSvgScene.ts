@@ -28,6 +28,7 @@ import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
+  isEmbeddableElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
@@ -302,6 +303,39 @@ const renderElementToSvg = (
     }
     case "iframe":
     case "embeddable": {
+      // host-supplied static rendering (e.g. widgets). iframe keeps the
+      // placeholder; canvas export never sets this callback.
+      if (isEmbeddableElement(element) && renderConfig.renderEmbeddableStatic) {
+        const custom = renderConfig.renderEmbeddableStatic(element, {
+          document: svgRoot.ownerDocument,
+          theme: renderConfig.theme,
+        });
+        if (custom) {
+          custom.setAttribute(
+            "transform",
+            `translate(${offsetX || 0} ${
+              offsetY || 0
+            }) rotate(${degree} ${cx} ${cy})`,
+          );
+          // combine the host's own opacity with the element's
+          const hostOpacity = Number(custom.getAttribute("opacity") ?? 1);
+          const combinedOpacity =
+            (Number.isFinite(hostOpacity) ? hostOpacity : 1) *
+            (element.opacity / 100);
+          if (combinedOpacity !== 1) {
+            custom.setAttribute("opacity", `${combinedOpacity}`);
+          }
+          const g = maybeWrapNodesInFrameClipPath(
+            element,
+            root,
+            [custom],
+            renderConfig.frameRendering,
+            elementsMap,
+          );
+          addToRoot(g || custom, element);
+          break;
+        }
+      }
       // render placeholder rectangle
       const shape = ShapeCache.generateElementShape(element, renderConfig);
       const node = roughSVGDrawWithPrecision(
