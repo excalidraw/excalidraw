@@ -200,6 +200,13 @@ export class AppText {
       element.textAlign === DEFAULT_TEXT_ALIGN
         ? element.textAlign
         : null;
+    // While it follows what's typed, a text that grows with its content stays
+    // where its editing started (where the caret first blinked): a
+    // right-aligned text ends there, a left-aligned one starts there.
+    // Otherwise each switch would keep the anchored edge of the previous
+    // alignment, and the first RTL character would land right of the caret.
+    const autoTextAlignAnchorX =
+      autoTextAlign && element.autoResize ? element.x : null;
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
       const latestTextElement =
@@ -233,6 +240,14 @@ export class AppText {
       const nextTextAlign: ExcalidrawTextElement["textAlign"] = autoTextAlign
         ? (autoTextAlign = isRTL(nextOriginalText) ? "right" : "left")
         : latestTextElement.textAlign;
+      // put the edge the text grows from at the anchor, so that the resize
+      // below keeps it there
+      const nextX =
+        autoTextAlign && autoTextAlignAnchorX !== null
+          ? nextTextAlign === "right"
+            ? autoTextAlignAnchorX - latestTextElement.width
+            : autoTextAlignAnchorX
+          : latestTextElement.x;
 
       this.app.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
@@ -252,7 +267,7 @@ export class AppText {
               ...(stickyLayout?.text ??
                 // returns (wrapped) text and new dimensions
                 refreshTextDimensions(
-                  { ..._element, textAlign: nextTextAlign },
+                  { ..._element, textAlign: nextTextAlign, x: nextX },
                   getContainerElement(_element, elementsMap),
                   elementsMap,
                   nextOriginalText,

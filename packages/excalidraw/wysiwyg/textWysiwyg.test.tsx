@@ -3629,6 +3629,26 @@ describe("textWysiwyg", () => {
       );
     });
 
+    it("keeps a new text pinned where it was clicked while its alignment follows the typed language", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      const clickX = h.elements[0].x;
+
+      // right-aligned: it ends where the caret was blinking
+      updateTextEditor(editor, "שלום עולם");
+      let text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.textAlign).toBe(TEXT_ALIGN.RIGHT);
+      expect(text.x + text.width).toBeCloseTo(clickX);
+
+      // left-aligned again: it starts there, not where the Hebrew text did
+      updateTextEditor(editor, "");
+      updateTextEditor(editor, "hello world");
+      text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.textAlign).toBe(TEXT_ALIGN.LEFT);
+      expect(text.x).toBeCloseTo(clickX);
+    });
+
     it("stops following the typed language once the user picks an alignment", async () => {
       UI.clickTool("text");
       mouse.clickAt(400, 400);
