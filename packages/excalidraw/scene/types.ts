@@ -1,7 +1,9 @@
 import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawEmbeddableElement,
   ExcalidrawFrameLikeElement,
+  NonDeleted,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -61,6 +63,29 @@ export type StaticCanvasRenderConfig = {
   elementRenderOverrides?: ElementRenderOverrides;
 };
 
+/**
+ * Static SVG rendering of an embeddable, supplied by the host (the export-time
+ * counterpart of `renderEmbeddable`). Return an SVG node in the element's
+ * local coordinates (origin at its top-left corner), or null to keep the
+ * default placeholder.
+ */
+export type RenderEmbeddableStatic = (
+  element: NonDeleted<ExcalidrawEmbeddableElement>,
+  context: {
+    /**
+     * Document to create the SVG node in (the export's, which may differ from
+     * `window.document`).
+     */
+    document: Document;
+    /**
+     * Theme of the export. The export does not recolor host nodes (dark mode
+     * is applied per element, not as a filter on the whole SVG), so render
+     * the dark variant yourself when this is "dark".
+     */
+    theme: AppState["theme"];
+  },
+) => SVGElement | null;
+
 export type SVGRenderConfig = {
   /**
    * Host environment used for the text measurements this render needs (the
@@ -73,6 +98,13 @@ export type SVGRenderConfig = {
   isExporting: boolean;
   exportWithDarkMode: boolean;
   renderEmbeddables: boolean;
+  /**
+   * Static SVG rendering of an embeddable, supplied by the host. The export
+   * positions and rotates the node, multiplies its `opacity` by the element's
+   * and clips it to its frame like any other element. Only `embeddable`
+   * elements are concerned (not `iframe`). Absent from canvas export.
+   */
+  renderEmbeddableStatic?: RenderEmbeddableStatic;
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   embedsValidationStatus: EmbedsValidationStatus;
