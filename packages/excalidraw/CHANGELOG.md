@@ -13,7 +13,7 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### Static embeddable rendering on SVG export
+### Static embeddable rendering on SVG export [#12529](https://github.com/excalidraw/excalidraw/pull/12529)
 
 `exportScene({ type: "svg", config: { renderEmbeddableStatic } })` (and `exportToClipboard`) accept a callback `(element, { document, theme }) => SVGElement | null` that returns, per `embeddable` element, an SVG node in the element's local coordinates. The export positions and rotates it, combines its opacity with the element's and clips it to its frame; `null` keeps the default placeholder. The canvas export ignores it. It is the export-time counterpart of `renderEmbeddable`.
 
