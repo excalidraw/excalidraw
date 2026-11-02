@@ -163,6 +163,7 @@ import {
   isFrameClippable,
   addElementsToFrame,
   replaceAllElementsInFrame,
+  removeArrowsWithoutEndInFrame,
   removeElementsFromFrame,
   getElementsInResizingFrame,
   getElementsInNewFrame,
@@ -5479,6 +5480,11 @@ class App extends React.Component<AppProps, AppState> {
         moveFrameArrows(frameArrowIds, { x: offsetX, y: offsetY }, this.scene, {
           renderEnvironment: this.renderEnvironment,
         });
+        // a moved arrow's ends may have left its frame
+        removeArrowsWithoutEndInFrame(
+          movedElements,
+          this.scene.getNonDeletedElementsMap(),
+        );
 
         this.scene.triggerUpdate();
 

@@ -1546,6 +1546,48 @@ describe("arrows in frames", () => {
     expect(arrow.frameId).toBe(null);
   });
 
+  /** an arrow in frame A, just inside its right edge */
+  const createArrowAtFrameEdge = () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 291,
+      y: 50,
+      width: 5,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(5, 0)],
+      frameId: frameA.id,
+    });
+    API.setElements([...h.elements, arrow]);
+    API.setSelectedElements([arrow]);
+    return arrow;
+  };
+
+  it("should take an arrow out of its frame when nudging its ends out of it", () => {
+    const arrow = createArrowAtFrameEdge();
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    expect(arrow.frameId).toBe(frameA.id);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should take an arrow out of its frame when moving its ends out of it from the stats panel", () => {
+    const arrow = createArrowAtFrameEdge();
+
+    API.setAppState({ stats: { ...h.state.stats, open: true } });
+    UI.updateInput(
+      UI.queryStatsProperty("X")!.querySelector(".drag-input")!,
+      "350",
+    );
+
+    expect(arrow.x).toBe(350);
+    expect(arrow.frameId).toBe(null);
+  });
+
   it("should take an arrow out of its frame when resizing the frame leaves its ends out", () => {
     const arrow = drawArrowBetweenFrames();
 
