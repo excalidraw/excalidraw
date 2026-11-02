@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### Arrows aren't clipped to frames (2026-10-31) [#12516](https://github.com/excalidraw/excalidraw/pull/12516)
 
-- Arrows and their labels are no longer clipped to the frame they belong to, so they can connect elements across and out of frames, and their part outside the frame can be selected. They still belong to their frame, so they're moved, copied and deleted with it.
+- Arrows and their labels are no longer clipped to the frame they belong to, so they can connect elements across and out of frames, and their part outside the frame can be selected. They still belong to their frame, so they're moved, copied and deleted with it, but only while one of their ends is in it (bound to an element in the frame, or inside it). An arrow whose ends both leave its frame (moved, bound to elements outside it, or with the elements it's bound to) leaves the frame.
 - Exporting a frame (and `getElementsOverlappingFrame`) now includes other frames' arrows that reach into it, like other elements overlapping it.
 - Moving a frame (dragging it, with the arrow keys or from the stats panel) keeps its arrows bound to the elements that don't move with it, instead of unbinding them.
 

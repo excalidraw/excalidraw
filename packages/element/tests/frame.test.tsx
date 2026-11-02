@@ -1511,6 +1511,50 @@ describe("arrows in frames", () => {
     ).toEqual(endPoint);
   });
 
+  it("should take an arrow out of its frame when neither of its ends is in it", () => {
+    const rectC = API.createElement({
+      type: "rectangle",
+      x: -300,
+      y: 100,
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectC, ...h.elements]);
+    // from inside frame A
+    const arrow = drawArrowBetweenFrames(pointFrom<GlobalPoint>(250, 250));
+
+    // onto rectC, crossing frame A
+    mouse.downAt(250, 250);
+    mouse.moveTo(-250, 150);
+    mouse.up();
+
+    expect(arrow.startBinding?.elementId).toBe(rectC.id);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should take an arrow out of its frame when what it's bound to in it leaves it", () => {
+    const arrow = drawArrowBetweenFrames();
+
+    mouse.downAt(60, 110);
+    mouse.moveTo(-240, 110);
+    mouse.up();
+
+    expect(rectA.frameId).toBe(null);
+    expect(arrow.startBinding?.elementId).toBe(rectA.id);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should take an arrow out of its frame when resizing the frame leaves its ends out", () => {
+    const arrow = drawArrowBetweenFrames();
+
+    UI.resize(frameA, "w", [200, 0]);
+
+    expect(rectA.frameId).toBe(null);
+    expect(arrow.frameId).toBe(null);
+  });
+
   it("should keep an elbow arrow's fixed segment when dragging its frame", () => {
     API.setAppState({ currentItemArrowType: "elbow" });
     // routed around rectB, with its middle segment fixed
