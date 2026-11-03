@@ -92,6 +92,7 @@ const TOOLTIP_WARM_WINDOW = 300;
 /** a pending delayed tooltip, timed in its item's window */
 let showTooltipTimer: { id: number; ownerWindow: Window } | null = null;
 let tooltipHiddenAt = 0;
+let activeTooltipItem: HTMLElement | null = null;
 /**
  * the tooltip `showTooltip` showed last (it lives in its item's document,
  * which may be another window's)
@@ -112,6 +113,7 @@ const clearShowTooltipTimer = () => {
 
 /** Hides the tooltip `showTooltip` shows, and cancels a pending one. */
 export const hideTooltip = () => {
+  activeTooltipItem = null;
   clearShowTooltipTimer();
   tooltipItemObserver?.disconnect();
   tooltipItemObserver = null;
@@ -130,6 +132,7 @@ const updateTooltip = (
   long: boolean,
   position: "bottom" | "top",
 ) => {
+  activeTooltipItem = item;
   if (shownTooltip && shownTooltip !== tooltip) {
     // shown in another document before
     shownTooltip.classList.remove(TOOLTIP_VISIBLE_CLASS);
@@ -223,11 +226,26 @@ export const Tooltip = ({
   disabled,
   delay = false,
 }: TooltipProps) => {
+  const itemRef = React.useRef<HTMLDivElement>(null);
+
+  React.useLayoutEffect(() => {
+    const item = itemRef.current;
+    if (item && activeTooltipItem === item) {
+      const tooltip = item.ownerDocument.querySelector<HTMLDivElement>(
+        ".excalidraw-tooltip",
+      );
+      if (tooltip) {
+        updateTooltip(item, tooltip, label, long, "bottom");
+      }
+    }
+  }, [label, long]);
+
   if (disabled) {
     return null;
   }
   return (
     <div
+      ref={itemRef}
       className={clsx("excalidraw-tooltip-wrapper", className)}
       onPointerEnter={(event) =>
         showTooltip(event.currentTarget, label, { long, delay })
