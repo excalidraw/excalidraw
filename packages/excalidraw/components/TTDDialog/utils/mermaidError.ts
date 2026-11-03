@@ -1,3 +1,5 @@
+import { getMermaidContentLines } from "../../../mermaid";
+
 const MERMAID_SYNTAX_ERROR_LINE = /(?:Parse|Lexical) error on line (\d+)[.:]/i;
 const MERMAID_INACTIVE_PARTICIPANT_ERROR =
   /Trying to inactivate an inactive participant \((.+)\)/i;
@@ -47,40 +49,18 @@ const MERMAID_DIAGRAM_TYPES: Record<string, MermaidDiagramType> = {
  * Index of the line that declares the diagram type: the first one that isn't
  * empty, a comment, a directive (`%%{...}%%`) or front matter (`---` block).
  */
-export const getMermaidHeaderLineIndex = (sourceText: string) => {
-  const lines = sourceText.split(/\r?\n/);
-  let index = 0;
-  const isSkipped = (line: string) => !line.trim() || /^\s*%%/.test(line);
-  while (index < lines.length && isSkipped(lines[index])) {
-    index++;
-  }
-  if (lines[index]?.trim() === "---") {
-    const end = lines.findIndex(
-      (line, lineIndex) => lineIndex > index && line.trim() === "---",
-    );
-    if (end !== -1) {
-      index = end + 1;
-      while (index < lines.length && isSkipped(lines[index])) {
-        index++;
-      }
-    }
-  }
-  return index < lines.length ? index : null;
-};
+export const getMermaidHeaderLineIndex = (sourceText: string) =>
+  getMermaidContentLines(sourceText)[0]?.index ?? null;
 
 /** The diagram type the definition declares (of those Excalidraw converts). */
 export const getMermaidDiagramType = (
   sourceText: string,
 ): MermaidDiagramType | null => {
-  const headerIndex = getMermaidHeaderLineIndex(sourceText);
-  if (headerIndex === null) {
+  const header = getMermaidContentLines(sourceText)[0];
+  if (!header) {
     return null;
   }
-  const keyword = sourceText
-    .split(/\r?\n/)
-    [headerIndex].trim()
-    .split(/\s/)[0]
-    .toLowerCase();
+  const keyword = header.text.trim().split(/\s/)[0].toLowerCase();
   return MERMAID_DIAGRAM_TYPES[keyword] ?? null;
 };
 
@@ -148,34 +128,15 @@ export const getMermaidErrorLineNumber = (
  * next one.
  */
 const getParsedLineStarts = (sourceText: string) => {
-  const lines = sourceText.split(/\r?\n/);
   const type = getMermaidDiagramType(sourceText);
   const runsOnAfterComments = type === "flowchart" || type === "er";
   const starts: number[] = [];
-  let index = 0;
-  if (lines[0]?.trim() === "---") {
-    const end = lines.findIndex((line, i) => i > 0 && line.trim() === "---");
-    if (end !== -1) {
-      index = end + 1;
-    }
-  }
   let runsOn = false;
-  for (; index < lines.length; index++) {
-    const line = lines[index];
-    // a directive, possibly over several lines
-    if (/^\s*%%\{/.test(line)) {
-      while (index < lines.length - 1 && !/\}%%/.test(lines[index])) {
-        index++;
-      }
-      continue;
-    }
-    if (/^\s*%%(?!\{)./.test(line) || (!starts.length && !line.trim())) {
-      continue;
-    }
+  for (const { index, text } of getMermaidContentLines(sourceText)) {
     if (!runsOn) {
       starts.push(index);
     }
-    runsOn = runsOnAfterComments && /\S.*%%/.test(line);
+    runsOn = runsOnAfterComments && /\S.*%%/.test(text);
   }
   return starts;
 };
@@ -306,7 +267,7 @@ export const getMermaidSyntaxErrorGuidance = (
   }
 
   const header = sourceText
-    ? sourceText.split(/\r?\n/)[getMermaidHeaderLineIndex(sourceText) ?? 0]
+    ? getMermaidContentLines(sourceText)[0]?.text ?? ""
     : "";
   // e.g. `sequenceDiagram LR`, `classDiagram direction LR`
   const headerRest = header.match(/^\s*\S+\s+(?!%%)(.+?)\s*$/)?.[1];
@@ -327,7 +288,7 @@ export const getMermaidSyntaxErrorGuidance = (
   }
   if (sourceText && type === "flowchart") {
     const lines = sourceText.split(/\r?\n/);
-    const header = lines[getMermaidHeaderLineIndex(sourceText) ?? 0];
+    const header = getMermaidContentLines(sourceText)[0]?.text ?? "";
     const headerDirection = header.match(
       /^\s*(?:flowchart|graph)\s+(\S+)/,
     )?.[1];

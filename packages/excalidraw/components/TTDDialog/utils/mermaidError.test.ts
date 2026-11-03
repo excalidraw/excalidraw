@@ -138,6 +138,12 @@ describe("getMermaidErrorLineNumber", () => {
       ["flowchart TD\n\n  A --> B\n\n  C --> D]", 5, 5],
       ["---\ntitle: x\n---\nflowchart TD\n  A --> B\n  C --> D]", 3, 6],
       ["%%{init: {'theme':'dark'}}%%\nflowchart TD\n  C --> D]", 2, 3],
+      [
+        "%%{init: {\n  'theme': 'dark'\n}}%%\nflowchart TD\n  A --> B\n  C --> D]",
+        3,
+        6,
+      ],
+      ["%%{init: {'theme':'dark'}}%%flowchart TD\n  A --> B\n  C --> D]", 2, 2],
       ["flowchart TD\n  %%\n  A --> B\n  C --> D]", 4, 4],
       // a flowchart line ending with a comment runs on into the next one
       ["flowchart TD\n  A --> B %% note\n  C --> D]", 2, 2],
@@ -335,5 +341,16 @@ sequenceDiagram
     expect(getMermaidDiagramType("graph LR\n  A --> B")).toBe("flowchart");
     expect(getMermaidDiagramType("stateDiagram-v2\n  [*] --> A")).toBe("state");
     expect(getMermaidDiagramType('pie\n  "A": 1')).toBeNull();
+  });
+
+  it("reads the diagram type past multi-line directives", () => {
+    expect(
+      getMermaidDiagramType(
+        '%%{init: {\n  "theme": "dark"\n}}%%\nflowchart TD\n  A --> B',
+      ),
+    ).toBe("flowchart");
+    expect(getMermaidDiagramType("%%{init: {}}%%flowchart TD")).toBe(
+      "flowchart",
+    );
   });
 });
