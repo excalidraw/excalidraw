@@ -17,6 +17,7 @@ import {
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
+  isElbowArrow,
   isExcalidrawElement,
   getColorUpdate,
   isNonDeletedElement,
@@ -26,6 +27,7 @@ import {
   getBaseFontSize,
   getBaseFontSizeUpdate,
   relayoutStickyNotes,
+  updateElbowArrowRoute,
   updateBoundElements,
 } from "@excalidraw/element";
 
@@ -188,6 +190,15 @@ export const actionPasteStyles = register({
                 startArrowhead: elementStylesToCopyFrom.startArrowhead,
                 endArrowhead: elementStylesToCopyFrom.endArrowhead,
               });
+              if (isElbowArrow(newElement)) {
+                newElement = newElementWith(
+                  newElement,
+                  updateElbowArrowRoute(
+                    newElement,
+                    app.scene.getNonDeletedElementsMap(),
+                  ),
+                );
+              }
             }
 
             if (isFrameLikeElement(element)) {
@@ -225,7 +236,9 @@ export const actionPasteStyles = register({
           prev.x !== element.x ||
           prev.y !== element.y)
       ) {
-        updateBoundElements(element, app.scene);
+        updateBoundElements(element, app.scene, {
+          renderEnvironment: app.renderEnvironment,
+        });
       }
     }
 

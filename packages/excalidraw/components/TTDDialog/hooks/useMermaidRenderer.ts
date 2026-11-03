@@ -4,6 +4,8 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom } from "../../../editor-jotai";
 
+import { useApp } from "../../App";
+
 import { chatHistoryAtom, errorAtom, showPreviewAtom } from "../TTDContext";
 import { convertMermaidToExcalidraw } from "../common";
 import { isValidMermaidSyntax } from "../utils/mermaidValidation";
@@ -59,6 +61,7 @@ export const useMermaidRenderer = ({
   const hasErrorOffsetRef = useRef(false);
   const currentThrottleDelayRef = useRef(FAST_THROTTLE_DELAY);
 
+  const app = useApp();
   const { theme } = useUIAppState();
 
   const renderMermaid = useCallback(
@@ -85,6 +88,7 @@ export const useMermaidRenderer = ({
         setError,
         mermaidDefinition,
         theme,
+        renderEnvironment: app.renderEnvironment,
       });
 
       const renderDuration = performance.now() - renderStartTime;
@@ -98,7 +102,7 @@ export const useMermaidRenderer = ({
       isRenderingRef.current = false;
       return result.success;
     },
-    [canvasRef, mermaidToExcalidrawLib, setError, theme],
+    [app, canvasRef, mermaidToExcalidrawLib, setError, theme],
   );
 
   const throttledRenderMermaid = useMemo(() => {

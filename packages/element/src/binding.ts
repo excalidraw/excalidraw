@@ -35,6 +35,7 @@ import {
   hitElementItself,
   intersectElementWithLineSegment,
   isBindableElementInsideOtherBindable,
+  isPointInBindingArea,
   isPointInElement,
 } from "./collision";
 import { distanceToElement } from "./distance";
@@ -68,6 +69,7 @@ import {
 
 import { isNonDeletedElement } from ".";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { ElementUpdate } from "./mutateElement";
@@ -1184,6 +1186,100 @@ export const bindBindingElement = (
   applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
 };
 
+/**
+ * Whether the arrow's end is bound to an element it's beyond the binding area
+ * of, i.e. that it couldn't be bound to in the editor (e.g. a participant's
+ * header in a sequence diagram, as laid out by mermaid)
+ */
+export const isEndBoundBeyondBindingArea = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "start" | "end",
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): boolean => {
+  const binding =
+    startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+  const bindableElement = binding && elementsMap.get(binding.elementId);
+  return (
+    !!bindableElement &&
+    isBindableElement(bindableElement) &&
+    !isPointInBindingArea(
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      ),
+      bindableElement,
+      elementsMap,
+      zoom,
+    )
+  );
+};
+
+// how far at least to extend an arrow's end segment looking for what it's
+// bound to (see `getBoundEndExtension`)
+const MIN_BOUND_END_EXTENSION = 100;
+
+/**
+ * Extends the arrow's bound end along its end segment, by the segment's length
+ * (at least MIN_BOUND_END_EXTENSION), to find where it would reach the element
+ * it's bound to, off the element by the binding gap. Moving the end there
+ * restores bindings given to arrows that just fall short of their elements.
+ *
+ * @returns where to move the end to, or null if it doesn't reach the element
+ */
+export const getBoundEndExtension = (
+  arrow: ExcalidrawArrowElement,
+  startOrEnd: "start" | "end",
+  elementsMap: NonDeletedSceneElementsMap,
+): GlobalPoint | null => {
+  const binding =
+    startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+  const bindableElement = binding && elementsMap.get(binding.elementId);
+  if (
+    !bindableElement ||
+    !isBindableElement(bindableElement) ||
+    arrow.points.length < 2
+  ) {
+    return null;
+  }
+
+  const end = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
+  const adjacent = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 1 : -2,
+    elementsMap,
+  );
+  const segmentLength = pointDistance(adjacent, end);
+  if (segmentLength < PRECISION) {
+    return null;
+  }
+
+  const extension = lineSegment(
+    end,
+    pointFromVector(
+      vectorScale(
+        vectorNormalize(vectorFromPoint(end, adjacent)),
+        Math.max(segmentLength, MIN_BOUND_END_EXTENSION),
+      ),
+      end,
+    ),
+  );
+  return (
+    intersectElementWithLineSegment(
+      bindableElement,
+      elementsMap,
+      extension,
+      getBindingGap(bindableElement),
+    ).sort((a, b) => pointDistanceSq(a, end) - pointDistanceSq(b, end))[0] ??
+    null
+  );
+};
+
 export const unbindBindingElement = (
   arrow: ExcalidrawArrowElement,
   startOrEnd: "start" | "end",
@@ -1316,6 +1412,217 @@ export const reanchorBindingsToOutline = (
   });
 };
 
+/**
+ * Places both bound ends of `arrow` where its bindings put them on the elements
+ * in `elementsMap` they're bound to, and rewraps its label along it as placed.
+ * Leaves the label's x/y as they were (the editor derives arrow labels' x/y as
+ * it renders them), so callers returning the elements as data must store them
+ * (see `LinearElementEditor.getBoundTextElementPosition`).
+ */
+export const updateBoundArrow = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  scene: Scene,
+  elementsMap: ElementsMap,
+  /** measures the arrow's label */
+  renderEnvironment?: RenderEnvironment,
+  /**
+   * whether it's placed as what it's bound to moved: an arrow bound to one
+   * element at both ends then moves with it whole (its midpoints with its
+   * start), rather than only at its ends
+   */
+  boundElementMoved = true,
+) => {
+  const startBindingElement = arrow.startBinding
+    ? elementsMap.get(arrow.startBinding.elementId)
+    : null;
+  const endBindingElement = arrow.endBinding
+    ? // PERF: If the arrow is bound to the same element on both ends.
+      startBindingElement?.id === arrow.endBinding.elementId
+      ? startBindingElement
+      : elementsMap.get(arrow.endBinding.elementId)
+    : null;
+
+  LinearElementEditor.movePoints(
+    arrow,
+    scene,
+    getBoundPointUpdates(arrow, elementsMap),
+    undefined,
+    {
+      moveMidPointsWithElement:
+        boundElementMoved &&
+        !!startBindingElement &&
+        startBindingElement?.id === endBindingElement?.id,
+    },
+  );
+
+  updateArrowLabel(arrow, scene, elementsMap, renderEnvironment);
+};
+
+/**
+ * Where `arrow`'s bindings put its bound ends on the elements in `elementsMap`
+ * they're bound to.
+ */
+const getBoundPointUpdates = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  elementsMap: ElementsMap,
+): PointsPositionUpdates =>
+  new Map(
+    bindableElementsVisitor(
+      elementsMap,
+      arrow,
+      (bindableElement, bindingProp) => {
+        if (
+          bindableElement &&
+          isBindableElement(bindableElement) &&
+          (bindingProp === "startBinding" || bindingProp === "endBinding")
+        ) {
+          const point = updateBoundPoint(
+            arrow,
+            bindingProp,
+            arrow[bindingProp],
+            bindableElement,
+            elementsMap,
+          );
+
+          if (point) {
+            return [
+              bindingProp === "startBinding" ? 0 : arrow.points.length - 1,
+              { point },
+            ] as MapEntry<PointsPositionUpdates>;
+          }
+        }
+
+        return null;
+      },
+    ).filter(
+      (update): update is MapEntry<PointsPositionUpdates> => update !== null,
+    ),
+  );
+
+/** Rewraps `arrow`'s label (if any) along it as placed. */
+const updateArrowLabel = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  scene: Scene,
+  elementsMap: ElementsMap,
+  renderEnvironment?: RenderEnvironment,
+) => {
+  const boundText = getBoundTextElement(arrow, elementsMap);
+  if (boundText && !boundText.isDeleted) {
+    handleBindTextResize(
+      arrow,
+      scene,
+      false,
+      false,
+      false,
+      false,
+      renderEnvironment,
+    );
+  }
+};
+
+/** Whether `arrow` is bound to an element not in `elementIds`. */
+export const isBoundToElementNotIn = (
+  arrow: ExcalidrawArrowElement,
+  elementIds: ReadonlySet<ExcalidrawElement["id"]>,
+) =>
+  (!!arrow.startBinding && !elementIds.has(arrow.startBinding.elementId)) ||
+  (!!arrow.endBinding && !elementIds.has(arrow.endBinding.elementId));
+
+/**
+ * The arrows that move with a frame being moved (with `movedElements`) but are
+ * bound to elements that don't (e.g. in other frames). They must neither be
+ * unbound, nor be left for what they're bound to to move: move everything
+ * else without them, and then them, with `moveFrameArrows()`.
+ *
+ * @param movedElements all the elements moving, frames included
+ */
+export const getFrameArrowIdsToReattach = (
+  movedElements: readonly ExcalidrawElement[],
+): ReadonlySet<ExcalidrawElement["id"]> => {
+  const movedElementIds = getSimultaneouslyUpdatedElementIds(movedElements);
+  const ids = new Set<ExcalidrawElement["id"]>();
+  for (const element of movedElements) {
+    if (
+      isArrowElement(element) &&
+      element.frameId &&
+      movedElementIds.has(element.frameId) &&
+      isBoundToElementNotIn(element, movedElementIds)
+    ) {
+      ids.add(element.id);
+    }
+  }
+  return ids;
+};
+
+/**
+ * Moves the arrows (see `getFrameArrowIdsToReattach()`) by `offset` from where
+ * they were in `originalElements` (from where they are, without it), and puts
+ * their bound ends on what they're bound to: an end bound to a moved element
+ * thus follows it, and one bound to an unmoved element stays. Call it once
+ * everything else has moved.
+ */
+export const moveFrameArrows = (
+  arrowIds: ReadonlySet<ExcalidrawElement["id"]>,
+  offset: { x: number; y: number },
+  scene: Scene,
+  opts?: {
+    originalElements?: ElementsMap;
+    /** measures the arrows' labels */
+    renderEnvironment?: RenderEnvironment;
+  },
+) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  for (const id of arrowIds) {
+    const arrow = elementsMap.get(id);
+    if (!isArrowElement(arrow)) {
+      continue;
+    }
+    const original =
+      (opts?.originalElements?.get(id) as typeof arrow | undefined) ?? arrow;
+    // its points too, as putting its ends on what they're bound to (which
+    // moving it from where it was undoes) changes them
+    const moved = {
+      x: original.x + offset.x,
+      y: original.y + offset.y,
+      points: original.points,
+    };
+    if (isElbowArrow(arrow)) {
+      if (isElbowArrow(original) && original.fixedSegments?.length) {
+        // routing it keeps its fixed segments, as placed relative to its
+        // route where it is, so first put its route where it was, moved (which
+        // doesn't route it, its fixed segments being given)
+        scene.mutateElement(arrow, {
+          ...moved,
+          fixedSegments: original.fixedSegments,
+          startIsSpecial: original.startIsSpecial,
+          endIsSpecial: original.endIsSpecial,
+        });
+      }
+      // updating its points routes it, so route it once, with its bound ends
+      // already on what they're bound to (where its route heads off)
+      const points = moved.points.slice();
+      getBoundPointUpdates({ ...arrow, ...moved }, elementsMap).forEach(
+        ({ point }, index) => {
+          points[index] = point;
+        },
+      );
+      scene.mutateElement(arrow, { ...moved, points });
+      updateArrowLabel(arrow, scene, elementsMap, opts?.renderEnvironment);
+    } else {
+      scene.mutateElement(arrow, moved);
+      updateBoundArrow(
+        arrow,
+        scene,
+        elementsMap,
+        opts?.renderEnvironment,
+        // it moved, not what it's bound to: an arrow bound to one element at
+        // both ends thus keeps its midpoints moved with the frame too
+        false,
+      );
+    }
+  }
+};
+
 // Supports translating, rotating and scaling `changedElement` with bound
 // linear elements.
 export const updateBoundElements = (
@@ -1325,6 +1632,8 @@ export const updateBoundElements = (
     /** see `getSimultaneouslyUpdatedElementIds` for how to pass it */
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
+    /** measures the labels of the arrows it updates (the host's, in the editor) */
+    renderEnvironment?: RenderEnvironment;
   },
 ) => {
   if (!isBindableElement(changedElement)) {
@@ -1361,68 +1670,12 @@ export const updateBoundElements = (
       return;
     }
 
-    // Check for intersections before updating bound elements incase connected elements overlap
-    const startBindingElement = element.startBinding
-      ? elementsMap.get(element.startBinding.elementId)
-      : null;
-    const endBindingElement = element.endBinding
-      ? // PERF: If the arrow is bound to the same element on both ends.
-        startBindingElement?.id === element.endBinding.elementId
-        ? startBindingElement
-        : elementsMap.get(element.endBinding.elementId)
-      : null;
-
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
       return;
     }
 
-    const updates = bindableElementsVisitor(
-      elementsMap,
-      element,
-      (bindableElement, bindingProp) => {
-        if (
-          bindableElement &&
-          isBindableElement(bindableElement) &&
-          (bindingProp === "startBinding" || bindingProp === "endBinding") &&
-          (changedElement.id === element[bindingProp]?.elementId ||
-            changedElement.id ===
-              element[
-                bindingProp === "startBinding" ? "endBinding" : "startBinding"
-              ]?.elementId)
-        ) {
-          const point = updateBoundPoint(
-            element,
-            bindingProp,
-            element[bindingProp],
-            bindableElement,
-            elementsMap,
-          );
-
-          if (point) {
-            return [
-              bindingProp === "startBinding" ? 0 : element.points.length - 1,
-              { point },
-            ] as MapEntry<PointsPositionUpdates>;
-          }
-        }
-
-        return null;
-      },
-    ).filter(
-      (update): update is MapEntry<PointsPositionUpdates> => update !== null,
-    );
-
-    LinearElementEditor.movePoints(element, scene, new Map(updates), {
-      moveMidPointsWithElement:
-        !!startBindingElement &&
-        startBindingElement?.id === endBindingElement?.id,
-    });
-
-    const boundText = getBoundTextElement(element, elementsMap);
-    if (boundText && !boundText.isDeleted) {
-      handleBindTextResize(element, scene, false);
-    }
+    updateBoundArrow(element, scene, elementsMap, options?.renderEnvironment);
   };
 
   boundElementsVisitor(elementsMap, changedElement, visitor);
@@ -1500,6 +1753,8 @@ export const updateBindings = (
   options?: {
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     newSize?: { width: number; height: number };
+    /** measures the labels of the bound arrows it updates */
+    renderEnvironment?: RenderEnvironment;
   },
 ) => {
   if (isArrowElement(latestElement)) {

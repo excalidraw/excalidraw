@@ -487,7 +487,9 @@ export const convertElementTypes = (
       for (const element of Object.values(convertedElements)) {
         if (isBindableElement(element)) {
           reanchorBindingsToOutline(element, app.scene, app.state.zoom);
-          updateBindings(element, app.scene, app.state);
+          updateBindings(element, app.scene, app.state, {
+            renderEnvironment: app.renderEnvironment,
+          });
         }
 
         const boundText = getBoundTextElement(

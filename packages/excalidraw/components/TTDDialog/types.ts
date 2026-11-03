@@ -36,6 +36,12 @@ export namespace TChat {
     warningType?: /* daily rate limit */
     "messageLimitExceeded" | /* general 429 */ "rateLimitExceeded";
     content?: string;
+    /**
+     * What an assistant's diagram was rendered with: Pele, since
+     * `@excalidraw/mermaid-to-excalidraw` v3. Not set on (saved) messages
+     * from before, which were rendered with Mermaid.
+     */
+    renderer?: "pele";
   };
 
   export type ChatHistory = {

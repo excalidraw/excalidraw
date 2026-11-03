@@ -16,7 +16,9 @@ import type {
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import {
+  getFrameArrowIdsToReattach,
   getSimultaneouslyUpdatedElementIds,
+  moveFrameArrows,
   unbindBindingElement,
   updateBoundElements,
 } from "./binding";
@@ -47,6 +49,8 @@ export const dragSelectedElements = (
     y: number;
   },
   gridSize: NullableGridSize,
+  /** measures the labels of the bound arrows the drag moves */
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (
     _selectedElements.length === 1 &&
@@ -114,8 +118,13 @@ export const dragSelectedElements = (
   const elementsToUpdateIds = getSimultaneouslyUpdatedElementIds(
     elementsToUpdateArray,
   );
+  const frameArrowIds = getFrameArrowIdsToReattach(elementsToUpdateArray);
 
   elementsToUpdate.forEach((element) => {
+    if (frameArrowIds.has(element.id)) {
+      // moved with their frame once the rest has (below)
+      return;
+    }
     if (!isArrowElement(element)) {
       updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
@@ -134,6 +143,7 @@ export const dragSelectedElements = (
       }
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdateArray,
+        renderEnvironment,
       });
     } else if (
       // NOTE: Add a little initial drag to the arrow dragging when the arrow
@@ -165,6 +175,11 @@ export const dragSelectedElements = (
         }
       }
     }
+  });
+
+  moveFrameArrows(frameArrowIds, adjustedOffset, scene, {
+    originalElements: pointerDownState.originalElements,
+    renderEnvironment,
   });
 };
 

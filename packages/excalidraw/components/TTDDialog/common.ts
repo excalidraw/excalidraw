@@ -4,6 +4,7 @@ import { convertToExcalidrawElements } from "@excalidraw/element";
 
 import { exportScene } from "@excalidraw/utils";
 
+import type { RenderEnvironment } from "@excalidraw/element";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
@@ -43,6 +44,7 @@ export const convertMermaidToExcalidraw = async ({
   setError,
   data,
   theme,
+  renderEnvironment,
 }: {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
@@ -53,6 +55,8 @@ export const convertMermaidToExcalidraw = async ({
     files: BinaryFiles | null;
   }>;
   theme: Theme;
+  /** the host's environment (`app.renderEnvironment`), to measure labels with */
+  renderEnvironment?: RenderEnvironment;
 }): Promise<{ success: true } | { success: false; error?: Error }> => {
   const canvasNode = canvasRef.current;
   const parent = canvasNode?.parentElement;
@@ -96,6 +100,7 @@ export const convertMermaidToExcalidraw = async ({
     data.current = {
       elements: convertToExcalidrawElements(elements, {
         regenerateIds: true,
+        renderEnvironment,
       }),
       files,
     };

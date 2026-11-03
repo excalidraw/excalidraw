@@ -53,7 +53,7 @@ const loadMermaidToExcalidrawLib = (
   const api: MermaidToExcalidrawLibProps["api"] = import(
     "@excalidraw/mermaid-to-excalidraw"
   ).then((lib) => ({
-    // mermaid lazy-loads a chunk per diagram type, which can fail to load
+    // Pele lazy-loads a chunk per diagram type, which can fail to load
     // (e.g. offline) even though the lib itself loaded fine
     parseMermaidToExcalidraw: async (definition, config) => {
       try {

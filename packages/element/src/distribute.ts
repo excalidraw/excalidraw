@@ -7,6 +7,7 @@ import { getSelectedElementsByGroup } from "./groups";
 
 import { getNonDeletedElements } from ".";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
@@ -22,6 +23,8 @@ export const distributeElements = (
   distribution: Distribution,
   appState: Readonly<AppState>,
   scene: Scene,
+  /** measures the labels of the bound arrows the distribution moves */
+  renderEnvironment?: RenderEnvironment,
 ): NonDeletedExcalidrawElement[] => {
   const [start, mid, end, extent] =
     distribution.axis === "x"
@@ -79,6 +82,7 @@ export const distributeElements = (
         });
         updateBoundElements(element, scene, {
           simultaneouslyUpdated: group,
+          renderEnvironment,
         });
         return updatedElement;
       });
@@ -107,6 +111,7 @@ export const distributeElements = (
       });
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: group,
+        renderEnvironment,
       });
       return updatedElement;
     });

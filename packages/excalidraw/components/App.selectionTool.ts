@@ -44,6 +44,7 @@ import {
   transformElements,
   uncropElementSides,
   updateBoundElements,
+  removeArrowsWithoutEndInFrame,
   updateFrameMembershipOfSelectedElements,
 } from "@excalidraw/element";
 import {
@@ -509,7 +510,9 @@ export class AppSelectionTool {
           ),
         );
 
-        updateBoundElements(croppingElement, this.app.scene);
+        updateBoundElements(croppingElement, this.app.scene, {
+          renderEnvironment: this.app.renderEnvironment,
+        });
 
         this.app.setState({
           isCropping: true,
@@ -555,7 +558,9 @@ export class AppSelectionTool {
     if (updates) {
       this.app.store.scheduleCapture();
       this.app.scene.mutateElement(image, updates);
-      updateBoundElements(image, this.app.scene);
+      updateBoundElements(image, this.app.scene, {
+        renderEnvironment: this.app.renderEnvironment,
+      });
     }
     return true;
   };
@@ -991,6 +996,7 @@ export class AppSelectionTool {
             this.app.scene,
             snapOffset,
             event[KEYS.CTRL_OR_CMD] ? null : this.app.getEffectiveGridSize(),
+            this.app.renderEnvironment,
           );
         }
 
@@ -1212,6 +1218,8 @@ export class AppSelectionTool {
       this.app.state,
       this.app,
     );
+    // the dragged arrows, and those bound to the dragged elements
+    removeArrowsWithoutEndInFrame(selectedElements, nextElements);
 
     this.app.scene.replaceAllElements(nextElements);
   };

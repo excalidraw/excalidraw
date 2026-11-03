@@ -120,7 +120,7 @@ export const transformElements = (
           pointerY,
           shouldRotateWithDiscreteAngle,
         );
-        updateBoundElements(element, scene);
+        updateBoundElements(element, scene, { renderEnvironment });
       }
     } else if (transformHandleType) {
       const elementId = selectedElements[0].id;
@@ -158,7 +158,7 @@ export const transformElements = (
       }
     }
     if (isTextElement(element)) {
-      updateBoundElements(element, scene);
+      updateBoundElements(element, scene, { renderEnvironment });
     }
     return true;
   } else if (selectedElements.length > 1) {
@@ -172,6 +172,7 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
         centerX,
         centerY,
+        renderEnvironment,
       );
       return true;
     } else if (transformHandleType) {
@@ -436,6 +437,7 @@ const rotateMultipleElements = (
   shouldRotateWithDiscreteAngle: boolean,
   centerX: number,
   centerY: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   let centerAngle =
@@ -478,6 +480,7 @@ const rotateMultipleElements = (
 
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elements,
+        renderEnvironment,
       });
 
       if (isBindingElement(element)) {
@@ -1006,7 +1009,7 @@ export const resizeSingleElement = (
       );
     }
 
-    updateBoundElements(latestElement, scene);
+    updateBoundElements(latestElement, scene, { renderEnvironment });
   }
 };
 
@@ -1580,6 +1583,7 @@ export const resizeMultipleElements = (
       } else {
         updateBoundElements(element, scene, {
           simultaneouslyUpdated: elementsToUpdate,
+          renderEnvironment,
         });
       }
 

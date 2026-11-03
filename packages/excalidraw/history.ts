@@ -6,7 +6,11 @@ import {
   StoreDelta,
 } from "@excalidraw/element";
 
-import type { StoreSnapshot, Store } from "@excalidraw/element";
+import type {
+  RenderEnvironment,
+  StoreSnapshot,
+  Store,
+} from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
@@ -20,6 +24,8 @@ export class HistoryDelta extends StoreDelta {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: StoreSnapshot,
+    /** measures the labels re-laid out after applying */
+    renderEnvironment?: RenderEnvironment,
   ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] = this.elements.applyTo(
       elements,
@@ -31,6 +37,7 @@ export class HistoryDelta extends StoreDelta {
       // approaching each undo / redo as a new user action
       {
         excludedProperties: new Set(["version", "versionNonce"]),
+        renderEnvironment,
       },
     );
 
@@ -136,21 +143,33 @@ export class History {
     );
   }
 
-  public undo(elements: SceneElementsMap, appState: AppState) {
+  public undo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    /** measures the labels re-laid out after undoing (the host's, in the editor) */
+    renderEnvironment?: RenderEnvironment,
+  ) {
     return this.perform(
       elements,
       appState,
       () => History.pop(this.undoStack),
       (entry: HistoryDelta) => History.push(this.redoStack, entry),
+      renderEnvironment,
     );
   }
 
-  public redo(elements: SceneElementsMap, appState: AppState) {
+  public redo(
+    elements: SceneElementsMap,
+    appState: AppState,
+    /** measures the labels re-laid out after redoing (the host's, in the editor) */
+    renderEnvironment?: RenderEnvironment,
+  ) {
     return this.perform(
       elements,
       appState,
       () => History.pop(this.redoStack),
       (entry: HistoryDelta) => History.push(this.undoStack, entry),
+      renderEnvironment,
     );
   }
 
@@ -159,6 +178,7 @@ export class History {
     appState: AppState,
     pop: () => HistoryDelta | null,
     push: (entry: HistoryDelta) => void,
+    renderEnvironment: RenderEnvironment | undefined,
   ): [SceneElementsMap, AppState] | void {
     try {
       let historyDelta = pop();
@@ -179,7 +199,12 @@ export class History {
       while (historyDelta) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =
-            historyDelta.applyTo(nextElements, nextAppState, prevSnapshot);
+            historyDelta.applyTo(
+              nextElements,
+              nextAppState,
+              prevSnapshot,
+              renderEnvironment,
+            );
 
           const prevElements = prevSnapshot.elements;
           const nextSnapshot = prevSnapshot.maybeClone(

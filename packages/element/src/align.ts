@@ -6,6 +6,7 @@ import { getSelectedElementsByGroup } from "./groups";
 
 import { getNonDeletedElements } from ".";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
@@ -21,6 +22,8 @@ export const alignElements = (
   alignment: Alignment,
   scene: Scene,
   appState: Readonly<AppState>,
+  /** measures the labels of the bound arrows the alignment moves */
+  renderEnvironment?: RenderEnvironment,
 ): NonDeletedExcalidrawElement[] => {
   const groups = getSelectedElementsByGroup(
     selectedElements,
@@ -45,6 +48,7 @@ export const alignElements = (
       // update bound elements
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: group,
+        renderEnvironment,
       });
       return updatedEle;
     });
