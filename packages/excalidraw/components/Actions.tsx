@@ -160,6 +160,7 @@ export const SelectedShapeActions = ({
   return (
     <div className="selected-shape-actions">
       <div>{predicates.strokeColor && renderAction("changeStrokeColor")}</div>
+      {predicates.freedrawPointer && renderAction("changeFreedrawPointer")}
       {predicates.backgroundColor && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
@@ -296,6 +297,8 @@ const CombinedShapeProperties = ({
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
               {predicates.opacity && renderAction("changeOpacity")}
+              {predicates.freedrawPointer &&
+                renderAction("changeFreedrawPointer")}
             </div>
           </PropertiesPopover>
         )}

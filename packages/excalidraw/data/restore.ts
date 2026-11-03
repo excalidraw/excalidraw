@@ -1311,6 +1311,14 @@ export const restoreAppState = (
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
 
+  if (
+    nextAppState.currentItemFreedrawPointer !== "crosshair" &&
+    nextAppState.currentItemFreedrawPointer !== "dot"
+  ) {
+    nextAppState.currentItemFreedrawPointer =
+      defaultAppState.currentItemFreedrawPointer;
+  }
+
   // drop malformed persisted custom top picks (imported data is untrusted)
   nextAppState.colorTopPicks = {
     elementStroke: restoreColorTopPicksList(
