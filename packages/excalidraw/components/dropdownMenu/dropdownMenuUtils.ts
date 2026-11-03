@@ -25,3 +25,18 @@ export const getSubMenuTriggerComponent = getMenuComponent(
 export const getSubMenuContentComponent = getMenuComponent(
   "DropdownMenuSubContent",
 );
+
+export const shouldShiftSubMenu = ({
+  parentRect,
+  viewportWidth,
+  menuWidth,
+}: {
+  parentRect: { left: number; right: number };
+  viewportWidth: number;
+  menuWidth: number;
+}) => {
+  const requiredSpace = menuWidth + 20;
+  const spaceOnRight = viewportWidth - parentRect.right;
+  const spaceOnLeft = parentRect.left;
+  return spaceOnRight < requiredSpace && spaceOnLeft < requiredSpace;
+};
