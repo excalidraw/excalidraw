@@ -114,9 +114,13 @@
 
       &__button {
         display: flex;
-
         align-items: center;
         justify-content: center;
+        :root[dir="rtl"] & {
+          .ExcButton__contents {
+            flex-direction: row-reverse;
+          }
+        }
       }
     }
 
