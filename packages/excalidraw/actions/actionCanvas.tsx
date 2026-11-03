@@ -8,13 +8,14 @@ import {
   KEYS,
 } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import { getNonDeletedElements, getRootElements } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { getCommonBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
@@ -305,6 +306,19 @@ const getScrollConstraintsBounds = (
   ] as Bounds;
 };
 
+// Frames clip their children, so only the frames count towards what's visible
+const getVisibleElementsBounds = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const nonDeletedElements = getNonDeletedElements(elements);
+  return getCommonBounds(
+    appState.frameRendering.enabled && appState.frameRendering.clip
+      ? getRootElements(nonDeletedElements)
+      : nonDeletedElements,
+  );
+};
+
 // Note, this action differs from actionZoomToFitSelection in that it doesn't
 // zoom beyond 100%. In other words, if the content is smaller than viewport
 // size, it won't be zoomed in.
@@ -326,7 +340,7 @@ export const actionZoomToFitSelectionInViewport = register({
       ? getCommonBounds(getNonDeletedElements(selectedElements))
       : appState.scrollConstraints
       ? getScrollConstraintsBounds(appState.scrollConstraints)
-      : getCommonBounds(getNonDeletedElements(elements));
+      : getVisibleElementsBounds(elements, appState);
     const result = zoomToFitBounds({
       bounds,
       appState,
@@ -369,7 +383,7 @@ export const actionZoomToFitSelection = register({
       ? getCommonBounds(getNonDeletedElements(selectedElements))
       : appState.scrollConstraints
       ? getScrollConstraintsBounds(appState.scrollConstraints)
-      : getCommonBounds(getNonDeletedElements(elements));
+      : getVisibleElementsBounds(elements, appState);
     const result = zoomToFitBounds({
       bounds,
       appState,
@@ -406,7 +420,7 @@ export const actionZoomToFit = register({
     // under a viewport lock, fits the locked box rather than the elements
     const bounds = appState.scrollConstraints
       ? getScrollConstraintsBounds(appState.scrollConstraints)
-      : getCommonBounds(getNonDeletedElements(elements));
+      : getVisibleElementsBounds(elements, appState);
     const result = zoomToFitBounds({
       bounds,
       appState,
