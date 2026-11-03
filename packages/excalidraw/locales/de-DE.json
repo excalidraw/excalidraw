@@ -681,7 +681,7 @@
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau",
     "label": "Mermaid",
-    "inputPlaceholder": "",
+    "inputPlaceholder": "Mermaid-Diagrammdefinition hier eingeben...",
     "autoFixAvailable": "Automatische Korrektur verfügbar",
     "loadError": "",
     "loadErrorReload": "",
