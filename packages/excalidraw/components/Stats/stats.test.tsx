@@ -3,7 +3,7 @@ import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
-import { setDateTimeForTests, reseed } from "@excalidraw/common";
+import { setDateTimeForTests, reseed, STATS_PANELS } from "@excalidraw/common";
 
 import { isInGroup } from "@excalidraw/element";
 
@@ -20,7 +20,7 @@ import type {
 
 import { Excalidraw, getCommonBounds } from "../..";
 import { actionGroup } from "../../actions";
-import { t } from "../../i18n";
+import { defaultLang, setLanguage, t } from "../../i18n";
 import * as StaticScene from "../../renderer/staticScene";
 import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
@@ -923,5 +923,41 @@ describe("frame resizing behavior", () => {
     expect(h.elements.find((el) => el.id === outsideRect.id)?.frameId).toBe(
       null,
     );
+  });
+});
+
+describe("stats canvas section", () => {
+  beforeAll(() => {
+    mockBoundingClientRect();
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  afterEach(async () => {
+    await act(() => setLanguage(defaultLang));
+  });
+
+  it("should translate the canvas section labels", async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    // the test language renders every translated string as [[key]], so any
+    // hardcoded (untranslated) label would show up as plain English text
+    await act(() => setLanguage({ code: "__test__", label: "test language" }));
+
+    act(() => {
+      API.setAppState({
+        gridModeEnabled: true,
+        stats: { open: true, panels: STATS_PANELS.generalStats },
+      });
+    });
+
+    const statsText = UI.queryStats()?.textContent;
+
+    expect(statsText).toContain(t("stats.canvas"));
+    expect(statsText).toContain(t("stats.gridStep"));
+    expect(statsText).not.toContain("Grid step");
   });
 });

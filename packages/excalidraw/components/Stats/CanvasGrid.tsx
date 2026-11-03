@@ -1,5 +1,6 @@
 import type { Scene } from "@excalidraw/element";
 
+import { t } from "../../i18n";
 import { getNormalizedGridStep } from "../../scene";
 
 import StatsDragInput from "./DragInput";
@@ -24,7 +25,7 @@ const CanvasGrid = ({
 }: PositionProps) => {
   return (
     <StatsDragInput
-      label="Grid step"
+      label={t("stats.gridStep")}
       sensitivity={8}
       elements={[]}
       dragInputCallback={({
