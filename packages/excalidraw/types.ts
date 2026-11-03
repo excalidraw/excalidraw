@@ -327,6 +327,20 @@ export type ScrollConstraints = {
   offsets?: Offsets;
 };
 
+/** A saved color can include the drawing settings that make it a pen preset.
+ * Strings are retained for built-in picks and browser data saved before presets. */
+export type ColorTopPick = string | SavedPenPreset;
+
+export type SavedPenPreset = {
+  color: string;
+  strokeWidthKey: StrokeWidthKey;
+  strokeStyle: ExcalidrawElement["strokeStyle"];
+  roughness: number;
+  opacity: number;
+  fillStyle: ExcalidrawElement["fillStyle"];
+  strokeVariability: StrokeVariability;
+};
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -575,15 +589,15 @@ export interface AppState {
    * color picker popup). `null` means no customization (defaults, or
    * host-supplied `topPicks`, are used). Kept per picker. */
   colorTopPicks: {
-    elementStroke: readonly string[] | null;
-    elementBackground: readonly string[] | null;
+    elementStroke: readonly ColorTopPick[] | null;
+    elementBackground: readonly ColorTopPick[] | null;
     /** the bucket-fill tool keeps a list separate from `elementBackground`
      * even though both drive `currentItemBackgroundColor` (its defaults and
      * use case differ — no transparent) */
-    bucketFill: readonly string[] | null;
+    bucketFill: readonly ColorTopPick[] | null;
     /** sticky notes are their own color domain (own defaults, own picks) */
-    stickyNoteStroke: readonly string[] | null;
-    stickyNoteBackground: readonly string[] | null;
+    stickyNoteStroke: readonly ColorTopPick[] | null;
+    stickyNoteBackground: readonly ColorTopPick[] | null;
   };
   /** user-customized font-picker top picks (pinned via drag & drop from the
    * font picker popup). `null` means no customization (defaults are used) */
