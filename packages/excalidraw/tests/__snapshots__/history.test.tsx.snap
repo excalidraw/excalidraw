@@ -13750,7 +13750,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
       },
       "updated": {},
     },
-    "id": "id4",
+    "id": "id5",
   },
 ]
 `;
@@ -13972,7 +13972,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
       },
       "updated": {},
     },
-    "id": "id4",
+    "id": "id5",
   },
 ]
 `;
