@@ -104,6 +104,46 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+/**
+ * Where an offset into `text` falls once the text changed under it, in one
+ * place: before the change it stays, past the change it moves with the
+ * change's length, and within the change it lands at the change's end.
+ */
+const mapOffsetToChangedText = (
+  text: string,
+  nextText: string,
+  offset: number,
+) => {
+  const maxCommon = Math.min(text.length, nextText.length);
+  let prefix = 0;
+  while (prefix < maxCommon && text[prefix] === nextText[prefix]) {
+    prefix++;
+  }
+  let suffix = 0;
+  while (
+    suffix < maxCommon - prefix &&
+    text[text.length - 1 - suffix] === nextText[nextText.length - 1 - suffix]
+  ) {
+    suffix++;
+  }
+  // the change's end never splits a surrogate pair: a suffix starting with
+  // the low half of one in the new text starts past the pair instead
+  if (
+    suffix > 0 &&
+    (nextText.charCodeAt(nextText.length - suffix) & 0xfc00) === 0xdc00 &&
+    (nextText.charCodeAt(nextText.length - suffix - 1) & 0xfc00) === 0xd800
+  ) {
+    suffix--;
+  }
+  if (offset <= prefix) {
+    return offset;
+  }
+  if (offset >= text.length - suffix) {
+    return offset + nextText.length - text.length;
+  }
+  return nextText.length - suffix;
+};
+
 const getLineDirection = (text: string, offset: number) => {
   const hardLineStart = text.lastIndexOf("\n", Math.max(0, offset - 1)) + 1;
   const hardLineEnd = text.indexOf("\n", offset);
@@ -847,6 +887,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
+      isParked = false;
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
         const selectionStart = editable.selectionStart;
@@ -1040,6 +1081,17 @@ export const textWysiwyg = ({
     const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
     );
+    // The state not holding the edit anymore means it was ended from outside
+    // the editor (that sync, or a host's updateScene with an appState, see
+    // App.componentDidUpdate): the text to keep is then the scene's, which
+    // the textarea didn't follow while the user could be typing (see the
+    // scene's onUpdate below), and anything typed since goes with the draft.
+    // Until the state says so the draft is the user's and wins, as it did
+    // before an edit could outlive the window's focus.
+    const nextOriginalText =
+      updateElement && app.state.editingTextElement?.id !== element.id
+        ? updateElement.originalText
+        : editable.value;
     const container =
       updateElement && !updateElement.isDeleted
         ? getContainerElement(
@@ -1049,7 +1101,7 @@ export const textWysiwyg = ({
         : null;
 
     if (updateElement && container) {
-      if (editable.value.trim()) {
+      if (nextOriginalText.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           app.scene.mutateElement(container, {
@@ -1083,7 +1135,7 @@ export const textWysiwyg = ({
 
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
-      nextOriginalText: editable.value,
+      nextOriginalText,
     });
   };
 
@@ -1101,8 +1153,17 @@ export const textWysiwyg = ({
     ownerWindow.parent === ownerWindow &&
     ownerDocument.activeElement === editable;
 
+  // The edit is parked while the window is away: the user can't be typing
+  // into the textarea then. The window coming back focuses it again, and
+  // anything typed is proof it is back too, should that focus never fire.
+  let isParked = false;
+  editable.onfocus = () => {
+    isParked = false;
+  };
+
   const handleBlur = () => {
     if (keepsFocusOnWindowBlur()) {
+      isParked = true;
       return;
     }
     handleSubmit();
@@ -1117,6 +1178,7 @@ export const textWysiwyg = ({
     ownerWindow.removeEventListener("blur", onWindowBlur);
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
     if (keepsFocusOnWindowBlur()) {
+      isParked = true;
       editable.onblur = handleBlur;
       return;
     }
@@ -1126,6 +1188,7 @@ export const textWysiwyg = ({
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
+    editable.onfocus = null;
     editable.oninput = null;
     editable.onkeydown = null;
 
@@ -1285,22 +1348,27 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
-    // the text changed under the editor, which the edit kept open through a
-    // sync from another tab, or the host's updateScene: show that text, the
-    // draft it replaced is gone from the scene
+    // The host's updateScene changed the text under an edit the window
+    // being away kept open: show that text, the draft it replaced is gone
+    // from the scene, with the caret kept to its place in the text. Not
+    // while the user can be typing: the draft is theirs until the submit,
+    // as it was before an edit could outlive the window's focus. (Replacing
+    // the value drops the textarea's undo history, which is right here: an
+    // undo past the change would bring the draft back over it.)
     const latestTextElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
     );
     if (
+      isParked &&
       latestTextElement &&
       isTextElement(latestTextElement) &&
       latestTextElement.originalText !== editable.value
     ) {
-      const { selectionStart, selectionEnd } = editable;
+      const { value, selectionStart, selectionEnd } = editable;
       editable.value = latestTextElement.originalText;
       editable.setSelectionRange(
-        Math.min(selectionStart, editable.value.length),
-        Math.min(selectionEnd, editable.value.length),
+        mapOffsetToChangedText(value, editable.value, selectionStart),
+        mapOffsetToChangedText(value, editable.value, selectionEnd),
       );
     }
     updateWysiwygStyle();
