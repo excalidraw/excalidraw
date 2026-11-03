@@ -66,6 +66,7 @@ import {
   ViewportStatusBorder,
 } from "./ViewportStatusFrame/ViewportStatusFrame";
 
+import EditableFileName from "./EditableFileName";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 
@@ -80,6 +81,7 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
+import { STORAGE_KEYS } from "excalidraw-app/app_constants";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -236,11 +238,12 @@ const LayerUI = ({
     );
   };
 
-  const renderCanvasActions = () => (
+  const renderCanvasActions = (fileName: string, setFileName: (name: string) => void) => (
     <div style={{ position: "relative" }}>
       <div className="excalidraw-ui-top-left">
         {renderTopLeftUI?.(false, appState)}
         <tunnels.MainMenuTunnel.Out />
+        <EditableFileName fileName={fileName} setFileName={setFileName} theme={appState.theme} />
       </div>
       {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>
@@ -299,6 +302,15 @@ const LayerUI = ({
   };
 
   const renderFixedSideContainer = () => {
+    const fileNameFromLocalStorage = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_FILENAME) == null ? "Untitled" : localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_FILENAME) as string;
+
+    const [fileName, setFileName] = React.useState(fileNameFromLocalStorage);
+
+    const setFileNameInLocalStorageAndInState = (name: string) => {
+      localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_FILENAME, name);
+      setFileName(name);
+    }
+
     const shouldRenderSelectedShapeActions =
       defaultUIEnabled && showSelectedShapeActions(appState, elements);
 
@@ -316,7 +328,7 @@ const LayerUI = ({
             gap={spacing.menuTopGap}
             className={clsx("App-menu_top__left")}
           >
-            {renderCanvasActions()}
+            {renderCanvasActions(fileName, setFileNameInLocalStorageAndInState)}
             {defaultUIEnabled && (
               <div
                 className={clsx("selected-shape-actions-container", {
