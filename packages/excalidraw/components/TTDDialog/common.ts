@@ -75,7 +75,7 @@ export const convertMermaidToExcalidraw = async ({
     const api = await mermaidToExcalidrawLib.api;
 
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition.replace(/<br\s*\/?>/gi, "\\n"));
     } catch (err: unknown) {
       const originalParseError = err as Error;
 
@@ -85,7 +85,7 @@ export const convertMermaidToExcalidraw = async ({
 
       try {
         ret = await api.parseMermaidToExcalidraw(
-          mermaidDefinition.replace(/"/g, "'"),
+          mermaidDefinition.replace(/"/g, "'").replace(/<br\s*\/?>/gi, "\\n"),
         );
       } catch {
         // Keep the original error so line/column references stay aligned with
