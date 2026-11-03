@@ -110,6 +110,7 @@
 
     &__key-container {
       display: flex;
+      direction: ltr;
       align-items: center;
       column-gap: 0.25rem;
       flex-shrink: 0;
