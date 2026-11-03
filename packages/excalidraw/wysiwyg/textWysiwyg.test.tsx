@@ -3,10 +3,12 @@ import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
+  CaptureUpdateAction,
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
   isTextElement,
   newElementWith,
+  LinearElementEditor,
 } from "@excalidraw/element";
 
 import {
@@ -21,6 +23,7 @@ import {
   applyDarkModeFilter,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
+  arrayToMap,
 } from "@excalidraw/common";
 
 import type {
@@ -1543,12 +1546,219 @@ describe("textWysiwyg", () => {
           h.app.updateScene({
             elements: [synced],
             appState: { editingTextElement: null },
+            captureUpdate: CaptureUpdateAction.NEVER,
           }),
         );
         await expectEnded();
         expect((h.elements[0] as ExcalidrawTextElement).text).toBe(
           "Hello there",
         );
+      });
+
+      const stackSize = () => (h.history as any).undoStack.length;
+      const text = () => (h.elements[0] as ExcalidrawTextElement).text;
+      const snapshotOf = (id: string) => h.store.snapshot.elements.get(id);
+
+      // an element from before the edit, so there is a history to undo to:
+      // "Hello" committed, reopened, " world" typed, the window away and back
+      const reopenAndType = async () => {
+        Keyboard.exitTextEditor(textarea);
+        expect(stackSize()).toBe(1);
+        mouse.select(textElement);
+        Keyboard.keyPress(KEYS.ENTER);
+        textarea = await getTextEditor();
+        updateTextEditor(textarea, "Hello world");
+        fireEvent.blur(textarea);
+        fireEvent.blur(window);
+        fireEvent.focus(textarea);
+        return h.elements[0] as ExcalidrawTextElement;
+      };
+
+      it("should record the edit a sync ends, as the blur did, undoable like any other", async () => {
+        // changed in the other tab under the edit: the sync brings a newer
+        // version of it. The sync never makes the undo stack (the other
+        // tab's changes aren't this tab's to undo), but it does put that
+        // version in the store's snapshot, so a submit after it would find
+        // nothing of the typing to record. Recording it first, as the blur
+        // did, keeps it undoable: the undo takes the text back to where this
+        // tab's edit started.
+        const edited = await reopenAndType();
+        act(() =>
+          h.app.updateScene({
+            elements: [
+              {
+                ...edited,
+                text: "Hello there",
+                originalText: "Hello there",
+                version: edited.version + 1,
+              },
+            ],
+            appState: { editingTextElement: null },
+            captureUpdate: CaptureUpdateAction.NEVER,
+          }),
+        );
+        await expectEnded();
+        expect(text()).toBe("Hello there");
+        expect(stackSize()).toBe(2);
+
+        Keyboard.undo();
+        expect(text()).toBe("Hello");
+      });
+
+      it("should record it from a host's lifecycle too, where the submit's flushSync is deferred", async () => {
+        // updateScene called from onChange or an effect: React defers the
+        // submit's flushSync there, so without a commit of its own the
+        // sync's change would reach the store first and the draft's capture
+        // would find nothing left to record
+        const edited = await reopenAndType();
+        const consoleError = console.error.bind(console);
+        const spy = vi
+          .spyOn(console, "error")
+          .mockImplementation((...args: unknown[]) => {
+            // React's warning about that flushSync is the point here
+            if (!String(args[0]).includes("flushSync")) {
+              consoleError(...args);
+            }
+          });
+        try {
+          const off = h.app.onChangeEmitter.on(() => {
+            off();
+            h.app.updateScene({
+              elements: [
+                {
+                  ...edited,
+                  text: "Hello there",
+                  originalText: "Hello there",
+                  version: edited.version + 1,
+                },
+              ],
+              appState: { editingTextElement: null },
+              captureUpdate: CaptureUpdateAction.NEVER,
+            });
+          });
+          act(() => API.setAppState({ scrollX: h.state.scrollX + 1 }));
+          await expectEnded();
+        } finally {
+          spy.mockRestore();
+        }
+        expect(text()).toBe("Hello there");
+        expect(stackSize()).toBe(2);
+
+        Keyboard.undo();
+        expect(text()).toBe("Hello");
+      });
+
+      it("should undo against the synced text when the sync is older than the draft", async () => {
+        // excalidraw-app syncs 50 ms after the window's focus: a keystroke
+        // in between makes the element newer than the stored copy the sync
+        // brings. The store takes changes by version, so that copy would
+        // never reach its snapshot, which would keep the draft while the
+        // scene shows the sync: the next undo then applies to a text that
+        // isn't there (it throws an invariant). The copy is bumped above the
+        // draft instead, as an import's would be.
+        await reopenAndType();
+        const stored = { ...(h.elements[0] as ExcalidrawTextElement) };
+        updateTextEditor(textarea, "Hello world!");
+        expect(h.elements[0].version).toBeGreaterThan(stored.version);
+        act(() =>
+          h.app.updateScene({
+            elements: [stored],
+            appState: { editingTextElement: null },
+            captureUpdate: CaptureUpdateAction.NEVER,
+          }),
+        );
+        await expectEnded();
+        expect(text()).toBe("Hello world");
+        expect((snapshotOf(stored.id) as ExcalidrawTextElement).text).toBe(
+          "Hello world",
+        );
+        expect(stackSize()).toBe(2);
+
+        Keyboard.undo();
+        expect(text()).toBe("Hello");
+      });
+
+      it("should keep the element deleted by a sync older than the draft, through an undo", async () => {
+        // the other tab deleted it (one version up from the stored copy),
+        // this tab typed once more since the window came back (one version
+        // up as well): same version, different edits
+        await reopenAndType();
+        const stored = h.elements[0] as ExcalidrawTextElement;
+        const deleted = newElementWith(stored, { isDeleted: true });
+        updateTextEditor(textarea, "Hello world!");
+        expect(h.elements[0].version).toBe(deleted.version);
+        act(() =>
+          h.app.updateScene({
+            elements: [deleted],
+            appState: { editingTextElement: null },
+            captureUpdate: CaptureUpdateAction.NEVER,
+          }),
+        );
+        await expectEnded();
+        expect(h.elements[0].isDeleted).toBe(true);
+        expect(snapshotOf(deleted.id)?.isDeleted).toBe(true);
+
+        Keyboard.undo();
+        expect(h.elements[0].isDeleted).toBe(true);
+      });
+
+      it("should land with nothing selected or being edited when a sync ends the edit", async () => {
+        // the user may still be typing into what looked like a live caret:
+        // a Backspace must not delete what the other tab had selected, nor
+        // walk the group or the line it was editing
+        const synced = {
+          ...(h.elements[0] as ExcalidrawTextElement),
+          text: "Hello there",
+          originalText: "Hello there",
+          groupIds: ["g1"],
+        };
+        const other = API.createElement({
+          type: "rectangle",
+          x: 200,
+          y: 200,
+          groupIds: ["g1"],
+        });
+        const line = API.createElement({
+          type: "line",
+          x: 300,
+          y: 300,
+          points: [pointFrom(0, 0), pointFrom(50, 50), pointFrom(100, 0)],
+        });
+        const elements = [synced, other, line];
+        act(() =>
+          h.app.updateScene({
+            elements,
+            appState: {
+              editingTextElement: null,
+              selectedElementIds: { [synced.id]: true },
+              selectedGroupIds: { g1: true },
+              editingGroupId: "g1",
+              selectedLinearElement: new LinearElementEditor(
+                line,
+                arrayToMap(elements),
+                true,
+              ),
+            },
+          }),
+        );
+        expect(h.state.selectedElementIds).toEqual({});
+        expect(h.state.selectedGroupIds).toEqual({});
+        expect(h.state.editingGroupId).toBeNull();
+        expect(h.state.selectedLinearElement).toBeNull();
+        await expectEnded();
+
+        Keyboard.keyPress(KEYS.BACKSPACE);
+        Keyboard.keyPress(KEYS.BACKSPACE);
+        expect(h.elements.filter((element) => element.isDeleted)).toEqual([]);
+        expect(line.points).toHaveLength(3);
+      });
+
+      it("should end when the state ends it without an update", async () => {
+        // the failsafe in App.componentDidUpdate, for any other way the
+        // state loses the edit while the editor is up
+        API.setAppState({ editingTextElement: null });
+        await expectEnded();
+        expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
       });
 
       it("should end when a sync removes the element", async () => {
@@ -1558,7 +1768,7 @@ describe("textWysiwyg", () => {
       });
 
       it("should end when a sync deletes the element, without bringing it back", async () => {
-        const deleted = { ...h.elements[0], isDeleted: true };
+        const deleted = newElementWith(h.elements[0], { isDeleted: true });
         act(() => h.app.updateScene({ elements: [deleted] }));
         await expectEnded();
         expect(h.elements.map((element) => element.isDeleted)).toEqual([true]);

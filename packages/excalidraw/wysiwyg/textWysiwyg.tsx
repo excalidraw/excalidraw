@@ -1081,17 +1081,7 @@ export const textWysiwyg = ({
     const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
     );
-    // The state not holding the edit anymore means it was ended from outside
-    // the editor (that sync, or a host's updateScene with an appState, see
-    // App.componentDidUpdate): the text to keep is then the scene's, which
-    // the textarea didn't follow while the user could be typing (see the
-    // scene's onUpdate below), and anything typed since goes with the draft.
-    // Until the state says so the draft is the user's and wins, as it did
-    // before an edit could outlive the window's focus.
-    const nextOriginalText =
-      updateElement && app.state.editingTextElement?.id !== element.id
-        ? updateElement.originalText
-        : editable.value;
+    const nextOriginalText = editable.value;
     const container =
       updateElement && !updateElement.isDeleted
         ? getContainerElement(

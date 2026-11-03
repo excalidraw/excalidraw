@@ -302,7 +302,11 @@ import {
 
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { restoreAppState, restoreElements } from "../data/restore";
+import {
+  bumpElementVersions,
+  restoreAppState,
+  restoreElements,
+} from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import {
   copyElementRenderOverrides,
@@ -4486,12 +4490,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // the editing ended in the state without going through the editor (the
-    // failsafe above, or a host's updateScene with an appState, which is how
-    // excalidraw-app syncs its tabs): end the edit in the editor too, else
-    // it outlives its state as a ghost. It keeps the scene's text over its
-    // draft then (see textWysiwyg's handleSubmit). After the current update,
-    // as the editor submits with a flushSync, unless another session started
-    // since.
+    // failsafe above, or an action's result without it): end the edit in the
+    // editor too, else it outlives its state as a ghost. After the current
+    // update, as the editor submits with a flushSync, unless another session
+    // started since. (A host's updateScene ending the edit submits it before
+    // applying, see updateScene.)
     if (prevState.editingTextElement && !this.state.editingTextElement) {
       const submit = this.text.textWysiwygSubmitHandler;
       if (submit) {
@@ -5012,7 +5015,63 @@ class App extends React.Component<AppProps, AppState> {
        */
       captureUpdate?: SceneData["captureUpdate"];
     }) => {
-      const { elements, appState, collaborators, captureUpdate } = sceneData;
+      const { collaborators, captureUpdate } = sceneData;
+      let elements = sceneData.elements;
+      let appState: Partial<AppState> | null | undefined = sceneData.appState;
+
+      // An update ending an open edit (its appState without the edit, or its
+      // elements without the element) submits the edit first, as the blur
+      // did before an edit could outlive the window's focus: what was typed
+      // is saved and recorded before the update replaces it, and the editor
+      // doesn't outlive its state as a ghost.
+      const editingTextElement = this.state.editingTextElement;
+      if (
+        editingTextElement &&
+        this.text.textWysiwygSubmitHandler &&
+        ((appState &&
+          "editingTextElement" in appState &&
+          appState.editingTextElement?.id !== editingTextElement.id) ||
+          (elements &&
+            !elements.some(
+              (element) =>
+                element.id === editingTextElement.id && !element.isDeleted,
+            )))
+      ) {
+        this.text.textWysiwygSubmitHandler();
+        // The submit records the draft through a flushSync, which React
+        // defers from a lifecycle or an effect (a host's onChange or
+        // useEffect calling updateScene). Committed here, so the draft's
+        // capture lands before the update's change, not after it with
+        // nothing left to record.
+        this.store.commit(
+          this.scene.getElementsMapIncludingDeleted(),
+          this.state,
+        );
+        if (elements) {
+          // The update's copy of the element, unless newer than what the
+          // submit just wrote, is bumped above it as an import's would be:
+          // the store takes changes by version, and its snapshot has to
+          // follow the update, or the next undo applies to the draft's text.
+          const submitted = this.scene.getElement(editingTextElement.id);
+          if (submitted) {
+            elements = bumpElementVersions(elements, [submitted]);
+          }
+        }
+        if (appState) {
+          // The update lands with nothing selected or being edited: the user
+          // may still be typing into what looked like a live caret, and those
+          // keystrokes must not act on what the update brought in
+          // (excalidraw-app's tab sync carries the other tab's selection,
+          // edited group and line).
+          appState = {
+            ...appState,
+            selectedElementIds: {},
+            selectedGroupIds: {},
+            editingGroupId: null,
+            selectedLinearElement: null,
+          };
+        }
+      }
 
       if (captureUpdate) {
         const nextElements = elements ? elements : undefined;
