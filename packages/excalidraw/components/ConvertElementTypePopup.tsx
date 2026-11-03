@@ -15,6 +15,7 @@ import {
   isArrowElement,
   isElbowArrow,
   isLinearElement,
+  isNonDeletedElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
@@ -120,6 +121,26 @@ const LINEAR_TYPES = [
   "curvedArrow",
   "elbowArrow",
 ] as const;
+
+const ARROW_TYPES = [
+  "sharpArrow",
+  "curvedArrow",
+  "elbowArrow",
+] as const;
+
+const isBoundOrHasText = (element: ExcalidrawElement) => {
+  return (
+    isArrowElement(element) &&
+    (isArrowBoundToElement(element) || hasBoundTextElement(element))
+  );
+};
+
+const getAvailableLinearTypes = (
+  elements: readonly ExcalidrawLinearElement[],
+) => {
+  const hasRestrictedArrow = elements.some(isBoundOrHasText);
+  return hasRestrictedArrow ? ARROW_TYPES : LINEAR_TYPES;
+};
 
 const CONVERTIBLE_GENERIC_TYPES: ReadonlySet<ConvertibleGenericTypes> = new Set(
   GENERIC_TYPES,
@@ -298,14 +319,25 @@ const Panel = ({
     }
   }, [genericElements, app.scene]);
 
+  const availableLinearTypes = useMemo(
+    () => getAvailableLinearTypes(linearElements),
+    [linearElements],
+  );
+
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
+      ? availableLinearTypes.map((type) => {
+          switch (type) {
+            case "line":
+              return ["line", LineIcon];
+            case "sharpArrow":
+              return ["sharpArrow", sharpArrowIcon];
+            case "curvedArrow":
+              return ["curvedArrow", roundArrowIcon];
+            case "elbowArrow":
+              return ["elbowArrow", elbowArrowIcon];
+          }
+        })
       : conversionType === "generic"
       ? [
           ["rectangle", RectangleIcon],
@@ -529,16 +561,30 @@ export const convertElementTypes = (
     const convertibleLinearElements =
       filterLinearConvertibleElements(selectedElements);
 
+    const availableLinearTypes = getAvailableLinearTypes(
+      convertibleLinearElements,
+    );
+
+    if (
+      nextType === "line" &&
+      convertibleLinearElements.some(isBoundOrHasText)
+    ) {
+      return false;
+    }
+
     if (!nextType) {
       const commonSubType = reduceToCommonValue(
         convertibleLinearElements,
         getLinearElementSubType,
       );
 
-      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
+      const index = commonSubType
+        ? availableLinearTypes.indexOf(commonSubType as any)
+        : -1;
       nextType =
-        LINEAR_TYPES[
-          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
+        availableLinearTypes[
+          (index + availableLinearTypes.length + advancement) %
+            availableLinearTypes.length
         ];
     }
 
@@ -599,7 +645,7 @@ export const convertElementTypes = (
             );
             mutateElement(element, app.scene.getNonDeletedElementsMap(), {
               ...updates,
-              endArrowhead: "arrow",
+              endArrowhead: element.endArrowhead ?? "arrow",
             });
           } else {
             // if we're converting to non-elbow linear element, check if
@@ -620,6 +666,15 @@ export const convertElementTypes = (
                 points,
               });
             }
+          }
+        }
+        if (
+          isArrowElement(element) &&
+          !isElbowArrow(element) &&
+          isNonDeletedElement(element)
+        ) {
+          if (element.startBinding || element.endBinding) {
+            updateBindings(element, app.scene, app.state);
           }
         }
       }
@@ -673,11 +728,7 @@ export const getConversionTypeFromElements = (
 };
 
 const isEligibleLinearElement = (element: ExcalidrawElement) => {
-  return (
-    isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
-  );
+  return isLinearElement(element);
 };
 
 const toCacheKey = (
@@ -891,40 +942,78 @@ const convertElementType = <
         );
       }
       case "sharpArrow": {
+        const next = newArrowElement({
+          ...element,
+          type: "arrow",
+          elbowed: false,
+          roundness: null,
+          startArrowhead: isArrowElement(element)
+            ? element.startArrowhead
+            : app.state.currentItemStartArrowhead,
+          endArrowhead: isArrowElement(element)
+            ? element.endArrowhead
+            : app.state.currentItemEndArrowhead,
+        });
         return bumpVersion(
-          newArrowElement({
-            ...element,
-            type: "arrow",
-            elbowed: false,
-            roundness: null,
-            startArrowhead: app.state.currentItemStartArrowhead,
-            endArrowhead: app.state.currentItemEndArrowhead,
-          }),
+          isArrowElement(element)
+            ? {
+                ...next,
+                startBinding: element.startBinding,
+                endBinding: element.endBinding,
+                boundElements: element.boundElements,
+              }
+            : next,
         );
       }
       case "curvedArrow": {
+        const next = newArrowElement({
+          ...element,
+          type: "arrow",
+          elbowed: false,
+          roundness: {
+            type: ROUNDNESS.PROPORTIONAL_RADIUS,
+          },
+          startArrowhead: isArrowElement(element)
+            ? element.startArrowhead
+            : app.state.currentItemStartArrowhead,
+          endArrowhead: isArrowElement(element)
+            ? element.endArrowhead
+            : app.state.currentItemEndArrowhead,
+        });
         return bumpVersion(
-          newArrowElement({
-            ...element,
-            type: "arrow",
-            elbowed: false,
-            roundness: {
-              type: ROUNDNESS.PROPORTIONAL_RADIUS,
-            },
-            startArrowhead: app.state.currentItemStartArrowhead,
-            endArrowhead: app.state.currentItemEndArrowhead,
-          }),
+          isArrowElement(element)
+            ? {
+                ...next,
+                startBinding: element.startBinding,
+                endBinding: element.endBinding,
+                boundElements: element.boundElements,
+              }
+            : next,
         );
       }
       case "elbowArrow": {
+        const next = newArrowElement({
+          ...element,
+          type: "arrow",
+          elbowed: true,
+          fixedSegments: null,
+          roundness: null,
+          startArrowhead: isArrowElement(element)
+            ? element.startArrowhead
+            : app.state.currentItemStartArrowhead,
+          endArrowhead: isArrowElement(element)
+            ? element.endArrowhead
+            : app.state.currentItemEndArrowhead,
+        });
         return bumpVersion(
-          newArrowElement({
-            ...element,
-            type: "arrow",
-            elbowed: true,
-            fixedSegments: null,
-            roundness: null,
-          }),
+          isArrowElement(element)
+            ? {
+                ...next,
+                startBinding: element.startBinding,
+                endBinding: element.endBinding,
+                boundElements: element.boundElements,
+              }
+            : next,
         );
       }
     }
