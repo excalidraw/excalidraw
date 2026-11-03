@@ -4,7 +4,7 @@ slug: /@excalidraw/excalidraw/api/utils
 
 # Utils
 
-These are pure Javascript functions exported from the @excalidraw/excalidraw [`@excalidraw/excalidraw`](https://npmjs.com/@excalidraw/excalidraw). If you want to export your drawings in different formats eg `png`, `svg` and more you can check out [Export Utilities](/docs/@excalidraw/excalidraw/API/utils/export). If you want to restore your drawings you can check out [Restore Utilities](/docs/@excalidraw/excalidraw/API/utils/restore).
+These are pure Javascript functions exported from the @excalidraw/excalidraw [`@excalidraw/excalidraw`](https://npmjs.com/@excalidraw/excalidraw). If you want to export your drawings in different formats eg `png`, `svg` and more you can check out [Export Utilities](/docs/@excalidraw/excalidraw/api/utils/export). If you want to restore your drawings you can check out [Restore Utilities](/docs/@excalidraw/excalidraw/api/utils/restore).
 
 ### serializeAsJSON
 
