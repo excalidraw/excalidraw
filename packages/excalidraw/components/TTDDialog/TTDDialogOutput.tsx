@@ -47,7 +47,7 @@ export const TTDDialogOutput = ({
   const errorMessage = parseError
     ? hideErrorDetails
       ? t("chat.errors.mermaidParseError")
-      : formatMermaidParseErrorMessage(parseError.message, sourceText)
+      : formatMermaidParseErrorMessage(parseError.message)
     : null;
   const syntaxGuidance =
     parseError && !hideErrorDetails
