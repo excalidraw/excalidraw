@@ -194,4 +194,48 @@ describe("search", () => {
       expect(h.app.state.searchMatches?.matches.length).toBe(3);
     });
   });
+
+  it("should maintain stable order when elements share the same Y coordinate", async () => {
+    // Regression test: https://github.com/excalidraw/excalidraw/issues/9503
+    // When two elements share the same Y coordinate, sorting only by Y
+    // produces non-deterministic results, causing the search results list
+    // to reorder while dragging.
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    // Create two text elements at identical Y position
+    const elem1 = API.createElement({ type: "text", text: "test alpha", y: 100 });
+    const elem2 = API.createElement({ type: "text", text: "test beta", y: 100 });
+
+    // Elements are sorted by Y then by ID, so the order should be deterministic
+
+    API.setElements([elem1, elem2]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    // Run search twice to verify stable ordering
+    const firstRunOrder = h.app.state.searchMatches?.matches.map((m) => m.id);
+
+    // Trigger another search run
+    updateTextEditor(searchInput, "test ");
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    const secondRunOrder = h.app.state.searchMatches?.matches.map((m) => m.id);
+
+    // Order should be identical across runs (stable sort by Y + ID)
+    expect(firstRunOrder).toEqual(secondRunOrder);
+  });
 });
