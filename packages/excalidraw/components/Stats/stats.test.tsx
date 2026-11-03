@@ -151,6 +151,81 @@ describe("binding with linear elements", () => {
     UI.updateInput(inputX, String("254"));
     expect(linear.startBinding).toBe(null);
   });
+
+  it.each([
+    ["input", "start"],
+    ["input", "end"],
+    ["drag", "start"],
+    ["drag", "end"],
+  ])(
+    "should update attached arrows when rotating multiple shapes via %s with the %s bound",
+    (interaction, boundEnd) => {
+      const rectangle = h.elements[0];
+      UI.clickTool("arrow");
+      mouse.moveTo(boundEnd === "start" ? 205 : 500, 50);
+      mouse.down();
+      mouse.moveTo(boundEnd === "start" ? 500 : 205, 50);
+      mouse.up();
+      const arrow = h.elements[
+        h.elements.length - 1
+      ] as ExcalidrawLinearElement;
+      const otherRectangle = API.createElement({
+        type: "rectangle",
+        x: 800,
+        y: 400,
+        width: 200,
+        height: 100,
+      });
+      API.setElements([...h.elements, otherRectangle]);
+      API.setAppState({
+        selectedElementIds: {
+          [rectangle.id]: true,
+          [otherRectangle.id]: true,
+        },
+      });
+
+      const binding = boundEnd === "start" ? "startBinding" : "endBinding";
+      expect(arrow[binding]?.elementId).toBe(rectangle.id);
+      const boundIndex = boundEnd === "start" ? 0 : arrow.points.length - 1;
+      const freeIndex = boundEnd === "start" ? arrow.points.length - 1 : 0;
+      const originalBoundPoint = [
+        arrow.x + arrow.points[boundIndex][0],
+        arrow.y + arrow.points[boundIndex][1],
+      ];
+      const originalFreePoint = [
+        arrow.x + arrow.points[freeIndex][0],
+        arrow.y + arrow.points[freeIndex][1],
+      ];
+      const angleProperty = UI.queryStatsProperty("A")!;
+
+      if (interaction === "input") {
+        const input =
+          angleProperty.querySelector<HTMLInputElement>(".drag-input")!;
+        UI.updateInput(input, "90");
+      } else {
+        const label = angleProperty.querySelector(".drag-input-label")!;
+        const ownerWindow = h.app.ownerWindow;
+        fireEvent.pointerDown(label, { clientX: 100 });
+        fireEvent.pointerMove(ownerWindow, { clientX: 100 });
+        fireEvent.pointerMove(ownerWindow, { clientX: 190 });
+        fireEvent.pointerUp(ownerWindow);
+      }
+
+      expect(rectangle.angle).toBeCloseTo(Math.PI / 2);
+      expect(otherRectangle.angle).toBeCloseTo(Math.PI / 2);
+      expect(arrow[binding]?.elementId).toBe(rectangle.id);
+      expect([
+        arrow.x + arrow.points[boundIndex][0],
+        arrow.y + arrow.points[boundIndex][1],
+      ]).not.toEqual(originalBoundPoint);
+      expect(arrow.x + arrow.points[freeIndex][0]).toBeCloseTo(
+        originalFreePoint[0],
+      );
+      expect(arrow.y + arrow.points[freeIndex][1]).toBeCloseTo(
+        originalFreePoint[1],
+      );
+    },
+  );
 });
 
 // single element
