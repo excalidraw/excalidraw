@@ -66,6 +66,31 @@ describe("BinaryHeap", () => {
   });
 
   describe("remove", () => {
+    it.each([{ values: [] }, { values: [3] }, { values: [5, 3, 8, 1, 9] }])(
+      "leaves the heap unchanged when removing a missing element from $values",
+      ({ values }) => {
+        const heap = numberHeap();
+        values.forEach((value) => heap.push(value));
+
+        heap.remove(0);
+        heap.remove(10);
+
+        expect(heap.size()).toBe(values.length);
+        expect(drain(heap)).toEqual([...values].sort((a, b) => a - b));
+      },
+    );
+
+    it("does not remove another object with the same score", () => {
+      const heap = new BinaryHeap<{ score: number }>((node) => node.score);
+      const node = { score: 1 };
+      heap.push(node);
+
+      heap.remove({ score: 1 });
+
+      expect(heap.size()).toBe(1);
+      expect(heap.pop()).toBe(node);
+    });
+
     it("removes an interior element and keeps the rest ordered", () => {
       const heap = numberHeap();
       [5, 3, 8, 1, 9].forEach((n) => heap.push(n));
