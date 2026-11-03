@@ -2,16 +2,41 @@ import React from "react";
 
 import { KEYS } from "@excalidraw/common";
 
+import { languages, setLanguage } from "../../i18n";
 import { Excalidraw } from "../../index";
 import { Keyboard } from "../../tests/helpers/ui";
 import {
   render,
+  act,
   waitFor,
   getByTestId,
   fireEvent,
 } from "../../tests/test-utils";
 
 describe("Test <DropdownMenu/>", () => {
+  it("sets the menu direction for RTL languages", async () => {
+    const rtlLanguage = languages.find((language) => language.rtl)!;
+    const { container } = await render(<Excalidraw />);
+    try {
+      await act(async () => {
+        await setLanguage(rtlLanguage);
+      });
+      fireEvent.click(getByTestId(container, "main-menu-trigger"));
+
+      await waitFor(() => {
+        expect(
+          container.querySelector('[data-testid="dropdown-menu"]'),
+        ).toHaveAttribute("dir", "rtl");
+      });
+    } finally {
+      await act(async () => {
+        await setLanguage(
+          languages.find((language) => language.code === "en")!,
+        );
+      });
+    }
+  });
+
   it("closes on Escape", async () => {
     const { container } = await render(<Excalidraw />);
 
