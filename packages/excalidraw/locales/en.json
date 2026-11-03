@@ -205,7 +205,28 @@
     "showHints": "Show hints",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
-    "inputDeviceMouse": "Mouse"
+    "inputDeviceMouse": "Mouse",
+    "animation": {
+      "title": "Animate",
+      "apply": "Apply",
+      "type": "Animation type",
+      "none": "None",
+      "dashes": "Moving dashes",
+      "pulse": "Pulse",
+      "speed": "Speed",
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast",
+      "direction": "Direction",
+      "forward": "Start to end",
+      "reverse": "End to start",
+      "mixed": "Mixed animations",
+      "dot": "Traveling dot",
+      "gap": "Traveling gap",
+      "size": "Size",
+      "sizeValue": "Size value",
+      "count": "Count"
+    }
   },
   "elementLink": {
     "title": "Link to object",
