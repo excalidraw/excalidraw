@@ -152,6 +152,13 @@
           height: 100%;
           align-items: center;
         }
+
+        &__hint {
+          margin-right: 0.75rem;
+          font-size: 0.875rem;
+          color: var(--color-gray-50);
+          white-space: nowrap;
+        }
       }
 
       &__buttons {

@@ -19,6 +19,7 @@ import {
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { prepareElementsForExport } from "../data";
+import { serializeAsJSON } from "../data/json";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
@@ -110,6 +111,49 @@ const ImageExportModal = ({
     appStateSnapshot,
     exportSelectionOnly,
   );
+
+  // how much embedding the scene adds to the exported file (e.g. "+22 kB").
+  // Computed only while the option is enabled, and the (de)compression
+  // helpers are loaded lazily so they don't bloat the main bundle.
+  const [embedSceneSize, setEmbedSceneSize] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!embedScene) {
+      setEmbedSceneSize(null);
+      return;
+    }
+    let isStale = false;
+    const { exportedElements } = prepareElementsForExport(
+      elementsSnapshot,
+      appStateSnapshot,
+      exportSelectionOnly,
+    );
+    import("../data/image")
+      .then(({ getPngMetadataSize, formatFileSize }) => {
+        if (isStale) {
+          return;
+        }
+        const size = getPngMetadataSize(
+          serializeAsJSON(exportedElements, appStateSnapshot, files, "local"),
+        );
+        setEmbedSceneSize(`+${formatFileSize(size)}`);
+      })
+      .catch((error) => {
+        console.error(error);
+        if (!isStale) {
+          setEmbedSceneSize(null);
+        }
+      });
+    return () => {
+      isStale = true;
+    };
+  }, [
+    embedScene,
+    elementsSnapshot,
+    appStateSnapshot,
+    exportSelectionOnly,
+    files,
+  ]);
 
   useEffect(() => {
     const previewNode = previewRef.current;
@@ -274,6 +318,15 @@ const ImageExportModal = ({
           tooltip={t("imageExportDialog.tooltip.embedScene")}
           name="exportEmbedSwitch"
         >
+          {embedSceneSize && (
+            <span
+              className="ImageExportModal__settings__setting__hint"
+              data-testid="export-embed-scene-size"
+              title={t("imageExportDialog.tooltip.embedSceneSize")}
+            >
+              {embedSceneSize}
+            </span>
+          )}
           <Switch
             name="exportEmbedSwitch"
             checked={embedScene}

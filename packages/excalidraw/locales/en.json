@@ -541,7 +541,8 @@
       "padding": "Padding"
     },
     "tooltip": {
-      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
+      "embedSceneSize": "Approximate size the embedded scene adds to the exported PNG file"
     },
     "title": {
       "exportToPng": "Export to PNG",
