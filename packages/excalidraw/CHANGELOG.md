@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Arrows between frames render above what they connect (2026-11-03) [#PR](https://github.com/excalidraw/excalidraw/pull/PR)
+
+- An arrow in a frame now belongs to the topmost of the frames one of its ends is in, instead of the frame it was drawn from, so an arrow between two frames is rendered and hit above the elements it connects in both, rather than under the content of the frame above. It moves to that frame when it's drawn or its ends are moved, when the elements it's bound to move between frames, when a frame is resized, and when frames are reordered. It leaves frames only once none of its ends is in one.
+
 ### Arrows aren't clipped to frames (2026-10-31) [#12516](https://github.com/excalidraw/excalidraw/pull/12516)
 
 - Arrows and their labels are no longer clipped to the frame they belong to, so they can connect elements across and out of frames, and their part outside the frame can be selected. They still belong to their frame, so they're moved, copied and deleted with it, but only while one of their ends is in it (bound to an element in the frame, or inside it). An arrow whose ends both leave its frame (moved, bound to elements outside it, or with the elements it's bound to) leaves the frame.
