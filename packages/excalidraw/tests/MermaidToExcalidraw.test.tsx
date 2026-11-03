@@ -131,11 +131,11 @@ describe("Test <MermaidToExcalidraw/>", () => {
     const dialog = document.querySelector(".ttd-dialog")!;
     await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
     expect(normalizeDialogSnapshot(dialog)).toMatchSnapshot();
-    // flowchart edges and state transitions as elbow arrows
+    // flowchart edges as elbow arrows
     expect(
       MermaidToExcalidrawLib.parseMermaidToExcalidraw,
     ).toHaveBeenCalledWith(expect.any(String), {
-      flowchart: { curve: "step" },
+      elbow: { flowchart: true },
     });
   });
 

@@ -1,12 +1,12 @@
 import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 
 /**
- * How Mermaid diagrams are converted (unless the definition says otherwise,
- * e.g. sets its own `curve` in its front matter or `%%{init}%%`): flowchart
- * edges and state transitions as elbow arrows, which are easier to edit.
+ * How Mermaid diagrams are converted: flowchart edges as elbow arrows, which
+ * are easier to edit (unless the definition sets its own curve in its front
+ * matter or `%%{init}%%`).
  */
 export const MERMAID_TO_EXCALIDRAW_CONFIG: MermaidConfig = {
-  flowchart: { curve: "step" },
+  elbow: { flowchart: true },
 };
 
 /** heuristically checks whether the text may be a mermaid diagram definition */

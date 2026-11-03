@@ -805,7 +805,7 @@ describe("clipboard - pasting mermaid definition", () => {
     });
     expect(
       MermaidToExcalidrawLib.parseMermaidToExcalidraw,
-    ).toHaveBeenCalledWith(text, { flowchart: { curve: "step" } });
+    ).toHaveBeenCalledWith(text, { elbow: { flowchart: true } });
   });
 
   it("should support directives", async () => {
