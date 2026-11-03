@@ -26,6 +26,7 @@ import type {
   BinaryFileData,
   BinaryFiles,
   SocketId,
+  LaserMode,
 } from "@excalidraw/excalidraw/types";
 import type { MakeBrand } from "@excalidraw/common/utility-types";
 
@@ -96,7 +97,14 @@ export type SocketUpdateDataSource = {
     type: WS_SUBTYPES.MOUSE_LOCATION;
     payload: {
       socketId: SocketId;
-      pointer: { x: number; y: number; tool: "pointer" | "laser" };
+      pointer: {
+        x: number;
+        y: number;
+        tool: "pointer" | "laser";
+        laserMode?: LaserMode;
+        laserThickness?: number;
+        laserNeon?: boolean;
+      };
       button: "down" | "up";
       selectedElementIds: AppState["selectedElementIds"];
       username: string;

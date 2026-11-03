@@ -14,22 +14,29 @@ const DropdownMenuSubTrigger = ({
   icon,
   shortcut,
   className,
+  ...rest
 }: {
   children: React.ReactNode;
   icon?: JSX.Element;
   shortcut?: string;
   className?: string;
-}) => {
+} & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   return (
-    <DropdownMenuPrimitive.SubTrigger
-      className={`${getDropdownMenuItemClassName(
-        className,
-      )} dropdown-menu__submenu-trigger`}
-    >
-      <MenuItemContent icon={icon} shortcut={shortcut}>
-        {children}
-      </MenuItemContent>
-      <div className="dropdown-menu__submenu-trigger-icon">{chevronRight}</div>
+    <DropdownMenuPrimitive.SubTrigger asChild>
+      <button
+        {...rest}
+        type="button"
+        className={`${getDropdownMenuItemClassName(
+          className,
+        )} dropdown-menu__submenu-trigger`}
+      >
+        <MenuItemContent icon={icon} shortcut={shortcut}>
+          {children}
+        </MenuItemContent>
+        <div className="dropdown-menu__submenu-trigger-icon">
+          {chevronRight}
+        </div>
+      </button>
     </DropdownMenuPrimitive.SubTrigger>
   );
 };
