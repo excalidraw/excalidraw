@@ -1,7 +1,4 @@
-import {
-  clearAppStateForLocalStorage,
-  getDefaultAppState,
-} from "@excalidraw/excalidraw/appState";
+import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -59,12 +56,12 @@ export const importFromLocalStorage = () => {
   let appState = null;
   if (savedState) {
     try {
-      appState = {
-        ...getDefaultAppState(),
-        ...clearAppStateForLocalStorage(
-          JSON.parse(savedState) as Partial<AppState>,
-        ),
-      };
+      // Keep this partial. On initial load, restoreAppState() fills in defaults.
+      // During tab sync this is applied as a patch, so adding defaults here
+      // would reset transient, tab-local state such as an open dialog.
+      appState = clearAppStateForLocalStorage(
+        JSON.parse(savedState) as Partial<AppState>,
+      );
     } catch (error: any) {
       console.error(error);
       // Do nothing because appState is already null
