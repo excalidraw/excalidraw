@@ -1,3 +1,4 @@
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
 import { expect, vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";

@@ -27,6 +27,7 @@
     "copyStyles": "スタイルのコピー",
     "pasteStyles": "スタイルの貼り付け",
     "stroke": "線",
+    "textColor": "文字色",
     "changeStroke": "線の色を変更",
     "background": "背景",
     "changeBackground": "背景色変更",
