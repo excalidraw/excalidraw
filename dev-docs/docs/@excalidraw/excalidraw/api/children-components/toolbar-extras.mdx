@@ -24,4 +24,4 @@ function App() {
 }
 ```
 
-Style your buttons like the native ones (`ToolIcon` classes) so they align with the rest of the island. The slot is rendered on desktop and tablet layouts; on phones the toolbar is the mobile one, which has no extras slot yet.
+Style your buttons like the native ones (`ToolIcon` classes) so they align with the rest of the island. The slot is rendered on every layout. On phones it sits right before the "more tools" menu, and native tools move into that menu to make room for your buttons, so keep it to one or two. If there still isn't enough room, the toolbar scrolls horizontally.

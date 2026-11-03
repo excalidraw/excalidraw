@@ -55,6 +55,18 @@
     z-index: var(--zIndex-layerUI);
   }
 
+  .mobile-toolbar-extras {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+
+    // keep the toolbar spacing untouched when the host adds nothing
+    &:empty {
+      display: none;
+    }
+  }
+
   .mobile-toolbar-separator {
     width: 1px;
     height: 24px;

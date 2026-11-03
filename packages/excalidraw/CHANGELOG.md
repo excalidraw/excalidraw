@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### `ToolbarExtras` host slot in the toolbar
 
-New `ToolbarExtras` children component: whatever you render inside it appears in the native toolbar island, after the eraser and before the "more tools" menu, with the same tunnel mechanism as `Footer` and `MainMenu`. Use it to add tools of your own (e.g. a GIF picker, a widget inserter) without replacing the toolbar.
+New `ToolbarExtras` children component: whatever you render inside it appears in the native toolbar island, after the eraser and before the "more tools" menu, with the same tunnel mechanism as `Footer` and `MainMenu`. Use it to add tools of your own (e.g. a GIF picker, a widget inserter) without replacing the toolbar. It also works in the phone toolbar, where native tools move into the "more tools" menu to make room.
 
 ### Flowchart navigation (2026-10-30) [#12502](https://github.com/excalidraw/excalidraw/pull/12502)
 
