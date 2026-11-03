@@ -1,5 +1,9 @@
 import { ROUNDNESS } from "@excalidraw/common";
 
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
+
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
 import { convertElementTypes } from "../components/ConvertElementTypePopup";
 import { Excalidraw } from "../index";
 
@@ -42,5 +46,32 @@ describe("convert element type", () => {
 
     expect(h.elements[0].type).toBe("rectangle");
     expect(h.elements[0].roundness?.type).toBe(ROUNDNESS.ADAPTIVE_RADIUS);
+  });
+
+  // #11967
+  it("preserves endArrowhead when converting an arrow to elbow", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+      endArrowhead: "triangle",
+    });
+
+    API.setElements([arrow]);
+    API.setSelectedElements([arrow]);
+
+    act(() => {
+      convertElementTypes(h.app, {
+        conversionType: "linear",
+        nextType: "elbowArrow",
+      });
+    });
+
+    expect((h.elements[0] as ExcalidrawArrowElement).endArrowhead).toBe(
+      "triangle",
+    );
   });
 });
