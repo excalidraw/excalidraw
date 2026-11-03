@@ -1,3 +1,14 @@
+import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
+
+/**
+ * How Mermaid diagrams are converted (unless the definition says otherwise,
+ * e.g. sets its own `curve` in its front matter or `%%{init}%%`): flowchart
+ * edges and state transitions as elbow arrows, which are easier to edit.
+ */
+export const MERMAID_TO_EXCALIDRAW_CONFIG: MermaidConfig = {
+  flowchart: { curve: "step" },
+};
+
 /** heuristically checks whether the text may be a mermaid diagram definition */
 export const isMaybeMermaidDefinition = (text: string) => {
   const chartTypes = [
