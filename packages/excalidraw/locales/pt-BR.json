@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid para Excalidraw",
     "button": "Inserir",
-    "description": "Atualmente, apenas <flowchartLink>fluxogramas</flowchartLink>, <sequenceLink>sequências</sequenceLink>, <classLink>classes</classLink> e <erdLink>diagramas de relacionamento de entidades</erdLink> são suportados. Outros tipos serão mostrados como imagens no Excalidraw.",
+    "description": "",
     "syntax": "Sintaxe em Mermaid",
     "preview": "Visualizar",
     "label": "Mermaid",
