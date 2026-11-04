@@ -843,6 +843,13 @@ export type ElementRenderOffsets = ReadonlyMap<
 export interface ExcalidrawProps {
   className?: string;
   /**
+   * Opt in to drawing vector shapes and text directly when at most this many
+   * elements are visible. This avoids resampling element bitmaps during zoom,
+   * at the cost of drawing their paths on every frame. Images and other element
+   * types continue to use the bitmap cache. Omit or pass 0 to keep caching.
+   */
+  maxVisibleElementsForDirectDraw?: number;
+  /**
    * Document that owns Excalidraw's mounted DOM.
    *
    * Set only when it differs from the global `document`, such as when code

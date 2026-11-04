@@ -2644,6 +2644,8 @@ class App extends React.Component<AppProps, AppState> {
                             renderConfig={{
                               imageCache: this.imageCache,
                               isExporting: false,
+                              maxVisibleElementsForDirectDraw:
+                                this.props.maxVisibleElementsForDirectDraw,
                               scale: this.ownerWindow.devicePixelRatio,
                               renderEnvironment: this.renderEnvironment,
                               renderGrid: isGridModeEnabled(this),
