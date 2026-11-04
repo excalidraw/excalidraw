@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid till Excalidraw",
     "button": "Infoga",
-    "description": "För närvarande stöds endast <flowchartLink>Flödesdiagram</flowchartLink>, <sequenceLink> Sekvensdiagram</sequenceLink>, <classLink>Klassdiagram</classLink> och <erdLink>Entitetsrelationsdiagram</erdLink>. De andra typerna kommer att återges som bild i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska",
     "label": "Mermaid",
