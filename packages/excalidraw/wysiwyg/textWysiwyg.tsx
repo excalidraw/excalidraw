@@ -787,6 +787,12 @@ export const textWysiwyg = ({
       };
     })();
 
+  // Set by a blur that keeps the edit open while the window is away (see
+  // handleBlur): the user can't be typing into the textarea then. The window
+  // coming back focuses it again, and anything typed is proof it is back too,
+  // should that focus never fire.
+  let isParked = false;
+
   if (onChange) {
     editable.onpaste = async (event) => {
       // we need to synchronously get the MIME types so we can preventDefault()
@@ -1075,9 +1081,9 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    // the element can be gone from the scene by now (a sync from another
-    // tab, or the host's updateScene, removed or deleted it): the edit still
-    // ends, and leaves the container alone
+    // the element can be gone from the scene by now (deleted by an action's
+    // result, or the scene reset): the edit still ends, and leaves the
+    // container alone
     const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
     );
@@ -1143,10 +1149,6 @@ export const textWysiwyg = ({
     ownerWindow.parent === ownerWindow &&
     ownerDocument.activeElement === editable;
 
-  // The edit is parked while the window is away: the user can't be typing
-  // into the textarea then. The window coming back focuses it again, and
-  // anything typed is proof it is back too, should that focus never fire.
-  let isParked = false;
   editable.onfocus = () => {
     isParked = false;
   };

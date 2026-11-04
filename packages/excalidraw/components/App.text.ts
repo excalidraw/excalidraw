@@ -53,13 +53,14 @@ import type {
 } from "@excalidraw/element/types";
 
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { bumpElementVersions } from "../data/restore";
 import { withBatchedUpdates } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { scrollBoundsIntoView } from "../viewport";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 
 import type App from "./App";
-import type { AppState, Offsets, ViewportUIName } from "../types";
+import type { AppState, Offsets, SceneData, ViewportUIName } from "../types";
 
 type AppTextDependencies = {
   getContainer: () => HTMLDivElement | null;
@@ -84,6 +85,116 @@ export class AppText {
   constructor(private app: App, private dependencies: AppTextDependencies) {}
 
   public textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null = null;
+  // the editor's own record of its element: the state's editingTextElement
+  // is nulled under a live editor by an action's result that leaves it out
+  // (syncActionResult), so what ends the editor can't go by the state
+  private editingTextElementId: string | null = null;
+
+  /**
+   * An update that ends an open edit (its appState setting editingTextElement
+   * to null or to another element, or its elements leaving the element out
+   * or deleted) submits the edit first, as the blur did before an edit could
+   * outlive the window's focus: the draft is saved and recorded before the
+   * update replaces it, and the editor doesn't outlive its state as a ghost.
+   * Returns the elements and appState to apply.
+   */
+  public submitEditEndedBy = <K extends keyof AppState>({
+    elements,
+    appState,
+  }: {
+    elements?: SceneData["elements"];
+    appState?: Pick<AppState, K> | null;
+  }) => {
+    const submit = this.textWysiwygSubmitHandler;
+    const editingId = this.editingTextElementId;
+    if (!submit || !editingId) {
+      return { elements, appState };
+    }
+    const endsTheEdit =
+      (appState &&
+        "editingTextElement" in appState &&
+        (appState as Partial<AppState>).editingTextElement?.id !== editingId) ||
+      (elements &&
+        !elements.some(
+          (element) => element.id === editingId && !element.isDeleted,
+        ));
+    if (!endsTheEdit) {
+      return { elements, appState };
+    }
+
+    submit();
+    // The submit records the draft through a flushSync, which React defers
+    // from a lifecycle or an effect (a host's onChange or useEffect calling
+    // updateScene): committed here, so it lands before the update's change.
+    this.app.store.commit(
+      this.app.scene.getElementsMapIncludingDeleted(),
+      this.app.state,
+    );
+    if (elements) {
+      // The store takes changes by version, and the edit made the text, its
+      // container and their bound arrows newer than the update's copies: each
+      // copy older than the scene's (or at its version with another nonce) is
+      // bumped one above it, as excalidraw-app does with an import's and a
+      // collab reconcile's. In place, as the scene takes the update's objects
+      // as they are and mutates them in place from then on. Else the store's
+      // snapshot keeps the draft under a scene showing the update, and the
+      // next undo applies to what isn't there.
+      elements = bumpElementVersions(
+        elements,
+        this.app.scene.getElementsMapIncludingDeleted(),
+      );
+    }
+    if (appState) {
+      // The update's selection, edited group and line are dropped, this
+      // tab's own stay: the user may still be typing into what looked like a
+      // live caret, and a Backspace must not act on what the update brought
+      // in (excalidraw-app's tab sync carries the other tab's).
+      const kept: Partial<AppState> = { ...appState };
+      for (const key of [
+        "selectedElementIds",
+        "selectedGroupIds",
+        "editingGroupId",
+        "selectedLinearElement",
+      ] as const) {
+        delete kept[key];
+      }
+      appState = kept as Pick<AppState, K>;
+    }
+    return { elements, appState };
+  };
+
+  /**
+   * Ends an edit whose element is gone from the scene, deleted or removed by
+   * something other than updateScene (which submits first): an action's
+   * result, a scene reset. Called from componentDidUpdate. The state's
+   * editingTextElement is the failsafe for updates landing in the wrong
+   * order, resolved against the scene by id since the state holds an
+   * immutable snapshot whose `isDeleted` never flips. The editor goes with
+   * its element too, else it outlives it as a ghost: keyed on its own element
+   * rather than the state's (see editingTextElementId), and since the submit
+   * flushes state synchronously, run after the update, and only if the same
+   * edit is still open.
+   */
+  public endEditOfGoneElement = () => {
+    const isGone = (id: string) => {
+      const element = this.app.scene.getElement(id);
+      return !element || element.isDeleted;
+    };
+    const { editingTextElement } = this.app.state;
+    if (editingTextElement && isGone(editingTextElement.id)) {
+      this.app.setState({ editingTextElement: null });
+    }
+    const submit = this.textWysiwygSubmitHandler;
+    const editingId = this.editingTextElementId;
+    if (submit && editingId && isGone(editingId)) {
+      queueMicrotask(() => {
+        if (this.textWysiwygSubmitHandler === submit) {
+          submit();
+        }
+      });
+    }
+  };
+
   private getTextCreationGridPoint = (x: number, y: number) => {
     const effectiveGridSize = this.app.getEffectiveGridSize();
 
@@ -191,8 +302,8 @@ export class AppText {
       if (
         !latestTextElement ||
         !isTextElement(latestTextElement) ||
-        // deleted from under the edit (by a sync from another tab, or the
-        // host's updateScene): the edit's submit doesn't bring it back
+        // deleted from under the edit (by an action's result): the submit
+        // that ends the edit doesn't bring it back
         latestTextElement.isDeleted
       ) {
         return;
@@ -282,6 +393,7 @@ export class AppText {
       }
     };
 
+    this.editingTextElementId = element.id;
     this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.app.canvas,
       getViewportCoords: (x, y) => {
@@ -305,6 +417,7 @@ export class AppText {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         this.textWysiwygSubmitHandler = null;
+        this.editingTextElementId = null;
 
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);

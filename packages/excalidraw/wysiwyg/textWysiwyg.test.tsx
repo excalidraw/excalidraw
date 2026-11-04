@@ -60,6 +60,16 @@ const { h } = window;
 
 unmountComponent();
 
+const nextTick = () =>
+  act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+// switching apps/tabs blurs the textarea, then the window, without moving
+// the document's focus elsewhere: the browser gives it back on return
+const switchWindowAway = (textarea: HTMLTextAreaElement) => {
+  fireEvent.blur(textarea);
+  fireEvent.blur(window);
+  expect(document.activeElement).toBe(textarea);
+};
+
 const tab = "    ";
 const mouse = new Pointer("mouse");
 
@@ -1367,33 +1377,15 @@ describe("textWysiwyg", () => {
       await waitFor(() => expect(document.activeElement).toBe(textarea));
     });
 
-    it("should keep editing when the window loses focus, and submit when focus moves", async () => {
-      // the editor arms its submit-on-blur a tick after it's created
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-      updateTextEditor(textarea, "Hello");
-      expect(document.activeElement).toBe(textarea);
-
-      // switching apps/tabs blurs the textarea, then the window, without
-      // moving the document's focus elsewhere: the browser gives it back
-      // when the window returns
-      fireEvent.blur(textarea);
-      fireEvent.blur(window);
-      expect(document.activeElement).toBe(textarea);
-      expect(h.state.editingTextElement?.id).toBe(textElement.id);
-      expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
-
-      fireEvent.focus(textarea);
-      updateTextEditor(textarea, "Hello world");
-      expect(h.state.editingTextElement?.id).toBe(textElement.id);
-
-      // focus actually leaving the textarea still submits
-      act(() => textarea.blur());
-      expect(document.activeElement).not.toBe(textarea);
+    const text = () => (h.elements[0] as ExcalidrawTextElement).text;
+    const valueAndCaret = () => [textarea.value, textarea.selectionStart];
+    const expectEnded = async (expectedText: string) => {
+      await nextTick();
       expect(h.state.editingTextElement).toBeNull();
+      expect(h.app.text.textWysiwygSubmitHandler).toBeNull();
       expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello world");
-    });
-
+      expect(text()).toBe(expectedText);
+    };
     const changeTextUnderTheEdit = (originalText: string) =>
       act(() =>
         h.app.updateScene({
@@ -1407,395 +1399,19 @@ describe("textWysiwyg", () => {
         }),
       );
 
-    const selection = () => [textarea.selectionStart, textarea.selectionEnd];
+    it("should keep editing when the window loses focus, and submit when focus moves", async () => {
+      // the editor arms its submit-on-blur a tick after it's created
+      await nextTick();
+      updateTextEditor(textarea, "Hello");
+      switchWindowAway(textarea);
+      expect(h.state.editingTextElement?.id).toBe(textElement.id);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
 
-    it("should show a change made under the edit while the window is away, with the caret kept to its place", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      fireEvent.focus(textarea);
       updateTextEditor(textarea, "Hello world");
-      fireEvent.blur(textarea);
-      fireEvent.blur(window);
-      textarea.setSelectionRange(8, 8);
-
-      // a host's updateScene changes the text while the window is away: the
-      // caret moves with a change before it, stays put through one after
-      // it, and lands at the end of one around it
-      changeTextUnderTheEdit("Hi world");
-      expect(h.state.editingTextElement?.id).toBe(textElement.id);
-      expect(textarea.value).toBe("Hi world");
-      expect(selection()).toEqual([5, 5]);
-      changeTextUnderTheEdit("Hi world!");
-      expect(textarea.value).toBe("Hi world!");
-      expect(selection()).toEqual([5, 5]);
-      changeTextUnderTheEdit("Hi there!");
-      expect(textarea.value).toBe("Hi there!");
-      expect(selection()).toEqual([8, 8]);
-
-      // back in the window, the edit goes on from that text
-      fireEvent.focus(textarea);
-      updateTextEditor(textarea, "Hi there!!");
+      // focus actually leaving the textarea still submits
       act(() => textarea.blur());
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hi there!!");
-    });
-
-    it("should not land the caret inside a surrogate pair when showing a change", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-      updateTextEditor(textarea, "Hello \u{1F514}\u{1F514} world");
-      fireEvent.blur(textarea);
-      fireEvent.blur(window);
-      // between the two bells
-      textarea.setSelectionRange(8, 8);
-
-      // the new emoji shares its low surrogate with the old ones, so the
-      // common suffix would start between its halves
-      changeTextUnderTheEdit("Hello \u{1F914} world");
-      expect(textarea.value).toBe("Hello \u{1F914} world");
-      expect(selection()).toEqual([8, 8]);
-    });
-
-    it("should leave the textarea alone again once the window is back", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-      updateTextEditor(textarea, "Hello");
-      fireEvent.blur(textarea);
-      fireEvent.blur(window);
-
-      // the browser focuses the textarea again when the window is back
-      fireEvent.focus(textarea);
-      changeTextUnderTheEdit("Hello there");
-      expect(textarea.value).toBe("Hello");
-
-      // and typing is proof of that, should the focus event not fire
-      fireEvent.blur(textarea);
-      fireEvent.blur(window);
-      updateTextEditor(textarea, "Hello!");
-      changeTextUnderTheEdit("Hello there");
-      expect(textarea.value).toBe("Hello!");
-    });
-
-    it("should keep the draft over a change made under the edit while the user is in it", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-      updateTextEditor(textarea, "Hello");
-      textarea.setSelectionRange(2, 2);
-
-      // a host's updateScene changes the text while the user may be typing:
-      // the textarea is left alone (with its undo history, and a composition
-      // in progress), and the draft is what the submit keeps, as before
-      changeTextUnderTheEdit("Hello there");
-      expect(h.state.editingTextElement?.id).toBe(textElement.id);
-      expect(textarea.value).toBe("Hello");
-      expect(selection()).toEqual([2, 2]);
-
-      updateTextEditor(textarea, "Hello!");
-      act(() => textarea.blur());
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello!");
-    });
-
-    describe("the edit ended from outside the editor", () => {
-      const nextTick = () =>
-        act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-
-      beforeEach(async () => {
-        await nextTick();
-        updateTextEditor(textarea, "Hello");
-        // the window loses the focus, the edit stays open
-        fireEvent.blur(textarea);
-        fireEvent.blur(window);
-        expect(document.activeElement).toBe(textarea);
-        expect(h.state.editingTextElement?.id).toBe(textElement.id);
-        // and gets it back: excalidraw-app's sync follows a few ms later
-        fireEvent.focus(textarea);
-      });
-
-      const expectEnded = async () => {
-        await nextTick();
-        expect(h.state.editingTextElement).toBeNull();
-        expect(h.app.text.textWysiwygSubmitHandler).toBeNull();
-        expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-        expect(textarea.isConnected).toBe(false);
-      };
-
-      it("should end when a sync ends it in the state, with the synced text", async () => {
-        // excalidraw-app's tab sync: the other tab's elements and app state
-        const synced = {
-          ...(h.elements[0] as ExcalidrawTextElement),
-          text: "Hello there",
-          originalText: "Hello there",
-        };
-        act(() =>
-          h.app.updateScene({
-            elements: [synced],
-            appState: { editingTextElement: null },
-          }),
-        );
-        await expectEnded();
-        expect((h.elements[0] as ExcalidrawTextElement).text).toBe(
-          "Hello there",
-        );
-      });
-
-      it("should end on the synced text, over what was typed since the window came back", async () => {
-        // excalidraw-app syncs 50 ms after the window's focus: a keystroke
-        // in between is part of the draft the sync's text replaces
-        updateTextEditor(textarea, "Hello!");
-        expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello!");
-        const synced = {
-          ...(h.elements[0] as ExcalidrawTextElement),
-          text: "Hello there",
-          originalText: "Hello there",
-        };
-        act(() =>
-          h.app.updateScene({
-            elements: [synced],
-            appState: { editingTextElement: null },
-            captureUpdate: CaptureUpdateAction.NEVER,
-          }),
-        );
-        await expectEnded();
-        expect((h.elements[0] as ExcalidrawTextElement).text).toBe(
-          "Hello there",
-        );
-      });
-
-      const stackSize = () => (h.history as any).undoStack.length;
-      const text = () => (h.elements[0] as ExcalidrawTextElement).text;
-      const snapshotOf = (id: string) => h.store.snapshot.elements.get(id);
-
-      // an element from before the edit, so there is a history to undo to:
-      // "Hello" committed, reopened, " world" typed, the window away and back
-      const reopenAndType = async () => {
-        Keyboard.exitTextEditor(textarea);
-        expect(stackSize()).toBe(1);
-        mouse.select(textElement);
-        Keyboard.keyPress(KEYS.ENTER);
-        textarea = await getTextEditor();
-        updateTextEditor(textarea, "Hello world");
-        fireEvent.blur(textarea);
-        fireEvent.blur(window);
-        fireEvent.focus(textarea);
-        return h.elements[0] as ExcalidrawTextElement;
-      };
-
-      it("should record the edit a sync ends, as the blur did, undoable like any other", async () => {
-        // changed in the other tab under the edit: the sync brings a newer
-        // version of it. The sync never makes the undo stack (the other
-        // tab's changes aren't this tab's to undo), but it does put that
-        // version in the store's snapshot, so a submit after it would find
-        // nothing of the typing to record. Recording it first, as the blur
-        // did, keeps it undoable: the undo takes the text back to where this
-        // tab's edit started.
-        const edited = await reopenAndType();
-        act(() =>
-          h.app.updateScene({
-            elements: [
-              {
-                ...edited,
-                text: "Hello there",
-                originalText: "Hello there",
-                version: edited.version + 1,
-              },
-            ],
-            appState: { editingTextElement: null },
-            captureUpdate: CaptureUpdateAction.NEVER,
-          }),
-        );
-        await expectEnded();
-        expect(text()).toBe("Hello there");
-        expect(stackSize()).toBe(2);
-
-        Keyboard.undo();
-        expect(text()).toBe("Hello");
-      });
-
-      it("should record it from a host's lifecycle too, where the submit's flushSync is deferred", async () => {
-        // updateScene called from onChange or an effect: React defers the
-        // submit's flushSync there, so without a commit of its own the
-        // sync's change would reach the store first and the draft's capture
-        // would find nothing left to record
-        const edited = await reopenAndType();
-        const consoleError = console.error.bind(console);
-        const spy = vi
-          .spyOn(console, "error")
-          .mockImplementation((...args: unknown[]) => {
-            // React's warning about that flushSync is the point here
-            if (!String(args[0]).includes("flushSync")) {
-              consoleError(...args);
-            }
-          });
-        try {
-          const off = h.app.onChangeEmitter.on(() => {
-            off();
-            h.app.updateScene({
-              elements: [
-                {
-                  ...edited,
-                  text: "Hello there",
-                  originalText: "Hello there",
-                  version: edited.version + 1,
-                },
-              ],
-              appState: { editingTextElement: null },
-              captureUpdate: CaptureUpdateAction.NEVER,
-            });
-          });
-          act(() => API.setAppState({ scrollX: h.state.scrollX + 1 }));
-          await expectEnded();
-        } finally {
-          spy.mockRestore();
-        }
-        expect(text()).toBe("Hello there");
-        expect(stackSize()).toBe(2);
-
-        Keyboard.undo();
-        expect(text()).toBe("Hello");
-      });
-
-      it("should undo against the synced text when the sync is older than the draft", async () => {
-        // excalidraw-app syncs 50 ms after the window's focus: a keystroke
-        // in between makes the element newer than the stored copy the sync
-        // brings. The store takes changes by version, so that copy would
-        // never reach its snapshot, which would keep the draft while the
-        // scene shows the sync: the next undo then applies to a text that
-        // isn't there (it throws an invariant). The copy is bumped above the
-        // draft instead, as an import's would be.
-        await reopenAndType();
-        const stored = { ...(h.elements[0] as ExcalidrawTextElement) };
-        updateTextEditor(textarea, "Hello world!");
-        expect(h.elements[0].version).toBeGreaterThan(stored.version);
-        act(() =>
-          h.app.updateScene({
-            elements: [stored],
-            appState: { editingTextElement: null },
-            captureUpdate: CaptureUpdateAction.NEVER,
-          }),
-        );
-        await expectEnded();
-        expect(text()).toBe("Hello world");
-        expect((snapshotOf(stored.id) as ExcalidrawTextElement).text).toBe(
-          "Hello world",
-        );
-        expect(stackSize()).toBe(2);
-
-        Keyboard.undo();
-        expect(text()).toBe("Hello");
-      });
-
-      it("should keep the element deleted by a sync older than the draft, through an undo", async () => {
-        // the other tab deleted it (one version up from the stored copy),
-        // this tab typed once more since the window came back (one version
-        // up as well): same version, different edits
-        await reopenAndType();
-        const stored = h.elements[0] as ExcalidrawTextElement;
-        const deleted = newElementWith(stored, { isDeleted: true });
-        updateTextEditor(textarea, "Hello world!");
-        expect(h.elements[0].version).toBe(deleted.version);
-        act(() =>
-          h.app.updateScene({
-            elements: [deleted],
-            appState: { editingTextElement: null },
-            captureUpdate: CaptureUpdateAction.NEVER,
-          }),
-        );
-        await expectEnded();
-        expect(h.elements[0].isDeleted).toBe(true);
-        expect(snapshotOf(deleted.id)?.isDeleted).toBe(true);
-
-        Keyboard.undo();
-        expect(h.elements[0].isDeleted).toBe(true);
-      });
-
-      it("should land with nothing selected or being edited when a sync ends the edit", async () => {
-        // the user may still be typing into what looked like a live caret:
-        // a Backspace must not delete what the other tab had selected, nor
-        // walk the group or the line it was editing
-        const synced = {
-          ...(h.elements[0] as ExcalidrawTextElement),
-          text: "Hello there",
-          originalText: "Hello there",
-          groupIds: ["g1"],
-        };
-        const other = API.createElement({
-          type: "rectangle",
-          x: 200,
-          y: 200,
-          groupIds: ["g1"],
-        });
-        const line = API.createElement({
-          type: "line",
-          x: 300,
-          y: 300,
-          points: [pointFrom(0, 0), pointFrom(50, 50), pointFrom(100, 0)],
-        });
-        const elements = [synced, other, line];
-        act(() =>
-          h.app.updateScene({
-            elements,
-            appState: {
-              editingTextElement: null,
-              selectedElementIds: { [synced.id]: true },
-              selectedGroupIds: { g1: true },
-              editingGroupId: "g1",
-              selectedLinearElement: new LinearElementEditor(
-                line,
-                arrayToMap(elements),
-                true,
-              ),
-            },
-          }),
-        );
-        expect(h.state.selectedElementIds).toEqual({});
-        expect(h.state.selectedGroupIds).toEqual({});
-        expect(h.state.editingGroupId).toBeNull();
-        expect(h.state.selectedLinearElement).toBeNull();
-        await expectEnded();
-
-        Keyboard.keyPress(KEYS.BACKSPACE);
-        Keyboard.keyPress(KEYS.BACKSPACE);
-        expect(h.elements.filter((element) => element.isDeleted)).toEqual([]);
-        expect(line.points).toHaveLength(3);
-      });
-
-      it("should end when the state ends it without an update", async () => {
-        // the failsafe in App.componentDidUpdate, for any other way the
-        // state loses the edit while the editor is up
-        API.setAppState({ editingTextElement: null });
-        await expectEnded();
-        expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
-      });
-
-      it("should end when a sync removes the element", async () => {
-        act(() => h.app.updateScene({ elements: [] }));
-        await expectEnded();
-        expect(h.elements).toEqual([]);
-      });
-
-      it("should end when a sync deletes the element, without bringing it back", async () => {
-        const deleted = newElementWith(h.elements[0], { isDeleted: true });
-        act(() => h.app.updateScene({ elements: [deleted] }));
-        await expectEnded();
-        expect(h.elements.map((element) => element.isDeleted)).toEqual([true]);
-        expect(h.elements[0].version).toBe(deleted.version);
-      });
-    });
-
-    it("should submit when the focus moves into an iframe in the document", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-      updateTextEditor(textarea, "Hello");
-      // an embeddable, or a host's widget: the focus moving into it blurs
-      // the textarea like any focus move in the document (the textarea is
-      // not the active element anymore, the iframe is), and then blurs the
-      // window too, like a switch to another app would
-      const iframe = document.createElement("iframe");
-      document.body.appendChild(iframe);
-      try {
-        act(() => {
-          iframe.focus();
-          fireEvent.blur(window);
-        });
-      } finally {
-        iframe.remove();
-      }
-      expect(h.state.editingTextElement).toBeNull();
-      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+      await expectEnded("Hello world");
     });
 
     it("should still submit on window blur when collaborating", async () => {
@@ -1806,20 +1422,17 @@ describe("textWysiwyg", () => {
       textElement = UI.createElement("text");
       mouse.clickOn(textElement);
       textarea = await getTextEditor();
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      await nextTick();
       updateTextEditor(textarea, "Hello");
-
       act(() => {
         fireEvent.blur(textarea);
         fireEvent.blur(window);
       });
-      expect(h.state.editingTextElement).toBeNull();
-      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+      await expectEnded("Hello");
     });
 
     it("should still submit on window blur inside an iframe", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      await nextTick();
       updateTextEditor(textarea, "Hello");
       // a click on the embedding page blurs the iframe's window, with the
       // textarea still its document's active element
@@ -1831,105 +1444,278 @@ describe("textWysiwyg", () => {
       } finally {
         parent.mockRestore();
       }
-      expect(h.state.editingTextElement).toBeNull();
-      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-      expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+      await expectEnded("Hello");
     });
 
-    describe("losing the window's focus mid-press", () => {
+    it("should show a change made under the edit while the window is away, with the caret kept to its place", async () => {
+      await nextTick();
+      updateTextEditor(textarea, "Hello world");
+      switchWindowAway(textarea);
+      textarea.setSelectionRange(8, 8);
+      // a host's updateScene changes the text while the window is away: the
+      // caret moves with a change before it, stays put through one after
+      // it, and lands at the end of one around it
+      changeTextUnderTheEdit("Hi world");
+      expect(valueAndCaret()).toEqual(["Hi world", 5]);
+      changeTextUnderTheEdit("Hi world!");
+      expect(valueAndCaret()).toEqual(["Hi world!", 5]);
+      changeTextUnderTheEdit("Hi there!");
+      expect(valueAndCaret()).toEqual(["Hi there!", 8]);
+      // never inside a surrogate pair (the new emoji shares its low half
+      // with the old ones)
+      fireEvent.focus(textarea);
+      updateTextEditor(textarea, "Hi \u{1F514}\u{1F514} there!");
+      switchWindowAway(textarea);
+      textarea.setSelectionRange(5, 5);
+      changeTextUnderTheEdit("Hi \u{1F914} there!");
+      expect(valueAndCaret()).toEqual(["Hi \u{1F914} there!", 5]);
+
+      // back in the window, the edit goes on from that text
+      fireEvent.focus(textarea);
+      updateTextEditor(textarea, "Hi \u{1F914} there!!");
+      act(() => textarea.blur());
+      await expectEnded("Hi \u{1F914} there!!");
+    });
+
+    it("should leave the textarea alone while the user can be typing", async () => {
+      await nextTick();
+      updateTextEditor(textarea, "Hello");
+      textarea.setSelectionRange(2, 2);
+      // the user in the editor: the draft stays, with the textarea's undo
+      // history and any composition in progress, and wins at the submit
+      changeTextUnderTheEdit("Hello there");
+      expect(valueAndCaret()).toEqual(["Hello", 2]);
+      // back from a switch, the browser focuses the textarea again
+      switchWindowAway(textarea);
+      fireEvent.focus(textarea);
+      changeTextUnderTheEdit("Hello there");
+      expect(textarea.value).toBe("Hello");
+      // and typing is proof of that, should the focus event not fire
+      switchWindowAway(textarea);
+      updateTextEditor(textarea, "Hello!");
+      changeTextUnderTheEdit("Hello there");
+      expect(textarea.value).toBe("Hello!");
+
+      act(() => textarea.blur());
+      await expectEnded("Hello!");
+    });
+
+    describe("the edit ended from outside the editor", () => {
       beforeEach(async () => {
-        // the zoom buttons pressed below show on a desktop
-        unmountComponent();
-        await render(
-          <Excalidraw
-            handleKeyboardGlobally={true}
-            UIOptions={{ getFormFactor: () => "desktop" }}
-          />,
-        );
-        textElement = UI.createElement("text");
-        mouse.clickOn(textElement);
-        textarea = await getTextEditor();
-      });
-
-      // a press on a control which doesn't take the focus (the zoom
-      // buttons here) disables submit-on-blur until the pointerup, which
-      // never comes when the user alt-tabs away before releasing
-      const press = async () => {
-        // (the editor takes pointer downs from the next frame on)
-        await act(
-          () => new Promise((resolve) => requestAnimationFrame(resolve)),
-        );
+        await nextTick();
         updateTextEditor(textarea, "Hello");
-        const zoomIn = document.querySelector<HTMLElement>(".zoom-in-button")!;
-        fireEvent.pointerDown(zoomIn, {
-          pointerId: 1,
-          pointerType: "mouse",
-          button: 0,
-          buttons: 1,
-        });
-        return zoomIn;
-      };
+        switchWindowAway(textarea);
+        // and the window is back: excalidraw-app's sync follows 50 ms later
+        fireEvent.focus(textarea);
+      });
 
-      it("should submit when the focus is elsewhere by then", async () => {
-        const zoomIn = await press();
-        zoomIn.focus();
-        act(() => fireEvent.blur(window));
+      it("should end when a sync deletes the element, without bringing it back", async () => {
+        const deleted = newElementWith(h.elements[0], { isDeleted: true });
+        act(() => h.app.updateScene({ elements: [deleted] }));
+        await expectEnded("Hello");
+        expect(h.elements[0].isDeleted).toBe(true);
+      });
 
+      it("should keep a live edit through an action's result that leaves the edit out of its state, until one deletes the element", async () => {
+        // an async action started before the edit (copy as PNG, a save)
+        // finishes while the user types: its result has no editingTextElement,
+        // and the state loses it
+        act(() =>
+          h.app.syncActionResult({
+            appState: { toast: { message: "Copied" } },
+            captureUpdate: CaptureUpdateAction.NEVER,
+          }),
+        );
+        await nextTick();
         expect(h.state.editingTextElement).toBeNull();
-        expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-        expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+        expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
+        updateTextEditor(textarea, "Hello world");
+
+        // a result deleting the element still ends the edit in the editor,
+        // which is keyed on its own element, not the state's
+        act(() =>
+          h.app.syncActionResult({
+            elements: [newElementWith(h.elements[0], { isDeleted: true })],
+            appState: { selectedElementIds: {} },
+            captureUpdate: CaptureUpdateAction.NEVER,
+          }),
+        );
+        await expectEnded("Hello world");
+        expect(h.elements[0].isDeleted).toBe(true);
       });
 
-      it("should show a change made under the edit while the window is away", async () => {
-        await press();
-        act(() => fireEvent.blur(window));
-        expect(h.state.editingTextElement?.id).toBe(textElement.id);
-
-        changeTextUnderTheEdit("Hi");
-        expect(textarea.value).toBe("Hi");
-      });
-
-      it("should keep editing when the textarea keeps the focus, and submit on the next focus move", async () => {
-        await press();
-        fireEvent.blur(textarea);
-        fireEvent.blur(window);
-        expect(h.state.editingTextElement?.id).toBe(textElement.id);
+      it("should drop the selection a sync carries, and keep the tab's own", async () => {
+        // the user may still be typing into what looked like a live caret: a
+        // Backspace must not act on what the other tab had selected, nor on
+        // the group or line it was editing. This tab's own aren't the sync's
+        // to reset either: the edited text it has selected, and a line
+        // editor, which an arrow label's edit leaves up (a group edit can't
+        // be live here, starting an edit clears it)
+        const newLine = () =>
+          API.createElement({
+            type: "line",
+            points: [pointFrom(0, 0), pointFrom(100, 0)],
+          });
+        const ownLine = newLine();
+        API.setElements([...h.elements, ownLine]);
+        API.setAppState({
+          selectedLinearElement: new LinearElementEditor(
+            ownLine,
+            arrayToMap([ownLine]),
+            true,
+          ),
+        });
+        const own = () => ({
+          selectedElementIds: h.state.selectedElementIds,
+          selectedGroupIds: h.state.selectedGroupIds,
+          editingGroupId: h.state.editingGroupId,
+          selectedLinearElement: h.state.selectedLinearElement,
+        });
+        const before = own();
+        expect(before.selectedElementIds).toEqual({ [textElement.id]: true });
+        expect(before.editingGroupId).toBeNull();
+        expect(before.selectedLinearElement?.elementId).toBe(ownLine.id);
         expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
 
-        // back in the window: tabbing to another input submits, as if the
-        // press had ended
-        act(() => textarea.blur());
-        expect(h.state.editingTextElement).toBeNull();
-        expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-        expect((h.elements[0] as ExcalidrawTextElement).text).toBe("Hello");
+        const line = newLine();
+        act(() =>
+          h.app.updateScene({
+            appState: {
+              editingTextElement: null,
+              selectedElementIds: { [line.id]: true },
+              selectedGroupIds: { g1: true },
+              editingGroupId: "g1",
+              selectedLinearElement: new LinearElementEditor(
+                line,
+                arrayToMap([line]),
+                true,
+              ),
+            },
+          }),
+        );
+        await expectEnded("Hello");
+        expect(own()).toEqual(before);
+      });
 
-        // and the press' late pointerup doesn't focus the textarea again
-        fireEvent.pointerUp(window, {
-          pointerId: 1,
-          pointerType: "mouse",
-          button: 0,
-          buttons: 0,
-        });
-        await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
-        expect(document.activeElement).not.toBe(textarea);
+      // "Hello" committed, reopened, " world" typed, the window away and back:
+      // an edit with a history to undo to, and the sync that ends it, which
+      // brings a newer version of the text from the other tab
+      const reopenAndType = async () => {
+        Keyboard.exitTextEditor(textarea);
+        expect(API.getUndoStack()).toHaveLength(1);
+        mouse.select(textElement);
+        Keyboard.keyPress(KEYS.ENTER);
+        textarea = await getTextEditor();
+        updateTextEditor(textarea, "Hello world");
+        switchWindowAway(textarea);
+        fireEvent.focus(textarea);
+        const edited = h.elements[0] as ExcalidrawTextElement;
+        return {
+          elements: [
+            {
+              ...edited,
+              text: "Hello there",
+              originalText: "Hello there",
+              version: edited.version + 1,
+            },
+          ],
+          appState: { editingTextElement: null },
+          captureUpdate: CaptureUpdateAction.NEVER,
+        };
+      };
+
+      it("should record the edit a sync ends, as the blur did, undoable like any other", async () => {
+        // the sync never makes the undo stack (the other tab's changes aren't
+        // this tab's to undo), but puts its version in the store's snapshot:
+        // a submit after it would find nothing of the typing to record
+        const sync = await reopenAndType();
+        act(() => h.app.updateScene(sync));
+        await expectEnded("Hello there");
+        expect(API.getUndoStack()).toHaveLength(2);
+
+        Keyboard.undo();
+        expect(text()).toBe("Hello");
+      });
+
+      it("should record it from a host's lifecycle too, where the submit's flushSync is deferred", async () => {
+        const sync = await reopenAndType();
+        // React warns about the deferred flushSync: kept out of the output
+        const consoleError = console.error.bind(console);
+        const spy = vi
+          .spyOn(console, "error")
+          .mockImplementation((...args: unknown[]) => {
+            if (!String(args[0]).includes("flushSync")) {
+              consoleError(...args);
+            }
+          });
+        try {
+          const off = h.app.onChangeEmitter.on(() => {
+            off();
+            h.app.updateScene(sync);
+          });
+          act(() => API.setAppState({ scrollX: h.state.scrollX + 1 }));
+          await expectEnded("Hello there");
+        } finally {
+          spy.mockRestore();
+        }
+        expect(API.getUndoStack()).toHaveLength(2);
+
+        Keyboard.undo();
+        expect(text()).toBe("Hello");
       });
     });
 
-    it("should submit and tear down the editor when the app unmounts", async () => {
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+    it("should keep editing when the window loses focus mid-press, and submit on the next focus move", async () => {
+      // the zoom buttons pressed below show on a desktop
+      unmountComponent();
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      textElement = UI.createElement("text");
+      mouse.clickOn(textElement);
+      textarea = await getTextEditor();
+      // (the editor takes pointer downs from the next frame on)
+      await act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+      updateTextEditor(textarea, "Hello");
+      // a press on a control which doesn't take the focus (the zoom buttons)
+      // disables submit-on-blur until the pointerup, which never comes when
+      // the user alt-tabs away before releasing
+      const zoomIn = document.querySelector<HTMLElement>(".zoom-in-button")!;
+      fireEvent.pointerDown(zoomIn, {
+        pointerId: 1,
+        pointerType: "mouse",
+        button: 0,
+        buttons: 1,
+      });
+      expect(textarea.onblur).toBe(null);
+      switchWindowAway(textarea);
+      expect(h.state.editingTextElement?.id).toBe(textElement.id);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
+      // and parked like any window blur: a change under the edit is shown
+      changeTextUnderTheEdit("Hi");
+      expect(textarea.value).toBe("Hi");
+
+      // back in the window: tabbing to another input submits, as if the
+      // press had ended
+      updateTextEditor(textarea, "Hello world");
+      act(() => textarea.blur());
+      await expectEnded("Hello world");
+    });
+
+    it("should tear down the editor when the app unmounts", async () => {
+      await nextTick();
       updateTextEditor(textarea, "Hello");
       const { app } = h;
 
       unmountComponent();
 
+      // the editor's cleanup ran: the textarea is unbound, and no handler is
+      // left to end an edit later
+      expect(textarea.onblur).toBe(null);
       expect(app.text.textWysiwygSubmitHandler).toBe(null);
-      expect(textarea.isConnected).toBe(false);
-      // the editor's window listeners are gone with it
-      expect(() => {
-        fireEvent.blur(window);
-        fireEvent.pointerUp(window);
-        fireEvent(window, new Event("beforeunload"));
-      }).not.toThrow();
     });
 
     it("should keep the editor's box off a docked sidebar", () => {
@@ -2015,8 +1801,15 @@ describe("textWysiwyg", () => {
       ]);
     });
 
-    it("should end the edit of a label a sync deleted, leaving the container alone", async () => {
-      const rectangle = API.createElement({
+    // a filled container, and its label opened by a double-click inside it
+    const openLabelOf = async (container: NonDeletedExcalidrawElement) => {
+      mouse.doubleClickAt(container.x + 10, container.y + 10);
+      const editor = await getTextEditor();
+      await nextTick();
+      return editor;
+    };
+    const openLabelOfNewContainer = async () => {
+      const container = API.createElement({
         type: "rectangle",
         x: 10,
         y: 20,
@@ -2024,33 +1817,97 @@ describe("textWysiwyg", () => {
         height: 75,
         backgroundColor: "red",
       });
-      API.setElements([rectangle]);
-      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
-      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.containerId).toBe(rectangle.id);
-      mouse.down();
-      const editor = await getTextEditor();
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      API.setElements([container]);
+      const editor = await openLabelOf(container);
+      expect(
+        (h.elements[1] as ExcalidrawTextElementWithContainer).containerId,
+      ).toBe(container.id);
+      return { container, editor };
+    };
+
+    it("should end the edit of a label an action's result deleted, leaving the container alone", async () => {
+      const { editor } = await openLabelOfNewContainer();
       updateTextEditor(editor, "Hello");
       // the window loses the focus, the edit stays open
-      fireEvent.blur(editor);
-      fireEvent.blur(window);
-      expect(document.activeElement).toBe(editor);
-      expect(h.state.editingTextElement?.id).toBe(text.id);
+      switchWindowAway(editor);
+      expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
 
-      // a sync from another tab deleted the label and unbound it
-      const syncedContainer = { ...h.elements[0], boundElements: [] };
-      const syncedText = { ...h.elements[1], isDeleted: true };
-      act(() => h.app.updateScene({ elements: [syncedContainer, syncedText] }));
-      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      // not through updateScene, so the edit ends from the failsafe in
+      // componentDidUpdate, on a label already deleted and unbound
+      const [container, label] = h.elements;
+      const unbound = newElementWith(container, { boundElements: [] });
+      const deleted = newElementWith(label, { isDeleted: true });
+      const versions = [unbound.version, deleted.version];
+      act(() =>
+        h.app.syncActionResult({
+          elements: [unbound, deleted],
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+      );
+      await nextTick();
 
       expect(h.state.editingTextElement).toBeNull();
+      expect(h.app.text.textWysiwygSubmitHandler).toBeNull();
       expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-      expect(h.elements[1].id).toBe(text.id);
+      // the result's copies landed as they came: the submit touched neither
       expect(h.elements[1].isDeleted).toBe(true);
-      expect(h.elements[1].version).toBe(syncedText.version);
       expect(h.elements[0].boundElements).toEqual([]);
-      expect(h.elements[0].version).toBe(syncedContainer.version);
+      expect(h.elements.map((element) => element.version)).toEqual(versions);
+    });
+
+    it("should keep the store in step when a sync older than the edit lands on a label and its container", async () => {
+      // excalidraw-app syncs 50 ms after the window's focus: typing in between
+      // makes the label, and the container it grows, newer than the stored
+      // copies. The store takes changes by version, so the copies land bumped
+      // above the submitted edit: else the snapshot keeps the draft under a
+      // scene showing the sync, and the undo breaks on either element
+      const { container, editor } = await openLabelOfNewContainer();
+      updateTextEditor(editor, "Hello");
+      Keyboard.exitTextEditor(editor);
+      const stored = h.elements.map((element) => ({ ...element }));
+      const reopened = await openLabelOf(container);
+      updateTextEditor(reopened, "Hello\nworld\nhere\nis\nmore");
+      expect(h.elements[0].height).toBeGreaterThan(stored[0].height);
+      expect(h.elements[0].version).toBeGreaterThan(stored[0].version);
+      expect(h.elements[1].version).toBeGreaterThan(stored[1].version);
+      switchWindowAway(reopened);
+      fireEvent.focus(reopened);
+
+      act(() =>
+        h.app.updateScene({
+          elements: stored,
+          appState: { editingTextElement: null },
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+      );
+      await nextTick();
+      expect(h.state.editingTextElement).toBeNull();
+      const [syncedContainer, syncedLabel] = h.elements;
+      expect(syncedContainer.height).toBe(stored[0].height);
+      expect((syncedLabel as ExcalidrawTextElement).text).toBe("Hello");
+      // (the snapshot holds copies)
+      expect(h.store.snapshot.elements.get(syncedContainer.id)).toEqual(
+        syncedContainer,
+      );
+      expect(h.store.snapshot.elements.get(syncedLabel.id)).toEqual(
+        syncedLabel,
+      );
+
+      // the draft is recorded, and already gone from the scene: undoing it
+      // changes nothing on the elements, the next undo takes the label itself
+      const label = () =>
+        h.elements.find(
+          (element) => element.id === syncedLabel.id,
+        ) as ExcalidrawTextElement;
+      Keyboard.undo();
+      expect(label().text).toBe("Hello");
+      expect(h.elements[0].height).toBe(stored[0].height);
+      Keyboard.undo();
+      expect(label().isDeleted).toBe(true);
+      expect(h.elements[0].boundElements ?? []).toEqual([]);
+      Keyboard.redo();
+      expect(label().isDeleted).toBe(false);
+      expect(label().text).toBe("Hello");
     });
 
     it("should not add bound text to a frame when its container is not a frame child", async () => {
