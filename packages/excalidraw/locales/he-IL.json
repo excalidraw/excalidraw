@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
-    "description": "נכון לעכשיו, רק דיאגרמות <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> ו-<erdLink>Entity Relationship</erdLink> נתמכות. שאר הסוגים יוצגו כתמונה ב-Excalidraw.",
+    "description": "",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "Mermaid",
