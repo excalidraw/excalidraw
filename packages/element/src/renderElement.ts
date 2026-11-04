@@ -59,6 +59,7 @@ import {
   getBoundTextMaxWidth,
 } from "./textElement";
 import { getLineHeightInPx } from "./textMeasurements";
+import { getTextStyleRunsForLine } from "./textFormatting";
 import {
   isTextElement,
   isLinearElement,
@@ -702,13 +703,78 @@ const drawElementOnCanvas = (
             element.fontSize,
             lineHeightPx,
           );
+          const styleRanges = element.textStyleRanges;
+          let originalOffset = 0;
+          const styledLines = styleRanges?.length
+            ? lines.map((text) => {
+                const foundOffset = element.originalText.indexOf(
+                  text,
+                  originalOffset,
+                );
+                const start = foundOffset === -1 ? originalOffset : foundOffset;
+                originalOffset = start + text.length;
+                return { text, start };
+              })
+            : null;
 
           for (let index = 0; index < lines.length; index++) {
-            context.fillText(
-              lines[index],
-              horizontalOffset,
-              index * lineHeightPx + verticalOffset,
+            const line = lines[index];
+
+            if (!styleRanges?.length) {
+              context.fillText(
+                line,
+                horizontalOffset,
+                index * lineHeightPx + verticalOffset,
+              );
+              continue;
+            }
+
+            const wrappedLine = styledLines?.[index];
+            if (!wrappedLine) {
+              context.fillText(
+                line,
+                horizontalOffset,
+                index * lineHeightPx + verticalOffset,
+              );
+              continue;
+            }
+
+            const runs = getTextStyleRunsForLine(
+              wrappedLine.text,
+              wrappedLine.start,
+              styleRanges,
             );
+            const runWidths = runs.map((run) => {
+              context.font = run.bold ? `bold ${getFontString(element)}` : getFontString(element);
+              return context.measureText(run.text).width;
+            });
+            const lineWidth = runWidths.reduce((sum, width) => sum + width, 0);
+            context.textAlign = "left";
+            let x =
+              horizontalOffset -
+              (element.textAlign === "center"
+                ? lineWidth / 2
+                : element.textAlign === "right"
+                ? lineWidth
+                : 0);
+            const baseline = index * lineHeightPx + verticalOffset;
+
+            runs.forEach((run, runIndex) => {
+              const width = runWidths[runIndex];
+              context.font = run.bold
+                ? `bold ${getFontString(element)}`
+                : getFontString(element);
+              context.fillText(run.text, x, baseline);
+              if (run.underline) {
+                context.strokeStyle = context.fillStyle;
+                context.beginPath();
+                context.lineWidth = Math.max(1, element.fontSize / 16);
+                context.moveTo(x, baseline + 2);
+                context.lineTo(x + width, baseline + 2);
+                context.stroke();
+              }
+              x += width;
+            });
           }
         });
         if (shouldTemporarilyAttach) {

@@ -155,6 +155,30 @@ describe("exportToSvg", () => {
     });
   });
 
+  it("exports inline bold and underline text styles", async () => {
+    const text = {
+      ...API.createElement({
+        type: "text",
+        text: "hello world",
+      }),
+      textStyleRanges: [
+        { start: 0, end: 5, bold: true },
+        { start: 6, end: 11, underline: true },
+      ],
+    };
+    const svgElement = await exportScene({
+      type: "svg",
+      data: { elements: [text] },
+    });
+
+    expect(svgElement.querySelector("tspan[font-weight='bold']")?.textContent).toBe(
+      "hello",
+    );
+    expect(
+      svgElement.querySelector("tspan[text-decoration='underline']")?.textContent,
+    ).toBe("world");
+  });
+
   it("with exportPadding", async () => {
     const svgElement = await exportScene({
       type: "svg",

@@ -42,6 +42,12 @@ import { normalizeText } from "@excalidraw/element";
 import { wrapText } from "@excalidraw/element";
 import { getWrappedTextLines } from "@excalidraw/element";
 import {
+  adjustTextStyleRangesForEdit,
+  getTextStyleAtOffset,
+  getTextStyleRunsForLine,
+  updateTextStyleRanges,
+} from "@excalidraw/element";
+import {
   isArrowElement,
   isBoundToContainer,
   isStickyNoteElement,
@@ -54,6 +60,7 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
   ExcalidrawTextContainer,
+  TextStyleRange,
 } from "@excalidraw/element/types";
 
 import { actionSaveFileToDisk, actionSaveToActiveFile } from "../actions";
@@ -265,8 +272,15 @@ export const textWysiwyg = ({
    * Note: `text`, which can be wrapped and therefore different from `originalText`,
    *       is derived from `originalText`
    */
-  onChange?: (nextOriginalText: string) => void;
-  onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
+  onChange?: (data: {
+    nextOriginalText: string;
+    nextTextStyleRanges: readonly TextStyleRange[];
+  }) => void;
+  onSubmit: (data: {
+    viaKeyboard: boolean;
+    nextOriginalText: string;
+    nextTextStyleRanges: readonly TextStyleRange[];
+  }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -333,6 +347,9 @@ export const textWysiwyg = ({
   };
 
   let LAST_THEME = app.state.theme;
+  let textStyleRanges = element.textStyleRanges ?? [];
+  let lastValue = element.originalText;
+  let textMirror: HTMLDivElement | null = null;
 
   const updateWysiwygStyle = () => {
     LAST_THEME = app.state.theme;
@@ -500,12 +517,40 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: applyDarkModeFilter(
+        color: "transparent",
+        caretColor: applyDarkModeFilter(
           updatedTextElement.strokeColor,
           appState.theme === THEME.DARK,
         ),
         opacity: updatedTextElement.opacity / 100,
       });
+      editable.style.setProperty("-webkit-text-fill-color", "transparent");
+      if (textMirror) {
+        Object.assign(textMirror.style, {
+          font,
+          lineHeight: updatedTextElement.lineHeight,
+          width: `${width}px`,
+          height: `${height}px`,
+          left: `${viewportX - editorBoxLeft}px`,
+          top: `${viewportY}px`,
+          transformOrigin: `${updatedTextElement.width / 2}px ${
+            updatedTextElement.height / 2
+          }px`,
+          transform: getTransform(
+            updatedTextElement.width,
+            updatedTextElement.height,
+            angle,
+            appState,
+          ),
+          textAlign,
+          verticalAlign,
+          color: applyDarkModeFilter(
+            updatedTextElement.strokeColor,
+            appState.theme === THEME.DARK,
+          ),
+          opacity: updatedTextElement.opacity / 100,
+        });
+      }
       currentTextLayout = {
         angle: angle as Radians,
         font,
@@ -566,8 +611,50 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+  textMirror = ownerDocument.createElement("div");
+  textMirror.classList.add("excalidraw-wysiwyg-textMirror");
+  textMirror.dir = "auto";
+  textMirror.setAttribute("aria-hidden", "true");
+  Object.assign(textMirror.style, {
+    position: "absolute",
+    display: "inline-block",
+    minHeight: "1em",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    pointerEvents: "none",
+    background: "transparent",
+    overflow: "hidden",
+    zIndex: "var(--zIndex-wysiwyg)",
+    wordBreak,
+    whiteSpace,
+    overflowWrap: "break-word",
+    boxSizing: "content-box",
+  });
   editable.value = element.originalText;
   updateWysiwygStyle();
+  const updateTextMirror = () => {
+    if (!textMirror) {
+      return;
+    }
+    textMirror.replaceChildren();
+    for (const run of getTextStyleRunsForLine(
+      editable.value,
+      0,
+      textStyleRanges,
+    )) {
+      const span = ownerDocument.createElement("span");
+      span.textContent = run.text;
+      if (run.bold) {
+        span.style.fontWeight = "bold";
+      }
+      if (run.underline) {
+        span.style.textDecoration = "underline";
+      }
+      textMirror.appendChild(span);
+    }
+  };
+  updateTextMirror();
 
   const getCaretIndexFromInitialSceneCoords = () => {
     if (!initialCaretSceneCoords || !currentTextLayout) {
@@ -860,7 +947,17 @@ export const textWysiwyg = ({
         editable.selectionStart = selectionStart;
         editable.selectionEnd = selectionStart;
       }
-      onChange(editable.value);
+      textStyleRanges = adjustTextStyleRangesForEdit(
+        textStyleRanges,
+        lastValue,
+        editable.value,
+      );
+      lastValue = editable.value;
+      updateTextMirror();
+      onChange({
+        nextOriginalText: editable.value,
+        nextTextStyleRanges: textStyleRanges,
+      });
       // once the update, and any scroll it made (see
       // AppText.handleTextWysiwyg), is in the app's state
       queueMicrotask(followCaretFromUnderPanels);
@@ -868,7 +965,36 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
-    if (!event.shiftKey && actionZoomIn.keyTest(event)) {
+    if (
+      event[KEYS.CTRL_OR_CMD] &&
+      !event.altKey &&
+      (event.key === "b" || event.key === "B" || event.key === "u" || event.key === "U")
+    ) {
+      event.preventDefault();
+      const { selectionStart, selectionEnd } = editable;
+      if (selectionStart !== selectionEnd) {
+        const property = event.key.toLowerCase() === "b" ? "bold" : "underline";
+        let isFullyStyled = true;
+        for (let offset = selectionStart; offset < selectionEnd; offset++) {
+          if (getTextStyleAtOffset(textStyleRanges, offset)[property] !== true) {
+            isFullyStyled = false;
+            break;
+          }
+        }
+        textStyleRanges = updateTextStyleRanges(
+          textStyleRanges,
+          selectionStart,
+          selectionEnd,
+          property,
+          !isFullyStyled,
+        );
+        updateTextMirror();
+        onChange?.({
+          nextOriginalText: editable.value,
+          nextTextStyleRanges: textStyleRanges,
+        });
+      }
+    } else if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
       updateWysiwygStyle();
@@ -1085,6 +1211,7 @@ export const textWysiwyg = ({
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
       nextOriginalText: editable.value,
+      nextTextStyleRanges: textStyleRanges,
     });
   };
 
@@ -1114,6 +1241,7 @@ export const textWysiwyg = ({
     editorBox?.style.removeProperty("right");
 
     editable.remove();
+    textMirror?.remove();
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -1327,7 +1455,7 @@ export const textWysiwyg = ({
     });
   });
   ownerWindow.addEventListener("beforeunload", handleSubmit);
-  editorBox!.appendChild(editable);
+  editorBox!.append(textMirror!, editable);
 
   return handleSubmit;
 };

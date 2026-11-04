@@ -174,6 +174,29 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should preserve inline text styles when restoring text elements", () => {
+    const textElement = {
+      ...API.createElement({
+        type: "text",
+        text: "hello world",
+      }),
+      textStyleRanges: [
+        { start: 0, end: 5, bold: true },
+        { start: 6, end: 11, underline: true },
+      ],
+    };
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.textStyleRanges).toEqual([
+      { start: 0, end: 5, bold: true },
+      { start: 6, end: 11, underline: true },
+    ]);
+  });
+
   it("should not delete empty text element when opts.deleteInvisibleElements is not defined", () => {
     const textElement = API.createElement({
       type: "text",

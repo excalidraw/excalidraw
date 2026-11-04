@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "excalidraw-monorepo",
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "yarn@4.18.1",
   "workspaces": [
     "excalidraw-app",
     "packages/*",
@@ -96,5 +96,10 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   }
 }
