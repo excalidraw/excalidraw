@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>, <sequenceLink>диаграммы последовательности</sequenceLink>, <classLink>диаграммы классов</classLink> и <erdLink>диаграммы взаимоотношений сущностей</erdLink>. Другие типы будут отображаться в виде изображения в Excalidraw.",
+    "description": "",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
