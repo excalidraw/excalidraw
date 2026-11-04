@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid у Excalidraw",
     "button": "Вставити",
-    "description": "Наразі підтримуються лише діаграми типів <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> та <erdLink>Entity Relationship</erdLink>. Інші типи будуть показані в Excalidraw як зображення.",
+    "description": "",
     "syntax": "Синтаксис Mermaid",
     "preview": "Попередній перегляд",
     "label": "Mermaid",
