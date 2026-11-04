@@ -1,6 +1,8 @@
 import React from "react";
 import { vi } from "vitest";
 
+import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
+
 import { getLineHeightInPx } from "@excalidraw/element";
 
 import {
@@ -801,6 +803,9 @@ describe("clipboard - pasting mermaid definition", () => {
         ]),
       );
     });
+    expect(
+      MermaidToExcalidrawLib.parseMermaidToExcalidraw,
+    ).toHaveBeenCalledWith(text, { elbow: { flowchart: true } });
   });
 
   it("should support directives", async () => {

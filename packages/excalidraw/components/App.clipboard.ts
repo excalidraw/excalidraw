@@ -39,7 +39,10 @@ import { tryParseSpreadsheet } from "../charts";
 import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import { ImageURLToFile, SVGStringToFile } from "../data/blob";
 import { t } from "../i18n";
-import { isMaybeMermaidDefinition } from "../mermaid";
+import {
+  isMaybeMermaidDefinition,
+  MERMAID_TO_EXCALIDRAW_CONFIG,
+} from "../mermaid";
 import { withBatchedUpdates } from "../reactUtils";
 import { getShortcutKey } from "../shortcut";
 import { scrollBoundsIntoView } from "../viewport";
@@ -210,7 +213,10 @@ export class AppClipboard {
         // if this fails to load (e.g. offline), fall through and paste as text
         const api = await import("@excalidraw/mermaid-to-excalidraw");
         const { elements: skeletonElements, files = {} } =
-          await api.parseMermaidToExcalidraw(data.text);
+          await api.parseMermaidToExcalidraw(
+            data.text,
+            MERMAID_TO_EXCALIDRAW_CONFIG,
+          );
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,
