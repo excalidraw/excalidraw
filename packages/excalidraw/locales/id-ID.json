@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid menjadi Excalidraw",
     "button": "Sisipkan",
-    "description": "Saat ini hanya Diagram  Diagram Alir  ,  Urutan  ,  Kelas  , dan  Hubungan Entitas  yang didukung. Jenis lainnya akan dirender sebagai gambar di Excalidraw .",
+    "description": "",
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
     "label": "Mermaid",
