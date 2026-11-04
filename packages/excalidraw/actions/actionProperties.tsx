@@ -32,6 +32,7 @@ import {
   getNonDeletedElements,
   isNonDeletedElement,
   syncStickyNoteInk,
+  stripTextSpanStyle,
 } from "@excalidraw/element";
 
 import {
@@ -171,12 +172,17 @@ import {
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
+import { getRichEditorWithSelection } from "../wysiwyg/richEditable";
 
 import {
   getColorTargetAppStateUpdates,
   resolveColorTarget,
 } from "./colorTargets";
 import { register } from "./register";
+import {
+  applyStyleToSelectedTextPortion,
+  scaleFontSizeOfSelectedTextPortion,
+} from "./actionTextStyle";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
@@ -298,6 +304,11 @@ const changeFontSize = (
   app: AppClassProperties,
   getNewFontSize: (element: ExcalidrawTextElement) => number,
   fallbackValue?: ExcalidrawTextElement["fontSize"],
+  /**
+   * what happens to portions with a size of their own: a size picked for the
+   * whole text replaces theirs, a relative change scales them along
+   */
+  spanFontSizes: "replace" | "scale" = "replace",
 ) => {
   const newFontSizes = new Set<number>();
   const elementsMap = app.scene.getNonDeletedElementsMap();
@@ -311,10 +322,28 @@ const changeFontSize = (
         newFontSizes.add(newFontSize);
         const container = app.scene.getContainerElement(oldElement);
 
-        let newElement: ExcalidrawTextElement = newElementWith(
-          oldElement,
-          getBaseFontSizeUpdate(oldElement, newFontSize, elementsMap),
-        );
+        const ratio = newFontSize / oldElement.fontSize;
+        let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
+          ...getBaseFontSizeUpdate(oldElement, newFontSize, elementsMap),
+          ...(oldElement.spans?.some((span) => span.fontSize)
+            ? {
+                spans:
+                  spanFontSizes === "replace"
+                    ? stripTextSpanStyle(oldElement.spans, ["fontSize"])
+                    : oldElement.spans.map((span) =>
+                        span.fontSize
+                          ? {
+                              ...span,
+                              fontSize: Math.max(
+                                1,
+                                Math.round(span.fontSize * ratio),
+                              ),
+                            }
+                          : span,
+                      ),
+              }
+            : {}),
+        } as ElementUpdate<ExcalidrawTextElement>);
         redrawTextBoundingBox(
           newElement,
           container,
@@ -369,12 +398,21 @@ export const actionChangeStrokeColor = register<
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     const { color, ...appStateUpdates } = value ?? {};
     if (color === undefined) {
       return {
         appState: { ...appState, ...appStateUpdates },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+    // part of the text selected in the editor: color just that part
+    if (
+      applyStyleToSelectedTextPortion(appState, app, { strokeColor: color })
+    ) {
+      return {
+        appState: { ...appState, ...appStateUpdates },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
     // resolved from the state the action runs against — never from the
@@ -391,10 +429,13 @@ export const actionChangeStrokeColor = register<
           appState,
           (el) =>
             hasStrokeColor(el.type)
-              ? newElementWith(
-                  el,
-                  getColorUpdate(el, "strokeColor", color, elementsMap),
-                )
+              ? newElementWith(el, {
+                  ...getColorUpdate(el, "strokeColor", color, elementsMap),
+                  // the whole text takes the color, portions included
+                  ...(isTextElement(el) && el.spans?.length
+                    ? { spans: stripTextSpanStyle(el.spans, ["strokeColor"]) }
+                    : {}),
+                } as ElementUpdate<NonDeletedExcalidrawElement>)
               : el,
           true,
         ),
@@ -1010,6 +1051,13 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
     label: "labels.fontSize",
     trackEvent: false,
     perform: (elements, appState, value, app) => {
+      // part of the text selected in the editor: size just that part
+      if (
+        value &&
+        applyStyleToSelectedTextPortion(appState, app, { fontSize: value })
+      ) {
+        return { appState, captureUpdate: CaptureUpdateAction.IMMEDIATELY };
+      }
       return changeFontSize(
         elements,
         appState,
@@ -1106,13 +1154,25 @@ export const actionDecreaseFontSize = register({
   icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
+    const decrease = (fontSize: number) =>
       Math.round(
         // get previous value before relative increase (doesn't work fully
         // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) *
+        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * fontSize,
+      );
+    if (scaleFontSizeOfSelectedTextPortion(appState, app, decrease)) {
+      return { appState, captureUpdate: CaptureUpdateAction.IMMEDIATELY };
+    }
+    return changeFontSize(
+      elements,
+      appState,
+      app,
+      (element) =>
+        decrease(
           getBaseFontSize(element, app.scene.getNonDeletedElementsMap()),
-      ),
+        ),
+      undefined,
+      "scale",
     );
   },
   keyTest: (event) => {
@@ -1131,11 +1191,21 @@ export const actionIncreaseFontSize = register({
   icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(
-        getBaseFontSize(element, app.scene.getNonDeletedElementsMap()) *
-          (1 + FONT_SIZE_RELATIVE_INCREASE_STEP),
-      ),
+    const increase = (fontSize: number) =>
+      Math.round(fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP));
+    if (scaleFontSizeOfSelectedTextPortion(appState, app, increase)) {
+      return { appState, captureUpdate: CaptureUpdateAction.IMMEDIATELY };
+    }
+    return changeFontSize(
+      elements,
+      appState,
+      app,
+      (element) =>
+        increase(
+          getBaseFontSize(element, app.scene.getNonDeletedElementsMap()),
+        ),
+      undefined,
+      "scale",
     );
   },
   keyTest: (event) => {
@@ -1208,6 +1278,26 @@ export const actionChangeFontFamily = register<{
     invariant(value, "actionChangeFontFamily: value must be defined");
 
     const { currentItemFontFamily, currentHoveredFontFamily } = value;
+
+    // part of the text selected in the editor: picking a font sets it for
+    // just that part (and hovering doesn't preview it on the whole text)
+    if (
+      appState.editingTextElement &&
+      getRichEditorWithSelection(appState.editingTextElement.id)
+    ) {
+      if (currentItemFontFamily) {
+        applyStyleToSelectedTextPortion(appState, app, {
+          fontFamily: currentItemFontFamily,
+        });
+      }
+      const { currentItemFontFamily: _, ...restAppState } = nextAppState;
+      return {
+        appState: { ...appState, ...restAppState },
+        captureUpdate: currentItemFontFamily
+          ? CaptureUpdateAction.IMMEDIATELY
+          : CaptureUpdateAction.EVENTUALLY,
+      };
+    }
 
     let nextCaptureUpdateAction: CaptureUpdateActionType =
       CaptureUpdateAction.EVENTUALLY;
@@ -1294,6 +1384,14 @@ export const actionChangeFontFamily = register<{
                 {
                   fontFamily: nextFontFamily,
                   lineHeight: getLineHeight(nextFontFamily!),
+                  // the whole text takes the font, portions included
+                  ...(oldElement.spans?.length && currentItemFontFamily
+                    ? {
+                        spans: stripTextSpanStyle(oldElement.spans, [
+                          "fontFamily",
+                        ]),
+                      }
+                    : {}),
                 },
               );
 

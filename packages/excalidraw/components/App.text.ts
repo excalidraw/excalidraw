@@ -41,6 +41,8 @@ import {
   newTextElement,
   refreshTextDimensions,
   updateBoundElements,
+  adjustTextSpansForTextChange,
+  normalizeTextSpans,
 } from "@excalidraw/element";
 
 import type { ArrowEndpoint } from "@excalidraw/element";
@@ -48,6 +50,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
+  TextSpan,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -184,13 +187,35 @@ export class AppText {
   ) {
     const elementsMap = this.app.scene.getElementsMapIncludingDeleted();
 
-    const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
-      const latestTextElement =
+    const updateElement = (
+      nextOriginalText: string,
+      isDeleted: boolean,
+      /** the editor's styled portions; `undefined` keeps the element's */
+      nextSpans?: readonly TextSpan[] | null,
+    ) => {
+      const storedTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
 
-      if (!latestTextElement || !isTextElement(latestTextElement)) {
+      if (!storedTextElement || !isTextElement(storedTextElement)) {
         return;
       }
+
+      const spans =
+        nextSpans !== undefined
+          ? normalizeTextSpans(nextSpans, nextOriginalText.length)
+          : adjustTextSpansForTextChange(
+              storedTextElement.spans,
+              storedTextElement.originalText,
+              nextOriginalText,
+            );
+      // never add the key to texts that never had styled portions
+      const spansUpdate =
+        spans || "spans" in storedTextElement ? { spans } : {};
+      // laid out with the spans it's getting
+      const latestTextElement: ExcalidrawTextElement = {
+        ...storedTextElement,
+        ...spansUpdate,
+      };
 
       const container = getContainerElement(latestTextElement, elementsMap);
       const stickyContainer =
@@ -223,10 +248,11 @@ export class AppText {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              ...spansUpdate,
               ...(stickyLayout?.text ??
                 // returns (wrapped) text and new dimensions
                 refreshTextDimensions(
-                  _element,
+                  { ..._element, ...spansUpdate },
                   getContainerElement(_element, elementsMap),
                   elementsMap,
                   nextOriginalText,
@@ -278,6 +304,23 @@ export class AppText {
       }
     };
 
+    const onEditorChange = withBatchedUpdates(
+      ({
+        nextOriginalText,
+        nextSpans,
+      }: {
+        nextOriginalText: string;
+        nextSpans: readonly TextSpan[] | null;
+      }) => {
+        updateElement(nextOriginalText, false, nextSpans);
+        if (isNonDeletedElement(element)) {
+          updateBoundElements(element, this.app.scene, {
+            renderEnvironment: this.app.renderEnvironment,
+          });
+        }
+      },
+    );
+
     this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.app.canvas,
       getViewportCoords: (x, y) => {
@@ -293,77 +336,73 @@ export class AppText {
           viewportY - this.app.state.offsetTop,
         ];
       },
-      onChange: withBatchedUpdates((nextOriginalText) => {
-        updateElement(nextOriginalText, false);
-        if (isNonDeletedElement(element)) {
-          updateBoundElements(element, this.app.scene, {
-            renderEnvironment: this.app.renderEnvironment,
-          });
-        }
-      }),
-      onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
-        this.textWysiwygSubmitHandler = null;
+      onChange: (nextOriginalText, nextSpans) =>
+        onEditorChange({ nextOriginalText, nextSpans }),
+      onSubmit: withBatchedUpdates(
+        ({ viaKeyboard, nextOriginalText, nextSpans }) => {
+          this.textWysiwygSubmitHandler = null;
 
-        const isDeleted = !nextOriginalText.trim();
-        updateElement(nextOriginalText, isDeleted);
+          const isDeleted = !nextOriginalText.trim();
+          updateElement(nextOriginalText, isDeleted, nextSpans);
 
-        // keyboard-submit keeps focus on the edited object. For bound text, keep
-        // the container selected even if the text becomes empty and is deleted.
-        // The autoshape tool stays active through the editing session and never
-        // selects anything — don't fight the finalize action's selection reset.
-        const elementIdToSelect =
-          viaKeyboard &&
-          !this.app.isToolLocked() &&
-          this.app.state.activeTool.type !== "autoshape"
-            ? element.containerId || (!isDeleted ? element.id : null)
-            : null;
+          // keyboard-submit keeps focus on the edited object. For bound text, keep
+          // the container selected even if the text becomes empty and is deleted.
+          // The autoshape tool stays active through the editing session and never
+          // selects anything — don't fight the finalize action's selection reset.
+          const elementIdToSelect =
+            viaKeyboard &&
+            !this.app.isToolLocked() &&
+            this.app.state.activeTool.type !== "autoshape"
+              ? element.containerId || (!isDeleted ? element.id : null)
+              : null;
 
-        if (elementIdToSelect) {
-          // needed to ensure state is updated before "finalize" action
-          // that's invoked on keyboard-submit as well
-          // TODO either move this into finalize as well, or handle all state
-          // updates in one place, skipping finalize action
+          if (elementIdToSelect) {
+            // needed to ensure state is updated before "finalize" action
+            // that's invoked on keyboard-submit as well
+            // TODO either move this into finalize as well, or handle all state
+            // updates in one place, skipping finalize action
+            flushSync(() => {
+              this.app.setState((prevState) => ({
+                selectedElementIds: makeNextSelectedElementIds(
+                  {
+                    ...prevState.selectedElementIds,
+                    [elementIdToSelect]: true,
+                  },
+                  prevState,
+                ),
+              }));
+            });
+          }
+
+          if (isDeleted) {
+            fixBindingsAfterDeletion(this.app.scene.getNonDeletedElements(), [
+              element,
+            ]);
+          }
+
+          if (!isDeleted || isExistingElement) {
+            this.app.store.scheduleCapture();
+          }
+
           flushSync(() => {
-            this.app.setState((prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [elementIdToSelect]: true,
-                },
-                prevState,
-              ),
-            }));
+            this.app.setState({
+              newElement: null,
+              editingTextElement: null,
+            });
           });
-        }
 
-        if (isDeleted) {
-          fixBindingsAfterDeletion(this.app.scene.getNonDeletedElements(), [
-            element,
-          ]);
-        }
+          // tools that survive the submit (locked, or autoshape's
+          // double-click-to-type flow) need their cursor back
+          if (
+            this.app.isToolLocked() ||
+            this.app.state.activeTool.type === "autoshape"
+          ) {
+            this.app.cursor.applyForTool();
+          }
 
-        if (!isDeleted || isExistingElement) {
-          this.app.store.scheduleCapture();
-        }
-
-        flushSync(() => {
-          this.app.setState({
-            newElement: null,
-            editingTextElement: null,
-          });
-        });
-
-        // tools that survive the submit (locked, or autoshape's
-        // double-click-to-type flow) need their cursor back
-        if (
-          this.app.isToolLocked() ||
-          this.app.state.activeTool.type === "autoshape"
-        ) {
-          this.app.cursor.applyForTool();
-        }
-
-        this.app.focusContainer();
-      }),
+          this.app.focusContainer();
+        },
+      ),
       element,
       excalidrawContainer: this.dependencies.getContainer(),
       app: this.app,

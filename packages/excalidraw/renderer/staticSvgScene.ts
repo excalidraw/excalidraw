@@ -27,6 +27,11 @@ import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
+  getLineWidth,
+  getTextElementLines,
+  getTextSegmentFontString,
+} from "@excalidraw/element";
+import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
@@ -816,11 +821,94 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+        const isDarkMode = renderConfig.theme === THEME.DARK;
+        // rich text (styled portions): a <tspan> per piece, flowing in one
+        // <text> per line so the line's anchor still aligns it
+        const richLines =
+          direction === "ltr" ? getTextElementLines(element) : null;
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
+          const richLine = richLines?.[i];
+          if (richLine) {
+            // highlights: rects behind the line's text, laid out with the
+            // same measurements as the canvas
+            const widths = richLine.segments.map((segment) =>
+              getLineWidth(
+                segment.text,
+                getTextSegmentFontString(element, segment.style),
+              ),
+            );
+            const lineWidth = widths.reduce((sum, width) => sum + width, 0);
+            let x =
+              element.textAlign === "center"
+                ? (element.width - lineWidth) / 2
+                : element.textAlign === "right"
+                ? element.width - lineWidth
+                : 0;
+            richLine.segments.forEach((segment, index) => {
+              if (segment.style.highlightColor) {
+                const rect = svgRoot.ownerDocument.createElementNS(
+                  SVG_NS,
+                  "rect",
+                );
+                rect.setAttribute("x", `${x}`);
+                rect.setAttribute("y", `${richLine.top}`);
+                rect.setAttribute("width", `${widths[index]}`);
+                rect.setAttribute("height", `${richLine.height}`);
+                rect.setAttribute(
+                  "fill",
+                  applyDarkModeFilter(segment.style.highlightColor, isDarkMode),
+                );
+                node.appendChild(rect);
+              }
+              x += widths[index];
+            });
+
+            for (const segment of richLine.segments) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = segment.text;
+              const { style } = segment;
+              if (style.strokeColor) {
+                tspan.setAttribute(
+                  "fill",
+                  applyDarkModeFilter(style.strokeColor, isDarkMode),
+                );
+              }
+              if (style.fontFamily) {
+                tspan.setAttribute(
+                  "font-family",
+                  getFontFamilyString({ fontFamily: style.fontFamily }),
+                );
+              }
+              if (style.fontSize) {
+                tspan.setAttribute("font-size", `${style.fontSize}px`);
+              }
+              if (style.bold) {
+                tspan.setAttribute("font-weight", "bold");
+              }
+              if (style.italic) {
+                tspan.setAttribute("font-style", "italic");
+              }
+              const decorations = [
+                style.underline && "underline",
+                style.strikethrough && "line-through",
+              ].filter(Boolean);
+              if (decorations.length) {
+                tspan.setAttribute("text-decoration", decorations.join(" "));
+              }
+              text.appendChild(tspan);
+            }
+          } else {
+            text.textContent = lines[i];
+          }
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
+          text.setAttribute(
+            "y",
+            `${richLine ? richLine.baseline : i * lineHeightPx + verticalOffset}`,
+          );
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute(

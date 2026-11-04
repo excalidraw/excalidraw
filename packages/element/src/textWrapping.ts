@@ -400,8 +400,9 @@ export const wrapText = (
   font: FontString,
   maxWidth: number,
   env?: RenderEnvironment,
+  measure?: TextLineMeasurer,
 ): string => {
-  return getWrappedTextLines(text, font, maxWidth, env)
+  return getWrappedTextLines(text, font, maxWidth, env, measure)
     .map((line) => line.text)
     .join("\n");
 };
@@ -413,6 +414,12 @@ export const wrapText = (
  * not include synthetic soft line breaks inserted by this module. If trailing whitespace
  * was trimmed away at a wrap boundary, `end` points to the last rendered character.
  */
+/**
+ * Measures `text` that starts at `start` in the original text. Lets the
+ * wrapping measure rich text (spans of different fonts) - see `textSpans.ts`.
+ */
+export type TextLineMeasurer = (text: string, start: number) => number;
+
 export type WrappedTextLine = {
   text: string;
   start: number;
@@ -450,6 +457,7 @@ export const getWrappedTextLines = (
   font: FontString,
   maxWidth: number,
   env?: RenderEnvironment,
+  measure?: TextLineMeasurer,
 ): WrappedTextLine[] => {
   // if maxWidth is not finite or NaN which can happen in case of bugs in
   // computation, we need to make sure we don't continue as we'll end up
@@ -462,7 +470,9 @@ export const getWrappedTextLines = (
   let offset = 0;
 
   for (const originalLine of text.split("\n")) {
-    const originalLineWidth = getLineWidth(originalLine, font, env);
+    const originalLineWidth = measure
+      ? measure(originalLine, offset)
+      : getLineWidth(originalLine, font, env);
 
     if (originalLineWidth <= maxWidth) {
       lines.push({
@@ -471,7 +481,9 @@ export const getWrappedTextLines = (
         end: offset + originalLine.length,
       });
     } else {
-      lines.push(...wrapLine(originalLine, font, maxWidth, offset, env));
+      lines.push(
+        ...wrapLine(originalLine, font, maxWidth, offset, env, measure),
+      );
     }
 
     offset += originalLine.length + 1;
@@ -492,9 +504,12 @@ const wrapLine = (
   maxWidth: number,
   lineStart: number,
   env?: RenderEnvironment,
+  measure?: TextLineMeasurer,
 ): WrappedTextLine[] => {
   const lines: WrappedTextLine[] = [];
   const tokens = parseTokens(line);
+  const lineWidth = (text: string, start: number) =>
+    measure ? measure(text, start) : getLineWidth(text, font, env);
 
   let currentLine = "";
   let currentLineStart = lineStart;
@@ -512,8 +527,11 @@ const wrapLine = (
 
     // cache single codepoint whitespace, CJK or emoji width calc. as kerning should not apply here
     const testLineWidth = isSingleCharacter(token)
-      ? currentLineWidth + charWidth.calculate(token, font, env)
-      : getLineWidth(testLine, font, env);
+      ? currentLineWidth +
+        (measure
+          ? measure(token, tokenStart)
+          : charWidth.calculate(token, font, env))
+      : lineWidth(testLine, currentLine ? currentLineStart : tokenStart);
 
     // build up the current line, skipping length check for possibly trailing whitespaces
     if (/\s/.test(token) || testLineWidth <= maxWidth) {
@@ -530,7 +548,14 @@ const wrapLine = (
 
     // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
     if (!currentLine) {
-      const wrappedWord = wrapWord(token, font, maxWidth, tokenStart, env);
+      const wrappedWord = wrapWord(
+        token,
+        font,
+        maxWidth,
+        tokenStart,
+        env,
+        measure,
+      );
       const trailingLine = wrappedWord[wrappedWord.length - 1] ?? {
         text: "",
         start: tokenStart,
@@ -544,7 +569,7 @@ const wrapLine = (
       currentLine = trailingLine.text;
       currentLineStart = trailingLine.start;
       currentLineEnd = trailingLine.end;
-      currentLineWidth = getLineWidth(trailingLine.text, font, env);
+      currentLineWidth = lineWidth(trailingLine.text, trailingLine.start);
       tokenOffset = tokenEnd;
       tokenIndex++;
     } else {
@@ -570,6 +595,7 @@ const wrapLine = (
       font,
       maxWidth,
       env,
+      measure,
     );
     lines.push(trailingLine);
   }
@@ -586,6 +612,7 @@ const wrapWord = (
   maxWidth: number,
   wordStart: number,
   env?: RenderEnvironment,
+  measure?: TextLineMeasurer,
 ): WrappedTextLine[] => {
   // multi-codepoint emojis are already broken apart and shouldn't be broken further
   if (getEmojiRegex().test(word)) {
@@ -612,7 +639,9 @@ const wrapWord = (
   for (const char of chars) {
     const charStart = offset;
     const charEnd = charStart + char.length;
-    const _charWidth = charWidth.calculate(char, font, env);
+    const _charWidth = measure
+      ? measure(char, charStart)
+      : charWidth.calculate(char, font, env);
     const testLineWidth = currentLineWidth + _charWidth;
 
     if (testLineWidth <= maxWidth) {
@@ -665,8 +694,11 @@ const trimLine = (
   font: FontString,
   maxWidth: number,
   env?: RenderEnvironment,
+  measure?: TextLineMeasurer,
 ): WrappedTextLine => {
-  const shouldTrimWhitespaces = getLineWidth(line, font, env) > maxWidth;
+  const lineWidth = (text: string) =>
+    measure ? measure(text, start) : getLineWidth(text, font, env);
+  const shouldTrimWhitespaces = lineWidth(line) > maxWidth;
 
   if (!shouldTrimWhitespaces) {
     return {
@@ -683,10 +715,12 @@ const trimLine = (
     "",
   ];
 
-  let trimmedLineWidth = getLineWidth(trimmedLine, font, env);
+  let trimmedLineWidth = lineWidth(trimmedLine);
 
   for (const whitespace of Array.from(whitespaces)) {
-    const _charWidth = charWidth.calculate(whitespace, font, env);
+    const _charWidth = measure
+      ? measure(whitespace, start + trimmedLine.length)
+      : charWidth.calculate(whitespace, font, env);
     const testLineWidth = trimmedLineWidth + _charWidth;
 
     if (testLineWidth > maxWidth) {

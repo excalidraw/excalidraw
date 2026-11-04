@@ -1,5 +1,3 @@
-import { getFontString } from "@excalidraw/common";
-
 import {
   getTextAnchorRatios,
   isExcalidrawElement,
@@ -7,7 +5,7 @@ import {
   newElementWith,
   updateBoundElements,
 } from "@excalidraw/element";
-import { measureText } from "@excalidraw/element";
+import { measureTextElementText } from "@excalidraw/element";
 
 import { isTextElement } from "@excalidraw/element";
 
@@ -48,10 +46,10 @@ export const actionTextAutoResize = register({
       return false;
     }
 
-    const metrics = measureText(
+    const metrics = measureTextElementText(
+      target,
       target.originalText,
-      getFontString(target),
-      target.lineHeight,
+      target.originalText,
     );
 
     // unwrapping resizes the box, so keep the point the text's alignment pins

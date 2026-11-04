@@ -7,7 +7,6 @@ import {
   STICKY_NOTE_PADDING,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
-  getFontString,
   isProdEnv,
   invariant,
 } from "@excalidraw/common";
@@ -24,8 +23,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 
 import { updateStickyNoteLayout } from "./stickyNote";
-import { measureText } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { measureTextElementText, wrapTextElementText } from "./richTextLayout";
 
 import {
   isBoundToContainer,
@@ -98,18 +96,18 @@ export const redrawTextBoundingBox = (
     maxWidth = container
       ? getBoundTextMaxWidth(container, textElement)
       : textElement.width;
-    boundTextUpdates.text = wrapText(
+    boundTextUpdates.text = wrapTextElementText(
+      textElement,
       textElement.originalText,
-      getFontString(textElement),
       maxWidth,
       renderEnvironment,
     );
   }
 
-  const metrics = measureText(
+  const metrics = measureTextElementText(
+    textElement,
     boundTextUpdates.text,
-    getFontString(textElement),
-    textElement.lineHeight,
+    textElement.originalText,
     renderEnvironment,
   );
 
@@ -202,17 +200,17 @@ export const handleBindTextResize = (
       (transformHandleType !== "n" && transformHandleType !== "s")
     ) {
       if (text) {
-        text = wrapText(
+        text = wrapTextElementText(
+          textElement,
           textElement.originalText,
-          getFontString(textElement),
           maxWidth,
           renderEnvironment,
         );
       }
-      const metrics = measureText(
+      const metrics = measureTextElementText(
+        textElement,
         text,
-        getFontString(textElement),
-        textElement.lineHeight,
+        textElement.originalText,
         renderEnvironment,
       );
       nextHeight = metrics.height;

@@ -472,6 +472,11 @@ export class Fonts {
       elements.reduce((families, element) => {
         if (isTextElement(element)) {
           families.add(element.fontFamily);
+          for (const span of element.spans ?? []) {
+            if (span.fontFamily) {
+              families.add(span.fontFamily);
+            }
+          }
         }
         return families;
       }, new Set<number>()),
@@ -498,6 +503,17 @@ export class Fonts {
         }
 
         charsPerFamily[element.fontFamily].add(char);
+      }
+
+      // portions of the text styled with another font (rich text)
+      for (const span of element.spans ?? []) {
+        if (!span.fontFamily) {
+          continue;
+        }
+        const chars = (charsPerFamily[span.fontFamily] ??= new Set());
+        for (const char of element.originalText.slice(span.start, span.end)) {
+          chars.add(char);
+        }
       }
     }
 

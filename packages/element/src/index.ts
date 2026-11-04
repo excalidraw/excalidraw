@@ -100,6 +100,8 @@ export * from "./stickyNote";
 export * from "./textElement";
 export * from "./textMeasurements";
 export * from "./textWrapping";
+export * from "./textSpans";
+export * from "./richTextLayout";
 export * from "./transform";
 export * from "./transformHandles";
 export * from "./typeChecks";

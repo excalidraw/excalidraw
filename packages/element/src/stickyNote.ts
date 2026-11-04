@@ -25,7 +25,7 @@ import { newElementWith } from "./mutateElement";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { computeBoundTextPosition, getBoundTextElement } from "./textElement";
 import { measureText } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { measureTextElementText, wrapTextElementText } from "./richTextLayout";
 import { isStickyNoteElement, isTextElement } from "./typeChecks";
 
 import type { RenderEnvironment } from "./renderEnvironment";
@@ -709,12 +709,27 @@ export const getStickyNoteLayout = (
   const { fontFamily, lineHeight } = textElement;
 
   const fit = (fontSize: number): FontFit => {
-    const font = getFontString({ fontFamily, fontSize });
-    const text = wrapText(originalText, font, maxWidth, renderEnvironment);
+    const layoutElement = {
+      fontFamily,
+      fontSize,
+      lineHeight,
+      spans: textElement.spans,
+    };
+    const text = wrapTextElementText(
+      layoutElement,
+      originalText,
+      maxWidth,
+      renderEnvironment,
+    );
     return {
       text,
       fontSize,
-      ...measureText(text, font, lineHeight, renderEnvironment),
+      ...measureTextElementText(
+        layoutElement,
+        text,
+        originalText,
+        renderEnvironment,
+      ),
     };
   };
 

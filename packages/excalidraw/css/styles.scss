@@ -143,8 +143,28 @@ body.excalidraw-cursor-resize * {
     overflow: hidden;
     pointer-events: none;
 
-    > textarea {
+    // the editor (a contenteditable, see richEditable.ts) takes the pointer
+    // and, unlike a textarea, needs the text selection the editor root
+    // turns off re-enabled
+    > .excalidraw-wysiwyg {
       pointer-events: auto;
+      user-select: text;
+      -webkit-user-select: text;
+      cursor: text;
+    }
+
+    // the selection is drawn by the selection layer (see textWysiwyg), in
+    // bands of the lines' full height, under the text
+    > .excalidraw-wysiwyg--uniform-selection,
+    > .excalidraw-wysiwyg--uniform-selection * {
+      &::selection {
+        background: transparent;
+      }
+    }
+
+    > .excalidraw-wysiwyg-selection > .excalidraw-wysiwyg-selection-band {
+      background: var(--color-primary);
+      opacity: 0.3;
     }
   }
 

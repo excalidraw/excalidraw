@@ -43,6 +43,7 @@ import {
   isValidPolygon,
   projectFixedPointOntoDiagonal,
   isNonDeletedElement,
+  normalizeTextSpans,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
@@ -593,6 +594,19 @@ export const restoreElement = (
           ? normalizeStickyNoteFontSize(element.baseFontSize)
           : null,
       });
+
+      // rich text: keep valid spans only (in normal form, within the text)
+      if ("spans" in element) {
+        const spans = normalizeTextSpans(
+          element.spans as unknown[] | null | undefined,
+          element.originalText.length,
+        );
+        if (spans) {
+          element = { ...element, spans };
+        } else {
+          delete (element as { spans?: unknown }).spans;
+        }
+      }
 
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)

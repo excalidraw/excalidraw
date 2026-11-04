@@ -60,6 +60,11 @@ import {
 } from "./textElement";
 import { getLineHeightInPx } from "./textMeasurements";
 import {
+  getTextDecorationMetrics,
+  getTextElementLines,
+} from "./richTextLayout";
+import { getTextSegmentFontString } from "./textSpans";
+import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
@@ -81,6 +86,7 @@ import {
 } from "./stickyNote";
 
 import type { RenderEnvironment } from "./renderEnvironment";
+import type { TextElementLine } from "./richTextLayout";
 
 import type {
   ExcalidrawElement,
@@ -703,6 +709,21 @@ const drawElementOnCanvas = (
             lineHeightPx,
           );
 
+          // rich text (styled portions): drawn piece by piece, so RTL text
+          // (which needs the browser's bidi layout of the whole line) keeps
+          // the plain path
+          const richLines = rtl ? null : getTextElementLines(element);
+
+          if (richLines) {
+            drawTextElementLines(
+              context,
+              element,
+              richLines,
+              renderConfig.theme === THEME.DARK,
+            );
+            return;
+          }
+
           for (let index = 0; index < lines.length; index++) {
             context.fillText(
               lines[index],
@@ -718,6 +739,75 @@ const drawElementOnCanvas = (
         throw new Error(`Unimplemented type ${element.type}`);
       }
     }
+  }
+};
+
+const drawTextElementLines = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawTextElement,
+  lines: readonly TextElementLine[],
+  isDarkMode: boolean,
+) => {
+  context.textAlign = "left";
+
+  for (const line of lines) {
+    const widths = line.segments.map((segment) => {
+      context.font = getTextSegmentFontString(element, segment.style);
+      return context.measureText(segment.text).width;
+    });
+    const lineWidth = widths.reduce((sum, width) => sum + width, 0);
+    const lineX =
+      element.textAlign === "center"
+        ? (element.width - lineWidth) / 2
+        : element.textAlign === "right"
+        ? element.width - lineWidth
+        : 0;
+
+    // highlights first, so that no piece's glyphs end up beneath the next
+    // piece's highlight; each the line's full height, so that they're even
+    // whatever the fonts and sizes on the line
+    let x = lineX;
+    line.segments.forEach((segment, index) => {
+      if (segment.style.highlightColor) {
+        context.fillStyle = applyDarkModeFilter(
+          segment.style.highlightColor,
+          isDarkMode,
+        );
+        context.fillRect(x, line.top, widths[index], line.height);
+      }
+      x += widths[index];
+    });
+
+    x = lineX;
+    line.segments.forEach((segment, index) => {
+      const width = widths[index];
+      const decoration = getTextDecorationMetrics(
+        segment.style.fontSize ?? element.fontSize,
+      );
+      context.font = getTextSegmentFontString(element, segment.style);
+      context.fillStyle = applyDarkModeFilter(
+        segment.style.strokeColor ?? element.strokeColor,
+        isDarkMode,
+      );
+      context.fillText(segment.text, x, line.baseline);
+      if (segment.style.underline) {
+        context.fillRect(
+          x,
+          line.baseline + decoration.underlineOffset,
+          width,
+          decoration.thickness,
+        );
+      }
+      if (segment.style.strikethrough) {
+        context.fillRect(
+          x,
+          line.baseline + decoration.strikethroughOffset,
+          width,
+          decoration.thickness,
+        );
+      }
+      x += width;
+    });
   }
 };
 

@@ -288,7 +288,36 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * so it survives midpoint insertion and other geometry changes.
      * */
     labelPosition?: number | null;
+    /**
+     * Styles applied to portions of the text (rich text). Offsets are
+     * end-exclusive code-unit offsets into `originalText`; spans are sorted,
+     * non-overlapping, and only carry the properties that differ from the
+     * element's own (`strokeColor`, `fontFamily`). Anything not covered by a
+     * span is drawn with the element's own style.
+     */
+    spans?: readonly TextSpan[] | null;
   }>;
+
+/** the style a portion of a text element can override */
+export type TextSpanStyle = {
+  strokeColor?: string;
+  fontFamily?: FontFamilyValues;
+  /** px, like the element's `fontSize` */
+  fontSize?: number;
+  /** a background behind the glyphs (highlighter) */
+  highlightColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+};
+
+export type TextSpan = Readonly<
+  {
+    start: number;
+    end: number;
+  } & TextSpanStyle
+>;
 
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement

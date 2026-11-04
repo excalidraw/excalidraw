@@ -74,11 +74,17 @@ export const Picker = React.forwardRef(
         ? t("labels.stroke")
         : type === "elementBackground"
         ? t("labels.background")
+        : type === "textHighlight"
+        ? t("labels.textHighlight")
         : null
       : null;
 
     const [customColors] = React.useState(() => {
       if (type === "canvasBackground") {
+        return [];
+      }
+      // highlights are text portions' colors, not elements': none to offer
+      if (type === "textHighlight") {
         return [];
       }
       return getMostUsedCustomColors(elements, type, palette);
@@ -120,7 +126,7 @@ export const Picker = React.forwardRef(
 
     const [activeShade, setActiveShade] = useState(
       colorObj?.shade ??
-        (type === "elementBackground"
+        (type === "elementBackground" || type === "textHighlight"
           ? DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX
           : DEFAULT_ELEMENT_STROKE_COLOR_INDEX),
     );
