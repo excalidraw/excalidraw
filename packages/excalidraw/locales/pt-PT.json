@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid para Excalidraw",
     "button": "Inserir",
-    "description": "Atualmente apenas podem ser convertidos diagramas dos seguintes tipos: <flowchartLink>Fluxograma</flowchartLink>, <sequenceLink>Sequência, </sequenceLink>, <classLink>Classe</classLink> e <erdLink>Relação de Entidades</erdLink>. Os restantes tipos surgirão em forma de imagem.",
+    "description": "",
     "syntax": "Sintaxe Mermaid",
     "preview": "Pré-visualizar",
     "label": "Mermaid",
