@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid la Excalidraw",
     "button": "Introducere",
-    "description": "În prezent, numai <flowchartLink>schemele logice</flowchartLink>, <sequenceLink>diagramele de secvență</sequenceLink>, <classLink>diagramele de clasă</classLink> și <erdLink>diagramele entitate-asociere</erdLink> sunt acceptate. Celelalte tipuri vor fi redate ca imagine în Excalidraw.",
+    "description": "",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
     "label": "Mermaid",
