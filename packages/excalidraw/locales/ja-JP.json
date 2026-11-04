@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid を Excalidraw に変換",
     "button": "挿入",
-    "description": "現在対応しているのは<flowchartLink>フローチャート</flowchartLink>、<sequenceLink>シーケンス図</sequenceLink>、<classLink>クラス図</classLink>、<erdLink>ER図</erdLink>のみです。その他の種類は Excalidraw 上で画像として描画されます。",
+    "description": "",
     "syntax": "Mermaid 構文",
     "preview": "プレビュー",
     "label": "Mermaid",
