@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid'den Excalidraw'a",
     "button": "Ekle",
-    "description": "Şu anda yalnızca <flowchartLink>Akış şeması</flowchartLink>, <sequenceLink> Dizi, </sequenceLink>, <classLink>Sınıf </classLink> ve <erdLink> Varlık ilişkileri</erdLink> Diyagramları desteklenmektedir. Diğer türler, Excalidraw'da görsel olarak çizilecektir.",
+    "description": "",
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme",
     "label": "Mermaid",
