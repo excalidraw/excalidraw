@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid v Excalidraw",
     "button": "Vstavi",
-    "description": "Trenutno so podprti samo diagrami <flowchartLink>Diagram poteka</flowchartLink>, <sequenceLink>Zaporedje</sequenceLink>, <classLink>Razred</classLink> in <erdLink>Diagrami entitet in razmerij</erdLink>. Druge vrste bodo v programu Excalidraw upodobljene kot slike.",
+    "description": "",
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled",
     "label": "Mermaid",
