@@ -113,6 +113,41 @@ describe("search", () => {
     expect(h.app.state.searchMatches?.matches[1].focus).toBe(false);
   });
 
+  it("should keep search results stable when matching text elements move", async () => {
+    API.setElements([
+      API.createElement({ type: "text", text: "test one", y: 0 }),
+      API.createElement({ type: "text", text: "test two", y: 100 }),
+    ]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    const initialMatchIds = h.app.state.searchMatches?.matches.map(
+      (match) => match.id,
+    );
+
+    API.updateElement(h.elements[0] as ExcalidrawTextElement, {
+      y: 200,
+    });
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    });
+
+    expect(h.app.state.searchMatches?.matches.map((match) => match.id)).toEqual(
+      initialMatchIds,
+    );
+  });
+
   it("should match text split across multiple lines", async () => {
     const scrollIntoViewMock = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
