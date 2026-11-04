@@ -319,7 +319,7 @@ export const getTransformHandles = (
       ...omitSides,
       rotation: true,
     };
-  } else if (element.type === "table") {
+  } else if (element.type === "dbtable") {
     // a table's size is derived from its content: it can only be rotated
     // (or scaled as part of a multi-selection)
     omitSides = OMIT_SIDES_FOR_TABLE;

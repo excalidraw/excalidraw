@@ -93,7 +93,7 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     (hasBackground(element.type) && !isTransparent(element.backgroundColor)) ||
     hasBoundTextElement(element) ||
     // a table is a solid card: grabbable anywhere, even without a fill
-    element.type === "table" ||
+    element.type === "dbtable" ||
     isIframeLikeElement(element) ||
     isTextElement(element);
 
@@ -542,7 +542,7 @@ export const intersectElementWithLineSegment = (
   switch (element.type) {
     case "rectangle":
     case "stickynote":
-    case "table":
+    case "dbtable":
     case "image":
     case "text":
     case "iframe":

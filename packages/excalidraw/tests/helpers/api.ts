@@ -23,7 +23,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newStickyNoteElement,
-  newTableElement,
+  newDBTableElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -340,8 +340,8 @@ export class API {
           baseHeight: rest.baseHeight ?? height,
         });
         break;
-      case "table":
-        element = newTableElement({
+      case "dbtable":
+        element = newDBTableElement({
           ...base,
           type,
         });

@@ -59,7 +59,7 @@ import {
   isImageElement,
   isLinearElement,
   isStickyNoteElement,
-  isTableElement,
+  isDBTableElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -69,7 +69,7 @@ import {
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
-import { getTableLayout } from "./table";
+import { getDBTableLayout } from "./dbTable";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 
@@ -769,8 +769,8 @@ export const resizeSingleElement = (
     renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
-  // a table's size is derived from its content (see `normalizeTable`)
-  if (isTableElement(latestElement)) {
+  // a table's size is derived from its content (see `normalizeDBTable`)
+  if (isDBTableElement(latestElement)) {
     return;
   }
 
@@ -1410,7 +1410,7 @@ export const resizeMultipleElements = (
           item.latest.angle !== 0 ||
           isTextElement(item.latest) ||
           // tables scale through their font size, which keeps proportions
-          isTableElement(item.latest) ||
+          isDBTableElement(item.latest) ||
           isInGroup(item.latest),
       );
 
@@ -1534,7 +1534,7 @@ export const resizeMultipleElements = (
         update.fontSize = metrics.size;
       }
 
-      if (isTableElement(orig)) {
+      if (isDBTableElement(orig)) {
         const fontSize = orig.fontSize * scale;
         if (fontSize < MIN_FONT_SIZE) {
           return;
@@ -1542,7 +1542,10 @@ export const resizeMultipleElements = (
         update.fontSize = fontSize;
         // the size follows from the scaled font (≈ the scaled box, without
         // drift from rounding)
-        const layout = getTableLayout({ ...orig, fontSize }, renderEnvironment);
+        const layout = getDBTableLayout(
+          { ...orig, fontSize },
+          renderEnvironment,
+        );
         update.width = layout.width;
         update.height = layout.height;
         // keep the anchor-relative position consistent with the new size

@@ -114,12 +114,12 @@ const getHints = ({
     return t("hints.stickynote");
   }
 
-  if (activeTool.type === "table") {
-    return t("hints.table");
+  if (activeTool.type === "dbtable") {
+    return t("hints.dbtable");
   }
 
-  if (appState.editingTableId) {
-    return t("hints.table_editing");
+  if (appState.editingDBTableId) {
+    return t("hints.dbtable_editing");
   }
 
   if (activeTool.type === "autoshape") {
@@ -184,10 +184,10 @@ const getHints = ({
 
   if (
     selectedElements.length === 1 &&
-    selectedElements[0].type === "table" &&
+    selectedElements[0].type === "dbtable" &&
     isSelectionLikeTool(activeTool.type)
   ) {
-    return t("hints.table_selected");
+    return t("hints.dbtable_selected");
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {

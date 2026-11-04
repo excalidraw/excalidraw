@@ -565,7 +565,7 @@ export const TOOL_TYPE = {
   frame: "frame",
   magicframe: "magicframe",
   stickynote: "stickynote",
-  table: "table",
+  dbtable: "dbtable",
   embeddable: "embeddable",
   laser: "laser",
   autoshape: "autoshape",

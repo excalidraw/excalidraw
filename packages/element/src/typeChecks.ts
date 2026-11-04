@@ -30,7 +30,7 @@ import type {
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
   ExcalidrawStickyNoteElement,
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
 } from "./types";
 
 export const isInitializedImageElement = <T extends ExcalidrawElement>(
@@ -77,10 +77,10 @@ export const isStickyNoteElement = <T extends ExcalidrawElement>(
   return element != null && element.type === "stickynote";
 };
 
-export const isTableElement = <T extends ExcalidrawElement>(
+export const isDBTableElement = <T extends ExcalidrawElement>(
   element: T | null | undefined,
-): element is T & ExcalidrawTableElement => {
-  return element != null && element.type === "table";
+): element is T & ExcalidrawDBTableElement => {
+  return element != null && element.type === "dbtable";
 };
 
 export const isFrameElement = <T extends ExcalidrawElement>(
@@ -197,7 +197,7 @@ export const isBindableElement = <T extends ExcalidrawElement>(
     (!element.locked || includeLocked === true) &&
     (element.type === "rectangle" ||
       element.type === "stickynote" ||
-      element.type === "table" ||
+      element.type === "dbtable" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
       element.type === "image" ||
@@ -216,7 +216,7 @@ export const isRectanguloidElement = <T extends ExcalidrawElement>(
     element != null &&
     (element.type === "rectangle" ||
       element.type === "stickynote" ||
-      element.type === "table" ||
+      element.type === "dbtable" ||
       element.type === "diamond" ||
       element.type === "image" ||
       element.type === "iframe" ||
@@ -236,7 +236,7 @@ export const isRectangularElement = <T extends ExcalidrawElement>(
     element != null &&
     (element.type === "rectangle" ||
       element.type === "stickynote" ||
-      element.type === "table" ||
+      element.type === "dbtable" ||
       element.type === "image" ||
       element.type === "text" ||
       element.type === "iframe" ||
@@ -274,7 +274,7 @@ export const isExcalidrawElement = (
     case "diamond":
     case "rectangle":
     case "stickynote":
-    case "table":
+    case "dbtable":
     case "iframe":
     case "embeddable":
     case "ellipse":
@@ -332,7 +332,7 @@ export const isArrowBoundToElement = (element: ExcalidrawArrowElement) => {
 
 export const isUsingAdaptiveRadius = (type: string) =>
   type === "rectangle" ||
-  type === "table" ||
+  type === "dbtable" ||
   type === "embeddable" ||
   type === "iframe" ||
   type === "image";
@@ -426,7 +426,7 @@ export const isEligibleFrameChildType = (type: ElementOrToolType) => {
   switch (type) {
     case "rectangle":
     case "stickynote":
-    case "table":
+    case "dbtable":
     case "diamond":
     case "ellipse":
     case "arrow":

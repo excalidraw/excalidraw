@@ -196,7 +196,7 @@ export type ElementShapes = {
   line: Drawable[];
   text: null;
   stickynote: null;
-  table: Drawable[];
+  dbtable: Drawable[];
   image: null;
   frame: null;
   magicframe: null;

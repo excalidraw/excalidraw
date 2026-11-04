@@ -62,7 +62,7 @@ import {
 } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { isStickyNoteElement } from "@excalidraw/element";
-import { newTableRow, normalizeTable } from "@excalidraw/element";
+import { newDBTableRow, normalizeDBTable } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
   isArrowBoundToElement,
@@ -92,7 +92,7 @@ import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawArrowElement,
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
@@ -235,7 +235,7 @@ export const AllowedExcalidrawActiveTools: Record<
   arrow: true,
   freedraw: true,
   stickynote: true,
-  table: true,
+  dbtable: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -363,6 +363,10 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
           elementId: binding.elementId,
           mode: binding.mode,
           fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+          // a database table row connection
+          ...(typeof binding.rowId === "string" && binding.rowId
+            ? { rowId: binding.rowId }
+            : {}),
         } as FixedPointBinding | null;
       }
       return null;
@@ -769,16 +773,16 @@ export const restoreElement = (
             element.height,
         }),
       );
-    case "table": {
+    case "dbtable": {
       const fontFamily = Object.values(FONT_FAMILY).includes(
         element.fontFamily as any,
       )
         ? element.fontFamily
         : DEFAULT_FONT_FAMILY;
-      return normalizeTable(
+      return normalizeDBTable(
         restoreElementWithProperties(element, {
           title: typeof element.title === "string" ? element.title : "",
-          rows: restoreTableRows(element.rows),
+          rows: restoreDBTableRows(element.rows),
           collapsed: element.collapsed === true,
           fontSize:
             isFiniteNumber(element.fontSize) && element.fontSize > 0
@@ -802,12 +806,14 @@ export const restoreElement = (
 };
 
 /** keeps well-formed rows, with unique ids, dropping anything else */
-const restoreTableRows = (rows: unknown): ExcalidrawTableElement["rows"] => {
+const restoreDBTableRows = (
+  rows: unknown,
+): ExcalidrawDBTableElement["rows"] => {
   if (!Array.isArray(rows)) {
     return [];
   }
   const seenIds = new Set<string>();
-  const restored: ExcalidrawTableElement["rows"][number][] = [];
+  const restored: ExcalidrawDBTableElement["rows"][number][] = [];
   for (const row of rows) {
     if (!row || typeof row !== "object") {
       continue;
@@ -817,7 +823,7 @@ const restoreTableRows = (rows: unknown): ExcalidrawTableElement["rows"] => {
     const id =
       typeof row.id === "string" && row.id && !seenIds.has(row.id)
         ? row.id
-        : newTableRow().id;
+        : newDBTableRow().id;
     seenIds.add(id);
     restored.push({ id, key, name });
   }

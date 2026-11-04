@@ -86,19 +86,19 @@ import {
 } from "./stickyNote";
 
 import {
-  getTableFontString,
-  getTableKeyFontString,
-  getTableLayout,
-  getTableTextBaselineOffset,
-  TABLE_KEY_TEXT_OPACITY,
-} from "./table";
+  getDBTableFontString,
+  getDBTableKeyFontString,
+  getDBTableLayout,
+  getDBTableTextBaselineOffset,
+  DB_TABLE_KEY_TEXT_OPACITY,
+} from "./dbTable";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { TextElementLine } from "./richTextLayout";
 
 import type {
   ExcalidrawElement,
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -234,17 +234,17 @@ export interface ExcalidrawElementWithCanvas {
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   /** a table's text is left out while its cells are edited in place */
-  hideTableText: boolean;
+  hideDBTableText: boolean;
 }
 
 /** whether `element` is the table whose cells are being edited in place */
-const isTableBeingEdited = (
+const isDBTableBeingEdited = (
   element: ExcalidrawElement,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) =>
-  element.type === "table" &&
-  "editingTableId" in appState &&
-  appState.editingTableId === element.id;
+  element.type === "dbtable" &&
+  "editingDBTableId" in appState &&
+  appState.editingDBTableId === element.id;
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
@@ -350,8 +350,8 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  const hideTableText = isTableBeingEdited(element, appState);
-  drawElementOnCanvas(element, rc, context, renderConfig, { hideTableText });
+  const hideDBTableText = isDBTableBeingEdited(element, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig, { hideDBTableText });
 
   context.restore();
 
@@ -368,7 +368,7 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
-    hideTableText,
+    hideDBTableText,
   };
 };
 
@@ -490,10 +490,10 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  options?: { hideTableText?: boolean },
+  options?: { hideDBTableText?: boolean },
 ) => {
   switch (element.type) {
-    case "table": {
+    case "dbtable": {
       context.lineJoin = "round";
       context.lineCap = "round";
       for (const shape of ShapeCache.generateElementShape(
@@ -503,11 +503,11 @@ const drawElementOnCanvas = (
         rc.draw(shape);
       }
       withSavedContext(context, () => {
-        drawTableChrome(
+        drawDBTableChrome(
           context,
           element,
           renderConfig.theme === THEME.DARK,
-          !options?.hideTableText,
+          !options?.hideDBTableText,
         );
       });
       break;
@@ -788,13 +788,13 @@ const drawElementOnCanvas = (
  * Paints a table's collapse toggle and (unless edited in place) its text:
  * the centered title, the key column (smaller and muted) and the names.
  */
-const drawTableChrome = (
+const drawDBTableChrome = (
   context: CanvasRenderingContext2D,
-  element: ExcalidrawTableElement,
+  element: ExcalidrawDBTableElement,
   isDarkMode: boolean,
   withText: boolean,
 ) => {
-  const layout = getTableLayout(element);
+  const layout = getDBTableLayout(element);
   const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
 
   // --- toggle: a small rounded square with a minus (expanded) or plus ---------
@@ -837,13 +837,13 @@ const drawTableChrome = (
   context.textBaseline = "alphabetic";
 
   // --- title ------------------------------------------------------------------
-  context.font = getTableFontString(element);
+  context.font = getDBTableFontString(element);
   context.textAlign = "center";
   context.fillText(
     element.title,
     layout.width / 2,
     layout.titleY +
-      getTableTextBaselineOffset(
+      getDBTableTextBaselineOffset(
         element.fontFamily,
         layout.fontSize,
         layout.lineHeight,
@@ -852,24 +852,24 @@ const drawTableChrome = (
 
   // --- rows -------------------------------------------------------------------
   context.textAlign = "left";
-  const nameBaseline = getTableTextBaselineOffset(
+  const nameBaseline = getDBTableTextBaselineOffset(
     element.fontFamily,
     layout.fontSize,
     layout.lineHeight,
   );
-  const keyBaseline = getTableTextBaselineOffset(
+  const keyBaseline = getDBTableTextBaselineOffset(
     element.fontFamily,
     layout.keyFontSize,
     layout.lineHeight,
   );
-  const keyFont = getTableKeyFontString(element);
-  const nameFont = getTableFontString(element);
+  const keyFont = getDBTableKeyFontString(element);
+  const nameFont = getDBTableFontString(element);
   const opacity = context.globalAlpha;
 
   for (const row of layout.rows) {
     if (row.row.key) {
       context.font = keyFont;
-      context.globalAlpha = opacity * TABLE_KEY_TEXT_OPACITY;
+      context.globalAlpha = opacity * DB_TABLE_KEY_TEXT_OPACITY;
       context.fillText(
         row.row.key,
         row.key.x + layout.paddingX,
@@ -990,8 +990,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.environment !== renderEnvironment ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
-    prevElementWithCanvas.hideTableText !==
-      isTableBeingEdited(element, appState)
+    prevElementWithCanvas.hideDBTableText !==
+      isDBTableBeingEdited(element, appState)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -1399,7 +1399,7 @@ const drawElement = (
     }
     case "rectangle":
     case "stickynote":
-    case "table":
+    case "dbtable":
     case "diamond":
     case "ellipse":
     case "line":

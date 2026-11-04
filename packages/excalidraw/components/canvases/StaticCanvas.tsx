@@ -99,7 +99,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     editingGroupId: appState.editingGroupId,
     currentHoveredFontFamily: appState.currentHoveredFontFamily,
     croppingElementId: appState.croppingElementId,
-    editingTableId: appState.editingTableId,
+    editingDBTableId: appState.editingDBTableId,
     suggestedBinding: appState.suggestedBinding,
   };
 

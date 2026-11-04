@@ -364,7 +364,7 @@ import {
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
-import { TableEditor } from "../components/TableEditor";
+import { DBTableEditor } from "../components/DBTableEditor";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isOverScrollBars } from "../scene/scrollbars";
@@ -389,7 +389,7 @@ import { AppClipboard } from "./App.clipboard";
 import { AppText } from "./App.text";
 import { AppTextTool } from "./App.textTool";
 import { AppBucketFill } from "./App.bucketFill";
-import { AppTable } from "./App.table";
+import { AppDBTable } from "./App.dbTable";
 import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
@@ -685,7 +685,7 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
-  public table: AppTable = new AppTable(this);
+  public dbTable: AppDBTable = new AppDBTable(this);
   public duplicate: AppDuplicate = new AppDuplicate(this, {
     getPointerCount: () => gesture.pointers.size,
   });
@@ -2518,14 +2518,14 @@ class App extends React.Component<AppProps, AppState> {
                           </LayerUI>
 
                           <div className="excalidraw-textEditorContainer" />
-                          {this.state.editingTableId &&
+                          {this.state.editingDBTableId &&
                             (() => {
-                              const table = this.table.getEditingTable();
+                              const table = this.dbTable.getEditingDBTable();
                               return table ? (
-                                <TableEditor
+                                <DBTableEditor
                                   key={table.id}
                                   table={table}
-                                  controller={this.table}
+                                  controller={this.dbTable}
                                 />
                               ) : null;
                             })()}
@@ -4325,8 +4325,8 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     // the edited table went away (deleted, undone, removed by a collaborator)
-    if (this.state.editingTableId && !this.table.getEditingTable()) {
-      this.setState({ editingTableId: null });
+    if (this.state.editingDBTableId && !this.dbTable.getEditingDBTable()) {
+      this.setState({ editingDBTableId: null });
     }
 
     const renderOverridesUpdatePending = this.renderOverridesUpdatePending;
@@ -6425,7 +6425,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.cursor.reset();
     if (!this.state.viewModeEnabled) {
-      if (this.table.handleDoubleClick({ x: sceneX, y: sceneY })) {
+      if (this.dbTable.handleDoubleClick({ x: sceneX, y: sceneY })) {
         return;
       }
 
@@ -7260,7 +7260,7 @@ class App extends React.Component<AppProps, AppState> {
       !isLaserTool &&
       this.state.activeTool.type !== "eraser" &&
       !this.state.viewModeEnabled &&
-      this.table.getTableWithToggleAt(scenePointer)
+      this.dbTable.getDBTableWithToggleAt(scenePointer)
     ) {
       this.cursor.set(CURSOR_TYPE.POINTER);
       return;
@@ -7852,7 +7852,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type === "lasso") &&
       !this.state.viewModeEnabled &&
       !event.shiftKey &&
-      this.table.handleTogglePointerDown(pointerDownState.origin)
+      this.dbTable.handleTogglePointerDown(pointerDownState.origin)
     ) {
       return;
     }
@@ -7964,10 +7964,10 @@ class App extends React.Component<AppProps, AppState> {
       // mode this branch is unreachable:
       // `pan.start` swallows the pointer-down.
       this.bucketFill.handlePointerDown(scenePointer);
-    } else if (this.state.activeTool.type === "table") {
+    } else if (this.state.activeTool.type === "dbtable") {
       // click-to-place: armed here, placed on a genuine pointer up (see the
       // bucket fill above for why)
-      this.table.handlePointerDown(scenePointer);
+      this.dbTable.handlePointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -8858,7 +8858,7 @@ class App extends React.Component<AppProps, AppState> {
       | "selection"
       | "rectangle"
       | "stickynote"
-      | "table"
+      | "dbtable"
       | "diamond"
       | "ellipse"
       | "iframe"
@@ -9552,11 +9552,11 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (
         childEvent.type === "pointerup" &&
-        this.state.activeTool.type === "table"
+        this.state.activeTool.type === "dbtable"
       ) {
-        this.table.handlePointerUp();
+        this.dbTable.handlePointerUp();
       } else {
-        this.table.cancel();
+        this.dbTable.cancel();
       }
       const {
         newElement,

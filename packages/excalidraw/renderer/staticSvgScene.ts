@@ -44,10 +44,10 @@ import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 import {
-  getTableKeyFontSize,
-  getTableLayout,
-  getTableTextBaselineOffset,
-  TABLE_KEY_TEXT_OPACITY,
+  getDBTableKeyFontSize,
+  getDBTableLayout,
+  getDBTableTextBaselineOffset,
+  DB_TABLE_KEY_TEXT_OPACITY,
 } from "@excalidraw/element";
 import {
   getStickyNoteFooter,
@@ -283,11 +283,11 @@ const renderElementToSvg = (
       addToRoot(g || group, element);
       break;
     }
-    case "table": {
+    case "dbtable": {
       const doc = svgRoot.ownerDocument;
       const isDarkMode = renderConfig.theme === THEME.DARK;
       const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
-      const layout = getTableLayout(element);
+      const layout = getDBTableLayout(element);
 
       const group = doc.createElementNS(SVG_NS, "g");
       group.setAttribute(
@@ -371,7 +371,7 @@ const renderElementToSvg = (
           element.title,
           layout.width / 2,
           layout.titleY +
-            getTableTextBaselineOffset(
+            getDBTableTextBaselineOffset(
               element.fontFamily,
               layout.fontSize,
               layout.lineHeight,
@@ -380,13 +380,13 @@ const renderElementToSvg = (
           "middle",
         );
       }
-      const keyFontSize = getTableKeyFontSize(element.fontSize);
-      const keyBaseline = getTableTextBaselineOffset(
+      const keyFontSize = getDBTableKeyFontSize(element.fontSize);
+      const keyBaseline = getDBTableTextBaselineOffset(
         element.fontFamily,
         keyFontSize,
         layout.lineHeight,
       );
-      const nameBaseline = getTableTextBaselineOffset(
+      const nameBaseline = getDBTableTextBaselineOffset(
         element.fontFamily,
         layout.fontSize,
         layout.lineHeight,
@@ -399,7 +399,7 @@ const renderElementToSvg = (
             row.keyTextY + keyBaseline,
             keyFontSize,
             "start",
-          ).setAttribute("fill-opacity", `${TABLE_KEY_TEXT_OPACITY}`);
+          ).setAttribute("fill-opacity", `${DB_TABLE_KEY_TEXT_OPACITY}`);
         }
         if (row.row.name) {
           createText(

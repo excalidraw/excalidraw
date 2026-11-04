@@ -352,7 +352,7 @@
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
     "stickynote": "Sticky note",
-    "table": "Database table",
+    "dbtable": "Database table",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
     "autoshape": "Draw to shape",
@@ -366,7 +366,7 @@
     "noRegion": "Couldn't find an enclosed region to fill here.",
     "tooComplex": "This region is too complex to fill."
   },
-  "table": {
+  "dbTable": {
     "titlePlaceholder": "table_name",
     "keyPlaceholder": "key",
     "namePlaceholder": "field_name",
@@ -389,7 +389,7 @@
     "frame": "Frame",
     "magicframe": "Wireframe to code",
     "stickynote": "Sticky note",
-    "table": "Table",
+    "dbtable": "Database table",
     "embeddable": "Web Embed",
     "selection": "Selection",
     "iframe": "IFrame"
@@ -409,9 +409,9 @@
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
     "stickynote": "Click to place a note, or drag to size it",
-    "table": "Click to place a database table",
-    "table_selected": "Double-click a cell to edit it, or click the toggle to collapse the table",
-    "table_editing": "Enter adds a field, Tab moves between cells, Esc finishes editing",
+    "dbtable": "Click to place a database table",
+    "dbtable_selected": "Double-click a cell to edit it, or click the toggle to collapse the table",
+    "dbtable_editing": "Enter adds a field, Tab moves between cells, Esc finishes editing",
     "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",

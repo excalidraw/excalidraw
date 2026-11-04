@@ -2,7 +2,7 @@ import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
 export const hasBackground = (type: ElementOrToolType) =>
   type === "rectangle" ||
-  type === "table" ||
+  type === "dbtable" ||
   type === "stickynote" ||
   type === "iframe" ||
   type === "embeddable" ||
@@ -19,7 +19,7 @@ export const hasFillStyle = (type: ElementOrToolType) =>
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||
-  type === "table" ||
+  type === "dbtable" ||
   type === "stickynote" ||
   type === "ellipse" ||
   type === "diamond" ||
@@ -32,7 +32,7 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
 
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
-  type === "table" ||
+  type === "dbtable" ||
   type === "iframe" ||
   type === "embeddable" ||
   type === "ellipse" ||
@@ -44,7 +44,7 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
 
 export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "rectangle" ||
-  type === "table" ||
+  type === "dbtable" ||
   type === "iframe" ||
   type === "embeddable" ||
   type === "ellipse" ||
@@ -60,7 +60,7 @@ export const hasFreedrawMode = (type: ElementOrToolType) => type === "freedraw";
 
 export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "rectangle" ||
-  type === "table" ||
+  type === "dbtable" ||
   type === "iframe" ||
   type === "embeddable" ||
   type === "line" ||

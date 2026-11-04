@@ -57,11 +57,11 @@ import {
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
 import {
-  getTableBodyColor,
-  getTableColorWithOpacity,
-  getTableLayout,
-  TABLE_COLUMN_DIVIDER_OPACITY,
-} from "./table";
+  getDBTableBodyColor,
+  getDBTableColorWithOpacity,
+  getDBTableLayout,
+  DB_TABLE_COLUMN_DIVIDER_OPACITY,
+} from "./dbTable";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -84,7 +84,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
   Arrowhead,
 } from "./types";
 
@@ -238,7 +238,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
-    case "table":
+    case "dbtable":
     case "iframe":
     case "embeddable":
     case "diamond":
@@ -897,8 +897,8 @@ const _generateElementShape = (
       }
       return shape;
     }
-    case "table": {
-      return generateTableShape(element, generator, isDarkMode);
+    case "dbtable": {
+      return generateDBTableShape(element, generator, isDarkMode);
     }
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
@@ -1190,14 +1190,14 @@ const getTopRoundedRectPath = (w: number, h: number, r: number) =>
  * 3. header divider and the subtle key/name column divider
  * 4. the outline
  *
- * The text is painted separately (`drawTableText` / the SVG renderer).
+ * The text is painted separately (`drawDBTableText` / the SVG renderer).
  */
-const generateTableShape = (
-  element: ExcalidrawTableElement,
+const generateDBTableShape = (
+  element: ExcalidrawDBTableElement,
   generator: RoughGenerator,
   isDarkMode: boolean,
 ): Drawable[] => {
-  const layout = getTableLayout(element);
+  const layout = getDBTableLayout(element);
   const { width: w, height: h } = element;
   const headerHeight = layout.header.height;
   const radius = element.roundness
@@ -1217,7 +1217,7 @@ const generateTableShape = (
         stroke: "none",
         fillStyle: "solid",
         fill: applyDarkModeFilter(
-          getTableBodyColor(element.backgroundColor),
+          getDBTableBodyColor(element.backgroundColor),
           isDarkMode,
         ),
       }),
@@ -1249,9 +1249,9 @@ const generateTableShape = (
           ...strokeOnly,
           seed: element.seed + 4,
           strokeWidth: Math.max(1, element.strokeWidth * 0.75),
-          stroke: getTableColorWithOpacity(
+          stroke: getDBTableColorWithOpacity(
             options.stroke!,
-            TABLE_COLUMN_DIVIDER_OPACITY,
+            DB_TABLE_COLUMN_DIVIDER_OPACITY,
           ),
         }),
       );
@@ -1274,7 +1274,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "stickynote":
-    case "table":
+    case "dbtable":
     case "diamond":
     case "frame":
     case "magicframe":

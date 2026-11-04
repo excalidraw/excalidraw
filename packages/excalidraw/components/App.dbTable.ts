@@ -1,18 +1,18 @@
 import { getGridPoint, KEYS } from "@excalidraw/common";
 
 import {
-  getTableCellAtPoint,
-  isPointOnTableToggle,
-  isTableElement,
-  newTableElement,
-  newTableRow,
-  updateTableContent,
+  getDBTableCellAtPoint,
+  isPointOnDBTableToggle,
+  isDBTableElement,
+  newDBTableElement,
+  newDBTableRow,
+  updateDBTableContent,
 } from "@excalidraw/element";
 
-import type { TableCell, TableContentUpdate } from "@excalidraw/element";
+import type { DBTableCell, DBTableContentUpdate } from "@excalidraw/element";
 
 import type {
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
   NonDeleted,
 } from "@excalidraw/element/types";
 
@@ -23,16 +23,16 @@ type ScenePoint = { x: number; y: number };
 /**
  * Owns the database-table interactions: placing a table with the tool,
  * collapsing it from its header toggle, and the in-place cell editing that
- * `TableEditor` renders over the canvas.
+ * `DBTableEditor` renders over the canvas.
  */
-export class AppTable {
+export class AppDBTable {
   constructor(private app: App) {}
 
   /** the click armed on pointer down, committed on (a genuine) pointer up */
   private pending: ScenePoint | null = null;
 
-  /** the cell `TableEditor` focuses when it mounts */
-  public initialCell: TableCell = { type: "title" };
+  /** the cell `DBTableEditor` focuses when it mounts */
+  public initialCell: DBTableCell = { type: "title" };
 
   // ---------------------------------------------------------------------------
   // creation
@@ -69,20 +69,20 @@ export class AppTable {
         : this.app.getEffectiveGridSize(),
     );
 
-    const table = newTableElement({
-      type: "table",
+    const table = newDBTableElement({
+      type: "dbtable",
       x,
       y,
       strokeColor: state.currentItemStrokeColor,
-      backgroundColor: getTableBackgroundColor(
+      backgroundColor: getDBTableBackgroundColor(
         state.currentItemBackgroundColor,
       ),
       fillStyle: state.currentItemFillStyle,
-      strokeWidth: this.app.getCurrentItemStrokeWidth("table"),
+      strokeWidth: this.app.getCurrentItemStrokeWidth("dbtable"),
       strokeStyle: state.currentItemStrokeStyle,
       roughness: state.currentItemRoughness,
       opacity: state.currentItemOpacity,
-      roundness: this.app.getCurrentItemRoundness("table"),
+      roundness: this.app.getCurrentItemRoundness("dbtable"),
       fontFamily: state.currentItemFontFamily,
       locked: false,
       frameId: this.app.getTopLayerFrameAtSceneCoords({ x, y })?.id ?? null,
@@ -91,7 +91,11 @@ export class AppTable {
 
     this.app.insertNewElement(table);
     this.app.scheduleCapture();
-    this.startEditing(table, { type: "title" });
+    // with the tool locked, tables are placed one after another (and, like
+    // other shapes, not selected); otherwise the new table is named first
+    if (!state.activeTool.locked) {
+      this.startEditing(table, { type: "title" });
+    }
     return table;
   };
 
@@ -100,12 +104,12 @@ export class AppTable {
   // ---------------------------------------------------------------------------
 
   /** the top-most table whose toggle is at `point`, if any */
-  getTableWithToggleAt = (point: ScenePoint) => {
+  getDBTableWithToggleAt = (point: ScenePoint) => {
     const hit = this.app.getElementAtPosition(point.x, point.y);
     if (
-      isTableElement(hit) &&
+      isDBTableElement(hit) &&
       !hit.locked &&
-      isPointOnTableToggle(hit, point, this.app.state.zoom.value)
+      isPointOnDBTableToggle(hit, point, this.app.state.zoom.value)
     ) {
       return hit;
     }
@@ -114,7 +118,7 @@ export class AppTable {
 
   /** toggles the table whose toggle was clicked; `true` if one was */
   handleTogglePointerDown = (point: ScenePoint) => {
-    const table = this.getTableWithToggleAt(point);
+    const table = this.getDBTableWithToggleAt(point);
     if (!table) {
       return false;
     }
@@ -126,7 +130,7 @@ export class AppTable {
     return true;
   };
 
-  toggleCollapsed = (table: NonDeleted<ExcalidrawTableElement>) => {
+  toggleCollapsed = (table: NonDeleted<ExcalidrawDBTableElement>) => {
     this.updateContent(table, { collapsed: !table.collapsed });
     this.app.scheduleCapture();
   };
@@ -138,28 +142,28 @@ export class AppTable {
   /** the double-clicked table cell (or the title), when a table was hit */
   handleDoubleClick = (point: ScenePoint) => {
     const hit = this.app.getElementAtPosition(point.x, point.y);
-    if (!isTableElement(hit) || hit.locked) {
+    if (!isDBTableElement(hit) || hit.locked) {
       return false;
     }
-    if (isPointOnTableToggle(hit, point, this.app.state.zoom.value)) {
+    if (isPointOnDBTableToggle(hit, point, this.app.state.zoom.value)) {
       // the first click of the pair already toggled it
       return true;
     }
     this.startEditing(
       hit,
-      getTableCellAtPoint(hit, point) ?? { type: "title" },
+      getDBTableCellAtPoint(hit, point) ?? { type: "title" },
     );
     return true;
   };
 
-  startEditing = (table: ExcalidrawTableElement, cell: TableCell) => {
+  startEditing = (table: ExcalidrawDBTableElement, cell: DBTableCell) => {
     // editing a collapsed table's body means showing it first
     if (table.collapsed && cell.type !== "title") {
       this.updateContent(table, { collapsed: false });
     }
     this.initialCell = cell;
     this.app.setState({
-      editingTableId: table.id,
+      editingDBTableId: table.id,
       selectedElementIds: { [table.id]: true },
       selectedGroupIds: {},
       editingGroupId: null,
@@ -172,11 +176,11 @@ export class AppTable {
    * undo step.
    */
   stopEditing = () => {
-    const id = this.app.state.editingTableId;
+    const id = this.app.state.editingDBTableId;
     if (!id) {
       return;
     }
-    const table = this.getEditingTable(id);
+    const table = this.getEditingDBTable(id);
     if (table) {
       const rows = table.rows.filter(
         (row) => row.key.trim() || row.name.trim(),
@@ -185,23 +189,23 @@ export class AppTable {
         this.updateContent(table, { rows });
       }
     }
-    this.app.setState({ editingTableId: null });
+    this.app.setState({ editingDBTableId: null });
     this.app.scheduleCapture();
   };
 
-  getEditingTable = (id = this.app.state.editingTableId) => {
+  getEditingDBTable = (id = this.app.state.editingDBTableId) => {
     if (!id) {
       return null;
     }
     const element = this.app.scene.getNonDeletedElement(id);
-    return isTableElement(element) ? element : null;
+    return isDBTableElement(element) ? element : null;
   };
 
   updateContent = (
-    table: ExcalidrawTableElement,
-    updates: TableContentUpdate,
+    table: ExcalidrawDBTableElement,
+    updates: DBTableContentUpdate,
   ) => {
-    updateTableContent(
+    updateDBTableContent(
       table,
       updates,
       this.app.scene,
@@ -209,16 +213,16 @@ export class AppTable {
     );
   };
 
-  newRow = newTableRow;
+  newRow = newDBTableRow;
 }
 
 /**
  * A table without a header color would lose its structure, so a transparent
  * current background falls back to the palette's light blue.
  */
-export const TABLE_DEFAULT_BACKGROUND = "#a5d8ff";
+export const DB_TABLE_DEFAULT_BACKGROUND = "#a5d8ff";
 
-const getTableBackgroundColor = (currentItemBackgroundColor: string) =>
+const getDBTableBackgroundColor = (currentItemBackgroundColor: string) =>
   currentItemBackgroundColor === "transparent"
-    ? TABLE_DEFAULT_BACKGROUND
+    ? DB_TABLE_DEFAULT_BACKGROUND
     : currentItemBackgroundColor;

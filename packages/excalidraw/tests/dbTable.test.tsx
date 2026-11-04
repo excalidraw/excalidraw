@@ -4,18 +4,19 @@ import { KEYS, reseed } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
 import {
-  getTableCellAtPoint,
-  getTableLayout,
+  getBindingGap,
+  getDBTableCellAtPoint,
+  getDBTableLayout,
   getTransformHandles,
-  isPointOnTableToggle,
-  newTableElement,
+  isPointOnDBTableToggle,
+  newDBTableElement,
 } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type {
   ExcalidrawArrowElement,
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
   NonDeleted,
 } from "@excalidraw/element/types";
 
@@ -30,30 +31,32 @@ import { act, fireEvent, render } from "./test-utils";
 const { h } = window;
 const mouse = new Pointer("mouse");
 
-const getTable = (id: string) =>
+const getDBTable = (id: string) =>
   h.elements.find(
     (element) => element.id === id,
-  ) as NonDeleted<ExcalidrawTableElement>;
+  ) as NonDeleted<ExcalidrawDBTableElement>;
 
 const getEditorInputs = () =>
   [
     ...document.querySelectorAll<HTMLInputElement>(
-      ".excalidraw-table-editor__input",
+      ".excalidraw-dbtable-editor__input",
     ),
   ] as HTMLInputElement[];
 
 const getTitleInput = () =>
-  document.querySelector<HTMLInputElement>(".excalidraw-table-editor__title")!;
+  document.querySelector<HTMLInputElement>(
+    ".excalidraw-dbtable-editor__title",
+  )!;
 
 const type = (input: HTMLInputElement, value: string) => {
   fireEvent.change(input, { target: { value } });
 };
 
-const createTable = (
-  opts: Partial<Parameters<typeof newTableElement>[0]> = {},
+const createDBTable = (
+  opts: Partial<Parameters<typeof newDBTableElement>[0]> = {},
 ) =>
-  newTableElement({
-    type: "table",
+  newDBTableElement({
+    type: "dbtable",
     x: 100,
     y: 100,
     backgroundColor: "#a5d8ff",
@@ -72,22 +75,22 @@ describe("table element", () => {
 
   describe("layout", () => {
     it("derives its size from the content", () => {
-      const table = createTable({
+      const table = createDBTable({
         title: "t",
         rows: [{ key: "PK", name: "id" }],
       });
-      const layout = getTableLayout(table);
+      const layout = getDBTableLayout(table);
       expect(table.width).toBe(layout.width);
       expect(table.height).toBe(layout.height);
 
-      const longName = createTable({
+      const longName = createDBTable({
         title: "t",
         rows: [{ key: "PK", name: "a_very_long_column_name_indeed" }],
       });
       expect(longName.width).toBeGreaterThan(table.width);
       expect(longName.height).toBe(table.height);
 
-      const moreRows = createTable({
+      const moreRows = createDBTable({
         title: "t",
         rows: [
           { key: "PK", name: "id" },
@@ -99,8 +102,8 @@ describe("table element", () => {
     });
 
     it("keeps the title centered and clear of the toggle", () => {
-      const table = createTable({ title: "a_long_table_name_here" });
-      const layout = getTableLayout(table);
+      const table = createDBTable({ title: "a_long_table_name_here" });
+      const layout = getDBTableLayout(table);
       expect(layout.title.x).toBeGreaterThan(
         layout.toggle.x + layout.toggle.width,
       );
@@ -108,13 +111,13 @@ describe("table element", () => {
     });
 
     it("lays out a strict two-column body", () => {
-      const table = createTable({
+      const table = createDBTable({
         rows: [
           { key: "PK", name: "id" },
           { key: "varchar", name: "email" },
         ],
       });
-      const layout = getTableLayout(table);
+      const layout = getDBTableLayout(table);
       for (const row of layout.rows) {
         expect(row.key.x).toBe(0);
         expect(row.name.x).toBe(layout.keyColumnWidth);
@@ -123,16 +126,16 @@ describe("table element", () => {
     });
 
     it("shows only the header when collapsed", () => {
-      const table = createTable({ collapsed: true });
-      const layout = getTableLayout(table);
+      const table = createDBTable({ collapsed: true });
+      const layout = getDBTableLayout(table);
       expect(table.height).toBe(Math.ceil(layout.header.height));
       expect(layout.body).toBeNull();
       expect(layout.rows).toHaveLength(0);
     });
 
     it("scales with its font size", () => {
-      const small = createTable({ fontSize: 20 });
-      const large = createTable({ fontSize: 40 });
+      const small = createDBTable({ fontSize: 20 });
+      const large = createDBTable({ fontSize: 40 });
       expect(large.width / small.width).toBeCloseTo(2, 0);
       expect(large.height / small.height).toBeCloseTo(2, 0);
     });
@@ -140,17 +143,17 @@ describe("table element", () => {
 
   describe("hit testing", () => {
     it("finds the toggle and the cells, also when rotated", () => {
-      const table = createTable({
+      const table = createDBTable({
         rows: [{ key: "PK", name: "id" }],
       });
-      const layout = getTableLayout(table);
+      const layout = getDBTableLayout(table);
       const toggleCenter = {
         x: table.x + layout.toggle.x + layout.toggle.width / 2,
         y: table.y + layout.toggle.y + layout.toggle.height / 2,
       };
-      expect(isPointOnTableToggle(table, toggleCenter)).toBe(true);
+      expect(isPointOnDBTableToggle(table, toggleCenter)).toBe(true);
       expect(
-        isPointOnTableToggle(table, {
+        isPointOnDBTableToggle(table, {
           x: table.x + table.width / 2,
           y: table.y + layout.header.height / 2,
         }),
@@ -158,13 +161,13 @@ describe("table element", () => {
 
       const [row] = layout.rows;
       expect(
-        getTableCellAtPoint(table, {
+        getDBTableCellAtPoint(table, {
           x: table.x + row.name.x + 5,
           y: table.y + row.name.y + 5,
         }),
       ).toEqual({ type: "name", rowId: row.row.id });
       expect(
-        getTableCellAtPoint(table, {
+        getDBTableCellAtPoint(table, {
           x: table.x + row.key.x + 5,
           y: table.y + row.key.y + 5,
         }),
@@ -173,7 +176,7 @@ describe("table element", () => {
       // rotated half a turn, the toggle sits at the opposite corner
       const rotated = { ...table, angle: Math.PI } as typeof table;
       expect(
-        isPointOnTableToggle(rotated, {
+        isPointOnDBTableToggle(rotated, {
           x: table.x + table.width - (toggleCenter.x - table.x),
           y: table.y + table.height - (toggleCenter.y - table.y),
         }),
@@ -181,7 +184,7 @@ describe("table element", () => {
     });
 
     it("only offers the rotation handle (its size follows the content)", () => {
-      const table = createTable();
+      const table = createDBTable();
       const handles = getTransformHandles(table, h.state.zoom, new Map());
       expect(
         Object.entries(handles)
@@ -193,14 +196,14 @@ describe("table element", () => {
 
   describe("tool and in-place editing", () => {
     it("places a table on click and starts editing its name", async () => {
-      UI.clickTool("table");
+      UI.clickTool("dbtable");
       mouse.clickAt(200, 200);
 
-      const [table] = h.elements as ExcalidrawTableElement[];
-      expect(table.type).toBe("table");
+      const [table] = h.elements as ExcalidrawDBTableElement[];
+      expect(table.type).toBe("dbtable");
       expect(table.x).toBe(200);
       expect(table.y).toBe(200);
-      expect(h.state.editingTableId).toBe(table.id);
+      expect(h.state.editingDBTableId).toBe(table.id);
       expect(h.state.selectedElementIds).toEqual({ [table.id]: true });
       expect(h.state.activeTool.type).toBe("selection");
 
@@ -209,63 +212,65 @@ describe("table element", () => {
     });
 
     it("grows the table as the user types and adds rows on Enter", async () => {
-      const table = createTable({ rows: [{ key: "PK", name: "id" }] });
+      const table = createDBTable({ rows: [{ key: "PK", name: "id" }] });
       API.setElements([table]);
-      act(() => h.app.table.startEditing(table, { type: "title" }));
+      act(() => h.app.dbTable.startEditing(table, { type: "title" }));
       await act(async () => {});
 
-      const widthBefore = getTable(table.id).width;
+      const widthBefore = getDBTable(table.id).width;
       type(getTitleInput(), "a_much_longer_table_name_than_before");
-      expect(getTable(table.id).title).toBe(
+      expect(getDBTable(table.id).title).toBe(
         "a_much_longer_table_name_than_before",
       );
-      expect(getTable(table.id).width).toBeGreaterThan(widthBefore);
+      expect(getDBTable(table.id).width).toBeGreaterThan(widthBefore);
 
-      const heightBefore = getTable(table.id).height;
+      const heightBefore = getDBTable(table.id).height;
       const nameInput = getEditorInputs().find((input) =>
-        input.classList.contains("excalidraw-table-editor__name"),
+        input.classList.contains("excalidraw-dbtable-editor__name"),
       )!;
       Keyboard.keyPress(KEYS.ENTER, nameInput);
       await act(async () => {});
-      expect(getTable(table.id).rows).toHaveLength(2);
-      expect(getTable(table.id).height).toBeGreaterThan(heightBefore);
+      expect(getDBTable(table.id).rows).toHaveLength(2);
+      expect(getDBTable(table.id).height).toBeGreaterThan(heightBefore);
 
       // the new row is focused
       const focused = document.activeElement as HTMLInputElement;
       type(focused, "created_at");
-      expect(getTable(table.id).rows[1].name).toBe("created_at");
+      expect(getDBTable(table.id).rows[1].name).toBe("created_at");
     });
 
     it("drops untouched empty rows when editing finishes, as one undo step", async () => {
-      const table = createTable({ rows: [{ key: "PK", name: "id" }] });
+      const table = createDBTable({ rows: [{ key: "PK", name: "id" }] });
       API.setElements([table]);
-      act(() => h.app.table.startEditing(table, { type: "title" }));
+      act(() => h.app.dbTable.startEditing(table, { type: "title" }));
       await act(async () => {});
 
       type(getTitleInput(), "users");
-      fireEvent.click(document.querySelector(".excalidraw-table-editor__add")!);
+      fireEvent.click(
+        document.querySelector(".excalidraw-dbtable-editor__add")!,
+      );
       await act(async () => {});
-      expect(getTable(table.id).rows).toHaveLength(2);
+      expect(getDBTable(table.id).rows).toHaveLength(2);
 
       Keyboard.keyPress(KEYS.ESCAPE, document.activeElement as HTMLElement);
       await act(async () => {});
-      expect(h.state.editingTableId).toBe(null);
-      expect(getTable(table.id).rows).toHaveLength(1);
-      expect(getTable(table.id).title).toBe("users");
+      expect(h.state.editingDBTableId).toBe(null);
+      expect(getDBTable(table.id).rows).toHaveLength(1);
+      expect(getDBTable(table.id).title).toBe("users");
 
       Keyboard.undo();
-      expect(getTable(table.id).title).toBe(table.title);
+      expect(getDBTable(table.id).title).toBe(table.title);
     });
 
     it("edits the double-clicked cell", async () => {
-      const table = createTable({
+      const table = createDBTable({
         rows: [
           { key: "PK", name: "id" },
           { key: "", name: "email" },
         ],
       });
       API.setElements([table]);
-      const row = getTableLayout(table).rows[1];
+      const row = getDBTableLayout(table).rows[1];
 
       mouse.doubleClickAt(
         table.x + row.name.x + row.name.width / 2,
@@ -273,14 +278,14 @@ describe("table element", () => {
       );
       await act(async () => {});
 
-      expect(h.state.editingTableId).toBe(table.id);
+      expect(h.state.editingDBTableId).toBe(table.id);
       expect((document.activeElement as HTMLInputElement).value).toBe("email");
     });
   });
 
   describe("collapse toggle and bindings", () => {
-    it("collapses on toggle click and keeps bound arrows attached", () => {
-      const table = createTable({
+    it("collapses on toggle click, moving header connections along", () => {
+      const table = createDBTable({
         rows: [
           { key: "PK", name: "id" },
           { key: "", name: "name" },
@@ -319,32 +324,184 @@ describe("table element", () => {
         ) as ExcalidrawArrowElement;
         return a.y + a.points[a.points.length - 1][1];
       };
-      const endBefore = endY();
-      const heightBefore = getTable(table.id).height;
+      const heightBefore = getDBTable(table.id).height;
 
-      const layout = getTableLayout(table);
+      const layout = getDBTableLayout(table);
       mouse.clickAt(
         table.x + layout.toggle.x + layout.toggle.width / 2,
         table.y + layout.toggle.y + layout.toggle.height / 2,
       );
 
-      const collapsed = getTable(table.id);
+      const collapsed = getDBTable(table.id);
       expect(collapsed.collapsed).toBe(true);
       expect(collapsed.height).toBeLessThan(heightBefore);
-      // the arrow followed the bottom edge up (orbit gap → tolerance)
-      const shrink = heightBefore - collapsed.height;
-      expect(Math.abs(endBefore - endY() - shrink)).toBeLessThan(10);
+      // a connection without a row attaches at the header's center line
+      expect(endY()).toBeCloseTo(collapsed.y + collapsed.height / 2, 0);
 
       Keyboard.undo();
-      expect(getTable(table.id).collapsed).toBe(false);
-      expect(getTable(table.id).height).toBe(heightBefore);
+      expect(getDBTable(table.id).collapsed).toBe(false);
+      expect(getDBTable(table.id).height).toBe(heightBefore);
     });
 
     it("is a bindable, single selectable element", () => {
-      const table = createTable();
+      const table = createDBTable();
       API.setElements([table]);
       mouse.clickAt(table.x + table.width / 2, table.y + table.height - 4);
       expect(h.state.selectedElementIds).toEqual({ [table.id]: true });
+    });
+  });
+
+  describe("row connections", () => {
+    const rowCenterY = (table: ExcalidrawDBTableElement, rowName: string) => {
+      const row = getDBTableLayout(table).rows.find(
+        (row) => row.row.name === rowName,
+      )!;
+      return table.y + row.rect.y + row.rect.height / 2;
+    };
+    const getArrow = () =>
+      h.elements.find(
+        (e) => e.type === "arrow" && !e.isDeleted,
+      ) as NonDeleted<ExcalidrawArrowElement>;
+    const endPoint = (arrow: ExcalidrawArrowElement, index: 0 | -1) => {
+      const point = arrow.points.at(index)!;
+      return { x: arrow.x + point[0], y: arrow.y + point[1] };
+    };
+
+    let users: NonDeleted<ExcalidrawDBTableElement>;
+    let orders: NonDeleted<ExcalidrawDBTableElement>;
+
+    beforeEach(() => {
+      users = createDBTable({
+        x: 100,
+        y: 100,
+        title: "users",
+        rows: [
+          { key: "PK", name: "id" },
+          { key: "", name: "email" },
+        ],
+      });
+      orders = createDBTable({
+        x: 600,
+        y: 400,
+        title: "orders",
+        rows: [
+          { key: "PK", name: "id" },
+          { key: "FK", name: "user_id" },
+          { key: "", name: "total" },
+        ],
+      });
+      act(() =>
+        h.app.updateScene({
+          elements: [users, orders],
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+      );
+      act(() => h.setState({ currentItemArrowType: "round" }));
+
+      // users.email → orders.user_id, dropped anywhere on the rows
+      UI.clickTool("arrow");
+      mouse.downAt(users.x + 40, rowCenterY(users, "email") + 3);
+      mouse.moveTo(orders.x + 30, rowCenterY(orders, "user_id") - 4);
+      mouse.upAt(orders.x + 30, rowCenterY(orders, "user_id") - 4);
+    });
+
+    const getUsers = () => getDBTable(users.id);
+    const getOrders = () => getDBTable(orders.id);
+
+    it("binds each end to the row it was dropped on", () => {
+      const arrow = getArrow();
+      expect(arrow.startBinding?.elementId).toBe(users.id);
+      expect(arrow.startBinding?.rowId).toBe(
+        users.rows.find((row) => row.name === "email")!.id,
+      );
+      expect(arrow.endBinding?.elementId).toBe(orders.id);
+      expect(arrow.endBinding?.rowId).toBe(
+        orders.rows.find((row) => row.name === "user_id")!.id,
+      );
+    });
+
+    it("attaches at the row's center line on the facing edges", () => {
+      const arrow = getArrow();
+      const gap = getBindingGap(users);
+      const start = endPoint(arrow, 0);
+      const end = endPoint(arrow, -1);
+      expect(start.y).toBeCloseTo(rowCenterY(getUsers(), "email"), 0);
+      expect(start.x).toBeCloseTo(users.x + users.width + gap, 0);
+      expect(end.y).toBeCloseTo(rowCenterY(getOrders(), "user_id"), 0);
+      expect(end.x).toBeCloseTo(orders.x - gap, 0);
+    });
+
+    it("follows its row when rows are added, removed or reordered", () => {
+      act(() =>
+        h.app.dbTable.updateContent(getOrders(), {
+          rows: [
+            { id: "a", key: "", name: "created_at" },
+            { id: "b", key: "", name: "status" },
+            ...getOrders().rows,
+          ],
+        }),
+      );
+      expect(endPoint(getArrow(), -1).y).toBeCloseTo(
+        rowCenterY(getOrders(), "user_id"),
+        0,
+      );
+
+      act(() =>
+        h.app.dbTable.updateContent(getOrders(), {
+          rows: [...getOrders().rows].reverse(),
+        }),
+      );
+      expect(endPoint(getArrow(), -1).y).toBeCloseTo(
+        rowCenterY(getOrders(), "user_id"),
+        0,
+      );
+    });
+
+    it("attaches at the header while collapsed and returns to its row", () => {
+      act(() => h.app.dbTable.toggleCollapsed(getOrders()));
+      expect(endPoint(getArrow(), -1).y).toBeCloseTo(
+        getOrders().y + getOrders().height / 2,
+        0,
+      );
+
+      act(() => h.app.dbTable.toggleCollapsed(getOrders()));
+      expect(endPoint(getArrow(), -1).y).toBeCloseTo(
+        rowCenterY(getOrders(), "user_id"),
+        0,
+      );
+    });
+
+    it("switches sides when the tables move past each other", () => {
+      UI.clickTool("selection");
+      // drag `users` by its header to the right of `orders`
+      const grab = { x: users.x + users.width / 2, y: users.y + 8 };
+      mouse.downAt(grab.x, grab.y);
+      mouse.moveTo(grab.x + 900, grab.y);
+      mouse.upAt(grab.x + 900, grab.y);
+
+      const movedUsers = getUsers();
+      expect(movedUsers.x).toBeGreaterThan(orders.x + orders.width);
+      const gap = getBindingGap(users);
+      const arrow = getArrow();
+      expect(endPoint(arrow, 0).x).toBeCloseTo(movedUsers.x - gap, 0);
+      expect(endPoint(arrow, -1).x).toBeCloseTo(
+        orders.x + orders.width + gap,
+        0,
+      );
+      // still on the same rows
+      expect(endPoint(arrow, 0).y).toBeCloseTo(
+        rowCenterY(movedUsers, "email"),
+        0,
+      );
+    });
+
+    it("keeps the row through save and load", () => {
+      const [restored] = restoreElements(
+        [getArrow()],
+        null,
+      ) as ExcalidrawArrowElement[];
+      expect(restored.startBinding?.rowId).toBe(getArrow().startBinding?.rowId);
+      expect(restored.endBinding?.rowId).toBe(getArrow().endBinding?.rowId);
     });
   });
 
@@ -353,7 +510,7 @@ describe("table element", () => {
       const [restored] = restoreElements(
         [
           {
-            ...createTable(),
+            ...createDBTable(),
             width: 1,
             height: 1,
             title: 42,
@@ -368,9 +525,9 @@ describe("table element", () => {
           } as any,
         ],
         null,
-      ) as ExcalidrawTableElement[];
+      ) as ExcalidrawDBTableElement[];
 
-      expect(restored.type).toBe("table");
+      expect(restored.type).toBe("dbtable");
       expect(restored.title).toBe("");
       expect(restored.fontSize).toBe(20);
       expect(restored.rows.map((row) => [row.key, row.name])).toEqual([
@@ -379,12 +536,12 @@ describe("table element", () => {
         ["", "no_id"],
       ]);
       expect(new Set(restored.rows.map((row) => row.id)).size).toBe(3);
-      expect(restored.width).toBe(getTableLayout(restored).width);
-      expect(restored.height).toBe(getTableLayout(restored).height);
+      expect(restored.width).toBe(getDBTableLayout(restored).width);
+      expect(restored.height).toBe(getDBTableLayout(restored).height);
     });
 
     it("exports its text to SVG", async () => {
-      const table = createTable({
+      const table = createDBTable({
         title: "orders",
         rows: [
           { key: "PK", name: "id" },

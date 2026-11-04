@@ -101,7 +101,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     // nor for tables (sized by their content)
     if (
       !(isLinearElement(element) && element.points.length <= 2) &&
-      element.type !== "table"
+      element.type !== "dbtable"
     ) {
       const SPACING = isImageElement(element)
         ? 0

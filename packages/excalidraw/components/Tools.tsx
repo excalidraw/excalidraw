@@ -123,7 +123,7 @@ export const TOOLS = defineTools({
     icon: stickyNoteToolIcon,
     letterKey: KEYS.N,
   },
-  table: {
+  dbtable: {
     icon: tableToolIcon,
     letterKey: KEYS.T,
     shiftKey: true,
@@ -340,7 +340,7 @@ export const LineToolButton = createToolButton("line");
 export const FreedrawToolButton = createToolButton("freedraw");
 export const TextToolButton = createToolButton("text");
 export const StickyNoteToolButton = createToolButton("stickynote");
-export const TableToolButton = createToolButton("table");
+export const DBTableToolButton = createToolButton("dbtable");
 export const ImageToolButton = createToolButton("image");
 export const EraserToolButton = createToolButton("eraser");
 export const FrameToolButton = createToolButton("frame");

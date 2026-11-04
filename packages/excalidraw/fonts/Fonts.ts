@@ -22,9 +22,9 @@ import {
 import { ShapeCache } from "@excalidraw/element";
 
 import {
-  isTableElement,
+  isDBTableElement,
   isTextElement,
-  relayoutTable,
+  relayoutDBTable,
 } from "@excalidraw/element";
 
 import type {
@@ -154,12 +154,12 @@ export class Fonts {
         if (container) {
           ShapeCache.delete(container);
         }
-      } else if (isTableElement(element)) {
+      } else if (isDBTableElement(element)) {
         // tables are sized from text measurements, which were taken with the
         // fallback font until now
         didUpdate = true;
         charWidth.clearCache(getFontString(element));
-        relayoutTable(element, this.scene);
+        relayoutDBTable(element, this.scene);
         ShapeCache.delete(element);
       }
     }
@@ -481,7 +481,7 @@ export class Fonts {
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
       elements.reduce((families, element) => {
-        if (isTableElement(element)) {
+        if (isDBTableElement(element)) {
           families.add(element.fontFamily);
         }
         if (isTextElement(element)) {
@@ -506,7 +506,7 @@ export class Fonts {
     const charsPerFamily: Record<number, Set<string>> = {};
 
     for (const element of elements) {
-      if (isTableElement(element)) {
+      if (isDBTableElement(element)) {
         const chars = (charsPerFamily[element.fontFamily] ??= new Set());
         for (const text of [
           element.title,

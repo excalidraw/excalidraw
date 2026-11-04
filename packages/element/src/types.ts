@@ -108,7 +108,7 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
  * One row of a table's body: the key column holds the constraint (`PK`,
  * `FK`, …) or the datatype, the name column the field name.
  */
-export type ExcalidrawTableRow = Readonly<{
+export type ExcalidrawDBTableRow = Readonly<{
   /** stable across edits, for collaboration and React keys */
   id: string;
   key: string;
@@ -118,15 +118,15 @@ export type ExcalidrawTableRow = Readonly<{
 /**
  * A database table (ER diagram entity): a header with the table name and a
  * collapse toggle, over a two-column body. Its `width` and `height` are
- * derived from the content (see `getTableLayout`) and kept in sync by
- * `normalizeTable`, so bounds, binding and hit testing treat it as a plain
+ * derived from the content (see `getDBTableLayout`) and kept in sync by
+ * `normalizeDBTable`, so bounds, binding and hit testing treat it as a plain
  * rectangle.
  */
-export type ExcalidrawTableElement = _ExcalidrawElementBase &
+export type ExcalidrawDBTableElement = _ExcalidrawElementBase &
   Readonly<{
-    type: "table";
+    type: "dbtable";
     title: string;
-    rows: readonly ExcalidrawTableRow[];
+    rows: readonly ExcalidrawDBTableRow[];
     /** only the header is shown */
     collapsed: boolean;
     fontSize: number;
@@ -236,7 +236,7 @@ export type ExcalidrawFlowchartNodeElement =
 export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
   | ExcalidrawStickyNoteElement
-  | ExcalidrawTableElement
+  | ExcalidrawDBTableElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
@@ -253,7 +253,7 @@ export type ExcalidrawRectanguloidElement =
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawStickyNoteElement
-  | ExcalidrawTableElement
+  | ExcalidrawDBTableElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
@@ -353,7 +353,7 @@ export type TextSpan = Readonly<
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawStickyNoteElement
-  | ExcalidrawTableElement
+  | ExcalidrawDBTableElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
@@ -391,6 +391,13 @@ export type FixedPointBinding = {
   // Determines whether the arrow remains outside the shape or is allowed to
   // go all the way inside the shape up to the exact fixed point.
   mode: BindMode;
+
+  /**
+   * Database tables only: the row the arrow connects to (see
+   * `syncDBTableRowBindings`). Absent for every other bindable, and for
+   * connections to a table's header.
+   */
+  rowId?: string;
 };
 
 type Index = number;

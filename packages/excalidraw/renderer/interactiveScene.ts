@@ -35,6 +35,10 @@ import {
   hitElementItself,
   isArrowElement,
   isBindableElement,
+  isDBTableElement,
+  getDBTableLayout,
+  getDBTableRowIdAtPoint,
+  getDBTableSideFacing,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -70,6 +74,7 @@ import type {
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
+  ExcalidrawDBTableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawImageElement,
@@ -255,6 +260,57 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   );
 };
 
+/**
+ * Highlights the band of the row (or the header) an arrow end at
+ * `pointerCoords` would connect to, with a dot at the edge it attaches at.
+ */
+const renderDBTableRowHighlight = (
+  context: CanvasRenderingContext2D,
+  table: ExcalidrawDBTableElement,
+  pointerCoords: GlobalPoint,
+  appState: InteractiveCanvasAppState,
+) => {
+  const layout = getDBTableLayout(table);
+  const scenePoint = { x: pointerCoords[0], y: pointerCoords[1] };
+  const rowId = table.collapsed
+    ? null
+    : getDBTableRowIdAtPoint(table, scenePoint);
+  const band = rowId
+    ? layout.rows.find((row) => row.row.id === rowId)!.rect
+    : layout.header;
+  const side = getDBTableSideFacing(table, scenePoint);
+  const rgb = BINDING_HIGHLIGHT_RGB[appState.theme];
+
+  context.save();
+  context.translate(table.x + table.width / 2, table.y + table.height / 2);
+  context.rotate(table.angle);
+  context.translate(-table.width / 2, -table.height / 2);
+
+  // the band, inset from the outline so the table's edges stay crisp
+  const inset = Math.max(1, table.strokeWidth) / 2;
+  context.fillStyle = `rgba(${rgb}, 0.2)`;
+  context.fillRect(
+    band.x + inset,
+    band.y + (rowId ? 0 : inset),
+    band.width - inset * 2,
+    band.height - (rowId ? 0 : inset * 2),
+  );
+
+  // the attachment point
+  const radius = 4 / appState.zoom.value;
+  context.fillStyle = `rgba(${rgb}, 1)`;
+  context.beginPath();
+  context.arc(
+    side === "left" ? 0 : table.width,
+    band.y + band.height / 2,
+    radius,
+    0,
+    2 * Math.PI,
+  );
+  context.fill();
+  context.restore();
+};
+
 const renderBindingHighlightForBindableElement_simple = (
   context: CanvasRenderingContext2D,
   suggestedBinding: NonNullable<AppState["suggestedBinding"]>,
@@ -438,6 +494,20 @@ const renderBindingHighlightForBindableElement_simple = (
       context.restore();
 
       break;
+  }
+
+  // database tables connect rows: show which row the arrow will attach to
+  // (side midpoints don't apply, the end snaps to the row's edge)
+  if (isDBTableElement(suggestedBinding.element)) {
+    if (pointerCoords) {
+      renderDBTableRowHighlight(
+        context,
+        suggestedBinding.element,
+        pointerCoords,
+        appState,
+      );
+    }
+    return;
   }
 
   // Draw midpoint indicators

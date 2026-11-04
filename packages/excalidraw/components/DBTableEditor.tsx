@@ -8,12 +8,12 @@ import {
   sceneCoordsToViewportCoords,
   THEME,
 } from "@excalidraw/common";
-import { getTableKeyFontSize, getTableLayout } from "@excalidraw/element";
+import { getDBTableKeyFontSize, getDBTableLayout } from "@excalidraw/element";
 
-import type { TableCell } from "@excalidraw/element";
+import type { DBTableCell } from "@excalidraw/element";
 import type {
-  ExcalidrawTableElement,
-  ExcalidrawTableRow,
+  ExcalidrawDBTableElement,
+  ExcalidrawDBTableRow,
   NonDeleted,
 } from "@excalidraw/element/types";
 
@@ -22,9 +22,9 @@ import { t } from "../i18n";
 import { useExcalidrawAppState } from "./App";
 import { PlusIcon, CloseIcon } from "./icons";
 
-import "./TableEditor.scss";
+import "./DBTableEditor.scss";
 
-import type { AppTable } from "./App.table";
+import type { AppDBTable } from "./App.dbTable";
 
 /** suggestions offered in the key column (constraints first, then types) */
 const KEY_SUGGESTIONS = [
@@ -46,7 +46,7 @@ const KEY_SUGGESTIONS = [
 
 type Column = "key" | "name";
 
-const cellId = (cell: TableCell) =>
+const cellId = (cell: DBTableCell) =>
   cell.type === "title" ? "title" : `${cell.rowId}:${cell.type}`;
 
 /**
@@ -56,18 +56,18 @@ const cellId = (cell: TableCell) =>
  * every keystroke is written to the element, so the table grows as you type
  * and bound arrows follow along.
  */
-export const TableEditor = ({
+export const DBTableEditor = ({
   table,
   controller,
 }: {
-  table: NonDeleted<ExcalidrawTableElement>;
-  controller: AppTable;
+  table: NonDeleted<ExcalidrawDBTableElement>;
+  controller: AppDBTable;
 }) => {
   const appState = useExcalidrawAppState();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputs = useRef(new Map<string, HTMLInputElement>());
   /** the cell to focus once the next render has mounted it */
-  const pendingFocus = useRef<{ cell: TableCell; select: boolean } | null>({
+  const pendingFocus = useRef<{ cell: DBTableCell; select: boolean } | null>({
     cell: controller.initialCell,
     select: true,
   });
@@ -76,7 +76,7 @@ export const TableEditor = ({
   const tableRef = useRef(table);
   tableRef.current = table;
 
-  const layout = getTableLayout(table);
+  const layout = getDBTableLayout(table);
 
   useLayoutEffect(() => {
     const pending = pendingFocus.current;
@@ -114,7 +114,7 @@ export const TableEditor = ({
   // --- content updates -----------------------------------------------------------
 
   const setRows = useCallback(
-    (rows: readonly ExcalidrawTableRow[]) => {
+    (rows: readonly ExcalidrawDBTableRow[]) => {
       controller.updateContent(tableRef.current, { rows });
     },
     [controller],
@@ -172,15 +172,15 @@ export const TableEditor = ({
   // --- keyboard navigation -------------------------------------------------------
 
   /** title → key₀ → name₀ → key₁ → … in reading order */
-  const getCellOrder = (): TableCell[] => [
+  const getCellOrder = (): DBTableCell[] => [
     { type: "title" },
-    ...tableRef.current.rows.flatMap((row): TableCell[] => [
+    ...tableRef.current.rows.flatMap((row): DBTableCell[] => [
       { type: "key", rowId: row.id },
       { type: "name", rowId: row.id },
     ]),
   ];
 
-  const focusCell = (cell: TableCell, select = true) => {
+  const focusCell = (cell: DBTableCell, select = true) => {
     const input = inputs.current.get(cellId(cell));
     if (input) {
       input.focus({ preventScroll: true });
@@ -192,7 +192,7 @@ export const TableEditor = ({
 
   const onKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
-    cell: TableCell,
+    cell: DBTableCell,
   ) => {
     // keep the editor's keys away from the canvas shortcuts
     event.stopPropagation();
@@ -299,15 +299,15 @@ export const TableEditor = ({
   const color = applyDarkModeFilter(table.strokeColor, isDarkMode);
   const font = getFontString(table);
   const keyFont = getFontString({
-    fontSize: getTableKeyFontSize(table.fontSize),
+    fontSize: getDBTableKeyFontSize(table.fontSize),
     fontFamily: table.fontFamily,
   });
   const lineHeightPx = table.fontSize * layout.lineHeight;
   const keyLineHeightPx = layout.keyFontSize * layout.lineHeight;
-  const datalistId = `excalidraw-table-keys-${table.id}`;
+  const datalistId = `excalidraw-dbtable-keys-${table.id}`;
 
   const registerInput =
-    (cell: TableCell) => (input: HTMLInputElement | null) => {
+    (cell: DBTableCell) => (input: HTMLInputElement | null) => {
       if (input) {
         inputs.current.set(cellId(cell), input);
       } else {
@@ -318,8 +318,8 @@ export const TableEditor = ({
   return (
     <div
       ref={rootRef}
-      className={clsx("excalidraw-table-editor", {
-        "excalidraw-table-editor--dark": isDarkMode,
+      className={clsx("excalidraw-dbtable-editor", {
+        "excalidraw-dbtable-editor--dark": isDarkMode,
       })}
       style={{
         left: left - appState.offsetLeft,
@@ -328,15 +328,15 @@ export const TableEditor = ({
         height: table.height,
         transform: `scale(${zoom.value})`,
         transformOrigin: "0 0",
-        ["--table-editor-zoom" as string]: zoom.value,
-        ["--table-editor-color" as string]: color,
+        ["--dbtable-editor-zoom" as string]: zoom.value,
+        ["--dbtable-editor-color" as string]: color,
         opacity: table.opacity / 100,
       }}
       onPointerDown={(event) => event.stopPropagation()}
       onWheel={(event) => event.stopPropagation()}
     >
       <div
-        className="excalidraw-table-editor__frame"
+        className="excalidraw-dbtable-editor__frame"
         style={{
           // rotated about the table's center, as on the canvas
           transform: `rotate(${table.angle}rad)`,
@@ -345,7 +345,7 @@ export const TableEditor = ({
       >
         <input
           ref={registerInput({ type: "title" })}
-          className="excalidraw-table-editor__input excalidraw-table-editor__title"
+          className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__title"
           style={{
             left: layout.title.x,
             top: layout.title.y,
@@ -355,10 +355,10 @@ export const TableEditor = ({
             font,
           }}
           value={table.title}
-          placeholder={t("table.titlePlaceholder")}
+          placeholder={t("dbTable.titlePlaceholder")}
           spellCheck={false}
           autoComplete="off"
-          aria-label={t("table.titlePlaceholder")}
+          aria-label={t("dbTable.titlePlaceholder")}
           onChange={(event) =>
             controller.updateContent(tableRef.current, {
               title: event.target.value,
@@ -368,10 +368,10 @@ export const TableEditor = ({
         />
 
         {layout.rows.map(({ row, key, name, keyTextY, nameTextY }) => (
-          <div key={row.id} className="excalidraw-table-editor__row">
+          <div key={row.id} className="excalidraw-dbtable-editor__row">
             <input
               ref={registerInput({ type: "key", rowId: row.id })}
-              className="excalidraw-table-editor__input excalidraw-table-editor__key"
+              className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__key"
               style={{
                 left: key.x + layout.paddingX,
                 top: keyTextY,
@@ -383,10 +383,10 @@ export const TableEditor = ({
               }}
               value={row.key}
               list={datalistId}
-              placeholder={t("table.keyPlaceholder")}
+              placeholder={t("dbTable.keyPlaceholder")}
               spellCheck={false}
               autoComplete="off"
-              aria-label={t("table.keyPlaceholder")}
+              aria-label={t("dbTable.keyPlaceholder")}
               onChange={(event) => updateRow(row.id, "key", event.target.value)}
               onKeyDown={(event) =>
                 onKeyDown(event, { type: "key", rowId: row.id })
@@ -394,7 +394,7 @@ export const TableEditor = ({
             />
             <input
               ref={registerInput({ type: "name", rowId: row.id })}
-              className="excalidraw-table-editor__input excalidraw-table-editor__name"
+              className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__name"
               style={{
                 left: name.x + layout.paddingX,
                 top: nameTextY,
@@ -404,10 +404,10 @@ export const TableEditor = ({
                 font,
               }}
               value={row.name}
-              placeholder={t("table.namePlaceholder")}
+              placeholder={t("dbTable.namePlaceholder")}
               spellCheck={false}
               autoComplete="off"
-              aria-label={t("table.namePlaceholder")}
+              aria-label={t("dbTable.namePlaceholder")}
               onChange={(event) =>
                 updateRow(row.id, "name", event.target.value)
               }
@@ -418,10 +418,10 @@ export const TableEditor = ({
             <button
               type="button"
               tabIndex={-1}
-              className="excalidraw-table-editor__remove"
+              className="excalidraw-dbtable-editor__remove"
               style={{ top: key.y + key.height / 2, left: table.width }}
-              title={t("table.removeRow")}
-              aria-label={t("table.removeRow")}
+              title={t("dbTable.removeRow")}
+              aria-label={t("dbTable.removeRow")}
               onClick={() => removeRow(row.id, false)}
             >
               {CloseIcon}
@@ -432,12 +432,12 @@ export const TableEditor = ({
         {!table.collapsed && (
           <button
             type="button"
-            className="excalidraw-table-editor__add"
+            className="excalidraw-dbtable-editor__add"
             style={{ top: table.height, left: table.width / 2 }}
             onClick={() => insertRow(tableRef.current.rows.length, "key")}
           >
             {PlusIcon}
-            <span>{t("table.addRow")}</span>
+            <span>{t("dbTable.addRow")}</span>
           </button>
         )}
       </div>

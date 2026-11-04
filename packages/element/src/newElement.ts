@@ -29,11 +29,11 @@ import {
   normalizeStickyNoteStrokeColor,
 } from "./stickyNote";
 import {
-  newTableRow,
-  normalizeTable,
-  TABLE_DEFAULT_ROWS,
-  TABLE_DEFAULT_TITLE,
-} from "./table";
+  newDBTableRow,
+  normalizeDBTable,
+  DB_TABLE_DEFAULT_ROWS,
+  DB_TABLE_DEFAULT_TITLE,
+} from "./dbTable";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { measureTextElementText, wrapTextElementText } from "./richTextLayout";
@@ -64,8 +64,8 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
-  ExcalidrawTableElement,
-  ExcalidrawTableRow,
+  ExcalidrawDBTableElement,
+  ExcalidrawDBTableRow,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -252,25 +252,27 @@ export const newStickyNoteElement = (
   });
 };
 
-export const newTableElement = (
+export const newDBTableElement = (
   opts: {
-    type: "table";
+    type: "dbtable";
     title?: string;
-    rows?: readonly Partial<Omit<ExcalidrawTableRow, "id">>[];
+    rows?: readonly Partial<Omit<ExcalidrawDBTableRow, "id">>[];
     collapsed?: boolean;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     renderEnvironment?: RenderEnvironment;
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawTableElement> => {
-  const base = _newElementBase<ExcalidrawTableElement>("table", opts);
+): NonDeleted<ExcalidrawDBTableElement> => {
+  const base = _newElementBase<ExcalidrawDBTableElement>("dbtable", opts);
 
   // the size is derived from the content, never taken from `opts`
-  return normalizeTable(
+  return normalizeDBTable(
     {
       ...base,
-      title: opts.title ?? TABLE_DEFAULT_TITLE,
-      rows: (opts.rows ?? TABLE_DEFAULT_ROWS).map((row) => newTableRow(row)),
+      title: opts.title ?? DB_TABLE_DEFAULT_TITLE,
+      rows: (opts.rows ?? DB_TABLE_DEFAULT_ROWS).map((row) =>
+        newDBTableRow(row),
+      ),
       collapsed: opts.collapsed ?? false,
       fontSize: opts.fontSize || DEFAULT_FONT_SIZE,
       fontFamily: opts.fontFamily || DEFAULT_FONT_FAMILY,

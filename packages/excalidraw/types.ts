@@ -38,7 +38,7 @@ import type {
   ExcalidrawNonSelectionElement,
   BindMode,
   ExcalidrawTextElement,
-  ExcalidrawTableElement,
+  ExcalidrawDBTableElement,
   StrokeVariability,
 } from "@excalidraw/element/types";
 
@@ -166,7 +166,7 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "stickynote"
-  | "table"
+  | "dbtable"
   | "embeddable"
   | "laser"
   | "autoshape"
@@ -224,7 +224,7 @@ export type StaticCanvasAppState = Readonly<
     // Cropping
     croppingElementId: AppState["croppingElementId"];
     /** the table edited in place, whose text the canvas leaves out */
-    editingTableId?: AppState["editingTableId"];
+    editingDBTableId?: AppState["editingDBTableId"];
   }
 >;
 
@@ -429,8 +429,8 @@ export interface AppState {
    * set when a new text is created or when an existing text is being edited
    */
   editingTextElement: ExcalidrawTextElement | null;
-  /** set while a table's cells are edited in place (see `TableEditor`) */
-  editingTableId: ExcalidrawTableElement["id"] | null;
+  /** set while a table's cells are edited in place (see `DBTableEditor`) */
+  editingDBTableId: ExcalidrawDBTableElement["id"] | null;
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the
