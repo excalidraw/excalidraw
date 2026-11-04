@@ -2,14 +2,31 @@ import {
   convertToExcalidrawElements,
   Excalidraw,
 } from "@excalidraw/excalidraw";
-import { arrayToMap, ELEMENT_TRANSLATE_AMOUNT, KEYS } from "@excalidraw/common";
+import {
+  arrayToMap,
+  CODES,
+  ELEMENT_TRANSLATE_AMOUNT,
+  KEYS,
+} from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
+import {
+  actionAlignTop,
+  actionAlignBottom,
+  actionAlignLeft,
+  actionAlignRight,
+  actionAlignVerticallyCentered,
+  actionAlignHorizontallyCentered,
+  distributeHorizontally,
+  distributeVertically,
+} from "@excalidraw/excalidraw/actions";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
 import {
   act,
+  createEvent,
+  fireEvent,
   getCloneByOrigId,
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
@@ -1339,6 +1356,98 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame2, rectangle1);
       expect(h.elements.length).toBe(4);
     });
+  });
+});
+
+describe("aligning and distributing frames", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it.each([
+    {
+      action: actionAlignTop,
+      shortcut: {
+        key: KEYS.ARROW_UP,
+        [KEYS.CTRL_OR_CMD]: true,
+        shiftKey: true,
+      },
+    },
+    {
+      action: actionAlignBottom,
+      shortcut: {
+        key: KEYS.ARROW_DOWN,
+        [KEYS.CTRL_OR_CMD]: true,
+        shiftKey: true,
+      },
+    },
+    {
+      action: actionAlignLeft,
+      shortcut: {
+        key: KEYS.ARROW_LEFT,
+        [KEYS.CTRL_OR_CMD]: true,
+        shiftKey: true,
+      },
+    },
+    {
+      action: actionAlignRight,
+      shortcut: {
+        key: KEYS.ARROW_RIGHT,
+        [KEYS.CTRL_OR_CMD]: true,
+        shiftKey: true,
+      },
+    },
+    { action: actionAlignVerticallyCentered, shortcut: null },
+    { action: actionAlignHorizontallyCentered, shortcut: null },
+    {
+      action: distributeHorizontally,
+      shortcut: { key: "h", code: CODES.H, altKey: true },
+    },
+    {
+      action: distributeVertically,
+      shortcut: { key: "v", code: CODES.V, altKey: true },
+    },
+  ])("keeps the scene unchanged for $action.name", ({ action, shortcut }) => {
+    const first = API.createElement({ type: "rectangle", x: 0, y: 0 });
+    const frame = API.createElement({ type: "frame", x: 300, y: 300 });
+    const child = API.createElement({
+      type: "rectangle",
+      x: 320,
+      y: 320,
+      width: 40,
+      height: 40,
+      frameId: frame.id,
+    });
+    const last = API.createElement({ type: "rectangle", x: 800, y: 800 });
+    API.setElements([first, child, frame, last]);
+    API.setSelectedElements([first, frame, last]);
+
+    expect(API.getSelectedElements().map((element) => element.id)).toEqual([
+      first.id,
+      frame.id,
+      last.id,
+    ]);
+    const getSceneGeometry = () =>
+      h.elements.map((element) => ({
+        id: element.id,
+        position: pointFrom<GlobalPoint>(element.x, element.y),
+        width: element.width,
+        height: element.height,
+        angle: element.angle,
+        frameId: element.frameId,
+      }));
+    const before = getSceneGeometry();
+
+    if (shortcut) {
+      const event = createEvent.keyDown(h.app.ownerDocument, shortcut);
+      fireEvent(h.app.ownerDocument, event);
+      expect(event.defaultPrevented).toBe(true);
+    } else {
+      API.executeAction(action);
+    }
+
+    expect(getSceneGeometry()).toEqual(before);
+    expect(API.getElement(child).frameId).toBe(frame.id);
   });
 });
 
