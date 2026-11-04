@@ -163,6 +163,21 @@ describe("elbow arrow routing", () => {
     expect(arrow.height).toEqual(200);
   });
 
+  it("can move an elbow arrow to the origin while routing it", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 5,
+      y: 5,
+      points: [pointFrom(0, 0), pointFrom(100, 0)],
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
+    API.setElements([arrow]);
+
+    h.scene.mutateElement(arrow, { x: 0, y: 0, points: arrow.points });
+
+    expect([arrow.x, arrow.y]).toEqual([0, 0]);
+  });
+
   it("can generate proper points for bound elbow arrow", () => {
     const rectangle1 = API.createElement({
       type: "rectangle",
