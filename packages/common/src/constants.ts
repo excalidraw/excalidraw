@@ -422,6 +422,18 @@ export const VERSIONS = {
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
+
+/**
+ * Inner padding presets for text containers (rectangle / diamond / ellipse).
+ * `small` matches the legacy `BOUND_TEXT_PADDING`, so elements without an
+ * explicit `padding` keep their existing layout.
+ */
+export const CONTAINER_PADDING = {
+  none: 0,
+  small: BOUND_TEXT_PADDING,
+  medium: 15,
+} as const;
+export const MAX_CONTAINER_PADDING = 100;
 export const ARROW_LABEL_WIDTH_FRACTION = 0.7;
 export const ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO = 11;
 

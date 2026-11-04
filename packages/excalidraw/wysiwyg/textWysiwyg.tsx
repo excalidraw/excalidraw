@@ -38,6 +38,7 @@ import {
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
+  getContainerPadding,
   getBoundTextElement,
 } from "@excalidraw/element";
 import { getTextWidth } from "@excalidraw/element";
@@ -484,6 +485,7 @@ export const textWysiwyg = ({
             const targetContainerHeight = computeContainerDimensionForBoundText(
               height,
               container.type,
+              getContainerPadding(container),
             );
 
             app.scene.mutateElement(container, {
@@ -503,6 +505,7 @@ export const textWysiwyg = ({
             const targetContainerHeight = computeContainerDimensionForBoundText(
               height,
               container.type,
+              getContainerPadding(container),
             );
             app.scene.mutateElement(container, {
               height: targetContainerHeight,

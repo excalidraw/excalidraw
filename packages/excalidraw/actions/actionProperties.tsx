@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
+  CONTAINER_PADDING,
+  MAX_CONTAINER_PADDING,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
@@ -47,6 +49,9 @@ import { newElementWith } from "@excalidraw/element";
 import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
+  canHaveContainerPadding,
+  getContainerPadding,
+  normalizeContainerPadding,
   getBoundTextElement,
   getBaseFontSize,
   getBaseFontSizeUpdate,
@@ -110,6 +115,10 @@ import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
 import {
+  PaddingCustomIcon,
+  PaddingMediumIcon,
+  PaddingNoneIcon,
+  PaddingSmallIcon,
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadCircleIcon,
@@ -1936,6 +1945,135 @@ export const actionChangeRoundness = register<"sharp" | "round">({
           />
           {renderAction("togglePolygon")}
         </div>
+      </fieldset>
+    );
+  },
+});
+
+type PaddingPreset = keyof typeof CONTAINER_PADDING | "custom";
+
+const getPaddingPreset = (padding: number): PaddingPreset =>
+  (Object.keys(CONTAINER_PADDING) as (keyof typeof CONTAINER_PADDING)[]).find(
+    (key) => CONTAINER_PADDING[key] === padding,
+  ) ?? "custom";
+
+export const actionChangePadding = register<number>({
+  name: "changePadding",
+  label: "labels.padding",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const padding = normalizeContainerPadding(value);
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const updatedContainers = new Map<string, ExcalidrawElement>();
+
+    const nextElements = changeProperty(elements, appState, (el) => {
+      if (!canHaveContainerPadding(el)) {
+        return el;
+      }
+      const nextElement = newElementWith(el, { padding });
+      updatedContainers.set(el.id, nextElement);
+      return nextElement;
+    });
+
+    // re-layout the bound text of every updated container (this can grow the
+    // container when the new padding no longer fits the text)
+    return {
+      elements: nextElements.map((el) => {
+        const container =
+          isTextElement(el) && el.containerId
+            ? updatedContainers.get(el.containerId)
+            : undefined;
+        if (!container || !isTextElement(el)) {
+          return el;
+        }
+        const nextText = newElementWith(el, {});
+        redrawTextBoundingBox(
+          nextText,
+          container,
+          app.scene,
+          app.renderEnvironment,
+        );
+        return nextText;
+      }),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, updateData, app }) => {
+    const padding = getFormValue<number | null>(
+      elements,
+      app,
+      // while editing a label, reflect its container's padding
+      (element) =>
+        getContainerPadding(
+          (isTextElement(element) && app.scene.getContainerElement(element)) ||
+            element,
+        ),
+      (element) => canHaveContainerPadding(element),
+      null,
+    );
+    const [isCustomOpen, setIsCustomOpen] = useState(false);
+    const preset: PaddingPreset | null =
+      padding === null
+        ? null
+        : isCustomOpen
+        ? "custom"
+        : getPaddingPreset(padding);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.padding")}</legend>
+        <div className="buttonList">
+          <RadioSelection<PaddingPreset>
+            group="padding"
+            options={[
+              {
+                value: "none",
+                text: t("labels.padding_none"),
+                icon: PaddingNoneIcon,
+                testId: "padding-none",
+              },
+              {
+                value: "small",
+                text: t("labels.padding_small"),
+                icon: PaddingSmallIcon,
+                testId: "padding-small",
+              },
+              {
+                value: "medium",
+                text: t("labels.padding_medium"),
+                icon: PaddingMediumIcon,
+                testId: "padding-medium",
+              },
+              {
+                value: "custom",
+                text: t("labels.padding_custom"),
+                icon: PaddingCustomIcon,
+                testId: "padding-custom",
+              },
+            ]}
+            value={preset}
+            onChange={(value) => {
+              if (value === "custom") {
+                setIsCustomOpen(true);
+                return;
+              }
+              setIsCustomOpen(false);
+              updateData(CONTAINER_PADDING[value]);
+            }}
+          />
+        </div>
+        {preset === "custom" && (
+          <Range
+            label={t("labels.padding_customValue")}
+            value={padding ?? CONTAINER_PADDING.small}
+            onChange={updateData}
+            min={0}
+            max={MAX_CONTAINER_PADDING}
+            step={1}
+            testId="padding-custom-value"
+          />
+        )}
       </fieldset>
     );
   },

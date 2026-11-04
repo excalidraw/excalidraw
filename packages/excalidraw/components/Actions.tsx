@@ -185,6 +185,8 @@ export const SelectedShapeActions = ({
 
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
 
+      {predicates.padding && renderAction("changePadding")}
+
       {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
 
       {predicates.text && (
@@ -307,6 +309,7 @@ const CombinedShapeProperties = ({
               )}
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
+              {predicates.padding && renderAction("changePadding")}
               {predicates.opacity && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>

@@ -2614,3 +2614,35 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// container padding presets: an outer box with text lines inset by the
+// padding amount
+const paddingIcon = (inset: number) =>
+  createIcon(
+    <g strokeWidth="1.5">
+      <rect x="2.5" y="2.5" width="15" height="15" rx="2" />
+      <path d={`M${2.5 + inset} 8H${17.5 - inset}`} />
+      <path d={`M${2.5 + inset} 12H${17.5 - inset}`} />
+    </g>,
+    modifiedTablerIconProps,
+  );
+
+export const PaddingNoneIcon = paddingIcon(0);
+export const PaddingSmallIcon = paddingIcon(3);
+export const PaddingMediumIcon = paddingIcon(5.5);
+
+export const PaddingCustomIcon = createIcon(
+  <g strokeWidth="1.5">
+    <rect x="2.5" y="2.5" width="15" height="15" rx="2" />
+    <rect
+      x="6"
+      y="6"
+      width="8"
+      height="8"
+      rx="1"
+      strokeDasharray="2 2"
+      strokeWidth="1.25"
+    />
+  </g>,
+  modifiedTablerIconProps,
+);

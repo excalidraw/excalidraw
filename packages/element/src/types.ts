@@ -90,9 +90,16 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
   type: "selection";
 };
 
-export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
-  type: "rectangle";
-};
+/**
+ * Inner padding (px) between a container's edge and its bound text. Omitted
+ * means the default (`BOUND_TEXT_PADDING`).
+ */
+type ContainerPaddingProps = Readonly<{ padding?: number }>;
+
+export type ExcalidrawRectangleElement = _ExcalidrawElementBase &
+  ContainerPaddingProps & {
+    type: "rectangle";
+  };
 
 export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
   Readonly<{
@@ -133,13 +140,15 @@ export type ExcalidrawDBTableElement = _ExcalidrawElementBase &
     fontFamily: FontFamilyValues;
   }>;
 
-export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
-  type: "diamond";
-};
+export type ExcalidrawDiamondElement = _ExcalidrawElementBase &
+  ContainerPaddingProps & {
+    type: "diamond";
+  };
 
-export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
-  type: "ellipse";
-};
+export type ExcalidrawEllipseElement = _ExcalidrawElementBase &
+  ContainerPaddingProps & {
+    type: "ellipse";
+  };
 
 export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
   Readonly<{

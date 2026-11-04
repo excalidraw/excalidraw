@@ -1,6 +1,7 @@
 import { isTransparent } from "@excalidraw/common";
 
 import {
+  canHaveContainerPadding,
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
   getColorTargetElement,
@@ -144,6 +145,8 @@ export const getShapeActionPredicates = (
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasRoughness),
     roundness: forToolOrSelection(canChangeRoundness),
+    /** inner (bound text) padding of rectangle / diamond / ellipse */
+    padding: targetElements.some(canHaveContainerPadding),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),
 
