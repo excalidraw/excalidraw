@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Set inn",
-    "description": "For tida er berre <flowchartLink>flytdiagram</flowchartLink>, <sequenceLink>sekvensdiagram</sequenceLink>, <classLink>klassediagram</classLink> og <erdLink>entitetsrelasjonsdiagram</erdLink> støtta. Dei andre typane vert viste som bilete i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntaks",
     "preview": "Førehandsvising",
     "label": "Mermaid",
