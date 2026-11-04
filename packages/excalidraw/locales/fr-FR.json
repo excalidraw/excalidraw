@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "De Mermaid à Excalidraw",
     "button": "Insérer",
-    "description": "Actuellement seulement <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Séquence</sequenceLink>, Les diagrammes <classLink>Classe</classLink>et <erdLink>Entity Relationship</erdLink> sont pris en charge. Les autres types seront rendus en tant qu'image dans Excalidraw.",
+    "description": "",
     "syntax": "Syntaxe Mermaid",
     "preview": "Prévisualisation",
     "label": "Mermaid",
