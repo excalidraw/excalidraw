@@ -2,7 +2,6 @@ import React from "react";
 import { vi } from "vitest";
 
 import { Excalidraw } from "../index";
-import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../components/App.viewport";
 import { AnimationController } from "../renderer/animation";
 import { getNormalizedZoom } from "../scene";
 
@@ -52,7 +51,9 @@ const waitForAnimationToStop = (maxFrames = 200) => {
         let remaining = maxFrames;
         const check = () => {
           if (
-            !AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
+            !AnimationController.running(
+              h.app.viewport.scrollToContentAnimationKey,
+            ) ||
             --remaining <= 0
           ) {
             resolve();
@@ -392,9 +393,9 @@ describe("scale-down animated", () => {
 
     // the animation must remove itself from the controller rather than keep
     // ticking forever after reaching the target
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+    ).toBe(false);
 
     // it should have settled on the target viewport (moved off the origin)
     const settledScrollX = h.state.scrollX;

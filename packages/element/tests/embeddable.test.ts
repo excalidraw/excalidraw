@@ -243,3 +243,31 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("Instagram embedding", () => {
+  it.each([
+    {
+      url: "https://www.instagram.com/p/BsOGulcndj-/",
+      expectedLink: "https://www.instagram.com/p/BsOGulcndj-/embed/",
+    },
+    {
+      url: "https://instagram.com/reel/DSu-vbYDDlf/?igsh=MWQ1ZGUxMzBkMA==",
+      expectedLink: "https://www.instagram.com/reel/DSu-vbYDDlf/embed/",
+    },
+    {
+      url: "https://www.instagram.com/reels/DSu-vbYDDlf/",
+      expectedLink: "https://www.instagram.com/reel/DSu-vbYDDlf/embed/",
+    },
+    {
+      url: "https://www.instagram.com/world_record_egg/p/BsOGulcndj-/",
+      expectedLink: "https://www.instagram.com/p/BsOGulcndj-/embed/",
+    },
+  ])("should normalize Instagram link: $url", ({ url, expectedLink }) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    const result = getEmbedLink(url);
+    expect(result?.type).toBe("generic");
+    if (result?.type === "generic") {
+      expect(result.link).toBe(expectedLink);
+    }
+  });
+});

@@ -24,11 +24,15 @@ export const withBatchedUpdatesThrottled = <
   TFunction extends ((event: any) => void) | (() => void),
 >(
   func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
+  ownerWindow: Window = window,
 ) => {
-  // @ts-ignore
-  return throttleRAF<Parameters<TFunction>>(((event) => {
-    unstable_batchedUpdates(func, event);
-  }) as TFunction);
+  return throttleRAF<Parameters<TFunction>>(
+    // @ts-ignore
+    ((event) => {
+      unstable_batchedUpdates(func, event);
+    }) as TFunction,
+    ownerWindow,
+  );
 };
 
 export const isRenderThrottlingEnabled = (() => {

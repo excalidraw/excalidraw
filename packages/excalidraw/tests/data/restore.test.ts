@@ -580,6 +580,24 @@ describe("restoreElements", () => {
     expect(restoredArrow.endArrowhead).toBe("cardinality_one_or_many");
   });
 
+  it("should strip the leaked `moveMidPointsWithElement` prop from linear elements", () => {
+    const arrowElement = API.createElement({ type: "arrow" });
+    const lineElement = API.createElement({ type: "line" });
+
+    const restoredElements = restore.restoreElements(
+      [
+        { ...arrowElement, moveMidPointsWithElement: false } as any,
+        { ...lineElement, moveMidPointsWithElement: true } as any,
+      ],
+      null,
+    );
+
+    expect(restoredElements).toHaveLength(2);
+    for (const element of restoredElements) {
+      expect(element).not.toHaveProperty("moveMidPointsWithElement");
+    }
+  });
+
   it("should strip element if restore fails", () => {
     const rect1 = API.createElement({
       type: "rectangle",

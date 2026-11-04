@@ -59,6 +59,7 @@ const distributeSelectedElements = (
     distribution,
     appState,
     app.scene,
+    app.renderEnvironment,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);

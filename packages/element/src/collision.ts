@@ -320,10 +320,6 @@ const bindableElementBorderDistanceIfClose = (
     return -Infinity;
   }
 
-  if (isPointClippedByEnclosingFrame(element, point, elementsMap)) {
-    return -Infinity;
-  }
-
   const isInside = isPointInElement(point, element, elementsMap);
   // frames are only bindable from the outside, so arrows ending inside
   // a frame can bind to its children (or stay unbound)
@@ -337,6 +333,29 @@ const bindableElementBorderDistanceIfClose = (
   }
 
   return distance > tolerance ? -Infinity : -distance;
+};
+
+/**
+ * Whether an arrow endpoint at the point could bind to the element: inside it,
+ * or within binding distance of its outline. Unlike `getBindingCandidates`,
+ * it ignores frame clipping, as frames may not be sized yet (e.g. while
+ * converting skeletons, where frames are sized around their children last)
+ */
+export const isPointInBindingArea = (
+  point: GlobalPoint,
+  element: NonDeleted<ExcalidrawBindableElement>,
+  elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+) => {
+  const maxDistance = maxBindingDistance_simple(zoom);
+  return (
+    bindableElementBorderDistanceIfClose(
+      element,
+      point,
+      elementsMap,
+      maxDistance,
+    ) > -maxDistance
+  );
 };
 
 type BindingCandidate = {
@@ -397,6 +416,10 @@ const getBindingCandidates = (
       ) {
         occludingFrameId = element.id;
       }
+    }
+
+    if (isPointClippedByEnclosingFrame(element, point, elementsMap)) {
+      continue;
     }
 
     const distance = bindableElementBorderDistanceIfClose(

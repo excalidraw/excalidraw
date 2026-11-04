@@ -21,6 +21,8 @@ export const isMaybeMermaidDefinition = (text: string) => {
     "sankey",
     "xychart",
     "block",
+    // `swimlane-beta`, which Pele (unlike Mermaid) renders, as a flowchart
+    "swimlane",
   ];
 
   const re = new RegExp(

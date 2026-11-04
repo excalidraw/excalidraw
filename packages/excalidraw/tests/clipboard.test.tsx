@@ -868,6 +868,21 @@ describe("copy and cut events", () => {
 });
 
 describe("paste routing", () => {
+  it("should paste embed code with its loader <script> on a separate line as an embeddable", async () => {
+    pasteWithCtrlCmdV(
+      `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"><div style="padding:16px;"> <a href="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">View this post on Instagram</a></div></blockquote>
+<script async src="//www.instagram.com/embed.js"></script>`,
+    );
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link: "https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading",
+        }),
+      ]);
+    });
+  });
+
   it("should leave a paste to the host when its onPaste returns false", async () => {
     unmountComponent();
     const onPaste = vi.fn(() => false);
