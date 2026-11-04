@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Konwertuj diagram Mermaid do Excalidraw",
     "button": "Wstaw",
-    "description": "Obecnie wspierane są jedynie diagramy typu <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> i <erdLink>Entity Relationship</erdLink>. Pozostałe typy będą wyświetlane jako obrazy w Excalidraw.",
+    "description": "",
     "syntax": "Składnia diagramów Mermaid",
     "preview": "Podgląd",
     "label": "Mermaid",
