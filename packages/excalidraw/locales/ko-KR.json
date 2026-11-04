@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "",
     "button": "",
-    "description": "현재 <flowchartLink>순서도</flowchartLink>, <sequenceLink>시퀀스</sequenceLink>, <classLink>클래스 구조</classLink>, <erdLink>개체-관계 다이어그램</erdLink> 다이어그램만 지원됩니다. 그 외 유형은 Excalidraw에서 이미지로 렌더링됩니다.",
+    "description": "",
     "syntax": "",
     "preview": "",
     "label": "",
