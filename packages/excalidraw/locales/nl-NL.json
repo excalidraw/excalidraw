@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid naar Excalidraw",
     "button": "Invoegen",
-    "description": "Momenteel worden alleen <flowchartLink>Stroomdiagram</flowchartLink>, <sequenceLink>Volgordediagram</sequenceLink>, <classLink>Klasse</classLink>, en <erdLink>Entiteitsrelatie</erdLink>diagrammen ondersteund. De andere typen worden weergegeven als afbeelding in Excalidraw.",
+    "description": "",
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
