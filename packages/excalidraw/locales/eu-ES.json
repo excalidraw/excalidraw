@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid-etik Excalidraw-ra",
     "button": "Txertatu",
-    "description": "Momentu honetan <flowchartLink>Fluxu-diagrama</flowchartLink>, <sequenceLink>Sekuentzia</sequenceLink>, <classLink>Klasea</classLink> eta <erdLink>Entitate-erlazioa</erdLink> Diagramak onartzen dira. Beste motak irudi gisa errendatuko dira Excalidrawn.",
+    "description": "",
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista",
     "label": "Mermaid",
