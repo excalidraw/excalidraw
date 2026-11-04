@@ -364,6 +364,7 @@ import {
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
+import { TableEditor } from "../components/TableEditor";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isOverScrollBars } from "../scene/scrollbars";
@@ -388,6 +389,7 @@ import { AppClipboard } from "./App.clipboard";
 import { AppText } from "./App.text";
 import { AppTextTool } from "./App.textTool";
 import { AppBucketFill } from "./App.bucketFill";
+import { AppTable } from "./App.table";
 import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
@@ -683,6 +685,7 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
+  public table: AppTable = new AppTable(this);
   public duplicate: AppDuplicate = new AppDuplicate(this, {
     getPointerCount: () => gesture.pointers.size,
   });
@@ -2515,6 +2518,17 @@ class App extends React.Component<AppProps, AppState> {
                           </LayerUI>
 
                           <div className="excalidraw-textEditorContainer" />
+                          {this.state.editingTableId &&
+                            (() => {
+                              const table = this.table.getEditingTable();
+                              return table ? (
+                                <TableEditor
+                                  key={table.id}
+                                  table={table}
+                                  controller={this.table}
+                                />
+                              ) : null;
+                            })()}
                           <div className="excalidraw-contextMenuContainer" />
                           <div className="excalidraw-eye-dropper-container" />
                           <SVGLayer
@@ -4310,6 +4324,11 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    // the edited table went away (deleted, undone, removed by a collaborator)
+    if (this.state.editingTableId && !this.table.getEditingTable()) {
+      this.setState({ editingTableId: null });
+    }
+
     const renderOverridesUpdatePending = this.renderOverridesUpdatePending;
     this.renderOverridesUpdatePending = false;
     // Only a requested visual update can skip the document pipeline. Real
@@ -6406,6 +6425,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.cursor.reset();
     if (!this.state.viewModeEnabled) {
+      if (this.table.handleDoubleClick({ x: sceneX, y: sceneY })) {
+        return;
+      }
+
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
       if (isIframeLikeElement(hitElement)) {
@@ -7233,6 +7256,16 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (
+      !isLaserTool &&
+      this.state.activeTool.type !== "eraser" &&
+      !this.state.viewModeEnabled &&
+      this.table.getTableWithToggleAt(scenePointer)
+    ) {
+      this.cursor.set(CURSOR_TYPE.POINTER);
+      return;
+    }
+
     if (!isOverScrollBar) {
       // for linear elements, we'd like to prioritize point dragging over edge resizing
       // therefore, we update and check hovered point index first
@@ -7814,6 +7847,16 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (
+      (this.state.activeTool.type === "selection" ||
+        this.state.activeTool.type === "lasso") &&
+      !this.state.viewModeEnabled &&
+      !event.shiftKey &&
+      this.table.handleTogglePointerDown(pointerDownState.origin)
+    ) {
+      return;
+    }
+
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
     }
@@ -7921,6 +7964,10 @@ class App extends React.Component<AppProps, AppState> {
       // mode this branch is unreachable:
       // `pan.start` swallows the pointer-down.
       this.bucketFill.handlePointerDown(scenePointer);
+    } else if (this.state.activeTool.type === "table") {
+      // click-to-place: armed here, placed on a genuine pointer up (see the
+      // bucket fill above for why)
+      this.table.handlePointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -8811,6 +8858,7 @@ class App extends React.Component<AppProps, AppState> {
       | "selection"
       | "rectangle"
       | "stickynote"
+      | "table"
       | "diamond"
       | "ellipse"
       | "iframe"
@@ -9501,6 +9549,14 @@ class App extends React.Component<AppProps, AppState> {
         this.bucketFill.handlePointerUp();
       } else {
         this.bucketFill.cancel();
+      }
+      if (
+        childEvent.type === "pointerup" &&
+        this.state.activeTool.type === "table"
+      ) {
+        this.table.handlePointerUp();
+      } else {
+        this.table.cancel();
       }
       const {
         newElement,

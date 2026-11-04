@@ -97,8 +97,12 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       elementsMap,
     );
 
-    // do not resize from the sides for linear elements with only two points
-    if (!(isLinearElement(element) && element.points.length <= 2)) {
+    // do not resize from the sides for linear elements with only two points,
+    // nor for tables (sized by their content)
+    if (
+      !(isLinearElement(element) && element.points.length <= 2) &&
+      element.type !== "table"
+    ) {
       const SPACING = isImageElement(element)
         ? 0
         : SIDE_RESIZING_THRESHOLD / zoom.value;

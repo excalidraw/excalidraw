@@ -28,6 +28,12 @@ import {
   normalizeStickyNoteBackgroundColor,
   normalizeStickyNoteStrokeColor,
 } from "./stickyNote";
+import {
+  newTableRow,
+  normalizeTable,
+  TABLE_DEFAULT_ROWS,
+  TABLE_DEFAULT_TITLE,
+} from "./table";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { measureTextElementText, wrapTextElementText } from "./richTextLayout";
@@ -58,6 +64,8 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
+  ExcalidrawTableElement,
+  ExcalidrawTableRow,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -242,6 +250,33 @@ export const newStickyNoteElement = (
     ...base,
     baseHeight: opts.baseHeight ?? base.height,
   });
+};
+
+export const newTableElement = (
+  opts: {
+    type: "table";
+    title?: string;
+    rows?: readonly Partial<Omit<ExcalidrawTableRow, "id">>[];
+    collapsed?: boolean;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    renderEnvironment?: RenderEnvironment;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawTableElement> => {
+  const base = _newElementBase<ExcalidrawTableElement>("table", opts);
+
+  // the size is derived from the content, never taken from `opts`
+  return normalizeTable(
+    {
+      ...base,
+      title: opts.title ?? TABLE_DEFAULT_TITLE,
+      rows: (opts.rows ?? TABLE_DEFAULT_ROWS).map((row) => newTableRow(row)),
+      collapsed: opts.collapsed ?? false,
+      fontSize: opts.fontSize || DEFAULT_FONT_SIZE,
+      fontFamily: opts.fontFamily || DEFAULT_FONT_FAMILY,
+    },
+    opts.renderEnvironment,
+  );
 };
 
 export const newEmbeddableElement = (

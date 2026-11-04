@@ -1,0 +1,160 @@
+.excalidraw {
+  .excalidraw-table-editor {
+    position: absolute;
+    z-index: var(--zIndex-wysiwyg);
+    // the inputs sit exactly on top of the canvas text: transparent chrome,
+    // only the caret, selection and placeholders show they are editable
+    pointer-events: none;
+  }
+
+  .excalidraw-table-editor__frame {
+    position: absolute;
+    inset: 0;
+  }
+
+  .excalidraw-table-editor__input {
+    position: absolute;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    outline: none;
+    background: transparent;
+    color: var(--table-editor-color);
+    caret-color: var(--table-editor-color);
+    white-space: pre;
+    pointer-events: auto;
+    // a soft highlight marks the focused cell without shifting the text
+    transition: box-shadow 0.12s ease-out, background-color 0.12s ease-out;
+
+    &::placeholder {
+      color: var(--table-editor-color);
+      opacity: 0.35;
+    }
+
+    &:hover {
+      background: rgb(105 101 219 / 6%);
+    }
+
+    &:focus {
+      background: rgb(105 101 219 / 10%);
+      box-shadow: 0 0 0 calc(3px / var(--table-editor-zoom))
+        rgb(105 101 219 / 10%);
+    }
+
+    &::selection {
+      background: rgb(105 101 219 / 30%);
+    }
+
+    // datalist chevron (Chromium) would cover short keys
+    &::-webkit-calendar-picker-indicator {
+      display: none !important;
+    }
+  }
+
+  .excalidraw-table-editor--dark .excalidraw-table-editor__input {
+    &:hover {
+      background: rgb(168 165 255 / 8%);
+    }
+
+    &:focus {
+      background: rgb(168 165 255 / 12%);
+      box-shadow: 0 0 0 calc(3px / var(--table-editor-zoom))
+        rgb(168 165 255 / 12%);
+    }
+  }
+
+  .excalidraw-table-editor__title {
+    text-align: center;
+  }
+
+  // empty cells hint at what goes in them only where the user is working,
+  // so a table with optional keys doesn't read as unfinished
+  .excalidraw-table-editor__row:not(:hover):not(:focus-within)
+    .excalidraw-table-editor__input::placeholder {
+    opacity: 0;
+  }
+
+  .excalidraw-table-editor__key {
+    opacity: 0.7;
+
+    &:focus {
+      opacity: 1;
+    }
+  }
+
+  // --- row & table controls (kept at screen size whatever the zoom) -----------
+
+  .excalidraw-table-editor__remove,
+  .excalidraw-table-editor__add {
+    position: absolute;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--ui-font);
+    color: var(--color-on-surface);
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    transition: background-color 0.12s ease-out, color 0.12s ease-out,
+      opacity 0.12s ease-out;
+
+    &:hover {
+      background: var(--button-hover-bg);
+    }
+
+    &:active {
+      background: var(--button-active-bg, var(--button-hover-bg));
+    }
+
+    svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  .excalidraw-table-editor__remove {
+    width: 1.375rem;
+    height: 1.375rem;
+    padding: 0;
+    border-radius: 50%;
+    // just right of the table, centered on its row
+    transform: translate(0.5rem, -50%) scale(calc(1 / var(--table-editor-zoom)));
+    transform-origin: 0 50%;
+    opacity: 0;
+
+    &:hover {
+      color: var(--color-danger);
+    }
+
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+
+  .excalidraw-table-editor__row:hover .excalidraw-table-editor__remove,
+  .excalidraw-table-editor__row:focus-within .excalidraw-table-editor__remove {
+    opacity: 1;
+  }
+
+  .excalidraw-table-editor__add {
+    gap: 0.25rem;
+    height: 1.75rem;
+    padding: 0 0.625rem 0 0.5rem;
+    border-radius: var(--border-radius-lg, 0.5rem);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    // centered just below the table
+    transform: translate(-50%, 0.5rem) scale(calc(1 / var(--table-editor-zoom)));
+    transform-origin: 50% 0;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}

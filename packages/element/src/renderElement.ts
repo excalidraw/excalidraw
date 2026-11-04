@@ -85,11 +85,20 @@ import {
   type StickyNotePathCommand,
 } from "./stickyNote";
 
+import {
+  getTableFontString,
+  getTableKeyFontString,
+  getTableLayout,
+  getTableTextBaselineOffset,
+  TABLE_KEY_TEXT_OPACITY,
+} from "./table";
+
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { TextElementLine } from "./richTextLayout";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawTableElement,
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -224,7 +233,18 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
+  /** a table's text is left out while its cells are edited in place */
+  hideTableText: boolean;
 }
+
+/** whether `element` is the table whose cells are being edited in place */
+const isTableBeingEdited = (
+  element: ExcalidrawElement,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+) =>
+  element.type === "table" &&
+  "editingTableId" in appState &&
+  appState.editingTableId === element.id;
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
@@ -330,7 +350,8 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  const hideTableText = isTableBeingEdited(element, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig, { hideTableText });
 
   context.restore();
 
@@ -347,6 +368,7 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
+    hideTableText,
   };
 };
 
@@ -468,8 +490,28 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  options?: { hideTableText?: boolean },
 ) => {
   switch (element.type) {
+    case "table": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      for (const shape of ShapeCache.generateElementShape(
+        element,
+        renderConfig,
+      )) {
+        rc.draw(shape);
+      }
+      withSavedContext(context, () => {
+        drawTableChrome(
+          context,
+          element,
+          renderConfig.theme === THEME.DARK,
+          !options?.hideTableText,
+        );
+      });
+      break;
+    }
     case "stickynote": {
       withSavedContext(context, () => {
         context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
@@ -742,6 +784,110 @@ const drawElementOnCanvas = (
   }
 };
 
+/**
+ * Paints a table's collapse toggle and (unless edited in place) its text:
+ * the centered title, the key column (smaller and muted) and the names.
+ */
+const drawTableChrome = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawTableElement,
+  isDarkMode: boolean,
+  withText: boolean,
+) => {
+  const layout = getTableLayout(element);
+  const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
+
+  // --- toggle: a small rounded square with a minus (expanded) or plus ---------
+  const { toggle, unit } = layout;
+  const toggleRadius = 2.5 * unit;
+  context.save();
+  context.globalAlpha *= 0.8;
+  context.strokeStyle = color;
+  context.lineWidth = Math.max(1, 1.25 * unit);
+  context.lineCap = "round";
+  context.beginPath();
+  {
+    // (manual path: not every canvas backend has `roundRect`)
+    const { x, y, width: w, height: h } = toggle;
+    const r = toggleRadius;
+    context.moveTo(x + r, y);
+    context.arcTo(x + w, y, x + w, y + h, r);
+    context.arcTo(x + w, y + h, x, y + h, r);
+    context.arcTo(x, y + h, x, y, r);
+    context.arcTo(x, y, x + w, y, r);
+    context.closePath();
+  }
+  const cx = toggle.x + toggle.width / 2;
+  const cy = toggle.y + toggle.height / 2;
+  const arm = toggle.width * 0.27;
+  context.moveTo(cx - arm, cy);
+  context.lineTo(cx + arm, cy);
+  if (element.collapsed) {
+    context.moveTo(cx, cy - arm);
+    context.lineTo(cx, cy + arm);
+  }
+  context.stroke();
+  context.restore();
+
+  if (!withText) {
+    return;
+  }
+
+  context.fillStyle = color;
+  context.textBaseline = "alphabetic";
+
+  // --- title ------------------------------------------------------------------
+  context.font = getTableFontString(element);
+  context.textAlign = "center";
+  context.fillText(
+    element.title,
+    layout.width / 2,
+    layout.titleY +
+      getTableTextBaselineOffset(
+        element.fontFamily,
+        layout.fontSize,
+        layout.lineHeight,
+      ),
+  );
+
+  // --- rows -------------------------------------------------------------------
+  context.textAlign = "left";
+  const nameBaseline = getTableTextBaselineOffset(
+    element.fontFamily,
+    layout.fontSize,
+    layout.lineHeight,
+  );
+  const keyBaseline = getTableTextBaselineOffset(
+    element.fontFamily,
+    layout.keyFontSize,
+    layout.lineHeight,
+  );
+  const keyFont = getTableKeyFontString(element);
+  const nameFont = getTableFontString(element);
+  const opacity = context.globalAlpha;
+
+  for (const row of layout.rows) {
+    if (row.row.key) {
+      context.font = keyFont;
+      context.globalAlpha = opacity * TABLE_KEY_TEXT_OPACITY;
+      context.fillText(
+        row.row.key,
+        row.key.x + layout.paddingX,
+        row.keyTextY + keyBaseline,
+      );
+      context.globalAlpha = opacity;
+    }
+    if (row.row.name) {
+      context.font = nameFont;
+      context.fillText(
+        row.row.name,
+        row.name.x + layout.paddingX,
+        row.nameTextY + nameBaseline,
+      );
+    }
+  }
+};
+
 const drawTextElementLines = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawTextElement,
@@ -843,7 +989,9 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.deviceScale !== renderConfig.scale ||
     prevElementWithCanvas.environment !== renderEnvironment ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    prevElementWithCanvas.hideTableText !==
+      isTableBeingEdited(element, appState)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -1251,6 +1399,7 @@ const drawElement = (
     }
     case "rectangle":
     case "stickynote":
+    case "table":
     case "diamond":
     case "ellipse":
     case "line":

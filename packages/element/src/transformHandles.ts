@@ -76,6 +76,17 @@ export const OMIT_SIDES_FOR_FRAME = {
   rotation: true,
 };
 
+export const OMIT_SIDES_FOR_TABLE = {
+  e: true,
+  s: true,
+  n: true,
+  w: true,
+  nw: true,
+  ne: true,
+  sw: true,
+  se: true,
+};
+
 const OMIT_SIDES_FOR_LINE_SLASH = {
   e: true,
   s: true,
@@ -308,6 +319,10 @@ export const getTransformHandles = (
       ...omitSides,
       rotation: true,
     };
+  } else if (element.type === "table") {
+    // a table's size is derived from its content: it can only be rotated
+    // (or scaled as part of a multi-selection)
+    omitSides = OMIT_SIDES_FOR_TABLE;
   }
   const margin = isLinearElement(element)
     ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8

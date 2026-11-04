@@ -44,6 +44,12 @@ import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 import {
+  getTableKeyFontSize,
+  getTableLayout,
+  getTableTextBaselineOffset,
+  TABLE_KEY_TEXT_OPACITY,
+} from "@excalidraw/element";
+import {
   getStickyNoteFooter,
   getStickyNotePathCommands,
   type StickyNotePathCommand,
@@ -264,6 +270,146 @@ const renderElementToSvg = (
         dateText.setAttribute("fill-opacity", `${STICKY_NOTE_FOOTER.opacity}`);
         dateText.textContent = footer.text;
         group.appendChild(dateText);
+      }
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group],
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+
+      addToRoot(g || group, element);
+      break;
+    }
+    case "table": {
+      const doc = svgRoot.ownerDocument;
+      const isDarkMode = renderConfig.theme === THEME.DARK;
+      const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
+      const layout = getTableLayout(element);
+
+      const group = doc.createElementNS(SVG_NS, "g");
+      group.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      if (opacity !== 1) {
+        group.setAttribute("opacity", `${opacity}`);
+      }
+
+      for (const shape of ShapeCache.generateElementShape(
+        element,
+        renderConfig,
+      )) {
+        const node = roughSVGDrawWithPrecision(
+          rsvg,
+          shape,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
+        node.setAttribute("stroke-linecap", "round");
+        group.appendChild(node);
+      }
+
+      // collapse toggle (kept in exports: it tells the table is collapsible)
+      const { toggle, unit } = layout;
+      const arm = toggle.width * 0.27;
+      const toggleCx = toggle.x + toggle.width / 2;
+      const toggleCy = toggle.y + toggle.height / 2;
+      const toggleNode = doc.createElementNS(SVG_NS, "path");
+      toggleNode.setAttribute(
+        "d",
+        [
+          `M ${toggleCx - arm} ${toggleCy} L ${toggleCx + arm} ${toggleCy}`,
+          element.collapsed
+            ? `M ${toggleCx} ${toggleCy - arm} L ${toggleCx} ${toggleCy + arm}`
+            : "",
+        ].join(" "),
+      );
+      const toggleRect = doc.createElementNS(SVG_NS, "rect");
+      toggleRect.setAttribute("x", `${toggle.x}`);
+      toggleRect.setAttribute("y", `${toggle.y}`);
+      toggleRect.setAttribute("width", `${toggle.width}`);
+      toggleRect.setAttribute("height", `${toggle.height}`);
+      toggleRect.setAttribute("rx", `${2.5 * unit}`);
+      for (const node of [toggleRect, toggleNode]) {
+        node.setAttribute("fill", "none");
+        node.setAttribute("stroke", color);
+        node.setAttribute("stroke-opacity", "0.8");
+        node.setAttribute("stroke-width", `${Math.max(1, 1.25 * unit)}`);
+        node.setAttribute("stroke-linecap", "round");
+        group.appendChild(node);
+      }
+
+      const fontFamily = getFontFamilyString(element);
+      const createText = (
+        content: string,
+        x: number,
+        y: number,
+        fontSize: number,
+        anchor: "start" | "middle",
+      ) => {
+        const text = doc.createElementNS(SVG_NS, "text");
+        text.textContent = content;
+        text.setAttribute("x", `${x}`);
+        text.setAttribute("y", `${y}`);
+        text.setAttribute("font-family", fontFamily);
+        text.setAttribute("font-size", `${fontSize}px`);
+        text.setAttribute("fill", color);
+        text.setAttribute("text-anchor", anchor);
+        text.setAttribute("direction", "ltr");
+        text.setAttribute("dominant-baseline", "alphabetic");
+        text.setAttribute("style", "white-space: pre;");
+        group.appendChild(text);
+        return text;
+      };
+
+      if (element.title) {
+        createText(
+          element.title,
+          layout.width / 2,
+          layout.titleY +
+            getTableTextBaselineOffset(
+              element.fontFamily,
+              layout.fontSize,
+              layout.lineHeight,
+            ),
+          layout.fontSize,
+          "middle",
+        );
+      }
+      const keyFontSize = getTableKeyFontSize(element.fontSize);
+      const keyBaseline = getTableTextBaselineOffset(
+        element.fontFamily,
+        keyFontSize,
+        layout.lineHeight,
+      );
+      const nameBaseline = getTableTextBaselineOffset(
+        element.fontFamily,
+        layout.fontSize,
+        layout.lineHeight,
+      );
+      for (const row of layout.rows) {
+        if (row.row.key) {
+          createText(
+            row.row.key,
+            row.key.x + layout.paddingX,
+            row.keyTextY + keyBaseline,
+            keyFontSize,
+            "start",
+          ).setAttribute("fill-opacity", `${TABLE_KEY_TEXT_OPACITY}`);
+        }
+        if (row.row.name) {
+          createText(
+            row.row.name,
+            row.name.x + layout.paddingX,
+            row.nameTextY + nameBaseline,
+            layout.fontSize,
+            "start",
+          );
+        }
       }
 
       const g = maybeWrapNodesInFrameClipPath(
@@ -907,7 +1053,9 @@ const renderElementToSvg = (
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute(
             "y",
-            `${richLine ? richLine.baseline : i * lineHeightPx + verticalOffset}`,
+            `${
+              richLine ? richLine.baseline : i * lineHeightPx + verticalOffset
+            }`,
           );
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);

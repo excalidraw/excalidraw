@@ -56,6 +56,12 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
+import {
+  getTableBodyColor,
+  getTableColorWithOpacity,
+  getTableLayout,
+  TABLE_COLUMN_DIVIDER_OPACITY,
+} from "./table";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -78,6 +84,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  ExcalidrawTableElement,
   Arrowhead,
 } from "./types";
 
@@ -231,6 +238,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "table":
     case "iframe":
     case "embeddable":
     case "diamond":
@@ -889,6 +897,9 @@ const _generateElementShape = (
       }
       return shape;
     }
+    case "table": {
+      return generateTableShape(element, generator, isDarkMode);
+    }
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 
@@ -1159,6 +1170,99 @@ export const generateElbowArrowShape = (
   return d.join(" ");
 };
 
+const getRoundedRectPath = (w: number, h: number, r: number) =>
+  `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${h - r} Q ${w} ${h}, ${
+    w - r
+  } ${h} L ${r} ${h} Q 0 ${h}, 0 ${h - r} L 0 ${r} Q 0 0, ${r} 0`;
+
+/** a rectangle with only its top corners rounded (the header over a body) */
+const getTopRoundedRectPath = (w: number, h: number, r: number) =>
+  `M 0 ${h} L 0 ${r} Q 0 0, ${r} 0 L ${
+    w - r
+  } 0 Q ${w} 0, ${w} ${r} L ${w} ${h} Z`;
+
+/**
+ * A table is drawn as layered roughjs drawables, bottom to top, so that the
+ * outline always sits on top of the fills:
+ *
+ * 1. body fill (a tint of the header color, always solid for legibility)
+ * 2. header fill (the element's background, honoring its fill style)
+ * 3. header divider and the subtle key/name column divider
+ * 4. the outline
+ *
+ * The text is painted separately (`drawTableText` / the SVG renderer).
+ */
+const generateTableShape = (
+  element: ExcalidrawTableElement,
+  generator: RoughGenerator,
+  isDarkMode: boolean,
+): Drawable[] => {
+  const layout = getTableLayout(element);
+  const { width: w, height: h } = element;
+  const headerHeight = layout.header.height;
+  const radius = element.roundness
+    ? Math.min(getCornerRadius(Math.min(w, h), element), headerHeight / 2)
+    : 0;
+
+  const options = generateRoughOptions(element, true, isDarkMode);
+  const strokeOnly: Options = { ...options, fill: undefined };
+  const hasFill = !isTransparent(element.backgroundColor);
+  const shapes: Drawable[] = [];
+
+  if (hasFill && layout.body) {
+    shapes.push(
+      generator.path(getRoundedRectPath(w, h, radius), {
+        ...options,
+        seed: element.seed + 1,
+        stroke: "none",
+        fillStyle: "solid",
+        fill: applyDarkModeFilter(
+          getTableBodyColor(element.backgroundColor),
+          isDarkMode,
+        ),
+      }),
+    );
+  }
+
+  if (hasFill) {
+    shapes.push(
+      generator.path(
+        layout.body
+          ? getTopRoundedRectPath(w, headerHeight, radius)
+          : getRoundedRectPath(w, headerHeight, radius),
+        { ...options, seed: element.seed + 2, stroke: "none" },
+      ),
+    );
+  }
+
+  if (layout.body) {
+    shapes.push(
+      generator.line(0, headerHeight, w, headerHeight, {
+        ...strokeOnly,
+        seed: element.seed + 3,
+      }),
+    );
+    if (element.rows.length) {
+      const x = layout.keyColumnWidth;
+      shapes.push(
+        generator.line(x, headerHeight, x, h, {
+          ...strokeOnly,
+          seed: element.seed + 4,
+          strokeWidth: Math.max(1, element.strokeWidth * 0.75),
+          stroke: getTableColorWithOpacity(
+            options.stroke!,
+            TABLE_COLUMN_DIVIDER_OPACITY,
+          ),
+        }),
+      );
+    }
+  }
+
+  shapes.push(generator.path(getRoundedRectPath(w, h, radius), strokeOnly));
+
+  return shapes;
+};
+
 /**
  * get the pure geometric shape of an excalidraw elementw
  * which is then used for hit detection
@@ -1170,6 +1274,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "stickynote":
+    case "table":
     case "diamond":
     case "frame":
     case "magicframe":

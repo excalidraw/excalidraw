@@ -114,6 +114,14 @@ const getHints = ({
     return t("hints.stickynote");
   }
 
+  if (activeTool.type === "table") {
+    return t("hints.table");
+  }
+
+  if (appState.editingTableId) {
+    return t("hints.table_editing");
+  }
+
   if (activeTool.type === "autoshape") {
     return t("hints.autoshape");
   }
@@ -172,6 +180,14 @@ const getHints = ({
     return t("hints.cycleSelection", {
       shortcut: getTaggedShortcutKey("Alt"),
     });
+  }
+
+  if (
+    selectedElements.length === 1 &&
+    selectedElements[0].type === "table" &&
+    isSelectionLikeTool(activeTool.type)
+  ) {
+    return t("hints.table_selected");
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {

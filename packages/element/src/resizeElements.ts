@@ -59,6 +59,7 @@ import {
   isImageElement,
   isLinearElement,
   isStickyNoteElement,
+  isTableElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -68,6 +69,7 @@ import {
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
+import { getTableLayout } from "./table";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 
@@ -767,6 +769,11 @@ export const resizeSingleElement = (
     renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
+  // a table's size is derived from its content (see `normalizeTable`)
+  if (isTableElement(latestElement)) {
+    return;
+  }
+
   if (isTextElement(latestElement) && isTextElement(origElement)) {
     return resizeSingleTextElement(
       origElement,
@@ -1402,6 +1409,8 @@ export const resizeMultipleElements = (
         (item) =>
           item.latest.angle !== 0 ||
           isTextElement(item.latest) ||
+          // tables scale through their font size, which keeps proportions
+          isTableElement(item.latest) ||
           isInGroup(item.latest),
       );
 
@@ -1523,6 +1532,28 @@ export const resizeMultipleElements = (
           return;
         }
         update.fontSize = metrics.size;
+      }
+
+      if (isTableElement(orig)) {
+        const fontSize = orig.fontSize * scale;
+        if (fontSize < MIN_FONT_SIZE) {
+          return;
+        }
+        update.fontSize = fontSize;
+        // the size follows from the scaled font (≈ the scaled box, without
+        // drift from rounding)
+        const layout = getTableLayout({ ...orig, fontSize }, renderEnvironment);
+        update.width = layout.width;
+        update.height = layout.height;
+        // keep the anchor-relative position consistent with the new size
+        update.x =
+          anchorX +
+          flipFactorX * (offsetX * scaleX) -
+          (flipByX ? layout.width : 0);
+        update.y =
+          anchorY +
+          flipFactorY * (offsetY * scaleY) -
+          (flipByY ? layout.height : 0);
       }
 
       const boundTextElement = originalElementsMap.get(

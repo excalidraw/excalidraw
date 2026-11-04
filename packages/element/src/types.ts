@@ -104,6 +104,35 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
     baseHeight: number;
   }>;
 
+/**
+ * One row of a table's body: the key column holds the constraint (`PK`,
+ * `FK`, …) or the datatype, the name column the field name.
+ */
+export type ExcalidrawTableRow = Readonly<{
+  /** stable across edits, for collaboration and React keys */
+  id: string;
+  key: string;
+  name: string;
+}>;
+
+/**
+ * A database table (ER diagram entity): a header with the table name and a
+ * collapse toggle, over a two-column body. Its `width` and `height` are
+ * derived from the content (see `getTableLayout`) and kept in sync by
+ * `normalizeTable`, so bounds, binding and hit testing treat it as a plain
+ * rectangle.
+ */
+export type ExcalidrawTableElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "table";
+    title: string;
+    rows: readonly ExcalidrawTableRow[];
+    /** only the header is shown */
+    collapsed: boolean;
+    fontSize: number;
+    fontFamily: FontFamilyValues;
+  }>;
+
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
 };
@@ -207,6 +236,7 @@ export type ExcalidrawFlowchartNodeElement =
 export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
   | ExcalidrawStickyNoteElement
+  | ExcalidrawTableElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
@@ -223,6 +253,7 @@ export type ExcalidrawRectanguloidElement =
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawStickyNoteElement
+  | ExcalidrawTableElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
@@ -322,6 +353,7 @@ export type TextSpan = Readonly<
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawStickyNoteElement
+  | ExcalidrawTableElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement

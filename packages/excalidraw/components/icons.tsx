@@ -1998,6 +1998,19 @@ export const stickyNoteToolIcon = createIcon(
   tablerIconProps,
 );
 
+// a database table: header band over a key/name two-column body
+export const tableToolIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+    <path d="M4 9h16"></path>
+    <path d="M9 9v11"></path>
+    <path d="M12 13.5h5"></path>
+    <path d="M12 16.5h3"></path>
+  </g>,
+  tablerIconProps,
+);
+
 export const mermaidLogoIcon = createIcon(
   <path
     fill="currentColor"
