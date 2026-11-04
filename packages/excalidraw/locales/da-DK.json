@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Indsæt",
-    "description": "I øjeblikket understøttes kun <flowchartLink>rutediagrammer</flowchartLink>, <sequenceLink>sekvensdiagrammer</sequenceLink>, <classLink>klassediagrammer</classLink> og <erdLink>ER-diagrammer</erdLink>. Andre typer vises som billeder i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntaks",
     "preview": "Forhåndsvisning",
     "label": "Mermaid",
