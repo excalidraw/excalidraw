@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>、<classLink>类图</classLink>和<erdLink>实体关系（ER）图</erdLink>。其他类型在 Excalidraw 中将以图像呈现。",
+    "description": "",
     "syntax": "Mermaid 语法",
     "preview": "预览",
     "label": "Mermaid",
