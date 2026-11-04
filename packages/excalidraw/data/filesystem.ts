@@ -46,7 +46,28 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   return (await normalizeFile(files)) as RetType;
 };
 
-export const fileSave = (
+/**
+ * Fall back to a regular anchor download. Used when the native File System
+ * Access API is present but blocked by the platform (see `fileSave`).
+ */
+const downloadBlob = async (
+  blob: Blob | Promise<Blob>,
+  fileName: string,
+): Promise<null> => {
+  const url = URL.createObjectURL(await blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  anchor.rel = "noopener";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  // revoke on the next tick so the download has a chance to start
+  setTimeout(() => URL.revokeObjectURL(url));
+  return null;
+};
+
+export const fileSave = async (
   blob: Blob | Promise<Blob>,
   opts: {
     /** supply without the extension */
@@ -59,17 +80,35 @@ export const fileSave = (
     fileHandle?: FileSystemFileHandle | null;
   },
 ) => {
-  return _fileSave(
-    blob,
-    {
-      fileName: `${opts.name}.${opts.extension}`,
-      description: opts.description,
-      extensions: [`.${opts.extension}`],
-      mimeTypes: opts.mimeTypes,
-    },
-    opts.fileHandle,
-    false,
-  );
+  const fileName = `${opts.name}.${opts.extension}`;
+  try {
+    return await _fileSave(
+      blob,
+      {
+        fileName,
+        description: opts.description,
+        extensions: [`.${opts.extension}`],
+        mimeTypes: opts.mimeTypes,
+      },
+      opts.fileHandle,
+      false,
+    );
+  } catch (error: any) {
+    // user dismissed the native save picker — propagate so callers can
+    // distinguish a cancel from a real failure
+    if (error?.name === "AbortError") {
+      throw error;
+    }
+    // the native File System Access API may exist but be blocked by the
+    // platform (e.g. when embedded in a cross-origin iframe, or invoked
+    // without a transient user activation), in which case `showSaveFilePicker`
+    // throws instead of letting browser-fs-access fall back to a download.
+    // Fall back manually so the export still succeeds.
+    if (nativeFileSystemSupported) {
+      return downloadBlob(blob, fileName);
+    }
+    throw error;
+  }
 };
 
 export { nativeFileSystemSupported };
