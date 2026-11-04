@@ -2,6 +2,26 @@
 
 .excalidraw {
   .HelpDialog {
+    &__search {
+      padding: 12px 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    &__search-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--dialog-border-color);
+      border-radius: var(--border-radius-lg);
+      font-size: 14px;
+      background: var(--color-surface-lowest);
+      color: var(--text-primary-color);
+
+      &:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+    }
     .Modal__content {
       max-width: 960px;
     }
@@ -65,6 +85,18 @@
 
       @media screen and (min-width: 1024px) {
         grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    &__search-active {
+      .HelpDialog__islands-container {
+        @media screen and (min-width: 1024px) {
+          .HelpDialog__island--tools,
+          .HelpDialog__island--view,
+          .HelpDialog__island--editor {
+            grid-area: auto;
+          }
+        }
       }
     }
 

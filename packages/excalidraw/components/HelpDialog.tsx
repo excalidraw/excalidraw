@@ -66,16 +66,45 @@ const Section = (props: { title: string; children: React.ReactNode }) => (
   </>
 );
 
+//New ShortcutIsland component that filters shortcuts based on search query
 const ShortcutIsland = (props: {
   caption: string;
   children: React.ReactNode;
   className?: string;
-}) => (
-  <div className={`HelpDialog__island ${props.className}`}>
-    <h4 className="HelpDialog__island-title">{props.caption}</h4>
-    <div className="HelpDialog__island-content">{props.children}</div>
-  </div>
-);
+  searchQuery: string;
+}) => {
+  const query = props.searchQuery.trim().toLowerCase();
+
+  const matchingShortcuts = React.Children.toArray(
+    props.children,
+  ).filter((child) => {
+    if (!React.isValidElement<{ label: string }>(child)) {
+      return false;
+    }
+
+    if (!query) {
+      return true;
+    }
+
+    return child.props.label.toLowerCase().includes(query);
+  });
+
+  if (matchingShortcuts.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={`HelpDialog__island ${props.className || ""}`}>
+      <h4 className="HelpDialog__island-title">
+        {props.caption}
+      </h4>
+      <div className="HelpDialog__island-content">
+        {matchingShortcuts}
+      </div>
+    </div>
+  );
+};
+
 
 function* intersperse(as: JSX.Element[][], delim: string | null) {
   let first = true;
@@ -127,6 +156,33 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
 
 export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
   const actionManager = useExcalidrawActionManager();
+  //New state for search query
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const handleSearchShortcut = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "f" &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener("keydown", handleSearchShortcut, true);
+
+    return () => {
+      window.removeEventListener("keydown", handleSearchShortcut, true);
+    };
+  }, []);
+
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
@@ -138,13 +194,29 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
       <Dialog
         onCloseRequest={handleClose}
         title={t("helpDialog.title")}
-        className={"HelpDialog"}
+        className={
+          searchQuery.trim()
+            ? "HelpDialog HelpDialog__search-active"
+            : "HelpDialog"
+          }
       >
         <Header />
+        <div className="HelpDialog__search">
+          <input
+            ref={searchInputRef}
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search shortcuts..."
+            aria-label="Search keyboard shortcuts"
+            className="HelpDialog__search-input"
+          />
+        </div>
         <Section title={t("helpDialog.shortcuts")}>
           <ShortcutIsland
             className="HelpDialog__island--tools"
             caption={t("helpDialog.tools")}
+            searchQuery={searchQuery}
           >
             <Shortcut label={t("toolBar.hand")} shortcuts={[KEYS.H]} />
             <Shortcut
@@ -262,6 +334,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
           <ShortcutIsland
             className="HelpDialog__island--view"
             caption={t("helpDialog.view")}
+            searchQuery={searchQuery}
           >
             <Shortcut
               label={t("buttons.zoomIn")}
@@ -336,6 +409,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
           <ShortcutIsland
             className="HelpDialog__island--editor"
             caption={t("helpDialog.editor")}
+            searchQuery={searchQuery}
           >
             <Shortcut
               label={t("helpDialog.createFlowchart")}
