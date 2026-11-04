@@ -6,6 +6,7 @@ import {
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -24,7 +25,13 @@ import {
   getEmbedLink,
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+import {
+  getBoundTextElement,
+  getBoundTextMaxWidth,
+  getContainerElement,
+  getTextStyleRunsForLine,
+  getWrappedTextLines,
+} from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
   isArrowElement,
@@ -793,7 +800,23 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const container = getContainerElement(element, elementsMap);
+        const maxWidth = container
+          ? getBoundTextMaxWidth(container, element)
+          : element.autoResize
+          ? Infinity
+          : element.width;
+        const lines = element.textStyleRanges?.length
+          ? getWrappedTextLines(
+              element.originalText,
+              getFontString(element),
+              maxWidth,
+            )
+          : element.text.replace(/\r\n?/g, "\n").split("\n").map((text) => ({
+              text,
+              start: 0,
+              end: text.length,
+            }));
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
@@ -818,7 +841,28 @@ const renderElementToSvg = (
             : "start";
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
+          if (element.textStyleRanges?.length) {
+            for (const run of getTextStyleRunsForLine(
+              lines[i].text,
+              lines[i].start,
+              element.textStyleRanges,
+            )) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = run.text;
+              if (run.bold) {
+                tspan.setAttribute("font-weight", "bold");
+              }
+              if (run.underline) {
+                tspan.setAttribute("text-decoration", "underline");
+              }
+              text.appendChild(tspan);
+            }
+          } else {
+            text.textContent = lines[i].text;
+          }
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));

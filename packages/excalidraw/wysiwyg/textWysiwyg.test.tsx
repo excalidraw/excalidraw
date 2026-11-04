@@ -817,6 +817,49 @@ describe("textWysiwyg", () => {
       restoreOriginalGetBoundingClientRect();
     });
 
+    it("applies bold and underline to selected text", () => {
+      textarea.value = "hello world";
+      textarea.selectionStart = 0;
+      textarea.selectionEnd = 5;
+      fireEvent.keyDown(textarea, {
+        key: "b",
+        [KEYS.CTRL_OR_CMD]: true,
+      });
+
+      expect(
+        document.querySelector<HTMLSpanElement>(
+          ".excalidraw-wysiwyg-textMirror span",
+        )
+          ?.style.fontWeight,
+      ).toBe("bold");
+      expect(
+        API.getElement(textElement).textStyleRanges,
+      ).toEqual([{ start: 0, end: 5, bold: true }]);
+      expect(
+        document.querySelector(".excalidraw-wysiwyg-textMirror span")
+          ?.textContent,
+      ).toBe("hello");
+
+      textarea.selectionStart = 6;
+      textarea.selectionEnd = 11;
+      fireEvent.keyDown(textarea, {
+        key: "u",
+        [KEYS.CTRL_OR_CMD]: true,
+      });
+
+      expect(
+        API.getElement(textElement).textStyleRanges,
+      ).toEqual([
+        { start: 0, end: 5, bold: true },
+        { start: 6, end: 11, underline: true },
+      ]);
+      expect(
+        document.querySelector(
+          ".excalidraw-wysiwyg-textMirror span[style*='underline']",
+        )?.textContent,
+      ).toBe("world");
+    });
+
     it("should add a tab at the start of the first line", () => {
       textarea.value = "Line#1\nLine#2";
       // cursor: "|Line#1\nLine#2"
@@ -3404,7 +3447,7 @@ describe("textWysiwyg", () => {
       API.setElements([]);
     });
 
-    it("should update textarea color when theme changes to dark mode and back", async () => {
+    it("should update text color when theme changes to dark mode and back", async () => {
       const originalColor = "#ff0000";
 
       const textElement = API.createElement({
@@ -3418,8 +3461,11 @@ describe("textWysiwyg", () => {
       mouse.doubleClickOn(textElement as ExcalidrawTextElement);
 
       const editor = await getTextEditor({ waitForEditor: true });
+      const textMirror = document.querySelector<HTMLDivElement>(
+        ".excalidraw-wysiwyg-textMirror",
+      )!;
 
-      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+      expect(colorsAreEqual(textMirror.style.color, originalColor)).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.DARK });
@@ -3427,14 +3473,17 @@ describe("textWysiwyg", () => {
         h.app.scene.mutateElement(textElement, {});
       });
       expect(
-        colorsAreEqual(editor.style.color, applyDarkModeFilter(originalColor)),
+        colorsAreEqual(
+          textMirror.style.color,
+          applyDarkModeFilter(originalColor),
+        ),
       ).toBe(true);
 
       act(() => {
         h.setState({ theme: THEME.LIGHT });
         h.app.scene.mutateElement(textElement, {});
       });
-      expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+      expect(colorsAreEqual(textMirror.style.color, originalColor)).toBe(true);
     });
   });
 
