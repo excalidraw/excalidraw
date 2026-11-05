@@ -159,6 +159,19 @@ export class AppText {
       ] as const) {
         delete kept[key];
       }
+      // ...unless the update takes this tab's line away: its editor goes too
+      const { selectedLinearElement } = this.app.state;
+      if (
+        selectedLinearElement &&
+        elements &&
+        !elements.some(
+          (element) =>
+            element.id === selectedLinearElement.elementId &&
+            !element.isDeleted,
+        )
+      ) {
+        kept.selectedLinearElement = null;
+      }
       appState = kept as Pick<AppState, K>;
     }
     return { elements, appState };
