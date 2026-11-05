@@ -777,9 +777,11 @@ class App extends React.Component<AppProps, AppState> {
   private elementRenderOffsets: ElementRenderOffsets = new Map();
   private renderOverridesUpdatePending = false;
 
-  private getRenderOverrideConfig = () => ({
-    elementRenderOverrides: this.elementRenderOverrides,
-  });
+  private getRenderOverrideConfig() {
+    return {
+      elementRenderOverrides: this.elementRenderOverrides,
+    };
+  }
 
   private getElementRenderState = (
     element: ExcalidrawElement,
@@ -2089,9 +2091,9 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private getFrameNameDOMId = (frameElement: ExcalidrawElement) => {
+  private getFrameNameDOMId(frameElement: ExcalidrawElement) {
     return `${this.id}-frame-name-${frameElement.id}`;
-  };
+  }
 
   frameNameBoundsCache: FrameNameBoundsCache = {
     get: (frameElement) => {
@@ -3728,12 +3730,12 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getFormFactor = (editorWidth: number, editorHeight: number) => {
+  private getFormFactor(editorWidth: number, editorHeight: number) {
     return (
       this.props.UIOptions.getFormFactor?.(editorWidth, editorHeight) ??
       getFormFactor(editorWidth, editorHeight)
     );
-  };
+  }
 
   public refreshEditorInterface = () => {
     const container = this.excalidrawContainerRef.current;
