@@ -367,6 +367,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
           ...(typeof binding.rowId === "string" && binding.rowId
             ? { rowId: binding.rowId }
             : {}),
+          ...(binding.sideLocked === true ? { sideLocked: true } : {}),
         } as FixedPointBinding | null;
       }
       return null;

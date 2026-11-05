@@ -407,6 +407,11 @@ export type FixedPointBinding = {
    * connections to a table's header.
    */
   rowId?: string;
+  /**
+   * Database tables only: the user attached this end to the side facing away
+   * from the other end, so the side is kept instead of re-picked towards it.
+   */
+  sideLocked?: boolean;
 };
 
 type Index = number;

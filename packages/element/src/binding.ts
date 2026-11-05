@@ -1175,6 +1175,9 @@ export const bindBindingElement = (
       );
     const scenePoint = { x: point[0], y: point[1] };
     const rowId = getDBTableRowIdAtPoint(hoveredElement, scenePoint);
+    const facingSide = getDBTableSideFacing(hoveredElement, scenePoint);
+    // the side the end was dropped on is the user's choice: it is kept
+    // (see `sideLocked`)
     binding = {
       elementId: hoveredElement.id,
       // a row connection always attaches at the table's edge
@@ -1182,9 +1185,10 @@ export const bindBindingElement = (
       fixedPoint: getDBTableRowFixedPoint(
         hoveredElement,
         hoveredElement.collapsed ? null : rowId,
-        getDBTableSideFacing(hoveredElement, scenePoint),
+        facingSide,
       ),
       ...(rowId ? { rowId } : {}),
+      sideLocked: true,
     };
     applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
     refreshElbowArrowDBTableSides(
@@ -2308,8 +2312,14 @@ export const updateBoundPoint = (
   // their route is planned from it)
   if (isDBTableElement(bindableElement) && !isElbowArrow(arrow)) {
     const side =
-      getDBTableOtherEndTarget(arrow, startOrEnd, bindableElement, elementsMap)
-        ?.side ?? (binding.fixedPoint[0] < 0.5 ? "left" : "right");
+      (!binding.sideLocked &&
+        getDBTableOtherEndTarget(
+          arrow,
+          startOrEnd,
+          bindableElement,
+          elementsMap,
+        )?.side) ||
+      (binding.fixedPoint[0] < 0.5 ? "left" : "right");
     const rowAnchorY = binding.fixedPoint[1] * bindableElement.height;
     const anchor = pointRotateRads(
       pointFrom<GlobalPoint>(
@@ -2532,7 +2542,7 @@ const refreshElbowArrowDBTableSides = (
   for (const prop of ["startBinding", "endBinding"] as const) {
     const binding = arrow[prop];
     const table = binding && elementsMap.get(binding.elementId);
-    if (!binding || !isDBTableElement(table)) {
+    if (!binding || binding.sideLocked || !isDBTableElement(table)) {
       continue;
     }
     const side = getDBTableOtherEndTarget(

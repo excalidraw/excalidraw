@@ -495,6 +495,42 @@ describe("table element", () => {
       );
     });
 
+    it("keeps the side the user moved an end to", () => {
+      UI.clickTool("selection");
+      const arrow = getArrow();
+      const gap = getBindingGap(orders);
+      expect(endPoint(arrow, -1).x).toBeCloseTo(orders.x - gap, 0);
+
+      // select the arrow and re-drop its end on the right half of the row
+      mouse.clickAt(
+        (endPoint(arrow, 0).x + endPoint(arrow, -1).x) / 2,
+        (endPoint(arrow, 0).y + endPoint(arrow, -1).y) / 2,
+      );
+      const from = endPoint(getArrow(), -1);
+      const to = {
+        x: orders.x + orders.width - 20,
+        y: rowCenterY(getOrders(), "user_id"),
+      };
+      mouse.downAt(from.x, from.y);
+      mouse.moveTo(to.x, to.y);
+      mouse.upAt(to.x, to.y);
+
+      const moved = getArrow();
+      expect(moved.endBinding?.elementId).toBe(orders.id);
+      expect(endPoint(moved, -1).x).toBeCloseTo(
+        orders.x + orders.width + gap,
+        0,
+      );
+
+      // and it stays there when the tables move
+      act(() => h.app.dbTable.toggleCollapsed(getOrders()));
+      act(() => h.app.dbTable.toggleCollapsed(getOrders()));
+      expect(endPoint(getArrow(), -1).x).toBeCloseTo(
+        orders.x + orders.width + gap,
+        0,
+      );
+    });
+
     it("keeps the row through save and load", () => {
       const [restored] = restoreElements(
         [getArrow()],
