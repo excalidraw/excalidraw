@@ -1194,20 +1194,14 @@
   resolved "https://registry.npmjs.org/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/math@0.18.0", "@excalidraw/math@file:/Users/sanchitsharma/excalidraw/packages/math":
-  version "0.18.0"
-  resolved "file:packages/math"
-  dependencies:
-    "@excalidraw/common" "0.18.0"
-
-"@excalidraw/mermaid-to-excalidraw@3.1.0":
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-3.1.0.tgz"
-  integrity sha512-B3H6aXm4f4O4+f7k1z/Eu1xNj3ZurnCX9RQNzjx00RCfnanLY4z8Pj/1r76FP8yZ1Ue84z50gJoRFCUIZy5xDg==
+"@excalidraw/mermaid-to-excalidraw@3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-3.6.0.tgz#fbf422ef01932d953f82a443b06f72ea51646fa0"
+  integrity sha512-h21Mr9FxmfLDds78iw0iTRDzes+/CDRFJ5kndFAmH+EVQLG6PHoMyn4Lms1dHiYgDTal+MkBJnqKJC9Xj080uA==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
     nanoid "4.0.2"
-    pele "1.8.0"
+    pele "1.13.0"
 
 "@excalidraw/prettier-config@1.0.2":
   version "1.0.2"
@@ -7056,10 +7050,10 @@ pathval@^2.0.0:
   resolved "https://registry.npmjs.org/pathval/-/pathval-2.0.0.tgz"
   integrity sha512-vE7JKRyES09KiunauX7nd2Q9/L7lhok4smP9RZTDeD4MVs72Dp2qNFVz39Nz5a0FVEW0BJR6C0DYrq6unoziZA==
 
-pele@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/pele/-/pele-1.8.0.tgz"
-  integrity sha512-AYmHttE70cwNJVXdfPMCANGivFlmc3bGGpMG0GqH5S5vE3RgtEuLlkqbhRfe94Csv/ZEd1TUbv2dMUHpw4p1Bg==
+pele@1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/pele/-/pele-1.13.0.tgz#5a14f20b809a5ae61b04cd8825a4940550675d11"
+  integrity sha512-Ie8UKY9x00MsuR3jO6AzUwzK2Z6MIV3Tf4EDdITiuk8Uaz8K7g0R082WqsqNaSU8DdgkrRvZThzhit83mi/uiw==
 
 pend@~1.2.0:
   version "1.2.0"
