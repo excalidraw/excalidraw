@@ -2201,7 +2201,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `8`;
+exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] redo stack 1`] = `[]`;
 
@@ -2311,16 +2311,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
           },
         },
       },
-      "updated": {
-        "id0": {
-          "deleted": {
-            "version": 5,
-          },
-          "inserted": {
-            "version": 3,
-          },
-        },
-      },
+      "updated": {},
     },
     "id": "id6",
   },
@@ -11109,7 +11100,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
 
 exports[`regression tests > make a group and duplicate it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > make a group and duplicate it > [end of test] number of renders 1`] = `17`;
+exports[`regression tests > make a group and duplicate it > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > make a group and duplicate it > [end of test] redo stack 1`] = `[]`;
 
@@ -11487,32 +11478,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
           },
         },
       },
-      "updated": {
-        "id0": {
-          "deleted": {
-            "version": 6,
-          },
-          "inserted": {
-            "version": 4,
-          },
-        },
-        "id3": {
-          "deleted": {
-            "version": 6,
-          },
-          "inserted": {
-            "version": 4,
-          },
-        },
-        "id6": {
-          "deleted": {
-            "version": 6,
-          },
-          "inserted": {
-            "version": 4,
-          },
-        },
-      },
+      "updated": {},
     },
     "id": "id21",
   },
