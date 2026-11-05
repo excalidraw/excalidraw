@@ -43,6 +43,14 @@ export const DB_TABLE_KEY_TEXT_OPACITY = 0.7;
 export const DB_TABLE_COLUMN_DIVIDER_OPACITY = 0.35;
 /** how much white the body tint mixes into the header color */
 export const DB_TABLE_BODY_TINT = 0.82;
+/**
+ * The examples column is washed out further than the body, so sample data
+ * reads as apart from the schema while staying part of the same table.
+ */
+export const DB_TABLE_EXAMPLE_TINT = 0.93;
+export const DB_TABLE_EXAMPLE_TEXT_OPACITY = 0.6;
+/** the examples column's text is set italic, the way sample values usually are */
+export const DB_TABLE_EXAMPLE_FONT_STYLE = "italic";
 
 const PADDING_X = 12;
 const HEADER_PADDING_Y = 10;
@@ -55,6 +63,8 @@ const TOGGLE_INSET = 10;
 const TOGGLE_GAP = 8;
 /** the toggle's hit area extends this far past its drawn square */
 const TOGGLE_HIT_SLOP = 5;
+/** an empty examples column stays wide enough to type in */
+const MIN_EXAMPLE_COLUMN_WIDTH = 96;
 
 // -----------------------------------------------------------------------------
 // layout
@@ -73,9 +83,11 @@ export type DBTableRowLayout = {
   rect: DBTableRect;
   key: DBTableRect;
   name: DBTableRect;
+  /** the examples cell; `null` while examples are hidden */
+  example: DBTableRect | null;
   /** top of the key text's line box */
   keyTextY: number;
-  /** top of the name text's line box */
+  /** top of the name (and example) text's line box */
   nameTextY: number;
 };
 
@@ -99,11 +111,28 @@ export type DBTableLayout = {
   title: DBTableRect;
   /** the square the collapse toggle is drawn in */
   toggle: DBTableRect;
+  /** the square the examples toggle is drawn in; `null` when collapsed */
+  examplesToggle: DBTableRect | null;
   /** the body below the header; `null` when collapsed */
   body: DBTableRect | null;
   keyColumnWidth: number;
+  /** left edge of the examples column (the schema part's width) */
+  examplesX: number;
+  /** 0 while examples are hidden */
+  examplesColumnWidth: number;
   rows: DBTableRowLayout[];
 };
+
+type DBTableLayoutInput = Pick<
+  ExcalidrawDBTableElement,
+  | "title"
+  | "rows"
+  | "collapsed"
+  | "showExamples"
+  | "fontSize"
+  | "fontFamily"
+  | "customWidth"
+>;
 
 export const getDBTableKeyFontSize = (fontSize: number) =>
   fontSize * DB_TABLE_KEY_FONT_SCALE;
@@ -128,10 +157,7 @@ const layoutCache = new WeakMap<
 >();
 
 export const getDBTableLayout = (
-  element: Pick<
-    ExcalidrawDBTableElement,
-    "title" | "rows" | "collapsed" | "fontSize" | "fontFamily" | "customWidth"
-  >,
+  element: DBTableLayoutInput,
   renderEnvironment?: RenderEnvironment,
 ): DBTableLayout => {
   const cached = layoutCache.get(element as ExcalidrawDBTableElement);
@@ -181,16 +207,37 @@ export const getDBTableLayout = (
   const keyColumnWidth = maxKeyWidth + paddingX * 2;
   const minNameColumnWidth = maxNameWidth + paddingX * 2;
 
-  const width = Math.ceil(
+  // the examples column hugs its content at the right, added on top of the
+  // schema part so showing it widens the table and hiding it restores it.
+  // It is measured upright: the italic is a slant that keeps the advances.
+  let examplesColumnWidth = 0;
+  if (element.showExamples) {
+    let maxExampleWidth = 0;
+    for (const row of element.rows) {
+      if (row.example) {
+        maxExampleWidth = Math.max(
+          maxExampleWidth,
+          getLineWidth(row.example, font, renderEnvironment),
+        );
+      }
+    }
+    examplesColumnWidth = Math.ceil(
+      Math.max(MIN_EXAMPLE_COLUMN_WIDTH * unit, maxExampleWidth + paddingX * 2),
+    );
+  }
+
+  const schemaWidth = Math.ceil(
     Math.max(
       MIN_WIDTH * unit,
-      titleWidth + titleSideInset * 2,
+      // the header spans the examples column too, so the title may use it
+      titleWidth + titleSideInset * 2 - examplesColumnWidth,
       keyColumnWidth + minNameColumnWidth,
       element.customWidth ?? 0,
     ),
   );
+  const width = schemaWidth + examplesColumnWidth;
   // the name column absorbs any extra width
-  const nameColumnWidth = width - keyColumnWidth;
+  const nameColumnWidth = schemaWidth - keyColumnWidth;
 
   // --- rows -------------------------------------------------------------------
   const rowHeight = textLineHeight + ROW_PADDING_Y * 2 * unit;
@@ -207,6 +254,14 @@ export const getDBTableLayout = (
         width: nameColumnWidth,
         height: rowHeight,
       },
+      example: examplesColumnWidth
+        ? {
+            x: schemaWidth,
+            y,
+            width: examplesColumnWidth,
+            height: rowHeight,
+          }
+        : null,
       keyTextY: y + (rowHeight - keyLineHeight) / 2,
       nameTextY: y + (rowHeight - textLineHeight) / 2,
     };
@@ -242,10 +297,21 @@ export const getDBTableLayout = (
       width: toggleSize,
       height: toggleSize,
     },
+    // mirrors the collapse toggle, in the space the title keeps clear of
+    examplesToggle: element.collapsed
+      ? null
+      : {
+          x: width - TOGGLE_INSET * unit - toggleSize,
+          y: (headerHeight - toggleSize) / 2,
+          width: toggleSize,
+          height: toggleSize,
+        },
     body: element.collapsed
       ? null
       : { x: 0, y: headerHeight, width, height: height - headerHeight },
     keyColumnWidth,
+    examplesX: schemaWidth,
+    examplesColumnWidth,
     rows: element.collapsed ? [] : rows,
   };
 
@@ -276,6 +342,7 @@ export const newDBTableRow = (
   id: randomId(),
   key: row.key ?? "",
   name: row.name ?? "",
+  ...(row.example ? { example: row.example } : {}),
 });
 
 /** keeps `width`/`height` in sync with the content (identity-preserving) */
@@ -290,12 +357,7 @@ export const normalizeDBTable = <T extends ExcalidrawDBTableElement>(
   return newElementWith(element, { width, height } as any) as T;
 };
 
-export type DBTableContentUpdate = Partial<
-  Pick<
-    ExcalidrawDBTableElement,
-    "title" | "rows" | "collapsed" | "fontSize" | "fontFamily" | "customWidth"
-  >
->;
+export type DBTableContentUpdate = Partial<DBTableLayoutInput>;
 
 /**
  * Applies a content change to a table in the scene, re-derives its size, and
@@ -521,23 +583,38 @@ const isInRect = (
   point.y >= rect.y - slop &&
   point.y <= rect.y + rect.height + slop;
 
+export type DBTableToggle = "collapse" | "examples";
+
+/** the header toggle at `scenePoint`, if any */
+export const getDBTableToggleAtPoint = (
+  element: ExcalidrawDBTableElement,
+  scenePoint: { x: number; y: number },
+  zoom = 1,
+): DBTableToggle | null => {
+  const layout = getDBTableLayout(element);
+  const local = getDBTableLocalPoint(element, scenePoint);
+  // keep the targets comfortably clickable when zoomed out
+  const slop = Math.max(TOGGLE_HIT_SLOP * layout.unit, TOGGLE_HIT_SLOP / zoom);
+  if (isInRect(local, layout.toggle, slop)) {
+    return "collapse";
+  }
+  if (layout.examplesToggle && isInRect(local, layout.examplesToggle, slop)) {
+    return "examples";
+  }
+  return null;
+};
+
 export const isPointOnDBTableToggle = (
   element: ExcalidrawDBTableElement,
   scenePoint: { x: number; y: number },
   zoom = 1,
-) => {
-  const layout = getDBTableLayout(element);
-  return isInRect(
-    getDBTableLocalPoint(element, scenePoint),
-    layout.toggle,
-    // keep the target comfortably clickable when zoomed out
-    Math.max(TOGGLE_HIT_SLOP * layout.unit, TOGGLE_HIT_SLOP / zoom),
-  );
-};
+) => getDBTableToggleAtPoint(element, scenePoint, zoom) !== null;
+
+export type DBTableColumn = "key" | "name" | "example";
 
 export type DBTableCell =
   | { type: "title" }
-  | { type: "key" | "name"; rowId: ExcalidrawDBTableRow["id"] };
+  | { type: DBTableColumn; rowId: ExcalidrawDBTableRow["id"] };
 
 export const getDBTableCellAtPoint = (
   element: ExcalidrawDBTableElement,
@@ -554,6 +631,9 @@ export const getDBTableCellAtPoint = (
     }
     if (isInRect(local, row.name)) {
       return { type: "name", rowId: row.row.id };
+    }
+    if (row.example && isInRect(local, row.example)) {
+      return { type: "example", rowId: row.row.id };
     }
   }
   return null;
@@ -601,6 +681,21 @@ export const getDBTableBodyColor = (headerColor: string) => {
     rgb.map((channel) => channel + (255 - channel) * DB_TABLE_BODY_TINT),
   );
 };
+
+/** the examples column fill: a lighter wash than the body (white fallback) */
+export const getDBTableExampleColumnColor = (headerColor: string) => {
+  const rgb = parseHexColor(headerColor);
+  if (!rgb) {
+    return "#ffffff";
+  }
+  return toHex(
+    rgb.map((channel) => channel + (255 - channel) * DB_TABLE_EXAMPLE_TINT),
+  );
+};
+
+export const getDBTableExampleFontString = (
+  element: Pick<ExcalidrawDBTableElement, "fontSize" | "fontFamily">,
+) => `${DB_TABLE_EXAMPLE_FONT_STYLE} ${getFontString(element)}`;
 
 /** `color` at `opacity`, for hex colors (others are returned unchanged) */
 export const getDBTableColorWithOpacity = (color: string, opacity: number) => {

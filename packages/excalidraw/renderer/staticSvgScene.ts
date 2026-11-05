@@ -54,6 +54,8 @@ import {
   getDBTableKeyFontSize,
   getDBTableLayout,
   getDBTableTextBaselineOffset,
+  DB_TABLE_EXAMPLE_FONT_STYLE,
+  DB_TABLE_EXAMPLE_TEXT_OPACITY,
   DB_TABLE_KEY_TEXT_OPACITY,
 } from "@excalidraw/element";
 import {
@@ -416,6 +418,17 @@ const renderElementToSvg = (
             layout.fontSize,
             "start",
           );
+        }
+        if (row.example && row.row.example) {
+          const text = createText(
+            row.row.example,
+            row.example.x + layout.paddingX,
+            row.nameTextY + nameBaseline,
+            layout.fontSize,
+            "start",
+          );
+          text.setAttribute("font-style", DB_TABLE_EXAMPLE_FONT_STYLE);
+          text.setAttribute("fill-opacity", `${DB_TABLE_EXAMPLE_TEXT_OPACITY}`);
         }
       }
 

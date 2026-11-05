@@ -92,12 +92,16 @@ import {
 } from "./stickyNote";
 
 import {
+  getDBTableExampleFontString,
   getDBTableFontString,
   getDBTableKeyFontString,
   getDBTableLayout,
   getDBTableTextBaselineOffset,
+  DB_TABLE_EXAMPLE_TEXT_OPACITY,
   DB_TABLE_KEY_TEXT_OPACITY,
 } from "./dbTable";
+
+import type { DBTableRect } from "./dbTable";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { TextElementLine } from "./richTextLayout";
@@ -514,6 +518,7 @@ const drawElementOnCanvas = (
           element,
           renderConfig.theme === THEME.DARK,
           !options?.hideDBTableText,
+          !renderConfig.isExporting,
         );
       });
       break;
@@ -842,39 +847,78 @@ const drawElementOnCanvas = (
   }
 };
 
+/** a rounded square path (manual: not every canvas backend has `roundRect`) */
+const traceDBTableToggle = (
+  context: CanvasRenderingContext2D,
+  { x, y, width: w, height: h }: DBTableRect,
+  r: number,
+) => {
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
+};
+
 /**
- * Paints a table's collapse toggle and (unless edited in place) its text:
- * the centered title, the key column (smaller and muted) and the names.
+ * Paints a table's header toggles and (unless edited in place) its text:
+ * the centered title, the key column (smaller and muted), the names and,
+ * when shown, the examples (muted italic). The examples toggle is an editing
+ * control, so it is left out of exports.
  */
 const drawDBTableChrome = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawDBTableElement,
   isDarkMode: boolean,
   withText: boolean,
+  withExamplesToggle: boolean,
 ) => {
   const layout = getDBTableLayout(element);
   const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
 
-  // --- toggle: a small rounded square with a minus (expanded) or plus ---------
-  const { toggle, unit } = layout;
+  // --- examples toggle: two panes, the right one filled while shown ----------
+  const { toggle, unit, examplesToggle } = layout;
   const toggleRadius = 2.5 * unit;
+  if (withExamplesToggle && examplesToggle) {
+    const isOn = !!element.showExamples;
+    const split = examplesToggle.x + examplesToggle.width * 0.5;
+    context.save();
+    context.globalAlpha *= isOn ? 0.8 : 0.45;
+    context.strokeStyle = color;
+    context.fillStyle = color;
+    context.lineWidth = Math.max(1, 1.25 * unit);
+    context.lineCap = "round";
+    if (isOn) {
+      context.save();
+      context.beginPath();
+      traceDBTableToggle(context, examplesToggle, toggleRadius);
+      context.clip();
+      context.globalAlpha *= 0.55;
+      context.fillRect(
+        split,
+        examplesToggle.y,
+        examplesToggle.x + examplesToggle.width - split,
+        examplesToggle.height,
+      );
+      context.restore();
+    }
+    context.beginPath();
+    traceDBTableToggle(context, examplesToggle, toggleRadius);
+    context.moveTo(split, examplesToggle.y);
+    context.lineTo(split, examplesToggle.y + examplesToggle.height);
+    context.stroke();
+    context.restore();
+  }
+
+  // --- toggle: a small rounded square with a minus (expanded) or plus ---------
   context.save();
   context.globalAlpha *= 0.8;
   context.strokeStyle = color;
   context.lineWidth = Math.max(1, 1.25 * unit);
   context.lineCap = "round";
   context.beginPath();
-  {
-    // (manual path: not every canvas backend has `roundRect`)
-    const { x, y, width: w, height: h } = toggle;
-    const r = toggleRadius;
-    context.moveTo(x + r, y);
-    context.arcTo(x + w, y, x + w, y + h, r);
-    context.arcTo(x + w, y + h, x, y + h, r);
-    context.arcTo(x, y + h, x, y, r);
-    context.arcTo(x, y, x + w, y, r);
-    context.closePath();
-  }
+  traceDBTableToggle(context, toggle, toggleRadius);
   const cx = toggle.x + toggle.width / 2;
   const cy = toggle.y + toggle.height / 2;
   const arm = toggle.width * 0.27;
@@ -922,6 +966,7 @@ const drawDBTableChrome = (
   );
   const keyFont = getDBTableKeyFontString(element);
   const nameFont = getDBTableFontString(element);
+  const exampleFont = getDBTableExampleFontString(element);
   const opacity = context.globalAlpha;
 
   for (const row of layout.rows) {
@@ -942,6 +987,16 @@ const drawDBTableChrome = (
         row.name.x + layout.paddingX,
         row.nameTextY + nameBaseline,
       );
+    }
+    if (row.example && row.row.example) {
+      context.font = exampleFont;
+      context.globalAlpha = opacity * DB_TABLE_EXAMPLE_TEXT_OPACITY;
+      context.fillText(
+        row.row.example,
+        row.example.x + layout.paddingX,
+        row.nameTextY + nameBaseline,
+      );
+      context.globalAlpha = opacity;
     }
   }
 };

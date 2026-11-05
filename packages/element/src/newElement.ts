@@ -258,6 +258,7 @@ export const newDBTableElement = (
     title?: string;
     rows?: readonly Partial<Omit<ExcalidrawDBTableRow, "id">>[];
     collapsed?: boolean;
+    showExamples?: boolean;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     renderEnvironment?: RenderEnvironment;
@@ -274,6 +275,7 @@ export const newDBTableElement = (
         newDBTableRow(row),
       ),
       collapsed: opts.collapsed ?? false,
+      ...(opts.showExamples ? { showExamples: true } : {}),
       fontSize: opts.fontSize || DEFAULT_FONT_SIZE,
       fontFamily: opts.fontFamily || DEFAULT_FONT_FAMILY,
     },

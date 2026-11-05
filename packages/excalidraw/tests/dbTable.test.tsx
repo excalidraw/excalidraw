@@ -7,6 +7,7 @@ import {
   getBindingGap,
   getDBTableCellAtPoint,
   getDBTableLayout,
+  getDBTableToggleAtPoint,
   getTransformHandles,
   isPointOnDBTableToggle,
   newDBTableElement,
@@ -191,6 +192,174 @@ describe("table element", () => {
           .filter(([, handle]) => handle)
           .map(([type]) => type),
       ).toEqual(["rotation", "w", "e"]);
+    });
+  });
+
+  describe("examples column", () => {
+    const rows = [
+      { key: "PK", name: "id", example: "42" },
+      { key: "text", name: "name_en", example: "After Meal" },
+    ];
+
+    it("adds a column at the right while shown, keeping the data while hidden", () => {
+      const hidden = createDBTable({ rows });
+      const shown = createDBTable({ rows, showExamples: true });
+      const hiddenLayout = getDBTableLayout(hidden);
+      const layout = getDBTableLayout(shown);
+
+      expect(hiddenLayout.examplesColumnWidth).toBe(0);
+      expect(hiddenLayout.rows[0].example).toBeNull();
+      expect(shown.width).toBe(hidden.width + layout.examplesColumnWidth);
+      expect(shown.height).toBe(hidden.height);
+      for (const row of layout.rows) {
+        expect(row.example!.x).toBe(layout.examplesX);
+        expect(row.key.width + row.name.width + row.example!.width).toBe(
+          shown.width,
+        );
+      }
+      // the schema part keeps its width, like the name column does
+      expect(layout.rows[0].name.width).toBe(hiddenLayout.rows[0].name.width);
+    });
+
+    it("finds the examples toggle and cells", () => {
+      const table = createDBTable({ rows, showExamples: true });
+      const layout = getDBTableLayout(table);
+      const toggle = layout.examplesToggle!;
+      expect(
+        getDBTableToggleAtPoint(table, {
+          x: table.x + toggle.x + toggle.width / 2,
+          y: table.y + toggle.y + toggle.height / 2,
+        }),
+      ).toBe("examples");
+      const [row] = layout.rows;
+      expect(
+        getDBTableCellAtPoint(table, {
+          x: table.x + row.example!.x + 5,
+          y: table.y + row.example!.y + 5,
+        }),
+      ).toEqual({ type: "example", rowId: row.row.id });
+      // no examples toggle on a collapsed table
+      expect(
+        getDBTableLayout(createDBTable({ collapsed: true })).examplesToggle,
+      ).toBeNull();
+    });
+
+    it("toggles from the header, focusing the first example", async () => {
+      const table = createDBTable({
+        rows: [
+          { key: "PK", name: "id" },
+          { key: "", name: "name_en" },
+        ],
+      });
+      API.setElements([table]);
+      const widthBefore = table.width;
+      const layout = getDBTableLayout(table);
+      const toggle = layout.examplesToggle!;
+      mouse.clickAt(
+        table.x + toggle.x + toggle.width / 2,
+        table.y + toggle.y + toggle.height / 2,
+      );
+      await act(async () => {});
+
+      expect(getDBTable(table.id).showExamples).toBe(true);
+      expect(getDBTable(table.id).width).toBeGreaterThan(widthBefore);
+      // with no examples yet, the caret goes straight into the first one
+      expect(h.state.editingDBTableId).toBe(table.id);
+      const focused = document.activeElement as HTMLInputElement;
+      expect(
+        focused.classList.contains("excalidraw-dbtable-editor__example"),
+      ).toBe(true);
+      type(focused, "1");
+      expect(getDBTable(table.id).rows[0].example).toBe("1");
+
+      // Tab moves name → example → next key
+      Keyboard.keyPress(KEYS.TAB, focused);
+      expect(
+        (document.activeElement as HTMLElement).classList.contains(
+          "excalidraw-dbtable-editor__key",
+        ),
+      ).toBe(true);
+
+      Keyboard.keyPress(KEYS.ESCAPE, document.activeElement as HTMLElement);
+      await act(async () => {});
+
+      mouse.clickAt(
+        table.x + getDBTableLayout(getDBTable(table.id)).examplesToggle!.x + 2,
+        table.y + toggle.y + toggle.height / 2,
+      );
+      expect(getDBTable(table.id).showExamples).toBe(false);
+      expect(getDBTable(table.id).width).toBe(widthBefore);
+      // hidden, not dropped
+      expect(getDBTable(table.id).rows[0].example).toBe("1");
+    });
+
+    it("toggles from the editor, leaving field names as typed", async () => {
+      const table = createDBTable({
+        rows: [{ key: "", name: "name_en (After Meal)" }],
+      });
+      API.setElements([table]);
+      act(() => h.app.dbTable.startEditing(table, { type: "title" }));
+      await act(async () => {});
+
+      const button = document.querySelector<HTMLButtonElement>(
+        ".excalidraw-dbtable-editor__examples-toggle",
+      )!;
+      expect(button.getAttribute("aria-pressed")).toBe("false");
+      fireEvent.click(button);
+      await act(async () => {});
+
+      const [row] = getDBTable(table.id).rows;
+      expect(getDBTable(table.id).showExamples).toBe(true);
+      // no automatic `name (example)` conversion
+      expect(row.name).toBe("name_en (After Meal)");
+      expect(row.example).toBeUndefined();
+      expect(button.getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("keeps a custom width for the schema part", () => {
+      const hidden = getDBTableLayout({
+        ...createDBTable({ rows }),
+        customWidth: 400,
+      });
+      const shown = getDBTableLayout({
+        ...createDBTable({ rows, showExamples: true }),
+        customWidth: 400,
+      });
+      expect(hidden.width).toBe(400);
+      expect(shown.width).toBe(400 + shown.examplesColumnWidth);
+    });
+
+    it("restores and exports examples", async () => {
+      const [restored] = restoreElements(
+        [
+          {
+            ...createDBTable(),
+            showExamples: true,
+            rows: [
+              { id: "a", key: "PK", name: "id", example: "42" },
+              { id: "b", key: "", name: "x", example: 5 },
+            ],
+          } as any,
+        ],
+        null,
+      ) as ExcalidrawDBTableElement[];
+      expect(restored.showExamples).toBe(true);
+      expect(restored.rows.map((row) => row.example)).toEqual([
+        "42",
+        undefined,
+      ]);
+
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: [restored as NonDeleted<ExcalidrawDBTableElement>],
+          files: {},
+        },
+        config: { canvasBackgroundColor: false },
+      });
+      const texts = [...svg.querySelectorAll("text")];
+      const example = texts.find((text) => text.textContent === "42")!;
+      expect(example.getAttribute("font-style")).toBe("italic");
     });
   });
 

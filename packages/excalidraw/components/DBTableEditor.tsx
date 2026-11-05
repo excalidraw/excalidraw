@@ -16,7 +16,7 @@ import {
 } from "@excalidraw/common";
 import { getDBTableKeyFontSize, getDBTableLayout } from "@excalidraw/element";
 
-import type { DBTableCell } from "@excalidraw/element";
+import type { DBTableCell, DBTableColumn } from "@excalidraw/element";
 import type {
   ExcalidrawDBTableElement,
   ExcalidrawDBTableRow,
@@ -50,7 +50,28 @@ const KEY_SUGGESTIONS = [
   "json",
 ];
 
-type Column = "key" | "name";
+type Column = DBTableColumn;
+
+/** two panes, the right one filled: the canvas examples toggle's glyph */
+const ExamplesIcon = (
+  <svg
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.4"
+    strokeLinecap="round"
+    aria-hidden="true"
+  >
+    <path
+      d="M8 2.75h3.75a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5H8z"
+      fill="currentColor"
+      fillOpacity="0.35"
+      stroke="none"
+    />
+    <rect x="2.75" y="2.75" width="10.5" height="10.5" rx="1.5" />
+    <path d="M8 2.75v10.5" />
+  </svg>
+);
 
 const DragHandleIcon = (
   <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -237,14 +258,53 @@ export const DBTableEditor = ({
 
   // --- keyboard navigation -------------------------------------------------------
 
-  /** title → key₀ → name₀ → key₁ → … in reading order */
+  /** title → key₀ → name₀ (→ example₀) → key₁ → … in reading order */
   const getCellOrder = (): DBTableCell[] => [
     { type: "title" },
     ...tableRef.current.rows.flatMap((row): DBTableCell[] => [
       { type: "key", rowId: row.id },
       { type: "name", rowId: row.id },
+      ...(tableRef.current.showExamples
+        ? [{ type: "example", rowId: row.id } as const]
+        : []),
     ]),
   ];
+
+  /**
+   * Shows or hides the examples column from the editor. Shown, the caret
+   * moves to the first field still missing an example; hidden while an
+   * example was being edited, it moves to that field's name.
+   */
+  const toggleExamples = () => {
+    const focusedRowId = (() => {
+      for (const [id, input] of inputs.current) {
+        if (input === document.activeElement && id !== "title") {
+          return id.slice(0, id.lastIndexOf(":"));
+        }
+      }
+      return null;
+    })();
+    const isShown = controller.toggleExamples(tableRef.current, {
+      startEditing: false,
+    });
+    const rows = tableRef.current.rows;
+    if (isShown) {
+      const target =
+        rows.find((row) => !row.example?.trim()) ??
+        rows.find((row) => row.id === focusedRowId) ??
+        rows[0];
+      pendingFocus.current = target
+        ? { cell: { type: "example", rowId: target.id }, select: true }
+        : null;
+    } else {
+      pendingFocus.current = {
+        cell: focusedRowId
+          ? { type: "name", rowId: focusedRowId }
+          : { type: "title" },
+        select: false,
+      };
+    }
+  };
 
   const focusCell = (cell: DBTableCell, select = true) => {
     const input = inputs.current.get(cellId(cell));
@@ -338,18 +398,21 @@ export const DBTableEditor = ({
       const row = rows[rowIndex];
       const input = event.currentTarget;
       const atStart = input.selectionStart === 0 && input.selectionEnd === 0;
-      if (!row.key && !row.name) {
+      const previousColumn =
+        cell.type === "example" ? "name" : cell.type === "name" ? "key" : null;
+      if (!row.key && !row.name && !row.example) {
         // an empty row goes away
         event.preventDefault();
         removeRow(row.id);
-      } else if (cell.type === "name" && atStart) {
-        // step back into the key column
+      } else if (previousColumn && atStart) {
+        // step back into the column on the left
         event.preventDefault();
-        const keyInput = inputs.current.get(
-          cellId({ type: "key", rowId: row.id }),
+        const previousInput = inputs.current.get(
+          cellId({ type: previousColumn, rowId: row.id }),
         );
-        keyInput?.focus({ preventScroll: true });
-        keyInput?.setSelectionRange(row.key.length, row.key.length);
+        const length = row[previousColumn]?.length ?? 0;
+        previousInput?.focus({ preventScroll: true });
+        previousInput?.setSelectionRange(length, length);
       }
     }
   };
@@ -433,7 +496,7 @@ export const DBTableEditor = ({
           onKeyDown={(event) => onKeyDown(event, { type: "title" })}
         />
 
-        {layout.rows.map(({ row, key, name, keyTextY, nameTextY }) => (
+        {layout.rows.map(({ row, key, name, example, keyTextY, nameTextY }) => (
           <div
             key={row.id}
             className={clsx("excalidraw-dbtable-editor__row", {
@@ -498,6 +561,33 @@ export const DBTableEditor = ({
                 onKeyDown(event, { type: "name", rowId: row.id })
               }
             />
+            {example && (
+              <input
+                ref={registerInput({ type: "example", rowId: row.id })}
+                className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__example"
+                style={{
+                  left: example.x + layout.paddingX,
+                  top: nameTextY,
+                  width: example.width - layout.paddingX * 1.5,
+                  height: lineHeightPx,
+                  lineHeight: `${lineHeightPx}px`,
+                  font,
+                }}
+                value={row.example ?? ""}
+                placeholder={t("dbTable.examplePlaceholder")}
+                spellCheck={false}
+                autoComplete="off"
+                aria-label={t("dbTable.exampleLabel", {
+                  name: row.name || t("dbTable.namePlaceholder"),
+                })}
+                onChange={(event) =>
+                  updateRow(row.id, "example", event.target.value)
+                }
+                onKeyDown={(event) =>
+                  onKeyDown(event, { type: "example", rowId: row.id })
+                }
+              />
+            )}
             <button
               type="button"
               tabIndex={-1}
@@ -513,15 +603,39 @@ export const DBTableEditor = ({
         ))}
 
         {!table.collapsed && (
-          <button
-            type="button"
-            className="excalidraw-dbtable-editor__add"
+          <div
+            className="excalidraw-dbtable-editor__footer"
             style={{ top: table.height, left: table.width / 2 }}
-            onClick={() => insertRow(tableRef.current.rows.length, "key")}
           >
-            {PlusIcon}
-            <span>{t("dbTable.addRow")}</span>
-          </button>
+            <button
+              type="button"
+              className="excalidraw-dbtable-editor__pill excalidraw-dbtable-editor__add"
+              onClick={() => insertRow(tableRef.current.rows.length, "key")}
+            >
+              {PlusIcon}
+              <span>{t("dbTable.addRow")}</span>
+            </button>
+            <button
+              type="button"
+              className={clsx(
+                "excalidraw-dbtable-editor__pill",
+                "excalidraw-dbtable-editor__examples-toggle",
+                { "is-active": !!table.showExamples },
+              )}
+              aria-pressed={!!table.showExamples}
+              title={t("dbTable.examplesHint")}
+              // keep the caret in its cell, so the toggle knows which row
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={toggleExamples}
+            >
+              {ExamplesIcon}
+              <span>
+                {table.showExamples
+                  ? t("dbTable.hideExamples")
+                  : t("dbTable.showExamples")}
+              </span>
+            </button>
+          </div>
         )}
       </div>
 

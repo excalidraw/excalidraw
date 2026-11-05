@@ -775,11 +775,11 @@ export const resizeSingleElement = (
     if (handleDirection !== "e" && handleDirection !== "w") {
       return;
     }
-    const minWidth = getDBTableLayout(
+    const minLayout = getDBTableLayout(
       { ...latestElement, customWidth: null },
       renderEnvironment,
-    ).width;
-    const width = Math.max(Math.abs(nextWidth), minWidth);
+    );
+    const width = Math.max(Math.abs(nextWidth), minLayout.width);
     const origin = getResizedOrigin(
       pointFrom<GlobalPoint>(origElement.x, origElement.y),
       origElement.width,
@@ -793,7 +793,12 @@ export const resizeSingleElement = (
     );
     scene.mutateElement(
       latestElement,
-      { ...origin, width, customWidth: width },
+      {
+        ...origin,
+        width,
+        // the examples column is added on top of the custom width
+        customWidth: width - minLayout.examplesColumnWidth,
+      },
       { informMutation: shouldInformMutation, isDragging: false },
     );
     syncDBTableRowBindings(latestElement, scene);

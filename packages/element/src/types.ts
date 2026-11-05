@@ -120,6 +120,11 @@ export type ExcalidrawDBTableRow = Readonly<{
   id: string;
   key: string;
   name: string;
+  /**
+   * Sample value for the field (instance data, not schema), shown in a
+   * separate column while the table's `showExamples` is on.
+   */
+  example?: string;
 }>;
 
 /**
@@ -136,11 +141,14 @@ export type ExcalidrawDBTableElement = _ExcalidrawElementBase &
     rows: readonly ExcalidrawDBTableRow[];
     /** only the header is shown */
     collapsed: boolean;
+    /** an extra column at the right shows each field's `example` value */
+    showExamples?: boolean;
     fontSize: number;
     fontFamily: FontFamilyValues;
     /**
      * Width set by resizing horizontally. The table is never narrower than its
-     * content needs; unset, it is exactly as wide as the content.
+     * content needs; unset, it is exactly as wide as the content. It excludes
+     * the examples column, which is added on top of it while shown.
      */
     customWidth?: number | null;
   }>;

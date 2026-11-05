@@ -2,6 +2,7 @@ import { getGridPoint, KEYS } from "@excalidraw/common";
 
 import {
   getDBTableCellAtPoint,
+  getDBTableToggleAtPoint,
   isPointOnDBTableToggle,
   isDBTableElement,
   newDBTableElement,
@@ -22,7 +23,8 @@ type ScenePoint = { x: number; y: number };
 
 /**
  * Owns the database-table interactions: placing a table with the tool,
- * collapsing it from its header toggle, and the in-place cell editing that
+ * collapsing it or showing its examples from its header toggles, and the
+ * in-place cell editing that
  * `DBTableEditor` renders over the canvas.
  */
 export class AppDBTable {
@@ -122,17 +124,56 @@ export class AppDBTable {
     if (!table) {
       return false;
     }
-    this.toggleCollapsed(table);
+    const toggle = getDBTableToggleAtPoint(
+      table,
+      point,
+      this.app.state.zoom.value,
+    );
     this.app.setState({
       selectedElementIds: { [table.id]: true },
       selectedGroupIds: {},
     });
+    if (toggle === "examples") {
+      this.toggleExamples(table);
+    } else {
+      this.toggleCollapsed(table);
+    }
     return true;
   };
 
   toggleCollapsed = (table: NonDeleted<ExcalidrawDBTableElement>) => {
     this.updateContent(table, { collapsed: !table.collapsed });
     this.app.scheduleCapture();
+  };
+
+  /**
+   * Shows or hides the examples column. When the table has no examples at
+   * all yet, showing it puts the caret in the first one so the user can
+   * start filling them in right away.
+   *
+   * @returns the table's examples state after the toggle
+   */
+  toggleExamples = (
+    table: NonDeleted<ExcalidrawDBTableElement>,
+    { startEditing = true }: { startEditing?: boolean } = {},
+  ) => {
+    if (table.showExamples) {
+      this.updateContent(table, { showExamples: false });
+      this.app.scheduleCapture();
+      return false;
+    }
+    this.updateContent(table, { showExamples: true });
+    this.app.scheduleCapture();
+    const { rows } = table;
+    if (
+      startEditing &&
+      rows.length &&
+      !rows.some((row) => row.example?.trim()) &&
+      !this.app.state.editingDBTableId
+    ) {
+      this.startEditing(table, { type: "example", rowId: rows[0].id });
+    }
+    return true;
   };
 
   // ---------------------------------------------------------------------------
@@ -183,7 +224,7 @@ export class AppDBTable {
     const table = this.getEditingDBTable(id);
     if (table) {
       const rows = table.rows.filter(
-        (row) => row.key.trim() || row.name.trim(),
+        (row) => row.key.trim() || row.name.trim() || row.example?.trim(),
       );
       if (rows.length !== table.rows.length) {
         this.updateContent(table, { rows });

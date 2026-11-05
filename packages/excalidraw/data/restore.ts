@@ -785,6 +785,7 @@ export const restoreElement = (
           title: typeof element.title === "string" ? element.title : "",
           rows: restoreDBTableRows(element.rows),
           collapsed: element.collapsed === true,
+          ...(element.showExamples === true ? { showExamples: true } : {}),
           fontSize:
             isFiniteNumber(element.fontSize) && element.fontSize > 0
               ? element.fontSize
@@ -829,7 +830,11 @@ const restoreDBTableRows = (
         ? row.id
         : newDBTableRow().id;
     seenIds.add(id);
-    restored.push({ id, key, name });
+    restored.push(
+      typeof row.example === "string" && row.example
+        ? { id, key, name, example: row.example }
+        : { id, key, name },
+    );
   }
   return restored;
 };

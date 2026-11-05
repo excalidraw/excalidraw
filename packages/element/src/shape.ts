@@ -59,6 +59,7 @@ import { getCornerRadius, isPathALoop } from "./utils";
 import {
   getDBTableBodyColor,
   getDBTableColorWithOpacity,
+  getDBTableExampleColumnColor,
   getDBTableLayout,
   DB_TABLE_COLUMN_DIVIDER_OPACITY,
 } from "./dbTable";
@@ -1181,13 +1182,27 @@ const getTopRoundedRectPath = (w: number, h: number, r: number) =>
     w - r
   } 0 Q ${w} 0, ${w} ${r} L ${w} ${h} Z`;
 
+/** the rectangle (x0, y0)–(x1, y1) with only its bottom-right corner rounded */
+const getBottomRightRoundedRectPath = (
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  r: number,
+) =>
+  `M ${x0} ${y0} L ${x1} ${y0} L ${x1} ${y1 - r} Q ${x1} ${y1}, ${
+    x1 - r
+  } ${y1} L ${x0} ${y1} Z`;
+
 /**
  * A table is drawn as layered roughjs drawables, bottom to top, so that the
  * outline always sits on top of the fills:
  *
- * 1. body fill (a tint of the header color, always solid for legibility)
+ * 1. body fill (a tint of the header color, always solid for legibility),
+ *    and the lighter examples column fill when examples are shown
  * 2. header fill (the element's background, honoring its fill style)
- * 3. header divider and the subtle key/name column divider
+ * 3. header divider, the subtle key/name column divider and the dashed
+ *    examples divider
  * 4. the outline
  *
  * The text is painted separately (`drawDBTableText` / the SVG renderer).
@@ -1224,6 +1239,30 @@ const generateDBTableShape = (
     );
   }
 
+  if (hasFill && layout.body && layout.examplesColumnWidth) {
+    shapes.push(
+      generator.path(
+        getBottomRightRoundedRectPath(
+          layout.examplesX,
+          headerHeight,
+          w,
+          h,
+          radius,
+        ),
+        {
+          ...options,
+          seed: element.seed + 5,
+          stroke: "none",
+          fillStyle: "solid",
+          fill: applyDarkModeFilter(
+            getDBTableExampleColumnColor(element.backgroundColor),
+            isDarkMode,
+          ),
+        },
+      ),
+    );
+  }
+
   if (hasFill) {
     shapes.push(
       generator.path(
@@ -1252,6 +1291,24 @@ const generateDBTableShape = (
           stroke: getDBTableColorWithOpacity(
             options.stroke!,
             DB_TABLE_COLUMN_DIVIDER_OPACITY,
+          ),
+        }),
+      );
+    }
+    if (layout.examplesColumnWidth) {
+      // dashed: what is right of it is sample data, not part of the schema
+      const x = layout.examplesX;
+      const dash = 5 * layout.unit;
+      shapes.push(
+        generator.line(x, headerHeight, x, h, {
+          ...strokeOnly,
+          seed: element.seed + 6,
+          strokeWidth: Math.max(1, element.strokeWidth * 0.75),
+          strokeLineDash: [dash, dash * 1.2],
+          disableMultiStroke: true,
+          stroke: getDBTableColorWithOpacity(
+            options.stroke!,
+            DB_TABLE_COLUMN_DIVIDER_OPACITY * 1.6,
           ),
         }),
       );
