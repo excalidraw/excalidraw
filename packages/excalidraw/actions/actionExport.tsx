@@ -401,11 +401,13 @@ export const actionLoadScene = register({
   },
   perform: async (elements, appState, _, app) => {
     try {
+      // submitted after the await, for an edit opened during it, and only if
+      // the file loaded: a cancelled picker leaves the edit open
       const {
         elements: loadedElements,
         appState: loadedAppState,
         files,
-      } = await loadFromJSON(appState, elements);
+      } = app.text.submitEditReplacedBy(await loadFromJSON(appState, elements));
       return {
         elements: loadedElements,
         appState: loadedAppState,
@@ -417,10 +419,10 @@ export const actionLoadScene = register({
         console.warn(error);
         return false;
       }
+      // off the live state: what was captured before the await is stale by
+      // now, and a result leaving out the theme or zen mode resets them
       return {
-        elements,
-        appState: { ...appState, errorMessage: error.message },
-        files: app.files,
+        appState: { ...app.state, errorMessage: error.message },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }

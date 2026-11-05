@@ -118,7 +118,7 @@ import {
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
-type RestoredAppState = Omit<
+export type RestoredAppState = Omit<
   AppState,
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;

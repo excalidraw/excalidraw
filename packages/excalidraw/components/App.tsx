@@ -812,6 +812,7 @@ class App extends React.Component<AppProps, AppState> {
       setElementRenderOverrides: this.setElementRenderOverrides,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
+      isEditingText: this.text.isEditing,
       getFiles: () => this.files,
       getName: this.getName,
       registerAction: (action: Action) => {
@@ -3136,13 +3137,20 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // submits an open text edit whose element the result takes out of the
+    // scene (AppText.submitEditEndedBy). Only by its elements: a result's
+    // appState can be a spread of the state the action was given, whose
+    // editingTextElement says nothing of an edit opened since
+    const { elements } = this.text.submitEditEndedBy({
+      elements: actionResult.elements,
+    });
+
     this.store.scheduleAction(actionResult.captureUpdate);
 
     let didUpdate = false;
 
-    let editingTextElement: AppState["editingTextElement"] | null = null;
-    if (actionResult.elements) {
-      this.scene.replaceAllElements(actionResult.elements);
+    if (elements) {
+      this.scene.replaceAllElements(elements);
       didUpdate = true;
     }
 
@@ -3151,7 +3159,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     }
 
-    if (actionResult.appState || editingTextElement || this.state.contextMenu) {
+    if (actionResult.appState || this.state.contextMenu) {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
       const theme =
@@ -3173,24 +3181,30 @@ class App extends React.Component<AppProps, AppState> {
         zenModeEnabled = this.props.zenModeEnabled;
       }
 
-      editingTextElement = actionResult.appState?.editingTextElement || null;
-
-      // make sure editingTextElement points to latest element reference
-      if (actionResult.elements && editingTextElement) {
-        const editingTextElementId = editingTextElement.id;
-        const nextElement = actionResult.elements.find(
-          (element) => element.id === editingTextElementId,
-        );
-        editingTextElement =
-          nextElement &&
-          isNonDeletedElement(nextElement) &&
-          isTextElement(nextElement)
-            ? nextElement
-            : null;
-      }
-
       this.setState((prevAppState) => {
         const actionAppState = actionResult.appState || {};
+
+        // a result that leaves the edit out of its appState doesn't end it.
+        // Off prevAppState: this.state misses an end of the edit still pending
+        // (updateScene's from a lifecycle or an effect, in the same tick)
+        let editingTextElement =
+          actionResult.appState && "editingTextElement" in actionResult.appState
+            ? actionResult.appState.editingTextElement ?? null
+            : prevAppState.editingTextElement;
+
+        // make sure editingTextElement points to latest element reference
+        if (elements && editingTextElement) {
+          const editingTextElementId = editingTextElement.id;
+          const nextElement = elements.find(
+            (element) => element.id === editingTextElementId,
+          );
+          editingTextElement =
+            nextElement &&
+            isNonDeletedElement(nextElement) &&
+            isTextElement(nextElement)
+              ? nextElement
+              : null;
+        }
 
         return {
           ...prevAppState,
@@ -3907,6 +3921,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    this.unmounted = true;
+    // an open text edit goes with the component (its editor listens on the window)
+    this.text.textWysiwygSubmitHandler?.();
+
     // we're recreating the api object reference so that the
     // <ExcalidrawAPIContext.Provider/> picks up on it
     this.api = { ...this.api, isDestroyed: true };
@@ -3946,7 +3964,6 @@ class App extends React.Component<AppProps, AppState> {
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
-    this.unmounted = true;
     this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();
@@ -4472,18 +4489,35 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    // failsafe in case the state is being updated in incorrect order resulting
-    // in the editingTextElement being now a deleted element. Resolved against
-    // the scene by id, since the state holds an immutable snapshot whose
-    // `isDeleted` never flips once the element is deleted.
-    if (this.state.editingTextElement) {
-      const sceneElement = this.scene.getElement(
-        this.state.editingTextElement.id,
-      );
-      if (!sceneElement || sceneElement.isDeleted) {
-        this.setState({ editingTextElement: null });
+    // likewise the line editor goes with its line, and so does the line's
+    // creation if it's under way (a multi-point line is expected to have its
+    // editor). Not left to the deferred actionFinalize above: it keeps an
+    // editor it can't resolve to a line, and would run again on every update
+    const lineEditorElementId = this.state.selectedLinearElement?.elementId;
+    if (lineEditorElementId) {
+      const line = this.scene.getElement(lineEditorElementId);
+      if (!line || line.isDeleted) {
+        this.setState((prevState) =>
+          prevState.selectedLinearElement?.elementId === lineEditorElementId
+            ? {
+                selectedLinearElement: null,
+                multiElement:
+                  prevState.multiElement?.id === lineEditorElementId
+                    ? null
+                    : prevState.multiElement,
+                newElement:
+                  prevState.newElement?.id === lineEditorElementId
+                    ? null
+                    : prevState.newElement,
+              }
+            : null,
+        );
       }
     }
+
+    // the edit of a gone element ends, in the state and in the editor
+    // (AppText.endEditOfGoneElement)
+    this.text.endEditOfGoneElement();
 
     // Forced false while a viewport animation runs — the scroll-back-to-content
     // button must not render mid-animation (clicking it would fight the
@@ -4994,7 +5028,9 @@ class App extends React.Component<AppProps, AppState> {
        */
       captureUpdate?: SceneData["captureUpdate"];
     }) => {
-      const { elements, appState, collaborators, captureUpdate } = sceneData;
+      const { collaborators, captureUpdate } = sceneData;
+      // submits an open text edit the update ends (AppText.submitEditEndedBy)
+      const { elements, appState } = this.text.submitEditEndedBy(sceneData);
 
       if (captureUpdate) {
         const nextElements = elements ? elements : undefined;
@@ -10817,10 +10853,11 @@ class App extends React.Component<AppProps, AppState> {
             });
             return;
           }
+          const loadedScene = this.text.submitEditReplacedBy(scene);
           this.syncActionResult({
-            ...scene,
+            ...loadedScene,
             appState: {
-              ...(scene.appState || this.state),
+              ...(loadedScene.appState || this.state),
               isLoading: false,
             },
             replaceFiles: true,
@@ -10970,22 +11007,26 @@ class App extends React.Component<AppProps, AppState> {
           });
           return;
         }
+        const loadedScene = this.text.submitEditReplacedBy(ret.data);
+        // the submit replaces the edited element in the scene
+        const currentElements = this.scene.getElementsIncludingDeleted();
+
         // restore the fractional indices by mutating elements
-        syncInvalidIndices(elements.concat(ret.data.elements));
+        syncInvalidIndices(currentElements.concat(loadedScene.elements));
 
         // don't capture and only update the store snapshot for old elements,
         // otherwise we would end up with duplicated fractional indices on undo
         this.store.scheduleMicroAction({
           action: CaptureUpdateAction.NEVER,
-          elements,
+          elements: currentElements,
           appState: undefined,
         });
 
         this.setState({ isLoading: true });
         this.syncActionResult({
-          ...ret.data,
+          ...loadedScene,
           appState: {
-            ...(ret.data.appState || this.state),
+            ...(loadedScene.appState || this.state),
             isLoading: false,
           },
           replaceFiles: true,
