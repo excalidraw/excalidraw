@@ -1403,6 +1403,7 @@ export interface ExcalidrawImperativeAPI {
   >["getSceneElementsMapIncludingDeleted"];
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
+    prune: InstanceType<typeof App>["pruneHistory"];
   };
   /**
    * Selects elements (or their ids — one or many), adds them to or removes
