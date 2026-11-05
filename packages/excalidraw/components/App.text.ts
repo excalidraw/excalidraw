@@ -105,9 +105,12 @@ export class AppText {
   public submitEditEndedBy = <K extends keyof AppState>({
     elements,
     appState,
+    isRevision = false,
   }: {
     elements?: SceneData["elements"];
     appState?: Pick<AppState, K> | null;
+    /** The update's elements are another revision, not the edited ones' copies */
+    isRevision?: boolean;
   }) => {
     const submit = this.textWysiwygSubmitHandler;
     const editingId = this.editingTextElementId;
@@ -144,11 +147,40 @@ export class AppText {
       // snapshot keeps the draft under a scene showing the update, and the
       // next undo applies to what isn't there.
       elements = bumpElementVersions(
-        elements,
+        isRevision ? elements : this.keepDraftDeleted(elements, editingId),
         this.app.scene.getElementsMapIncludingDeleted(),
       );
     }
     return { elements, appState };
+  };
+
+  /**
+   * The submit deletes a blank draft and unbinds it from its container, which
+   * the update's copies older than that deletion don't know of: bumped above
+   * it, they'd bring the text back as an invisible element. (A newer copy is a
+   * later edit, and stands.)
+   */
+  private keepDraftDeleted = (
+    elements: NonNullable<SceneData["elements"]>,
+    draftId: string,
+  ) => {
+    const draft = this.app.scene.getElement<ExcalidrawTextElement>(draftId);
+    const copy = elements.find((element) => element.id === draftId);
+    if (!draft?.isDeleted || !copy || copy.version > draft.version) {
+      return elements;
+    }
+    return elements.map((element) => {
+      if (element.id === draftId) {
+        return draft;
+      }
+      return element.id === draft.containerId
+        ? newElementWith(element, {
+            boundElements: element.boundElements?.filter(
+              ({ id }) => id !== draftId,
+            ),
+          })
+        : element;
+    });
   };
 
   /**
@@ -170,6 +202,7 @@ export class AppText {
     ...this.submitEditEndedBy({
       elements: scene.elements,
       appState: { ...scene.appState, editingTextElement: null },
+      isRevision: true,
     }),
   });
 
