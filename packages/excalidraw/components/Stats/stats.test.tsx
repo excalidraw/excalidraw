@@ -3,7 +3,12 @@ import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
-import { setDateTimeForTests, reseed } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  KEYS,
+  setDateTimeForTests,
+  reseed,
+} from "@excalidraw/common";
 
 import { isInGroup } from "@excalidraw/element";
 
@@ -12,6 +17,7 @@ import { isTextElement } from "@excalidraw/element";
 import type { Degrees } from "@excalidraw/math";
 
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -924,4 +930,112 @@ describe("frame resizing behavior", () => {
       null,
     );
   });
+});
+
+describe("arrows bound to a text whose font size changes in stats", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    API.setElements([]);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    fireEvent.click(queryByTestId(UI.queryContextMenu()!, "stats")!);
+  });
+
+  const setup = (elbowed: boolean) => {
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      x: 300,
+      y: 0,
+      text: "first line\nsecond line\nthird line",
+      fontSize: 20,
+      fontFamily: FONT_FAMILY.Excalifont,
+    });
+    const otherText = API.createElement({
+      type: "text",
+      id: "otherText",
+      x: 300,
+      y: 400,
+      text: "other",
+      fontSize: 20,
+      fontFamily: FONT_FAMILY.Excalifont,
+    });
+    API.setElements([text, otherText]);
+
+    // ends near the text's bottom-left, so a taller text moves the end
+    UI.clickTool("arrow");
+    if (elbowed) {
+      UI.clickOnTestId("elbow-arrow");
+    }
+    mouse.reset();
+    mouse.downAt(0, text.y + text.height * 0.9);
+    mouse.moveTo(150, text.y + text.height * 0.9);
+    mouse.moveTo(text.x + 5, text.y + text.height * 0.9);
+    mouse.up();
+
+    const arrow = h.elements.find(
+      (el) => el.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(text.id);
+
+    return { arrowId: arrow.id, text, otherText };
+  };
+
+  const getArrowEnd = (arrowId: string) => {
+    const arrow = h.elements.find(
+      (el) => el.id === arrowId,
+    ) as ExcalidrawArrowElement;
+    const [x, y] = arrow.points[arrow.points.length - 1];
+    return [arrow.x + x, arrow.y + y];
+  };
+
+  // nudging the text re-routes its arrows from scratch
+  const getRoutedArrowEnd = (arrowId: string) => {
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    return getArrowEnd(arrowId);
+  };
+
+  for (const elbowed of [false, true]) {
+    const arrowType = elbowed ? "elbow" : "simple";
+
+    it(`re-routes a bound ${arrowType} arrow when changing the font size of a text`, () => {
+      const { arrowId, text } = setup(elbowed);
+      API.setSelectedElements([text]);
+
+      const input =
+        UI.queryStatsProperty("F")!.querySelector<HTMLInputElement>(
+          ".drag-input",
+        )!;
+      UI.updateInput(input, "40");
+
+      expect(h.elements.find((el) => el.id === text.id)).toMatchObject({
+        fontSize: 40,
+      });
+      const end = getArrowEnd(arrowId);
+      expect(end).toEqual(getRoutedArrowEnd(arrowId));
+    });
+
+    it(`re-routes a bound ${arrowType} arrow when changing the font size of multiple texts`, () => {
+      const { arrowId, text, otherText } = setup(elbowed);
+      API.setSelectedElements([text, otherText]);
+
+      const input =
+        UI.queryStatsProperty("F")!.querySelector<HTMLInputElement>(
+          ".drag-input",
+        )!;
+      UI.updateInput(input, "40");
+
+      expect(h.elements.find((el) => el.id === text.id)).toMatchObject({
+        fontSize: 40,
+      });
+      const end = getArrowEnd(arrowId);
+      expect(end).toEqual(getRoutedArrowEnd(arrowId));
+    });
+  }
 });
