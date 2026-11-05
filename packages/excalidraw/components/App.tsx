@@ -3143,7 +3143,6 @@ class App extends React.Component<AppProps, AppState> {
 
     let didUpdate = false;
 
-    let editingTextElement: AppState["editingTextElement"] | null = null;
     if (elements) {
       this.scene.replaceAllElements(elements);
       didUpdate = true;
@@ -3154,7 +3153,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     }
 
-    if (actionResult.appState || editingTextElement || this.state.contextMenu) {
+    if (actionResult.appState || this.state.contextMenu) {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
       const theme =
@@ -3176,28 +3175,30 @@ class App extends React.Component<AppProps, AppState> {
         zenModeEnabled = this.props.zenModeEnabled;
       }
 
-      // a result that leaves the edit out of its appState doesn't end it
-      editingTextElement =
-        actionResult.appState && "editingTextElement" in actionResult.appState
-          ? actionResult.appState.editingTextElement ?? null
-          : this.state.editingTextElement;
-
-      // make sure editingTextElement points to latest element reference
-      if (elements && editingTextElement) {
-        const editingTextElementId = editingTextElement.id;
-        const nextElement = elements.find(
-          (element) => element.id === editingTextElementId,
-        );
-        editingTextElement =
-          nextElement &&
-          isNonDeletedElement(nextElement) &&
-          isTextElement(nextElement)
-            ? nextElement
-            : null;
-      }
-
       this.setState((prevAppState) => {
         const actionAppState = actionResult.appState || {};
+
+        // a result that leaves the edit out of its appState doesn't end it.
+        // Off prevAppState: this.state misses an end of the edit still pending
+        // (updateScene's from a lifecycle or an effect, in the same tick)
+        let editingTextElement =
+          actionResult.appState && "editingTextElement" in actionResult.appState
+            ? actionResult.appState.editingTextElement ?? null
+            : prevAppState.editingTextElement;
+
+        // make sure editingTextElement points to latest element reference
+        if (elements && editingTextElement) {
+          const editingTextElementId = editingTextElement.id;
+          const nextElement = elements.find(
+            (element) => element.id === editingTextElementId,
+          );
+          editingTextElement =
+            nextElement &&
+            isNonDeletedElement(nextElement) &&
+            isTextElement(nextElement)
+              ? nextElement
+              : null;
+        }
 
         return {
           ...prevAppState,
