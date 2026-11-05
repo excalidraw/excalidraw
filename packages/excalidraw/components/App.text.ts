@@ -312,7 +312,7 @@ export class AppText {
       if (
         !latestTextElement ||
         !isTextElement(latestTextElement) ||
-        // deleted from under the edit (by an action's result): the submit
+        // deleted from under the edit (see endEditOfGoneElement): the submit
         // that ends the edit doesn't bring it back
         latestTextElement.isDeleted
       ) {

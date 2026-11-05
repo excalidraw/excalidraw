@@ -1081,8 +1081,8 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    // the element can be gone from the scene by now (deleted by an action's
-    // result, or the scene reset): the edit still ends, and leaves the
+    // the element can be gone from the scene by now (see
+    // AppText.endEditOfGoneElement): the edit still ends, and leaves the
     // container alone
     const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,

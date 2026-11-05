@@ -1515,9 +1515,9 @@ describe("textWysiwyg", () => {
       });
 
       it("should keep a live edit through an action's result that leaves the edit out of its state, until one deletes the element", async () => {
-        // an async action started before the edit (copy as PNG, a save)
-        // finishes while the user types: its result has no editingTextElement,
-        // which leaves the edit as it is
+        // an async action started before the edit (copy as SVG) finishes
+        // while the user types: its result has no editingTextElement, which
+        // leaves the edit as it is
         act(() =>
           h.app.syncActionResult({
             appState: { toast: { message: "Copied" } },
@@ -1791,8 +1791,8 @@ describe("textWysiwyg", () => {
       switchWindowAway(editor);
       expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
 
-      // not through updateScene, so the edit ends from the failsafe in
-      // componentDidUpdate, on a label already deleted and unbound
+      // the result submits the edit before its copies land, so the label
+      // ends up deleted and the container unbound, as the result has them
       const [container, label] = h.elements;
       const unbound = newElementWith(container, { boundElements: [] });
       const deleted = newElementWith(label, { isDeleted: true });

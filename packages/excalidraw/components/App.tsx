@@ -3134,7 +3134,8 @@ class App extends React.Component<AppProps, AppState> {
 
     // submits an open text edit whose element the result takes out of the
     // scene (AppText.submitEditEndedBy). Only by its elements: a result's
-    // appState can leave the edit out without ending it
+    // appState can be a spread of the state the action was given, whose
+    // editingTextElement says nothing of an edit opened since
     const { elements } = this.text.submitEditEndedBy({
       elements: actionResult.elements,
     });
