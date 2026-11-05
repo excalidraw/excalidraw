@@ -538,18 +538,22 @@
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",
       "scale": "Scale",
-      "padding": "Padding"
+      "padding": "Padding",
+      "jpegQuality": "JPEG quality"
     },
     "tooltip": {
-      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
+      "jpegQuality": "Only applies when exporting to JPEG. Lower quality produces smaller files."
     },
     "title": {
       "exportToPng": "Export to PNG",
+      "exportToJpeg": "Export to JPEG",
       "exportToSvg": "Export to SVG",
       "copyPngToClipboard": "Copy PNG to clipboard"
     },
     "button": {
       "exportToPng": "PNG",
+      "exportToJpeg": "JPG",
       "exportToSvg": "SVG",
       "copyPngToClipboard": "Copy to clipboard"
     }
