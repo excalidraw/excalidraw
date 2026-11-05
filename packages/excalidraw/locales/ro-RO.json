@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid la Excalidraw",
     "button": "Introducere",
-    "description": "",
+    "description": "Diagramele <flowchartLink>Scheme logice</flowchartLink>, <sequenceLink>Secvență</sequenceLink>, <classLink>Clasă</classLink>, <stateLink>Stare</stateLink> și <erdLink>Entitate-asociere</erdLink>, <ganttLink>diagramele Gantt</ganttLink>, <quadrantLink>diagramele cu cadrane</quadrantLink> și <timelineLink>Cronologiile</timelineLink> sunt convertite în elemente Excalidraw. Alte tipuri sunt inserate ca imagine.",
     "syntax": "Sintaxă Mermaid",
     "preview": "Previzualizare",
     "label": "Mermaid",
