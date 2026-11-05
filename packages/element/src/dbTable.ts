@@ -210,8 +210,9 @@ export const getDBTableLayout = (
   // the examples column hugs its content at the right, added on top of the
   // schema part so showing it widens the table and hiding it restores it.
   // It is measured upright: the italic is a slant that keeps the advances.
+  // A collapsed table leaves it out, as its toggle is hidden then too.
   let examplesColumnWidth = 0;
-  if (element.showExamples) {
+  if (element.showExamples && !element.collapsed) {
     let maxExampleWidth = 0;
     for (const row of element.rows) {
       if (row.example) {

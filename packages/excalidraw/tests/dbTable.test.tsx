@@ -272,13 +272,22 @@ describe("table element", () => {
       type(focused, "1");
       expect(getDBTable(table.id).rows[0].example).toBe("1");
 
-      // Tab moves name → example → next key
-      Keyboard.keyPress(KEYS.TAB, focused);
-      expect(
+      const isFocused = (column: string) =>
         (document.activeElement as HTMLElement).classList.contains(
-          "excalidraw-dbtable-editor__key",
-        ),
-      ).toBe(true);
+          `excalidraw-dbtable-editor__${column}`,
+        );
+
+      // Backspace at the start of an example steps back into the name
+      focused.setSelectionRange(0, 0);
+      Keyboard.keyPress(KEYS.BACKSPACE, focused);
+      expect(isFocused("name")).toBe(true);
+      expect(getDBTable(table.id).rows[0].example).toBe("1");
+
+      // Tab moves name → example → next key
+      Keyboard.keyPress(KEYS.TAB, document.activeElement as HTMLElement);
+      expect(isFocused("example")).toBe(true);
+      Keyboard.keyPress(KEYS.TAB, document.activeElement as HTMLElement);
+      expect(isFocused("key")).toBe(true);
 
       Keyboard.keyPress(KEYS.ESCAPE, document.activeElement as HTMLElement);
       await act(async () => {});
@@ -314,6 +323,62 @@ describe("table element", () => {
       expect(row.name).toBe("name_en (After Meal)");
       expect(row.example).toBeUndefined();
       expect(button.getAttribute("aria-pressed")).toBe("true");
+    });
+
+    it("ignores the second click of a double-click on the examples toggle", async () => {
+      const table = createDBTable({ rows: [{ key: "PK", name: "id" }] });
+      API.setElements([table]);
+      const toggle = getDBTableLayout(table).examplesToggle!;
+      const point = {
+        x: table.x + toggle.x + toggle.width / 2,
+        y: table.y + toggle.y + toggle.height / 2,
+      };
+      mouse.clickAt(point.x, point.y);
+      await act(async () => {});
+      mouse.clickAt(point.x, point.y);
+      await act(async () => {});
+
+      expect(getDBTable(table.id).showExamples).toBe(true);
+      expect(h.state.editingDBTableId).toBe(table.id);
+    });
+
+    it("doesn't keep visibly empty rows for a hidden example", async () => {
+      const table = createDBTable({
+        rows: [
+          { key: "PK", name: "id" },
+          { key: "", name: "", example: "hidden" },
+          { key: "", name: "", example: "also hidden" },
+        ],
+      });
+      API.setElements([table]);
+      const [, second] = getDBTable(table.id).rows;
+      act(() =>
+        h.app.dbTable.startEditing(table, { type: "name", rowId: second.id }),
+      );
+      await act(async () => {});
+
+      // Backspace removes the row that looks empty
+      Keyboard.keyPress(KEYS.BACKSPACE, document.activeElement as HTMLElement);
+      await act(async () => {});
+      expect(getDBTable(table.id).rows).toHaveLength(2);
+
+      // and finishing editing drops the other one
+      Keyboard.keyPress(KEYS.ESCAPE, document.activeElement as HTMLElement);
+      await act(async () => {});
+      expect(getDBTable(table.id).rows.map((row) => row.name)).toEqual(["id"]);
+    });
+
+    it("leaves out the examples column while collapsed", () => {
+      const expanded = createDBTable({ rows, showExamples: true });
+      const collapsed = createDBTable({
+        rows,
+        showExamples: true,
+        collapsed: true,
+      });
+      const plain = createDBTable({ rows, collapsed: true });
+      expect(getDBTableLayout(collapsed).examplesColumnWidth).toBe(0);
+      expect(collapsed.width).toBe(plain.width);
+      expect(collapsed.width).toBeLessThan(expanded.width);
     });
 
     it("keeps a custom width for the schema part", () => {

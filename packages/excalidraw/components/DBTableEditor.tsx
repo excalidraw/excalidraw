@@ -139,7 +139,11 @@ export const DBTableEditor = ({
   useEffect(() => {
     // a press anywhere outside the editor (canvas, toolbar, …) finishes it
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+      if (
+        !rootRef.current?.contains(event.target as Node) &&
+        // the second click of the double-click that opened the editor
+        !controller.isRepeatExamplesTogglePress(controller.getScenePoint(event))
+      ) {
         controller.stopEditing();
       }
     };
@@ -276,14 +280,11 @@ export const DBTableEditor = ({
    * example was being edited, it moves to that field's name.
    */
   const toggleExamples = () => {
-    const focusedRowId = (() => {
-      for (const [id, input] of inputs.current) {
-        if (input === document.activeElement && id !== "title") {
-          return id.slice(0, id.lastIndexOf(":"));
-        }
-      }
-      return null;
-    })();
+    const focused = document.activeElement;
+    const focusedRowId =
+      focused instanceof HTMLElement && rootRef.current?.contains(focused)
+        ? focused.dataset.rowId ?? null
+        : null;
     const isShown = controller.toggleExamples(tableRef.current, {
       startEditing: false,
     });
@@ -400,7 +401,9 @@ export const DBTableEditor = ({
       const atStart = input.selectionStart === 0 && input.selectionEnd === 0;
       const previousColumn =
         cell.type === "example" ? "name" : cell.type === "name" ? "key" : null;
-      if (!row.key && !row.name && !row.example) {
+      // a hidden example doesn't keep a visibly empty row
+      const hasExample = !!tableRef.current.showExamples && !!row.example;
+      if (!row.key && !row.name && !hasExample) {
         // an empty row goes away
         event.preventDefault();
         removeRow(row.id);
@@ -517,6 +520,7 @@ export const DBTableEditor = ({
             </button>
             <input
               ref={registerInput({ type: "key", rowId: row.id })}
+              data-row-id={row.id}
               className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__key"
               style={{
                 left: key.x + layout.paddingX,
@@ -540,6 +544,7 @@ export const DBTableEditor = ({
             />
             <input
               ref={registerInput({ type: "name", rowId: row.id })}
+              data-row-id={row.id}
               className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__name"
               style={{
                 left: name.x + layout.paddingX,
@@ -564,6 +569,7 @@ export const DBTableEditor = ({
             {example && (
               <input
                 ref={registerInput({ type: "example", rowId: row.id })}
+                data-row-id={row.id}
                 className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__example"
                 style={{
                   left: example.x + layout.paddingX,
