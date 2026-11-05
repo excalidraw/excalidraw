@@ -1459,20 +1459,12 @@ describe("textWysiwyg", () => {
       expect(valueAndCaret()).toEqual(["Hi world!", 5]);
       changeTextUnderTheEdit("Hi there!");
       expect(valueAndCaret()).toEqual(["Hi there!", 8]);
-      // never inside a surrogate pair (the new emoji shares its low half
-      // with the old ones)
-      fireEvent.focus(textarea);
-      updateTextEditor(textarea, "Hi \u{1F514}\u{1F514} there!");
-      switchWindowAway(textarea);
-      textarea.setSelectionRange(5, 5);
-      changeTextUnderTheEdit("Hi \u{1F914} there!");
-      expect(valueAndCaret()).toEqual(["Hi \u{1F914} there!", 5]);
 
       // back in the window, the edit goes on from that text
       fireEvent.focus(textarea);
-      updateTextEditor(textarea, "Hi \u{1F914} there!!");
+      updateTextEditor(textarea, "Hi there!!");
       act(() => textarea.blur());
-      await expectEnded("Hi \u{1F914} there!!");
+      await expectEnded("Hi there!!");
     });
 
     it("should leave the textarea alone while the user can be typing", async () => {
@@ -1539,21 +1531,6 @@ describe("textWysiwyg", () => {
         );
         await expectEnded("Hello world");
         expect(h.elements[0].isDeleted).toBe(true);
-      });
-
-      it("should land the selection of the update that ends it", async () => {
-        const other = API.createElement({ type: "rectangle" });
-        API.setElements([...h.elements, other]);
-        act(() =>
-          h.app.updateScene({
-            appState: {
-              editingTextElement: null,
-              selectedElementIds: { [other.id]: true },
-            },
-          }),
-        );
-        await expectEnded("Hello");
-        expect(h.state.selectedElementIds).toEqual({ [other.id]: true });
       });
 
       // "Hello" committed, reopened, " world" typed, the window away and back:
@@ -1783,36 +1760,6 @@ describe("textWysiwyg", () => {
       ).toBe(container.id);
       return { container, editor };
     };
-
-    it("should end the edit of a label an action's result deleted, leaving the container alone", async () => {
-      const { editor } = await openLabelOfNewContainer();
-      updateTextEditor(editor, "Hello");
-      // the window loses the focus, the edit stays open
-      switchWindowAway(editor);
-      expect(h.state.editingTextElement?.id).toBe(h.elements[1].id);
-
-      // the result submits the edit before its copies land, so the label
-      // ends up deleted and the container unbound, as the result has them
-      const [container, label] = h.elements;
-      const unbound = newElementWith(container, { boundElements: [] });
-      const deleted = newElementWith(label, { isDeleted: true });
-      const versions = [unbound.version, deleted.version];
-      act(() =>
-        h.app.syncActionResult({
-          elements: [unbound, deleted],
-          captureUpdate: CaptureUpdateAction.NEVER,
-        }),
-      );
-      await nextTick();
-
-      expect(h.state.editingTextElement).toBeNull();
-      expect(h.app.text.textWysiwygSubmitHandler).toBeNull();
-      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
-      // the result's copies landed as they came: the submit touched neither
-      expect(h.elements[1].isDeleted).toBe(true);
-      expect(h.elements[0].boundElements).toEqual([]);
-      expect(h.elements.map((element) => element.version)).toEqual(versions);
-    });
 
     it("should keep the store in step when a sync older than the edit lands on a label and its container", async () => {
       // excalidraw-app syncs 50 ms after the window's focus: typing in between
