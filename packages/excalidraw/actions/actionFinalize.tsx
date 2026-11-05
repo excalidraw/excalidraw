@@ -5,7 +5,7 @@ import {
   isValidPolygon,
   LinearElementEditor,
   newElementWith,
-  removeArrowsWithoutEndInFrame,
+  updateArrowFrames,
 } from "@excalidraw/element";
 
 import {
@@ -148,7 +148,7 @@ export const actionFinalize = register<FormData>({
         }
       }
       // with its ends where they ended up
-      removeArrowsWithoutEndInFrame([element], elementsMap);
+      newElements = updateArrowFrames([element], newElements);
 
       if (linearElementEditor !== appState.selectedLinearElement) {
         // `handlePointerUp()` updated the linear element instance,

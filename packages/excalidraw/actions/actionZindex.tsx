@@ -7,7 +7,9 @@ import {
   moveAllRight,
 } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction, updateArrowFrames } from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import {
   BringForwardIcon,
@@ -20,6 +22,10 @@ import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
+/** reordering frames may change which of them is the topmost an arrow is in */
+const withArrowFrames = (elements: readonly ExcalidrawElement[]) =>
+  updateArrowFrames(elements, elements);
+
 export const actionSendBackward = register({
   name: "sendBackward",
   label: "labels.sendBackward",
@@ -28,7 +34,7 @@ export const actionSendBackward = register({
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneLeft(elements, appState, app.scene),
+      elements: withArrowFrames(moveOneLeft(elements, appState, app.scene)),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -58,7 +64,7 @@ export const actionBringForward = register({
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneRight(elements, appState, app.scene),
+      elements: withArrowFrames(moveOneRight(elements, appState, app.scene)),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -88,7 +94,7 @@ export const actionSendToBack = register({
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
-      elements: moveAllLeft(elements, appState),
+      elements: withArrowFrames(moveAllLeft(elements, appState)),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -126,7 +132,7 @@ export const actionBringToFront = register({
 
   perform: (elements, appState) => {
     return {
-      elements: moveAllRight(elements, appState),
+      elements: withArrowFrames(moveAllRight(elements, appState)),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

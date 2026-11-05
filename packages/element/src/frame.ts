@@ -747,15 +747,27 @@ export const isArrowEndInFrame = (
 };
 
 /**
- * Takes the arrows among `elements`, and those bound to them, that have no end
- * in their frame (see `isArrowEndInFrame()`) out of it. Call it once their ends
- * (and the elements they're bound to) may have left it. Arrows in groups are
- * left to their group.
+ * Puts the arrows among `elements`, and those bound to them, that are in a
+ * frame into the topmost (z-order wise) of the frames one of their ends is in
+ * (see `isArrowEndInFrame()`), and takes those with no end in any frame out of
+ * theirs. As frames clip neither arrows nor their labels, but render their
+ * children together, an arrow connecting frames is thus rendered (and hit)
+ * above all the elements it connects. Call it once their ends (and the
+ * elements they're bound to) may have left their frame, or frames have been
+ * reordered. Arrows in groups are left to their group.
+ *
+ * @returns `allElements`, reordered if an arrow changed frames
  */
-export const removeArrowsWithoutEndInFrame = (
+export const updateArrowFrames = <T extends ElementsMapOrArray>(
   elements: Iterable<ExcalidrawElement>,
-  elementsMap: ElementsMap,
-) => {
+  allElements: T,
+): T => {
+  const elementsMap: ElementsMap = new Map();
+  for (const element of allElements.values()) {
+    if (!element.isDeleted) {
+      elementsMap.set(element.id, element);
+    }
+  }
   const arrows = new Set<ExcalidrawArrowElement>();
   for (const element of elements) {
     if (isArrowElement(element)) {
@@ -769,20 +781,40 @@ export const removeArrowsWithoutEndInFrame = (
     }
   }
 
+  const frames: ExcalidrawFrameLikeElement[] = [];
+  for (const element of elementsMap.values()) {
+    if (isFrameLikeElement(element)) {
+      frames.push(element);
+    }
+  }
+
+  let nextElements = allElements;
   const arrowsToRemove = [];
   for (const arrow of arrows) {
     const frame = arrow.frameId ? elementsMap.get(arrow.frameId) : undefined;
     if (
-      !arrow.isDeleted &&
-      !arrow.groupIds.length &&
-      frame &&
-      isFrameLikeElement(frame) &&
-      !isArrowEndInFrame(arrow, frame, elementsMap)
+      arrow.isDeleted ||
+      arrow.groupIds.length ||
+      !frame ||
+      !isFrameLikeElement(frame)
     ) {
+      continue;
+    }
+    let topmostFrame: ExcalidrawFrameLikeElement | null = null;
+    for (let index = frames.length - 1; index >= 0; index--) {
+      if (isArrowEndInFrame(arrow, frames[index], elementsMap)) {
+        topmostFrame = frames[index];
+        break;
+      }
+    }
+    if (!topmostFrame) {
       arrowsToRemove.push(arrow);
+    } else if (topmostFrame !== frame) {
+      nextElements = addElementsToFrame(nextElements, [arrow], topmostFrame);
     }
   }
   removeElementsFromFrame(arrowsToRemove, elementsMap);
+  return nextElements;
 };
 
 export const removeAllElementsFromFrame = <T extends ExcalidrawElement>(
@@ -803,9 +835,8 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
     removeAllElementsFromFrame(allElements, frame),
     nextElementsInFrame,
     frame,
-  ).slice();
-  removeArrowsWithoutEndInFrame(nextElementsInFrame, arrayToMap(nextElements));
-  return nextElements;
+  );
+  return updateArrowFrames(nextElementsInFrame, nextElements).slice();
 };
 
 /** does not mutate elements, but returns new ones */
