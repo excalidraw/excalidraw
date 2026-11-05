@@ -4482,6 +4482,32 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    // likewise the line editor goes with its line, and so does the line's
+    // creation if it's under way (a multi-point line is expected to have its
+    // editor). Not left to the deferred actionFinalize above: it keeps an
+    // editor it can't resolve to a line, and would run again on every update
+    const lineEditorElementId = this.state.selectedLinearElement?.elementId;
+    if (lineEditorElementId) {
+      const line = this.scene.getElement(lineEditorElementId);
+      if (!line || line.isDeleted) {
+        this.setState((prevState) =>
+          prevState.selectedLinearElement?.elementId === lineEditorElementId
+            ? {
+                selectedLinearElement: null,
+                multiElement:
+                  prevState.multiElement?.id === lineEditorElementId
+                    ? null
+                    : prevState.multiElement,
+                newElement:
+                  prevState.newElement?.id === lineEditorElementId
+                    ? null
+                    : prevState.newElement,
+              }
+            : null,
+        );
+      }
+    }
+
     // the edit of a gone element ends, in the state and in the editor
     // (AppText.endEditOfGoneElement)
     this.text.endEditOfGoneElement();

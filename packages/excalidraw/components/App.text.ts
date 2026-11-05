@@ -148,21 +148,6 @@ export class AppText {
         this.app.scene.getElementsMapIncludingDeleted(),
       );
     }
-    if (appState && elements) {
-      // a line the update takes away takes its editor with it, whether the
-      // editor is this tab's or the update's own
-      const { selectedLinearElement } = { ...this.app.state, ...appState };
-      if (
-        selectedLinearElement &&
-        !elements.some(
-          (element) =>
-            element.id === selectedLinearElement.elementId &&
-            !element.isDeleted,
-        )
-      ) {
-        appState = { ...appState, selectedLinearElement: null };
-      }
-    }
     return { elements, appState };
   };
 
