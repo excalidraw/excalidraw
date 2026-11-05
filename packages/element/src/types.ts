@@ -408,8 +408,9 @@ export type FixedPointBinding = {
    */
   rowId?: string;
   /**
-   * Database tables only: the user attached this end to the side facing away
-   * from the other end, so the side is kept instead of re-picked towards it.
+   * Database tables only: the user placed this end (dragged or dropped it), so
+   * its side is kept instead of being re-picked towards the other end.
+   * Programmatic bindings and older files leave it unset and auto-orient.
    */
   sideLocked?: boolean;
 };

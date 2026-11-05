@@ -398,9 +398,9 @@ describe("table element", () => {
       );
       act(() => h.setState({ currentItemArrowType: "round" }));
 
-      // users.email → orders.user_id, dropped anywhere on the rows
+      // users.email → orders.user_id, from users' right half to orders' left
       UI.clickTool("arrow");
-      mouse.downAt(users.x + 40, rowCenterY(users, "email") + 3);
+      mouse.downAt(users.x + users.width - 20, rowCenterY(users, "email") + 3);
       mouse.moveTo(orders.x + 30, rowCenterY(orders, "user_id") - 4);
       mouse.upAt(orders.x + 30, rowCenterY(orders, "user_id") - 4);
     });
@@ -471,7 +471,23 @@ describe("table element", () => {
       );
     });
 
-    it("switches sides when the tables move past each other", () => {
+    it("keeps the side chosen while drawing the arrow", () => {
+      UI.clickTool("arrow");
+      // start on the LEFT half of users' row, although orders is to the right
+      mouse.downAt(users.x + 20, rowCenterY(users, "id") + 3);
+      mouse.moveTo(orders.x + 30, rowCenterY(orders, "total") - 4);
+      mouse.upAt(orders.x + 30, rowCenterY(orders, "total") - 4);
+      const arrows = h.elements.filter(
+        (el) => el.type === "arrow",
+      ) as ExcalidrawArrowElement[];
+      const drawn = arrows[arrows.length - 1];
+      expect(endPoint(drawn, 0).x).toBeCloseTo(
+        users.x - getBindingGap(users),
+        0,
+      );
+    });
+
+    it("keeps its sides when the tables move past each other", () => {
       UI.clickTool("selection");
       // drag `users` by its header to the right of `orders`
       const grab = { x: users.x + users.width / 2, y: users.y + 8 };
@@ -483,11 +499,11 @@ describe("table element", () => {
       expect(movedUsers.x).toBeGreaterThan(orders.x + orders.width);
       const gap = getBindingGap(users);
       const arrow = getArrow();
-      expect(endPoint(arrow, 0).x).toBeCloseTo(movedUsers.x - gap, 0);
-      expect(endPoint(arrow, -1).x).toBeCloseTo(
-        orders.x + orders.width + gap,
+      expect(endPoint(arrow, 0).x).toBeCloseTo(
+        movedUsers.x + movedUsers.width + gap,
         0,
       );
+      expect(endPoint(arrow, -1).x).toBeCloseTo(orders.x - gap, 0);
       // still on the same rows
       expect(endPoint(arrow, 0).y).toBeCloseTo(
         rowCenterY(movedUsers, "email"),

@@ -272,6 +272,7 @@ const bindOrUnbindBindingElementEdge = (
       focusPoint,
       shouldSnapToOutline,
       isMidpointSnappingEnabled,
+      true,
     );
   }
 };
@@ -1160,6 +1161,8 @@ export const bindBindingElement = (
   focusPoint?: GlobalPoint,
   shouldSnapToOutline = true,
   isMidpointSnappingEnabled = true,
+  /** the end was placed by the user (not programmatically): keep its side */
+  lockDBTableSide = false,
 ): void => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -1176,8 +1179,6 @@ export const bindBindingElement = (
     const scenePoint = { x: point[0], y: point[1] };
     const rowId = getDBTableRowIdAtPoint(hoveredElement, scenePoint);
     const facingSide = getDBTableSideFacing(hoveredElement, scenePoint);
-    // the side the end was dropped on is the user's choice: it is kept
-    // (see `sideLocked`)
     binding = {
       elementId: hoveredElement.id,
       // a row connection always attaches at the table's edge
@@ -1188,7 +1189,7 @@ export const bindBindingElement = (
         facingSide,
       ),
       ...(rowId ? { rowId } : {}),
-      sideLocked: true,
+      ...(lockDBTableSide ? { sideLocked: true } : {}),
     };
     applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
     refreshElbowArrowDBTableSides(
