@@ -85,6 +85,16 @@ describe("BinaryHeap", () => {
       expect(heap.size()).toBe(4);
       expect(heap.pop()).toBe(3);
     });
+
+    it("is a no-op when the element is not found in a non-empty heap", () => {
+      const heap = numberHeap();
+      [5, 3, 8].forEach((n) => heap.push(n));
+
+      heap.remove(99);
+
+      expect(heap.size()).toBe(3);
+      expect(drain(heap)).toEqual([3, 5, 8]);
+    });
   });
 
   describe("rescoreElement", () => {
@@ -104,6 +114,34 @@ describe("BinaryHeap", () => {
       expect(heap.pop()).toBe(c);
       expect(heap.pop()).toBe(a);
       expect(heap.pop()).toBe(b);
+    });
+
+    it("re-sorts a node after its score is increased", () => {
+      const heap = new BinaryHeap<Node>((node) => node.f);
+
+      const a = { id: "a", f: 10 };
+      const b = { id: "b", f: 20 };
+      const c = { id: "c", f: 30 };
+      [a, b, c].forEach((node) => heap.push(node));
+
+      a.f = 50;
+      heap.rescoreElement(a);
+
+      expect(heap.pop()).toBe(b);
+      expect(heap.pop()).toBe(c);
+      expect(heap.pop()).toBe(a);
+    });
+
+    it("is a no-op and does not throw when the node is not in the heap", () => {
+      const heap = new BinaryHeap<Node>((node) => node.f);
+
+      const a = { id: "a", f: 10 };
+      const absent = { id: "absent", f: 99 };
+      heap.push(a);
+
+      expect(() => heap.rescoreElement(absent)).not.toThrow();
+      expect(heap.size()).toBe(1);
+      expect(heap.pop()).toBe(a);
     });
   });
 });
