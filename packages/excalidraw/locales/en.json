@@ -205,7 +205,12 @@
     "showHints": "Show hints",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
-    "inputDeviceMouse": "Mouse"
+    "inputDeviceMouse": "Mouse",
+    "inputInstructions": {
+      "mouse": "Scroll to Zoom",
+      "trackpad": "Pinch to Zoom"
+    }
+    
   },
   "elementLink": {
     "title": "Link to object",

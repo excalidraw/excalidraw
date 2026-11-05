@@ -4,6 +4,8 @@ import { THEME } from "@excalidraw/common";
 
 import type { Theme } from "@excalidraw/element/types";
 
+import { resolveInputDevice } from "../../appState";
+
 import {
   actionClearCanvas,
   actionLoadScene,
@@ -20,7 +22,6 @@ import {
   actionToggleZenMode,
 } from "../../actions";
 import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
-import { resolveInputDevice } from "../../appState";
 
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
