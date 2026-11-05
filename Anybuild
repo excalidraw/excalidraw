@@ -1,0 +1,17 @@
+load("//anybuild/tools:node_static.bzl", "nodestatic_build", "nodestatic_config")
+load("//anybuild/tools:staticfile.bzl", "staticfile_serve")
+
+config = nodestatic_config(
+    schema = 1,
+    commands = {"install": "yarn --frozen-lockfile"},
+    node_package_manager = "yarn",
+    yarn_version = "1.22.22",
+    node_version = "24",
+    node_build_command = "yarn build:app:docker",
+    node_install_requires_all_files = True,
+    static_dir = "excalidraw-app/build",
+)
+
+build = nodestatic_build(config)
+
+staticfile_serve(config, build, name = "excalidraw", provider = "node-static")
