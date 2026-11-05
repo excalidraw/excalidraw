@@ -55,6 +55,10 @@ const getWorkerFontFaceSet = (): FontFaceSet | null =>
 
 export class Fonts {
   public static readonly loadedFontsCache = new Set<string>();
+  private static readonly registeredFontSets = new WeakMap<
+    FontFaceSet,
+    Set<FontFace>
+  >();
 
   private static _registered:
     | Map<
@@ -86,6 +90,35 @@ export class Fonts {
 
   public get registered() {
     return Fonts.registered;
+  }
+
+  /**
+   * Replace a bundled family's faces before mounting the editor. This lets
+   * embedders provide locale-specific fallback glyphs for canvas and export.
+   * Metrics and scene font-family IDs remain unchanged.
+   */
+  public static registerFontFaces(
+    family: keyof typeof FONT_FAMILY | keyof typeof FONT_FAMILY_FALLBACKS,
+    descriptors: readonly ExcalidrawFontFaceDescriptor[],
+  ): void {
+    const fontFamily =
+      FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
+      FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
+    const registered = Fonts.registered.get(fontFamily);
+    if (!registered) {
+      throw new Error(`Unknown font family: ${family}`);
+    }
+    if (registered.metadata.local) {
+      throw new Error(`Local font faces are managed by the host: ${family}`);
+    }
+    if (!descriptors.length) {
+      throw new Error("At least one font face is required");
+    }
+    const fontFaces = descriptors.map(
+      ({ uri, descriptors }) =>
+        new ExcalidrawFontFace(family, uri, descriptors),
+    );
+    Fonts.registered.set(fontFamily, { ...registered, fontFaces });
   }
 
   private readonly scene: Scene;
@@ -268,6 +301,7 @@ export class Fonts {
     charsPerFamily: Record<number, Set<string>>,
     fontFaceSet: FontFaceSet,
   ) {
+    const currentFaces = new Set<FontFace>();
     // add all registered font faces into the font set (if not added already)
     for (const { fontFaces, metadata } of Fonts.registered.values()) {
       // skip registering font faces for local fonts (i.e. Helvetica)
@@ -276,11 +310,18 @@ export class Fonts {
       }
 
       for (const { fontFace } of fontFaces) {
+        currentFaces.add(fontFace);
         if (!fontFaceSet.has(fontFace)) {
           fontFaceSet.add(fontFace);
         }
       }
     }
+    for (const previous of Fonts.registeredFontSets.get(fontFaceSet) ?? []) {
+      if (!currentFaces.has(previous)) {
+        fontFaceSet.delete(previous);
+      }
+    }
+    Fonts.registeredFontSets.set(fontFaceSet, currentFaces);
 
     // loading 10 font faces at a time, in a controlled manner
     const iterator = Fonts.fontFacesLoader(
