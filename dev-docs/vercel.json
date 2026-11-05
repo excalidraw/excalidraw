@@ -64,7 +64,7 @@
       "permanent": true
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "destination": "https://plus.excalidraw.com/docs/sdk",
       "permanent": true
     }
