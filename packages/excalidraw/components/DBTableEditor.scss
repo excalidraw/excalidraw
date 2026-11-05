@@ -87,6 +87,7 @@
   // --- row & table controls (kept at screen size whatever the zoom) -----------
 
   .excalidraw-dbtable-editor__remove,
+  .excalidraw-dbtable-editor__drag,
   .excalidraw-dbtable-editor__add {
     position: absolute;
     pointer-events: auto;
@@ -137,9 +138,32 @@
     }
   }
 
+  .excalidraw-dbtable-editor__drag {
+    width: 1.375rem;
+    height: 1.375rem;
+    padding: 0;
+    border-radius: var(--border-radius-md, 0.375rem);
+    // just left of the table, centered on its row
+    transform: translate(calc(-100% - 0.5rem), -50%)
+      scale(calc(1 / var(--dbtable-editor-zoom)));
+    transform-origin: 100% 50%;
+    cursor: grab;
+    touch-action: none;
+    opacity: 0;
+  }
+
+  .excalidraw-dbtable-editor__row--dragged .excalidraw-dbtable-editor__drag {
+    cursor: grabbing;
+    color: var(--color-primary);
+  }
+
   .excalidraw-dbtable-editor__row:hover .excalidraw-dbtable-editor__remove,
+  .excalidraw-dbtable-editor__row:hover .excalidraw-dbtable-editor__drag,
+  .excalidraw-dbtable-editor__row--dragged .excalidraw-dbtable-editor__drag,
   .excalidraw-dbtable-editor__row:focus-within
-    .excalidraw-dbtable-editor__remove {
+    .excalidraw-dbtable-editor__remove,
+  .excalidraw-dbtable-editor__row:focus-within
+    .excalidraw-dbtable-editor__drag {
     opacity: 1;
   }
 

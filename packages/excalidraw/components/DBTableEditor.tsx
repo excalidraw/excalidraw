@@ -1,5 +1,11 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   applyDarkModeFilter,
@@ -46,6 +52,14 @@ const KEY_SUGGESTIONS = [
 
 type Column = "key" | "name";
 
+const DragHandleIcon = (
+  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    {[5, 8, 11].flatMap((y) =>
+      [6, 10].map((x) => <circle key={`${x}-${y}`} cx={x} cy={y} r="1.1" />),
+    )}
+  </svg>
+);
+
 const cellId = (cell: DBTableCell) =>
   cell.type === "title" ? "title" : `${cell.rowId}:${cell.type}`;
 
@@ -77,6 +91,9 @@ export const DBTableEditor = ({
   tableRef.current = table;
 
   const layout = getDBTableLayout(table);
+  const [draggedRowId, setDraggedRowId] = useState<string | null>(null);
+  const appStateZoomRef = useRef(appState.zoom.value);
+  appStateZoomRef.current = appState.zoom.value;
 
   useLayoutEffect(() => {
     const pending = pendingFocus.current;
@@ -167,6 +184,55 @@ export const DBTableEditor = ({
     [rows[index], rows[target]] = [rows[target], rows[index]];
     pendingFocus.current = { cell: { type: column, rowId }, select: false };
     setRows(rows);
+  };
+
+  /** drags a row by its handle; it is reordered live as the pointer crosses rows */
+  const startRowDrag = (
+    event: React.PointerEvent<HTMLButtonElement>,
+    rowId: string,
+  ) => {
+    if (event.button !== 0) {
+      return;
+    }
+    event.preventDefault();
+    const startIndex = tableRef.current.rows.findIndex((r) => r.id === rowId);
+    const rowHeight = getDBTableLayout(tableRef.current).rows[0]?.rect.height;
+    if (startIndex === -1 || !rowHeight) {
+      return;
+    }
+    const { angle } = tableRef.current;
+    // pointer travel along the table's own (rotated) vertical axis, in scene px
+    const along = (e: PointerEvent) =>
+      (-e.clientX * Math.sin(angle) + e.clientY * Math.cos(angle)) /
+      appStateZoomRef.current;
+    const startAlong = along(event.nativeEvent);
+    setDraggedRowId(rowId);
+
+    const onMove = (e: PointerEvent) => {
+      const rows = [...tableRef.current.rows];
+      const from = rows.findIndex((r) => r.id === rowId);
+      const to = Math.max(
+        0,
+        Math.min(
+          rows.length - 1,
+          startIndex + Math.round((along(e) - startAlong) / rowHeight),
+        ),
+      );
+      if (from === -1 || from === to) {
+        return;
+      }
+      rows.splice(to, 0, rows.splice(from, 1)[0]);
+      setRows(rows);
+    };
+    const onEnd = () => {
+      setDraggedRowId(null);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onEnd);
+      window.removeEventListener("pointercancel", onEnd);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onEnd);
+    window.addEventListener("pointercancel", onEnd);
   };
 
   // --- keyboard navigation -------------------------------------------------------
@@ -368,7 +434,24 @@ export const DBTableEditor = ({
         />
 
         {layout.rows.map(({ row, key, name, keyTextY, nameTextY }) => (
-          <div key={row.id} className="excalidraw-dbtable-editor__row">
+          <div
+            key={row.id}
+            className={clsx("excalidraw-dbtable-editor__row", {
+              "excalidraw-dbtable-editor__row--dragged":
+                draggedRowId === row.id,
+            })}
+          >
+            <button
+              type="button"
+              tabIndex={-1}
+              className="excalidraw-dbtable-editor__drag"
+              style={{ top: key.y + key.height / 2, left: 0 }}
+              title={t("dbTable.dragRow")}
+              aria-label={t("dbTable.dragRow")}
+              onPointerDown={(event) => startRowDrag(event, row.id)}
+            >
+              {DragHandleIcon}
+            </button>
             <input
               ref={registerInput({ type: "key", rowId: row.id })}
               className="excalidraw-dbtable-editor__input excalidraw-dbtable-editor__key"

@@ -262,6 +262,43 @@ describe("table element", () => {
       expect(getDBTable(table.id).title).toBe(table.title);
     });
 
+    it("reorders a row dragged by its handle", async () => {
+      const table = createDBTable({
+        rows: [
+          { key: "PK", name: "id" },
+          { key: "", name: "name" },
+          { key: "", name: "email" },
+        ],
+      });
+      API.setElements([table]);
+      act(() => h.app.dbTable.startEditing(table, { type: "title" }));
+      await act(async () => {});
+
+      const rowHeight = getDBTableLayout(table).rows[0].rect.height;
+      const handle = document.querySelector(
+        ".excalidraw-dbtable-editor__drag",
+      ) as HTMLElement;
+      fireEvent.pointerDown(handle, { button: 0, clientX: 0, clientY: 0 });
+      // zoom is 1: two rows down moves the first row to the end
+      fireEvent.pointerMove(window, { clientX: 0, clientY: rowHeight * 2 });
+      await act(async () => {});
+      expect(getDBTable(table.id).rows.map((row) => row.name)).toEqual([
+        "name",
+        "email",
+        "id",
+      ]);
+
+      // and back up by one
+      fireEvent.pointerMove(window, { clientX: 0, clientY: rowHeight });
+      fireEvent.pointerUp(window);
+      await act(async () => {});
+      expect(getDBTable(table.id).rows.map((row) => row.name)).toEqual([
+        "name",
+        "id",
+        "email",
+      ]);
+    });
+
     it("edits the double-clicked cell", async () => {
       const table = createDBTable({
         rows: [

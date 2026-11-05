@@ -378,6 +378,7 @@
     "namePlaceholder": "field_name",
     "addRow": "Add field",
     "removeRow": "Remove field",
+    "dragRow": "Drag to reorder",
     "collapse": "Collapse table",
     "expand": "Expand table",
     "keySuggestions": "Key suggestions"
