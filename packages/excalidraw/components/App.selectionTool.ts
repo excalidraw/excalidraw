@@ -765,9 +765,8 @@ export class AppSelectionTool {
       !isSelectingPointsInLineEditor &&
       !pointerDownState.drag.blockDragging
     ) {
-      const selectedElements = this.app.scene.getSelectedElements(
-        this.app.state,
-      );
+      // (`let`, as an alt-drag below swaps the selection to the duplicates)
+      let selectedElements = this.app.scene.getSelectedElements(this.app.state);
       if (
         selectedElements.length > 0 &&
         selectedElements.every((element) => element.locked)
@@ -986,6 +985,16 @@ export class AppSelectionTool {
 
         this.app.setState({ snapLines });
 
+        // Duplicate the selection first, on an alt-drag, so that the drag
+        // below moves the duplicates and the originals are never moved:
+        // dragging a bound arrow first would unbind it, and a bound elbow
+        // arrow wouldn't move at all, so its duplicate would miss this
+        // move's drag offset (#8435).
+        if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
+          this.app.duplicate.duplicateDraggedSelection(pointerDownState, event);
+          selectedElements = this.app.scene.getSelectedElements(this.app.state);
+        }
+
         // when we're editing the name of a frame, we want the user to be
         // able to select and interact with the text input
         if (!this.app.state.editingFrame) {
@@ -1006,11 +1015,6 @@ export class AppSelectionTool {
           // should be removed
           selectionElement: null,
         });
-
-        // We duplicate the selected element if alt is pressed on pointer move
-        if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
-          this.app.duplicate.duplicateDraggedSelection(pointerDownState, event);
-        }
 
         return true;
       }

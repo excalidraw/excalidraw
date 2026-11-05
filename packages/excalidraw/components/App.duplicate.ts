@@ -5,7 +5,6 @@ import {
   distance,
   getGridPoint,
   randomInteger,
-  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
 import {
@@ -416,7 +415,31 @@ export class AppDuplicate {
         };
       },
     });
-    const { origElementsMap, origIdToDuplicateId } = duplication;
+    const { origElementsMap, origIdToDuplicateId, duplicateIdToOrigId } =
+      duplication;
+
+    // The drag that follows measures its offset from where the drag started
+    // (see below: the drag origin is not reset), so the duplicates must
+    // start from where the drag started too. If the originals were already
+    // dragged before alt was pressed, shift each duplicate back by how far
+    // its original has moved since the drag started, keeping the
+    // duplicate's own geometry (e.g. an elbow arrow's re-routed points).
+    for (const duplicateElement of duplication.duplicatedElements) {
+      const origId = duplicateIdToOrigId.get(duplicateElement.id);
+      const origElement = origId && origElementsMap.get(origId);
+      const origDragStart =
+        origId && pointerDownState.originalElements.get(origId);
+      if (origElement && origDragStart) {
+        const dx = origDragStart.x - origElement.x;
+        const dy = origDragStart.y - origElement.y;
+        if (dx !== 0 || dy !== 0) {
+          Object.assign(duplicateElement, {
+            x: duplicateElement.x + dx,
+            y: duplicateElement.y + dy,
+          });
+        }
+      }
+    }
 
     const mappedClonedElements = duplication.elementsWithDuplicates.map(
       (el) => {
@@ -494,12 +517,13 @@ export class AppDuplicate {
           [],
         );
 
-      // update drag origin to the position at which we started
-      // the duplication so that the drag offset is correct
-      pointerDownState.drag.origin = viewportCoordsToSceneCoords(
-        event,
-        this.app.state,
-      );
+      // The drag origin stays where the drag started: the duplicates above
+      // were shifted back to where the drag started, and the drag offset is
+      // measured from the drag origin, so the drag moves the duplicates by
+      // the pointer's full displacement since the drag started (#8435).
+      // (Resetting the origin here used to be correct, when the duplicates
+      // were created from the already-dragged originals and the drag offset
+      // had to be incremental instead.)
 
       // switch selected elements to the duplicated ones
       this.app.setState((prevState) => ({
