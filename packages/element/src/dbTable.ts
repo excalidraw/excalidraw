@@ -130,7 +130,7 @@ const layoutCache = new WeakMap<
 export const getDBTableLayout = (
   element: Pick<
     ExcalidrawDBTableElement,
-    "title" | "rows" | "collapsed" | "fontSize" | "fontFamily"
+    "title" | "rows" | "collapsed" | "fontSize" | "fontFamily" | "customWidth"
   >,
   renderEnvironment?: RenderEnvironment,
 ): DBTableLayout => {
@@ -186,6 +186,7 @@ export const getDBTableLayout = (
       MIN_WIDTH * unit,
       titleWidth + titleSideInset * 2,
       keyColumnWidth + minNameColumnWidth,
+      element.customWidth ?? 0,
     ),
   );
   // the name column absorbs any extra width
@@ -292,7 +293,7 @@ export const normalizeDBTable = <T extends ExcalidrawDBTableElement>(
 export type DBTableContentUpdate = Partial<
   Pick<
     ExcalidrawDBTableElement,
-    "title" | "rows" | "collapsed" | "fontSize" | "fontFamily"
+    "title" | "rows" | "collapsed" | "fontSize" | "fontFamily" | "customWidth"
   >
 >;
 

@@ -77,10 +77,8 @@ export const OMIT_SIDES_FOR_FRAME = {
 };
 
 export const OMIT_SIDES_FOR_TABLE = {
-  e: true,
   s: true,
   n: true,
-  w: true,
   nw: true,
   ne: true,
   sw: true,
@@ -320,8 +318,8 @@ export const getTransformHandles = (
       rotation: true,
     };
   } else if (element.type === "dbtable") {
-    // a table's size is derived from its content: it can only be rotated
-    // (or scaled as part of a multi-selection)
+    // a table's height is derived from its content: it can be rotated and
+    // resized horizontally (or scaled as part of a multi-selection)
     omitSides = OMIT_SIDES_FOR_TABLE;
   }
   const margin = isLinearElement(element)

@@ -69,7 +69,7 @@ import {
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
-import { getDBTableLayout } from "./dbTable";
+import { getDBTableLayout, syncDBTableRowBindings } from "./dbTable";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 
@@ -769,8 +769,35 @@ export const resizeSingleElement = (
     renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
-  // a table's size is derived from its content (see `normalizeDBTable`)
+  // a table's height is derived from its content (see `normalizeDBTable`);
+  // only its width can be set, and never below what the content needs
   if (isDBTableElement(latestElement)) {
+    if (handleDirection !== "e" && handleDirection !== "w") {
+      return;
+    }
+    const minWidth = getDBTableLayout(
+      { ...latestElement, customWidth: null },
+      renderEnvironment,
+    ).width;
+    const width = Math.max(Math.abs(nextWidth), minWidth);
+    const origin = getResizedOrigin(
+      pointFrom<GlobalPoint>(origElement.x, origElement.y),
+      origElement.width,
+      origElement.height,
+      width,
+      origElement.height,
+      origElement.angle,
+      handleDirection,
+      false,
+      !!shouldResizeFromCenter,
+    );
+    scene.mutateElement(
+      latestElement,
+      { ...origin, width, customWidth: width },
+      { informMutation: shouldInformMutation, isDragging: false },
+    );
+    syncDBTableRowBindings(latestElement, scene);
+    updateBoundElements(latestElement, scene, { renderEnvironment });
     return;
   }
 
@@ -1436,6 +1463,7 @@ export const resizeMultipleElements = (
       > & {
         points?: ExcalidrawLinearElement["points"];
         fontSize?: ExcalidrawTextElement["fontSize"];
+        customWidth?: number | null;
         scale?: ExcalidrawImageElement["scale"];
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
         startBinding?: ExcalidrawElbowArrowElement["startBinding"];
@@ -1540,10 +1568,14 @@ export const resizeMultipleElements = (
           return;
         }
         update.fontSize = fontSize;
+        const customWidth = orig.customWidth
+          ? orig.customWidth * scale
+          : orig.customWidth;
+        update.customWidth = customWidth;
         // the size follows from the scaled font (≈ the scaled box, without
         // drift from rounding)
         const layout = getDBTableLayout(
-          { ...orig, fontSize },
+          { ...orig, fontSize, customWidth },
           renderEnvironment,
         );
         update.width = layout.width;

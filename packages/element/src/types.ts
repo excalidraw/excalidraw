@@ -138,6 +138,11 @@ export type ExcalidrawDBTableElement = _ExcalidrawElementBase &
     collapsed: boolean;
     fontSize: number;
     fontFamily: FontFamilyValues;
+    /**
+     * Width set by resizing horizontally. The table is never narrower than its
+     * content needs; unset, it is exactly as wide as the content.
+     */
+    customWidth?: number | null;
   }>;
 
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase &

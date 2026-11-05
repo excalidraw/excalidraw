@@ -790,6 +790,9 @@ export const restoreElement = (
               ? element.fontSize
               : DEFAULT_FONT_SIZE,
           fontFamily,
+          ...(isFiniteNumber(element.customWidth) && element.customWidth > 0
+            ? { customWidth: element.customWidth }
+            : {}),
         }),
       );
     }

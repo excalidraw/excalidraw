@@ -97,12 +97,8 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       elementsMap,
     );
 
-    // do not resize from the sides for linear elements with only two points,
-    // nor for tables (sized by their content)
-    if (
-      !(isLinearElement(element) && element.points.length <= 2) &&
-      element.type !== "dbtable"
-    ) {
+    // do not resize from the sides for linear elements with only two points
+    if (!(isLinearElement(element) && element.points.length <= 2)) {
       const SPACING = isImageElement(element)
         ? 0
         : SIDE_RESIZING_THRESHOLD / zoom.value;
@@ -116,6 +112,10 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       );
 
       for (const [dir, side] of Object.entries(sides)) {
+        // a table's height is sized by its content: only its width resizes
+        if (element.type === "dbtable" && dir !== "e" && dir !== "w") {
+          continue;
+        }
         // test to see if x, y are on the line segment
         if (
           pointOnLineSegment(

@@ -183,14 +183,14 @@ describe("table element", () => {
       ).toBe(true);
     });
 
-    it("only offers the rotation handle (its size follows the content)", () => {
+    it("only offers rotation and side handles (its height follows the content)", () => {
       const table = createDBTable();
       const handles = getTransformHandles(table, h.state.zoom, new Map());
       expect(
         Object.entries(handles)
           .filter(([, handle]) => handle)
           .map(([type]) => type),
-      ).toEqual(["rotation"]);
+      ).toEqual(["rotation", "w", "e"]);
     });
   });
 
@@ -545,6 +545,40 @@ describe("table element", () => {
         orders.x + orders.width + gap,
         0,
       );
+    });
+
+    it("resizes horizontally from its side handles, never below its content", () => {
+      UI.clickTool("selection");
+      mouse.clickAt(users.x + 20, users.y + 8);
+      const gap = getBindingGap(users);
+      const minWidth = users.width;
+
+      // widen from the right edge: the arrow follows the new edge
+      const edge = { x: users.x + users.width, y: users.y + users.height / 2 };
+      mouse.downAt(edge.x, edge.y);
+      mouse.moveTo(edge.x + 100, edge.y);
+      mouse.upAt(edge.x + 100, edge.y);
+      expect(getUsers().width).toBeCloseTo(minWidth + 100, 0);
+      expect(getUsers().customWidth).toBeCloseTo(minWidth + 100, 0);
+      expect(getUsers().height).toBe(users.height);
+      expect(endPoint(getArrow(), 0).x).toBeCloseTo(
+        users.x + minWidth + 100 + gap,
+        0,
+      );
+
+      // shrinking stops at the content's width
+      const edge2 = { x: users.x + getUsers().width, y: edge.y };
+      mouse.downAt(edge2.x, edge2.y);
+      mouse.moveTo(edge2.x - 400, edge2.y);
+      mouse.upAt(edge2.x - 400, edge2.y);
+      expect(getUsers().width).toBe(minWidth);
+
+      // survives save and load
+      const [restored] = restoreElements(
+        [{ ...getUsers(), customWidth: 400 }],
+        null,
+      ) as ExcalidrawDBTableElement[];
+      expect(restored.width).toBe(400);
     });
 
     it("keeps the row through save and load", () => {
