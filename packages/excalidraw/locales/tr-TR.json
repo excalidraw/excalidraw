@@ -220,7 +220,11 @@
     "multipleResults": "sonuç",
     "placeholder": "Tuvalde metin bul...",
     "frames": "Çerçeveler",
-    "texts": "Metinler"
+    "texts": "Metinler",
+    "includeHandwriting": "El yazısında ara (deneysel)",
+    "handwritingHint": "İngilizce el yazısını bu cihazda tanır. İlk kullanımda bir model indirilir; çizimler sunucuya gönderilmez.",
+    "handwritingLoading": "El yazısı tanınıyor… Modelin ilk indirilmesi birkaç dakika sürebilir. Normal metin araması hazır.",
+    "handwritingError": "El yazısı tanınamadı. Yeniden denemek için el yazısı aramasını kapatıp açın. Normal metin araması kullanılabilir."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
