@@ -4,6 +4,8 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { CLASSES } from "@excalidraw/common";
 
+import { getLanguage } from "../../i18n";
+
 import DropdownMenuContent from "./DropdownMenuContent";
 import DropdownMenuGroup from "./DropdownMenuGroup";
 import DropdownMenuItem from "./DropdownMenuItem";
@@ -40,7 +42,11 @@ const DropdownMenu = ({
       : MenuContentComp;
 
   return (
-    <DropdownMenuPrimitive.Root open={open} modal={false}>
+    <DropdownMenuPrimitive.Root
+      open={open}
+      modal={false}
+      dir={getLanguage().rtl ? "rtl" : "ltr"}
+    >
       <div
         className={CLASSES.DROPDOWN_MENU_EVENT_WRAPPER}
         style={{
