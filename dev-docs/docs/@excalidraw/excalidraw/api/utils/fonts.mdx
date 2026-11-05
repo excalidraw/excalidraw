@@ -1,0 +1,26 @@
+---
+sidebar_position: 5
+---
+
+# Fonts
+
+`Fonts` is exported from `@excalidraw/excalidraw`. Use `Fonts.registerFontFaces` **before mounting any editor** to replace the faces of a bundled font family. The replacement applies to all editor instances and subsequent exports in the same JavaScript environment. It does not change stored scene font IDs or metrics.
+
+For example, an embedded application targeting Japanese can replace the `Xiaolai` fallback with a compatible Japanese handwriting font it hosts:
+
+```tsx
+import { Fonts } from "@excalidraw/excalidraw";
+
+Fonts.registerFontFaces("Xiaolai", [
+  {
+    uri: "https://your-app.example/fonts/japanese-handwriting.woff2",
+    descriptors: { unicodeRange: "U+3000-30FF, U+4E00-9FFF" },
+  },
+]);
+```
+
+Supply all required ranges: this replaces the family's entire face list, rather than appending overlapping faces. Both canvas font loading and SVG font embedding use the replacement. Fonts hosted on another origin must allow cross-origin fetches. Use compatible metrics and a font license that permits embedding.
+
+The family must already be registered, and the descriptor list must be nonempty; otherwise the method throws without changing the registry. Each descriptor has a `uri` and optional standard `FontFaceDescriptors`. Local/system font families such as `Helvetica` cannot be replaced with this API.
+
+This is an explicit, application-wide customization. It does not detect Japanese, select different fonts per element, or alter the defaults on excalidraw.com. A server-side export process must register the same replacement before exporting.
