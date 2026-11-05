@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { KEYS, normalizeInputColor } from "@excalidraw/common";
+import { KEYS, isIMEComposing, normalizeInputColor } from "@excalidraw/common";
 
 import { getShortcutKey } from "../..//shortcut";
 import { useAtom } from "../../editor-jotai";
@@ -103,7 +103,7 @@ export const ColorInput = ({
           onKeyDown={(event) => {
             if (event.key === KEYS.TAB) {
               return;
-            } else if (event.key === KEYS.ESCAPE) {
+            } else if (event.key === KEYS.ESCAPE && !isIMEComposing(event)) {
               eyeDropperTriggerRef.current?.focus();
             }
             event.stopPropagation();

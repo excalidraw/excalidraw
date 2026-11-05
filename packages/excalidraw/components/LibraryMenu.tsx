@@ -12,6 +12,7 @@ import {
   randomId,
   isShallowEqual,
   KEYS,
+  isIMEComposing,
   isWritableElement,
   addEventListener,
   EVENT,
@@ -280,6 +281,7 @@ export const LibraryMenu = memo(() => {
       (event) => {
         if (
           event.key === KEYS.ESCAPE &&
+          !isIMEComposing(event) &&
           event.target instanceof ownerWindow.HTMLElement
         ) {
           const target = event.target;

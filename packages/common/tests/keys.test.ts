@@ -1,4 +1,4 @@
-import { KEYS, matchKey } from "../src/keys";
+import { KEYS, isIMEComposing, matchKey } from "../src/keys";
 
 describe("key matcher", async () => {
   it("should not match unexpected key", async () => {
@@ -267,5 +267,40 @@ describe("key matcher", async () => {
         KEYS.Y,
       ),
     ).toBeTruthy();
+  });
+});
+
+describe("isIMEComposing", () => {
+  it("should tell the keys of an IME composition from the others", () => {
+    expect(
+      isIMEComposing(new KeyboardEvent("keydown", { key: KEYS.ENTER })),
+    ).toBe(false);
+    expect(
+      isIMEComposing(
+        new KeyboardEvent("keydown", { key: KEYS.ENTER, isComposing: true }),
+      ),
+    ).toBe(true);
+    // Safari ends the composition before the keydown
+    expect(
+      isIMEComposing(
+        new KeyboardEvent("keydown", { key: KEYS.ENTER, keyCode: 229 }),
+      ),
+    ).toBe(true);
+  });
+
+  it("should read the native event of a React event", () => {
+    expect(
+      isIMEComposing({
+        nativeEvent: new KeyboardEvent("keydown", {
+          key: KEYS.ENTER,
+          isComposing: true,
+        }),
+      }),
+    ).toBe(true);
+    expect(
+      isIMEComposing({
+        nativeEvent: new KeyboardEvent("keydown", { key: KEYS.ENTER }),
+      }),
+    ).toBe(false);
   });
 });

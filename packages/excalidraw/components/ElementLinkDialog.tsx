@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { normalizeLink, KEYS } from "@excalidraw/common";
+import { normalizeLink, KEYS, isIMEComposing } from "@excalidraw/common";
 
 import {
   defaultGetElementLinkFromSelection,
@@ -89,6 +89,10 @@ const ElementLinkDialog = ({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isIMEComposing(event)) {
+        return;
+      }
+
       if (
         appState.openDialog?.name === "elementLinkSelector" &&
         event.key === KEYS.ENTER
@@ -128,7 +132,7 @@ const ElementLinkDialog = ({
             setNextLink(value);
           }}
           onKeyDown={(event) => {
-            if (event.key === KEYS.ENTER) {
+            if (event.key === KEYS.ENTER && !isIMEComposing(event)) {
               handleConfirm();
             }
           }}
