@@ -267,6 +267,60 @@ describe("textWysiwyg", () => {
       expect(text.y + lineHeightPx / 2).toBe(80);
     });
 
+    // Regression test for https://github.com/excalidraw/excalidraw/issues/12438
+    // When a user clicks the canvas with the text tool and starts typing, the
+    // bounding box must grow away from the alignment anchor — not toward it.
+    //
+    // - "left":   left edge anchored at click → box grows right         ✓ always was
+    // - "center": left edge anchored at click → box grows right         ✓ fixed here
+    // - "right":  right edge anchored at click → box grows left         ✓ always was
+    //
+    // Before the fix, "center" alignment shifted x left by half the width
+    // growth on every keystroke inside `getAdjustedDimensions`, making the
+    // text appear to extend toward the left.
+    it.each([
+      {
+        textAlign: "left" as const,
+        // left edge stays fixed; width grows rightward
+        anchor: (t: ExcalidrawTextElement) => t.x,
+      },
+      {
+        textAlign: "center" as const,
+        // left edge stays fixed; width grows rightward (the bug was here)
+        anchor: (t: ExcalidrawTextElement) => t.x,
+      },
+      {
+        textAlign: "right" as const,
+        // right edge stays fixed; width grows leftward
+        anchor: (t: ExcalidrawTextElement) => t.x + t.width,
+      },
+    ])(
+      "should keep the $textAlign anchor fixed while typing free text (issue #12438)",
+      async ({ textAlign, anchor }) => {
+        API.setAppState({ currentItemTextAlign: textAlign });
+        UI.clickTool("text");
+
+        mouse.clickAt(120, 80);
+
+        const editor = await getTextEditor();
+        const textBefore = h.elements[0] as ExcalidrawTextElement;
+        const anchorBefore = anchor(textBefore);
+
+        // Simulate typing a progressively longer string so the element grows.
+        updateTextEditor(editor, "Hello");
+        const textAfter5 = h.elements[0] as ExcalidrawTextElement;
+
+        updateTextEditor(editor, "Hello, world!");
+        const textAfterMore = h.elements[0] as ExcalidrawTextElement;
+
+        // The alignment anchor must not drift as the box widens.
+        expect(anchor(textAfter5)).toBe(anchorBefore);
+        expect(anchor(textAfterMore)).toBe(anchorBefore);
+        // The element should have grown wider as text was added.
+        expect(textAfterMore.width).toBeGreaterThan(textAfter5.width);
+      },
+    );
+
     it("should snap newly created text top-left to the current grid cell when clicked with text tool in grid mode", async () => {
       API.setAppState({
         currentItemFontFamily: FONT_FAMILY.Cascadia,
