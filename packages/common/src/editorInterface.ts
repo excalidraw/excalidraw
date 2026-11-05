@@ -19,7 +19,10 @@ const DESKTOP_UI_MODE_STORAGE_KEY = "excalidraw.desktopUIMode";
 export const MQ_MAX_MOBILE = 599;
 
 export const MQ_MAX_WIDTH_LANDSCAPE = 1000;
-export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
+// bumped from 500 to 600 so narrow-width viewports with short heights
+// (e.g. 690x550) trigger the mobile layout instead of clipping the
+// top-right controls (fixes #11295)
+export const MQ_MAX_HEIGHT_LANDSCAPE = 600;
 
 // tablets
 export const MQ_MIN_TABLET = MQ_MAX_MOBILE + 1; // lower bound (excludes phones)
