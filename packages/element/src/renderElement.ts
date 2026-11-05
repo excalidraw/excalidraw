@@ -62,8 +62,14 @@ import { getLineHeightInPx } from "./textMeasurements";
 import {
   getTextDecorationMetrics,
   getTextElementLines,
+  isTextElementListLine,
 } from "./richTextLayout";
 import { getTextSegmentFontString } from "./textSpans";
+import {
+  getAlignedLineXs,
+  getListLineContent,
+  getListLineLayouts,
+} from "./markdownList";
 import {
   isTextElement,
   isLinearElement,
@@ -754,7 +760,12 @@ const drawElementOnCanvas = (
           // rich text (styled portions): drawn piece by piece, so RTL text
           // (which needs the browser's bidi layout of the whole line) keeps
           // the plain path
-          const richLines = rtl ? null : getTextElementLines(element);
+          const richLines = rtl
+            ? null
+            : getTextElementLines(
+                element,
+                getRenderEnvironment(renderConfig.renderEnvironment),
+              );
 
           if (richLines) {
             drawTextElementLines(
@@ -766,12 +777,59 @@ const drawElementOnCanvas = (
             return;
           }
 
+          // markdown list items: markers drawn as bullets / numbers, and
+          // their text (also on the lines they wrap into) hanging past them
+          const listLayouts = getListLineLayouts(
+            element.text,
+            element.originalText,
+            element.fontSize,
+            (marker) => context.measureText(marker).width,
+          );
+
+          if (!listLayouts) {
+            for (let index = 0; index < lines.length; index++) {
+              context.fillText(
+                lines[index],
+                horizontalOffset,
+                index * lineHeightPx + verticalOffset,
+              );
+            }
+            return;
+          }
+
+          const contents = lines.map(
+            (line, index) =>
+              getListLineContent(line, listLayouts[index] ?? null).text,
+          );
+          const lineXs = getAlignedLineXs(
+            contents.map((content, index) => ({
+              width:
+                (listLayouts[index]?.contentX ?? 0) +
+                context.measureText(content).width,
+              isListLine: !!listLayouts[index],
+            })),
+            element.textAlign,
+            element.width,
+          );
+          context.textAlign = "left";
+
           for (let index = 0; index < lines.length; index++) {
-            context.fillText(
-              lines[index],
-              horizontalOffset,
-              index * lineHeightPx + verticalOffset,
-            );
+            const baseline = index * lineHeightPx + verticalOffset;
+            const listLayout = listLayouts[index];
+            const lineX = lineXs[index];
+            if (!listLayout) {
+              context.fillText(contents[index], lineX, baseline);
+              continue;
+            }
+            const content = contents[index];
+            if (listLayout.item) {
+              context.fillText(
+                listLayout.item.displayMarker,
+                lineX + listLayout.markerX,
+                baseline,
+              );
+            }
+            context.fillText(content, lineX + listLayout.contentX, baseline);
           }
         });
         if (shouldTemporarilyAttach) {
@@ -896,23 +954,41 @@ const drawTextElementLines = (
 ) => {
   context.textAlign = "left";
 
-  for (const line of lines) {
-    const widths = line.segments.map((segment) => {
+  const lineWidths = lines.map((line) =>
+    line.segments.map((segment) => {
       context.font = getTextSegmentFontString(element, segment.style);
       return context.measureText(segment.text).width;
-    });
-    const lineWidth = widths.reduce((sum, width) => sum + width, 0);
-    const lineX =
-      element.textAlign === "center"
-        ? (element.width - lineWidth) / 2
-        : element.textAlign === "right"
-        ? element.width - lineWidth
-        : 0;
+    }),
+  );
+  const lineXs = getAlignedLineXs(
+    lines.map((line, index) => ({
+      width:
+        line.contentX +
+        lineWidths[index].reduce((sum, width) => sum + width, 0),
+      isListLine: isTextElementListLine(line),
+    })),
+    element.textAlign,
+    element.width,
+  );
+
+  for (const [lineIndex, line] of lines.entries()) {
+    const widths = lineWidths[lineIndex];
+    const lineX = lineXs[lineIndex];
+
+    if (line.listMarker) {
+      context.font = getFontString(element);
+      context.fillStyle = applyDarkModeFilter(element.strokeColor, isDarkMode);
+      context.fillText(
+        line.listMarker.text,
+        lineX + line.listMarker.x,
+        line.baseline,
+      );
+    }
 
     // highlights first, so that no piece's glyphs end up beneath the next
     // piece's highlight; each the line's full height, so that they're even
     // whatever the fonts and sizes on the line
-    let x = lineX;
+    let x = lineX + line.contentX;
     line.segments.forEach((segment, index) => {
       if (segment.style.highlightColor) {
         context.fillStyle = applyDarkModeFilter(
@@ -924,7 +1000,7 @@ const drawTextElementLines = (
       x += widths[index];
     });
 
-    x = lineX;
+    x = lineX + line.contentX;
     line.segments.forEach((segment, index) => {
       const width = widths[index];
       const decoration = getTextDecorationMetrics(

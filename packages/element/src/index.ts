@@ -103,6 +103,7 @@ export * from "./textMeasurements";
 export * from "./textWrapping";
 export * from "./textSpans";
 export * from "./richTextLayout";
+export * from "./markdownList";
 export * from "./transform";
 export * from "./transformHandles";
 export * from "./typeChecks";

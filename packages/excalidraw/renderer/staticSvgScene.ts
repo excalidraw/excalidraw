@@ -6,6 +6,7 @@ import {
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -26,6 +27,12 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
+import {
+  getAlignedLineXs,
+  getListLineContent,
+  getListLineLayouts,
+  isTextElementListLine,
+} from "@excalidraw/element";
 import {
   getLineWidth,
   getTextElementLines,
@@ -972,25 +979,71 @@ const renderElementToSvg = (
         // <text> per line so the line's anchor still aligns it
         const richLines =
           direction === "ltr" ? getTextElementLines(element) : null;
+        // markdown list items: markers drawn as bullets / numbers, and their
+        // text (also on the lines they wrap into) hanging past them
+        const fontString = getFontString(element);
+        const listLayouts = richLines
+          ? null
+          : getListLineLayouts(
+              element.text,
+              element.originalText,
+              element.fontSize,
+              (marker) => getLineWidth(marker, fontString),
+            );
+        // the widths of each rich line's pieces
+        const richWidths = richLines?.map((richLine) =>
+          richLine.segments.map((segment) =>
+            getLineWidth(
+              segment.text,
+              getTextSegmentFontString(element, segment.style),
+            ),
+          ),
+        );
+        // where each line starts (a run of list lines aligned as a block)
+        const lineXs = getAlignedLineXs(
+          lines.map((line, index) => {
+            const richLine = richLines?.[index];
+            if (richLine && richWidths) {
+              return {
+                width:
+                  richLine.contentX +
+                  richWidths[index].reduce((sum, width) => sum + width, 0),
+                isListLine: isTextElementListLine(richLine),
+              };
+            }
+            const listLayout = listLayouts?.[index] ?? null;
+            return {
+              width:
+                (listLayout?.contentX ?? 0) +
+                getLineWidth(
+                  getListLineContent(line, listLayout).text,
+                  fontString,
+                ),
+              isListLine: !!listLayout,
+            };
+          }),
+          element.textAlign,
+          element.width,
+        );
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
           const richLine = richLines?.[i];
+          const listLayout = listLayouts?.[i] ?? null;
+          // a list line is laid out from its start, as on the canvas
+          let lineX: number | null = null;
+          let contentX = 0;
+          let listMarker: { text: string; x: number } | null = null;
           if (richLine) {
             // highlights: rects behind the line's text, laid out with the
             // same measurements as the canvas
-            const widths = richLine.segments.map((segment) =>
-              getLineWidth(
-                segment.text,
-                getTextSegmentFontString(element, segment.style),
-              ),
-            );
-            const lineWidth = widths.reduce((sum, width) => sum + width, 0);
-            let x =
-              element.textAlign === "center"
-                ? (element.width - lineWidth) / 2
-                : element.textAlign === "right"
-                ? element.width - lineWidth
-                : 0;
+            const widths = richWidths![i];
+            const alignedX = lineXs[i];
+            if (isTextElementListLine(richLine)) {
+              lineX = alignedX;
+              contentX = richLine.contentX;
+              listMarker = richLine.listMarker;
+            }
+            let x = alignedX + richLine.contentX;
             richLine.segments.forEach((segment, index) => {
               if (segment.style.highlightColor) {
                 const rect = svgRoot.ownerDocument.createElementNS(
@@ -1047,29 +1100,54 @@ const renderElementToSvg = (
               }
               text.appendChild(tspan);
             }
+          } else if (listLayout) {
+            const content = getListLineContent(lines[i], listLayout).text;
+            contentX = listLayout.contentX;
+            lineX = lineXs[i];
+            listMarker = listLayout.item
+              ? { text: listLayout.item.displayMarker, x: listLayout.markerX }
+              : null;
+            text.textContent = content;
           } else {
             text.textContent = lines[i];
           }
-          text.setAttribute("x", `${horizontalOffset}`);
+          const baseline = richLine
+            ? richLine.baseline
+            : i * lineHeightPx + verticalOffset;
+          const setTextAttributes = (textNode: Element) => {
+            textNode.setAttribute("y", `${baseline}`);
+            textNode.setAttribute("font-family", getFontFamilyString(element));
+            textNode.setAttribute("font-size", `${element.fontSize}px`);
+            textNode.setAttribute(
+              "fill",
+              applyDarkModeFilter(
+                element.strokeColor,
+                renderConfig.theme === THEME.DARK,
+              ),
+            );
+            textNode.setAttribute(
+              "text-anchor",
+              lineX === null ? textAnchor : "start",
+            );
+            textNode.setAttribute("style", "white-space: pre;");
+            textNode.setAttribute("direction", direction);
+            textNode.setAttribute("dominant-baseline", "alphabetic");
+          };
+          if (lineX !== null && listMarker) {
+            const markerNode = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "text",
+            );
+            markerNode.textContent = listMarker.text;
+            markerNode.setAttribute("x", `${lineX + listMarker.x}`);
+            setTextAttributes(markerNode);
+            node.appendChild(markerNode);
+          }
           text.setAttribute(
-            "y",
-            `${
-              richLine ? richLine.baseline : i * lineHeightPx + verticalOffset
-            }`,
+            "x",
+            `${lineX === null ? horizontalOffset : lineX + contentX}`,
           );
-          text.setAttribute("font-family", getFontFamilyString(element));
-          text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
-          text.setAttribute("text-anchor", textAnchor);
-          text.setAttribute("style", "white-space: pre;");
-          text.setAttribute("direction", direction);
-          text.setAttribute("dominant-baseline", "alphabetic");
+          setTextAttributes(text);
           node.appendChild(text);
         }
 

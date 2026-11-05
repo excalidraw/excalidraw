@@ -49,6 +49,7 @@ import { wrapText } from "@excalidraw/element";
 import { getWrappedTextLines } from "@excalidraw/element";
 import { textSpansEqual } from "@excalidraw/element";
 import { getTextElementLines } from "@excalidraw/element";
+import { getListContinuation } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -754,30 +755,26 @@ export const textWysiwyg = ({
     }
 
     // highlights (the spans' backgrounds stay transparent)
-    editable
-      .querySelectorAll<HTMLElement>("span[data-rt]")
-      .forEach((span) => {
-        let highlightColor: string | undefined;
-        try {
-          highlightColor = JSON.parse(span.getAttribute("data-rt") || "{}")
-            .highlightColor;
-        } catch {
-          return;
-        }
-        if (!highlightColor) {
-          return;
-        }
-        range.selectNodeContents(span);
-        drawLineBands(
-          getLineBands(range, lines),
-          lines,
-          "excalidraw-wysiwyg-highlight",
-          applyDarkModeFilter(
-            highlightColor,
-            app.state.theme === THEME.DARK,
-          ),
-        );
-      });
+    editable.querySelectorAll<HTMLElement>("span[data-rt]").forEach((span) => {
+      let highlightColor: string | undefined;
+      try {
+        highlightColor = JSON.parse(
+          span.getAttribute("data-rt") || "{}",
+        ).highlightColor;
+      } catch {
+        return;
+      }
+      if (!highlightColor) {
+        return;
+      }
+      range.selectNodeContents(span);
+      drawLineBands(
+        getLineBands(range, lines),
+        lines,
+        "excalidraw-wysiwyg-highlight",
+        applyDarkModeFilter(highlightColor, app.state.theme === THEME.DARK),
+      );
+    });
 
     // the selection (where the browser's own is hidden, see updateWysiwygStyle)
     const selection = ownerWindow.getSelection();
@@ -1247,6 +1244,27 @@ export const textWysiwyg = ({
       }
       submittedViaKeyboard = true;
       handleSubmit();
+    } else if (
+      event.key === KEYS.ENTER &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.isComposing &&
+      event.keyCode !== 229 &&
+      editable.selectionStart === editable.selectionEnd
+    ) {
+      // markdown lists: Enter in a list item starts the next item (`- `,
+      // `N+1. `), and in an empty one ends the list (Shift+Enter just
+      // breaks the line)
+      const continuation = getListContinuation(
+        editable.value,
+        editable.selectionStart,
+      );
+      if (continuation) {
+        event.preventDefault();
+        editable.setSelectionRange(continuation.start, continuation.end);
+        // (types over the range, keeping the spans, and dispatches `input`)
+        editable.insertText(continuation.text);
+      }
     } else if (
       event.key === KEYS.TAB ||
       (event[KEYS.CTRL_OR_CMD] &&

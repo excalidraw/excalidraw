@@ -828,6 +828,33 @@ describe("textWysiwyg", () => {
       restoreOriginalGetBoundingClientRect();
     });
 
+    it("should continue a markdown list on Enter", async () => {
+      textarea.value = "- foo";
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      expect(textarea.value).toEqual("- foo\n- ");
+      expect(textarea.selectionStart).toEqual(8);
+
+      textarea.value = "  9. foo";
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      expect(textarea.value).toEqual("  9. foo\n  10. ");
+
+      // an empty item ends the list
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      expect(textarea.value).toEqual("  9. foo\n");
+
+      // Shift+Enter is left to the browser
+      textarea.value = "- foo";
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER, shiftKey: true });
+      expect(textarea.value).toEqual("- foo");
+
+      // the element keeps the raw markers
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      Keyboard.exitTextEditor(textarea);
+      expect((h.elements[0] as ExcalidrawTextElement).originalText).toEqual(
+        "- foo\n- ",
+      );
+    });
+
     it("should add a tab at the start of the first line", () => {
       textarea.value = "Line#1\nLine#2";
       // cursor: "|Line#1\nLine#2"
