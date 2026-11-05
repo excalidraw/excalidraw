@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const { pathToFileURL } = require("url");
 
-const { build } = require("esbuild");
+const { buildMode } = require("./buildMode");
 const { sassPlugin } = require("esbuild-sass-plugin");
 
 const { parseEnvVariables } = require("../packages/excalidraw/env.cjs");
@@ -85,26 +85,6 @@ const getConfig = (outdir) => ({
   },
 });
 
-function buildDev(config) {
-  return build({
-    ...config,
-    sourcemap: true,
-    define: {
-      "import.meta.env": JSON.stringify(ENV_VARS.development),
-    },
-  });
-}
-
-function buildProd(config) {
-  return build({
-    ...config,
-    minify: true,
-    define: {
-      "import.meta.env": JSON.stringify(ENV_VARS.production),
-    },
-  });
-}
-
 const createESMRawBuild = async () => {
   const chunksConfig = {
     entryPoints: ["index.tsx", "**/*.chunk.ts"],
@@ -112,16 +92,24 @@ const createESMRawBuild = async () => {
   };
 
   // development unminified build with source maps
-  await buildDev({
-    ...getConfig("dist/dev"),
-    ...chunksConfig,
-  });
+  await buildMode(
+    {
+      ...getConfig("dist/dev"),
+      ...chunksConfig,
+    },
+    "development",
+    ENV_VARS,
+  );
 
   // production minified buld without sourcemaps
-  await buildProd({
-    ...getConfig("dist/prod"),
-    ...chunksConfig,
-  });
+  await buildMode(
+    {
+      ...getConfig("dist/prod"),
+      ...chunksConfig,
+    },
+    "production",
+    ENV_VARS,
+  );
 };
 
 (async () => {

@@ -1,6 +1,6 @@
 const path = require("path");
 
-const { build } = require("esbuild");
+const { buildMode } = require("./buildMode");
 
 // contains all dependencies bundled inside
 const getConfig = (outdir) => ({
@@ -21,32 +21,17 @@ const getConfig = (outdir) => ({
   ],
 });
 
-function buildDev(config) {
-  return build({
-    ...config,
-    sourcemap: true,
-    define: {
-      "import.meta.env": JSON.stringify({ DEV: true }),
-    },
-  });
-}
-
-function buildProd(config) {
-  return build({
-    ...config,
-    minify: true,
-    define: {
-      "import.meta.env": JSON.stringify({ PROD: true }),
-    },
-  });
-}
+const ENV_VARS = {
+  development: { DEV: true },
+  production: { PROD: true },
+};
 
 const createESMRawBuild = async () => {
   // development unminified build with source maps
-  await buildDev(getConfig("dist/dev"));
+  await buildMode(getConfig("dist/dev"), "development", ENV_VARS);
 
   // production minified build without sourcemaps
-  await buildProd(getConfig("dist/prod"));
+  await buildMode(getConfig("dist/prod"), "production", ENV_VARS);
 };
 
 (async () => {
