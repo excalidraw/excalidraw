@@ -807,6 +807,7 @@ class App extends React.Component<AppProps, AppState> {
       setElementRenderOverrides: this.setElementRenderOverrides,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
+      isEditingText: this.text.isEditing,
       getFiles: () => this.files,
       getName: this.getName,
       registerAction: (action: Action) => {

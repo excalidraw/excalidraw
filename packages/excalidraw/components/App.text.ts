@@ -91,6 +91,9 @@ export class AppText {
   // (actionFinalize), so what ends the editor can't go by the state
   private editingTextElementId: string | null = null;
 
+  /** Whether an editor is open, whatever the state's editingTextElement says */
+  public isEditing = () => this.editingTextElementId !== null;
+
   /**
    * An update that ends an open edit (its appState setting editingTextElement
    * to null or to another element, or its elements leaving the element out

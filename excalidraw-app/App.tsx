@@ -609,7 +609,7 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
-            appState: excalidrawAPI.getAppState().editingTextElement
+            appState: excalidrawAPI.isEditingText()
               ? omitTabSelection(localDataState.appState)
               : localDataState.appState,
             captureUpdate: CaptureUpdateAction.NEVER,

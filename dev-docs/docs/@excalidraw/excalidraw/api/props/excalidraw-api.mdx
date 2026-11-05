@@ -28,6 +28,7 @@ You can use this prop when you want to access some [Excalidraw APIs](https://git
 | [getSceneElementsIncludingDeleted](#getsceneelementsincludingdeleted) | `function` | Returns all the elements including the deleted in the scene |
 | [getSceneElements](#getsceneelements) | `function` | Returns all the elements excluding the deleted in the scene |
 | [getAppState](#getappstate) | `function` | Returns current appState |
+| [isEditingText](#iseditingtext) | `function` | Returns whether a text editor is open |
 | [history](#history) | `object` | This is the history API. `history.clear()` will clear the history |
 | [scrollToContent](#scrolltocontent) | `function` | Scroll the nearest element out of the elements supplied to the center. Defaults to the elements on the scene. |
 | [refresh](#refresh) | `function` | Updates the offsets for the Excalidraw component so that the coordinates are computed correctly (for example the cursor position). |
@@ -266,6 +267,14 @@ Returns all the elements excluding the deleted in the scene
 </pre>
 
 Returns current appState.
+
+## isEditingText
+
+```tsx
+() => boolean;
+```
+
+Returns whether a text editor is open. To detect a live editor, use this rather than `getAppState().editingTextElement`: an action's result can null the state while the editor stays open.
 
 ## history
 

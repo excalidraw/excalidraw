@@ -1424,6 +1424,12 @@ export interface ExcalidrawImperativeAPI {
   >;
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
+  /**
+   * Whether a text editor is open. To detect a live editor, use this rather
+   * than `getAppState().editingTextElement`: an action's result can null the
+   * state while the editor stays open.
+   */
+  isEditingText: () => boolean;
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   setViewport: InstanceType<typeof App>["viewport"]["setViewport"];
