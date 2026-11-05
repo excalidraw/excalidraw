@@ -14,8 +14,10 @@ import {
   CODES,
   colorToHex,
   CURSOR_TYPE,
+  EXPORT_DATA_TYPES,
   KEYS,
   FONT_FAMILY,
+  MIME_TYPES,
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
@@ -1601,6 +1603,37 @@ describe("textWysiwyg", () => {
       });
     });
 
+    it("should let a loaded scene replace a blank draft, whatever its version", async () => {
+      await nextTick();
+      updateTextEditor(textarea, "");
+      switchWindowAway(textarea);
+      fireEvent.focus(textarea);
+
+      await API.drop([
+        {
+          kind: "file",
+          file: new Blob(
+            [
+              JSON.stringify({
+                type: EXPORT_DATA_TYPES.excalidraw,
+                elements: [
+                  {
+                    ...h.elements[0],
+                    text: "Hello",
+                    originalText: "Hello",
+                    version: 1,
+                  },
+                ],
+              }),
+            ],
+            { type: MIME_TYPES.json },
+          ),
+        },
+      ]);
+      await waitFor(() => expect(text()).toBe("Hello"));
+      expect(h.elements[0].isDeleted).toBe(false);
+    });
+
     it("should keep editing when the window loses focus mid-press, and submit on the next focus move", async () => {
       // the zoom buttons pressed below show on a desktop
       unmountComponent();
@@ -1814,6 +1847,27 @@ describe("textWysiwyg", () => {
       Keyboard.redo();
       expect(label().isDeleted).toBe(false);
       expect(label().text).toBe("Hello");
+    });
+
+    it("should keep a blank label deleted and unbound when an older copy ends its edit", async () => {
+      const { editor } = await openLabelOfNewContainer();
+      updateTextEditor(editor, "  \n ");
+      switchWindowAway(editor);
+      fireEvent.focus(editor);
+      const stored = h.elements.map((element) => ({ ...element }));
+
+      act(() =>
+        h.app.updateScene({
+          elements: stored,
+          appState: { editingTextElement: null },
+          captureUpdate: CaptureUpdateAction.NEVER,
+        }),
+      );
+      await nextTick();
+      expect(h.state.editingTextElement).toBeNull();
+      const [container, label] = h.elements;
+      expect(label.isDeleted).toBe(true);
+      expect(container.boundElements ?? []).toEqual([]);
     });
 
     it("should not add bound text to a frame when its container is not a frame child", async () => {
