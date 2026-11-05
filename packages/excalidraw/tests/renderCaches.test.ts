@@ -2,7 +2,11 @@
 
 import { RoughCanvas } from "roughjs/bin/canvas";
 
-import { newElement } from "@excalidraw/element";
+import {
+  newElement,
+  newImageElement,
+  newTextElement,
+} from "@excalidraw/element";
 
 import { vi } from "vitest";
 
@@ -180,6 +184,69 @@ describe("element canvas cache", () => {
     );
     expect(a.canvases).toHaveLength(2);
     expect(b.canvases).toHaveLength(1);
+  });
+});
+
+describe("opt-in direct drawing", () => {
+  const rectangle = (x: number) =>
+    newElement({ type: "rectangle", x, y: 0, width: 100, height: 50 });
+
+  it("uses the visible count, switches back to bitmaps above the limit, and defaults to caching", () => {
+    const { env, canvases } = makeEnv();
+    const elements = [rectangle(0), rectangle(150)];
+    const config = makeConfig(elements, { scale: 2, renderEnvironment: env });
+    config.renderConfig.renderLinks = false;
+    const context = config.canvas.getContext("2d")!;
+
+    renderStaticScene(config);
+    expect(canvases).toHaveLength(2);
+    expect(getDrawImageSources(config.canvas)).toHaveLength(2);
+
+    vi.mocked(context.drawImage).mockClear();
+    config.renderConfig.maxVisibleElementsForDirectDraw = 1;
+    renderStaticScene(config);
+    expect(getDrawImageSources(config.canvas)).toHaveLength(2);
+
+    vi.mocked(context.drawImage).mockClear();
+    config.visibleElements = [elements[0]];
+    renderStaticScene(config);
+    expect(getDrawImageSources(config.canvas)).toHaveLength(0);
+    expect(canvases).toHaveLength(2);
+  });
+
+  it("draws text on the scene canvas without leaking its direction", () => {
+    const { env, canvases } = makeEnv();
+    const text = newTextElement({ x: 0, y: 0, text: "שלום", fontSize: 20 });
+    const config = makeConfig([text], { scale: 2, renderEnvironment: env });
+    config.renderConfig.maxVisibleElementsForDirectDraw = 1;
+    config.renderConfig.renderLinks = false;
+    config.canvas.setAttribute("dir", "ltr");
+
+    renderStaticScene(config);
+    expect(config.canvas.getAttribute("dir")).toBe("ltr");
+    expect(config.canvas.getContext("2d")!.fillText).toHaveBeenCalled();
+    expect(canvases).toHaveLength(0);
+  });
+
+  it("keeps image elements on the bitmap path", () => {
+    const { env, canvases } = makeEnv();
+    const image = newImageElement({
+      type: "image",
+      x: 0,
+      y: 0,
+      width: 40,
+      height: 40,
+    });
+    const config = makeConfig([rectangle(0), image], {
+      scale: 2,
+      renderEnvironment: env,
+    });
+    config.renderConfig.maxVisibleElementsForDirectDraw = 2;
+    config.renderConfig.renderLinks = false;
+
+    renderStaticScene(config);
+    expect(canvases).toHaveLength(1);
+    expect(getDrawImageSources(config.canvas)).toContain(canvases[0]);
   });
 });
 

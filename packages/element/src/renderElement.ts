@@ -1017,6 +1017,20 @@ export const renderSelectionElement = (
   context.restore();
 };
 
+// Keep images, freehand strokes, embeds, and sticky notes on their existing
+// editor paths. This matches the vector types selected by the opt-in.
+const shouldDrawDirectly = (
+  element: NonDeletedExcalidrawElement,
+  renderConfig: StaticCanvasRenderConfig,
+) =>
+  !!renderConfig.directDraw &&
+  (element.type === "rectangle" ||
+    element.type === "diamond" ||
+    element.type === "ellipse" ||
+    element.type === "line" ||
+    element.type === "arrow" ||
+    element.type === "text");
+
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,
@@ -1044,11 +1058,21 @@ export const renderElement = (
   // Cached bitmaps apply the offset before pixel snapping. Moving it into
   // the canvas transform first loses precision at half-device-pixel ties.
   if (
-    (renderConfig.isExporting || isFrameLikeElement(element)) &&
+    (renderConfig.isExporting ||
+      isFrameLikeElement(element) ||
+      shouldDrawDirectly(element, renderConfig)) &&
     (renderState.offset.x || renderState.offset.y)
   ) {
     context.translate(renderState.offset.x, renderState.offset.y);
   }
+  // drawElementOnCanvas sets the canvas direction for bidi text. An element
+  // bitmap owns that attribute, whereas the editor canvas is shared.
+  const originalDirection =
+    shouldDrawDirectly(element, renderConfig) &&
+    isTextElement(element) &&
+    typeof context.canvas.getAttribute === "function"
+      ? context.canvas.getAttribute("dir")
+      : undefined;
   try {
     drawElement(
       element,
@@ -1061,6 +1085,11 @@ export const renderElement = (
       renderState,
     );
   } finally {
+    if (originalDirection === null) {
+      context.canvas.removeAttribute("dir");
+    } else if (originalDirection !== undefined) {
+      context.canvas.setAttribute("dir", originalDirection);
+    }
     context.restore();
   }
 };
@@ -1164,7 +1193,10 @@ const drawElement = (
     case "text":
     case "iframe":
     case "embeddable": {
-      if (renderConfig.isExporting) {
+      if (
+        renderConfig.isExporting ||
+        shouldDrawDirectly(element, renderConfig)
+      ) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const centerX = (x1 + x2) / 2;
         const centerY = (y1 + y2) / 2;
