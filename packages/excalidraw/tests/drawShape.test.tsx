@@ -10,7 +10,7 @@ import { actionFinalize } from "../actions";
 import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 
 import { API } from "./helpers/api";
-import { Keyboard, Pointer } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { GlobalTestState, act, fireEvent, render, waitFor } from "./test-utils";
 
@@ -463,6 +463,14 @@ describe("autoshape styles panel & selection (preview path)", () => {
     // the preview exists, but the styles panel must not target it — it keeps
     // showing the tool defaults
     expect(h.state.newElement?.type).toBe("rectangle");
+
+    const preview = h.state.newElement;
+    assert(preview);
+    expect(h.app.scene.getNonDeletedElement(preview.id)).toBeNull();
+    expect(h.state.multiElement).toBeNull();
+    UI.clickOnTestId("strokeWidth-bold");
+    expect(h.state.currentItemStrokeWidthKey).toBe("bold");
+    expect(h.state.newElement).toBe(preview);
     const targetElements = getTargetElements(
       h.app.scene.getNonDeletedElementsMap(),
       h.state,
