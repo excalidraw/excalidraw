@@ -1519,7 +1519,7 @@ describe("textWysiwyg", () => {
       it("should keep a live edit through an action's result that leaves the edit out of its state, until one deletes the element", async () => {
         // an async action started before the edit (copy as PNG, a save)
         // finishes while the user types: its result has no editingTextElement,
-        // and the state loses it
+        // which leaves the edit as it is
         act(() =>
           h.app.syncActionResult({
             appState: { toast: { message: "Copied" } },
@@ -1527,12 +1527,11 @@ describe("textWysiwyg", () => {
           }),
         );
         await nextTick();
-        expect(h.state.editingTextElement).toBeNull();
+        expect(h.state.editingTextElement?.id).toBe(textElement.id);
         expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
         updateTextEditor(textarea, "Hello world");
 
-        // a result deleting the element still ends the edit in the editor,
-        // which is keyed on its own element, not the state's
+        // a result deleting the element still ends the edit
         act(() =>
           h.app.syncActionResult({
             elements: [newElementWith(h.elements[0], { isDeleted: true })],

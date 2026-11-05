@@ -3131,13 +3131,20 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // submits an open text edit whose element the result takes out of the
+    // scene (AppText.submitEditEndedBy). Only by its elements: a result's
+    // appState can leave the edit out without ending it
+    const { elements } = this.text.submitEditEndedBy({
+      elements: actionResult.elements,
+    });
+
     this.store.scheduleAction(actionResult.captureUpdate);
 
     let didUpdate = false;
 
     let editingTextElement: AppState["editingTextElement"] | null = null;
-    if (actionResult.elements) {
-      this.scene.replaceAllElements(actionResult.elements);
+    if (elements) {
+      this.scene.replaceAllElements(elements);
       didUpdate = true;
     }
 
@@ -3168,12 +3175,16 @@ class App extends React.Component<AppProps, AppState> {
         zenModeEnabled = this.props.zenModeEnabled;
       }
 
-      editingTextElement = actionResult.appState?.editingTextElement || null;
+      // a result that leaves the edit out of its appState doesn't end it
+      editingTextElement =
+        actionResult.appState && "editingTextElement" in actionResult.appState
+          ? actionResult.appState.editingTextElement ?? null
+          : this.state.editingTextElement;
 
       // make sure editingTextElement points to latest element reference
-      if (actionResult.elements && editingTextElement) {
+      if (elements && editingTextElement) {
         const editingTextElementId = editingTextElement.id;
-        const nextElement = actionResult.elements.find(
+        const nextElement = elements.find(
           (element) => element.id === editingTextElementId,
         );
         editingTextElement =
@@ -10808,10 +10819,11 @@ class App extends React.Component<AppProps, AppState> {
             });
             return;
           }
+          const loadedScene = this.text.submitEditReplacedBy(scene);
           this.syncActionResult({
-            ...scene,
+            ...loadedScene,
             appState: {
-              ...(scene.appState || this.state),
+              ...(loadedScene.appState || this.state),
               isLoading: false,
             },
             replaceFiles: true,
@@ -10961,22 +10973,26 @@ class App extends React.Component<AppProps, AppState> {
           });
           return;
         }
+        const loadedScene = this.text.submitEditReplacedBy(ret.data);
+        // the submit replaces the edited element in the scene
+        const currentElements = this.scene.getElementsIncludingDeleted();
+
         // restore the fractional indices by mutating elements
-        syncInvalidIndices(elements.concat(ret.data.elements));
+        syncInvalidIndices(currentElements.concat(loadedScene.elements));
 
         // don't capture and only update the store snapshot for old elements,
         // otherwise we would end up with duplicated fractional indices on undo
         this.store.scheduleMicroAction({
           action: CaptureUpdateAction.NEVER,
-          elements,
+          elements: currentElements,
           appState: undefined,
         });
 
         this.setState({ isLoading: true });
         this.syncActionResult({
-          ...ret.data,
+          ...loadedScene,
           appState: {
-            ...(ret.data.appState || this.state),
+            ...(loadedScene.appState || this.state),
             isLoading: false,
           },
           replaceFiles: true,

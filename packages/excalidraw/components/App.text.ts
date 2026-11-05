@@ -59,6 +59,7 @@ import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { scrollBoundsIntoView } from "../viewport";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 
+import type { RestoredAppState } from "../data/restore";
 import type App from "./App";
 import type { AppState, Offsets, SceneData, ViewportUIName } from "../types";
 
@@ -86,8 +87,8 @@ export class AppText {
 
   public textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null = null;
   // the editor's own record of its element: the state's editingTextElement
-  // is nulled under a live editor by an action's result that leaves it out
-  // (syncActionResult), so what ends the editor can't go by the state
+  // can be nulled under a live editor by an action's result that clears it
+  // (actionFinalize), so what ends the editor can't go by the state
   private editingTextElementId: string | null = null;
 
   /**
@@ -164,9 +165,31 @@ export class AppText {
   };
 
   /**
+   * A loaded scene ends an open edit whatever its elements are: an element it
+   * shares the id with is another revision, not the one being edited. Its
+   * appState is restored over the current one (see restoreAppState), so it
+   * carries the edit along unless cleared here. To run before anything else
+   * of the load touches the store, which would take the draft in unrecorded.
+   */
+  public submitEditReplacedBy = <
+    T extends {
+      elements: NonNullable<SceneData["elements"]>;
+      appState: RestoredAppState;
+    },
+  >(
+    scene: T,
+  ) => ({
+    ...scene,
+    ...this.submitEditEndedBy({
+      elements: scene.elements,
+      appState: { ...scene.appState, editingTextElement: null },
+    }),
+  });
+
+  /**
    * Ends an edit whose element is gone from the scene, deleted or removed by
-   * something other than updateScene (which submits first): an action's
-   * result, a scene reset. Called from componentDidUpdate. The state's
+   * something other than updateScene or an action's result (which submit
+   * first): a scene reset. Called from componentDidUpdate. The state's
    * editingTextElement is the failsafe for updates landing in the wrong
    * order, resolved against the scene by id since the state holds an
    * immutable snapshot whose `isDeleted` never flips. The editor goes with
