@@ -35,8 +35,7 @@ import {
   useAppProps,
   useApp,
 } from "../App";
-import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
-import Trans from "../Trans";
+import { confirmLoadScene } from "../OverwriteConfirm/OverwriteConfirm";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
 import DropdownMenuItemCheckbox from "../dropdownMenu/DropdownMenuItemCheckbox";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
@@ -78,21 +77,7 @@ export const LoadScene = () => {
   }
 
   const handleSelect = async () => {
-    if (
-      !elements.length ||
-      (await openConfirmModal({
-        title: t("overwriteConfirm.modal.loadFromFile.title"),
-        actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
-        color: "warning",
-        description: (
-          <Trans
-            i18nKey="overwriteConfirm.modal.loadFromFile.description"
-            bold={(text) => <strong>{text}</strong>}
-            br={() => <br />}
-          />
-        ),
-      }))
-    ) {
+    if (!elements.length || (await confirmLoadScene())) {
       actionManager.executeAction(actionLoadScene);
     }
   };
