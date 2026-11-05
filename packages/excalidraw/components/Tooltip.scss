@@ -8,7 +8,7 @@
   position: fixed;
   z-index: var(--zIndex-popup);
 
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
   box-sizing: border-box;
   pointer-events: none;
@@ -37,7 +37,7 @@
 .excalidraw-tooltip-icon {
   width: 0.9em;
   height: 0.9em;
-  margin-left: 5px;
+  margin-left: 6px;
   margin-top: 1px;
   display: flex;
 
