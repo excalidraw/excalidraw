@@ -142,6 +142,20 @@ export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_DOWN ||
   key === KEYS.ARROW_UP;
 
+/**
+ * Whether a keydown belongs to an IME composition: Enter confirms the
+ * conversion, the arrows go through its candidates and Escape cancels it, so
+ * the key shouldn't do anything else. Safari ends the composition before the
+ * keydown (`isComposing` is false), which `keyCode` 229 still tells apart.
+ */
+export const isIMEComposing = (
+  event: KeyboardEvent | { nativeEvent: KeyboardEvent },
+) => {
+  const { isComposing, keyCode } =
+    "nativeEvent" in event ? event.nativeEvent : event;
+  return isComposing || keyCode === 229;
+};
+
 export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
 

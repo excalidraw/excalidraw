@@ -15,7 +15,7 @@ import {
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { KEYS, getFrame } from "@excalidraw/common";
+import { KEYS, getFrame, isIMEComposing } from "@excalidraw/common";
 import { useEffect, useRef, useState } from "react";
 
 import { atom, useAtom, useAtomValue } from "../app-jotai";
@@ -112,7 +112,9 @@ const ActiveRoomDialog = ({
         placeholder="Your name"
         label="Your name"
         onChange={collabAPI.setUsername}
-        onKeyDown={(event) => event.key === KEYS.ENTER && handleClose()}
+        onKeyDown={(event) =>
+          event.key === KEYS.ENTER && !isIMEComposing(event) && handleClose()
+        }
       />
       <div className="ShareDialog__active__linkRow">
         <TextField

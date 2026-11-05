@@ -6,6 +6,7 @@ import {
   DEFAULT_SIDEBAR,
   EVENT,
   KEYS,
+  isIMEComposing,
   arrayToMap,
   isWritableElement,
 } from "@excalidraw/common";
@@ -691,6 +692,10 @@ function CommandPaletteInner({
   );
 
   const handleKeyDown = useStableCallback((event: KeyboardEvent) => {
+    if (isIMEComposing(event)) {
+      return;
+    }
+
     const ignoreAlphanumerics =
       isWritableElement(event.target) ||
       isCommandPaletteToggleShortcut(event) ||

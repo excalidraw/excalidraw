@@ -1,6 +1,7 @@
 import {
   CODES,
   KEYS,
+  isIMEComposing,
   CLASSES,
   POINTER_BUTTON,
   THEME,
@@ -898,7 +899,7 @@ export const textWysiwyg = ({
       app.actionManager.executeAction(actionSaveFileToDisk, "keyboard");
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
-      if (event.isComposing || event.keyCode === 229) {
+      if (isIMEComposing(event)) {
         return;
       }
       submittedViaKeyboard = true;
