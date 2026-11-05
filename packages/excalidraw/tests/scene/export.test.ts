@@ -230,6 +230,29 @@ describe("exportToSvg", () => {
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
 
+  it.each([
+    ["left", "Hello", "ltr", "start"],
+    ["right", "Hello", "ltr", "end"],
+    ["left", "שלום", "rtl", "end"],
+    ["center", "שלום", "rtl", "middle"],
+    ["right", "שלום", "rtl", "start"],
+  ] as const)(
+    "anchors %s-aligned %s text on the side it's aligned to",
+    async (textAlign, text, direction, textAnchor) => {
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: [API.createElement({ type: "text", text, textAlign })],
+        },
+      });
+
+      const node = svg.querySelector("text");
+      expect(node).toHaveAttribute("direction", direction);
+      // `text-anchor` is logical: `start` is the right edge of RTL text
+      expect(node).toHaveAttribute("text-anchor", textAnchor);
+    },
+  );
+
   // #11439: a perfectly horizontal/vertical arrow has a zero-size bounding box.
   // The bound-text "gap" mask must use userSpaceOnUse units, otherwise its
   // objectBoundingBox region collapses to zero area and the whole arrow line
