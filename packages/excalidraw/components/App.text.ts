@@ -145,34 +145,20 @@ export class AppText {
         this.app.scene.getElementsMapIncludingDeleted(),
       );
     }
-    if (appState) {
-      // The update's selection, edited group and line are dropped, this
-      // tab's own stay: the user may still be typing into what looked like a
-      // live caret, and a Backspace must not act on what the update brought
-      // in (excalidraw-app's tab sync carries the other tab's).
-      const kept: Partial<AppState> = { ...appState };
-      for (const key of [
-        "selectedElementIds",
-        "selectedGroupIds",
-        "editingGroupId",
-        "selectedLinearElement",
-      ] as const) {
-        delete kept[key];
-      }
-      // ...unless the update takes this tab's line away: its editor goes too
-      const { selectedLinearElement } = this.app.state;
+    if (appState && elements) {
+      // a line the update takes away takes its editor with it, whether the
+      // editor is this tab's or the update's own
+      const { selectedLinearElement } = { ...this.app.state, ...appState };
       if (
         selectedLinearElement &&
-        elements &&
         !elements.some(
           (element) =>
             element.id === selectedLinearElement.elementId &&
             !element.isDeleted,
         )
       ) {
-        kept.selectedLinearElement = null;
+        appState = { ...appState, selectedLinearElement: null };
       }
-      appState = kept as Pick<AppState, K>;
     }
     return { elements, appState };
   };

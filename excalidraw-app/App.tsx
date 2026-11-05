@@ -129,7 +129,7 @@ import {
   LocalData,
   localStorageQuotaExceededAtom,
 } from "./data/LocalData";
-import { isBrowserStorageStateNewer } from "./data/tabSync";
+import { isBrowserStorageStateNewer, omitTabSelection } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
@@ -609,6 +609,9 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
+            appState: excalidrawAPI.getAppState().editingTextElement
+              ? omitTabSelection(localDataState.appState)
+              : localDataState.appState,
             captureUpdate: CaptureUpdateAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {

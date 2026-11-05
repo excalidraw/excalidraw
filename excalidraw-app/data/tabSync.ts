@@ -1,3 +1,5 @@
+import type { AppState } from "@excalidraw/excalidraw/types";
+
 import { STORAGE_KEYS } from "../app_constants";
 
 // in-memory state (this tab's current state) versions. Currently just
@@ -8,6 +10,30 @@ const LOCAL_STATE_VERSIONS = {
 };
 
 type BrowserStateTypes = keyof typeof LOCAL_STATE_VERSIONS;
+
+/**
+ * The stored appState without the other tab's selection, edited group and
+ * line, for a sync landing on an open text edit. The sync ends the edit, and
+ * the user may still be typing into what looked like a live caret: a Backspace
+ * must not act on what the other tab had, so this tab's own stay.
+ */
+export const omitTabSelection = <T extends Partial<AppState>>(
+  appState: T | null,
+) => {
+  if (!appState) {
+    return appState;
+  }
+  const kept = { ...appState };
+  for (const key of [
+    "selectedElementIds",
+    "selectedGroupIds",
+    "editingGroupId",
+    "selectedLinearElement",
+  ] as const) {
+    delete kept[key];
+  }
+  return kept;
+};
 
 export const isBrowserStorageStateNewer = (type: BrowserStateTypes) => {
   const storageTimestamp = JSON.parse(localStorage.getItem(type) || "-1");

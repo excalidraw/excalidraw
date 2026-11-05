@@ -1346,7 +1346,8 @@ export const textWysiwyg = ({
     // while the user can be typing: the draft is theirs until the submit,
     // as it was before an edit could outlive the window's focus. (Replacing
     // the value drops the textarea's undo history, which is right here: an
-    // undo past the change would bring the draft back over it.)
+    // undo past the change would bring the draft back over it. The replaced
+    // draft gets no undo entry either, unlike an update that ends the edit.)
     const latestTextElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
     );

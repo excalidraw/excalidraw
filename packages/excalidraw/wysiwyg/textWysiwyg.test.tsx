@@ -8,7 +8,6 @@ import {
   getOriginalContainerHeightFromCache,
   isTextElement,
   newElementWith,
-  LinearElementEditor,
 } from "@excalidraw/element";
 
 import {
@@ -23,7 +22,6 @@ import {
   applyDarkModeFilter,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
-  arrayToMap,
 } from "@excalidraw/common";
 
 import type {
@@ -1543,57 +1541,19 @@ describe("textWysiwyg", () => {
         expect(h.elements[0].isDeleted).toBe(true);
       });
 
-      it("should drop the selection a sync carries, and keep the tab's own", async () => {
-        // the user may still be typing into what looked like a live caret: a
-        // Backspace must not act on what the other tab had selected, nor on
-        // the group or line it was editing. This tab's own aren't the sync's
-        // to reset either: the edited text it has selected, and a line
-        // editor, which an arrow label's edit leaves up (a group edit can't
-        // be live here, starting an edit clears it)
-        const newLine = () =>
-          API.createElement({
-            type: "line",
-            points: [pointFrom(0, 0), pointFrom(100, 0)],
-          });
-        const ownLine = newLine();
-        API.setElements([...h.elements, ownLine]);
-        API.setAppState({
-          selectedLinearElement: new LinearElementEditor(
-            ownLine,
-            arrayToMap([ownLine]),
-            true,
-          ),
-        });
-        const own = () => ({
-          selectedElementIds: h.state.selectedElementIds,
-          selectedGroupIds: h.state.selectedGroupIds,
-          editingGroupId: h.state.editingGroupId,
-          selectedLinearElement: h.state.selectedLinearElement,
-        });
-        const before = own();
-        expect(before.selectedElementIds).toEqual({ [textElement.id]: true });
-        expect(before.editingGroupId).toBeNull();
-        expect(before.selectedLinearElement?.elementId).toBe(ownLine.id);
-        expect(await getTextEditor({ waitForEditor: false })).toBe(textarea);
-
-        const line = newLine();
+      it("should land the selection of the update that ends it", async () => {
+        const other = API.createElement({ type: "rectangle" });
+        API.setElements([...h.elements, other]);
         act(() =>
           h.app.updateScene({
             appState: {
               editingTextElement: null,
-              selectedElementIds: { [line.id]: true },
-              selectedGroupIds: { g1: true },
-              editingGroupId: "g1",
-              selectedLinearElement: new LinearElementEditor(
-                line,
-                arrayToMap([line]),
-                true,
-              ),
+              selectedElementIds: { [other.id]: true },
             },
           }),
         );
         await expectEnded("Hello");
-        expect(own()).toEqual(before);
+        expect(h.state.selectedElementIds).toEqual({ [other.id]: true });
       });
 
       // "Hello" committed, reopened, " world" typed, the window away and back:
