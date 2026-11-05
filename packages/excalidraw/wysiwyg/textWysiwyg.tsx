@@ -49,7 +49,11 @@ import { wrapText } from "@excalidraw/element";
 import { getWrappedTextLines } from "@excalidraw/element";
 import { textSpansEqual } from "@excalidraw/element";
 import { getTextElementLines } from "@excalidraw/element";
-import { getListContinuation } from "@excalidraw/element";
+import {
+  getListContinuation,
+  getTextElementRawWidth,
+  parseMarkdownListLines,
+} from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -534,6 +538,26 @@ export const textWysiwyg = ({
         width += 0.5;
       }
 
+      // markdown list items: the editor shows their markers as typed
+      // (`    - item`), which can take more room than the bullets and indents
+      // the canvas lays out — widen the box to the lines as typed, so that it
+      // wraps them where the canvas does (rather than breaking `- item`), and
+      // shift it so that the text stays aligned where it is
+      let listOverflowX = 0;
+      if (parseMarkdownListLines(updatedTextElement.originalText)) {
+        const extraWidth =
+          getTextElementRawWidth(updatedTextElement, app.renderEnvironment) -
+          updatedTextElement.width;
+        if (extraWidth > 0) {
+          width += extraWidth;
+          listOverflowX =
+            textAlign === "center"
+              ? extraWidth / 2
+              : textAlign === "right"
+              ? extraWidth
+              : 0;
+        }
+      }
       // add 5% buffer otherwise it causes wysiwyg to jump
       height *= 1.05;
 
@@ -591,8 +615,9 @@ export const textWysiwyg = ({
           updatedTextElement.lineHeight,
         ),
         textAlign,
-        width: updatedTextElement.width,
-        x: coordX,
+        // the editor's box (wider than the text with raw list markers)
+        width: width - (container ? 0.5 : 0),
+        x: coordX - listOverflowX,
         y: coordY,
       };
       // a font's glyphs can reach past its lines, beyond the 5% buffer: the

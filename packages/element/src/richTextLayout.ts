@@ -262,6 +262,33 @@ export const measureTextElementText = (
   return { width, height: last ? last.top + last.height : metrics.height };
 };
 
+/**
+ * The width of a text element's (wrapped) lines as typed: with list items'
+ * raw markers (`    - item`) rather than the bullets and indents the canvas
+ * lays out, which is what the text editor shows.
+ */
+export const getTextElementRawWidth = (
+  element: TextLayoutElement &
+    Pick<ExcalidrawTextElement, "text" | "originalText">,
+  env?: RenderEnvironment,
+) => {
+  const font = getFontString(element);
+  const measure = getTextSpanMeasurer(element, env);
+  return getWrappedLineOffsets(
+    element.text.replace(/\r\n?/g, "\n"),
+    element.originalText,
+  ).reduce(
+    (max, line) =>
+      Math.max(
+        max,
+        measure && line.end - line.start === line.text.length
+          ? measure(line.text, line.start)
+          : getLineWidth(line.text, font, env),
+      ),
+    0,
+  );
+};
+
 /** a line of a list item (its first, or one it wrapped into) */
 export const isTextElementListLine = (line: TextElementLine) =>
   line.listMarker !== null || line.contentX > 0;

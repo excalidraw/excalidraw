@@ -5,6 +5,7 @@ import { pointFrom } from "@excalidraw/math";
 import {
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
+  getTextElementRawWidth,
   isTextElement,
   newElementWith,
 } from "@excalidraw/element";
@@ -1873,6 +1874,25 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
+    });
+
+    it("should not wrap a label's nested list items in the editor", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "- a\n    - bb");
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      // the canvas lays the nested item out narrower than it's typed...
+      const rawWidth = getTextElementRawWidth(text);
+      expect(text.width).toBeLessThan(rawWidth);
+      // ...but the editor shows it as typed, so must be as wide (or it'd
+      // break `    - bb` onto two lines)
+      expect(parseFloat(editor.style.width)).toBeGreaterThanOrEqual(rawWidth);
+      // centered: the box is shifted left by half of what it grew
+      const growth = parseFloat(editor.style.width) - 0.5 - text.width;
+      expect(editor.style.transformOrigin).toBe(
+        `${growth / 2 + text.width / 2}px ${text.height / 2}px`,
+      );
     });
 
     it("should bind text to container when double clicked on container stroke", async () => {
