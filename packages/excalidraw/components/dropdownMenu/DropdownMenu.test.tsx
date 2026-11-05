@@ -1,13 +1,15 @@
-import React from "react";
+import React, { act } from "react";
 
 import { KEYS } from "@excalidraw/common";
 
-import { Excalidraw } from "../../index";
+import { Excalidraw, MainMenu } from "../../index";
 import { Keyboard } from "../../tests/helpers/ui";
+import { defaultLang, languages, setLanguage } from "../../i18n";
 import {
   render,
   waitFor,
   getByTestId,
+  getByText,
   fireEvent,
 } from "../../tests/test-utils";
 
@@ -24,6 +26,39 @@ describe("Test <DropdownMenu/>", () => {
       Keyboard.keyDown(KEYS.ESCAPE);
       expect(window.h.state.openMenu).toBe(null);
     });
+  });
+
+  it("repositions submenu when switching language direction", async () => {
+    const { container } = await render(
+      <Excalidraw>
+        <MainMenu>
+          <MainMenu.DefaultItems.Preferences />
+        </MainMenu>
+      </Excalidraw>,
+    );
+
+    const rtlLang = languages.find((lang) => lang.rtl)!;
+
+    fireEvent.click(getByTestId(container, "main-menu-trigger"));
+    fireEvent.click(getByText(container, "Preferences"));
+
+    await waitFor(() => {
+      expect(
+        container.querySelector(".excalidraw-main-menu-preferences-submenu"),
+      ).not.toBeNull();
+    });
+
+    await act(async () => {
+      await setLanguage(rtlLang);
+    });
+
+    expect(document.documentElement.dir).toBe("rtl");
+
+    await act(async () => {
+      await setLanguage(defaultLang);
+    });
+
+    expect(document.documentElement.dir).toBe("ltr");
   });
 
   it.each([
