@@ -6,5 +6,67 @@
     }
   },
   "outputDirectory": "build",
-  "installCommand": "yarn install"
+  "installCommand": "yarn install",
+  "redirects": [
+    {
+      "source": "/docs/introduction/development",
+      "destination": "https://plus.excalidraw.com/docs/sdk/development",
+      "permanent": true
+    },
+    {
+      "source": "/docs/introduction/contributing",
+      "destination": "https://plus.excalidraw.com/docs/sdk/contributing",
+      "permanent": true
+    },
+    {
+      "source": "/docs/codebase/:path*",
+      "destination": "https://plus.excalidraw.com/docs/sdk/codebase/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/excalidraw/API/:path*",
+      "destination": "https://plus.excalidraw.com/docs/sdk/excalidraw/api/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/excalidraw/:path*",
+      "destination": "https://plus.excalidraw.com/docs/sdk/excalidraw/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/mermaid-to-excalidraw/installation",
+      "destination": "https://plus.excalidraw.com/docs/mermaid-to-excalidraw/getting-started",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/mermaid-to-excalidraw/api",
+      "destination": "https://plus.excalidraw.com/docs/mermaid-to-excalidraw/api",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/mermaid-to-excalidraw/development",
+      "destination": "https://plus.excalidraw.com/docs/mermaid-to-excalidraw/development",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/mermaid-to-excalidraw/codebase/new-diagram-type",
+      "destination": "https://plus.excalidraw.com/docs/mermaid-to-excalidraw/adding-a-diagram-type",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/mermaid-to-excalidraw/codebase/:path*",
+      "destination": "https://plus.excalidraw.com/docs/mermaid-to-excalidraw/how-it-works",
+      "permanent": true
+    },
+    {
+      "source": "/docs/@excalidraw/mermaid-to-excalidraw/:path*",
+      "destination": "https://plus.excalidraw.com/docs/mermaid-to-excalidraw",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://plus.excalidraw.com/docs/sdk",
+      "permanent": true
+    }
+  ]
 }
