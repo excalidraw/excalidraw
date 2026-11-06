@@ -477,6 +477,24 @@ describe("wrap (w)", () => {
       expect(selectedIds().sort()).toEqual(["a", "b"]);
     });
 
+    it("doesn't remove a locked frame, wrapping all its children instead", () => {
+      const { frame, children } = createFrameWithChildren();
+      API.updateElement(frame, { locked: true });
+      API.setSelectedElements(children);
+
+      expect(actionWrapSelectionInFrame.label(h.elements, h.state, h.app)).toBe(
+        "labels.wrapSelectionInFrame",
+      );
+
+      pressW();
+
+      expect(getElement("frame").isDeleted).toBe(false);
+      const newFrameId = getElement("a").frameId;
+      expect(newFrameId).not.toBe("frame");
+      expect(getElement(newFrameId!).type).toBe("frame");
+      expect(getElement("b").frameId).toBe(newFrameId);
+    });
+
     it("moves some of a frame's children into a new frame", () => {
       const { children } = createFrameWithChildren();
       API.setSelectedElements([children[0]]);
