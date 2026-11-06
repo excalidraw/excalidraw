@@ -86,6 +86,20 @@ import type { AppState } from "../types";
 export const CARET_FOLLOW_PADDING = 5;
 
 /**
+ * Room past the measured text so the caret stays visible.
+ *
+ * The editor is exactly as wide as the text's advance width, with
+ * `overflow: hidden`. Gecko floors that width to an integer client width, so
+ * the caret — drawn just past the last glyph, and past a trailing space in
+ * particular — lands outside the box and disappears until the width happens
+ * to round the other way. A couple of px of padding-right (content-box, so
+ * the content width, alignment, and wrapping stay the advance width) keeps
+ * it inside. The much larger horizontal padding this used to be pushed the
+ * editor into the UI and was removed in #8745.
+ */
+export const WYSIWYG_CARET_PADDING = 2;
+
+/**
  * The editor is scaled and rotated about the text's center (its transform
  * origin), as the canvas draws the text. The zoom puts that center at half
  * the *scaled* size from the box's top-left, while the origin sits at half
@@ -519,7 +533,11 @@ export const textWysiwyg = ({
         x: coordX,
         y: coordY,
       };
+      // Gecko scrolls the textarea to reveal a caret it is about to clip.
+      // That scroll shifts the glyphs off the canvas text and still hides
+      // the caret, so keep the editor scrolled to its origin.
       editable.scrollTop = 0;
+      editable.scrollLeft = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
@@ -553,6 +571,8 @@ export const textWysiwyg = ({
     backfaceVisibility: "hidden",
     margin: 0,
     padding: 0,
+    // see WYSIWYG_CARET_PADDING
+    paddingRight: `${WYSIWYG_CARET_PADDING}px`,
     border: 0,
     outline: 0,
     resize: "none",
