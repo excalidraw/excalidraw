@@ -22,6 +22,7 @@ import { base64ToString, stringToBase64, toByteString } from "./encode";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import {
+  bumpElementVersions,
   restoreAppState,
   restoreElements,
   restoreLibraryItems,
@@ -160,10 +161,16 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
-      const elements = restoreElements(data.elements, localElements, {
-        repairBindings: true,
-        deleteInvisibleElements: true,
-      });
+      // an element the file shares with the scene (e.g. reopening an earlier
+      // save) must supersede the scene's copy, or the store, history and
+      // collaborators would ignore it as outdated
+      const elements = bumpElementVersions(
+        restoreElements(data.elements, localElements, {
+          repairBindings: true,
+          deleteInvisibleElements: true,
+        }),
+        localElements,
+      );
       return {
         type: MIME_TYPES.excalidraw,
         data: {
