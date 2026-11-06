@@ -63,6 +63,7 @@ export const AppMainMenu: React.FC<{
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
+          aria-label="Visual Debug"
           onSelect={() => {
             if (window.visualDebug) {
               delete window.visualDebug;

@@ -18,6 +18,9 @@ export const SidebarHeader = ({
 }) => {
   const editorInterface = useEditorInterface();
   const props = useContext(SidebarPropsContext);
+  const dockLabel = t(
+    props.docked ? "labels.sidebarUnlock" : "labels.sidebarLock",
+  );
 
   const renderDockButton = !!(
     editorInterface.canFitSidebar && props.shouldRenderDockButton
@@ -31,13 +34,14 @@ export const SidebarHeader = ({
       {children}
       <div className="sidebar__header__buttons">
         {renderDockButton && (
-          <Tooltip label={t("labels.sidebarLock")}>
+          <Tooltip label={dockLabel}>
             <Button
               onSelect={() => props.onDock?.(!props.docked)}
               selected={!!props.docked}
               className="sidebar__dock"
               data-testid="sidebar-dock"
-              aria-label={t("labels.sidebarLock")}
+              aria-label={dockLabel}
+              aria-pressed={!!props.docked}
             >
               {PinIcon}
             </Button>
