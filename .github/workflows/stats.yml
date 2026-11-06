@@ -1,8 +1,10 @@
 name: Stats
 
-# Posts every master commit's production build (bundle size) and, once
-# staging.excalidraw.com serves the commit, its page-load measurements to the
-# Excalidraw+ admin's Bundle size and Performance pages (scripts/stats/).
+# Posts every master commit's production build (bundle size) and its page-load
+# measurements — next to the commit before it, both built and measured
+# alternately on the same runner — to the Excalidraw+ admin's Bundle size and
+# Performance pages (scripts/stats/). No run cancels another, so commits merged
+# close together are all measured.
 # OSS_STATS_TOKEN lives in the `stats` environment, which only master can use.
 
 on:
@@ -42,13 +44,17 @@ jobs:
     # its browser on ubuntu-latest's 26.04 either
     runs-on: ubuntu-24.04
     environment: stats
-    # staging serves only the latest commit, so a newer push takes over
-    concurrency:
-      group: stats-perf
-      cancel-in-progress: true
     timeout-minutes: 40
+    env:
+      # master before the push; runs started by hand compare with the parent
+      BEFORE: ${{ github.event.before }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 2
+      - name: Fetch the commit before the push
+        if: env.BEFORE
+        run: git fetch --no-tags --depth=1 origin "$BEFORE"
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -57,11 +63,9 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           npx playwright install --with-deps chromium
-      - name: Measure staging once it serves this commit
-        run: yarn stats:perf --wait-for ${{ github.sha }} --out perf.json
+      - name: Measure this commit and the one before it
+        run: yarn stats:compare --base "${BEFORE:-HEAD^}" --iterations 6 --out perf.json
       - name: Post to the Excalidraw+ admin
-        # not measured when staging didn't serve the commit in time
-        if: hashFiles('perf.json') != ''
         run: node scripts/stats/post.mjs perf perf.json
         env:
           OSS_STATS_TOKEN: ${{ secrets.OSS_STATS_TOKEN }}

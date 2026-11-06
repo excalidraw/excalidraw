@@ -2,7 +2,8 @@ import {
   convertToExcalidrawElements,
   Excalidraw,
 } from "@excalidraw/excalidraw";
-import { arrayToMap } from "@excalidraw/common";
+import { arrayToMap, ELEMENT_TRANSLATE_AMOUNT, KEYS } from "@excalidraw/common";
+import { pointFrom } from "@excalidraw/math";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
@@ -14,10 +15,20 @@ import {
 } from "@excalidraw/excalidraw/tests/test-utils";
 
 import { getSelectedElements } from "@excalidraw/excalidraw/scene";
+import { exportScene } from "@excalidraw/excalidraw/scene/export";
 
-import { elementOverlapsWithFrame, shouldApplyFrameClip } from "../src/frame";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+
+import {
+  elementOverlapsWithFrame,
+  getElementsOverlappingFrame,
+  shouldApplyFrameClip,
+} from "../src/frame";
+import { LinearElementEditor } from "../src/linearElementEditor";
 
 import type {
+  ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -436,6 +447,50 @@ describe("adding elements to frames", () => {
       otherFrameChild.id,
       createdElement?.id,
       frame.id,
+    ]);
+  });
+
+  it("should insert a newly created frame child below its frame despite deleted frame children above it", () => {
+    const frameChild = API.createElement({
+      id: "frameChild",
+      type: "rectangle",
+      x: 100,
+      y: 20,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+    const deletedFrameChild = API.createElement({
+      id: "deletedFrameChild",
+      type: "rectangle",
+      x: 100,
+      y: 60,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+      isDeleted: true,
+    });
+
+    API.setElements([frameChild, frame, deletedFrameChild]);
+
+    UI.clickTool("rectangle");
+    mouse.downAt(20, 20);
+    mouse.moveTo(40, 40);
+    mouse.upAt(40, 40);
+
+    const createdElement = h.elements.find(
+      (element) =>
+        element.id !== frame.id &&
+        element.id !== frameChild.id &&
+        element.id !== deletedFrameChild.id,
+    );
+
+    expect(createdElement?.frameId).toBe(frame.id);
+    expect(h.elements.map((element) => element.id)).toEqual([
+      frameChild.id,
+      createdElement?.id,
+      frame.id,
+      deletedFrameChild.id,
     ]);
   });
 
@@ -1284,5 +1339,410 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame2, rectangle1);
       expect(h.elements.length).toBe(4);
     });
+  });
+});
+
+describe("arrows in frames", () => {
+  // frame A and frame B side by side, a rectangle in each
+  let frameA: NonDeleted<ExcalidrawFrameLikeElement>;
+  let frameB: NonDeleted<ExcalidrawFrameLikeElement>;
+  let rectA: NonDeletedExcalidrawElement;
+  let rectB: NonDeletedExcalidrawElement;
+
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    frameA = API.createElement({ type: "frame", width: 300, height: 300 });
+    frameB = API.createElement({
+      type: "frame",
+      x: 500,
+      y: 0,
+      width: 300,
+      height: 300,
+    });
+    rectA = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 100,
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+      frameId: frameA.id,
+    });
+    rectB = API.createElement({
+      type: "rectangle",
+      x: 600,
+      y: 100,
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+      frameId: frameB.id,
+    });
+    API.setElements([rectA, frameA, rectB, frameB]);
+  });
+
+  /**
+   * draws an arrow from `start` in frame A (rectA by default) to `end` in rectB,
+   * which is added to frame A
+   */
+  const drawArrowBetweenFrames = (
+    start = pointFrom<GlobalPoint>(100, 150),
+    end = pointFrom<GlobalPoint>(650, 150),
+  ) => {
+    UI.clickTool("arrow");
+    mouse.downAt(...start);
+    mouse.moveTo(400, end[1]);
+    mouse.moveTo(...end);
+    mouse.up();
+    UI.clickTool("selection");
+
+    const arrow = h.elements.find(
+      (element): element is ExcalidrawArrowElement => element.type === "arrow",
+    )!;
+    expect(arrow.frameId).toBe(frameA.id);
+    expect(arrow.endBinding?.elementId).toBe(rectB.id);
+    return arrow;
+  };
+
+  const getPoints = (arrow: ExcalidrawArrowElement) =>
+    arrow.points.map((_, index) =>
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        index,
+        arrayToMap(h.elements),
+      ),
+    );
+
+  /** an arrow (with a label) in frame A, reaching out into frame B */
+  const createLabeledArrowOutOfFrame = () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 100,
+      y: 150,
+      width: 550,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(550, 0)],
+      frameId: frameA.id,
+    });
+    const label = API.createElement({
+      type: "text",
+      x: 400,
+      y: 140,
+      width: 50,
+      height: 20,
+      containerId: arrow.id,
+      frameId: frameA.id,
+    });
+    h.app.scene.mutateElement(arrow, {
+      boundElements: [{ type: "text", id: label.id }],
+    });
+    API.setElements([rectA, arrow, label, frameA, rectB, frameB]);
+    return { arrow, label };
+  };
+
+  it("should not clip an arrow, nor its label, to its frame", async () => {
+    const { arrow, label } = createLabeledArrowOutOfFrame();
+
+    expect(
+      shouldApplyFrameClip(arrow, frameA, h.state, arrayToMap(h.elements)),
+    ).toBe(false);
+
+    const data = { elements: h.app.scene.getNonDeletedElements() };
+    // the rectangles to their frames, and the arrow's line around its label
+    // (drawn with it)
+    const canvas = await exportScene({ type: "canvas", data });
+    expect(
+      (canvas.getContext("2d") as any)
+        .__getEvents()
+        .filter((event: any) => event.type === "clip"),
+    ).toHaveLength(3);
+
+    const svg = await exportScene({ type: "svg", data });
+    const getClipPath = (element: ExcalidrawElement) =>
+      svg.querySelector(`[data-id="${element.id}"]`)?.getAttribute("clip-path");
+    expect(getClipPath(rectA)).toBe(`url(#${frameA.id})`);
+    expect(getClipPath(arrow)).toBe(null);
+    expect(getClipPath(label)).toBe(null);
+  });
+
+  it("should select an arrow by its part outside its frame", () => {
+    const arrow = drawArrowBetweenFrames();
+    mouse.clickAt(0, 0);
+
+    mouse.clickAt(400, 150);
+    expect(h.state.selectedElementIds).toEqual({ [arrow.id]: true });
+  });
+
+  it("should export an arrow reaching into a frame from another one", () => {
+    const { arrow, label } = createLabeledArrowOutOfFrame();
+
+    expect(
+      getElementsOverlappingFrame(h.elements, frameB, arrayToMap(h.elements)),
+    ).toEqual([arrow, label, rectB, frameB]);
+  });
+
+  it("should keep an arrow bound to an element in another frame when dragging its frame", () => {
+    const arrow = drawArrowBetweenFrames();
+    expect(arrow.startBinding?.elementId).toBe(rectA.id);
+    const { y } = arrow;
+    const endPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      -1,
+      arrayToMap(h.elements),
+    );
+
+    API.setSelectedElements([frameA]);
+    mouse.downAt(250, 250);
+    mouse.moveTo(250, 300);
+    mouse.moveTo(250, 350);
+    mouse.up();
+
+    expect(h.app.scene.getElement(frameA.id)?.y).toBe(100);
+    expect(arrow.startBinding?.elementId).toBe(rectA.id);
+    expect(arrow.endBinding?.elementId).toBe(rectB.id);
+    expect(arrow.y).toBe(y + 100);
+    expect(
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        -1,
+        arrayToMap(h.elements),
+      ),
+    ).toEqual(endPoint);
+  });
+
+  it("should take an arrow out of its frame when neither of its ends is in it", () => {
+    const rectC = API.createElement({
+      type: "rectangle",
+      x: -300,
+      y: 100,
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectC, ...h.elements]);
+    // from inside frame A
+    const arrow = drawArrowBetweenFrames(pointFrom<GlobalPoint>(250, 250));
+
+    // onto rectC, crossing frame A
+    mouse.downAt(250, 250);
+    mouse.moveTo(-250, 150);
+    mouse.up();
+
+    expect(arrow.startBinding?.elementId).toBe(rectC.id);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should take an arrow out of its frame when what it's bound to in it leaves it", () => {
+    const arrow = drawArrowBetweenFrames();
+
+    mouse.downAt(60, 110);
+    mouse.moveTo(-240, 110);
+    mouse.up();
+
+    expect(rectA.frameId).toBe(null);
+    expect(arrow.startBinding?.elementId).toBe(rectA.id);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  /** an arrow in frame A, just inside its right edge */
+  const createArrowAtFrameEdge = () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 291,
+      y: 50,
+      width: 5,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(5, 0)],
+      frameId: frameA.id,
+    });
+    API.setElements([...h.elements, arrow]);
+    API.setSelectedElements([arrow]);
+    return arrow;
+  };
+
+  it("should take an arrow out of its frame when nudging its ends out of it", () => {
+    const arrow = createArrowAtFrameEdge();
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    expect(arrow.frameId).toBe(frameA.id);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should take an arrow out of its frame when moving its ends out of it from the stats panel", () => {
+    const arrow = createArrowAtFrameEdge();
+
+    API.setAppState({ stats: { ...h.state.stats, open: true } });
+    UI.updateInput(
+      UI.queryStatsProperty("X")!.querySelector(".drag-input")!,
+      "350",
+    );
+
+    expect(arrow.x).toBe(350);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should take an arrow out of its frame when resizing the frame leaves its ends out", () => {
+    const arrow = drawArrowBetweenFrames();
+
+    UI.resize(frameA, "w", [200, 0]);
+
+    expect(rectA.frameId).toBe(null);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should keep an elbow arrow's fixed segment when dragging its frame", () => {
+    API.setAppState({ currentItemArrowType: "elbow" });
+    // routed around rectB, with its middle segment fixed
+    const arrow = drawArrowBetweenFrames(
+      undefined,
+      pointFrom<GlobalPoint>(650, 180),
+    ) as ExcalidrawElbowArrowElement;
+    expect(arrow.elbowed).toBe(true);
+    const index = Math.floor(arrow.points.length / 2);
+    API.updateElement(arrow, {
+      fixedSegments: [
+        { index, start: arrow.points[index - 1], end: arrow.points[index] },
+      ],
+    });
+    const { points, fixedSegments } = arrow;
+
+    API.setSelectedElements([frameA]);
+    mouse.downAt(250, 250);
+    mouse.moveTo(285, 350);
+    mouse.up();
+
+    expect(arrow.startBinding?.elementId).toBe(rectA.id);
+    expect(arrow.endBinding?.elementId).toBe(rectB.id);
+    // moved with its start (and frame), the rest of the route following
+    expect(arrow.points).toHaveLength(points.length);
+    expect(arrow.fixedSegments).toHaveLength(1);
+    expect(arrow.fixedSegments![0].index).toBe(index);
+    expect(arrow.fixedSegments![0].start).toEqual(fixedSegments![0].start);
+  });
+
+  it("should put an elbow arrow's fixed segment back when dragging its frame away and back", () => {
+    API.setAppState({ currentItemArrowType: "elbow" });
+    // from rectB (in frame B) to rectA, in frame A
+    UI.clickTool("arrow");
+    mouse.downAt(650, 180);
+    mouse.moveTo(400, 150);
+    mouse.moveTo(100, 150);
+    mouse.up();
+    UI.clickTool("selection");
+    const arrow = h.elements.find(
+      (element): element is ExcalidrawElbowArrowElement =>
+        element.type === "arrow",
+    )!;
+    expect(arrow.startBinding?.elementId).toBe(rectB.id);
+    expect(arrow.endBinding?.elementId).toBe(rectA.id);
+    const index = Math.floor(arrow.points.length / 2);
+    API.updateElement(arrow, {
+      frameId: frameA.id,
+      fixedSegments: [
+        { index, start: arrow.points[index - 1], end: arrow.points[index] },
+      ],
+    });
+    const points = getPoints(arrow);
+
+    API.setSelectedElements([frameA]);
+    mouse.downAt(250, 270);
+    mouse.moveTo(250, 320);
+    mouse.moveTo(250, 370);
+    mouse.moveTo(250, 320);
+    mouse.moveTo(250, 270);
+    mouse.up();
+
+    expect(h.app.scene.getElement(frameA.id)?.y).toBe(0);
+    const nextPoints = getPoints(arrow);
+    expect(nextPoints).toHaveLength(points.length);
+    points.forEach(([x, y], index) => {
+      expect(nextPoints[index][0]).toBeCloseTo(x);
+      expect(nextPoints[index][1]).toBeCloseTo(y);
+    });
+  });
+
+  it("should move the midpoints of an arrow bound at both ends to an element in another frame with its frame", () => {
+    const arrow = drawArrowBetweenFrames(pointFrom<GlobalPoint>(250, 250));
+    // a loop on rectB, bending in frame A
+    API.updateElement(arrow, {
+      points: [
+        arrow.points[arrow.points.length - 1],
+        pointFrom<LocalPoint>(arrow.points[1][0] - 300, 100),
+        arrow.points[arrow.points.length - 1],
+      ],
+      startBinding: arrow.endBinding,
+    });
+    const [startPoint, midPoint, endPoint] = getPoints(arrow);
+
+    API.setSelectedElements([frameA]);
+    mouse.downAt(150, 250);
+    mouse.moveTo(150, 300);
+    mouse.moveTo(150, 350);
+    mouse.up();
+
+    expect(arrow.startBinding?.elementId).toBe(rectB.id);
+    expect(arrow.endBinding?.elementId).toBe(rectB.id);
+    const [nextStartPoint, nextMidPoint, nextEndPoint] = getPoints(arrow);
+    expect(nextStartPoint[0]).toBeCloseTo(startPoint[0]);
+    expect(nextStartPoint[1]).toBeCloseTo(startPoint[1]);
+    expect(nextMidPoint[0]).toBeCloseTo(midPoint[0]);
+    expect(nextMidPoint[1]).toBeCloseTo(midPoint[1] + 100);
+    expect(nextEndPoint[0]).toBeCloseTo(endPoint[0]);
+    expect(nextEndPoint[1]).toBeCloseTo(endPoint[1]);
+  });
+
+  it("should keep an arrow bound to an element in another frame when moving its frame from the stats panel", () => {
+    const arrow = drawArrowBetweenFrames();
+    const [startPoint, endPoint] = getPoints(arrow);
+
+    API.setSelectedElements([frameA]);
+    API.setAppState({ stats: { ...h.state.stats, open: true } });
+    UI.updateInput(
+      UI.queryStatsProperty("Y")!.querySelector(".drag-input")!,
+      "100",
+    );
+
+    expect(h.app.scene.getElement(frameA.id)?.y).toBe(100);
+    expect(arrow.startBinding?.elementId).toBe(rectA.id);
+    expect(arrow.endBinding?.elementId).toBe(rectB.id);
+    const [nextStartPoint, nextEndPoint] = getPoints(arrow);
+    expect(nextStartPoint[0]).toBeCloseTo(startPoint[0]);
+    expect(nextStartPoint[1]).toBeCloseTo(startPoint[1] + 100);
+    expect(nextEndPoint).toEqual(endPoint);
+  });
+
+  it("should move an arrow bound to an element in another frame when nudging its frame", () => {
+    // from empty space in frame A, bending in it
+    const arrow = drawArrowBetweenFrames(pointFrom<GlobalPoint>(100, 250));
+    expect(arrow.startBinding).toBe(null);
+    API.updateElement(arrow, {
+      points: [
+        arrow.points[0],
+        pointFrom<LocalPoint>(100, 0),
+        arrow.points[arrow.points.length - 1],
+      ],
+    });
+    const [startPoint, midPoint, endPoint] = getPoints(arrow);
+
+    API.setSelectedElements([frameA]);
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+
+    expect(h.app.scene.getElement(frameA.id)?.x).toBe(ELEMENT_TRANSLATE_AMOUNT);
+    expect(arrow.endBinding?.elementId).toBe(rectB.id);
+    const [nextStartPoint, nextMidPoint, nextEndPoint] = getPoints(arrow);
+    expect(nextStartPoint).toEqual(
+      pointFrom(startPoint[0] + ELEMENT_TRANSLATE_AMOUNT, startPoint[1]),
+    );
+    expect(nextMidPoint).toEqual(
+      pointFrom(midPoint[0] + ELEMENT_TRANSLATE_AMOUNT, midPoint[1]),
+    );
+    expect(nextEndPoint).toEqual(endPoint);
   });
 });

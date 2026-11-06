@@ -7,6 +7,7 @@ import {
   TTDDialog,
   TTDStreamFetch,
   THEME,
+  useOnExcalidrawStateChange,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
@@ -14,6 +15,7 @@ import { safelyParseJSON } from "@excalidraw/common";
 import type { StreamChunk } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
+import { cacheMermaidChunks } from "../data/cacheMermaidChunks";
 import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 
 export const AIComponents = ({
@@ -21,6 +23,15 @@ export const AIComponents = ({
 }: {
   excalidrawAPI: ExcalidrawImperativeAPI;
 }) => {
+  useOnExcalidrawStateChange(
+    (appState) => appState.openDialog?.name === "ttd",
+    (isTTDDialogOpen) => {
+      if (isTTDDialogOpen) {
+        cacheMermaidChunks();
+      }
+    },
+  );
+
   return (
     <>
       <DiagramToCodePlugin

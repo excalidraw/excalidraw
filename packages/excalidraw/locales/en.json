@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "<flowchartLink>Flowcharts</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, <stateLink>State</stateLink> and <erdLink>Entity Relationship</erdLink> diagrams, <ganttLink>Gantt charts</ganttLink>, <quadrantLink>Quadrant charts</quadrantLink> and <timelineLink>Timelines</timelineLink> are converted to Excalidraw elements. Other types are inserted as an image.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",

@@ -24,7 +24,6 @@ import { TTDChatPanel } from "./Chat/TTDChatPanel";
 import { TTDPreviewPanel } from "./TTDPreviewPanel";
 
 import { getLastAssistantMessage } from "./utils/chat";
-import { withMermaidSourceLineNumber } from "./utils/mermaidError";
 
 import type { BinaryFiles } from "../../types";
 import type {
@@ -152,10 +151,7 @@ const TextToDiagramContent = ({
 
   const handleAiRepairClick = async (message: TChat.ChatMessage) => {
     const mermaidContent = message.content || "";
-    const errorMessage = withMermaidSourceLineNumber(
-      message.error || "",
-      mermaidContent,
-    );
+    const errorMessage = message.error || "";
 
     if (!mermaidContent) {
       return;
