@@ -138,8 +138,12 @@ export const getTransformHandlesFromCoords = (
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 4,
   spacing = DEFAULT_TRANSFORM_HANDLE_SPACING,
+  handleScale = 1,
 ): TransformHandles => {
-  const size = transformHandleSizes[pointerType];
+  const size = Math.max(
+    transformHandleSizes[pointerType],
+    transformHandleSizes.mouse * handleScale,
+  );
   const handleWidth = size / zoom.value;
   const handleHeight = size / zoom.value;
 
@@ -216,7 +220,7 @@ export const getTransformHandlesFromCoords = (
   // We only want to show height handles (all cardinal directions)  above a certain size
   // Note: we render using "mouse" size so we should also use "mouse" size for this check
   const minimumSizeForEightHandles =
-    (5 * transformHandleSizes.mouse) / zoom.value;
+    (5 * transformHandleSizes.mouse * handleScale) / zoom.value;
   if (Math.abs(width) > minimumSizeForEightHandles) {
     if (!omitSides.n) {
       transformHandles.n = generateTransformHandle(
@@ -275,6 +279,7 @@ export const getTransformHandles = (
   elementsMap: ElementsMap,
   pointerType: PointerType = "mouse",
   omitSides: { [T in TransformHandleType]?: boolean } = DEFAULT_OMIT_SIDES,
+  handleScale = 1,
 ): TransformHandles => {
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
@@ -322,6 +327,7 @@ export const getTransformHandles = (
     omitSides,
     margin,
     isImageElement(element) ? 0 : undefined,
+    handleScale,
   );
 };
 

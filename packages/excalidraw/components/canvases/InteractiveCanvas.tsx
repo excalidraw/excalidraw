@@ -42,6 +42,7 @@ type InteractiveCanvasProps = {
   canvasNonce: string;
   selectionNonce: number | undefined;
   scale: number;
+  canvasHandleScale: number;
   appState: InteractiveCanvasAppState;
   renderScrollbars: boolean;
   editorInterface: EditorInterface;
@@ -160,6 +161,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       scale: props.scale,
       appState: props.appState,
       renderConfig: {
+        canvasHandleScale: props.canvasHandleScale,
         remotePointerViewportCoords,
         remotePointerButton,
         remoteSelectedElementIds,
@@ -294,6 +296,7 @@ const areEqual = (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
     prevProps.canvasNonce !== nextProps.canvasNonce ||
     prevProps.scale !== nextProps.scale ||
+    prevProps.canvasHandleScale !== nextProps.canvasHandleScale ||
     // we need to memoize on elementsMap because they may have renewed
     // even if canvasNonce didn't change (e.g. we filter elements out based
     // on appState)
