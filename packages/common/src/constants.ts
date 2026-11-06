@@ -392,6 +392,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     loadScene: true,
     saveToActiveFile: true,
     toggleTheme: null,
+    toggleFullScreen: true,
     saveAsImage: true,
   },
   tools: {

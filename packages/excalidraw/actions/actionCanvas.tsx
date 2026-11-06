@@ -1,5 +1,8 @@
 import {
+  allowFullScreen,
   DEFAULT_CANVAS_BACKGROUND_PICKS,
+  exitFullScreen,
+  isFullScreen,
   MAX_ZOOM,
   MIN_ZOOM,
   THEME,
@@ -28,6 +31,7 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
   ZoomResetIcon,
+  fullscreenIcon,
 } from "../components/icons";
 import { useAppStateValue } from "../hooks/useAppStateValue";
 
@@ -290,6 +294,56 @@ export const actionResetZoom = register({
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});
+
+export const actionToggleFullScreen = register({
+  name: "toggleFullScreen",
+  label: "buttons.fullScreen",
+  icon: fullscreenIcon,
+  viewMode: true,
+  trackEvent: { category: "canvas" },
+  perform: async (_elements, appState) => {
+    try {
+      if (isFullScreen()) {
+        await exitFullScreen();
+      } else {
+        await allowFullScreen();
+      }
+    } catch (error) {
+      // noop
+    }
+
+    return {
+      appState: {
+        ...appState,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+  PanelComponent: ({ updateData }) => (
+    <Tooltip
+      label={t("buttons.fullScreen")}
+      className="fullscreen-button-wrapper"
+      delay
+    >
+      <IconButton
+        type="button"
+        className="fullscreen-button zoom-button"
+        icon={fullscreenIcon}
+        aria-label={t("buttons.fullScreen")}
+        onClick={() => {
+          updateData(null);
+        }}
+      />
+    </Tooltip>
+  ),
+  predicate: (_elements, _appState, _props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.toggleFullScreen &&
+      app.editorInterface.userAgent.platform === "android" &&
+      app.editorInterface.formFactor !== "desktop"
+    );
+  },
 });
 
 // under a viewport lock, zoom-to-fit targets the locked box rather than the
