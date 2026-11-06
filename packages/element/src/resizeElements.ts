@@ -452,7 +452,11 @@ const rotateMultipleElements = (
     NonDeletedExcalidrawElement
   >(elements.map((element) => [element.id, element]));
 
-  for (const element of elements) {
+  const arrowsLast = elements
+    .slice()
+    .sort((a, b) => Number(isArrowElement(a)) - Number(isArrowElement(b)));
+
+  for (const element of arrowsLast) {
     if (!isFrameLikeElement(element)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
       const cx = (x1 + x2) / 2;
