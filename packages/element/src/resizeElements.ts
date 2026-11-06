@@ -1549,6 +1549,11 @@ export const resizeMultipleElements = (
       });
     }
 
+    elementsAndUpdates.sort(
+      (a, b) =>
+        Number(isArrowElement(a.element)) - Number(isArrowElement(b.element)),
+    );
+
     const elementsToUpdate = elementsAndUpdates.map(({ element }) => element);
     const resizedElementsMap = new Map<
       ExcalidrawElement["id"],

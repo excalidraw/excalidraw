@@ -26,6 +26,7 @@ import type { GlobalPoint } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { getGlobalFixedPointForBindableElement } from "../src/binding";
 import { isLinearElement } from "../src/typeChecks";
 import { resizeSingleElement } from "../src/resizeElements";
 import { distanceToElement } from "../src/distance";
@@ -715,6 +716,60 @@ describe("arrow element", () => {
     UI.resize([rectangle, arrow], "nw", [300, 350]);
     expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.06);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
+  });
+
+  it("routes an elbow arrow to the resized elements above it", () => {
+    const start = UI.createElement("rectangle", {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const end = UI.createElement("rectangle", {
+      x: 300,
+      y: 200,
+      width: 100,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(105, 50);
+    mouse.click();
+    mouse.moveTo(295, 250);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.elementId).toBe(start.id);
+    expect(arrow.endBinding?.elementId).toBe(end.id);
+
+    API.setElements([arrow, start.get(), end.get()]);
+
+    UI.resize([start, end, arrow], "se", [-100, -80]);
+
+    const elementsMap = arrayToMap(h.elements);
+    const startPoint = getGlobalFixedPointForBindableElement(
+      arrow.startBinding!.fixedPoint,
+      start.get(),
+      elementsMap,
+    );
+    const endPoint = getGlobalFixedPointForBindableElement(
+      arrow.endBinding!.fixedPoint,
+      end.get(),
+      elementsMap,
+    );
+
+    expect(arrow.x + arrow.points[0][0]).toBeCloseTo(startPoint[0]);
+    expect(arrow.y + arrow.points[0][1]).toBeCloseTo(startPoint[1]);
+    expect(arrow.x + arrow.points[arrow.points.length - 1][0]).toBeCloseTo(
+      endPoint[0],
+    );
+    expect(arrow.y + arrow.points[arrow.points.length - 1][1]).toBeCloseTo(
+      endPoint[1],
+    );
   });
 });
 
