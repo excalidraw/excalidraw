@@ -1,14 +1,17 @@
 import React from "react";
+import tEXt from "png-chunk-text";
+import encodePng from "png-chunks-encode";
+import decodePng from "png-chunks-extract";
 
-import { SVG_NS } from "@excalidraw/common";
+import { MIME_TYPES, SVG_NS } from "@excalidraw/common";
 
 import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import * as clipboardModule from "../clipboard";
 import { exportCanvas, prepareElementsForExport } from "../data";
-import { getDataURL } from "../data/blob";
-import { encodePngMetadata } from "../data/image";
+import { blobToArrayBuffer, getDataURL } from "../data/blob";
+import { decodePngMetadata, encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
 import {
@@ -260,5 +263,40 @@ describe("export", () => {
     // in case of regressions, save the SVG to a file and visually compare to:
     // src/tests/fixtures/svg-image-exporting-reference.svg
     expect(svgText).toMatchSnapshot(`svg export output`);
+  });
+
+  it.each([
+    ["test_embedded_v1.png", "test"],
+    ["smiley_embedded_v2.png", "😀"],
+  ])("imports %s with unrelated PNG text metadata", async (file, text) => {
+    const pngBlob = await API.loadFile(`./fixtures/${file}`);
+    const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(pngBlob)));
+    chunks.splice(1, 0, tEXt.encode("Comment", "Review copy"));
+    chunks.splice(-1, 0, tEXt.encode("Author", "Diagram author"));
+
+    await API.drop([
+      {
+        kind: "file",
+        file: new Blob([encodePng(chunks)], { type: MIME_TYPES.png }),
+      },
+    ]);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text }),
+      ]);
+    });
+  });
+
+  it("does not treat unrelated PNG text as scene data", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(pngBlob)));
+    chunks.splice(1, 0, tEXt.encode("Comment", "Review copy"));
+
+    await expect(
+      decodePngMetadata(
+        new Blob([encodePng(chunks)], { type: MIME_TYPES.png }),
+      ),
+    ).rejects.toThrow("INVALID");
   });
 });
