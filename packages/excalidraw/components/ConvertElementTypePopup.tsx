@@ -561,8 +561,9 @@ export const convertElementTypes = (
           cachedElement &&
           getLinearElementSubType(cachedElement) === nextType
         ) {
-          nextElementsMap.set(cachedElement.id, cachedElement);
-          convertedElements.push(cachedElement);
+          const restored = restoreCachedLinearElement(element, cachedElement);
+          nextElementsMap.set(restored.id, restored);
+          convertedElements.push(restored);
         } else {
           const converted = convertElementType(element, nextType, app);
           nextElementsMap.set(converted.id, converted);
@@ -678,6 +679,42 @@ const isEligibleLinearElement = (element: ExcalidrawElement) => {
     (!isArrowElement(element) ||
       (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
   );
+};
+
+/** the properties a linear element's subtype dictates */
+const LINEAR_SUBTYPE_PROPERTIES: ReadonlySet<string> = new Set([
+  "type",
+  "points",
+  "width",
+  "height",
+  "roundness",
+  "startArrowhead",
+  "endArrowhead",
+  "polygon",
+  "elbowed",
+  "fixedSegments",
+  "startIsSpecial",
+  "endIsSpecial",
+]);
+
+/**
+ * Switches an element back to a subtype it was cached in, restoring that
+ * subtype's properties (e.g. the points an elbow conversion rewrote). The
+ * rest follows the element as it is now, so changes made since it was cached
+ * are kept, and its version moves forward for the store and collaborators.
+ */
+const restoreCachedLinearElement = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  cachedElement: ExcalidrawLinearElement,
+): NonDeleted<ExcalidrawLinearElement> => {
+  const restored: Record<string, unknown> = { ...cachedElement };
+  for (const [key, value] of Object.entries(element)) {
+    if (!LINEAR_SUBTYPE_PROPERTIES.has(key)) {
+      restored[key] = value;
+    }
+  }
+  ShapeCache.delete(element);
+  return bumpVersion(restored as NonDeleted<ExcalidrawLinearElement>);
 };
 
 const toCacheKey = (
