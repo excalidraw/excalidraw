@@ -148,6 +148,12 @@ export const serializeAsClipboardJSON = ({
   files: BinaryFiles | null;
 }) => {
   const elementsMap = arrayToMap(elements);
+  const groupSizes = new Map<string, number>();
+  for (const element of elements) {
+    for (const groupId of element.groupIds) {
+      groupSizes.set(groupId, (groupSizes.get(groupId) ?? 0) + 1);
+    }
+  }
   const framesToCopy = new Set<ExcalidrawFrameLikeElement>(
     elements.filter((element) => isFrameLikeElement(element)),
   );
@@ -173,13 +179,17 @@ export const serializeAsClipboardJSON = ({
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
     elements: elements.map((element) => {
-      if (
+      const groupIds = element.groupIds.filter(
+        (groupId) => groupSizes.get(groupId)! > 1,
+      );
+      const shouldClearFrame =
         getContainingFrame(element, elementsMap) &&
-        !framesToCopy.has(getContainingFrame(element, elementsMap)!)
-      ) {
+        !framesToCopy.has(getContainingFrame(element, elementsMap)!);
+      if (shouldClearFrame || groupIds.length !== element.groupIds.length) {
         const copiedElement = deepCopyElement(element);
         mutateElement(copiedElement, elementsMap, {
-          frameId: null,
+          frameId: shouldClearFrame ? null : element.frameId,
+          groupIds,
         });
         return copiedElement;
       }

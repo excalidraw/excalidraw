@@ -104,6 +104,29 @@ beforeEach(async () => {
 });
 
 describe("general paste behavior", () => {
+  it("pastes a single copied group member without retaining its group", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      groupIds: ["group"],
+    });
+    const ellipse = API.createElement({
+      type: "ellipse",
+      groupIds: ["group"],
+    });
+    API.setElements([rectangle, ellipse]);
+
+    pasteWithCtrlCmdV(
+      serializeAsClipboardJSON({ elements: [rectangle], files: null }),
+    );
+
+    await waitFor(() => {
+      expect(h.elements).toHaveLength(3);
+      expect(h.elements[2].groupIds).toEqual([]);
+    });
+    expect(h.elements[0].groupIds).toEqual(["group"]);
+    expect(h.elements[1].groupIds).toEqual(["group"]);
+  });
+
   it("should randomize seed on paste", async () => {
     const rectangle = API.createElement({ type: "rectangle" });
     const clipboardJSON = await serializeAsClipboardJSON({
