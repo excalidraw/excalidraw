@@ -272,6 +272,10 @@ export class Scene {
     nextElements: ElementsMapOrArray,
     options?: {
       skipValidation?: true;
+      /** pass when elements come from outside the editor (remote updates) —
+       * index healing then preserves `version`/`versionNonce`, so the local
+       * copy cannot outrace its source in version-based reconciliation */
+      preserveVersions?: boolean;
     },
   ) {
     // we do trust the insertion order on the map, though maybe we shouldn't and should prefer order defined by fractional indices
@@ -282,7 +286,9 @@ export class Scene {
       validateIndicesThrottled(_nextElements);
     }
 
-    this.elements = syncInvalidIndices(_nextElements);
+    this.elements = syncInvalidIndices(_nextElements, {
+      preserveVersions: options?.preserveVersions,
+    });
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
