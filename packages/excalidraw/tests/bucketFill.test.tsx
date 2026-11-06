@@ -836,4 +836,82 @@ describe("bucket fill tool", () => {
       h.elements.filter((el) => el.type === "rectangle" && !el.isDeleted),
     ).toHaveLength(1);
   });
+
+  describe("in a locked group", () => {
+    const seedLockedGroup = () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        x: 20,
+        y: 20,
+        width: 120,
+        height: 100,
+        roundness: null,
+        backgroundColor: "transparent",
+        groupIds: ["group"],
+        locked: true,
+      });
+      const other = API.createElement({
+        type: "rectangle",
+        x: 300,
+        y: 20,
+        groupIds: ["group"],
+        locked: true,
+      });
+      act(() => {
+        h.app.updateScene({
+          elements: [rect, other],
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+      });
+      return [rect, other];
+    };
+
+    it("locks the fill with the group", () => {
+      const [rect, other] = seedLockedGroup();
+      selectBucketFill();
+      mouse.clickAt(80, 70);
+
+      const fill = h.elements.find((el) => el.type === "line")!;
+      expect(fill).toMatchObject({ groupIds: ["group"], locked: true });
+
+      // the group can't be moved or deleted through the fill
+      act(() => {
+        h.app.setActiveTool({ type: "selection" });
+      });
+      mouse.reset();
+      mouse.downAt(80, 70);
+      mouse.moveTo(180, 170);
+      mouse.upAt();
+      expect(h.state.selectedElementIds).toEqual({});
+      Keyboard.keyPress(KEYS.DELETE);
+      for (const element of [rect, other, fill]) {
+        expect(API.getElement(element)).toMatchObject({
+          x: element.x,
+          y: element.y,
+          isDeleted: false,
+        });
+      }
+    });
+
+    it("doesn't stack a duplicate fill when re-clicked", () => {
+      seedLockedGroup();
+      selectBucketFill();
+      mouse.clickAt(80, 70);
+      mouse.clickAt(80, 70);
+
+      expect(h.elements.filter((el) => el.type === "line")).toHaveLength(1);
+    });
+
+    it("leaves the fill unlocked if the group isn't locked as a whole", () => {
+      const [rect, other] = seedLockedGroup();
+      API.updateElement(other, { locked: false });
+      selectBucketFill();
+      mouse.clickAt(80, 70);
+
+      expect(h.elements.find((el) => el.type === "line")).toMatchObject({
+        groupIds: rect.groupIds,
+        locked: false,
+      });
+    });
+  });
 });
