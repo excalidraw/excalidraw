@@ -670,13 +670,13 @@ const ExcalidrawWrapper = () => {
     };
 
     window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
-    window.addEventListener(EVENT.UNLOAD, onUnload, false);
+    window.addEventListener(EVENT.PAGEHIDE, onUnload, false);
     window.addEventListener(EVENT.BLUR, visibilityChange, false);
     document.addEventListener(EVENT.VISIBILITY_CHANGE, visibilityChange, false);
     window.addEventListener(EVENT.FOCUS, visibilityChange, false);
     return () => {
       window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
-      window.removeEventListener(EVENT.UNLOAD, onUnload, false);
+      window.removeEventListener(EVENT.PAGEHIDE, onUnload, false);
       window.removeEventListener(EVENT.BLUR, visibilityChange, false);
       window.removeEventListener(EVENT.FOCUS, visibilityChange, false);
       document.removeEventListener(
