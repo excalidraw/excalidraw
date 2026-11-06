@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid naar Excalidraw",
     "button": "Invoegen",
-    "description": "",
+    "description": "<flowchartLink>Stroomdiagrammen</flowchartLink>, <sequenceLink>Reeks-</sequenceLink>, <classLink>Klasse-</classLink>, <stateLink>Status-</stateLink> en <erdLink>Entiteitsrelatie-</erdLink> diagrammen, <ganttLink>Gantt-grafieken</ganttLink>, <quadrantLink>Kwadrantgrafieken</quadrantLink> en <timelineLink>Tijdlijnen</timelineLink> worden omgezet naar Excalidraw-elementen. Andere types worden ingevoegd als afbeelding.",
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
