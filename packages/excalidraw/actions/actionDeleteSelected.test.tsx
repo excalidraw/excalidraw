@@ -208,7 +208,7 @@ describe("deleting selected elements when frame selected should keep children + 
 
     assertElements(h.elements, [
       { id: f1.id, isDeleted: true },
-      { id: r1.id, isDeleted: false, selected: true },
+      { id: r1.id, isDeleted: false, selected: true, frameId: null },
     ]);
   });
 });
