@@ -3258,7 +3258,48 @@ class App extends React.Component<AppProps, AppState> {
       event.preventDefault();
       return;
     }
+    if (this.maybeHandleArrowKeyPan(event)) {
+      event.preventDefault();
+      return;
+    }
     this.actionManager.handleKeyDown(event);
+  };
+
+  /**
+   * Arrow-key pan: moves the viewport by a fixed step (scaled by zoom) when
+   * in view mode. Holding multiple arrows at once moves diagonally.
+   * Returns `true` when the event was consumed.
+   */
+  private maybeHandleArrowKeyPan = (
+    event: KeyboardEvent | React.KeyboardEvent,
+  ): boolean => {
+    if (!isArrowKey(event.key)) {
+      return false;
+    }
+    if (!this.state.viewModeEnabled) {
+      return false;
+    }
+
+    const step = 20 / this.state.zoom.value;
+
+    // Use setState directly instead of viewport.translate because onKeyDown
+    // is wrapped in withBatchedUpdates, and viewport.translate's internal
+    // setState can be clobbered by the batching.
+    this.setState((state) => {
+      let { scrollX, scrollY } = state;
+      if (event.key === KEYS.ARROW_LEFT) {
+        scrollX = scrollX + step;
+      } else if (event.key === KEYS.ARROW_RIGHT) {
+        scrollX = scrollX - step;
+      } else if (event.key === KEYS.ARROW_UP) {
+        scrollY = scrollY + step;
+      } else if (event.key === KEYS.ARROW_DOWN) {
+        scrollY = scrollY - step;
+      }
+      return { scrollX, scrollY };
+    });
+
+    return true;
   };
 
   /**
@@ -5311,6 +5352,13 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.actionManager.handleKeyDown(event)) {
+        return;
+      }
+
+      // Arrow-key panning in view mode — checked before the tool-switching
+      // guard below, which returns early for all non-tool keys in view mode.
+      if (this.state.viewModeEnabled && this.maybeHandleArrowKeyPan(event)) {
+        event.preventDefault();
         return;
       }
 
