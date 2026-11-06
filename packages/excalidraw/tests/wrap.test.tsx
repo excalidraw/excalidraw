@@ -107,6 +107,83 @@ describe("wrap (w)", () => {
     expect(h.state.selectedLinearElement?.elementId).toBe("arrow");
   });
 
+  it("binds a text to a container in another frame or group, moving it there", () => {
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      width: 300,
+      height: 300,
+    });
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      x: 50,
+      y: 50,
+      frameId: "frame",
+      groupIds: ["group"],
+    });
+    const other = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      frameId: "frame",
+      groupIds: ["group"],
+    });
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rect",
+      x: 600,
+      width: 200,
+      height: 100,
+    });
+    API.setElements([text, other, frame, rectangle]);
+    API.setSelectedElements([text, rectangle]);
+
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: "rect",
+      frameId: null,
+      groupIds: [],
+    });
+
+    // the label stays with its container when the frame moves
+    API.setSelectedElements([getElement("frame")]);
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    expect(getElement("frame").x).toBe(1);
+    expect(getElement("text").x).toBe(
+      getElement("rect").x + (200 - getElement("text").width) / 2,
+    );
+  });
+
+  it("binds a text to a container in a frame, adding it to the frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      width: 400,
+      height: 300,
+    });
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rect",
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 100,
+      frameId: "frame",
+    });
+    const text = API.createElement({ type: "text", id: "text", x: 600 });
+    API.setElements([rectangle, frame, text]);
+    API.setSelectedElements([text, rectangle]);
+
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: "rect",
+      frameId: "frame",
+    });
+  });
+
   it("wraps a text in a default rectangle of the text's color", () => {
     const text = API.createElement({
       type: "text",
