@@ -157,6 +157,25 @@ export const mergeLibraryItems = (
 };
 
 /**
+ * Loads several library files into a single list of library items, merged the
+ * same way as when importing the files one after another (items of later files
+ * first).
+ */
+export const loadLibraryFromBlobs = async (
+  blobs: readonly Blob[],
+  defaultStatus?: LibraryItem["status"],
+): Promise<LibraryItems> => {
+  let libraryItems: LibraryItems = [];
+  for (const blob of blobs) {
+    libraryItems = mergeLibraryItems(
+      libraryItems,
+      await loadLibraryFromBlob(blob, defaultStatus),
+    );
+  }
+  return libraryItems;
+};
+
+/**
  * Returns { deletedItems, addedItems } maps of all added and deleted items
  * since last onLibraryChange event.
  *
