@@ -605,9 +605,10 @@ const normalizeWrappedText = (
     const nextLine = wrappedLines[i + 1];
 
     if (nextLine) {
+      // search past the current line, which can contain the next line's text
       const nextLineIndexInOriginal = originalText.indexOf(
         nextLine,
-        originalIndex,
+        originalIndex + currentLine.length,
       );
 
       if (nextLineIndexInOriginal > currentLine.length + originalIndex) {
