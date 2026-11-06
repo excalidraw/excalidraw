@@ -354,8 +354,8 @@
     "convertElementType": "Formtyp umschalten"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Konnte hier keine geschlossene Region zum Ausfüllen finden.",
+    "tooComplex": "Diese Region ist zu komplex, um sie auszufüllen."
   },
   "element": {
     "rectangle": "Rechteck",
@@ -388,7 +388,7 @@
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
-    "stickynote": "",
+    "stickynote": "Klicke, um eine Notiz zu platzieren oder ziehe diese um die Größe zu verändern",
     "autoshape": "",
     "text_selected": "Doppelklicken oder {{shortcut}} drücken, um Text zu bearbeiten",
     "text_editing": "Drücke {{shortcut_1}} oder {{shortcut_2}}, um die Bearbeitung abzuschließen",
@@ -396,7 +396,7 @@
     "lockAngle": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
     "resize": "Halte {{shortcut_1}} gedrückt, um die Proportionen beizubehalten.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
     "resizeImage": "Halte {{shortcut_1}} gedrückt, um frei zu skalieren.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
-    "resizeStickyNote": "",
+    "resizeStickyNote": "Halte {{shortcut_1}} um die Größe frei zu ändern oder {{shortcut_2}} um die Größe von der Mitte aus zu ändern",
     "rotate": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
     "toggleArrowhead": "",
     "lineEditor_info": "Halte {{shortcut_1}} gedrückt und doppelklicke oder drücke {{shortcut_2}}, um Punkte zu bearbeiten",
@@ -631,8 +631,8 @@
     "noShades": "Keine Schattierungen für diese Farbe verfügbar",
     "invalidColor": "Keine gültige Farbe",
     "invalidHexLength": "Hex-Code muss 3, 4, 6 oder 8 Zeichen lang sein",
-    "topPicksTip": "Tipp: Ziehe eine Farbe zu deinen Top-Picks um sie anzupinnen",
-    "resetTopPicks": "Setze deine Top-Picks zurück"
+    "topPicksTip": "Tipp: Ziehe eine Farbe auf deine Top Picks um sie anzupinnen",
+    "resetTopPicks": "Zurücksetzen auf die Standard Top Picks"
   },
   "overwriteConfirm": {
     "action": {
@@ -683,8 +683,8 @@
     "label": "Mermaid",
     "inputPlaceholder": "Mermaid-Diagrammdefinition hier eingeben...",
     "autoFixAvailable": "Automatische Korrektur verfügbar",
-    "loadError": "",
-    "loadErrorReload": "",
+    "loadError": "Mermaid konnte nicht geladen werden. Überprüfe deine Internetverbindung und versuche es erneut.",
+    "loadErrorReload": "Mermaid konnte nicht geladen werden. Lade die Seite neu, um es erneut zu versuchen.",
     "reload": "Erneut laden"
   },
   "ttd": {
@@ -743,8 +743,8 @@
     "sceneFonts": "In dieser Szene",
     "availableFonts": "Verfügbare Schriftarten",
     "empty": "Keine Schriftarten gefunden",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Tipp: Ziehe eine Schriftart auf deine Top Picks um sie anzupinnen",
+    "resetTopPicks": "Zurücksetzen auf die Standard Top Picks"
   },
   "userList": {
     "empty": "Keine Benutzer gefunden",
