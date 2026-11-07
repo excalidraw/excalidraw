@@ -2,6 +2,9 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Senṭeḍ",
     "pasteAsPlaintext": "",
     "pasteCharts": "Senṭeḍ udlifen",
@@ -27,6 +30,7 @@
     "copyStyles": "Nɣel iɣunab",
     "pasteStyles": "Senṭeḍ iɣunab",
     "stroke": "Azizdew",
+    "textColor": "",
     "changeStroke": "",
     "background": "Agilal",
     "changeBackground": "",
@@ -187,6 +191,8 @@
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
@@ -195,7 +201,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +255,7 @@
     "undo": "Sefsex",
     "redo": "Err-d",
     "resetLibrary": "Ales awennez n temkarḍit",
+    "reset": "",
     "createNewRoom": "Snulfu-d taxxamt tamaynutt",
     "fullScreen": "Agdil aččuran",
     "darkMode": "Askar imsulles",
@@ -332,6 +343,7 @@
     "eraser": "Sfeḍ",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "laser": "",
     "autoshape": "",
@@ -357,6 +369,7 @@
     "group": "Sigrew",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +388,7 @@
     "freeDraw": "Ssit yerna zuɣer, serreḥ ticki tfukeḍ",
     "text": "Tixidest: tzemreḍ daɣen ad ternuḍ aḍris s usiti snat n tikkal anida tebɣiḍ s ufecku n tefrayt",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +396,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -392,6 +407,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
@@ -649,6 +665,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -657,7 +682,10 @@
     "preview": "",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": ""
@@ -714,7 +742,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
