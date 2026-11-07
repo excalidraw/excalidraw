@@ -467,6 +467,7 @@ export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
+export { ToolbarExtras } from "./components/toolbar/ToolbarExtras";
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
 export {

@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### `ToolbarExtras` host slot in the toolbar
+
+New `ToolbarExtras` children component: whatever you render inside it appears in the native toolbar island, after the eraser and before the "more tools" menu, with the same tunnel mechanism as `Footer` and `MainMenu`. Use it to add tools of your own (e.g. a GIF picker, a widget inserter) without replacing the toolbar. It also works in the phone toolbar, where native tools move into the "more tools" menu to make room.
+
 ### Arrows aren't clipped to frames (2026-10-31) [#12516](https://github.com/excalidraw/excalidraw/pull/12516)
 
 - Arrows and their labels are no longer clipped to the frame they belong to, so they can connect elements across and out of frames, and their part outside the frame can be selected. They still belong to their frame, so they're moved, copied and deleted with it, but only while one of their ends is in it (bound to an element in the frame, or inside it). An arrow whose ends both leave its frame (moved, bound to elements outside it, or with the elements it's bound to) leaves the frame.

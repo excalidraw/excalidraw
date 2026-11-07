@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import clsx from "clsx";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
@@ -81,7 +81,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const bucketFillToolSelected = activeTool.type === "bucketfill";
   const stickyNoteToolSelected = activeTool.type === "stickynote";
 
-  const { TTDDialogTriggerTunnel } = useTunnels();
+  const { TTDDialogTriggerTunnel, ToolbarExtrasTunnel } = useTunnels();
 
   const SHAPE_TOOLS = (["rectangle", "diamond", "ellipse"] as const).map(
     (type) => ({
@@ -100,6 +100,33 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   }));
 
   const [toolbarWidth, setToolbarWidth] = useState(0);
+  const [toolbarExtrasWidth, setToolbarExtrasWidth] = useState(0);
+  const toolbarExtrasRef = useRef<HTMLDivElement | null>(null);
+
+  // the tunnel updates its outlet without rerendering this component, so the
+  // slot has to be observed rather than measured on render
+  useLayoutEffect(() => {
+    const toolbarExtras = toolbarExtrasRef.current;
+    const ownerWindow = toolbarExtras?.ownerDocument.defaultView;
+    if (
+      !toolbarExtras ||
+      !ownerWindow ||
+      typeof ownerWindow.ResizeObserver !== "function"
+    ) {
+      return;
+    }
+
+    const resizeObserver = new ownerWindow.ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setToolbarExtrasWidth(entry.contentRect.width);
+      }
+    });
+    resizeObserver.observe(toolbarExtras);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const WIDTH = 36;
   const GAP = 4;
@@ -109,9 +136,18 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const MIN_WIDTH = MIN_TOOLS * WIDTH + (MIN_TOOLS - 1) * GAP;
   const ADDITIONAL_WIDTH = WIDTH + GAP;
 
-  const showTextToolOutside = toolbarWidth >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
-  const showImageToolOutside = toolbarWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
-  const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
+  // host tools take their room from the native tools shown outside the menu,
+  // so that the "more tools" trigger stays on screen
+  const availableWidth = toolbarExtrasWidth
+    ? toolbarWidth - toolbarExtrasWidth - GAP
+    : toolbarWidth;
+
+  const showTextToolOutside =
+    availableWidth >= MIN_WIDTH + 1 * ADDITIONAL_WIDTH;
+  const showImageToolOutside =
+    availableWidth >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+  const showFrameToolOutside =
+    availableWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools: readonly typeof activeTool.type[] = (
     [
@@ -227,6 +263,11 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
 
       {/* Frame Tool */}
       {showFrameToolOutside && <FrameToolButton {...toolProps} hideShortcut />}
+
+      {/* host tool buttons, see <ToolbarExtras> */}
+      <div className="mobile-toolbar-extras" ref={toolbarExtrasRef}>
+        <ToolbarExtrasTunnel.Out />
+      </div>
 
       {/* Other Shapes */}
       <DropdownMenu open={isOtherShapesMenuOpen}>
