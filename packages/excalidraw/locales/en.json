@@ -480,6 +480,7 @@
     "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text editor)",
+    "textFinishAndAddBelow": "Finish editing and add a text below (text editor)",
     "textNewLine": "Add new line (text editor)",
     "title": "Help",
     "view": "View",

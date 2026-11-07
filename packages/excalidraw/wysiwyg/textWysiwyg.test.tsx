@@ -26,6 +26,7 @@ import {
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -3592,6 +3593,231 @@ describe("textWysiwyg", () => {
       Keyboard.undo();
 
       expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(0);
+    });
+  });
+
+  describe("add a text below (Alt+Enter)", () => {
+    const addTextBelow = (editor: HTMLTextAreaElement) =>
+      fireEvent.keyDown(editor, { key: KEYS.ENTER, altKey: true });
+
+    const getNonDeletedTexts = () =>
+      h.elements.filter(
+        (el): el is NonDeleted<ExcalidrawTextElement> =>
+          isTextElement(el) && !el.isDeleted,
+      );
+
+    const editText = async (text: NonDeleted<ExcalidrawTextElement>) => {
+      API.setSelectedElements([text]);
+      Keyboard.keyPress(KEYS.ENTER);
+      return getTextEditor();
+    };
+
+    beforeAll(() => {
+      mockBoundingClientRect({ height: 400, width: 800 });
+    });
+
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      // @ts-ignore
+      h.app.refreshEditorInterface();
+      API.setElements([]);
+    });
+
+    afterAll(() => {
+      restoreOriginalGetBoundingClientRect();
+    });
+
+    it("submits the text and starts editing a new one below it", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(100, 100);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "first");
+
+      addTextBelow(editor);
+
+      const nextEditor = await getTextEditor();
+      expect(nextEditor).not.toBe(editor);
+      await waitFor(() => expect(document.activeElement).toBe(nextEditor));
+
+      const [first, next] = getNonDeletedTexts();
+      expect(first.text).toBe("first");
+      expect(h.state.editingTextElement?.id).toBe(next.id);
+      expect(next.text).toBe("");
+
+      const lineHeightPx = getLineHeightInPx(first.fontSize, first.lineHeight);
+      expect(next.x).toBeCloseTo(first.x);
+      expect(next.y).toBeCloseTo(first.y + first.height + lineHeightPx / 2);
+    });
+
+    it.each([
+      [TEXT_ALIGN.LEFT, 0],
+      [TEXT_ALIGN.CENTER, 0.5],
+      [TEXT_ALIGN.RIGHT, 1],
+    ] as const)(
+      "anchors the new text as the previous one (%s)",
+      async (textAlign, widthRatio) => {
+        const text = API.createElement({
+          type: "text",
+          text: "some text",
+          x: 100,
+          y: 100,
+          textAlign,
+        });
+        API.setElements([text]);
+        const editor = await editText(text);
+
+        addTextBelow(editor);
+        await getTextEditor();
+
+        const [first, next] = getNonDeletedTexts();
+        expect(next.textAlign).toBe(textAlign);
+        // the side (or middle) the texts grow away from
+        expect(next.x + next.width * widthRatio).toBeCloseTo(
+          first.x + first.width * widthRatio,
+        );
+      },
+    );
+
+    it("styles the new text as the previous one, not the current item", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "styled",
+        strokeColor: "#e03131",
+        opacity: 50,
+        fontSize: 36,
+        fontFamily: FONT_FAMILY.Nunito,
+      });
+      API.setElements([text]);
+      expect(h.state.currentItemFontSize).not.toBe(36);
+      const editor = await editText(text);
+
+      addTextBelow(editor);
+      await getTextEditor();
+
+      const next = getNonDeletedTexts()[1];
+      expect(next).toEqual(
+        expect.objectContaining({
+          strokeColor: "#e03131",
+          opacity: 50,
+          fontSize: 36,
+          fontFamily: FONT_FAMILY.Nunito,
+          lineHeight: text.lineHeight,
+        }),
+      );
+    });
+
+    it("scrolls a new text that'd start past the viewport into view", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "at the bottom",
+        x: 100,
+        y: h.state.height - 30,
+      });
+      API.setElements([text]);
+      const editor = await editText(text);
+      const { scrollY } = h.state;
+
+      addTextBelow(editor);
+      await getTextEditor();
+
+      const next = getNonDeletedTexts()[1];
+      expect(h.state.scrollY).toBeLessThan(scrollY);
+      expect(
+        (next.y + next.height + h.state.scrollY) * h.state.zoom.value,
+      ).toBeLessThanOrEqual(h.state.height);
+    });
+
+    it("only closes the editor when the text is empty", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(100, 100);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "   ");
+
+      addTextBelow(editor);
+
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect(h.state.editingTextElement).toBeNull();
+      expect(getNonDeletedTexts()).toHaveLength(0);
+    });
+
+    it("only submits a container's label", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 100,
+        height: 100,
+      });
+      API.setElements([container]);
+      API.setSelectedElements([container]);
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "label");
+
+      addTextBelow(editor);
+
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect(getNonDeletedTexts()).toHaveLength(1);
+      expect(API.getSelectedElements().map((el) => el.id)).toEqual([
+        container.id,
+      ]);
+    });
+
+    it("leaves the other Enter shortcuts as they were", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(100, 100);
+      let editor = await getTextEditor();
+      updateTextEditor(editor, "text");
+
+      // Shift+Enter is a new line, left to the textarea
+      fireEvent.keyDown(editor, { key: KEYS.ENTER, shiftKey: true });
+      expect(await getTextEditor({ waitForEditor: false })).toBe(editor);
+
+      // Ctrl+Alt+Enter (AltGr+Enter on Windows) submits, as Ctrl+Enter
+      fireEvent.keyDown(editor, {
+        key: KEYS.ENTER,
+        ctrlKey: true,
+        altKey: true,
+      });
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect(getNonDeletedTexts()).toHaveLength(1);
+      const [text] = getNonDeletedTexts();
+      expect(API.getSelectedElements().map((el) => el.id)).toEqual([text.id]);
+
+      editor = await editText(text);
+      fireEvent.keyDown(editor, { key: KEYS.ENTER, ctrlKey: true });
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+
+      editor = await editText(text);
+      Keyboard.exitTextEditor(editor);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+      expect(getNonDeletedTexts()).toHaveLength(1);
+      expect(API.getSelectedElements().map((el) => el.id)).toEqual([text.id]);
+    });
+
+    it("lands each submitted text in its own history entry", async () => {
+      const stackSize = () => (h.history as any).undoStack.length;
+      UI.clickTool("text");
+      const before = stackSize();
+      mouse.clickAt(100, 100);
+      let editor = await getTextEditor();
+      updateTextEditor(editor, "first");
+      addTextBelow(editor);
+      editor = await getTextEditor();
+      updateTextEditor(editor, "second");
+      Keyboard.exitTextEditor(editor);
+
+      expect(stackSize()).toBe(before + 2);
+      const texts = () => getNonDeletedTexts().map((el) => el.text);
+      expect(texts()).toEqual(["first", "second"]);
+
+      Keyboard.undo();
+      expect(texts()).toEqual(["first"]);
+      Keyboard.undo();
+      expect(texts()).toEqual([]);
+
+      Keyboard.redo();
+      expect(texts()).toEqual(["first"]);
+      Keyboard.redo();
+      expect(texts()).toEqual(["first", "second"]);
     });
   });
 });

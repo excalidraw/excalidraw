@@ -215,6 +215,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               ]}
             />
             <Shortcut
+              label={t("helpDialog.textFinishAndAddBelow")}
+              shortcuts={[getShortcutKey("Alt+Enter")]}
+            />
+            <Shortcut
               label={t("helpDialog.curvedArrow")}
               shortcuts={[
                 "A",
