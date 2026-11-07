@@ -7,11 +7,16 @@ import {
   getSubMenuTriggerComponent,
 } from "./dropdownMenuUtils";
 
-const DropdownMenuSub = ({ children }: { children?: React.ReactNode }) => {
+const DropdownMenuSub = ({
+  children,
+  ...props
+}: {
+  children?: React.ReactNode;
+} & React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) => {
   const MenuTriggerComp = getSubMenuTriggerComponent(children);
   const MenuContentComp = getSubMenuContentComponent(children);
   return (
-    <DropdownMenuPrimitive.Sub>
+    <DropdownMenuPrimitive.Sub {...props}>
       {MenuTriggerComp}
       {MenuContentComp}
     </DropdownMenuPrimitive.Sub>
