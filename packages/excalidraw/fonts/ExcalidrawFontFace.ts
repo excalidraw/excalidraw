@@ -148,25 +148,65 @@ export class ExcalidrawFontFace {
 
     // absolute assets paths, which are found in tests and excalidraw-app build, won't work with base url, so we are stripping initial slash away
     const assetUrl: string = uri.replace(/^\/+/, "");
-    const urls: URL[] = [];
-
-    if (typeof window.EXCALIDRAW_ASSET_PATH === "string") {
-      const normalizedBaseUrl = this.normalizeBaseUrl(
-        window.EXCALIDRAW_ASSET_PATH,
-      );
-
-      urls.push(new URL(assetUrl, normalizedBaseUrl));
-    } else if (Array.isArray(window.EXCALIDRAW_ASSET_PATH)) {
-      window.EXCALIDRAW_ASSET_PATH.forEach((path) => {
-        const normalizedBaseUrl = this.normalizeBaseUrl(path);
-        urls.push(new URL(assetUrl, normalizedBaseUrl));
-      });
-    }
+    const urls = ExcalidrawFontFace.getBaseUrls().map(
+      (baseUrl) => new URL(assetUrl, baseUrl),
+    );
 
     // fallback url for bundled fonts
     urls.push(new URL(assetUrl, ExcalidrawFontFace.ASSETS_FALLBACK_URL));
 
     return urls;
+  }
+
+  /** resolved once per `EXCALIDRAW_ASSET_PATH` value, rather than per font face */
+  private static baseUrlsCache: {
+    assetPath: Window["EXCALIDRAW_ASSET_PATH"];
+    baseUrls: string[];
+  } | null = null;
+
+  /**
+   * Resolves `EXCALIDRAW_ASSET_PATH` entries into absolute base urls.
+   *
+   * Never throws, so that a malformed custom asset path degrades to the other
+   * entries and the CDN fallback instead of taking down the whole editor on mount.
+   */
+  private static getBaseUrls(): string[] {
+    const assetPath = window.EXCALIDRAW_ASSET_PATH;
+    const cache = ExcalidrawFontFace.baseUrlsCache;
+
+    if (cache && cache.assetPath === assetPath) {
+      return cache.baseUrls;
+    }
+
+    const basePaths =
+      typeof assetPath === "string"
+        ? [assetPath]
+        : Array.isArray(assetPath)
+        ? assetPath
+        : [];
+
+    const baseUrls: string[] = [];
+
+    for (const basePath of basePaths) {
+      // treat blank entries as not set (i.e. an unset env var rendered as ""),
+      // otherwise they would resolve to the origin root
+      if (!basePath.trim()) {
+        continue;
+      }
+
+      try {
+        baseUrls.push(ExcalidrawFontFace.normalizeBaseUrl(basePath));
+      } catch (error) {
+        console.warn(
+          `Skipping invalid EXCALIDRAW_ASSET_PATH entry "${basePath}". Fonts will be loaded from the other entries, if any, or from "${ExcalidrawFontFace.ASSETS_FALLBACK_URL}".`,
+          error,
+        );
+      }
+    }
+
+    ExcalidrawFontFace.baseUrlsCache = { assetPath, baseUrls };
+
+    return baseUrls;
   }
 
   private static getFormat(url: URL | DataURL) {
@@ -189,21 +229,32 @@ export class ExcalidrawFontFace {
   }
 
   private static normalizeBaseUrl(baseUrl: string) {
-    let result = baseUrl;
-
-    // in case user passed a root-relative url (~absolute path),
-    // like "/" or "/some/path", or relative (starts with "./"),
-    // prepend it with `location.origin`
-    if (/^\.?\//.test(result)) {
-      result = new URL(
-        result.replace(/^\.?\/+/, ""),
-        window?.location?.origin,
-      ).toString();
+    // `new URL(asset, base)` requires `base` to be an absolute url, so relative
+    // paths ("/", "./assets", "assets") are resolved against `location.origin`,
+    // i.e. the same way no matter which page the editor is mounted on
+    const url = ExcalidrawFontFace.parseUrl(baseUrl.trim());
+    if (/^[a-z]:$/i.test(url.protocol)) {
+      throw new Error(`"${baseUrl}" is a file path, not an url`);
     }
 
     // ensure there is a trailing slash, otherwise url won't be correctly concatenated
-    result = `${result.replace(/\/+$/, "")}/`;
+    url.pathname = `${url.pathname.replace(/\/+$/, "")}/`;
 
-    return result;
+    if (!url.pathname.startsWith("/")) {
+      throw new Error(`"${baseUrl}" can't be used as a base url`);
+    }
+
+    return url.toString();
+  }
+
+  private static parseUrl(baseUrl: string) {
+    try {
+      // absolute urls are parsed on their own, as `new URL()` throws on an
+      // invalid base even when it's not used, and the origin is "null" in
+      // opaque origins (i.e. sandboxed iframes, `file://` pages in Firefox)
+      return new URL(baseUrl);
+    } catch {
+      return new URL(baseUrl, window.location.origin);
+    }
   }
 }
