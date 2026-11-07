@@ -128,47 +128,110 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   };
 };
 
+/** a single space stands for any run of spaces */
+type Delimiter = "\t" | "," | ";" | " ";
+
+// order = priority: tab > comma > semicolon > space
+const DELIMITERS: readonly Delimiter[] = ["\t", ",", ";", " "];
+
+const QUOTE = '"';
+
+const splitRowNaively = (line: string, delimiter: Delimiter) =>
+  delimiter === " " ? line.trim().split(/ +/) : line.split(delimiter);
+
+/**
+ * Splits a row into trimmed cells, following CSV quoting rules: a cell
+ * wrapped in double quotes can contain the delimiter, and `""` inside it
+ * stands for a literal quote.
+ *
+ * A quote left open (e.g. `5" screen`) is most likely not CSV quoting,
+ * so in that case the row is split ignoring quotes.
+ *
+ * @private exported for testing
+ */
+export const splitRow = (line: string, delimiter: Delimiter): string[] => {
+  const input = delimiter === " " ? line.trim() : line;
+  const cells: string[] = [];
+  let cell = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+
+    if (inQuotes) {
+      if (char !== QUOTE) {
+        cell += char;
+      } else if (input[i + 1] === QUOTE) {
+        cell += QUOTE;
+        i++;
+      } else {
+        inQuotes = false;
+      }
+    } else if (char === delimiter) {
+      cells.push(cell);
+      cell = "";
+      if (delimiter === " ") {
+        while (input[i + 1] === " ") {
+          i++;
+        }
+      }
+    } else if (char === QUOTE && cell.trim() === "") {
+      // only a quote at the start of a cell opens a quoted cell
+      inQuotes = true;
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+  cells.push(cell);
+
+  return (inQuotes ? splitRowNaively(line, delimiter) : cells).map((c) =>
+    c.trim(),
+  );
+};
+
+const hasHeaderRow = (rows: string[][]) =>
+  rows.length > 1 &&
+  rows[0].slice(1).every((cell) => tryParseNumber(cell) === null);
+
+/**
+ * Parses text copied from Excel, Google Sheets, or written as TSV, CSV,
+ * semicolon- or space-separated values.
+ */
 export const tryParseSpreadsheet = (text: string): ParseSpreadsheetResult => {
-  // Copy/paste from excel, spreadsheets, TSV, CSV, semicolon-separated.
-  const parseDelimitedLines = (delimiter: "\t" | "," | ";") =>
-    text
-      .replace(/\r\n?/g, "\n")
-      .split("\n")
-      .filter((line) => line.trim().length > 0)
-      .map((line) => line.split(delimiter).map((cell) => cell.trim()));
-
-  // Score each delimiter: prefer consistent column counts with the most columns.
-  // A delimiter that produces all single-column rows likely isn't the right one.
-  const candidates = (["\t", ",", ";"] as const).map((delimiter) => {
-    const parsed = parseDelimitedLines(delimiter);
-    const numCols = parsed[0]?.length ?? 0;
-    const isConsistent =
-      parsed.length > 0 && parsed.every((line) => line.length === numCols);
-    return { delimiter, parsed, numCols, isConsistent };
-  });
-
-  // Prefer: consistent + most columns. Among ties, tab > comma > semicolon
-  // (the array order already encodes this priority).
-  const best =
-    candidates.find((c) => c.isConsistent && c.numCols > 1) ??
-    candidates.find((c) => c.isConsistent) ??
-    candidates[0];
-
-  const lines = best.parsed;
+  const lines = text
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .filter((line) => line.trim().length > 0);
 
   if (lines.length === 0) {
     return { ok: false, reason: "No values" };
   }
 
-  const numColsFirstLine = lines[0].length;
-  const isSpreadsheet = lines.every((line) => line.length === numColsFirstLine);
+  const candidates = DELIMITERS.map((delimiter) => {
+    const rows = lines.map((line) => splitRow(line, delimiter));
+    const numCols = rows[0].length;
+    const isConsistent = rows.every((row) => row.length === numCols);
+    return { delimiter, rows, numCols, isConsistent };
+  }).filter(
+    // plain text has spaces too: only take spaces as columns when the first
+    // row looks like a header, so a list such as "Step 1\nStep 2" stays text
+    (c) => c.delimiter !== " " || hasHeaderRow(c.rows),
+  );
 
-  if (!isSpreadsheet) {
+  // Prefer the first delimiter (in priority order) that splits every row into
+  // the same number of columns, and more than one. Otherwise accept a single
+  // column, which every delimiter not present in the text produces.
+  const best =
+    candidates.find((c) => c.isConsistent && c.numCols > 1) ??
+    candidates.find((c) => c.isConsistent);
+
+  if (!best) {
     return {
       ok: false,
       reason: "All rows don't have same number of columns",
     };
   }
 
-  return tryParseCells(lines);
+  return tryParseCells(best.rows);
 };
