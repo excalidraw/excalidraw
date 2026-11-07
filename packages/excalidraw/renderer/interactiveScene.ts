@@ -1868,7 +1868,7 @@ const _renderInteractiveScene = ({
     const selectionColor =
       renderConfig.selectionColor || getThemedColor("#000", appState.theme);
     const lockedSelectionColor = getThemedColor("#ced4da", appState.theme);
-    const groupSelectionColor = getThemedColor("#000", appState.theme);
+    const groupSelectionColor = selectionColor;
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
