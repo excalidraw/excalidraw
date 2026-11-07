@@ -36,7 +36,6 @@ import type {
   ExcalidrawDiamondElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  Ordered,
 } from "../src/types";
 
 describe("check rotated elements can be hit:", () => {
@@ -688,7 +687,7 @@ describe("freedraw loop fill containment", () => {
 });
 
 describe("binding hit tests", () => {
-  type SceneElement = Ordered<NonDeletedExcalidrawElement>;
+  type SceneElement = NonDeletedExcalidrawElement;
   const zoom = (value: number) => ({ value } as Zoom);
 
   const hitTest = (

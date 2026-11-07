@@ -5,7 +5,7 @@ import { newElementWith } from "@excalidraw/element";
 import throttle from "lodash.throttle";
 
 import type { UserIdleState } from "@excalidraw/common";
-import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type {
   OnUserFollowedPayload,
   SocketId,
@@ -141,7 +141,7 @@ class Portal {
 
   broadcastScene = async (
     updateType: WS_SUBTYPES.INIT | WS_SUBTYPES.UPDATE,
-    elements: readonly OrderedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     syncAll: boolean,
   ) => {
     if (updateType === WS_SUBTYPES.INIT && !syncAll) {

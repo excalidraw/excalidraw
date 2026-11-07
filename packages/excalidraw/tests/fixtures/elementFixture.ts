@@ -2,9 +2,10 @@ import { DEFAULT_FONT_FAMILY } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+// fixtures mimic elements coming from the outside, which are not ordered yet
+import type { NonRestoredExcalidrawElement } from "@excalidraw/element/types";
 
-const elementBase: Omit<ExcalidrawElement, "type"> = {
+const elementBase: Omit<NonRestoredExcalidrawElement, "type"> = {
   id: "vWrqOAfkind2qcm7LDAGZ",
   x: 414,
   y: 237,
@@ -33,29 +34,29 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   locked: false,
 };
 
-export const rectangleFixture: ExcalidrawElement = {
+export const rectangleFixture: NonRestoredExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
 };
-export const embeddableFixture: ExcalidrawElement = {
+export const embeddableFixture: NonRestoredExcalidrawElement = {
   ...elementBase,
   type: "embeddable",
 };
-export const ellipseFixture: ExcalidrawElement = {
+export const ellipseFixture: NonRestoredExcalidrawElement = {
   ...elementBase,
   type: "ellipse",
 };
-export const diamondFixture: ExcalidrawElement = {
+export const diamondFixture: NonRestoredExcalidrawElement = {
   ...elementBase,
   type: "diamond",
 };
-export const rectangleWithLinkFixture: ExcalidrawElement = {
+export const rectangleWithLinkFixture: NonRestoredExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
   link: "excalidraw.com",
 };
 
-export const textFixture: ExcalidrawElement = {
+export const textFixture: NonRestoredExcalidrawElement = {
   ...elementBase,
   type: "text",
   fontSize: 20,

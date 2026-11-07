@@ -8,21 +8,21 @@ import {
   validateFractionalIndices,
 } from "@excalidraw/element";
 
-import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MakeBrand } from "@excalidraw/common/utility-types";
 
 import type { AppState } from "../types";
 
-export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
+export type ReconciledExcalidrawElement = ExcalidrawElement &
   MakeBrand<"ReconciledElement">;
 
-export type RemoteExcalidrawElement = OrderedExcalidrawElement &
+export type RemoteExcalidrawElement = ExcalidrawElement &
   MakeBrand<"RemoteExcalidrawElement">;
 
 export const shouldDiscardRemoteElement = (
   localAppState: AppState,
-  local: OrderedExcalidrawElement | undefined,
+  local: ExcalidrawElement | undefined,
   remote: RemoteExcalidrawElement,
 ): boolean => {
   if (
@@ -45,8 +45,8 @@ export const shouldDiscardRemoteElement = (
 
 const validateIndicesThrottled = throttle(
   (
-    orderedElements: readonly OrderedExcalidrawElement[],
-    localElements: readonly OrderedExcalidrawElement[],
+    orderedElements: readonly ExcalidrawElement[],
+    localElements: readonly ExcalidrawElement[],
     remoteElements: readonly RemoteExcalidrawElement[],
   ) => {
     if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
@@ -71,12 +71,12 @@ const validateIndicesThrottled = throttle(
 );
 
 export const reconcileElements = (
-  localElements: readonly OrderedExcalidrawElement[],
+  localElements: readonly ExcalidrawElement[],
   remoteElements: readonly RemoteExcalidrawElement[],
   localAppState: AppState,
 ): ReconciledExcalidrawElement[] => {
   const localElementsMap = arrayToMap(localElements);
-  const reconciledElements: OrderedExcalidrawElement[] = [];
+  const reconciledElements: ExcalidrawElement[] = [];
   const added = new Set<string>();
 
   // process remote elements

@@ -100,7 +100,7 @@ import type {
   FontFamilyValues,
   NonDeleted,
   NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
+  NonRestoredExcalidrawElement,
   StrokeVariability,
   StrokeRoundness,
 } from "@excalidraw/element/types";
@@ -244,7 +244,7 @@ export const AllowedExcalidrawActiveTools: Record<
 };
 
 export type RestoredDataState = {
-  elements: OrderedExcalidrawElement[];
+  elements: ExcalidrawElement[];
   appState: RestoredAppState;
   files: BinaryFiles;
 };
@@ -958,7 +958,11 @@ const restoreStickyNotes = (
 };
 
 export const restoreElements = <T extends ExcalidrawElement>(
-  targetElements: readonly T[] | undefined | null,
+  /** elements to restore, these don't have to be ordered (have valid indices) yet */
+  _targetElements:
+    | readonly (T | NonRestoredExcalidrawElement)[]
+    | undefined
+    | null,
   /** used for additional context (e.g. repairing arrow bindings) */
   existingElements: Readonly<ElementsMapOrArray> | null | undefined,
   opts?:
@@ -968,7 +972,10 @@ export const restoreElements = <T extends ExcalidrawElement>(
         deleteInvisibleElements?: boolean;
       }
     | undefined,
-): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
+): CombineBrandsIfNeeded<T, ExcalidrawElement> => {
+  // restoring is the boundary where elements become ordered: their (possibly
+  // missing) indices are assigned by `syncInvalidIndices` below
+  const targetElements = _targetElements as readonly T[] | undefined | null;
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
   const targetElementsMap = arrayToMap(targetElements || []);
@@ -1024,10 +1031,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
   );
 
   if (!opts?.repairBindings) {
-    return restoredElements as CombineBrandsIfNeeded<
-      T,
-      OrderedExcalidrawElement
-    >;
+    return restoredElements as CombineBrandsIfNeeded<T, ExcalidrawElement>;
   }
 
   // repair binding. Mutates elements.
@@ -1148,7 +1152,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
 
     return element;
-  }) as CombineBrandsIfNeeded<T, OrderedExcalidrawElement>;
+  }) as CombineBrandsIfNeeded<T, ExcalidrawElement>;
 };
 
 /**

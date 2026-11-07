@@ -66,7 +66,7 @@ import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
-  OrderedExcalidrawElement,
+  ExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
   AppState,
@@ -214,11 +214,16 @@ const shareableLinkConfirmDialog = {
   color: "danger",
 } as const;
 
+/** initial scene whose elements were already restored (and so are ordered) */
+type InitializedScene = Omit<ExcalidrawInitialDataState, "elements"> & {
+  elements?: readonly ExcalidrawElement[] | null;
+};
+
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
 }): Promise<
-  { scene: ExcalidrawInitialDataState | null } & (
+  { scene: InitializedScene | null } & (
     | { isExternalScene: true; id: string; key: string }
     | { isExternalScene: false; id?: null; key?: null }
   )
@@ -713,7 +718,7 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   const onChange = (
-    elements: readonly OrderedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => {

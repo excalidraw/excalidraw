@@ -41,7 +41,6 @@ import type {
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
-  OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type {
   BinaryFileData,
@@ -519,8 +518,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     // TODO: `ImportedDataState` type here seems abused
     const scenePromise = resolvablePromise<
-      | (ImportedDataState & { elements: readonly OrderedExcalidrawElement[] })
-      | null
+      (ImportedDataState & { elements: readonly ExcalidrawElement[] }) | null
     >();
 
     this.setIsCollaborating(true);
@@ -968,7 +966,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.portal.broadcastIdleChange(userState);
   };
 
-  broadcastElements = (elements: readonly OrderedExcalidrawElement[]) => {
+  broadcastElements = (elements: readonly ExcalidrawElement[]) => {
     if (
       getSceneVersion(elements) >
       this.getLastBroadcastedOrReceivedSceneVersion()
@@ -979,7 +977,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     }
   };
 
-  syncElements = (elements: readonly OrderedExcalidrawElement[]) => {
+  syncElements = (elements: readonly ExcalidrawElement[]) => {
     this.broadcastElements(elements);
     this.queueSaveToFirebase();
   };

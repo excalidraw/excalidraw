@@ -30,8 +30,6 @@ import type {
   ElementsMapOrArray,
   SceneElementsMap,
   NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
-  Ordered,
 } from "@excalidraw/element/types";
 
 import type {
@@ -55,10 +53,7 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   for (const element of allElements) {
     if (!element.isDeleted) {
       elements.push(element as NonDeleted<T>);
-      elementsMap.set(
-        element.id,
-        element as Ordered<NonDeletedExcalidrawElement>,
-      );
+      elementsMap.set(element.id, element as NonDeletedExcalidrawElement);
     }
   }
   return { elementsMap, elements };
@@ -112,13 +107,11 @@ export class Scene {
 
   private callbacks: Set<SceneStateCallback> = new Set();
 
-  private nonDeletedElements: readonly Ordered<NonDeletedExcalidrawElement>[] =
-    [];
+  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
   private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
     new Map(),
   );
-  // ideally all elements within the scene should be wrapped around with `Ordered` type, but right now there is no real benefit doing so
-  private elements: readonly OrderedExcalidrawElement[] = [];
+  private elements: readonly ExcalidrawElement[] = [];
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];
   private frames: readonly ExcalidrawFrameLikeElement[] = [];

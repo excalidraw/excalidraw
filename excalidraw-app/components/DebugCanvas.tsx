@@ -36,7 +36,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   FixedPointBinding,
-  OrderedExcalidrawElement,
+  ExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { STORAGE_KEYS } from "../app_constants";
@@ -210,7 +210,7 @@ const _renderBindableBinding = (
 
 const renderBindings = (
   context: CanvasRenderingContext2D,
-  elements: readonly OrderedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   zoom: number,
 ) => {
   const elementsMap = arrayToMap(elements);
@@ -333,7 +333,7 @@ const render = (
 const _debugRenderer = (
   canvas: HTMLCanvasElement,
   appState: AppState,
-  elements: readonly OrderedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   scale: number,
 ) => {
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
@@ -409,7 +409,7 @@ export const debugRenderer = throttleRAF(
   (
     canvas: HTMLCanvasElement,
     appState: AppState,
-    elements: readonly OrderedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     scale: number,
   ) => {
     _debugRenderer(canvas, appState, elements, scale);
