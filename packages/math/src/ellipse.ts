@@ -15,6 +15,7 @@ import {
 
 import type {
   Ellipse,
+  GenericPoint,
   GlobalPoint,
   Line,
   LineSegment,
@@ -30,7 +31,7 @@ import type {
  * @param halfHeight Half of the height of a non-slanted version of the ellipse
  * @returns The constructed Ellipse object
  */
-export function ellipse<Point extends GlobalPoint | LocalPoint>(
+export function ellipse<Point extends GenericPoint>(
   center: Point,
   halfWidth: number,
   halfHeight: number,
