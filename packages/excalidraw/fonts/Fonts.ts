@@ -825,30 +825,34 @@ export class Fonts {
       });
 
       // WARN: without "text" param it does not have to mean that all font faces are loaded as it could be just one irrelevant font face!
-      // instead, we are always checking chars used in the family, so that no required font faces remain unloaded.
+      // instead, we are always loading chars used in the family, so that no required font faces remain unloaded.
       // a family with no scene characters yet still needs a probe glyph - an
-      // empty string makes `check` pass vacuously, skipping the load
+      // empty string matches no face, skipping the load
       const text = Fonts.getCharacters(charsPerFamily, fontFamily) || " ";
 
-      if (!fontFaceSet.check(font, text)) {
-        yield promiseTry(async () => {
-          try {
-            // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
-            // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
-            const fontFaces = await fontFaceSet.load(font, text);
+      // WARN: always load, never gate on `fontFaceSet.check()` - Chrome reports
+      // any family whose name matches an *installed* system font as loaded,
+      // even with its web faces unloaded (i.e. anyone with Excalifont
+      // installed), which would leave the first paint in the fallback font.
+      // `load()` has no such shortcut and settles right away (~0.1ms) when
+      // the matching faces are loaded already
+      yield promiseTry(async () => {
+        try {
+          // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
+          // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
+          const fontFaces = await fontFaceSet.load(font, text);
 
-            return [index, fontFaces];
-          } catch (e) {
-            // don't let it all fail if just one font fails to load
-            console.error(
-              `Failed to load font "${font}" from urls "${this.registry.registered
-                .get(fontFamily)
-                ?.fontFaces.map((x) => x.urls)}"`,
-              e,
-            );
-          }
-        });
-      }
+          return [index, fontFaces];
+        } catch (e) {
+          // don't let it all fail if just one font fails to load
+          console.error(
+            `Failed to load font "${font}" from urls "${this.registry.registered
+              .get(fontFamily)
+              ?.fontFaces.map((x) => x.urls)}"`,
+            e,
+          );
+        }
+      });
     }
   }
 

@@ -632,6 +632,36 @@ describe("FontPicker", () => {
     expect(API.getElement(text).height).toBe(selectedGeometry.height);
   });
 
+  it("repairs a font change measured while `document.fonts.check` lied", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    // Chrome's `check()` passes for any family matching an installed system
+    // font, with its web faces unloaded - the synchronous redraw measured the
+    // fallback, so the faces `load()` then brings in must trigger a repair
+    const check = vi.spyOn(document.fonts, "check").mockReturnValue(true);
+    const fontFace = new FontFace("Nunito", "url(nunito.woff2)");
+    const load = vi.spyOn(document.fonts, "load").mockResolvedValue([fontFace]);
+    const onLoaded = vi.spyOn(window.h.app.fonts.instance, "onLoaded");
+
+    try {
+      fireEvent.click(queryByTestId("font-family-normal")!);
+
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY.Nunito);
+      expect(load).toHaveBeenCalledWith(
+        expect.stringContaining("Nunito"),
+        expect.anything(),
+      );
+      await waitFor(() => expect(onLoaded).toHaveBeenCalledWith([fontFace]));
+    } finally {
+      check.mockRestore();
+      load.mockRestore();
+      onLoaded.mockRestore();
+    }
+  });
+
   it("preserves geometry recalculated after a deferred font face load", async () => {
     // font faces of a freshly resolved family are added but not yet loaded, so
     // the redraw is deferred until `document.fonts.load` settles - only then is

@@ -1354,9 +1354,25 @@ export const actionChangeFontFamily = register<{
       // a family committed with no text selected still needs loading - an
       // empty string makes `check` pass vacuously, so probe with a glyph
       const chars = Array.from(uniqueChars.values()).join() || " ";
-      const ownerDocument = app.props.ownerDocument ?? document;
+      const fontFaceSet = (app.props.ownerDocument ?? document).fonts;
 
-      if (skipFontFaceCheck || ownerDocument.fonts.check(fontString, chars)) {
+      // WARN: `check()` can only be trusted when it says "unloaded" - Chrome
+      // reports any family whose name matches an *installed* system font as
+      // loaded, even with its web faces unloaded (i.e. anyone with Excalifont
+      // installed). A pass still gets the synchronous redraw below, but the
+      // faces get loaded regardless, repairing it if `check()` was wrong
+      const isLoaded =
+        skipFontFaceCheck || fontFaceSet.check(fontString, chars);
+      const loadedFacesBefore =
+        isLoaded && !skipFontFaceCheck
+          ? new Set(
+              Array.from(fontFaceSet).filter(
+                (fontFace) => fontFace.status === "loaded",
+              ),
+            )
+          : null;
+
+      if (isLoaded) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
@@ -1367,11 +1383,22 @@ export const actionChangeFontFamily = register<{
             app.renderEnvironment,
           );
         }
-      } else {
-        // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
-        ownerDocument.fonts
+      }
+
+      if (!skipFontFaceCheck) {
+        // load all font faces for the given chars and redraw elements once our font faces loaded
+        fontFaceSet
           .load(fontString, chars)
           .then((fontFaces) => {
+            // `check()` was right - the synchronous redraw above measured
+            // with the real faces already
+            if (
+              loadedFacesBefore &&
+              fontFaces.every((fontFace) => loadedFacesBefore.has(fontFace))
+            ) {
+              return;
+            }
+
             if (elementContainerMapping.size) {
               app.fonts.instance.runSceneRepair(() => {
                 for (const [element, container] of elementContainerMapping) {

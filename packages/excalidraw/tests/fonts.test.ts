@@ -229,6 +229,25 @@ describe("custom font registration", () => {
     expect(fonts.registered.has("scene:Current")).toBe(true);
   });
 
+  it("loads families even when `document.fonts.check` passes", async () => {
+    // Chrome's `check()` passes for any family matching an installed system
+    // font (i.e. a locally installed Excalifont), with its web faces unloaded
+    const check = vi.spyOn(document.fonts, "check").mockReturnValue(true);
+    const load = vi.spyOn(document.fonts, "load").mockResolvedValue([]);
+
+    try {
+      await new Fonts(new Scene()).loadSceneFonts([FONT_FAMILY.Excalifont]);
+
+      expect(load).toHaveBeenCalledWith(
+        expect.stringContaining("Excalifont"),
+        expect.anything(),
+      );
+    } finally {
+      check.mockRestore();
+      load.mockRestore();
+    }
+  });
+
   it("loads already-resolved families without waiting on pending resolvers", async () => {
     const check = vi.spyOn(document.fonts, "check").mockReturnValue(false);
     const load = vi.spyOn(document.fonts, "load").mockResolvedValue([]);
