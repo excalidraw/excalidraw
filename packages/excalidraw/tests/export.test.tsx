@@ -1,6 +1,7 @@
 import React from "react";
 
 import { SVG_NS } from "@excalidraw/common";
+import { vi } from "vitest";
 
 import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
@@ -16,6 +17,7 @@ import {
   encodeSvgBase64Payload,
   exportScene,
 } from "../scene/export";
+import * as sceneExport from "../scene/export";
 
 import { API } from "./helpers/api";
 import { render, waitFor } from "./test-utils";
@@ -126,6 +128,48 @@ describe("export", () => {
     const svgText = svg.outerHTML;
 
     expect(svgText).toMatchSnapshot(`svg-embdedded scene export output`);
+  });
+
+  it("passes the export name to SVG generation", async () => {
+    const title = "R&D <Roadmap> > Q4";
+    const { exportedElements, exportingFrame } = prepareElementsForExport(
+      testElements,
+      { selectedElementIds: {} },
+      false,
+    );
+    const exportSceneSpy = vi.spyOn(sceneExport, "exportScene");
+    const copyToClipboardSpy = vi
+      .spyOn(clipboardModule, "copyTextToSystemClipboard")
+      .mockResolvedValue(undefined);
+
+    try {
+      await exportCanvas(
+        "clipboard-svg",
+        exportedElements,
+        { ...h.state, name: title },
+        {},
+        {
+          name: title,
+          exportingFrame,
+        },
+      );
+
+      expect(exportSceneSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "svg",
+          data: expect.objectContaining({ elements: exportedElements }),
+          config: expect.objectContaining({ title }),
+        }),
+      );
+      expect(copyToClipboardSpy.mock.lastCall?.[0]).toEqual(
+        expect.stringContaining(
+          "<title>R&amp;D &lt;Roadmap&gt; &gt; Q4</title>",
+        ),
+      );
+    } finally {
+      copyToClipboardSpy.mockRestore();
+      exportSceneSpy.mockRestore();
+    }
   });
 
   it("import embedded png (legacy v1)", async () => {
