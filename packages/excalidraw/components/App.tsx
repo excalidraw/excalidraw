@@ -2472,6 +2472,9 @@ class App extends React.Component<AppProps, AppState> {
                             elements={this.scene.getNonDeletedElements()}
                             onLockToggle={this.toggleLock}
                             onPenModeToggle={this.togglePenMode}
+                            onCollaboratorsCursorsHiddenToggle={
+                              this.toggleCollaboratorsCursors
+                            }
                             langCode={getLanguage().code}
                             renderTopLeftUI={renderTopLeftUI}
                             renderTopRightUI={renderTopRightUI}
@@ -4833,6 +4836,12 @@ class App extends React.Component<AppProps, AppState> {
           : prevState.currentItemStrokeVariability,
       };
     });
+  };
+
+  toggleCollaboratorsCursors = () => {
+    this.setState((prevState) => ({
+      collaboratorsCursorsHidden: !prevState.collaboratorsCursorsHidden,
+    }));
   };
 
   // scroll `elements` into view only if they aren't already fully visible.
