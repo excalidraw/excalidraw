@@ -340,6 +340,7 @@ export const ALLOWED_PASTE_MIME_TYPES = [
 
 export const EXPORT_IMAGE_TYPES = {
   png: "png",
+  jpeg: "jpeg",
   svg: "svg",
   clipboard: "clipboard",
 } as const;
@@ -403,6 +404,7 @@ export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
 export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
+export const DEFAULT_JPEG_QUALITY = 0.92;
 
 export const DEFAULT_IMAGE_OPTIONS: AppProps["imageOptions"] = {
   maxWidthOrHeight: 1440,
