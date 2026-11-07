@@ -201,11 +201,14 @@ export class Store {
   }
 
   /**
-   * Clears the store instance.
+   * Clears the store instance, including actions scheduled but not yet committed.
+   * Pending micro actions captured their change before the clear and must not
+   * run against the emptied snapshot.
    */
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    this.scheduledMicroActions = [];
   }
 
   /**

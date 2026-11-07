@@ -27,12 +27,17 @@ import "@excalidraw/utils/test-utils";
 
 import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
 
-import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
+import {
+  CaptureUpdateAction,
+  StoreDelta,
+  type CaptureUpdateActionType,
+} from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
@@ -280,6 +285,77 @@ describe("history", () => {
           expect.objectContaining({ id: rect.id, isDeleted: false }),
         );
       });
+    });
+
+    const queueSceneUpdateAndReset = (
+      elements: readonly ExcalidrawElement[],
+      captureUpdate: CaptureUpdateActionType,
+    ) => {
+      act(() => {
+        h.app.api.updateScene({
+          elements,
+          captureUpdate,
+        });
+        h.app.api.resetScene();
+      });
+    };
+
+    const visibleIds = () =>
+      h.elements
+        .filter((element) => !element.isDeleted)
+        .map((element) => element.id);
+
+    it("should allow undoing the first element drawn after resetScene", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const queued = API.createElement({ type: "rectangle", id: "queued" });
+      queueSceneUpdateAndReset([queued], CaptureUpdateAction.IMMEDIATELY);
+
+      expect(visibleIds()).toEqual([]);
+      expect(API.getSnapshot()).toEqual([]);
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(0);
+
+      const fresh = UI.createElement("rectangle");
+      expect(visibleIds()).toEqual([fresh.id]);
+
+      Keyboard.undo();
+      expect(visibleIds()).toEqual([]);
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+
+      Keyboard.redo();
+      expect(visibleIds()).toEqual([fresh.id]);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+    });
+
+    it("should not resurrect a cleared element after a queued NEVER edit and resetScene", async () => {
+      const old = API.createElement({ type: "rectangle", id: "old", x: 10 });
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          initialData={{ elements: [old] }}
+        />,
+      );
+
+      queueSceneUpdateAndReset(
+        [newElementWith(h.elements[0], { x: 100 })],
+        CaptureUpdateAction.NEVER,
+      );
+
+      expect(visibleIds()).toEqual([]);
+      expect(API.getSnapshot()).toEqual([]);
+      expect(API.getUndoStack().length).toBe(0);
+
+      const fresh = UI.createElement("rectangle");
+      expect(visibleIds()).toEqual([fresh.id]);
+
+      Keyboard.undo();
+      expect(visibleIds()).toEqual([]);
+
+      Keyboard.redo();
+      expect(visibleIds()).toEqual([fresh.id]);
     });
 
     it("should not clear the redo stack on standalone appstate change", async () => {
