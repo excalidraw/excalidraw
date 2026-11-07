@@ -202,13 +202,13 @@ const legacy_decodeFromBackend = async ({
 export const importFromBackend = async (
   id: string,
   decryptionKey: string,
-): Promise<ImportedDataState> => {
+): Promise<ImportedDataState | null> => {
   try {
     const response = await fetch(`${BACKEND_V2_GET}${id}`);
 
     if (!response.ok) {
       window.alert(t("alerts.importBackendFailed"));
-      return {};
+      return null;
     }
     const buffer = await response.arrayBuffer();
 
@@ -237,7 +237,7 @@ export const importFromBackend = async (
   } catch (error: any) {
     window.alert(t("alerts.importBackendFailed"));
     console.error(error);
-    return {};
+    return null;
   }
 };
 

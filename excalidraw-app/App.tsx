@@ -264,6 +264,11 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
         );
 
+        if (!imported) {
+          window.history.replaceState({}, APP_NAME, window.location.origin);
+          return { scene, isExternalScene: false };
+        }
+
         scene = {
           elements: bumpElementVersions(
             restoreElements(imported.elements, null, {
