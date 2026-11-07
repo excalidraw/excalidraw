@@ -30,6 +30,8 @@ import {
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
+import type { FontFamily } from "@excalidraw/common";
+
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 import type { Zoom } from "@excalidraw/excalidraw/types";
 
@@ -98,7 +100,6 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FileId,
-  FontFamilyValues,
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -126,7 +127,7 @@ export type ValidLinearElement = {
   label?: {
     text: string;
     fontSize?: number;
-    fontFamily?: FontFamilyValues;
+    fontFamily?: FontFamily;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
     /** where along an arrow's path (0-1) the label is centered */
@@ -225,7 +226,7 @@ export type ValidContainer =
       label?: {
         text: string;
         fontSize?: number;
-        fontFamily?: FontFamilyValues;
+        fontFamily?: FontFamily;
         textAlign?: TextAlign;
         verticalAlign?: VerticalAlign;
       } & FragmentConstructorOpts;

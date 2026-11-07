@@ -9,14 +9,14 @@ import { vi } from "vitest";
 
 import { FONT_FAMILY } from "@excalidraw/common";
 
-import type { FontFamilyValues } from "@excalidraw/element/types";
+import type { FontFamily } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 import { useColorTopPicksDnD } from "../components/ColorPicker/colorTopPicksDnD";
 
 import type { ExcalidrawImperativeAPI } from "../types";
 
-const mountEditorInOwnDocument = (currentItemFontFamily?: FontFamilyValues) => {
+const mountEditorInOwnDocument = (currentItemFontFamily?: FontFamily) => {
   const iframe = document.createElement("iframe");
   document.body.append(iframe);
 

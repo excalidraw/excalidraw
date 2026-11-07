@@ -97,6 +97,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
+    app.fonts.onElementsDuplicated(duplicatedElements);
     app.duplicate.advanceListMarkers(duplicatedElements);
 
     return {
