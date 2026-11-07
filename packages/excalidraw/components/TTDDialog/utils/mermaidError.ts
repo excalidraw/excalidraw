@@ -136,73 +136,9 @@ export const getMermaidErrorLineNumber = (
     }
     return getInactiveParticipantLineNumber(message, sourceText);
   }
-  const line = Number.parseInt(match[1], 10);
-  return sourceText ? getMermaidSourceLineNumber(line, sourceText) : line;
-};
-
-/**
- * The (0-based) indexes of the source lines the lines Mermaid (and Pele)
- * number errors by start at. They parse a definition without its front
- * matter, directives, comment lines and leading blank lines, and in
- * flowcharts and ER diagrams, a line ending with a comment runs on into the
- * next one.
- */
-const getParsedLineStarts = (sourceText: string) => {
-  const lines = sourceText.split(/\r?\n/);
-  const type = getMermaidDiagramType(sourceText);
-  const runsOnAfterComments = type === "flowchart" || type === "er";
-  const starts: number[] = [];
-  let index = 0;
-  if (lines[0]?.trim() === "---") {
-    const end = lines.findIndex((line, i) => i > 0 && line.trim() === "---");
-    if (end !== -1) {
-      index = end + 1;
-    }
-  }
-  let runsOn = false;
-  for (; index < lines.length; index++) {
-    const line = lines[index];
-    // a directive, possibly over several lines
-    if (/^\s*%%\{/.test(line)) {
-      while (index < lines.length - 1 && !/\}%%/.test(lines[index])) {
-        index++;
-      }
-      continue;
-    }
-    if (/^\s*%%(?!\{)./.test(line) || (!starts.length && !line.trim())) {
-      continue;
-    }
-    if (!runsOn) {
-      starts.push(index);
-    }
-    runsOn = runsOnAfterComments && /\S.*%%/.test(line);
-  }
-  return starts;
-};
-
-/**
- * The line of the source an error Mermaid (or Pele) reports on `line` is on:
- * errors past its end (e.g. a missing `end`) are on its last non-empty line.
- */
-export const getMermaidSourceLineNumber = (
-  line: number,
-  sourceText: string,
-) => {
-  const starts = getParsedLineStarts(sourceText);
-  if (line >= 1 && line <= starts.length) {
-    let index = starts[line - 1];
-    // e.g. the empty line Mermaid reports an error at the end on
-    while (index > 0 && !sourceText.split(/\r?\n/)[index].trim()) {
-      index--;
-    }
-    return index + 1;
-  }
-  const lines = sourceText.split(/\r?\n/);
-  let lastLine = lines.length;
-  while (lastLine > 1 && !lines[lastLine - 1].trim()) {
-    lastLine--;
-  }
-  return lastLine;
+  // Pele reports errors on the source line (counting front matter, comments
+  // and blank lines), and errors past the end on the last line
+  return Number.parseInt(match[1], 10);
 };
 
 const countMatches = (text: string, re: RegExp) =>
@@ -377,32 +313,11 @@ export const getMermaidSyntaxErrorGuidance = (
   };
 };
 
-/** The error, reported on its line of `sourceText` (see `getMermaidSourceLineNumber`) */
-export const withMermaidSourceLineNumber = (
-  message: string,
-  sourceText: string,
-) =>
-  message.replace(MERMAID_SYNTAX_ERROR_LINE, (match, line) =>
-    match.replace(
-      line,
-      String(getMermaidSourceLineNumber(Number(line), sourceText)),
-    ),
-  );
-
-/**
- * The parse error, without the tokens it expected, and if given the source,
- * on its line of it.
- */
-export const formatMermaidParseErrorMessage = (
-  message: string,
-  sourceText?: string,
-) => {
+/** The parse error, without the tokens it expected */
+export const formatMermaidParseErrorMessage = (message: string) => {
   if (!isMermaidParseSyntaxError(message)) {
     return message;
   }
 
-  const formatted = message.replace(/\n\s*Expecting[\s\S]*$/, "").trimEnd();
-  return sourceText
-    ? withMermaidSourceLineNumber(formatted, sourceText)
-    : formatted;
+  return message.replace(/\n\s*Expecting[\s\S]*$/, "").trimEnd();
 };

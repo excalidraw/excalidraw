@@ -31,20 +31,6 @@ Expecting 'SEMI', 'NEWLINE', 'SPACE', got 'NODE_STRING'`;
     expect(formatMermaidParseErrorMessage(message)).toBe(message);
   });
 
-  it("reports the error on its source line, given the source", () => {
-    expect(
-      formatMermaidParseErrorMessage(
-        `Parse error on line 3:
-  C --> D]
----------^
-Expecting 'SEMI', got 'SQE'`,
-        "%% a\n%% b\nflowchart TD\n  A --> B\n  C --> D]",
-      ),
-    ).toBe(`Parse error on line 5:
-  C --> D]
----------^`);
-  });
-
   it("does not modify non-Mermaid parse messages", () => {
     const message =
       "Unexpected token while parsing JSON. Expecting value at position 10.";
@@ -120,35 +106,13 @@ describe("getMermaidInactiveParticipant", () => {
 });
 
 describe("getMermaidErrorLineNumber", () => {
-  it("reports errors after the last line on the last line", () => {
+  it("keeps the line as reported, since Pele numbers source lines", () => {
     expect(
       getMermaidErrorLineNumber(
-        "Parse error on line 4: ...",
-        "graph TD\nsubgraph A\n  A1[Start]\n",
+        "Parse error on line 5: ...",
+        "%% a\n%% b\nflowchart TD\n  A --> B\n  C --> D]",
       ),
-    ).toBe(3);
-  });
-
-  it("maps lines as Mermaid and Pele number them to the source's", () => {
-    // [source, the line they report the error on line `actual` on]
-    const cases: Array<[string, number, number]> = [
-      ["%% a\n%% b\nflowchart TD\n  A --> B\n  C --> D]", 3, 5],
-      ["flowchart TD\n  %% c\n  A --> B\n  C --> D]", 3, 4],
-      ["\n\nflowchart TD\n  A --> B\n  C --> D]", 3, 5],
-      ["flowchart TD\n\n  A --> B\n\n  C --> D]", 5, 5],
-      ["---\ntitle: x\n---\nflowchart TD\n  A --> B\n  C --> D]", 3, 6],
-      ["%%{init: {'theme':'dark'}}%%\nflowchart TD\n  C --> D]", 2, 3],
-      ["flowchart TD\n  %%\n  A --> B\n  C --> D]", 4, 4],
-      // a flowchart line ending with a comment runs on into the next one
-      ["flowchart TD\n  A --> B %% note\n  C --> D]", 2, 2],
-      ["sequenceDiagram\n  Alice->>Bob: hi %% note\n  Alice-B: x", 3, 3],
-      ["classDiagram\n  %% c\n  A <|-- B\n  A <|-|> C", 3, 4],
-    ];
-    for (const [source, reported, actual] of cases) {
-      expect(
-        getMermaidErrorLineNumber(`Parse error on line ${reported}:`, source),
-      ).toBe(actual);
-    }
+    ).toBe(5);
   });
 
   it("reports unknown diagram types on the line declaring it", () => {
