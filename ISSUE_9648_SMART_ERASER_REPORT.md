@@ -76,7 +76,7 @@ The full suite was run after the main implementation and before the final two ge
 | `Set-Location .\excalidraw-app; $env:VITE_APP_DISABLE_SENTRY='true'; ..\node_modules\.bin\vite.cmd build` | Passed. Vite emitted a non-fatal unresolved font-reference warning and a Node child-process deprecation warning. |
 | `yarn test:app ...` | Not run: `yarn` is unavailable; local Vitest executables were used. |
 
-No manual browser or physical-device testing was performed.
+Manual browser testing was performed locally. The tested eraser scenarios behaved as expected. Physical-device testing was not performed.
 
 ## Before/after comparison
 
