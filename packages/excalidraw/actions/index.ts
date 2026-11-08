@@ -83,6 +83,11 @@ export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
 export { actionToggleShowHints } from "./actionToggleShowHints";
+export {
+  actionTogglePalmRejection,
+  actionTogglePalmRejectionPinch,
+  actionTogglePalmRejectionContactSize,
+} from "./actionTogglePalmRejection";
 
 export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";

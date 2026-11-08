@@ -65,6 +65,9 @@ exports[`exportToSvg > with default arguments 1`] = `
     "x": 0,
     "y": 0,
   },
+  "palmRejection": false,
+  "palmRejectionContactSize": false,
+  "palmRejectionPinch": true,
   "pasteDialog": {
     "data": null,
     "shown": false,

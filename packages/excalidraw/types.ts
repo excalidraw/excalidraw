@@ -374,6 +374,23 @@ export interface AppState {
   /** user preference whether to show contextual hints above the toolbar */
   showHints: boolean;
   /**
+   * user preference: when enabled, only the first touch on the canvas is
+   * honored (assumed to be a passive stylus) and any further simultaneous
+   * touches (resting palm/fingers) are ignored. Touch-only: mouse & pen
+   * input are never affected.
+   */
+  palmRejection: boolean;
+  /**
+   * with `palmRejection`: let a second finger that lands quickly next to a
+   * still first touch pinch-zoom/pan the canvas
+   */
+  palmRejectionPinch: boolean;
+  /**
+   * with `palmRejection`: use the contact size reported by the browser to
+   * recognise (and ignore) large palm contacts, even if they land first
+   */
+  palmRejectionContactSize: boolean;
+  /**
    * user preference for what the wheel does: with a `trackpad` a plain wheel
    * pans; with a `mouse` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is
    * delivered) zooms with either device. Shift+wheel pans horizontally;

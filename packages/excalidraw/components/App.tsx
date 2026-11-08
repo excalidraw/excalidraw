@@ -309,6 +309,7 @@ import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
+import { PalmRejectionGate } from "../palmRejection";
 import {
   copyElementRenderOverrides,
   getElementRenderOffsets,
@@ -711,6 +712,14 @@ class App extends React.Component<AppProps, AppState> {
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
+
+  /** see `appState.palmRejection` */
+  private palmRejectionGate = new PalmRejectionGate();
+  /** reused to avoid allocating on every pointer event */
+  private palmRejectionOptions = {
+    allowPinch: true,
+    useContactSize: false,
+  };
   /**
    * the handle of the resize in progress while `state.isResizing` — for UI
    * that words itself by handle (a sticky note's corners resize
@@ -3221,6 +3230,7 @@ class App extends React.Component<AppProps, AppState> {
   // Lifecycle
 
   private onBlur = withBatchedUpdates(() => {
+    this.palmRejectionGate.reset();
     this.pan.setSpaceHeld(false);
     this.modifiers.reset();
     this.setState({
@@ -4169,6 +4179,44 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    // Palm rejection: capture-phase so that ignored touches are dropped
+    // before they reach React's handlers or any of the window-level drag
+    // listeners registered on pointerdown (single integration point, no
+    // duplicated per-handler checks).
+    const palmRejectionOptions = { capture: true, passive: false };
+    this.onRemoveEventListenersEmitter.once(
+      addEventListener(
+        this.ownerWindow,
+        EVENT.POINTER_DOWN,
+        this.onPalmRejectionEvent,
+        palmRejectionOptions,
+      ),
+      addEventListener(
+        this.ownerWindow,
+        EVENT.POINTER_MOVE,
+        this.onPalmRejectionEvent,
+        palmRejectionOptions,
+      ),
+      addEventListener(
+        this.ownerWindow,
+        EVENT.POINTER_UP,
+        this.onPalmRejectionEvent,
+        palmRejectionOptions,
+      ),
+      addEventListener(
+        this.ownerWindow,
+        EVENT.POINTER_CANCEL,
+        this.onPalmRejectionEvent,
+        palmRejectionOptions,
+      ),
+      addEventListener(
+        this.ownerWindow,
+        "contextmenu",
+        this.onPalmRejectionContextMenu,
+        { capture: true },
+      ),
+    );
+
     this.onRemoveEventListenersEmitter.once(
       addEventListener(
         this.excalidrawContainerRef.current,
@@ -4536,8 +4584,85 @@ class App extends React.Component<AppProps, AppState> {
     firstTapPosition = null;
   }
 
+  /**
+   * "First touch wins" palm rejection (see `palmRejection.ts`). Runs in the
+   * capture phase on the window; rejected touches are swallowed entirely so
+   * they can neither draw, select, pan nor pinch.
+   */
+  private onPalmRejectionEvent = (event: PointerEvent) => {
+    if (!this.state.palmRejection) {
+      // feature was switched off mid-interaction: don't keep stale contacts
+      this.palmRejectionGate.reset();
+      return;
+    }
+    if (event.pointerType !== "touch") {
+      return;
+    }
+    if (event.type === EVENT.POINTER_DOWN) {
+      // only touches landing on the drawing surface take part; taps on
+      // toolbars/menus must keep working while a palm rests on the canvas
+      if (event.target !== this.interactiveCanvas) {
+        return;
+      }
+    } else if (!this.palmRejectionGate.isTracked(event.pointerId)) {
+      return;
+    }
+
+    this.palmRejectionOptions.allowPinch = this.state.palmRejectionPinch;
+    this.palmRejectionOptions.useContactSize =
+      this.state.palmRejectionContactSize;
+
+    const verdict = this.palmRejectionGate.evaluate(
+      event,
+      this.palmRejectionOptions,
+    );
+    if (verdict === "reject") {
+      event.stopImmediatePropagation();
+      if (event.type === EVENT.POINTER_DOWN) {
+        event.preventDefault();
+      }
+    } else if (verdict === "promote") {
+      // the watched second contact turned out to be a pinch: hand it to the
+      // gesture tracking and drop the stroke the first finger had started
+      const partner = this.palmRejectionGate.takePromotedContact();
+      if (partner) {
+        this.updateGestureOnPointerDown({
+          pointerId: partner.pointerId,
+          clientX: partner.x,
+          clientY: partner.y,
+        });
+        this.endFreeDrawOnSecondTouch(true);
+      }
+    }
+  };
+
+  /**
+   * A palm resting still on the screen triggers the browser's long-press
+   * `contextmenu`; suppress it while any contact is being ignored.
+   */
+  private onPalmRejectionContextMenu = (event: Event) => {
+    if (
+      this.state.palmRejection &&
+      this.palmRejectionGate.hasRejectedContacts()
+    ) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  };
+
   private onTouchStart = (event: TouchEvent) => {
     if (!this.isInteractionEnabled()) {
+      return;
+    }
+
+    // palm rejection: extra simultaneous touches are ignored entirely
+    // (no two-finger deselect, no double-tap text from a resting palm),
+    // unless the gate recognised them as a deliberate two-finger pinch
+    if (
+      this.state.palmRejection &&
+      event.touches.length > 1 &&
+      !this.palmRejectionGate.isPinchActive()
+    ) {
       return;
     }
 
@@ -4606,6 +4731,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     this.resetContextMenuTimer();
+    if (
+      this.state.palmRejection &&
+      event.touches.length > 0 &&
+      !this.palmRejectionGate.hadPinch()
+    ) {
+      // a lifted palm/finger must not alter the selection mid-stroke
+      return;
+    }
     if (event.touches.length > 0) {
       this.setState({
         previousSelectedElementIds: {},
@@ -4616,6 +4749,8 @@ class App extends React.Component<AppProps, AppState> {
       });
     } else {
       gesture.pointers.clear();
+      // all fingers are up: safety net against missed pointerup/cancel
+      this.palmRejectionGate.reset();
     }
   };
 
@@ -7628,39 +7763,7 @@ class App extends React.Component<AppProps, AppState> {
     // discard the freedraw element if it is very short because it is likely
     // just a spike, otherwise finalize the freedraw element when the second
     // finger is lifted
-    if (
-      event.pointerType === "touch" &&
-      this.state.newElement &&
-      this.state.newElement.type === "freedraw"
-    ) {
-      const element = this.state.newElement as ExcalidrawFreeDrawElement;
-      this.updateScene({
-        ...(element.points.length < 10
-          ? {
-              elements: this.scene
-                .getElementsIncludingDeleted()
-                .filter((el) => el.id !== element.id),
-            }
-          : {}),
-        appState: {
-          newElement: null,
-          editingTextElement: null,
-          suggestedBinding: null,
-          selectedElementIds: makeNextSelectedElementIds(
-            Object.keys(this.state.selectedElementIds)
-              .filter((key) => key !== element.id)
-              .reduce((obj: { [id: string]: true }, key) => {
-                obj[key] = this.state.selectedElementIds[key];
-                return obj;
-              }, {}),
-            this.state,
-          ),
-        },
-        captureUpdate:
-          this.state.openDialog?.name === "elementLinkSelector"
-            ? CaptureUpdateAction.EVENTUALLY
-            : CaptureUpdateAction.NEVER,
-      });
+    if (event.pointerType === "touch" && this.endFreeDrawOnSecondTouch()) {
       return;
     }
 
@@ -8062,8 +8165,48 @@ class App extends React.Component<AppProps, AppState> {
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
 
+  /**
+   * A second finger touched the screen while a freedraw stroke is in
+   * progress: end that stroke, dropping it if it is just a short spike (or
+   * always, when `discard` is set). Returns whether a stroke was ended.
+   */
+  private endFreeDrawOnSecondTouch(discard = false): boolean {
+    if (!this.state.newElement || this.state.newElement.type !== "freedraw") {
+      return false;
+    }
+    const element = this.state.newElement as ExcalidrawFreeDrawElement;
+    this.updateScene({
+      ...(discard || element.points.length < 10
+        ? {
+            elements: this.scene
+              .getElementsIncludingDeleted()
+              .filter((el) => el.id !== element.id),
+          }
+        : {}),
+      appState: {
+        newElement: null,
+        editingTextElement: null,
+        suggestedBinding: null,
+        selectedElementIds: makeNextSelectedElementIds(
+          Object.keys(this.state.selectedElementIds)
+            .filter((key) => key !== element.id)
+            .reduce((obj: { [id: string]: true }, key) => {
+              obj[key] = this.state.selectedElementIds[key];
+              return obj;
+            }, {}),
+          this.state,
+        ),
+      },
+      captureUpdate:
+        this.state.openDialog?.name === "elementLinkSelector"
+          ? CaptureUpdateAction.EVENTUALLY
+          : CaptureUpdateAction.NEVER,
+    });
+    return true;
+  }
+
   private updateGestureOnPointerDown(
-    event: React.PointerEvent<HTMLElement>,
+    event: Pick<PointerEvent, "pointerId" | "clientX" | "clientY">,
   ): void {
     gesture.pointers.set(event.pointerId, {
       x: event.clientX,

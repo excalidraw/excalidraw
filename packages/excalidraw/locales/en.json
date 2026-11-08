@@ -203,6 +203,9 @@
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
     "showHints": "Show hints",
+    "palmRejection": "Palm rejection (first touch only)",
+    "palmRejectionPinch": "Allow two-finger pinch and pan",
+    "palmRejectionContactSize": "Detect palms by contact size",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"

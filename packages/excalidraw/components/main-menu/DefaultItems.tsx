@@ -13,6 +13,9 @@ import {
   actionToggleGridMode,
   actionToggleMidpointSnapping,
   actionToggleObjectsSnapMode,
+  actionTogglePalmRejection,
+  actionTogglePalmRejectionContactSize,
+  actionTogglePalmRejectionPinch,
   actionToggleSearchMenu,
   actionToggleShowHints,
   actionToggleStats,
@@ -581,6 +584,57 @@ const PreferencesToggleShowHintsItem = () => {
   );
 };
 
+const PreferencesTogglePalmRejectionItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.palmRejection}
+      onSelect={(event) => {
+        actionManager.executeAction(actionTogglePalmRejection);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.palmRejection")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+const PreferencesTogglePalmRejectionPinchItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.palmRejectionPinch}
+      onSelect={(event) => {
+        actionManager.executeAction(actionTogglePalmRejectionPinch);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.palmRejectionPinch")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
+const PreferencesTogglePalmRejectionContactSizeItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.palmRejectionContactSize}
+      onSelect={(event) => {
+        actionManager.executeAction(actionTogglePalmRejectionContactSize);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.palmRejectionContactSize")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleGridModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -684,6 +738,9 @@ export const Preferences = ({
             <PreferencesToggleArrowBindingItem />
             <PreferencesToggleMidpointSnappingItem />
             <PreferencesToggleShowHintsItem />
+            <PreferencesTogglePalmRejectionItem />
+            <PreferencesTogglePalmRejectionPinchItem />
+            <PreferencesTogglePalmRejectionContactSizeItem />
           </>
         )}
         {additionalItems}
@@ -699,6 +756,10 @@ Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
 Preferences.ToggleShowHints = PreferencesToggleShowHintsItem;
+Preferences.TogglePalmRejection = PreferencesTogglePalmRejectionItem;
+Preferences.TogglePalmRejectionPinch = PreferencesTogglePalmRejectionPinchItem;
+Preferences.TogglePalmRejectionContactSize =
+  PreferencesTogglePalmRejectionContactSizeItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
