@@ -10129,29 +10129,21 @@ class App extends React.Component<AppProps, AppState> {
       const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
 
       if (isEraserActive(this.state) && pointerStart && pointerEnd) {
-        this.eraserTrail.endPath();
-
-        const draggedDistance = pointDistance(
-          pointFrom(pointerStart.clientX, pointerStart.clientY),
-          pointFrom(pointerEnd.clientX, pointerEnd.clientY),
+        const scenePointer = viewportCoordsToSceneCoords(
+          {
+            clientX: pointerEnd.clientX,
+            clientY: pointerEnd.clientY,
+          },
+          this.state,
         );
-
-        if (draggedDistance === 0) {
-          const scenePointer = viewportCoordsToSceneCoords(
-            {
-              clientX: pointerEnd.clientX,
-              clientY: pointerEnd.clientY,
-            },
-            this.state,
-          );
-          const hitElements = this.getElementsAtPosition(
+        this.elementsPendingErasure = new Set(
+          this.eraserTrail.addPointToPath(
             scenePointer.x,
             scenePointer.y,
-          );
-          hitElements.forEach((hitElement) =>
-            this.elementsPendingErasure.add(hitElement.id),
-          );
-        }
+            childEvent.altKey,
+          ),
+        );
+        this.eraserTrail.endPath();
         this.eraseElements();
         return;
       } else if (this.elementsPendingErasure.size) {
