@@ -677,7 +677,7 @@
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Indsæt",
-    "description": "",
+    "description": "<flowchartLink>Rutediagrammer</flowchartLink>, <sequenceLink>sekvensdiagrammer</sequenceLink>, <classLink>klassediagrammer</classLink>, <stateLink>tilstandsdiagrammer</stateLink> og <erdLink>ER-diagrammer</erdLink> samt <ganttLink>Gantt-diagrammer</ganttLink>, <quadrantLink>kvadrantdiagrammer</quadrantLink> og <timelineLink>tidslinjer</timelineLink> konverteres til Excalidraw-elementer. Andre typer indsættes som billede.",
     "syntax": "Mermaid-syntaks",
     "preview": "Forhåndsvisning",
     "label": "Mermaid",
