@@ -18,53 +18,56 @@
     margin-inline: 0;
     height: 4px;
     -webkit-appearance: none;
-    background: linear-gradient(
-      to right,
-      var(--color-slider-track) calc(var(--range-progress) * 100%),
-      var(--button-bg) calc(var(--range-progress) * 100%)
-    );
+    background: linear-gradient(to right,
+        var(--color-slider-track) calc(var(--range-progress) * 100%),
+        var(--button-bg) calc(var(--range-progress) * 100%));
     border-radius: 2px;
     outline: none;
-  }
 
-  .range-input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: var(--slider-thumb-size);
-    height: var(--slider-thumb-size);
-    background: var(--color-slider-thumb);
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-  }
+    [dir="rtl"] &,
+    &.rtl {
+      transform: scaleX(-1);
+      background: linear-gradient(to left, 
+          var(--color-slider-track) calc(var(--range-progress) * 100%),
+          var(--button-bg) calc(var(--range-progress) * 100%));
+      }
+    }
 
-  .range-input::-moz-range-thumb {
-    width: var(--slider-thumb-size);
-    height: var(--slider-thumb-size);
-    background: var(--color-slider-thumb);
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-  }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: var(--slider-thumb-size);
+      height: var(--slider-thumb-size);
+      background: var(--color-slider-thumb);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
 
-  .value-bubble {
-    position: absolute;
-    bottom: 0;
-    // centered on the thumb, which travels (width - thumb size)
-    left: calc(
-      var(--slider-thumb-size) / 2 + (100% - var(--slider-thumb-size)) *
-        var(--range-progress)
-    );
-    transform: translateX(-50%);
-    font-size: 12px;
-    color: var(--text-primary-color);
-  }
+    .range-input::-moz-range-thumb {
+      width: var(--slider-thumb-size);
+      height: var(--slider-thumb-size);
+      background: var(--color-slider-thumb);
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
 
-  .zero-label {
-    position: absolute;
-    bottom: 0;
-    left: 4px;
-    font-size: 12px;
-    color: var(--text-primary-color);
+    .value-bubble {
+      position: absolute;
+      bottom: 0;
+      // centered on the thumb, which travels (width - thumb size)
+      left: calc(var(--slider-thumb-size) / 2 + (100% - var(--slider-thumb-size)) * var(--range-progress));
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--text-primary-color);
+    }
+
+    .zero-label {
+      position: absolute;
+      bottom: 0;
+      left: 4px;
+      font-size: 12px;
+      color: var(--text-primary-color);
+    }
   }
-}
