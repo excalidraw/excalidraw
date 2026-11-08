@@ -54,6 +54,7 @@ import {
 
 import {
   isArrowElement,
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
@@ -713,19 +714,74 @@ const getStrokeWidthForElement = (
   return getStrokeWidthByKey(element.type, strokeWidthKey);
 };
 
+// Arrows are re-routed against the scene. Elbow arrows always are, inside
+// `mutateElement`, so a shape whose outline changed has to be in the scene
+// before its arrows are updated. Same approach as re-routing arrows after a
+// text's font changes.
+const updateArrowsBoundToElements = (
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+  app: AppClassProperties,
+) => {
+  const prevById = new Map(
+    prevElements.map((element) => [element.id, element]),
+  );
+  const changedIds: ExcalidrawElement["id"][] = [];
+
+  for (const next of nextElements) {
+    const prev = prevById.get(next.id);
+    if (
+      !prev ||
+      next === prev ||
+      !isBindableElement(next) ||
+      !isNonDeletedElement(next) ||
+      !next.boundElements?.some((bound) => bound.type === "arrow")
+    ) {
+      continue;
+    }
+
+    // the binding gap is BASE_BINDING_GAP + strokeWidth / 2, and roundness
+    // changes the outline an arrow bound near a corner follows
+    if (
+      prev.strokeWidth !== next.strokeWidth ||
+      (prev.roundness?.type ?? null) !== (next.roundness?.type ?? null)
+    ) {
+      changedIds.push(next.id);
+    }
+  }
+
+  if (!changedIds.length) {
+    return nextElements;
+  }
+
+  app.scene.replaceAllElements(nextElements);
+  for (const id of changedIds) {
+    const element = app.scene.getNonDeletedElement(id);
+    if (element) {
+      updateBoundElements(element, app.scene, {
+        renderEnvironment: app.renderEnvironment,
+      });
+    }
+  }
+
+  return app.scene.getElementsIncludingDeleted();
+};
+
 export const actionChangeStrokeWidth = register<StrokeWidthKey>({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeStrokeWidth: value must be defined");
 
+    const nextElements = changeProperty(elements, appState, (el) =>
+      newElementWith(el, {
+        strokeWidth: getStrokeWidthForElement(el, value),
+      }),
+    );
+
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeWidth: getStrokeWidthForElement(el, value),
-        }),
-      ),
+      elements: updateArrowsBoundToElements(elements, nextElements, app),
       appState: { ...appState, currentItemStrokeWidthKey: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -1765,26 +1821,28 @@ export const actionChangeRoundness = register<"sharp" | "round">({
   name: "changeRoundness",
   label: "Change edge roundness",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
+    const nextElements = changeProperty(elements, appState, (el) => {
+      if (isElbowArrow(el)) {
+        return el;
+      }
+
+      const nextElement = newElementWith(el, {
+        roundness:
+          value === "round"
+            ? {
+                type: isUsingAdaptiveRadius(el.type)
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : null,
+      });
+
+      return nextElement;
+    });
+
     return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isElbowArrow(el)) {
-          return el;
-        }
-
-        const nextElement = newElementWith(el, {
-          roundness:
-            value === "round"
-              ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
-        });
-
-        return nextElement;
-      }),
+      elements: updateArrowsBoundToElements(elements, nextElements, app),
       appState: {
         ...appState,
         currentItemRoundness: value,
