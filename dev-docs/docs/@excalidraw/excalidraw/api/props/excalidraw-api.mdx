@@ -65,7 +65,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
 | `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
-| `captureUpdate` | [`CaptureUpdateAction`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/store.ts#L40) | Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes. |
+| `captureUpdate` | [`CaptureUpdateAction`](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/store.ts) | Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes. |
 
 ```jsx live
 function App() {
@@ -202,7 +202,7 @@ function App() {
       </button>
       <Excalidraw
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
-        // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
+        // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/src/initialData.js
         initialData={{
           libraryItems: initialData.libraryItems,
           appState: { openSidebar: "library" },
@@ -237,7 +237,7 @@ Resets the scene. If `resetLoadingState` is passed as true then it will also for
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts">
     ExcalidrawElement[]
   </a>
 </pre>
@@ -248,7 +248,7 @@ Returns all the elements including the deleted in the scene.
 
 <pre>
   () => NonDeleted&#60;
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts">
     ExcalidrawElement
   </a>
   []&#62;
@@ -301,7 +301,7 @@ Scroll the nearest element out of the elements supplied to the center of the vie
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts) | All scene elements | The element(s) to scroll to. |
 | opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
 | opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
 | opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
