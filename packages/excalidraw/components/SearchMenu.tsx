@@ -318,9 +318,11 @@ export const SearchMenu = () => {
           }
 
           if (event.key === KEYS.ARROW_UP) {
+            event.preventDefault();
             event.stopPropagation();
             stableState.goToPreviousItem();
           } else if (event.key === KEYS.ARROW_DOWN) {
+            event.preventDefault();
             event.stopPropagation();
             stableState.goToNextItem();
           }
