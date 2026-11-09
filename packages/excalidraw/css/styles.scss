@@ -450,7 +450,7 @@ body.excalidraw-cursor-resize * {
   //     columns get exactly the rest (`minmax(0,1fr)`), so center regions end
   //     above the footer no matter how tall either side grows;
   //   - horizontally, they can't size each other's tracks — nothing in the
-  //     footer can displace the toolbar, and an overflowing top row (regime 3
+  //     footer can displace the toolbar, and an overflowing top row (regime 4
   //     below) can't drag the footer past the editor edge (the outer column
   //     is `minmax(0,1fr)`, so overflow of the columns doesn't widen it).
   //
@@ -477,10 +477,12 @@ body.excalidraw-cursor-resize * {
   // column's width. A styles panel wider than its column overflows toward
   // the canvas instead of widening the column and offsetting the toolbar.
   //
-  // The toolbar column is sized by the toolbar. The side columns floor at
-  // their top region's min-content, then split the leftover space EQUALLY
-  // (same `1fr` flex factor). Those floors are what make the top row
-  // NEGOTIATE width. As the editor narrows there are three regimes:
+  // The toolbar column is `minmax(<fully folded>, <unfolded>)` toolbar
+  // widths (see `useToolbarFolding`; both are constants, independent of how
+  // many tools are currently folded). The side columns floor at their top
+  // region's min-content, then split the leftover space EQUALLY (same `1fr`
+  // flex factor). Those floors are what make the top row NEGOTIATE width.
+  // As the editor narrows there are four regimes:
   //
   //   1. Plenty of space — both sides fit inside their equal share, so the
   //      toolbar is exactly viewport-centered even when TOP-LEFT and
@@ -490,9 +492,13 @@ body.excalidraw-cursor-resize * {
   //      min-content and the toolbar shifts aside, making exactly enough
   //      room (e.g. tablet portrait while collaborating: call button +
   //      share + collapsed user list).
-  //   3. Nothing fits — the columns hold their floors and the row overflows
-  //      to the right, clipped at the editor edge by `.excalidraw`'s
-  //      `overflow: hidden`. Content never slides under its neighbors.
+  //   3. Both sides are at their floors — the toolbar column shrinks below
+  //      the unfolded toolbar, and the toolbar folds tools (from the end)
+  //      into its extra-tools dropdown to fit.
+  //   4. Nothing fits even fully folded — the columns hold their floors and
+  //      the row overflows to the right, clipped at the editor edge by
+  //      `.excalidraw`'s `overflow: hidden`. Content never slides under its
+  //      neighbors.
   //
   // Because the floors carry this negotiation, DO NOT set `min-width: 0`
   // (or `overflow` other than `visible`) anywhere on a top region or its
@@ -542,7 +548,7 @@ body.excalidraw-cursor-resize * {
     // past it.
     grid-template-rows: minmax(0, 1fr) auto;
     // single shared column with a ZERO minimum, so columns whose top row
-    // overflows (regime 3 above) can't widen it — and thus can't drag the
+    // overflows (regime 4 above) can't widen it — and thus can't drag the
     // footer band past the editor edge
     grid-template-columns: minmax(0, 1fr);
 
@@ -557,8 +563,13 @@ body.excalidraw-cursor-resize * {
     // side columns: equal flex factors so the leftover space (after the
     // toolbar column) splits evenly — that's what keeps the toolbar centered
     // — with `auto` minimums so each side's top region FLOORS its column:
-    // the toolbar moves aside for it instead of covering it
-    grid-template-columns: minmax(auto, 1fr) auto minmax(auto, 1fr);
+    // the toolbar moves aside for it instead of covering it. The toolbar
+    // track is `minmax(<fully folded>, <unfolded>)` once `useToolbarFolding`
+    // has measured the toolbar (`auto` until then, or where it can't measure)
+    grid-template-columns: minmax(auto, 1fr) var(--exc-toolbar-track, auto) minmax(
+        auto,
+        1fr
+      );
     // clearance between the toolbar and the side columns
     column-gap: 1rem;
     min-height: 0;
@@ -633,9 +644,8 @@ body.excalidraw-cursor-resize * {
     place-content: start start;
   }
 
-  // (Making the toolbar respond to a narrow container is a separate, future
-  // change — until then it keeps its intrinsic width, and in regime 3 it
-  // pushes the top-right UI past the editor edge.)
+  // The toolbar folds tools to fit this region's width (regime 3 above); in
+  // regime 4 it pushes the top-right UI past the editor edge.
   .exc-region-top-center {
     grid-auto-flow: column;
     place-content: start center;

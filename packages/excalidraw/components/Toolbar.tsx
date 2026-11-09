@@ -3,7 +3,9 @@ import { useState } from "react";
 
 import { KEYS } from "@excalidraw/common";
 
+import { trackEvent } from "../analytics";
 import { useTunnels } from "../context/tunnels";
+import { TOOLBAR_FOLD_ORDER } from "../hooks/useToolbarFolding";
 import { t } from "../i18n";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
@@ -32,6 +34,7 @@ import {
   EraserToolButton,
   FreedrawToolPopover,
   FreedrawToolButton,
+  getToolLetter,
   getToolShortcut,
   HandToolButton,
   isToolButtonDisabled,
@@ -42,7 +45,10 @@ import {
   SelectionToolPopover,
   StickyNoteToolButton,
   TextToolButton,
+  TOOLS,
 } from "./Tools";
+
+import type { FoldableToolType } from "../hooks/useToolbarFolding";
 
 import type {
   AppClassProperties,
@@ -56,11 +62,14 @@ const ExtraToolsDropdown = ({
   activeTool,
   setAppState,
   UIOptions,
+  foldedTools,
 }: {
   app: AppClassProperties;
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
   UIOptions: AppProps["UIOptions"];
+  /** toolbar tools that didn't fit the toolbar, in toolbar order */
+  foldedTools: readonly FoldableToolType[];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const isFullStylesPanel = useStylesPanelMode() === "full";
@@ -76,12 +85,16 @@ const ExtraToolsDropdown = ({
     activeTool.type === "lasso" &&
     app.state.preferredSelectionTool.type !== "lasso";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const foldedToolSelected = foldedTools.find(
+    (type) => activeTool.type === type,
+  );
 
   return (
     <DropdownMenu open={isExtraToolsMenuOpen}>
       <DropdownMenu.Trigger
         className={clsx("App-toolbar__extra-tools-trigger", {
           "App-toolbar__extra-tools-trigger--selected":
+            !!foldedToolSelected ||
             imageToolSelected ||
             frameToolSelected ||
             embeddableToolSelected ||
@@ -99,7 +112,9 @@ const ExtraToolsDropdown = ({
         }}
         title={t("toolBar.extraTools")}
       >
-        {imageToolSelected
+        {foldedToolSelected
+          ? TOOLS[foldedToolSelected].icon
+          : imageToolSelected
           ? ImageIcon
           : frameToolSelected
           ? frameToolIcon
@@ -120,6 +135,25 @@ const ExtraToolsDropdown = ({
         onSelect={() => setIsExtraToolsMenuOpen(false)}
         className="App-toolbar__extra-tools-dropdown"
       >
+        {foldedTools.map((type) => (
+          <DropdownMenu.Item
+            key={type}
+            onSelect={() => {
+              if (app.state.activeTool.type !== type) {
+                trackEvent("toolbar", type, "ui");
+                app.setActiveTool({ type });
+              }
+            }}
+            icon={<>{TOOLS[type].icon}</>}
+            shortcut={getToolLetter(type) || TOOLS[type].numericKey}
+            data-testid={`toolbar-${type}`}
+            selected={activeTool.type === type}
+            disabled={isToolButtonDisabled(app, type)}
+          >
+            {t(`toolBar.${type}`)}
+          </DropdownMenu.Item>
+        ))}
+        {foldedTools.length > 0 && <DropdownMenu.Separator />}
         {UIOptions.tools?.image !== false && (
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "image" })}
@@ -228,6 +262,7 @@ export const Toolbar = ({
   onPenModeToggle,
   onLockToggle,
   heading,
+  foldedCount = 0,
 }: {
   app: AppClassProperties;
   appState: UIAppState;
@@ -236,12 +271,26 @@ export const Toolbar = ({
   onPenModeToggle: AppClassProperties["togglePenMode"];
   onLockToggle: () => void;
   heading: React.ReactNode;
+  /**
+   * how many tools (in `TOOLBAR_FOLD_ORDER`) didn't fit the toolbar's column
+   * and render in the extra-tools dropdown instead (see `useToolbarFolding`)
+   */
+  foldedCount?: number;
 }) => {
   const editorInterface = useEditorInterface();
   const isCompactStylesPanel = useStylesPanelMode() === "compact";
 
   const activeTool = appState.activeTool;
   const toolProps = { app, activeTool };
+
+  const folded = new Set<FoldableToolType>(
+    TOOLBAR_FOLD_ORDER.slice(0, foldedCount),
+  );
+  // in toolbar order
+  const foldedTools = [...TOOLBAR_FOLD_ORDER]
+    .reverse()
+    .filter((type) => folded.has(type));
+  const shows = (type: FoldableToolType) => !folded.has(type);
 
   return (
     <Island
@@ -295,19 +344,20 @@ export const Toolbar = ({
         ) : (
           <SelectionToolButton {...toolProps} />
         )}
-        <RectangleToolButton {...toolProps} />
-        <DiamondToolButton {...toolProps} />
-        <EllipseToolButton {...toolProps} />
-        <ArrowToolButton {...toolProps} />
-        <LineToolButton {...toolProps} />
-        {isCompactStylesPanel ? (
-          <FreedrawToolPopover {...toolProps} />
-        ) : (
-          <FreedrawToolButton {...toolProps} />
-        )}
-        <TextToolButton {...toolProps} />
-        <StickyNoteToolButton {...toolProps} />
-        <EraserToolButton {...toolProps} />
+        {shows("rectangle") && <RectangleToolButton {...toolProps} />}
+        {shows("diamond") && <DiamondToolButton {...toolProps} />}
+        {shows("ellipse") && <EllipseToolButton {...toolProps} />}
+        {shows("arrow") && <ArrowToolButton {...toolProps} />}
+        {shows("line") && <LineToolButton {...toolProps} />}
+        {shows("freedraw") &&
+          (isCompactStylesPanel ? (
+            <FreedrawToolPopover {...toolProps} />
+          ) : (
+            <FreedrawToolButton {...toolProps} />
+          ))}
+        {shows("text") && <TextToolButton {...toolProps} />}
+        {shows("stickynote") && <StickyNoteToolButton {...toolProps} />}
+        {shows("eraser") && <EraserToolButton {...toolProps} />}
 
         <div
           className="App-toolbar__divider"
@@ -319,6 +369,7 @@ export const Toolbar = ({
           activeTool={activeTool}
           setAppState={setAppState}
           UIOptions={UIOptions}
+          foldedTools={foldedTools}
         />
       </Stack.Row>
     </Island>

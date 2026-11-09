@@ -23,6 +23,7 @@ import { trackEvent } from "../analytics";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
+import { useToolbarFolding } from "../hooks/useToolbarFolding";
 
 import { t } from "../i18n";
 import { getScrollToContentState, getSelectedElements } from "../scene";
@@ -178,6 +179,17 @@ const LayerUI = ({
   const appProps = useAppProps();
   const stylesPanelMode = useStylesPanelMode();
   const isCompactStylesPanel = stylesPanelMode === "compact";
+
+  const regionColumnsRef = React.useRef<HTMLDivElement>(null);
+  const toolbarFoldedCount = useToolbarFolding(
+    regionColumnsRef,
+    // the desktop regions (and the toolbar in them) are rendered
+    editorInterface.formFactor !== "phone" &&
+      defaultUIEnabled &&
+      !appState.viewModeEnabled &&
+      appState.openDialog?.name !== "elementLinkSelector",
+    stylesPanelMode,
+  );
   const tunnels = useInitializeTunnels();
 
   const spacing = isCompactStylesPanel
@@ -334,7 +346,7 @@ const LayerUI = ({
           } as React.CSSProperties
         }
       >
-        <div className="exc-region-columns">
+        <div className="exc-region-columns" ref={regionColumnsRef}>
           <div className="exc-region-column-left">
             <div className="exc-region-top-left">{renderCanvasActions()}</div>
             <div className="exc-region-center-left">
@@ -392,6 +404,7 @@ const LayerUI = ({
                             onPenModeToggle={onPenModeToggle}
                             onLockToggle={onLockToggle}
                             heading={heading}
+                            foldedCount={toolbarFoldedCount}
                           />
                           {isCollaborating && (
                             <Island
