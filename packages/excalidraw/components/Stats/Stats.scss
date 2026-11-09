@@ -1,14 +1,18 @@
 .exc-stats {
   width: 204px;
-  position: absolute;
-  top: 60px;
   font-size: 12px;
   z-index: var(--zIndex-layerUI);
   pointer-events: var(--ui-pointerEvents);
 
-  :root[dir="rtl"] & {
-    left: 12px;
-    right: initial;
+  // bounded by its region (down to the footer band), scrolling past it
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  min-height: 0;
+
+  & > .Island {
+    min-height: 0;
+    overflow-y: auto;
   }
 
   h2 {

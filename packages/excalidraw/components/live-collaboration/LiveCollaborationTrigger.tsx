@@ -13,17 +13,25 @@ const LiveCollaborationTrigger = ({
   isCollaborating,
   onSelect,
   editorInterface,
+  iconOnly,
   ...rest
 }: {
   isCollaborating: boolean;
   onSelect: () => void;
   editorInterface?: EditorInterface;
+  /**
+   * force the icon-only (`true`) or labeled (`false`) variant, e.g. from a
+   * `<Region.Item collapse="render">`; by default it's derived from the
+   * form factor and editor width
+   */
+  iconOnly?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const appState = useUIAppState();
 
   const showIconOnly =
-    editorInterface?.formFactor !== "desktop" ||
-    appState.width < MQ_MIN_WIDTH_DESKTOP;
+    iconOnly ??
+    (editorInterface?.formFactor !== "desktop" ||
+      appState.width < MQ_MIN_WIDTH_DESKTOP);
 
   return (
     <Button

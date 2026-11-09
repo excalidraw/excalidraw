@@ -360,11 +360,53 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .excalidraw-ui-top-left,
-  .excalidraw-ui-top-right {
+  // content clusters — the editor-owned rows of a region's content (menu
+  // trigger, user list, …), shared between the desktop regions and the
+  // mobile top bar
+  .exc-region-top-left-content,
+  .exc-region-top-right-content {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  // host-app slots — wrap ONLY the host-rendered content
+  // (`renderTopLeftUI` / `renderTopRightUI` output), nested inside the
+  // clusters/regions alongside the editor-owned content.
+  //
+  // Slots are intentionally rigid (they keep their intrinsic width): the
+  // slot's min-content is what floors the side column of the mesh, which is
+  // what makes the toolbar move aside for host UI instead of covering it
+  // (see the mesh doc below).
+  .exc-region-top-left-host-slot,
+  .exc-region-top-right-host-slot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    // keep host controls at their intrinsic width so they participate in the
+    // top-row width negotiation instead of wrapping or reflowing
+    & > * {
+      flex: 0 0 auto;
+    }
+
+    // don't leave a stray flex/grid gap behind when the host renders nothing
+    &:empty {
+      display: none;
+    }
+  }
+
+  // The menu trigger keeps its intrinsic size (mobile top bar; on desktop
+  // the cluster's children are region items, see Region.scss).
+  .exc-region-top-left-content
+    > :not(.exc-region-top-left-host-slot, .exc-region-item) {
+    flex: 0 0 auto;
+  }
+
+  // The dropdown wrapper uses `display: contents`, so its children participate
+  // in the cluster's flex layout directly.
+  .exc-region-top-left-content > .dropdown-menu-event-wrapper > * {
+    flex: 0 0 auto;
   }
 
   .App-toolbar-content {
@@ -390,125 +432,361 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu {
+  // ---------------------------------------------------------------------------
+  // UI regions
+  //
+  // The editor UI is laid out in 3×3 logical regions (the middle of the
+  // canvas has none):
+  //
+  //   .exc-region-top-left     .exc-region-top-center     .exc-region-top-right
+  //   .exc-region-center-left                             .exc-region-center-right
+  //   .exc-region-bottom-left  .exc-region-bottom-center  .exc-region-bottom-right
+  //
+  // `.exc-regions` is a two-row grid — `minmax(0, 1fr) auto` — of:
+  //
+  //   .exc-region-columns  the top + center regions, as three column stacks
+  //   .exc-region-bottom   the footer band (its own independent 3-column grid)
+  //
+  // The two are deliberately kept in SEPARATE grids:
+  //   - vertically, the band reserves its own height in normal flow and the
+  //     columns get exactly the rest (`minmax(0,1fr)`), so center regions end
+  //     above the footer no matter how tall either side grows;
+  //   - horizontally, they can't size each other's tracks — nothing in the
+  //     footer can displace the toolbar, and an overflowing top row (regime 4
+  //     below) can't drag the footer past the editor edge (the outer column
+  //     is `minmax(0,1fr)`, so overflow of the columns doesn't widen it).
+  //
+  // THE COLUMNS (top + center regions)
+  // ----------------------------------
+  //
+  //      .exc-region-column-left  -center              -right
+  //       ┌─────────────┬───────────────────────┬─────────────┐
+  //       │  TOP-LEFT   │      TOP-CENTER       │  TOP-RIGHT  │
+  //       ├─────────────┤       (toolbar)       ├─────────────┤
+  //       │ CENTER-LEFT │                       │CENTER-RIGHT │
+  //       │  (styles)   │                       │   (stats)   │
+  //       └─────────────┴───────────────────────┴─────────────┘
+  //       minmax(auto,1fr)         auto          minmax(auto,1fr)
+  //
+  // Each column is a vertical flex stack, so a center region starts right
+  // below the top region of ITS OWN column, and nothing else: a taller
+  // TOP-LEFT (e.g. a scene title) moves the styles panel down, a taller
+  // TOP-RIGHT (e.g. a call tray) moves the stats down, and the toolbar's
+  // height moves neither.
+  //
+  // Column widths come from the top regions only: the center regions have
+  // `contain: inline-size`, so their content contributes nothing to their
+  // column's width. A styles panel wider than its column overflows toward
+  // the canvas instead of widening the column and offsetting the toolbar.
+  //
+  // The toolbar column is `minmax(<fully folded>, <unfolded>)` toolbar
+  // widths (see `useToolbarFolding`; both are constants, independent of how
+  // many tools are currently folded). The side columns floor at their top
+  // region's min-content, then split the leftover space EQUALLY (same `1fr`
+  // flex factor). Those floors are what make the top row NEGOTIATE width.
+  // As the editor narrows there are four regimes:
+  //
+  //   1. Plenty of space — both sides fit inside their equal share, so the
+  //      toolbar is exactly viewport-centered even when TOP-LEFT and
+  //      TOP-RIGHT differ in width (e.g. a bare menu button vs. a user
+  //      list + share button cluster).
+  //   2. One side outgrows its share — that column pins to its content's
+  //      min-content and the toolbar shifts aside, making exactly enough
+  //      room (e.g. tablet portrait while collaborating: call button +
+  //      share + collapsed user list).
+  //   3. Both sides are at their floors — the toolbar column shrinks below
+  //      the unfolded toolbar, and the toolbar folds tools (from the end)
+  //      into its extra-tools dropdown to fit.
+  //   4. Nothing fits even fully folded — the columns hold their floors and
+  //      the row overflows to the right, clipped at the editor edge by
+  //      `.excalidraw`'s `overflow: hidden`. Content never slides under its
+  //      neighbors.
+  //
+  // The side floors come from the region items (`RegionCluster`): once it
+  // has measured them, a top region's minimum width is its FULLY collapsed
+  // row — every `render` item collapsed, every `overflow` item in the "⋯"
+  // menu, `shrink` items at their `minWidth`, `rigid` items as they are.
+  // So within regime 1 a side that outgrows its share first collapses its
+  // own items (lowest priority first); only its fully collapsed row pushes
+  // the toolbar aside (regime 2). Until measured (or where layout can't be
+  // measured), a top region's content min-content is its floor.
+  //
+  // DO NOT set `min-width: 0` (or `overflow` other than `visible`) anywhere
+  // on a top region's content chain — before the floor is measured that
+  // content IS the floor, and a zero minimum lets the toolbar cover it.
+  //
+  // OTHER RULES
+  // ------------
+  //   - Region boxes stretch across their column and overlap empty canvas.
+  //     Content is pushed into a corner with `place-content`, and every
+  //     region is `pointer-events: none`, with only its content opting back
+  //     in via the `--ui-pointerEvents` value. Never set pointer events on a
+  //     region directly — it would swallow clicks meant for the canvas.
+  //   - Every region is `position: relative`, so absolutely positioned host
+  //     content (e.g. a call tray hanging below the top-right UI) anchors to
+  //     its own region rather than to the whole UI area.
+  //   - New UI that may be wide belongs in a center region (or the footer
+  //     band), not in a top region, else its width negotiates with the
+  //     toolbar.
+  // ---------------------------------------------------------------------------
+
+  // the wrapper is flush with a docked sidebar's visible edge; keep the
+  // region content at the same visual clearance from the sidebar it had
+  // when the wrapper stopped at the reserved column instead (this also
+  // keeps the stack/toast center unchanged). Logical, because the sidebar
+  // docks on the left in RTL.
+  .layer-ui__wrapper--sidebar-docked .exc-regions {
+    inset-inline-end: calc(
+      var(--editor-container-padding) + var(--space-factor) * 2
+    );
+  }
+
+  .exc-regions {
+    position: absolute;
+    inset: var(--editor-container-padding);
+    padding-top: var(--sat, 0);
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
+
     display: grid;
+    // r1: the columns (top + center regions) · r2: the footer band. The band
+    // reserves its height in-flow; the columns get the rest and can't grow
+    // past it.
+    grid-template-rows: minmax(0, 1fr) auto;
+    // single shared column with a ZERO minimum, so columns whose top row
+    // overflows (regime 4 above) can't widen it — and thus can't drag the
+    // footer band past the editor edge
+    grid-template-columns: minmax(0, 1fr);
+
     color: var(--icon-fill-color);
-  }
-
-  .shapes-section {
-    display: flex;
-    justify-content: center;
-    pointer-events: none !important;
-
-    & > * {
-      pointer-events: var(--ui-pointerEvents);
-    }
-  }
-
-  .App-menu_top {
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 1rem;
-    align-items: flex-start;
     cursor: default;
-    pointer-events: none !important;
-
-    & > * {
-      pointer-events: var(--ui-pointerEvents);
-    }
-
-    @media (min-width: 1536px) {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-gap: 3rem;
-    }
+    pointer-events: none;
   }
 
-  .App-menu_top > .App-menu_top__left {
-    grid-column: 1;
-    justify-self: start;
-
-    // App-menu_top__left is a single-column grid, so its track width is
-    // driven by the widest row — including the host-provided
-    // renderTopLeftUI content, which can be arbitrarily wide. Its
-    // (stretched) grid-item wrappers must stay pointer-events:none so that
-    // slack isn't a dead zone over the canvas; only the actual
-    // (content-sized, non-stretched) interactive pieces opt back in.
-    // Specificity (not source order) is why this beats `.App-menu_top > *`.
+  .exc-region-columns {
+    grid-row: 1;
+    display: grid;
+    // side columns: equal flex factors so the leftover space (after the
+    // toolbar column) splits evenly — that's what keeps the toolbar centered
+    // — with `auto` minimums so each side's top region FLOORS its column:
+    // the toolbar moves aside for it instead of covering it. The toolbar
+    // track is `minmax(<fully folded>, <unfolded>)` once `useToolbarFolding`
+    // has measured the toolbar (`auto` until then, or where it can't measure)
+    grid-template-columns: minmax(auto, 1fr) var(--exc-toolbar-track, auto) minmax(
+        auto,
+        1fr
+      );
+    // clearance between the toolbar and the side columns
+    column-gap: 1rem;
+    min-height: 0;
     pointer-events: none;
 
-    .selected-shape-actions-container,
-    .ToolIcon__penMode {
+    @media (min-width: 1536px) {
+      column-gap: 3rem;
+    }
+  }
+
+  .exc-region-column-left,
+  .exc-region-column-center,
+  .exc-region-column-right {
+    display: flex;
+    flex-direction: column;
+    // gap between a top region and the center region below it
+    row-gap: var(--exc-regions-row-gap, 1rem);
+    min-height: 0;
+    pointer-events: none;
+  }
+
+  // NOTE: no `min-width: 0` here — a top region's min-content is the floor
+  // of its column, which is what keeps the toolbar from covering it (see the
+  // doc above).
+  .exc-region-top-left,
+  .exc-region-top-center,
+  .exc-region-top-right,
+  .exc-region-center-left,
+  .exc-region-center-right {
+    display: grid;
+    position: relative;
+    min-height: 0;
+    pointer-events: none;
+
+    & > * {
       pointer-events: var(--ui-pointerEvents);
     }
+  }
 
-    // .excalidraw-ui-top-left is itself `display: flex` (block-level), so
-    // it *also* stretches to fill this track's width — its own box needs
-    // the same none-then-opt-in treatment, one level deeper, so its real
-    // (content-sized, unstretched) children stay clickable without
-    // resizing/repositioning the row itself.
-    .excalidraw-ui-top-left {
+  .exc-region-bottom,
+  .exc-region-bottom-left,
+  .exc-region-bottom-center,
+  .exc-region-bottom-right {
+    display: grid;
+    min-height: 0;
+    pointer-events: none;
+  }
+
+  .exc-region-bottom-left,
+  .exc-region-bottom-center,
+  .exc-region-bottom-right {
+    position: relative;
+  }
+
+  .exc-region-bottom-left,
+  .exc-region-bottom-right {
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
+  // `place-content` (not `place-items`) anchors the content inside the region,
+  // so that the region itself can stretch across its column
+  .exc-region-top-left,
+  .exc-region-top-center,
+  .exc-region-top-right {
+    flex: 0 0 auto;
+  }
+
+  .exc-region-top-left {
+    grid-auto-flow: column;
+    place-content: start start;
+  }
+
+  // The toolbar folds tools to fit this region's width (regime 3 above); in
+  // regime 4 it pushes the top-right UI past the editor edge.
+  .exc-region-top-center {
+    grid-auto-flow: column;
+    place-content: start center;
+  }
+
+  .exc-region-top-right {
+    // single flexible track with an `auto` minimum: the content cluster
+    // stretches to whatever width the column resolves to (so the
+    // collaborator list can use the leftover space), while the cluster's
+    // min-content still floors the column
+    grid-template-columns: minmax(auto, 1fr);
+    place-content: start end;
+
+    & > .exc-region-top-right-content {
+      justify-content: flex-end;
+      gap: 0.75rem;
+      // This row spans the region so a `shrink` item (the collaborator
+      // list) can take the remaining width, but must not turn the otherwise
+      // transparent region into a full-width click target. Its children are
+      // region items, which opt their content back in (Region.scss).
       pointer-events: none;
+    }
 
-      > * {
-        pointer-events: var(--ui-pointerEvents);
-      }
+    &--compact > .exc-region-top-right-content {
+      gap: 0.5rem;
     }
   }
 
-  .App-menu_top > .shapes-section {
-    grid-column: 2;
+  // center regions hang below their column's top region, and may shrink (and
+  // scroll their panel) down to the footer band. `contain: inline-size`
+  // keeps their content out of the column-width negotiation (see the doc
+  // above).
+  .exc-region-center-left,
+  .exc-region-center-right {
+    flex: 0 1 auto;
+    contain: inline-size;
+    row-gap: var(--exc-regions-row-gap, 1rem);
+    margin-bottom: 1rem;
   }
 
-  .selected-shape-actions-container {
-    width: fit-content;
-
-    &--compact {
-      min-width: 48px;
-    }
+  .exc-region-center-left {
+    place-content: start start;
   }
 
-  .App-menu_top > .layer-ui__wrapper__top-right {
-    grid-column: 3;
-    justify-self: end;
+  .exc-region-center-right {
+    place-content: start end;
   }
 
-  .App-menu_bottom {
-    position: absolute;
-    bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    cursor: default;
-    pointer-events: none !important;
-    box-sizing: border-box;
-    padding: 0 1rem;
+  // The bottom band is a sibling of the columns, so none of its occupants
+  // can size the columns and offset the toolbar — and an overflowing top row
+  // can't push the band past the editor edge. Its independent inner grid
+  // recreates the footer contract: natural-width editor controls on either
+  // side and a host slot that owns all remaining space between them.
+  .exc-region-bottom {
+    grid-row: 2;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    min-width: 0;
+  }
 
-    &--transition-left {
-      section {
-        width: 185px;
-      }
-    }
+  .exc-region-bottom-left {
+    grid-column: 1;
+    grid-auto-flow: column;
+    place-content: end start;
 
-    section {
+    // the canvas actions (zoom, undo/redo)
+    .exc-region-item > section {
       display: flex;
     }
   }
 
-  .App-menu_bottom > *:first-child {
-    justify-self: flex-start;
+  .exc-region-bottom-center {
+    grid-column: 2;
+    align-items: end;
+    min-width: 0;
+    // `<Footer>` content can respond to its own width with
+    // `@container exc-footer (…)`. Its width is the band's flexible track,
+    // never its content, so the containment doesn't change its layout.
+    container: exc-footer / inline-size;
   }
 
-  .App-menu_bottom > *:last-child {
-    justify-self: flex-end;
+  .exc-region-bottom-right {
+    grid-column: 3;
+    grid-auto-flow: column;
+    place-content: end end;
   }
 
-  .App-menu_left {
-    grid-template-rows: 1fr auto 1fr;
-    height: 100%;
+  // Status UI stays tied to the canvas center instead of the center track of
+  // the inner footer grid, which shifts when the side controls have different
+  // widths. It deliberately overlays the bottom band.
+  .exc-regions > .floating-status-stack {
+    position: absolute;
+    // kept clear of the footer's left/right controls — symmetrically, so it
+    // stays centered — or, when they leave too little room, moved above the
+    // footer band (see FloatingStatusStack)
+    left: var(--exc-status-inset, 0px);
+    right: var(--exc-status-inset, 0px);
+    // centers the stack when its max-width (see the base rule) kicks in
+    margin-inline: auto;
+    // its bottom entry lines up with the footer controls (centered on the
+    // footer band), or it sits above the band (see FloatingStatusStack);
+    // until measured, at the band's bottom edge
+    bottom: var(--exc-status-bottom, var(--sab, 0px));
+
+    // measured at its natural width (see FloatingStatusStack)
+    & > .scroll-back-to-content {
+      white-space: nowrap;
+      // same height as the footer controls it lines up with
+      height: var(--lg-button-size);
+      padding-block: 0;
+    }
+
+    // the toast is click-through (only its close button is interactive)
+    & > .Toast {
+      pointer-events: none;
+    }
   }
 
-  .App-menu_right {
-    grid-template-rows: 1fr;
-    height: 100%;
+  // the styles panel is bounded by its region, and scrolls past it (the
+  // `min-height: 0`s let the panel shrink below its content height)
+  .selected-shape-actions-container {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    max-height: 100%;
+    min-height: 0;
+
+    &--compact {
+      min-width: 48px;
+    }
+
+    & > section {
+      min-height: 0;
+    }
   }
 
   .App-menu__left {
@@ -516,7 +794,7 @@ body.excalidraw-cursor-resize * {
     padding: 0.75rem;
     max-width: 12.5rem;
     box-sizing: border-box;
-    position: absolute;
+    min-height: 0;
   }
 
   .dropdown-select {
@@ -573,15 +851,8 @@ body.excalidraw-cursor-resize * {
 
     border: 1px solid var(--default-border-color);
     padding: 10px 20px;
-    position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
     box-sizing: border-box;
-    max-width: calc(
-      100% - var(--viewport-status-frame-border-width) -
-        var(--viewport-status-frame-border-width)
-    );
+    max-width: 100%;
     pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
@@ -594,40 +865,19 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  // always rendered as a flex column of [scroll-back-to-content, badge] —
-  // this positions the stack itself; children are centered/spaced via flex.
+  // always rendered as a flex column of [toast, scroll-back-to-content,
+  // badge] — children are centered/spaced via flex. The desktop stack is
+  // placed by `.exc-regions` above; mobile positioning is applied in the
+  // mobile block below.
   .floating-status-stack {
-    position: absolute;
-    left: var(--viewport-status-frame-border-width);
-    right: var(--viewport-status-frame-border-width);
-    bottom: calc(0.5rem + var(--viewport-status-frame-border-width));
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     pointer-events: none;
-
-    .scroll-back-to-content {
-      position: static;
-      left: auto;
-      bottom: auto;
-      transform: none;
-      max-width: 100%;
-      pointer-events: var(--ui-pointerEvents);
-    }
-  }
-
-  // on mobile, when the default bottom toolbar renders, the stack is a
-  // normal (in-flow) row above MobileShapeActions/the toolbar Island inside
-  // .App-bottom-bar instead of being independently viewport-positioned —
-  // self-sizing regardless of whether MobileShapeActions is showing, with
-  // no magic-number height math needed to clear the toolbar.
-  .App-bottom-bar > .floating-status-stack {
-    position: static;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    margin-bottom: 0.5rem;
+    // stay inside the viewport-status frame border when a follow-mode frame
+    // is shown
+    max-width: calc(100% - 2 * var(--viewport-status-frame-border-width));
   }
 
   .help-icon {
@@ -670,9 +920,28 @@ body.excalidraw-cursor-resize * {
       display: none;
     }
 
+    // the base rule is grid-placed by `.exc-regions` (desktop only) — the
+    // standalone mobile stack (view mode / no bottom bar) is positioned
+    // against the viewport instead, full-width so flex centers the children
     .floating-status-stack {
+      position: absolute;
+      left: var(--viewport-status-frame-border-width);
+      right: var(--viewport-status-frame-border-width);
       bottom: calc(30px + var(--sab, 0));
       z-index: var(--zIndex-ui-bottom);
+    }
+
+    // …but when the default bottom toolbar renders, the stack is a normal
+    // (in-flow) row above MobileShapeActions/the toolbar Island inside
+    // .App-bottom-bar instead of being independently viewport-positioned —
+    // self-sizing regardless of whether MobileShapeActions is showing, with
+    // no magic-number height math needed to clear the toolbar.
+    .App-bottom-bar > .floating-status-stack {
+      position: static;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      margin-bottom: 0.5rem;
     }
   }
 
@@ -766,13 +1035,6 @@ body.excalidraw-cursor-resize * {
 
   .disable-pointerEvents {
     pointer-events: none !important;
-  }
-
-  &.excalidraw--view-mode {
-    .App-menu {
-      display: flex;
-      justify-content: space-between;
-    }
   }
 
   &.excalidraw--non-interactive {

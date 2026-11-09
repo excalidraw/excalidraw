@@ -8,6 +8,10 @@ import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
+import {
+  RegionPhoneItems,
+  RegionPhoneOverflowMenu,
+} from "./regions/RegionItems";
 import { MobileToolbar } from "./MobileToolbar";
 import { FixedSideContainer } from "./FixedSideContainer";
 
@@ -68,23 +72,30 @@ export const MobileMenu = ({
       return null;
     }
 
+    // host UI renders alongside the editor's own controls, same as on desktop
     const topRightUI = (
-      <div className="excalidraw-ui-top-right">
-        {renderTopRightUI?.(true, appState) ??
-          (!appState.viewModeEnabled && (
-            <>
-              {defaultUIEnabled && (
-                <PenModeButton
-                  checked={appState.penMode}
-                  onChange={() => onPenModeToggle(null)}
-                  title={t("toolBar.penMode")}
-                  isMobile
-                  penDetected={appState.penDetected}
-                />
-              )}
-              <DefaultSidebarTriggerTunnel.Out />
-            </>
-          ))}
+      <div className="exc-region-top-right-content">
+        <div className="exc-region-top-right-host-slot">
+          {renderTopRightUI?.(true, appState)}
+        </div>
+        {/* host `<Region.Item>`s — expanded, no collapsing on phones; the
+            ones that don't fit the top bar go into its "⋯" menu */}
+        <RegionPhoneItems area="top-right" />
+        <RegionPhoneOverflowMenu />
+        {!appState.viewModeEnabled && (
+          <>
+            {defaultUIEnabled && (
+              <PenModeButton
+                checked={appState.penMode}
+                onChange={() => onPenModeToggle(null)}
+                title={t("toolBar.penMode")}
+                isMobile
+                penDetected={appState.penDetected}
+              />
+            )}
+            <DefaultSidebarTriggerTunnel.Out />
+          </>
+        )}
         {defaultUIEnabled &&
           appState.viewModeEnabled &&
           app.isInteractionEnabled() && (
@@ -94,9 +105,12 @@ export const MobileMenu = ({
     );
 
     const topLeftUI = (
-      <div className="excalidraw-ui-top-left">
-        {renderTopLeftUI?.(true, appState)}
+      <div className="exc-region-top-left-content">
+        <div className="exc-region-top-left-host-slot">
+          {renderTopLeftUI?.(true, appState)}
+        </div>
         <MainMenuTunnel.Out />
+        <RegionPhoneItems area="top-left" />
       </div>
     );
 

@@ -16,31 +16,6 @@
     pointer-events: none;
     z-index: var(--zIndex-layerUI);
 
-    &__top-right {
-      display: flex;
-      width: 100%;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      pointer-events: none !important;
-
-      &--compact {
-        gap: 0.5rem;
-      }
-
-      & > * {
-        pointer-events: var(--ui-pointerEvents);
-      }
-    }
-
-    &__footer {
-      width: 100%;
-
-      &-right {
-        z-index: 100;
-        display: flex;
-      }
-    }
-
     // UI hidden in zen mode fades out in place. `visibility` flips at the end
     // of the fade-out (and immediately on fade-in), and makes the hidden UI
     // non-interactive & unfocusable.
@@ -50,7 +25,7 @@
 
       &.transition-left,
       &.transition-right,
-      &.layer-ui__wrapper__footer-left--transition-bottom {
+      &.transition-bottom {
         opacity: 0;
         visibility: hidden;
 
@@ -67,10 +42,10 @@
       position: absolute;
       bottom: 0;
       [dir="ltr"] & {
-        right: 1rem;
+        right: 0;
       }
       [dir="rtl"] & {
-        left: 1rem;
+        left: 0;
       }
       opacity: 0;
       visibility: hidden;
@@ -103,29 +78,20 @@
       }
     }
 
-    .layer-ui__wrapper__footer-left,
-    .footer-center,
-    .layer-ui__wrapper__footer-right {
+    .footer-center {
       & > * {
         pointer-events: var(--ui-pointerEvents);
       }
-    }
-
-    .layer-ui__wrapper__footer-right {
-      margin-top: auto;
-      margin-bottom: auto;
     }
   }
 
   // on tablet, the pen mode button is rendered as a separate floating button
   // below the compact actions menu (see LayerUI.tsx)
-  .App-menu_top__left > .ToolIcon__penMode {
-    // NOTE: not `justify-self: center` — that centers against the grid
-    // column's track width, which (see above) can be inflated by unrelated
-    // content, visibly shifting this button off from the icon stack above
-    // it. Nudge by hand instead, against the fixed-width compact actions
-    // column (see .selected-shape-actions-container--compact's min-width).
-    justify-self: start;
+  // NOTE: not `justify-self: center` — the center-left region's grid track
+  // is as wide as its widest item, which may be host content. Nudge by hand
+  // instead, against the fixed-width compact actions column (see
+  // .selected-shape-actions-container--compact's min-width).
+  .exc-region-item--pen-mode > .ToolIcon__penMode {
     margin-left: calc((48px - var(--lg-button-size)) / 2);
 
     .ToolIcon__icon {

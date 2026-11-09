@@ -2,6 +2,8 @@ import { createIsolation } from "jotai-scope";
 import React from "react";
 import tunnel from "tunnel-rat";
 
+import { RegionRegistry } from "../components/regions/RegionRegistry";
+
 export type Tunnel = ReturnType<typeof tunnel>;
 
 type TunnelsContextValue = {
@@ -15,6 +17,8 @@ type TunnelsContextValue = {
   DefaultSidebarTabTriggersTunnel: Tunnel;
   OverwriteConfirmDialogTunnel: Tunnel;
   TTDDialogTriggerTunnel: Tunnel;
+  /** host-registered `<Region.Item>`s */
+  regions: RegionRegistry;
   // this can be removed once we create jotai stores per each editor
   // instance
   tunnelsJotai: ReturnType<typeof createIsolation>;
@@ -39,6 +43,7 @@ export const useInitializeTunnels = () => {
       DefaultSidebarTabTriggersTunnel: tunnel(),
       OverwriteConfirmDialogTunnel: tunnel(),
       TTDDialogTriggerTunnel: tunnel(),
+      regions: new RegionRegistry(),
       tunnelsJotai,
     };
   }, []);

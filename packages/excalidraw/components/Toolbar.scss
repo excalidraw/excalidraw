@@ -50,6 +50,8 @@
     margin-top: 0.375rem;
     right: 0;
     min-width: 11.875rem;
-    z-index: 1;
+    // above the region panels it can drop over (stats, styles panel) — the
+    // popper wrapper copies this z-index
+    z-index: var(--zIndex-ui-top);
   }
 }

@@ -635,7 +635,8 @@ describe("ui={false}", () => {
     expect(queryContainer(".App-toolbar")).toBe(null);
     expect(queryContainer(".dropdown-menu-button")).toBe(null);
     expect(queryContainer(".default-sidebar-trigger")).toBe(null);
-    expect(queryContainer(".layer-ui__wrapper__footer-left")).toBe(null);
+    expect(queryContainer(".zoom-actions")).toBe(null);
+    expect(queryContainer(".undo-redo-buttons")).toBe(null);
     expect(queryContainer(".help-icon")).toBe(null);
   });
 
@@ -732,6 +733,10 @@ describe("ui={{ enabled: ... }}", () => {
 
     const scrollBackButton = queryContainer(".scroll-back-to-content");
     expect(scrollBackButton).not.toBe(null);
+    expect(scrollBackButton!.parentElement).toHaveClass(
+      "floating-status-stack",
+    );
+    expect(scrollBackButton!.closest(".exc-region-bottom")).toBe(null);
     fireEvent.click(scrollBackButton!);
     await waitFor(() => expect(h.state.scrolledOutside).toBe(false));
   });
@@ -789,10 +794,32 @@ describe("ui={false} with host UI", () => {
       </Excalidraw>,
     );
 
-    expect(queryContainer("[data-testid='host-top-left']")).not.toBe(null);
-    expect(queryContainer("[data-testid='host-top-right']")).not.toBe(null);
+    const hostTopLeft = queryContainer("[data-testid='host-top-left']")!;
+    const hostTopRight = queryContainer("[data-testid='host-top-right']")!;
+    expect(hostTopLeft).not.toBe(null);
+    expect(hostTopRight).not.toBe(null);
     expect(queryContainer("[data-testid='host-footer']")).not.toBe(null);
     expect(queryContainer("[aria-label='host sidebar']")).not.toBe(null);
+    expect(hostTopLeft.parentElement).toHaveClass(
+      "exc-region-top-left-host-slot",
+    );
+    expect(hostTopLeft.closest(".exc-region-top-left-content")).not.toBe(null);
+    expect(hostTopRight.parentElement).toHaveClass(
+      "exc-region-top-right-host-slot",
+    );
+    const topRightContent = hostTopRight.closest(
+      ".exc-region-top-right-content",
+    );
+    expect(topRightContent).not.toBe(null);
+    expect(
+      topRightContent!.querySelector("[aria-label='host sidebar']"),
+    ).not.toBe(null);
+    // top regions live in the side columns, the host footer in its sibling band
+    expect(hostTopLeft.closest(".exc-region-column-left")).not.toBe(null);
+    expect(hostTopRight.closest(".exc-region-column-right")).not.toBe(null);
+    const hostFooter = queryContainer("[data-testid='host-footer']")!;
+    expect(hostFooter.closest(".exc-region-columns")).toBe(null);
+    expect(hostFooter.closest(".exc-region-bottom")).not.toBe(null);
 
     fireEvent.click(container.querySelector(".dropdown-menu-button")!);
     expect(container.textContent).toContain("host menu item");
@@ -803,6 +830,26 @@ describe("ui={false} with host UI", () => {
     await waitFor(() => {
       expect(document.querySelector(".ImageExportModal")).not.toBe(null);
     });
+  });
+});
+
+describe("host top-right UI on phone", () => {
+  it("renders alongside the default sidebar trigger", async () => {
+    await render(
+      <Excalidraw
+        UIOptions={{ getFormFactor: () => "phone" }}
+        renderTopRightUI={() => <div data-testid="host-top-right" />}
+      />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const topRightContent = queryContainer(
+      "[data-testid='host-top-right']",
+    )!.closest(".exc-region-top-right-content");
+    expect(topRightContent!.querySelector(".default-sidebar-trigger")).not.toBe(
+      null,
+    );
   });
 });
 
