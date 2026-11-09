@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: NPMscan/npmscan-action@de14168f65640a4ed1f0e82ad3ad8c80483d360d # v1.3.0
+      - uses: NPMscan/npmscan-action@e2ff8c953f1a0b536abd70b4479984137c76e1fe # v1.4.1
         with:
           file: yarn.lock
           mode: warn
