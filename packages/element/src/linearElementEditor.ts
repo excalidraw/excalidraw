@@ -1218,6 +1218,10 @@ export class LinearElementEditor {
         : null;
     ret.linearElementEditor = {
       ...linearElementEditor,
+      hoverPointIndex: clickedPointIsHandle ? clickedPointIndex : -1,
+      segmentMidPointHoveredCoords: clickedPointIsHandle
+        ? null
+        : segmentMidpoint,
       initialState: {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
