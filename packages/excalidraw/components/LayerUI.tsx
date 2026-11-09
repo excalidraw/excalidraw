@@ -60,6 +60,7 @@ import ElementLinkDialog from "./ElementLinkDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { HelpButton } from "./HelpButton";
+import { RegionCluster, RegionStaticItems } from "./regions/RegionItems";
 import { HelpDialog } from "./HelpDialog";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
@@ -86,6 +87,7 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
+import type { RegionItemSpec } from "./regions/RegionRegistry";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -253,14 +255,45 @@ const LayerUI = ({
     );
   };
 
+  // editor items of the top regions, laid out (and collapsed) together with
+  // host `<Region.Item>`s — see `RegionItemSpec.order` for their positions
+  const editorItem = (
+    id: string,
+    order: number,
+    content: React.ReactNode,
+    extra?: Partial<RegionItemSpec>,
+  ): RegionItemSpec => ({
+    id: `editor:${id}`,
+    order,
+    content,
+    priority: Infinity,
+    collapse: "rigid",
+    minWidth: 0,
+    seq: -1,
+    ...extra,
+  });
+
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      <div className="exc-region-top-left-content">
-        <div className="exc-region-top-left-host-slot">
-          {renderTopLeftUI?.(false, appState)}
-        </div>
-        <tunnels.MainMenuTunnel.Out />
-      </div>
+      <RegionCluster
+        area="top-left"
+        className="exc-region-top-left-content"
+        menuAlign="start"
+        editorItems={[
+          ...(renderTopLeftUI
+            ? [
+                editorItem(
+                  "host-top-left",
+                  -10,
+                  <div className="exc-region-top-left-host-slot">
+                    {renderTopLeftUI(false, appState)}
+                  </div>,
+                ),
+              ]
+            : []),
+          editorItem("main-menu", 0, <tunnels.MainMenuTunnel.Out />),
+        ]}
+      />
       {renderWelcomeScreen && <tunnels.WelcomeScreenMenuHintTunnel.Out />}
     </div>
   );
@@ -348,7 +381,9 @@ const LayerUI = ({
       >
         <div className="exc-region-columns" ref={regionColumnsRef}>
           <div className="exc-region-column-left">
-            <div className="exc-region-top-left">{renderCanvasActions()}</div>
+            <div className="exc-region exc-region-top-left">
+              {renderCanvasActions()}
+            </div>
             <div className="exc-region-center-left">
               {defaultUIEnabled && (
                 <div
@@ -378,6 +413,7 @@ const LayerUI = ({
                     penDetected={appState.penDetected}
                   />
                 )}
+              <RegionStaticItems area="center-left" />
             </div>
           </div>
           <div className="exc-region-column-center">
@@ -436,33 +472,66 @@ const LayerUI = ({
           </div>
           <div className="exc-region-column-right">
             <div
-              className={clsx("exc-region-top-right zen-mode-transition", {
-                "transition-right": appState.zenModeEnabled,
-                "exc-region-top-right--compact": isCompactStylesPanel,
-              })}
+              className={clsx(
+                "exc-region exc-region-top-right zen-mode-transition",
+                {
+                  "transition-right": appState.zenModeEnabled,
+                  "exc-region-top-right--compact": isCompactStylesPanel,
+                },
+              )}
             >
-              <div className="exc-region-top-right-content">
-                {defaultUIEnabled && appState.collaborators.size > 0 && (
-                  <UserList
-                    collaborators={appState.collaborators}
-                    userToFollow={appProps.userToFollow?.socketId || null}
-                    currentUserControls={currentUserControls}
-                  />
-                )}
-                <div className="exc-region-top-right-host-slot">
-                  {renderTopRightUI?.(
-                    editorInterface.formFactor === "phone",
-                    appState,
-                  )}
-                </div>
-                {!appState.viewModeEnabled &&
+              <RegionCluster
+                area="top-right"
+                className="exc-region-top-right-content"
+                menuAlign="end"
+                editorItems={[
+                  ...(defaultUIEnabled && appState.collaborators.size > 0
+                    ? [
+                        editorItem(
+                          "user-list",
+                          0,
+                          <UserList
+                            collaborators={appState.collaborators}
+                            userToFollow={
+                              appProps.userToFollow?.socketId || null
+                            }
+                            currentUserControls={currentUserControls}
+                          />,
+                          // collapses avatars into a "+N" pill as its
+                          // width shrinks
+                          { collapse: "shrink", minWidth: 36 },
+                        ),
+                      ]
+                    : []),
+                  ...(renderTopRightUI
+                    ? [
+                        editorItem(
+                          "host-top-right",
+                          10,
+                          <div className="exc-region-top-right-host-slot">
+                            {renderTopRightUI(
+                              editorInterface.formFactor === "phone",
+                              appState,
+                            )}
+                          </div>,
+                        ),
+                      ]
+                    : []),
+                  ...(!appState.viewModeEnabled &&
                   appState.openDialog?.name !== "elementLinkSelector" &&
                   // hide button when sidebar docked
                   (!isSidebarDocked ||
-                    appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
-                    <tunnels.DefaultSidebarTriggerTunnel.Out />
-                  )}
-              </div>
+                    appState.openSidebar?.name !== DEFAULT_SIDEBAR.name)
+                    ? [
+                        editorItem(
+                          "sidebar-trigger",
+                          100,
+                          <tunnels.DefaultSidebarTriggerTunnel.Out />,
+                        ),
+                      ]
+                    : []),
+                ]}
+              />
             </div>
             <div className="exc-region-center-right">
               {shouldShowStats && (
@@ -474,6 +543,7 @@ const LayerUI = ({
                   renderCustomStats={renderCustomStats}
                 />
               )}
+              <RegionStaticItems area="center-right" />
             </div>
           </div>
         </div>
@@ -495,6 +565,7 @@ const LayerUI = ({
                 )}
               </Section>
             )}
+            <RegionStaticItems area="bottom-left" />
           </div>
           <div className="exc-region-bottom-center">
             <tunnels.FooterCenterTunnel.Out />
@@ -504,6 +575,7 @@ const LayerUI = ({
               "transition-right": appState.zenModeEnabled,
             })}
           >
+            <RegionStaticItems area="bottom-right" />
             {(defaultUIEnabled || renderWelcomeScreen) && (
               <div style={{ position: "relative" }}>
                 {renderWelcomeScreen && (

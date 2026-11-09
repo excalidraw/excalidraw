@@ -1,6 +1,7 @@
 import {
   Excalidraw,
   LiveCollaborationTrigger,
+  Region,
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
@@ -1000,30 +1001,6 @@ const ExcalidrawWrapper = () => {
         autoFocus={true}
         theme={editorTheme}
         onThemeChange={setAppTheme}
-        renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || !isCollabAvailable) {
-            return null;
-          }
-
-          return (
-            <>
-              {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
-                <ExcalidrawPlusPromoBanner
-                  isSignedIn={isExcalidrawPlusSignedUser}
-                />
-              )}
-
-              {collabError.message && <CollabError collabError={collabError} />}
-              <LiveCollaborationTrigger
-                isCollaborating={isCollaborating}
-                onSelect={() =>
-                  setShareDialogState({ isOpen: true, type: "share" })
-                }
-                editorInterface={editorInterface}
-              />
-            </>
-          );
-        }}
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
@@ -1035,6 +1012,37 @@ const ExcalidrawWrapper = () => {
           }
         }}
       >
+        {editorInterface.formFactor !== "phone" &&
+          collabAPI &&
+          isCollabAvailable && (
+            <Region area="top-right">
+              {editorInterface.formFactor === "desktop" && (
+                // first to go: into the "⋯" menu
+                <Region.Item collapse="overflow" priority={1}>
+                  <ExcalidrawPlusPromoBanner
+                    isSignedIn={isExcalidrawPlusSignedUser}
+                  />
+                </Region.Item>
+              )}
+              {collabError.message && (
+                <Region.Item>
+                  <CollabError collabError={collabError} />
+                </Region.Item>
+              )}
+              <Region.Item collapse="render" priority={10}>
+                {({ collapsed }) => (
+                  <LiveCollaborationTrigger
+                    isCollaborating={isCollaborating}
+                    onSelect={() =>
+                      setShareDialogState({ isOpen: true, type: "share" })
+                    }
+                    editorInterface={editorInterface}
+                    iconOnly={collapsed}
+                  />
+                )}
+              </Region.Item>
+            </Region>
+          )}
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}

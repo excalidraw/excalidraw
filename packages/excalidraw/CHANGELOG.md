@@ -89,6 +89,16 @@ Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidr
 - `onDuplicate` may return `false` to prevent the duplication as a whole (same as omitting every duplicate, without having to find them).
 - `onDuplicate` receives a third argument with lookups covering just the elements taking part in the duplication, so you don't have to derive them by scanning the scene: `{ duplicateElements, originalElements, origIdToDuplicateId, duplicateIdToOrigId }` — the duplicates by id, the elements they were made from by id, and their ids mapped in both directions (`duplicateIdToOrigId` to look up a duplicate's original while modifying it, `origIdToDuplicateId` e.g. for remapping element ids you keep in `customData`). On paste and library insert the originals are the inserted elements, which aren't part of the scene. The maps are read-only.
 
+### Region API
+
+- Added `<Region area>` / `<Region.Item>` for placing host UI into the editor's layout regions. Render them as children of `<Excalidraw>`; `area` is one of `top-left`, `top-right`, `center-left`, `center-right`, `bottom-left`, `bottom-right` (the toolbar's `top-center` and `<Footer>`'s `bottom-center` stay closed).
+- `<Region.Item>` props: `priority` (lower gives up space first, default `0`), `order` (position within the region, ascending, default `10`; editor items sit at: top-left — `renderTopLeftUI` -10, main menu 0; top-right — collaborator list 0, `renderTopRightUI` 10, sidebar trigger 100), `collapse`, `minWidth`, `className`. `children` may be a function of `{ collapsed, inOverflowMenu }`.
+- `collapse` sets how an item gives up width in `top-left` / `top-right`, the regions sharing the row with the toolbar: `rigid` (default — keeps its width), `shrink` (takes the leftover width down to `minWidth`; the item adapts itself), `render` (switches to its collapsed variant, `({ collapsed }) => …`), `overflow` (moves into the region's "⋯" menu). Elsewhere items always render expanded.
+- When a top region outgrows its share of the row, its items collapse — lowest priority first — before the toolbar moves aside; the region's fully collapsed row is what the toolbar makes room for. A `render` item is rendered collapsed for one pre-paint pass to measure its collapsed width.
+- On phones, `top-left` / `top-right` items render expanded in the top bar; other areas aren't shown.
+- `renderTopLeftUI` / `renderTopRightUI` keep working as rigid items.
+- `LiveCollaborationTrigger` takes an optional `iconOnly` to force its icon-only or labeled variant (e.g. from a `collapse="render"` item).
+
 ### UI layout regions (2026-07-27)
 
 The editor UI is now laid out in 3×3 logical regions (the middle of the canvas has none), replacing the top bar (`FixedSideContainer` > `.App-menu_top`) plus absolutely-positioned footer:

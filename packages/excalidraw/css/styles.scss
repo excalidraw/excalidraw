@@ -396,8 +396,10 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  // The menu trigger keeps its intrinsic size.
-  .exc-region-top-left-content > :not(.exc-region-top-left-host-slot) {
+  // The menu trigger keeps its intrinsic size (mobile top bar; on desktop
+  // the cluster's children are region items, see Region.scss).
+  .exc-region-top-left-content
+    > :not(.exc-region-top-left-host-slot, .exc-region-item) {
     flex: 0 0 auto;
   }
 
@@ -500,13 +502,18 @@ body.excalidraw-cursor-resize * {
   //      `.excalidraw`'s `overflow: hidden`. Content never slides under its
   //      neighbors.
   //
-  // Because the floors carry this negotiation, DO NOT set `min-width: 0`
-  // (or `overflow` other than `visible`) anywhere on a top region or its
-  // content chain — a zero minimum removes that content from the
-  // negotiation, and the toolbar will silently cover it. This includes the
-  // host slots: they are intentionally rigid. The only shrinkable piece is
-  // the user list, which collapses avatars into a "+N" pill (its pill-sized
-  // `min-width` keeps it in the negotiation).
+  // The side floors come from the region items (`RegionCluster`): once it
+  // has measured them, a top region's minimum width is its FULLY collapsed
+  // row — every `render` item collapsed, every `overflow` item in the "⋯"
+  // menu, `shrink` items at their `minWidth`, `rigid` items as they are.
+  // So within regime 1 a side that outgrows its share first collapses its
+  // own items (lowest priority first); only its fully collapsed row pushes
+  // the toolbar aside (regime 2). Until measured (or where layout can't be
+  // measured), a top region's content min-content is its floor.
+  //
+  // DO NOT set `min-width: 0` (or `overflow` other than `visible`) anywhere
+  // on a top region's content chain — before the floor is measured that
+  // content IS the floor, and a zero minimum lets the toolbar cover it.
   //
   // OTHER RULES
   // ------------
@@ -662,33 +669,11 @@ body.excalidraw-cursor-resize * {
     & > .exc-region-top-right-content {
       justify-content: flex-end;
       gap: 0.75rem;
-      // This wrapper spans the region so the collaborator list can observe the
-      // remaining width, but must not turn the otherwise transparent region
-      // into a full-width click target.
+      // This row spans the region so a `shrink` item (the collaborator
+      // list) can take the remaining width, but must not turn the otherwise
+      // transparent region into a full-width click target. Its children are
+      // region items, which opt their content back in (Region.scss).
       pointer-events: none;
-
-      & > * {
-        pointer-events: var(--ui-pointerEvents);
-      }
-
-      // The collaborator list is the one shrinkable piece of the cluster: it
-      // receives the space left by host/editor controls and collapses avatars
-      // as that space shrinks. (`flex-basis: 0` keeps its measured width
-      // flex-driven, so the ResizeObserver that picks the avatar count can't
-      // feed back into layout; the pill-sized min-width keeps the collapsed
-      // "+N" pill in the column's floor, so the toolbar can't cover it.)
-      & > .UserList__wrapper {
-        flex: 1 1 0;
-        min-width: 2.25rem;
-      }
-
-      & > .exc-region-top-right-host-slot {
-        flex: 0 0 auto;
-      }
-
-      & > .default-sidebar-trigger {
-        flex: 0 0 auto;
-      }
     }
 
     &--compact > .exc-region-top-right-content {

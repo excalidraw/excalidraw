@@ -1,5 +1,6 @@
 {
   "labels": {
+    "regionOverflow": "More",
     "signUp": "Sign up",
     "signIn": "Sign in",
     "upgrade": "Upgrade",

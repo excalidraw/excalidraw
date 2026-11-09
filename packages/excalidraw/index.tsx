@@ -20,6 +20,7 @@ import App, {
 } from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
+import { Region } from "./components/regions/Region";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
@@ -467,6 +468,12 @@ export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
+export { Region };
+export type {
+  RegionArea,
+  RegionItemCollapse,
+  RegionItemRenderState,
+} from "./components/regions/RegionRegistry";
 export { MainMenu };
 export { Ellipsify } from "./components/Ellipsify";
 export {
