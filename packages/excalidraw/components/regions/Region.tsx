@@ -8,6 +8,7 @@ import type {
   RegionArea,
   RegionItemCollapse,
   RegionItemContent,
+  RegionItemMobile,
 } from "./RegionRegistry";
 
 const RegionAreaContext = React.createContext<RegionArea | null>(null);
@@ -48,6 +49,8 @@ const RegionItem = ({
   collapse = "rigid",
   order = 10,
   minWidth = 0,
+  minHeight = 0,
+  mobile = "same",
   className,
   children,
 }: {
@@ -59,6 +62,13 @@ const RegionItem = ({
   order?: number;
   /** `collapse="shrink"`: the width (px) the item never shrinks below */
   minWidth?: number;
+  /**
+   * center regions: the height (px) the item scrolls down to before it
+   * collapses (default 0: doesn't scroll)
+   */
+  minHeight?: number;
+  /** how the item shows in the phone layout (default "same") */
+  mobile?: RegionItemMobile;
   className?: string;
   children?: RegionItemContent;
 }) => {
@@ -94,6 +104,8 @@ const RegionItem = ({
       collapse,
       order,
       minWidth,
+      minHeight,
+      mobile,
       className,
       content: children,
       seq: seqRef.current!,

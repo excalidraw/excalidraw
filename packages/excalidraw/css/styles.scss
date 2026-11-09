@@ -719,7 +719,7 @@ body.excalidraw-cursor-resize * {
     place-content: end start;
 
     // the canvas actions (zoom, undo/redo)
-    & > section {
+    .exc-region-item > section {
       display: flex;
     }
   }
@@ -728,6 +728,10 @@ body.excalidraw-cursor-resize * {
     grid-column: 2;
     align-items: end;
     min-width: 0;
+    // `<Footer>` content can respond to its own width with
+    // `@container exc-footer (…)`. Its width is the band's flexible track,
+    // never its content, so the containment doesn't change its layout.
+    container: exc-footer / inline-size;
   }
 
   .exc-region-bottom-right {
@@ -741,18 +745,25 @@ body.excalidraw-cursor-resize * {
   // widths. It deliberately overlays the bottom band.
   .exc-regions > .floating-status-stack {
     position: absolute;
-    left: 0;
-    right: 0;
+    // kept clear of the footer's left/right controls — symmetrically, so it
+    // stays centered — or, when they leave too little room, moved above the
+    // footer band (see FloatingStatusStack)
+    left: var(--exc-status-inset, 0px);
+    right: var(--exc-status-inset, 0px);
     // centers the stack when its max-width (see the base rule) kicks in
     margin-inline: auto;
-    // the stack (and thus the viewport-status badge at its bottom) sits
-    // 0.5rem above the editor's bottom edge (plus the frame border when
-    // shown). `.exc-regions` is inset by --editor-container-padding, which
-    // the offset undoes.
-    bottom: calc(
-      0.5rem + var(--viewport-status-frame-border-width) -
-        var(--editor-container-padding)
-    );
+    // its bottom entry lines up with the footer controls (centered on the
+    // footer band), or it sits above the band (see FloatingStatusStack);
+    // until measured, at the band's bottom edge
+    bottom: var(--exc-status-bottom, var(--sab, 0px));
+
+    // measured at its natural width (see FloatingStatusStack)
+    & > .scroll-back-to-content {
+      white-space: nowrap;
+      // same height as the footer controls it lines up with
+      height: var(--lg-button-size);
+      padding-block: 0;
+    }
 
     // the toast is click-through (only its close button is interactive)
     & > .Toast {

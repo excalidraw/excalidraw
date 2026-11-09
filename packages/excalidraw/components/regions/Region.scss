@@ -28,6 +28,46 @@
     }
   }
 
+  // bottom regions: a row of items
+  .exc-region-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+
+  // center regions: the stack is box-less, so its items (and the "⋯" menu)
+  // are rows of the region's grid — the grid shares the region's height
+  // between them, down to each item's minimum
+  .exc-region-stack {
+    display: contents;
+  }
+
+  .exc-region-center-left > .exc-region-stack > * {
+    justify-self: start;
+  }
+
+  .exc-region-center-right > .exc-region-stack > * {
+    justify-self: end;
+  }
+
+  .exc-region-item--vertical.exc-region-item--vertical {
+    flex-direction: column;
+    align-items: stretch;
+    max-height: 100%;
+  }
+
+  // scrolls down to its `minHeight` (the grid shrinks it that far); content
+  // that bounds itself (the styles and stats panels) scrolls on its own
+  .exc-region-item--scrolls.exc-region-item--scrolls {
+    min-height: var(--exc-region-item-min-height);
+    overflow-y: auto;
+
+    & > * {
+      min-height: 0;
+    }
+  }
+
   // legacy `renderTopLeftUI` / `renderTopRightUI` slots that rendered nothing
   .exc-region-item:has(> .exc-region-top-left-host-slot:empty, > .exc-region-top-right-host-slot:empty) {
     display: none;
@@ -72,7 +112,9 @@
 
   .exc-region-overflow__menu {
     z-index: var(--zIndex-ui-top);
-    margin-top: 0.375rem;
+    // may hold a whole panel (e.g. stats): never taller than the viewport
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow-y: auto;
   }
 
   .exc-region-overflow__item {

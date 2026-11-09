@@ -60,7 +60,8 @@ import ElementLinkDialog from "./ElementLinkDialog";
 import { ErrorDialog } from "./ErrorDialog";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
 import { HelpButton } from "./HelpButton";
-import { RegionCluster, RegionStaticItems } from "./regions/RegionItems";
+import { FloatingStatusStack } from "./regions/FloatingStatusStack";
+import { RegionCluster } from "./regions/RegionItems";
 import { HelpDialog } from "./HelpDialog";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
@@ -255,8 +256,9 @@ const LayerUI = ({
     );
   };
 
-  // editor items of the top regions, laid out (and collapsed) together with
-  // host `<Region.Item>`s — see `RegionItemSpec.order` for their positions
+  // editor items of the regions, laid out (and collapsed) together with
+  // host `<Region.Item>`s — see `RegionItemSpec.order` for their positions.
+  // They never collapse unless `extra` says so.
   const editorItem = (
     id: string,
     order: number,
@@ -269,6 +271,9 @@ const LayerUI = ({
     priority: Infinity,
     collapse: "rigid",
     minWidth: 0,
+    minHeight: 0,
+    // the phone layout renders its own editor UI
+    mobile: "hide",
     seq: -1,
     ...extra,
   });
@@ -278,7 +283,10 @@ const LayerUI = ({
       <RegionCluster
         area="top-left"
         className="exc-region-top-left-content"
+        budget="region"
+        floor
         menuAlign="start"
+        menuPosition="last"
         editorItems={[
           ...(renderTopLeftUI
             ? [
@@ -384,36 +392,60 @@ const LayerUI = ({
             <div className="exc-region exc-region-top-left">
               {renderCanvasActions()}
             </div>
-            <div className="exc-region-center-left">
-              {defaultUIEnabled && (
-                <div
-                  className={clsx("selected-shape-actions-container", {
-                    "selected-shape-actions-container--compact":
-                      isCompactStylesPanel,
-                  })}
-                >
-                  {shouldRenderSelectedShapeActions &&
-                    renderSelectedShapeActions()}
-                </div>
-              )}
-              {/* in compact UI the pen mode button lives outside the toolbar, as
-                  a separate floating button below the compact actions menu
-                  (same as we render it on mobile); shown alongside the compact
-                  actions island, i.e. when a drawing tool or elements are
-                  selected */}
-              {defaultUIEnabled &&
-                isCompactStylesPanel &&
-                !appState.viewModeEnabled &&
-                shouldRenderSelectedShapeActions && (
-                  <PenModeButton
-                    checked={appState.penMode}
-                    onChange={() => onPenModeToggle(null)}
-                    title={t("toolBar.penMode")}
-                    isMobile
-                    penDetected={appState.penDetected}
-                  />
-                )}
-              <RegionStaticItems area="center-left" />
+            <div className="exc-region exc-region-center-left">
+              <RegionCluster
+                area="center-left"
+                budget="column"
+                menuAlign="start"
+                menuPosition="last"
+                editorItems={[
+                  ...(shouldRenderSelectedShapeActions
+                    ? [
+                        editorItem(
+                          "styles-panel",
+                          0,
+                          <div
+                            className={clsx(
+                              "selected-shape-actions-container",
+                              {
+                                "selected-shape-actions-container--compact":
+                                  isCompactStylesPanel,
+                              },
+                            )}
+                          >
+                            {renderSelectedShapeActions()}
+                          </div>,
+                          // scrolls (down to this height) instead of
+                          // collapsing
+                          { minHeight: 120 },
+                        ),
+                      ]
+                    : []),
+                  // in compact UI the pen mode button lives outside the
+                  // toolbar, as a separate floating button below the compact
+                  // actions menu (same as we render it on mobile); shown
+                  // alongside the compact actions island, i.e. when a
+                  // drawing tool or elements are selected
+                  ...(isCompactStylesPanel &&
+                  !appState.viewModeEnabled &&
+                  shouldRenderSelectedShapeActions
+                    ? [
+                        editorItem(
+                          "pen-mode",
+                          1,
+                          <PenModeButton
+                            checked={appState.penMode}
+                            onChange={() => onPenModeToggle(null)}
+                            title={t("toolBar.penMode")}
+                            isMobile
+                            penDetected={appState.penDetected}
+                          />,
+                          { className: "exc-region-item--pen-mode" },
+                        ),
+                      ]
+                    : []),
+                ]}
+              />
             </div>
           </div>
           <div className="exc-region-column-center">
@@ -483,7 +515,10 @@ const LayerUI = ({
               <RegionCluster
                 area="top-right"
                 className="exc-region-top-right-content"
+                budget="region"
+                floor
                 menuAlign="end"
+                menuPosition="first"
                 editorItems={[
                   ...(defaultUIEnabled && appState.collaborators.size > 0
                     ? [
@@ -533,68 +568,119 @@ const LayerUI = ({
                 ]}
               />
             </div>
-            <div className="exc-region-center-right">
-              {shouldShowStats && (
-                <Stats
-                  app={app}
-                  onClose={() => {
-                    actionManager.executeAction(actionToggleStats);
-                  }}
-                  renderCustomStats={renderCustomStats}
-                />
-              )}
-              <RegionStaticItems area="center-right" />
+            <div className="exc-region exc-region-center-right">
+              <RegionCluster
+                area="center-right"
+                budget="column"
+                menuAlign="end"
+                menuPosition="last"
+                editorItems={
+                  shouldShowStats
+                    ? [
+                        editorItem(
+                          "stats",
+                          0,
+                          <Stats
+                            app={app}
+                            onClose={() => {
+                              actionManager.executeAction(actionToggleStats);
+                            }}
+                            renderCustomStats={renderCustomStats}
+                          />,
+                          // scrolls down to this height, then moves into
+                          // the region's "⋯" menu
+                          { collapse: "overflow", minHeight: 120, priority: 0 },
+                        ),
+                      ]
+                    : []
+                }
+              />
             </div>
           </div>
         </div>
 
         <footer className="exc-region-bottom">
-          <div className="exc-region-bottom-left">
-            {shouldRenderCanvasActions && (
-              <Section heading="canvasActions">
-                {zoomUIEnabled && app.isNavigationEnabled() && (
-                  <ZoomActions renderAction={actionManager.renderAction} />
-                )}
-                {defaultUIEnabled && !appState.viewModeEnabled && (
-                  <UndoRedoActions
-                    renderAction={actionManager.renderAction}
-                    className={clsx("zen-mode-transition", {
-                      "transition-bottom": appState.zenModeEnabled,
-                    })}
-                  />
-                )}
-              </Section>
-            )}
-            <RegionStaticItems area="bottom-left" />
+          <div className="exc-region exc-region-bottom-left">
+            <RegionCluster
+              area="bottom-left"
+              budget="band"
+              className="exc-region-row"
+              menuAlign="start"
+              menuPosition="last"
+              editorItems={
+                shouldRenderCanvasActions
+                  ? [
+                      editorItem(
+                        "canvas-actions",
+                        0,
+                        <Section heading="canvasActions">
+                          {zoomUIEnabled && app.isNavigationEnabled() && (
+                            <ZoomActions
+                              renderAction={actionManager.renderAction}
+                            />
+                          )}
+                          {defaultUIEnabled && !appState.viewModeEnabled && (
+                            <UndoRedoActions
+                              renderAction={actionManager.renderAction}
+                              className={clsx("zen-mode-transition", {
+                                "transition-bottom": appState.zenModeEnabled,
+                              })}
+                            />
+                          )}
+                        </Section>,
+                      ),
+                    ]
+                  : []
+              }
+            />
           </div>
           <div className="exc-region-bottom-center">
             <tunnels.FooterCenterTunnel.Out />
           </div>
           <div
-            className={clsx("exc-region-bottom-right zen-mode-transition", {
-              "transition-right": appState.zenModeEnabled,
-            })}
-          >
-            <RegionStaticItems area="bottom-right" />
-            {(defaultUIEnabled || renderWelcomeScreen) && (
-              <div style={{ position: "relative" }}>
-                {renderWelcomeScreen && (
-                  <tunnels.WelcomeScreenHelpHintTunnel.Out />
-                )}
-                {defaultUIEnabled && (
-                  <HelpButton
-                    onClick={() => actionManager.executeAction(actionShortcuts)}
-                  />
-                )}
-              </div>
+            className={clsx(
+              "exc-region exc-region-bottom-right zen-mode-transition",
+              {
+                "transition-right": appState.zenModeEnabled,
+              },
             )}
+          >
+            <RegionCluster
+              area="bottom-right"
+              budget="band"
+              className="exc-region-row"
+              menuAlign="end"
+              menuPosition="first"
+              editorItems={
+                defaultUIEnabled || renderWelcomeScreen
+                  ? [
+                      editorItem(
+                        "help",
+                        100,
+                        <div style={{ position: "relative" }}>
+                          {renderWelcomeScreen && (
+                            <tunnels.WelcomeScreenHelpHintTunnel.Out />
+                          )}
+                          {defaultUIEnabled && (
+                            <HelpButton
+                              onClick={() =>
+                                actionManager.executeAction(actionShortcuts)
+                              }
+                            />
+                          )}
+                        </div>,
+                      ),
+                    ]
+                  : []
+              }
+            />
           </div>
         </footer>
 
         {(appState.toast ||
           (scrollBackToContentUIEnabled && appState.scrolledOutside) ||
           appProps.viewportStatusFrame?.label) && (
-          <div className="floating-status-stack">
+          <FloatingStatusStack>
             {appState.toast && (
               <Toast
                 message={appState.toast.message}
@@ -624,7 +710,7 @@ const LayerUI = ({
                 border={appProps.viewportStatusFrame.border}
               />
             )}
-          </div>
+          </FloatingStatusStack>
         )}
 
         {/* pinned to the UI area rather than docked into a region, so that it

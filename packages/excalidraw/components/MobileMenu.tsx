@@ -8,7 +8,10 @@ import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
-import { RegionStaticItems } from "./regions/RegionItems";
+import {
+  RegionPhoneItems,
+  RegionPhoneOverflowMenu,
+} from "./regions/RegionItems";
 import { MobileToolbar } from "./MobileToolbar";
 import { FixedSideContainer } from "./FixedSideContainer";
 
@@ -75,8 +78,10 @@ export const MobileMenu = ({
         <div className="exc-region-top-right-host-slot">
           {renderTopRightUI?.(true, appState)}
         </div>
-        {/* host `<Region.Item>`s — expanded, no collapsing on phones */}
-        <RegionStaticItems area="top-right" />
+        {/* host `<Region.Item>`s — expanded, no collapsing on phones; the
+            ones that don't fit the top bar go into its "⋯" menu */}
+        <RegionPhoneItems area="top-right" />
+        <RegionPhoneOverflowMenu />
         {!appState.viewModeEnabled && (
           <>
             {defaultUIEnabled && (
@@ -105,7 +110,7 @@ export const MobileMenu = ({
           {renderTopLeftUI?.(true, appState)}
         </div>
         <MainMenuTunnel.Out />
-        <RegionStaticItems area="top-left" />
+        <RegionPhoneItems area="top-left" />
       </div>
     );
 

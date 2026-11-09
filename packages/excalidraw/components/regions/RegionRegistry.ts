@@ -13,18 +13,31 @@ export type RegionArea =
   | "bottom-right";
 
 /**
- * How a region item gives up horizontal space when its region runs out of it
- * (only applies in `top-left` / `top-right`, the regions that share a row
- * with the toolbar; elsewhere items always render expanded):
+ * How a region item gives up space when its region runs out of it — width
+ * in the top and bottom regions, height in the center regions:
  *
- * - `rigid`    keeps its natural width (the default)
- * - `shrink`   takes the region's leftover width, down to `minWidth` — the
- *              item adapts itself (e.g. the collaborator list's "+N" pill)
+ * - `rigid`    keeps its natural size (the default)
+ * - `shrink`   top/bottom: takes the region's leftover width, down to
+ *              `minWidth` — the item adapts itself (e.g. the collaborator
+ *              list's "+N" pill). Center: like `rigid`.
  * - `render`   has a collapsed variant: `children` is a function receiving
  *              `{ collapsed }`
  * - `overflow` moves into the region's "⋯" menu
+ *
+ * In the center regions, an item with a `minHeight` first scrolls down to
+ * that height before it (or a lower priority item) collapses.
  */
 export type RegionItemCollapse = "rigid" | "shrink" | "render" | "overflow";
+
+/**
+ * How an item shows in the phone layout, which only has a top bar:
+ *
+ * - `same`     top-left / top-right items render in the top bar; items of
+ *              the other areas go into the top bar's "⋯" menu (default)
+ * - `overflow` always goes into the top bar's "⋯" menu
+ * - `hide`     isn't shown on phones
+ */
+export type RegionItemMobile = "same" | "overflow" | "hide";
 
 export type RegionItemRenderState = {
   /** `collapse="render"` items: render the collapsed variant */
@@ -48,12 +61,19 @@ export type RegionItemSpec = {
   /**
    * Position within the region, ascending. Editor items: top-left — host
    * `renderTopLeftUI` -10, main menu 0; top-right — collaborator list 0,
-   * host `renderTopRightUI` 10, sidebar trigger 100. Host items default
-   * to 10.
+   * host `renderTopRightUI` 10, sidebar trigger 100; center-left — styles
+   * panel 0, pen mode button 1; center-right — stats 0; bottom-left —
+   * zoom/undo 0; bottom-right — help 100. Host items default to 10.
    */
   order: number;
   /** `collapse="shrink"` items: the width they never shrink below */
   minWidth: number;
+  /**
+   * center regions: the item scrolls down to this height (px) before
+   * collapsing (0: it doesn't scroll)
+   */
+  minHeight: number;
+  mobile: RegionItemMobile;
   className?: string;
   content: RegionItemContent;
   /** registration order (tie-breaker) */

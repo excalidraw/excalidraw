@@ -87,13 +87,12 @@
 
   // on tablet, the pen mode button is rendered as a separate floating button
   // below the compact actions menu (see LayerUI.tsx)
-  // NOTE: centering is safe here (unlike the pre-regions `.App-menu_top__left`,
-  // whose grid track could be inflated by arbitrary-width host top-left
-  // content) — the center-left region's column is sized by the compact
-  // actions container only, so the button centers against exactly the icon
-  // stack above it.
-  .exc-region-center-left > .ToolIcon__penMode {
-    justify-self: center;
+  // NOTE: not `justify-self: center` — the center-left region's grid track
+  // is as wide as its widest item, which may be host content. Nudge by hand
+  // instead, against the fixed-width compact actions column (see
+  // .selected-shape-actions-container--compact's min-width).
+  .exc-region-item--pen-mode > .ToolIcon__penMode {
+    margin-left: calc((48px - var(--lg-button-size)) / 2);
 
     .ToolIcon__icon {
       width: var(--lg-button-size);
