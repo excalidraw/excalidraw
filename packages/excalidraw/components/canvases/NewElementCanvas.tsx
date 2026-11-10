@@ -3,7 +3,10 @@ import { useEffect, useRef } from "react";
 import type { NonDeletedSceneElementsMap } from "@excalidraw/element/types";
 
 import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderNewElementScene } from "../../renderer/renderNewElementScene";
+import {
+  cancelNewElementSceneThrottle,
+  renderNewElementScene,
+} from "../../renderer/renderNewElementScene";
 
 import type {
   RenderableElementsMap,
@@ -44,6 +47,17 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       isRenderThrottlingEnabled(),
     );
   });
+
+  // the canvas is unmounted on pointerup; drop its pending frame so it isn't
+  // drawn after removal
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    return () => {
+      if (canvas) {
+        cancelNewElementSceneThrottle(canvas);
+      }
+    };
+  }, []);
 
   return (
     <canvas

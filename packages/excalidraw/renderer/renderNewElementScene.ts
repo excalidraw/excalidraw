@@ -92,11 +92,53 @@ const _renderNewElementScene = ({
   }
 };
 
-export const renderNewElementSceneThrottled = throttleRAF(
-  (config: NewElementSceneRenderConfig) => {
-    _renderNewElementScene(config);
-  },
-);
+type NewElementSceneThrottle = ReturnType<typeof throttleRAF>;
+
+const newElementSceneThrottles = new WeakMap<
+  HTMLCanvasElement,
+  { throttle: NewElementSceneThrottle; ownerWindow: Window }
+>();
+
+// mirrors getStaticSceneThrottle (see staticScene.ts): the new element canvas
+// must be scheduled on the same window's rAF as the static canvas underneath
+// it, or the two layers can be painted in different frames
+const getNewElementSceneThrottle = (canvas: HTMLCanvasElement) => {
+  const ownerWindow = canvas.ownerDocument.defaultView ?? window;
+  let entry = newElementSceneThrottles.get(canvas);
+  if (entry && entry.ownerWindow !== ownerWindow) {
+    entry.throttle.cancel();
+    entry = undefined;
+  }
+  if (!entry) {
+    entry = {
+      throttle: throttleRAF((config: NewElementSceneRenderConfig) => {
+        _renderNewElementScene(config);
+      }, ownerWindow),
+      ownerWindow,
+    };
+    newElementSceneThrottles.set(canvas, entry);
+  }
+  return entry.throttle;
+};
+
+/**
+ * Throttled to animation framerate, one throttle per canvas, scheduled on the
+ * canvas' owner window (same as the static scene).
+ */
+export const renderNewElementSceneThrottled = (
+  config: NewElementSceneRenderConfig,
+) => {
+  if (!config.canvas) {
+    return;
+  }
+  getNewElementSceneThrottle(config.canvas)(config);
+};
+
+/** Drops the canvas' pending frame; the throttle itself is dropped with the
+ * canvas. */
+export const cancelNewElementSceneThrottle = (canvas: HTMLCanvasElement) => {
+  newElementSceneThrottles.get(canvas)?.throttle.cancel();
+};
 
 export const renderNewElementScene = (
   renderConfig: NewElementSceneRenderConfig,
