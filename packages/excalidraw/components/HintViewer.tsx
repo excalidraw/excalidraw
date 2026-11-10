@@ -85,6 +85,9 @@ const getHints = ({
 
   if (activeTool.type === "arrow" || activeTool.type === "line") {
     if (multiMode) {
+      if (isMobile) {
+        return t("hints.linearElementMultiMobile");
+      }
       return t("hints.linearElementMulti", {
         shortcut_1: getTaggedShortcutKey("Escape"),
         shortcut_2: getTaggedShortcutKey("Enter"),
