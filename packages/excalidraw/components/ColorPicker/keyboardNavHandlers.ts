@@ -15,6 +15,8 @@ import {
 
 import type { ActiveColorPickerSectionAtomType } from "./colorPickerUtils";
 
+import { getLanguage } from "../../i18n";
+
 const arrowHandler = (
   eventKey: string,
   currentIndex: number | null,
@@ -23,13 +25,22 @@ const arrowHandler = (
   const rows = Math.ceil(length / COLORS_PER_ROW);
 
   currentIndex = currentIndex ?? -1;
+  // Arrow navigation
+  const isRTL = getLanguage().rtl;
 
   switch (eventKey) {
     case "ArrowLeft": {
+      if(isRTL){
+        return (currentIndex + 1) % length;
+      }
       const prevIndex = currentIndex - 1;
       return prevIndex < 0 ? length - 1 : prevIndex;
     }
     case "ArrowRight": {
+      if(isRTL){
+        const prevIndex = currentIndex - 1;
+        return prevIndex < 0 ? length - 1 : prevIndex;
+      }
       return (currentIndex + 1) % length;
     }
     case "ArrowDown": {
