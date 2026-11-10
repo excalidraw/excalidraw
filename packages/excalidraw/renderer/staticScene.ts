@@ -331,91 +331,34 @@ const renderLinkIcon = (
     context.restore();
   }
 };
-const _renderStaticScene = ({
-  canvas,
+
+/**
+ * Paints `elements` in order (embeddables last), each clipped to its frame,
+ * with bound text and link icons. Shared by the static scene and the new
+ * element scene, which paints the elements covering a framed new element on
+ * top of it.
+ */
+export const renderSceneElements = ({
+  context,
   rc,
+  elements: visibleElements,
   elementsMap,
   allElementsMap,
-  visibleElements,
-  scale,
-  appState: unsnappedAppState,
+  appState,
   renderConfig,
-}: StaticSceneRenderConfig) => {
-  if (canvas === null) {
-    return;
-  }
-
-  const { renderGrid = true, isExporting } = renderConfig;
-  // export draws vectors, not cached bitmaps — nothing to keep on the grid
-  const appState = isExporting
-    ? unsnappedAppState
-    : snapScrollToDevicePixels(unsnappedAppState, scale);
-
-  const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
-    canvas,
-    scale,
-  );
-
-  const context = bootstrapCanvas({
-    canvas,
-    scale,
-    normalizedWidth,
-    normalizedHeight,
-    theme: appState.theme,
-    isExporting,
-    viewBackgroundColor: appState.viewBackgroundColor,
-  });
-
-  // Apply zoom
-  context.scale(appState.zoom.value, appState.zoom.value);
-
-  // Grid
-  if (renderGrid) {
-    strokeGrid(
-      context,
-      appState.gridSize,
-      appState.gridStep,
-      appState.scrollX,
-      appState.scrollY,
-      appState.zoom,
-      renderConfig.theme,
-      normalizedWidth / appState.zoom.value,
-      normalizedHeight / appState.zoom.value,
-      scale,
-    );
-  }
-
-  if (renderConfig.clipToFrame) {
-    const frame = renderConfig.clipToFrame;
-    context.beginPath();
-    context.rect(
-      frame.x + appState.scrollX,
-      frame.y + appState.scrollY,
-      frame.width,
-      frame.height,
-    );
-    context.clip();
-  }
-
-  const groupsToBeAddedToFrame = new Set<string>();
-
-  visibleElements.forEach((element) => {
-    if (
-      element.groupIds.length > 0 &&
-      appState.frameToHighlight &&
-      appState.selectedElementIds[element.id] &&
-      (elementOverlapsWithFrame(
-        element,
-        appState.frameToHighlight,
-        elementsMap,
-      ) ||
-        element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
-    ) {
-      element.groupIds.forEach((groupId) =>
-        groupsToBeAddedToFrame.add(groupId),
-      );
-    }
-  });
+  scale,
+}: {
+  context: CanvasRenderingContext2D;
+  rc: StaticSceneRenderConfig["rc"];
+  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: StaticSceneRenderConfig["elementsMap"];
+  allElementsMap: StaticSceneRenderConfig["allElementsMap"];
+  appState: StaticCanvasAppState;
+  renderConfig: StaticCanvasRenderConfig;
+  /** backing-store scale, see StaticCanvasRenderConfig["scale"] */
+  scale: number;
+}) => {
+  const { isExporting } = renderConfig;
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
@@ -588,6 +531,104 @@ const _renderStaticScene = ({
         logElementRenderError(error, element);
       }
     });
+};
+
+const _renderStaticScene = ({
+  canvas,
+  rc,
+  elementsMap,
+  allElementsMap,
+  visibleElements,
+  scale,
+  appState: unsnappedAppState,
+  renderConfig,
+}: StaticSceneRenderConfig) => {
+  if (canvas === null) {
+    return;
+  }
+
+  const { renderGrid = true, isExporting } = renderConfig;
+  // export draws vectors, not cached bitmaps — nothing to keep on the grid
+  const appState = isExporting
+    ? unsnappedAppState
+    : snapScrollToDevicePixels(unsnappedAppState, scale);
+
+  const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
+    canvas,
+    scale,
+  );
+
+  const context = bootstrapCanvas({
+    canvas,
+    scale,
+    normalizedWidth,
+    normalizedHeight,
+    theme: appState.theme,
+    isExporting,
+    viewBackgroundColor: appState.viewBackgroundColor,
+  });
+
+  // Apply zoom
+  context.scale(appState.zoom.value, appState.zoom.value);
+
+  // Grid
+  if (renderGrid) {
+    strokeGrid(
+      context,
+      appState.gridSize,
+      appState.gridStep,
+      appState.scrollX,
+      appState.scrollY,
+      appState.zoom,
+      renderConfig.theme,
+      normalizedWidth / appState.zoom.value,
+      normalizedHeight / appState.zoom.value,
+      scale,
+    );
+  }
+
+  if (renderConfig.clipToFrame) {
+    const frame = renderConfig.clipToFrame;
+    context.beginPath();
+    context.rect(
+      frame.x + appState.scrollX,
+      frame.y + appState.scrollY,
+      frame.width,
+      frame.height,
+    );
+    context.clip();
+  }
+
+  const groupsToBeAddedToFrame = new Set<string>();
+
+  visibleElements.forEach((element) => {
+    if (
+      element.groupIds.length > 0 &&
+      appState.frameToHighlight &&
+      appState.selectedElementIds[element.id] &&
+      (elementOverlapsWithFrame(
+        element,
+        appState.frameToHighlight,
+        elementsMap,
+      ) ||
+        element.groupIds.find((groupId) => groupsToBeAddedToFrame.has(groupId)))
+    ) {
+      element.groupIds.forEach((groupId) =>
+        groupsToBeAddedToFrame.add(groupId),
+      );
+    }
+  });
+
+  renderSceneElements({
+    context,
+    rc,
+    elements: visibleElements,
+    elementsMap,
+    allElementsMap,
+    appState,
+    renderConfig,
+    scale,
+  });
 
   // render pending nodes for flowcharts
   renderConfig.pendingFlowchartNodes?.forEach((element) => {

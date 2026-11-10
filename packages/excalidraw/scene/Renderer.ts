@@ -1,8 +1,12 @@
 import {
+  getCanvasPadding,
   getCommonFrameId,
+  getElementBounds,
   getFrameChildrenInsertionIndex,
   getContainerElement,
   isElementInViewport,
+  isFrameLikeElement,
+  isIframeLikeElement,
   isTextElement,
 } from "@excalidraw/element";
 
@@ -18,6 +22,7 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
+import { DEFAULT_LINK_SIZE } from "../components/hyperlink/helpers";
 import { cancelStaticSceneThrottle } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
@@ -249,7 +254,12 @@ export class Renderer {
     newElement: AppState["newElement"];
   }) {
     const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
-    const newElementCanvasElement = newElement?.frameId ? null : newElement;
+    // A new text doubles as `editingTextElement` (drawn by the wysiwyg), so a
+    // framed one isn't drawn on any canvas. Every other new element goes to
+    // the new element canvas, framed ones included: the elements covering it
+    // are drawn there on top of it (see getNewElementLayers).
+    const newElementCanvasElement =
+      newElement?.frameId && isTextElement(newElement) ? null : newElement;
 
     for (const element of elements) {
       if (newElementCanvasElement?.id === element.id) {
@@ -361,15 +371,11 @@ export class Renderer {
   public getRenderableElements = (opts: GetRenderableElementsOpts) => {
     const { newElement } = opts;
     // A new element being drag-sized is mutated in place without informing
-    // the scene, so `sceneNonce` doesn't move. Fold the element's own nonce
-    // in where a canvas draws it from the live element but memoizes on this
-    // nonce: a framed new element stays in the static canvas' element map
-    // (see getRenderableElementsMap), and a new text gets its dashed text box
-    // drawn by the interactive canvas (it doubles as `editingTextElement`).
+    // the scene, so `sceneNonce` doesn't move. A new text gets its dashed text
+    // box drawn by the interactive canvas (it doubles as `editingTextElement`)
+    // which memoizes on this nonce, so fold the text's own nonce in.
     const canvasNonce = `${this.scene.getSceneNonce()}${
-      newElement?.frameId || isTextElement(newElement)
-        ? `:${newElement.versionNonce}`
-        : ""
+      isTextElement(newElement) ? `:${newElement.versionNonce}` : ""
     }`;
 
     const ret = this._getRenderableElements({
@@ -413,6 +419,116 @@ export class Renderer {
 
     return ret;
   };
+
+  /**
+   * Splits the static canvas' elements around a framed new element drawn on
+   * the new element canvas. The new element sits at its frame's children
+   * insertion index, so elements above it in z-order that overlap its frame
+   * have to be drawn on top of it. They're moved off the static canvas to the
+   * new element canvas, which draws them after the new element. Embeddables
+   * are drawn on top of everything on the static canvas, so overlapping ones
+   * move regardless of z-order.
+   *
+   * Source-over compositing is associative, so the two layers composite to
+   * the same pixels as drawing everything in order on one canvas, and the
+   * static canvas doesn't re-render while the new element is being sized.
+   */
+  public getNewElementLayers = (opts: {
+    /** the static canvas' visible elements (with render offsets applied) */
+    visibleElements: readonly NonDeletedExcalidrawElement[];
+    elementsMap: RenderableElementsMap;
+    newElementCanvasElement: NonDeletedExcalidrawElement | null;
+    offsets: ElementRenderOffsets;
+  }) =>
+    this._getNewElementLayers({
+      ...opts,
+      // the new element is mutated in place, memoize on what matters
+      frameId: opts.newElementCanvasElement?.frameId ?? null,
+    });
+
+  private _getNewElementLayers = memoize(
+    ({
+      visibleElements,
+      elementsMap,
+      newElementCanvasElement: newElement,
+      offsets,
+      frameId,
+    }: {
+      visibleElements: readonly NonDeletedExcalidrawElement[];
+      elementsMap: RenderableElementsMap;
+      newElementCanvasElement: NonDeletedExcalidrawElement | null;
+      offsets: ElementRenderOffsets;
+      frameId: string | null;
+    }): {
+      staticElements: readonly NonDeletedExcalidrawElement[];
+      coveringElements: readonly NonDeletedExcalidrawElement[];
+    } => {
+      const frame = frameId ? elementsMap.get(frameId) : null;
+
+      if (!newElement || !frame || !isFrameLikeElement(frame)) {
+        return { staticElements: visibleElements, coveringElements: [] };
+      }
+
+      const elements = this.scene.getNonDeletedElements();
+      const newElementIndex = elements.findIndex(
+        (element) => element.id === newElement.id,
+      );
+      if (newElementIndex === -1) {
+        return { staticElements: visibleElements, coveringElements: [] };
+      }
+      const above = new Set<NonDeletedExcalidrawElement>(
+        elements.slice(newElementIndex + 1),
+      );
+
+      const frameOffset = offsets.get(frame.id);
+      const fx1 = frame.x + (frameOffset?.x ?? 0);
+      const fy1 = frame.y + (frameOffset?.y ?? 0);
+      const fx2 = fx1 + frame.width;
+      const fy2 = fy1 + frame.height;
+
+      const overlapsFrame = (element: NonDeletedExcalidrawElement) => {
+        const offset = offsets.get(element.id);
+        const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+        // conservative: an extra covering element only costs a redraw
+        const padding =
+          getCanvasPadding(element) +
+          (element.link ? DEFAULT_LINK_SIZE * 2 : 0);
+        const dx = offset?.x ?? 0;
+        const dy = offset?.y ?? 0;
+        return (
+          x1 + dx - padding < fx2 &&
+          x2 + dx + padding > fx1 &&
+          y1 + dy - padding < fy2 &&
+          y2 + dy + padding > fy1
+        );
+      };
+
+      const staticElements: NonDeletedExcalidrawElement[] = [];
+      const coveringElements: NonDeletedExcalidrawElement[] = [];
+
+      for (const element of visibleElements) {
+        // a bound text is drawn with its container, it goes where it goes
+        const container =
+          isTextElement(element) && element.containerId
+            ? elementsMap.get(element.containerId)
+            : null;
+        const target = container ?? element;
+
+        if (
+          (above.has(target) || isIframeLikeElement(target)) &&
+          overlapsFrame(target)
+        ) {
+          coveringElements.push(element);
+        } else {
+          staticElements.push(element);
+        }
+      }
+
+      return coveringElements.length
+        ? { staticElements, coveringElements }
+        : { staticElements: visibleElements, coveringElements };
+    },
+  );
 
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)

@@ -103,7 +103,8 @@ const isPendingImageElement = (
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
-const getCanvasPadding = (element: ExcalidrawElement) => {
+/** how far an element's rendering can reach past its bounds */
+export const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
       return element.strokeWidth * 12;

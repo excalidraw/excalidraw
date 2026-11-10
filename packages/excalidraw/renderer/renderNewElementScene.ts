@@ -13,7 +13,7 @@ import {
   snapScrollToDevicePixels,
 } from "./helpers";
 
-import { frameClip } from "./staticScene";
+import { frameClip, renderSceneElements } from "./staticScene";
 
 import type { NewElementSceneRenderConfig } from "../scene/types";
 
@@ -21,6 +21,7 @@ const _renderNewElementScene = ({
   canvas,
   rc,
   newElement,
+  coveringElements,
   elementsMap,
   allElementsMap,
   scale,
@@ -47,14 +48,16 @@ const _renderNewElementScene = ({
     // Apply zoom
     context.scale(appState.zoom.value, appState.zoom.value);
 
-    if (newElement && newElement.type !== "selection") {
-      // e.g. when creating arrows and we're still below the arrow drag distance
-      // threshold
+    if (
+      newElement &&
+      newElement.type !== "selection" &&
+      // e.g. when creating arrows and we're still below the arrow drag
+      // distance threshold
       // (for now we skip render only with elements while we're creating to be
       // safe)
-      if (isInvisiblySmallElement(newElement)) {
-        return;
-      }
+      !isInvisiblySmallElement(newElement)
+    ) {
+      context.save();
 
       const frameId = newElement.frameId || appState.frameToHighlight?.id;
 
@@ -73,10 +76,8 @@ const _renderNewElementScene = ({
         }
       }
 
-      const renderTargetElement = newElement;
-
       renderElement(
-        renderTargetElement,
+        newElement,
         elementsMap,
         allElementsMap,
         rc,
@@ -84,8 +85,24 @@ const _renderNewElementScene = ({
         renderConfig,
         appState,
       );
-    } else {
-      context.clearRect(0, 0, normalizedWidth, normalizedHeight);
+
+      context.restore();
+    }
+
+    // the elements above a framed new element, moved off the static canvas
+    // (see Renderer.getNewElementLayers). Drawn even while the new element
+    // isn't, as the static canvas no longer draws them.
+    if (coveringElements?.length) {
+      renderSceneElements({
+        context,
+        rc,
+        elements: coveringElements,
+        elementsMap,
+        allElementsMap,
+        appState,
+        renderConfig,
+        scale,
+      });
     }
 
     context.restore();
