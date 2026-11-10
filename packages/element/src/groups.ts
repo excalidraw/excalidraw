@@ -89,6 +89,24 @@ export const getSelectedGroupIds = (
     .filter(([groupId, isSelected]) => isSelected)
     .map(([groupId, isSelected]) => groupId);
 
+/**
+ * Returns the id of the group to enter (edit) when the user presses Enter,
+ * i.e. when the current selection is exactly one group, otherwise `null`.
+ */
+export const getSelectedGroupIdToEdit = (
+  appState: Pick<InteractiveCanvasAppState, "selectedGroupIds">,
+  selectedElements: readonly ExcalidrawElement[],
+): GroupId | null => {
+  const selectedGroupIds = getSelectedGroupIds(appState);
+  if (selectedGroupIds.length !== 1 || selectedElements.length < 2) {
+    return null;
+  }
+  const [groupId] = selectedGroupIds;
+  return selectedElements.every((element) => element.groupIds.includes(groupId))
+    ? groupId
+    : null;
+};
+
 // given a list of elements, return the the actual group ids that should be selected
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
