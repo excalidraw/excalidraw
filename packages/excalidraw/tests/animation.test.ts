@@ -5,9 +5,22 @@ import { AnimationController } from "../renderer/animation";
 const FIRST_KEY = "animation-test-first";
 const SECOND_KEY = "animation-test-second";
 
+/** Vitest 3.0.6 默认会 fake performance.now() 和 requestAnimationFrame ——
+ *  AnimationController 不需要它们，显式列出以避免 Node 24+ 下的 phantom timer。 */
+const FAKE_TIMERS = [
+  "setTimeout",
+  "clearTimeout",
+  "setInterval",
+  "clearInterval",
+  "setImmediate",
+  "clearImmediate",
+  "Date",
+] as const;
+
 describe("AnimationController", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    AnimationController.reset();
+    vi.useFakeTimers({ toFake: FAKE_TIMERS });
     window.EXCALIDRAW_THROTTLE_RENDER = false;
   });
 
@@ -72,6 +85,9 @@ describe("AnimationController", () => {
   });
 
   it("does not resurrect an animation cancelled during its initial callback", () => {
+    vi.useRealTimers();
+    vi.useFakeTimers({ toFake: FAKE_TIMERS });
+
     let frames = 0;
 
     AnimationController.start(FIRST_KEY, () => {
@@ -86,6 +102,9 @@ describe("AnimationController", () => {
   });
 
   it("cleans up the registration when the initial callback throws", () => {
+    vi.useRealTimers();
+    vi.useFakeTimers({ toFake: FAKE_TIMERS });
+
     expect(() =>
       AnimationController.start(FIRST_KEY, () => {
         throw new Error("initial frame failed");
@@ -124,6 +143,9 @@ describe("AnimationController", () => {
   });
 
   it("does not let a completed callback delete its same-key replacement", async () => {
+    vi.useRealTimers();
+    vi.useFakeTimers({ toFake: FAKE_TIMERS });
+
     // tests for this unwanted case:
     //
     // 1. The original animation’s scheduled callback begins.
