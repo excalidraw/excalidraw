@@ -6,13 +6,15 @@ import type {
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
-import { UI } from "./helpers/ui";
+import { Pointer, UI } from "./helpers/ui";
 import { act, fireEvent, render, screen } from "./test-utils";
 
 const { h } = window;
+const mouse = new Pointer("mouse");
 
 describe("freedraw mode action", () => {
   beforeEach(async () => {
+    mouse.reset();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
@@ -56,5 +58,21 @@ describe("freedraw mode action", () => {
       (h.elements[0] as ExcalidrawFreeDrawElement).strokeOptions?.streamline,
     ).toBe(0.5);
     expect(h.state.currentItemStrokeVariability).toBe("constant");
+  });
+
+  it("creates a tapped dot as a single-point element", () => {
+    // a dot has no extent, so it must be a single point — a multi-point
+    // element could be resized into a line (#4007)
+    UI.clickTool("freedraw");
+    mouse.click(100, 100);
+
+    expect(h.elements).toHaveLength(1);
+
+    const element = h.elements[0] as ExcalidrawFreeDrawElement;
+
+    expect(element.type).toBe("freedraw");
+    expect(element.points).toHaveLength(1);
+    expect(element.width).toBe(0);
+    expect(element.height).toBe(0);
   });
 });

@@ -63,6 +63,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import { isSinglePointFreeDrawElement } from "./sizeHelpers";
+
 import { isInGroup } from "./groups";
 import {
   getStickyNoteMinSize,
@@ -126,6 +128,13 @@ export const transformElements = (
       const elementId = selectedElements[0].id;
       const latestElement = elementsMap.get(elementId);
       const origElement = originalElements.get(elementId);
+
+      // A free draw element that is a dot has no extent to scale against,
+      // and resizing it would compute the scale from a zero-sized bounding
+      // box, corrupting the element with NaN.
+      if (isSinglePointFreeDrawElement(element)) {
+        return false;
+      }
 
       if (latestElement && origElement) {
         const { nextWidth, nextHeight } =

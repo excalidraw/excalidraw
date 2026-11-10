@@ -27,7 +27,7 @@ import type { GlobalPoint } from "@excalidraw/math";
 import type { LocalPoint } from "@excalidraw/math";
 
 import { isLinearElement } from "../src/typeChecks";
-import { resizeSingleElement } from "../src/resizeElements";
+import { resizeSingleElement, transformElements } from "../src/resizeElements";
 import { distanceToElement } from "../src/distance";
 import { getLinearElementPathSegments } from "../src/utils";
 import { LinearElementEditor } from "../src/linearElementEditor";
@@ -423,6 +423,69 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
     expect(newBounds[2]).toBeCloseTo(bounds[2] + 20);
     expect(newBounds[3]).toBeCloseTo(bounds[3] + 30);
     expect(element.angle).toBeCloseTo(0);
+  });
+});
+
+describe("single-point free draw element", () => {
+  // a free draw element with a single point is a dot — it has no extent to
+  // scale against, so resizing it is not allowed (#4007)
+  const createDot = () =>
+    API.createElement({
+      type: "freedraw",
+      x: 100,
+      y: 100,
+      width: 0,
+      height: 0,
+      points: [pointFrom(0, 0)],
+    });
+
+  const resize = (element: NonDeleted<ExcalidrawFreeDrawElement>) => {
+    API.setElements([element]);
+
+    const originalElements = arrayToMap(
+      h.app.scene.getNonDeletedElements().map((el) => ({ ...el })),
+    );
+
+    return transformElements(
+      originalElements,
+      "se",
+      [element],
+      h.app.scene,
+      false,
+      false,
+      false,
+      150,
+      150,
+      100,
+      100,
+    );
+  };
+
+  it("cannot be resized", () => {
+    const element = createDot();
+
+    expect(resize(element)).toBe(false);
+    expect(element.x).toBe(100);
+    expect(element.y).toBe(100);
+    expect(element.width).toBe(0);
+    expect(element.height).toBe(0);
+  });
+
+  it("cannot be resized when its points are coincident", () => {
+    // dots created before the points were normalized are two-point elements
+    // with coincident points — they must not be resizable either
+    const element = API.createElement({
+      type: "freedraw",
+      x: 100,
+      y: 100,
+      width: 0.0001,
+      height: 0.0001,
+      points: [pointFrom(0, 0), pointFrom(0.0001, 0.0001)],
+    });
+
+    expect(resize(element)).toBe(false);
+    expect(element.width).toBe(0.0001);
+    expect(element.height).toBe(0.0001);
   });
 });
 
