@@ -1,4 +1,90 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  embeddableURLValidator,
+  getEmbedLink,
+  maybeParseEmbedSrc,
+} from "../src/embeddable";
+
+describe("Reddit embedding", () => {
+  const postUrl =
+    "https://www.reddit.com/r/Showerthoughts/comments/2safxv/we_should_start_keeping_giraffes_a_secret_from/";
+  const canonicalComment =
+    "https://www.reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic/";
+  const legacyComment =
+    "https://www.reddit.com/r/Showerthoughts/comments/2safxv/we_should_start_keeping_giraffes_a_secret_from/cno7zic/";
+
+  it.each([
+    [
+      postUrl,
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/we_should_start_keeping_giraffes_a_secret_from",
+    ],
+    [
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/a-title-with-hyphens/",
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/a-title-with-hyphens",
+    ],
+    [
+      canonicalComment,
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic",
+    ],
+    [
+      legacyComment,
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic",
+    ],
+    [
+      "http://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic?context=3#context",
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic",
+    ],
+    [
+      "reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic",
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic",
+    ],
+    [
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/a-title-with-hyphens/cno7zic/",
+      "https://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic",
+    ],
+  ])("renders a validated Reddit link for %s", (url, expectedHref) => {
+    const result = getEmbedLink(url);
+    expect(result?.type).toBe("document");
+    if (result?.type === "document") {
+      const html = result.srcdoc("light");
+      expect(html).toContain(`<a href="${expectedHref}"></a>`);
+      expect(html.match(/<script\b/g)).toHaveLength(1);
+      expect(html).toContain('src="https://embed.reddit.com/widgets.js"');
+    }
+  });
+
+  it("embeds the comment extracted from Reddit blockquote markup", () => {
+    const markup = `<blockquote class="reddit-embed-bq"><a href="${canonicalComment}">Comment</a></blockquote>`;
+    const result = getEmbedLink(maybeParseEmbedSrc(markup));
+    expect(result?.type).toBe("document");
+    if (result?.type === "document") {
+      expect(result.srcdoc("light")).toContain("/comment/cno7zic");
+    }
+  });
+
+  it.each([
+    "https://reddit.com.evil.example/r/a/comments/b/comment/c",
+    "https://reddit.com@evil.example/r/a/comments/b/comment/c",
+    "https://reddit.com/r/a/comments/b/comment/c/extra",
+    "https://reddit.com/r/a/comments/b/comment/c%22",
+  ])("does not create Reddit srcdoc for an invalid URL: %s", (url) => {
+    expect(getEmbedLink(url)?.type).not.toBe("document");
+  });
+
+  it("does not copy untrusted query or fragment text into srcdoc", () => {
+    const result = getEmbedLink(
+      `${canonicalComment}?x=%22%3E%3Cscript%3E#untrusted`,
+    );
+    expect(result?.type).toBe("document");
+    if (result?.type === "document") {
+      const html = result.srcdoc("light");
+      expect(html).toContain(
+        '<a href="https://reddit.com/r/Showerthoughts/comments/2safxv/comment/cno7zic"></a>',
+      );
+      expect(html.match(/<script\b/g)).toHaveLength(1);
+      expect(html).not.toContain("untrusted");
+    }
+  });
+});
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
