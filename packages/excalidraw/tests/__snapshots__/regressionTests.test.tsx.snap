@@ -6569,7 +6569,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `33`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests > draw every type of shape > [end of test] redo stack 1`] = `[]`;
 
@@ -15290,7 +15290,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > undo/redo drawing an element > [end of test] redo stack 1`] = `
 [

@@ -7169,6 +7169,10 @@ class App extends React.Component<AppProps, AppState> {
         );
         if (newState) {
           this.setState(newState);
+        } else if (this.state.newElement?.id === multiElement.id) {
+          // a new linear element is mutated without informing the scene,
+          // so nothing else re-renders it on the new element canvas
+          this.triggerRender();
         }
       }
 

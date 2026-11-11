@@ -393,6 +393,7 @@ export class LinearElementEditor {
           app.state.isMidpointSnappingEnabled &&
           !angleLocked &&
           !app.state.gridModeEnabled,
+        informMutation: app.state.newElement?.id !== element.id,
       },
     );
     // Set the suggested binding from the updates if available

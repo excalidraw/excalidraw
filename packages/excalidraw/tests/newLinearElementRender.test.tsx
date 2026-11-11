@@ -127,6 +127,34 @@ describe("creating a linear element", () => {
     expectToFollowPointer(50, 50);
   });
 
+  it.each(["arrow", "line"] as const)(
+    "redraws a new multi-point %s without re-rendering the static scene",
+    (tool) => {
+      UI.clickTool(tool);
+      mouse.reset();
+      // click (not drag) to start a multi-point element
+      mouse.clickAt(500, 50);
+      expect(h.state.multiElement).not.toBeNull();
+      // leave the commit zone to create the uncommitted last point
+      mouse.move(10, 6);
+      renderStaticScene.mockClear();
+      renderNewElementScene.mockClear();
+      renderInteractiveScene.mockClear();
+      for (let i = 1; i < MOVES; i++) {
+        mouse.move(10, 6);
+      }
+      expect(renderStaticScene.mock.calls.length).toBe(0);
+      expect(renderNewElementScene.mock.calls.length).toBeGreaterThanOrEqual(
+        MOVES - 1,
+      );
+      expect(renderInteractiveScene.mock.calls.length).toBeGreaterThanOrEqual(
+        MOVES - 1,
+      );
+      expectToFollowPointer(500, 50);
+      Keyboard.keyPress(KEYS.ESCAPE);
+    },
+  );
+
   it("still binds a new arrow", () => {
     const rectangle = API.createElement({
       type: "rectangle",
