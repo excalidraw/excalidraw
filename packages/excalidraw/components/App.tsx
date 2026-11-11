@@ -2702,7 +2702,16 @@ class App extends React.Component<AppProps, AppState> {
                             visibleElements={visibleElements}
                             allElementsMap={allElementsMap}
                             selectedElements={selectedElements}
-                            canvasNonce={canvasNonce}
+                            canvasNonce={
+                              // a new linear element is mutated without
+                              // informing the scene (see
+                              // LinearElementEditor.handlePointDragging), but
+                              // its point handles and binding highlight are
+                              // drawn here
+                              isLinearElement(this.state.newElement)
+                                ? `${canvasNonce}:${this.state.newElement.versionNonce}`
+                                : canvasNonce
+                            }
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
                             }
@@ -9260,6 +9269,10 @@ class App extends React.Component<AppProps, AppState> {
                 newState.selectedLinearElement?.initialState?.altFocusPoint
             ) {
               this.setState(newState);
+            } else if (element && this.state.newElement?.id === element.id) {
+              // a new linear element is mutated without informing the scene,
+              // so nothing else re-renders it on the new element canvas
+              this.triggerRender();
             }
 
             return;
