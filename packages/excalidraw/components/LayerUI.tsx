@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React from "react";
+import MiniMap from "./MiniMap";
 
 import {
   CLASSES,
@@ -174,6 +175,20 @@ const LayerUI = ({
   const stylesPanelMode = useStylesPanelMode();
   const isCompactStylesPanel = stylesPanelMode === "compact";
   const tunnels = useInitializeTunnels();
+
+  // MiniMap navigation
+  const handleMiniMapNavigate = (sceneX: number, sceneY: number) => {
+    app.viewport.setViewport({
+      target: {
+        x: sceneX,
+        y: sceneY,
+        width: 0,
+        height: 0,
+      },
+      fit: "none",
+      animation: false,
+    });
+  };
 
   const spacing = isCompactStylesPanel
     ? {
@@ -698,6 +713,20 @@ const LayerUI = ({
               </div>
             )}
           </div>
+
+          {/* MiniMap */}
+          {!appState.viewModeEnabled && (
+            <MiniMap
+              elements={elements}
+              scrollX={app.state.scrollX}
+              scrollY={app.state.scrollY}
+              zoom={app.state.zoom.value}
+              width={app.state.width}
+              height={app.state.height}
+              onNavigate={handleMiniMapNavigate}
+/>
+          )}
+
           {renderSidebars()}
         </>
       )}
