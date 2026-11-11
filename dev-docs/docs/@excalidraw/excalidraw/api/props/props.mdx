@@ -24,7 +24,7 @@ All `props` are _optional_.
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | \_ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
-| [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](/docs/@excalidraw/excalidraw/api/props/ui-options#canvasactions) |
+| [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/tests/helpers/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](/docs/@excalidraw/excalidraw/api/props/ui-options#canvasactions) |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | Indicates whether to focus the Excalidraw component on page load |
@@ -61,7 +61,7 @@ Every time component updates, this callback if passed will get triggered and has
 (excalidrawElements, appState, files) => void;
 ```
 
-1. `excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) in the scene.
+1. `excalidrawElements`: Array of [excalidrawElements](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L114) in the scene.
 
 2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) of the scene.
 
@@ -87,7 +87,7 @@ This callback is triggered when mouse pointer is updated.
 (exportedElements, appState, canvas) => void
 ```
 
-1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L87) which needs to be exported.
+1. `exportedElements`: An array of [non deleted elements](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L87) which needs to be exported.
 2. `appState`: [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) of the scene.
 3. `canvas`: The `HTMLCanvasElement` of the scene.
 
@@ -158,7 +158,7 @@ This prop if passed will be triggered when clicked on `link`. To handle the redi
 
 <pre>
   (element:{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L114">
     ExcalidrawElement
   </a>
   , event: CustomEvent&lt;&#123; nativeEvent: MouseEvent }&gt;) => void
