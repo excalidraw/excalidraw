@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "붙여 넣기",
     "pasteAsPlaintext": "일반 텍스트로 붙여 넣기",
     "pasteCharts": "차트 붙여 넣기",
@@ -109,6 +111,7 @@
     "group": "그룹 생성",
     "ungroup": "그룹 해제",
     "collaborators": "공동 작업자",
+    "you": "",
     "toggleGrid": "격자 켜기/끄기",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
@@ -332,10 +335,15 @@
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
     "mermaidToExcalidraw": "Mermaid를 Excalidraw로",
     "convertElementType": "도형 타입 전환"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "직사각형",
@@ -606,7 +614,9 @@
     "hexCode": "Hex 코드",
     "noShades": "사용할 수 있는 색조가 없음",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

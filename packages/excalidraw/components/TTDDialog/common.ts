@@ -1,13 +1,10 @@
-import {
-  DEFAULT_EXPORT_PADDING,
-  EDITOR_LS_KEYS,
-  THEME,
-} from "@excalidraw/common";
+import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
-import { exportToCanvas } from "@excalidraw/utils";
+import { exportScene } from "@excalidraw/utils";
 
+import type { RenderEnvironment } from "@excalidraw/element";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
@@ -47,6 +44,7 @@ export const convertMermaidToExcalidraw = async ({
   setError,
   data,
   theme,
+  renderEnvironment,
 }: {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
@@ -57,6 +55,8 @@ export const convertMermaidToExcalidraw = async ({
     files: BinaryFiles | null;
   }>;
   theme: Theme;
+  /** the host's environment (`app.renderEnvironment`), to measure labels with */
+  renderEnvironment?: RenderEnvironment;
 }): Promise<{ success: true } | { success: false; error?: Error }> => {
   const canvasNode = canvasRef.current;
   const parent = canvasNode?.parentElement;
@@ -100,19 +100,23 @@ export const convertMermaidToExcalidraw = async ({
     data.current = {
       elements: convertToExcalidrawElements(elements, {
         regenerateIds: true,
+        renderEnvironment,
       }),
       files,
     };
 
-    const canvas = await exportToCanvas({
-      elements: data.current.elements,
-      files: data.current.files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight:
-        Math.max(parent.offsetWidth, parent.offsetHeight) *
-        window.devicePixelRatio,
-      appState: {
-        exportWithDarkMode: theme === THEME.DARK,
+    const canvas = await exportScene({
+      type: "canvas",
+      data: {
+        elements: data.current.elements,
+        files: data.current.files,
+      },
+      config: {
+        padding: DEFAULT_EXPORT_PADDING,
+        maxWidthOrHeight:
+          Math.max(parent.offsetWidth, parent.offsetHeight) *
+          (parent.ownerDocument.defaultView?.devicePixelRatio ?? 1),
+        theme,
       },
     });
 

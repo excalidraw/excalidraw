@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Senṭeḍ",
     "pasteAsPlaintext": "",
     "pasteCharts": "Senṭeḍ udlifen",
@@ -109,6 +111,7 @@
     "group": "Segrew tafrayt",
     "ungroup": "Kkess asegrew i tefrayt",
     "collaborators": "Imɛiwnen",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "Rnu ɣer temkarḍit",
     "removeFromLibrary": "Kkes si temkarḍit",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Afus (afecku n usmutti n tmuɣli)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Asrem",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

@@ -48,10 +48,37 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+/**
+ * Resolves the window owning `target`, so that we keep working when the editor
+ * is rendered into another document. Accepts a `Document` as well, in which
+ * case its `defaultView` is used. Falls back to the module realm's window.
+ */
+export const getTargetWindow = (
+  target: Element | EventTarget | Document | null,
+): (Window & typeof globalThis) | null => {
+  const owner = target as
+    | (EventTarget & {
+        ownerDocument?: Document | null;
+        defaultView?: (Window & typeof globalThis) | null;
+      })
+    | null;
+  return (
+    owner?.ownerDocument?.defaultView ??
+    owner?.defaultView ??
+    (typeof window === "undefined" ? null : window)
+  );
+};
+
 export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement =>
-  target instanceof HTMLElement && target.className.includes("ToolIcon");
+): target is HTMLElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    target instanceof targetWindow.HTMLElement &&
+    target.className.includes("ToolIcon")
+  );
+};
 
 export const isInputLike = (
   target: Element | EventTarget | null,
@@ -60,17 +87,26 @@ export const isInputLike = (
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLInputElement ||
-  target instanceof HTMLTextAreaElement ||
-  target instanceof HTMLSelectElement;
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLInputElement ||
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      target instanceof targetWindow.HTMLSelectElement)
+  );
+};
 
 export const isInteractive = (target: Element | EventTarget | null) => {
+  const targetWindow = getTargetWindow(target);
   return (
     isInputLike(target) ||
-    (target instanceof Element && !!target.closest("label, button"))
+    (!!targetWindow &&
+      target instanceof targetWindow.Element &&
+      !!target.closest("label, button"))
   );
 };
 
@@ -80,16 +116,23 @@ export const isWritableElement = (
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLTextAreaElement ||
-  (target instanceof HTMLInputElement &&
-    (target.type === "text" ||
-      target.type === "number" ||
-      target.type === "password" ||
-      target.type === "search")) ||
-  (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      (target instanceof targetWindow.HTMLInputElement &&
+        (target.type === "text" ||
+          target.type === "number" ||
+          target.type === "password" ||
+          target.type === "search")) ||
+      (target instanceof targetWindow.HTMLElement &&
+        target.closest(".cm-editor") !== null))
+  );
+};
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -152,12 +195,19 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame using the latest args
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  ownerWindow?: Pick<Window, "requestAnimationFrame" | "cancelAnimationFrame">,
+) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
 
+  // resolved lazily so module-scope callers work in environments without
+  // a global window (headless import)
+  const getOwnerWindow = () => ownerWindow ?? window;
+
   const scheduleFunc = () => {
-    timerId = window.requestAnimationFrame(() => {
+    timerId = getOwnerWindow().requestAnimationFrame(() => {
       timerId = null;
       const args = lastArgs;
       lastArgs = null;
@@ -176,7 +226,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   };
   ret.flush = () => {
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
     if (lastArgs) {
@@ -187,7 +237,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   ret.cancel = () => {
     lastArgs = null;
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
   };
@@ -344,6 +394,13 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  */
 export const isRTL = (text: string) => RE_RTL_CHECK.test(text);
 
+const RE_RTL_CHARS = new RegExp(`[${RS_RTL_CHARS}]`);
+/**
+ * Checks whether the text has any RTL character, i.e. whether it may be laid
+ * out bidirectionally.
+ */
+export const hasRTLChars = (text: string) => RE_RTL_CHARS.test(text);
+
 export const tupleToCoors = (
   xyTuple: readonly [number, number],
 ): { x: number; y: number } => {
@@ -475,12 +532,14 @@ export const supportsEmoji = () => {
 export const getNearestScrollableContainer = (
   element: HTMLElement,
 ): HTMLElement | Document => {
+  const ownerDocument = element.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   let parent = element.parentElement;
   while (parent) {
-    if (parent === document.body) {
-      return document;
+    if (parent === ownerDocument.body) {
+      return ownerDocument;
     }
-    const { overflowY } = window.getComputedStyle(parent);
+    const { overflowY } = ownerWindow.getComputedStyle(parent);
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
@@ -492,7 +551,7 @@ export const getNearestScrollableContainer = (
     }
     parent = parent.parentElement;
   }
-  return document;
+  return ownerDocument;
 };
 
 export const focusNearestParent = (element: HTMLInputElement) => {

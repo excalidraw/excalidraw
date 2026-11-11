@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "បិទភ្ជាប់",
     "pasteAsPlaintext": "បិទភ្ជាប់ជាអត្ថបទធម្មតា",
     "pasteCharts": "បិទភ្ជាប់តារាង",
@@ -109,6 +111,7 @@
     "group": "ការជ្រើសរើសជាក្រុម",
     "ungroup": "បំបែកក្រុមការជ្រើសរើសជាក្រុម",
     "collaborators": "អ្នកសហការ",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "បន្ថែមទៅបណ្ណាល័យ",
     "removeFromLibrary": "លុបចេញពីបណ្ណាល័យ",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "ដៃ (panning tool)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "លេខកូដ hex",
     "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

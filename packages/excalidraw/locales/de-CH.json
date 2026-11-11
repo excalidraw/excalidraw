@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Einfügen",
     "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
@@ -109,6 +111,7 @@
     "group": "Auswahl gruppieren",
     "ungroup": "Gruppierung aufheben",
     "collaborators": "Mitarbeitende",
+    "you": "",
     "toggleGrid": "Raster umschalten",
     "addToLibrary": "Zur Bibliothek hinzufügen",
     "removeFromLibrary": "Aus Bibliothek entfernen",
@@ -332,10 +335,15 @@
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
     "mermaidToExcalidraw": "Mermaid zu Excalidraw",
     "convertElementType": "Formtyp umschalten"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rechteck",
@@ -606,7 +614,9 @@
     "hexCode": "Hex-Code",
     "noShades": "Keine Schattierungen für diese Farbe verfügbar",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

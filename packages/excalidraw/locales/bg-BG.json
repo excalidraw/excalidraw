@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Постави",
     "pasteAsPlaintext": "Постави като обикновен текст",
     "pasteCharts": "Постави графики",
@@ -109,6 +111,7 @@
     "group": "Групирай селекцията",
     "ungroup": "Спри групирането на селекцията",
     "collaborators": "Сътрудници",
+    "you": "",
     "toggleGrid": "Превключване на мрежа",
     "addToLibrary": "Добавяне към библиотеката",
     "removeFromLibrary": "Премахване от библиотеката",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "Лазерна показалка",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "Още инструменти",
     "mermaidToExcalidraw": "Mermaid към Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Правоъгълник",
@@ -606,7 +614,9 @@
     "hexCode": "Шестнадесетичен код",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

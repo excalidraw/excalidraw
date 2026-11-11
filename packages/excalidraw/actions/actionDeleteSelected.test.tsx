@@ -4,6 +4,7 @@ import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { act, assertElements, render } from "../tests/test-utils";
 
+import { actionCut } from "./actionClipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 
 const { h } = window;
@@ -208,6 +209,70 @@ describe("deleting selected elements when frame selected should keep children + 
     assertElements(h.elements, [
       { id: f1.id, isDeleted: true },
       { id: r1.id, isDeleted: false, selected: true },
+    ]);
+  });
+});
+
+describe("cutting a selected frame takes its children along", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  const createFrameWithChildren = () => {
+    const f1 = API.createElement({ type: "frame" });
+    const r1 = API.createElement({ type: "rectangle", frameId: f1.id });
+    const r2 = API.createElement({ type: "rectangle", frameId: f1.id });
+    const t1 = API.createElement({
+      type: "text",
+      containerId: r2.id,
+      frameId: f1.id,
+    });
+    h.app.scene.mutateElement(r2, {
+      boundElements: [{ type: "text", id: t1.id }],
+    });
+    API.setElements([f1, r1, r2, t1]);
+    return { f1, r1, r2, t1 };
+  };
+
+  /** as on ctrl+x, with the clipboard data of the cut event */
+  const cut = () => {
+    const data = new Map<string, string>();
+    const event = {
+      clipboardData: {
+        setData: (type: string, value: string) => data.set(type, value),
+        getData: (type: string) => data.get(type),
+      },
+    } as unknown as ClipboardEvent;
+    act(() => {
+      h.app.actionManager.executeAction(actionCut, "keyboard", event);
+    });
+  };
+
+  it("frame only", async () => {
+    const { f1, r1, r2, t1 } = createFrameWithChildren();
+    API.setSelectedElements([f1]);
+
+    cut();
+
+    assertElements(h.elements, [
+      { id: f1.id, isDeleted: true },
+      { id: r1.id, isDeleted: true },
+      { id: r2.id, isDeleted: true },
+      { id: t1.id, isDeleted: true },
+    ]);
+  });
+
+  it("frame + children selected", async () => {
+    const { f1, r1, r2, t1 } = createFrameWithChildren();
+    API.setSelectedElements([f1, r1, r2]);
+
+    cut();
+
+    assertElements(h.elements, [
+      { id: f1.id, isDeleted: true },
+      { id: r1.id, isDeleted: true },
+      { id: r2.id, isDeleted: true },
+      { id: t1.id, isDeleted: true },
     ]);
   });
 });

@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
@@ -109,6 +111,7 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
+    "you": "",
     "toggleGrid": "जाली दिखना टॉगल करें",
     "addToLibrary": "लाइब्रेरी में सम्मिलित करें",
     "removeFromLibrary": "समूहकोष से अलग करें",
@@ -332,10 +335,15 @@
     "embeddable": "वेब जड़ायें",
     "laser": "लेसर टॉर्च",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
     "convertElementType": "आकार प्रकार टॉगल करें"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "आयत",
@@ -606,7 +614,9 @@
     "hexCode": "हेक्स कोड",
     "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

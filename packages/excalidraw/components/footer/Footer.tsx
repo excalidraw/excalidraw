@@ -34,16 +34,10 @@ const Footer = ({
       role="contentinfo"
       className="layer-ui__wrapper__footer App-menu App-menu_bottom"
     >
+      {/* footer-left is not faded out in zen mode: it holds the zoom controls,
+          which stay visible (chrome-less). Its children opt in individually. */}
       {(defaultUIEnabled || (zoomUIEnabled && app.isNavigationEnabled())) && (
-        <div
-          className={clsx(
-            "layer-ui__wrapper__footer-left zen-mode-transition",
-            {
-              "layer-ui__wrapper__footer-left--transition-left":
-                appState.zenModeEnabled,
-            },
-          )}
-        >
+        <div className="layer-ui__wrapper__footer-left zen-mode-transition">
           <Stack.Col gap={2}>
             <Section heading="canvasActions">
               {zoomUIEnabled && app.isNavigationEnabled() && (

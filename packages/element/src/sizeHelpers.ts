@@ -22,6 +22,37 @@ import {
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
+export type VerticalResizeAnchor = "top" | "bottom" | "center";
+
+/** Keeps the chosen edge or center fixed when an element's height changes. */
+export const getPositionAfterHeightChange = (
+  element: Pick<ExcalidrawElement, "x" | "y" | "height" | "angle">,
+  nextHeight: number,
+  anchor: VerticalResizeAnchor = "top",
+) => {
+  const delta = (element.height - nextHeight) / 2;
+
+  if (anchor === "center") {
+    // Rotation is about the center, so holding it is angle-independent.
+    return { x: element.x, y: element.y + delta };
+  }
+
+  const sin = Math.sin(element.angle);
+  const cos = Math.cos(element.angle);
+
+  if (anchor === "bottom") {
+    return {
+      x: element.x - delta * sin,
+      y: element.y + delta * (1 + cos),
+    };
+  }
+
+  return {
+    x: element.x + delta * sin,
+    y: element.y + delta * (1 - cos),
+  };
+};
+
 export const INVISIBLY_SMALL_ELEMENT_SIZE = 0.1;
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted

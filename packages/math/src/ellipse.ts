@@ -99,6 +99,12 @@ export const ellipseDistanceFromPoint = <
     vectorScale(vectorFromPoint(center), -1),
   );
 
+  // A circle's outline is equidistant along any ray from the center, so this
+  // is exact, and it avoids the iteration below, which is 0/0 at the center
+  if (a === b) {
+    return Math.abs(Math.hypot(translatedPoint[0], translatedPoint[1]) - a);
+  }
+
   const px = Math.abs(translatedPoint[0]);
   const py = Math.abs(translatedPoint[1]);
 
@@ -121,6 +127,10 @@ export const ellipseDistanceFromPoint = <
     const r = Math.hypot(ry, rx);
     const q = Math.hypot(qy, qx);
 
+    if (q === 0) {
+      break;
+    }
+
     tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
     ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
     const t = Math.hypot(ty, tx);
@@ -128,9 +138,12 @@ export const ellipseDistanceFromPoint = <
     ty /= t;
   }
 
+  // Map the first-quadrant solution back to the point's quadrant. A point on
+  // an axis (coordinate exactly 0) can use either side, but not 0, which
+  // would collapse the closest point onto the axis
   const [minX, minY] = [
-    a * tx * Math.sign(translatedPoint[0]),
-    b * ty * Math.sign(translatedPoint[1]),
+    a * tx * (translatedPoint[0] < 0 ? -1 : 1),
+    b * ty * (translatedPoint[1] < 0 ? -1 : 1),
   ];
 
   return pointDistance(pointFromVector(translatedPoint), pointFrom(minX, minY));

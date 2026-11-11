@@ -95,6 +95,18 @@ describe("YouTube timestamp parsing", () => {
     expect(result?.intrinsicSize).toEqual({ w: 315, h: 560 });
   });
 
+  it("should handle YouTube live URLs", () => {
+    const url = "https://www.youtube.com/live/dQw4w9WgXcQ?si=abc&t=30";
+    const result = getEmbedLink(url);
+
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(
+        "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&start=30",
+      );
+    }
+  });
+
   it("should handle playlist URLs with timestamps", () => {
     const url =
       "https://www.youtube.com/playlist?list=PLrAXtmRdnEQy1KbG5lbfgQ0-PKQY6FKYZ&t=60";
@@ -229,5 +241,33 @@ describe("Google Drive video embedding", () => {
         undefined,
       ),
     ).toBe(true);
+  });
+});
+
+describe("Instagram embedding", () => {
+  it.each([
+    {
+      url: "https://www.instagram.com/p/BsOGulcndj-/",
+      expectedLink: "https://www.instagram.com/p/BsOGulcndj-/embed/",
+    },
+    {
+      url: "https://instagram.com/reel/DSu-vbYDDlf/?igsh=MWQ1ZGUxMzBkMA==",
+      expectedLink: "https://www.instagram.com/reel/DSu-vbYDDlf/embed/",
+    },
+    {
+      url: "https://www.instagram.com/reels/DSu-vbYDDlf/",
+      expectedLink: "https://www.instagram.com/reel/DSu-vbYDDlf/embed/",
+    },
+    {
+      url: "https://www.instagram.com/world_record_egg/p/BsOGulcndj-/",
+      expectedLink: "https://www.instagram.com/p/BsOGulcndj-/embed/",
+    },
+  ])("should normalize Instagram link: $url", ({ url, expectedLink }) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    const result = getEmbedLink(url);
+    expect(result?.type).toBe("generic");
+    if (result?.type === "generic") {
+      expect(result.link).toBe(expectedLink);
+    }
   });
 });

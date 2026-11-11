@@ -87,44 +87,72 @@
 }
 
 .plus-banner {
-  display: flex;
-  justify-content: center;
-  cursor: pointer;
-  align-items: center;
-  border: 1px solid var(--color-primary);
-  padding: 0.5rem 0.875rem;
-  border-radius: var(--border-radius-lg);
-  background-color: var(--island-bg-color);
-  text-decoration: none !important;
+  --plus-banner-bg: #f0efff;
+  --plus-banner-bg-hover: var(--color-primary-light);
+  --plus-banner-border: var(--color-primary-light-darker);
+  --plus-banner-subtitle: #8b88e0;
 
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0 0.875rem 0 0.625rem;
+  border: 1px solid var(--plus-banner-border);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--plus-banner-bg);
+  color: var(--color-primary) !important;
+  text-decoration: none !important;
   font-family: var(--ui-font);
-  font-size: 0.8333rem;
   box-sizing: border-box;
   height: var(--lg-button-size);
-
-  border: none;
-  box-shadow: 0 0 0 1px var(--color-surface-lowest);
-  background-color: var(--color-surface-low);
-  color: var(--button-color, var(--color-on-surface)) !important;
-
-  &:active {
-    box-shadow: 0 0 0 1px var(--color-brand-active);
-  }
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 
   &:hover {
-    background-color: var(--color-primary);
-    color: white !important;
+    background-color: var(--plus-banner-bg-hover);
+    border-color: var(--plus-banner-bg-hover);
   }
 
   &:active {
-    background-color: var(--color-primary-darker);
+    border-color: var(--color-brand-active);
+  }
+
+  &__icon {
+    display: flex;
+    flex-shrink: 0;
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      stroke-width: 1.75;
+    }
+
+    g {
+      stroke-width: inherit;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__subtitle {
+    font-size: 0.75rem;
+    color: var(--plus-banner-subtitle);
   }
 }
 
 .theme--dark {
   .plus-banner {
-    &:hover {
-      color: black !important;
-    }
+    --plus-banner-bg: #2b2a40;
+    --plus-banner-border: #4f4d6f;
+    --plus-banner-subtitle: #8f8cc4;
   }
 }

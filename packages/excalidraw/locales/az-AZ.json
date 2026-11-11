@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Yapışdır",
     "pasteAsPlaintext": "Düz mətn kimi yapışdırın",
     "pasteCharts": "Diaqramları yapışdırın",
@@ -109,6 +111,7 @@
     "group": "Qrup şəklində seçim",
     "ungroup": "Qrupsuz seçim",
     "collaborators": "Əməkdaşlar",
+    "you": "",
     "toggleGrid": "Toru dəyiş",
     "addToLibrary": "Kitabxanaya əlavə et",
     "removeFromLibrary": "Kitabxanadan sil",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

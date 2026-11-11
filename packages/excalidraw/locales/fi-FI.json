@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Liitä",
     "pasteAsPlaintext": "Liitä pelkkänä tekstinä",
     "pasteCharts": "Liitä kaaviot",
@@ -109,6 +111,7 @@
     "group": "Ryhmitä valinta",
     "ungroup": "Pura valittu ryhmä",
     "collaborators": "Yhteistyökumppanit",
+    "you": "",
     "toggleGrid": "Näytä tai piilota ruudukko",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
@@ -332,10 +335,15 @@
     "embeddable": "Verkkoupote",
     "laser": "Laserosoitin",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": "Lisää työkaluja",
     "mermaidToExcalidraw": "Mermaid Excalidrawiksi",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "Hex koodi",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

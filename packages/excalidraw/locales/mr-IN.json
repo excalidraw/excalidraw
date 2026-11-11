@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "चिटकवा",
     "pasteAsPlaintext": "साधा मजकूर च्या रुपात पेस्ट करा",
     "pasteCharts": "चार्ट चिकटवा",
@@ -109,6 +111,7 @@
     "group": "समूह निवड",
     "ungroup": "समूह निवड ला रद्द करा",
     "collaborators": "Sahayog",
+    "you": "",
     "toggleGrid": "जाळी ऑन ऑफ़ करा",
     "addToLibrary": "संग्रह मधे सम्मिलित करा",
     "removeFromLibrary": "संग्रहातून काढ़ा",
@@ -332,10 +335,15 @@
     "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": "आणिक यंत्रे",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "आयत",
@@ -606,7 +614,9 @@
     "hexCode": "हेक्स कोड",
     "noShades": "ह्या रंगाच्या छटा उपलब्ध नाहित",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

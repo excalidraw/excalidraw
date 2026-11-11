@@ -74,6 +74,7 @@ export const actionTextAutoResize = register({
     if (isNonDeletedElement(resized)) {
       updateBoundElements(resized, app.scene, {
         changedElements: new Map([[resized.id, resized]]),
+        renderEnvironment: app.renderEnvironment,
       });
     }
 

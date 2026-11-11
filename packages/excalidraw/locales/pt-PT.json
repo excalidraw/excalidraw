@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Colar",
     "pasteAsPlaintext": "Colar como texto simples",
     "pasteCharts": "Colar gráficos",
@@ -109,6 +111,7 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
+    "you": "",
     "toggleGrid": "Ativar/desativar grelha",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
@@ -332,10 +335,15 @@
     "embeddable": "Incorporar web",
     "laser": "Ponteiro laser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Mão (ferramenta de deslocar vista)",
     "extraTools": "Mais ferramentas",
     "mermaidToExcalidraw": "Mermaid para Excalidraw",
     "convertElementType": "Alternar tipo de forma"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Retângulo",
@@ -606,7 +614,9 @@
     "hexCode": "Código hex",
     "noShades": "Sem tons disponíveis para esta cor",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

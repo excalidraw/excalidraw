@@ -14,6 +14,7 @@ import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
+import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
 
 import { CustomColorList } from "./CustomColorList";
 import PickerColorList from "./PickerColorList";
@@ -26,7 +27,7 @@ import {
   isCustomColor,
 } from "./colorPickerUtils";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
-import { useColorPickerDnD } from "./topPicksDnD";
+import { useColorPickerDnD } from "./colorTopPicksDnD";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
@@ -44,6 +45,8 @@ interface PickerProps {
   onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
   showHotKey?: boolean;
   excludedColors?: readonly string[];
+  /** present only while the top picks are customized */
+  onResetTopPicks?: () => void;
 }
 
 export const Picker = React.forwardRef(
@@ -62,6 +65,7 @@ export const Picker = React.forwardRef(
       onEscape,
       showHotKey = true,
       excludedColors,
+      onResetTopPicks,
     }: PickerProps,
     ref,
   ) => {
@@ -216,9 +220,11 @@ export const Picker = React.forwardRef(
           {children}
           {/* dnd context is only provided when top picks are customizable */}
           {dnd && (
-            <div className="color-picker__tip">
-              {t("colorPicker.topPicksTip")}
-            </div>
+            <TopPicksTip
+              tip={t("colorPicker.topPicksTip")}
+              onReset={onResetTopPicks}
+              resetTitle={t("colorPicker.resetTopPicks")}
+            />
           )}
         </div>
       </div>

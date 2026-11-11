@@ -71,6 +71,8 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
 
   if (
     rotationTransformHandle &&
+    // (the crop editor has none, nor draws it)
+    !appState.croppingElementId &&
     isInsideTransformHandle(rotationTransformHandle, x, y)
   ) {
     return "rotation" as TransformHandleType;

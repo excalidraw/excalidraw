@@ -272,11 +272,16 @@ export const LibraryMenu = memo(() => {
   const pendingElements = usePendingElementsMemo(appState, app);
 
   useEffect(() => {
+    const ownerDocument = app.ownerDocument;
+    const ownerWindow = app.ownerWindow;
     return addEventListener(
-      document,
+      ownerDocument,
       EVENT.KEYDOWN,
       (event) => {
-        if (event.key === KEYS.ESCAPE && event.target instanceof HTMLElement) {
+        if (
+          event.key === KEYS.ESCAPE &&
+          event.target instanceof ownerWindow.HTMLElement
+        ) {
           const target = event.target;
           if (target.closest(`.${CLASSES.SIDEBAR}`)) {
             // stop propagation so that we don't prevent it downstream
@@ -285,8 +290,8 @@ export const LibraryMenu = memo(() => {
               event.stopPropagation();
               setSelectedItems([]);
             } else if (
+              target instanceof ownerWindow.HTMLInputElement &&
               isWritableElement(target) &&
-              target instanceof HTMLInputElement &&
               !target.value
             ) {
               event.stopPropagation();
@@ -297,7 +302,7 @@ export const LibraryMenu = memo(() => {
             }
           } else if (selectedItems.length > 0) {
             const { x, y } = app.viewport.lastPosition;
-            const elementUnderCursor = document.elementFromPoint(x, y);
+            const elementUnderCursor = ownerDocument.elementFromPoint(x, y);
             // also deselect elements if sidebar doesn't have focus but the
             // cursor is over it
             if (elementUnderCursor?.closest(`.${CLASSES.SIDEBAR}`)) {

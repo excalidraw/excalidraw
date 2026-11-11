@@ -17,4 +17,34 @@
       grid-template-columns: none;
     }
   }
+
+  .FontPicker__top-picks-slots {
+    display: flex;
+    // follow the .buttonList spacing
+    gap: inherit;
+  }
+
+  // slot a dragged font would replace
+  .FontPicker__top-picks .top-picks-dnd__pick.is-dnd-target {
+    transform: scale(1.1);
+    border-color: var(--color-primary);
+  }
+
+  // glyph sample standing in for a clashing icon (see `needsGlyphSample`)
+  .FontPicker__top-pick-sample {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .FontPicker__tip {
+    margin-top: 0.5rem;
+  }
+}
+
+// drag & drop ghost content (see TopPicksDnD.scss) — outside the .excalidraw
+// scope, so the tile's colors are sampled inline from a strip button
+.excalidraw-font-dnd-ghost-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

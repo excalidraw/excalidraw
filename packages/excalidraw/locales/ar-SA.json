@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
@@ -109,6 +111,7 @@
     "group": "تحديد مجموعة",
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
+    "you": "",
     "toggleGrid": "تبديل الشبكة",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
@@ -332,10 +335,15 @@
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من الأدوات",
     "mermaidToExcalidraw": "من Mermaid إلى Excalidraw",
     "convertElementType": "تبديل نوع الشكل"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "مستطيل",
@@ -606,7 +614,9 @@
     "hexCode": "رمز Hex",
     "noShades": "لا تتوفر درجات لهذا اللون",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

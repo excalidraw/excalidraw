@@ -30,7 +30,7 @@ const CURSOR_HINT_GAP = 16;
  * are suppressed (repeatedly re-picking a tool you just used doesn't need
  * the reminder). Cycling arrow types and numeric shortcuts bypass this.
  */
-export const CURSOR_HINT_COOLDOWN = 5 * 60 * 1000;
+export const CURSOR_HINT_COOLDOWN = 30 * 1000;
 
 export const cursorHintAtom = atom<{
   content: React.ReactNode;

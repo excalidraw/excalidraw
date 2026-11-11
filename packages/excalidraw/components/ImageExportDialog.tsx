@@ -1,4 +1,3 @@
-import { exportToCanvas } from "@excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -26,6 +25,7 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
+import { exportScene, getExportConfigFromAppState } from "../scene/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -127,20 +127,25 @@ const ImageExportModal = ({
       return requestId !== previewRenderRequestIdRef.current;
     };
 
-    exportToCanvas({
-      elements: exportedElements,
-      appState: {
-        ...appStateSnapshot,
-        name: projectName,
-        exportBackground: exportWithBackground,
-        exportWithDarkMode,
-        exportScale,
-        exportEmbedScene: embedScene,
+    exportScene({
+      type: "canvas",
+      data: {
+        elements: exportedElements,
+        appState: appStateSnapshot,
+        files,
       },
-      files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
-      exportingFrame,
+      config: {
+        ...getExportConfigFromAppState({
+          ...appStateSnapshot,
+          exportBackground: exportWithBackground,
+          exportWithDarkMode,
+          // the preview fits `maxWidthOrHeight`
+          exportScale: 1,
+        }),
+        padding: DEFAULT_EXPORT_PADDING,
+        maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+        exportingFrame,
+      },
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {

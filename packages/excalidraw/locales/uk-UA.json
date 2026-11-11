@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
@@ -109,6 +111,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
+    "you": "",
     "toggleGrid": "Перемикати сітку",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
@@ -204,9 +207,9 @@
     "hint_emptyLibrary": "Виберіть об'єкт на полотні, щоб додати його сюди або встановіть бібліотеку з публічного репозиторію, що нижче.",
     "hint_emptyPrivateLibrary": "Виберіть елемент на полотні, щоб додати його сюди.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
+      "inputPlaceholder": "Шукати в бібліотеці",
+      "heading": "Збіги в бібліотеці",
+      "noResults": "Збігів не знайдено...",
       "clearSearch": "Очистити пошук"
     }
   },
@@ -216,8 +219,8 @@
     "singleResult": "результат",
     "multipleResults": "результати",
     "placeholder": "Знайти текст на полотні...",
-    "frames": "",
-    "texts": ""
+    "frames": "Рамки",
+    "texts": "Тексти"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -282,7 +285,7 @@
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
     "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
     "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Перевищено ліміт сховища браузера. Зміни не буде збережено."
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -313,7 +316,7 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "lasso": "",
+    "lasso": "Ласо",
     "image": "Вставити зображення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
@@ -332,10 +335,15 @@
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
     "autoshape": "",
+    "bucketfill": "Заливка",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "Не вдалося знайти замкнену область для заливки.",
+    "tooComplex": "Ця область занадто складна для заливки."
   },
   "element": {
     "rectangle": "Прямокутник",
@@ -420,8 +428,8 @@
     "title": "Помилка"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Збереження",
+    "defaultMessage": "Підготовка до збереження..."
   },
   "exportDialog": {
     "disk_title": "Зберегти на диск",
@@ -585,9 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Ваші малюнки зберігаються у сховищі браузера.",
+      "center_heading_line2": "Дані, збережені в браузері, можуть бути несподівано видалені.",
+      "center_heading_line3": "Регулярно зберігайте свою роботу у файл, щоб не втратити її.",
       "center_heading_plus": "Чи бажаєте перейти до Excalidraw+?",
       "menuHint": "Експорт, налаштування, мови, ..."
     },
@@ -605,8 +613,10 @@
     "shades": "Тіні",
     "hexCode": "Hex-код",
     "noShades": "Немає доступних відтінків цього кольору",
-    "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidColor": "Некоректний колір",
+    "invalidHexLength": "Код Hex має містити 3, 4, 6 або 8 символів",
+    "topPicksTip": "",
+    "resetTopPicks": "Скинути до стандартного набору кольорів"
   },
   "overwriteConfirm": {
     "action": {
@@ -642,58 +652,58 @@
   "mermaid": {
     "title": "Mermaid у Excalidraw",
     "button": "Вставити",
-    "description": "",
+    "description": "Наразі підтримуються лише діаграми типів <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> та <erdLink>Entity Relationship</erdLink>. Інші типи будуть показані в Excalidraw як зображення.",
     "syntax": "Синтаксис Mermaid",
     "preview": "Попередній перегляд",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Напишіть визначення діаграми Mermaid тут...",
+    "autoFixAvailable": "Доступне автовиправлення"
   },
   "ttd": {
     "error": "Помилка!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
+    "inputPlaceholder": "Почніть описувати ідею діаграми... ({{shortcut}} для нового рядка)",
+    "inputPlaceholderWithMessages": "Продовжити редагувати діаграму...",
+    "generating": "Генерація...",
     "rateLimitRemaining": "Сьогодні залишилося {{count}} запитів",
     "role": {
       "user": "Ви",
       "assistant": "ШІ-асистент",
       "system": "Система"
     },
-    "aiBeta": "",
+    "aiBeta": "AI бета-версія",
     "label": "Чат",
     "menu": "Меню",
     "newChat": "Новий чат",
     "deleteChat": "Видалити чат",
     "deleteMessage": "Видалити повідомлення",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "Переглянути як Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Створімо вашу діаграму",
+      "description": "Опишіть діаграму, яку хочете створити, — ми згенеруємо її для вас.",
+      "hint": "Наразі можна створювати блок-схеми, діаграми послідовностей, класів, станів і зв'язків між сутностями."
     },
-    "preview": "",
+    "preview": "Попередній перегляд",
     "insert": "Вставити",
     "retry": "Спробувати знову",
     "errors": {
       "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooLong": "Запит задовгий (максимум {{max}} символів)",
+      "generationFailed": "Не вдалося згенерувати",
+      "invalidDiagram": "Не вдалося створити коректну діаграму :(. Ви можете відредагувати її вручну, повторити спробу з автовиправленням або спробувати інший запит.",
+      "fixInMermaid": "Редагувати Mermaid вручну",
+      "aiRepair": "Згенерувати знову (автовиправлення)",
+      "requestAborted": "Запит перервано",
+      "requestFailed": "Не вдалося виконати запит",
+      "mermaidParseError": "Помилка синтаксису Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
+      "messageLimit": "Ви вичерпали ліміт AI на безплатному плані. Спробуйте Excalidraw+ або поверніться завтра.",
+      "generalRateLimit": "Притримайте коней, ви надто поспішаєте! Зачекайте трохи, перш ніж спробувати ще раз.",
       "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Перейти на Plus"
   },
   "quickSearch": {
     "placeholder": "Швидкий пошук"

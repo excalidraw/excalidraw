@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useRef } from "react";
+import { useMemo } from "react";
 import { createPortal } from "react-dom";
 
 import { KEYS } from "@excalidraw/common";
@@ -24,8 +24,12 @@ export const Modal: React.FC<{
     className: "excalidraw-modal-container",
   });
 
-  const animationsDisabledRef = useRef(
-    document.body.classList.contains("excalidraw-animations-disabled"),
+  const animationsDisabled = useMemo(
+    () =>
+      modalRoot?.ownerDocument.body.classList.contains(
+        "excalidraw-animations-disabled",
+      ) ?? false,
+    [modalRoot],
   );
 
   if (!modalRoot) {
@@ -44,7 +48,7 @@ export const Modal: React.FC<{
   return createPortal(
     <div
       className={clsx("Modal", props.className, {
-        "animations-disabled": animationsDisabledRef.current,
+        "animations-disabled": animationsDisabled,
       })}
       role="dialog"
       aria-modal="true"

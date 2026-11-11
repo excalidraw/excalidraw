@@ -1,8 +1,9 @@
 import "@excalidraw/utils/test-utils";
 
 import {
+  bezierEquation,
   curve,
-  curveClosestPoint,
+  curveClosestParameter,
   curveIntersectLineSegment,
   curvePointDistance,
 } from "../src/curve";
@@ -82,9 +83,9 @@ describe("Math curve", () => {
       );
       const p = pointFrom(0, 0);
 
-      expect([curveClosestPoint(c, p)]).toCloselyEqualPoints([
-        [5.965462100367372, -3.04104878946646],
-      ]);
+      expect([
+        bezierEquation(c, curveClosestParameter(c, p, 1e-3)),
+      ]).toCloselyEqualPoints([[5.965462100367372, -3.04104878946646]]);
     });
   });
 

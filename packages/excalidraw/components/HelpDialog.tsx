@@ -179,6 +179,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("toolBar.text")}
               shortcuts={[KEYS.T, KEYS["8"]]}
             />
+            <Shortcut label={t("toolBar.stickynote")} shortcuts={[KEYS.N]} />
             <Shortcut label={t("toolBar.image")} shortcuts={[KEYS["9"]]} />
             <Shortcut
               label={t("toolBar.eraser")}
@@ -483,6 +484,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("labels.ungroup")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+G")]}
+            />
+            <Shortcut
+              label={t("labels.toggleWrap")}
+              shortcuts={[getShortcutKey("W")]}
             />
             <Shortcut
               label={t("labels.flipHorizontal")}
