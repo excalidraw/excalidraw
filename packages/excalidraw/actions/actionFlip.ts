@@ -52,7 +52,7 @@ export const actionFlipHorizontal = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) => event.shiftKey && event.code === CODES.H,
+  keyTest: (event) => event.shiftKey && !event.altKey && event.code === CODES.H,
 });
 
 export const actionFlipVertical = register({
@@ -78,7 +78,10 @@ export const actionFlipVertical = register({
     };
   },
   keyTest: (event) =>
-    event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
+    event.shiftKey &&
+    !event.altKey &&
+    event.code === CODES.V &&
+    !event[KEYS.CTRL_OR_CMD],
 });
 
 const flipSelectedElements = (

@@ -86,7 +86,10 @@ export const distributeHorizontally = register({
     };
   },
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.H,
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    !event.shiftKey &&
+    event.code === CODES.H,
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
       hidden={!enableActionGroup(appState, app)}
@@ -117,7 +120,10 @@ export const distributeVertically = register({
     };
   },
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    !event.shiftKey &&
+    event.code === CODES.V,
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
       hidden={!enableActionGroup(appState, app)}
