@@ -143,6 +143,9 @@ describe("creating a linear element", () => {
     for (let i = 0; i < 10; i++) {
       mouse.move(20, 0);
     }
+    expect(h.state.suggestedBinding?.element.id).toBe(rectangle.id);
+    // the binding highlight is drawn on the interactive canvas only
+    expect(renderStaticScene.mock.calls.length).toBe(0);
     mouse.up();
 
     const arrow = getNewLinear();
