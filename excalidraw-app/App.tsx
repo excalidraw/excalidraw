@@ -248,7 +248,7 @@ const initializeScene = async (opts: {
   };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+  let isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -264,23 +264,29 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
         );
 
-        scene = {
-          elements: bumpElementVersions(
-            restoreElements(imported.elements, null, {
-              repairBindings: true,
-              deleteInvisibleElements: true,
-            }),
-            localDataState?.elements,
-          ),
-          appState: restoreAppState(
-            imported.appState,
-            // local appState when importing from backend to ensure we restore
-            // localStorage user settings which we do not persist on server.
-            localDataState?.appState,
-          ),
-        };
+        if (imported.elements) {
+          scene = {
+            elements: bumpElementVersions(
+              restoreElements(imported.elements, null, {
+                repairBindings: true,
+                deleteInvisibleElements: true,
+              }),
+              localDataState?.elements,
+            ),
+            appState: restoreAppState(
+              imported.appState,
+              // local appState when importing from backend to ensure we restore
+              // localStorage user settings which we do not persist on server.
+              localDataState?.appState,
+            ),
+          };
+          scene.scrollToContent = true;
+        } else {
+          isExternalScene = false;
+        }
+      } else {
+        scene.scrollToContent = true;
       }
-      scene.scrollToContent = true;
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }

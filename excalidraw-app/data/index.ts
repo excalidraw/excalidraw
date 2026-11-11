@@ -232,7 +232,7 @@ export const importFromBackend = async (
         "error when decoding shareLink data using the new format:",
         error,
       );
-      return legacy_decodeFromBackend({ buffer, decryptionKey });
+      return await legacy_decodeFromBackend({ buffer, decryptionKey });
     }
   } catch (error: any) {
     window.alert(t("alerts.importBackendFailed"));
