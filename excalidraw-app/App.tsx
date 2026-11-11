@@ -232,6 +232,10 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
+  const currentElements = opts.excalidrawAPI?.getSceneElementsIncludingDeleted()
+    ?.length
+    ? opts.excalidrawAPI.getSceneElementsIncludingDeleted()
+    : localDataState?.elements;
 
   let scene: Omit<
     RestoredDataState,
@@ -241,15 +245,22 @@ const initializeScene = async (opts: {
   > & {
     scrollToContent?: boolean;
   } = {
-    elements: restoreElements(localDataState?.elements, null, {
-      repairBindings: true,
-      deleteInvisibleElements: true,
-    }),
-    appState: restoreAppState(localDataState?.appState, null),
+    elements: restoreElements(
+      currentElements as readonly OrderedExcalidrawElement[] | undefined,
+      null,
+      {
+        repairBindings: true,
+        deleteInvisibleElements: true,
+      },
+    ),
+    appState: restoreAppState(
+      opts.excalidrawAPI?.getAppState() || localDataState?.appState,
+      null,
+    ),
   };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+  let isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -265,23 +276,29 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
         );
 
-        scene = {
-          elements: bumpElementVersions(
-            restoreElements(imported.elements, null, {
-              repairBindings: true,
-              deleteInvisibleElements: true,
-            }),
-            localDataState?.elements,
-          ),
-          appState: restoreAppState(
-            imported.appState,
-            // local appState when importing from backend to ensure we restore
-            // localStorage user settings which we do not persist on server.
-            localDataState?.appState,
-          ),
-        };
+        if (imported.elements) {
+          scene = {
+            elements: bumpElementVersions(
+              restoreElements(imported.elements, null, {
+                repairBindings: true,
+                deleteInvisibleElements: true,
+              }),
+              currentElements,
+            ),
+            appState: restoreAppState(
+              imported.appState,
+              // local appState when importing from backend to ensure we restore
+              // localStorage user settings which we do not persist on server.
+              localDataState?.appState,
+            ),
+          };
+          scene.scrollToContent = true;
+        } else {
+          isExternalScene = false;
+        }
+      } else {
+        scene.scrollToContent = true;
       }
-      scene.scrollToContent = true;
       if (!roomLinkData) {
         window.history.replaceState({}, APP_NAME, window.location.origin);
       }
@@ -583,13 +600,17 @@ const ExcalidrawWrapper = () => {
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
-            excalidrawAPI.updateScene({
-              elements: restoreElements(data.scene.elements, null, {
-                repairBindings: true,
-              }),
-              appState: restoreAppState(data.scene.appState, null),
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
+            if (data.isExternalScene) {
+              excalidrawAPI.updateScene({
+                elements: restoreElements(data.scene.elements, null, {
+                  repairBindings: true,
+                }),
+                appState: restoreAppState(data.scene.appState, null),
+                captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+              });
+            } else {
+              excalidrawAPI.updateScene({ appState: { isLoading: false } });
+            }
           }
         });
       }
