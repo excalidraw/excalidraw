@@ -192,7 +192,7 @@ convertToExcalidrawElements([
 
 ### Text Containers
 
-In addition to `type`, `x` and `y` properties, [`label`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L124C7-L130C59) property is required for text containers. The `text` property in `label` is required, rest of the attributes are optional.
+In addition to `type`, `x` and `y` properties, [`label`](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/transform.ts#L124C7-L130C59) property is required for text containers. The `text` property in `label` is required, rest of the attributes are optional.
 
 If you don't provide the dimensions of container, we calculate it based of the label dimensions.
 
@@ -355,7 +355,7 @@ convertToExcalidrawElements([
 
 ### Arrow bindings
 
-To bind arrow to a shape you need to specify its `start` and [`end`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L54) properties. You need to pass either `type` or `id` property in `start` and `end` properties, rest of the attributes are optional
+To bind arrow to a shape you need to specify its `start` and [`end`](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/transform.ts#L54) properties. You need to pass either `type` or `id` property in `start` and `end` properties, rest of the attributes are optional
 
 ```js
 convertToExcalidrawElements([
