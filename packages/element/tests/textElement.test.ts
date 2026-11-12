@@ -207,6 +207,10 @@ describe("Test getDefaultLineHeight", () => {
   it("should return correct line height", () => {
     expect(getLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
   });
+
+  it("should return line height using default font family for a custom font which isn't resolved yet", () => {
+    expect(getLineHeight("google:Unresolved")).toBe(1.25);
+  });
 });
 
 describe("Test computeBoundTextPosition", () => {

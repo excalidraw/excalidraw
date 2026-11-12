@@ -1,0 +1,377 @@
+import { useCallback, useMemo, useState, type JSX } from "react";
+
+import {
+  arrayToList,
+  createProviderFontFamily,
+  FONT_FAMILY,
+  isCustomFontFamily,
+  parseProviderFontFamily,
+} from "@excalidraw/common";
+
+import type { CustomFontFamily, FontFamily } from "@excalidraw/common";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import { t } from "../../i18n";
+import { DropDownMenuItemBadgeType } from "../dropdownMenu/DropdownMenuItem";
+import {
+  FontFamilyCodeIcon,
+  FontFamilyHeadingIcon,
+  FontFamilyNormalIcon,
+  FreedrawIcon,
+} from "../icons";
+
+import type { Fonts } from "../../fonts";
+
+import type { FontProviders } from "../../types";
+import type { ExcalidrawFontFace } from "../../fonts/ExcalidrawFontFace";
+
+import type { ProviderSearchResult } from "./useFontSearch";
+
+/** shared by all providers, the rest is left to narrowing down the search */
+const SEARCH_MATCHES_LIMIT = 10;
+const SEARCH_SUGGESTIONS_LIMIT = 5;
+
+/**
+ * Up to `total` items, slots dealt round-robin so every list gets an equal
+ * share - one running short passes its slots on to the rest. Each list keeps
+ * its own order and stays contiguous.
+ */
+const takeFairShare = <T,>(lists: readonly (readonly T[])[], total: number) => {
+  const slots = lists.map(() => 0);
+  for (let remaining = total, dealt = true; remaining > 0 && dealt; ) {
+    dealt = false;
+    for (let i = 0; i < lists.length && remaining > 0; i++) {
+      if (slots[i] < lists[i].length) {
+        slots[i]++;
+        remaining--;
+        dealt = true;
+      }
+    }
+  }
+  return lists.flatMap((list, i) => list.slice(0, slots[i]));
+};
+
+export interface FontDescriptor {
+  value: FontFamily;
+  icon: JSX.Element;
+  text: string;
+  status?: "failed" | "loading" | "unsupported";
+  deprecated?: true;
+  badge?: {
+    type: ValueOf<typeof DropDownMenuItemBadgeType>;
+    placeholder: string;
+  };
+}
+
+export const getFontFamilyIcon = (
+  fontFamily: FontFamily,
+  icons?: Record<string, { icon: JSX.Element }>,
+): JSX.Element => {
+  if (isCustomFontFamily(fontFamily)) {
+    const parsed = parseProviderFontFamily(fontFamily);
+    const icon = parsed ? icons?.[parsed.providerId]?.icon : undefined;
+    if (icon) {
+      return icon;
+    }
+  }
+
+  switch (fontFamily) {
+    case FONT_FAMILY.Excalifont:
+    case FONT_FAMILY.Virgil:
+      return FreedrawIcon;
+    case FONT_FAMILY.Nunito:
+    case FONT_FAMILY.Helvetica:
+      return FontFamilyNormalIcon;
+    case FONT_FAMILY["Lilita One"]:
+      return FontFamilyHeadingIcon;
+    case FONT_FAMILY["Comic Shanns"]:
+    case FONT_FAMILY.Cascadia:
+      return FontFamilyCodeIcon;
+    default:
+      return FontFamilyNormalIcon;
+  }
+};
+
+export const getFontFamilyLabel = (
+  fontFamily: FontFamily,
+  fontFaces: ExcalidrawFontFace[],
+) => {
+  if (isCustomFontFamily(fontFamily)) {
+    return parseProviderFontFamily(fontFamily)?.familyName ?? fontFamily;
+  }
+
+  return (
+    Object.entries(FONT_FAMILY).find(([, id]) => id === fontFamily)?.[0] ??
+    fontFaces[0]?.family ??
+    "Unknown"
+  );
+};
+
+interface FontCatalogOptions {
+  fonts: Fonts;
+  fontProviders?: FontProviders;
+  registeredFonts: Fonts["registered"];
+  failedResolutions: ReadonlyMap<string, unknown>;
+  selectedFontFamily: FontFamily | null;
+  hoveredFontFamily: FontFamily | null;
+  newSceneFamilies: ReadonlySet<FontFamily>;
+  resolvingFamily: CustomFontFamily | null;
+  searchTerm: string;
+  searchResults: readonly ProviderSearchResult[];
+  showDeprecatedFonts: boolean;
+}
+
+export const useFontCatalog = ({
+  fonts,
+  fontProviders,
+  registeredFonts,
+  failedResolutions,
+  selectedFontFamily,
+  hoveredFontFamily,
+  newSceneFamilies,
+  resolvingFamily,
+  searchTerm,
+  searchResults,
+  showDeprecatedFonts,
+}: FontCatalogOptions) => {
+  // a hover preview rewrites the selection's family, so the scene groups follow
+  // the registry only while there is none (and catch up once it ends)
+  const [sceneRegisteredFonts, setSceneRegisteredFonts] =
+    useState(registeredFonts);
+  if (hoveredFontFamily == null && sceneRegisteredFonts !== registeredFonts) {
+    setSceneRegisteredFonts(registeredFonts);
+  }
+
+  const sceneFamilies = useMemo(
+    () =>
+      new Set([
+        ...fonts.getSceneFamilies(),
+        ...newSceneFamilies,
+        // the current default family may be in no element yet (i.e. searched
+        // & selected with nothing on canvas, then the picker reopened -
+        // `newSceneFamilies` dies with the popup) - it must still be listed
+        ...(selectedFontFamily != null ? [selectedFontFamily] : []),
+      ]),
+    // refresh after selection without recalculating on hover. `registeredFonts`
+    // additionally refreshes the groups when a scene-only custom family arrives
+    // while the picker is open (i.e. collab, paste), registering on load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedFontFamily, newSceneFamilies, sceneRegisteredFonts],
+  );
+
+  const getCustomFontStatus = useCallback(
+    (family: CustomFontFamily) => {
+      if (resolvingFamily === family) {
+        return "loading" as const;
+      }
+      const parsed = parseProviderFontFamily(family);
+      // own-property check: "toString:Foo" must not match an inherited
+      // `Object.prototype` member as a provider
+      if (
+        !parsed ||
+        !fontProviders ||
+        !Object.hasOwn(fontProviders, parsed.providerId)
+      ) {
+        return "unsupported" as const;
+      }
+      return failedResolutions.has(family) ? ("failed" as const) : undefined;
+    },
+    [fontProviders, failedResolutions, resolvingFamily],
+  );
+
+  const resultFamilies = useMemo(
+    () =>
+      new Set(
+        searchResults.flatMap(({ providerId, names }) =>
+          names.map((name) => createProviderFontFamily(providerId, name)),
+        ),
+      ),
+    [searchResults],
+  );
+
+  const allFonts = useMemo(() => {
+    const descriptors = new Map<FontFamily, FontDescriptor>();
+
+    for (const [providerId, provider] of Object.entries(fontProviders ?? {})) {
+      for (const familyName of provider.availableFonts) {
+        const familyId = createProviderFontFamily(providerId, familyName);
+        descriptors.set(familyId, {
+          value: familyId,
+          icon: provider.icon,
+          text: familyName,
+          status: getCustomFontStatus(familyId),
+        });
+      }
+    }
+
+    for (const familyId of [
+      ...sceneFamilies,
+      // a search result resolves in place rather than jumping into the list
+      ...(resolvingFamily && !resultFamilies.has(resolvingFamily)
+        ? [resolvingFamily]
+        : []),
+    ]) {
+      if (!isCustomFontFamily(familyId) || descriptors.has(familyId)) {
+        continue;
+      }
+      descriptors.set(familyId, {
+        value: familyId,
+        icon: getFontFamilyIcon(familyId, fontProviders),
+        text: getFontFamilyLabel(familyId, []),
+        status: getCustomFontStatus(familyId),
+      });
+    }
+
+    for (const [familyId, { metadata, fontFaces }] of registeredFonts) {
+      if (metadata.private || metadata.fallback) {
+        continue;
+      }
+      // registration alone does not earn a custom family a place in the list -
+      // it gets one from `availableFonts` or from being used in the scene.
+      // Listing whatever is registered would instead grow the list with every
+      // previewed or searched family, and permanently so - the registry is
+      // page-global and never evicts.
+      if (isCustomFontFamily(familyId) && !descriptors.has(familyId)) {
+        continue;
+      }
+
+      const fontDescriptor: FontDescriptor = {
+        value: familyId,
+        icon: getFontFamilyIcon(familyId, fontProviders),
+        text: getFontFamilyLabel(familyId, fontFaces),
+      };
+
+      if (metadata.deprecated) {
+        fontDescriptor.deprecated = metadata.deprecated;
+        fontDescriptor.badge = {
+          type: DropDownMenuItemBadgeType.RED,
+          placeholder: t("fontList.badge.old"),
+        };
+      }
+
+      descriptors.set(familyId, fontDescriptor);
+    }
+
+    return Array.from(descriptors.values()).sort((a, b) =>
+      a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
+    );
+  }, [
+    registeredFonts,
+    fontProviders,
+    getCustomFontStatus,
+    resolvingFamily,
+    resultFamilies,
+    sceneFamilies,
+  ]);
+
+  const sceneFonts = useMemo(
+    () => allFonts.filter((font) => sceneFamilies.has(font.value)),
+    [allFonts, sceneFamilies],
+  );
+  const availableFonts = useMemo(
+    () =>
+      allFonts.filter(
+        (font) =>
+          !sceneFamilies.has(font.value) &&
+          (showDeprecatedFonts || !font.deprecated),
+      ),
+    [allFonts, sceneFamilies, showDeprecatedFonts],
+  );
+  const filteredFontDescriptors = useMemo(
+    () =>
+      [...sceneFonts, ...availableFonts].filter((font) =>
+        font.text.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    [sceneFonts, availableFonts, searchTerm],
+  );
+  const { searchMatches, hiddenSearchMatchCount, searchSuggestions } =
+    useMemo(() => {
+      const listed = new Set(filteredFontDescriptors.map((font) => font.value));
+      const getDescriptors = (kind: ProviderSearchResult["kind"]) =>
+        searchResults
+          .filter((result) => result.kind === kind)
+          .map(({ providerId, names }) => {
+            const descriptors: FontDescriptor[] = [];
+            for (const name of names) {
+              if (typeof name !== "string" || !name) {
+                continue;
+              }
+              const familyId = createProviderFontFamily(providerId, name);
+              if (listed.has(familyId)) {
+                continue;
+              }
+              listed.add(familyId);
+              descriptors.push({
+                value: familyId,
+                icon: getFontFamilyIcon(familyId, fontProviders),
+                text: name,
+                status: getCustomFontStatus(familyId),
+              });
+            }
+            return descriptors;
+          });
+
+      const matches = getDescriptors("match");
+      const searchMatches = takeFairShare(matches, SEARCH_MATCHES_LIMIT);
+
+      return {
+        searchMatches,
+        hiddenSearchMatchCount: matches.flat().length - searchMatches.length,
+        searchSuggestions:
+          filteredFontDescriptors.length || searchMatches.length
+            ? []
+            : takeFairShare(
+                getDescriptors("suggestion"),
+                SEARCH_SUGGESTIONS_LIMIT,
+              ),
+      };
+    }, [
+      filteredFontDescriptors,
+      searchResults,
+      fontProviders,
+      getCustomFontStatus,
+    ]);
+
+  // only the rows listed as results - a family listed already isn't news
+  const searchFamilies = useMemo(
+    () =>
+      new Set(
+        [...searchMatches, ...searchSuggestions].map((font) => font.value),
+      ),
+    [searchMatches, searchSuggestions],
+  );
+
+  const selectableFonts = useMemo(
+    () =>
+      arrayToList(
+        [
+          ...filteredFontDescriptors,
+          ...searchMatches,
+          ...searchSuggestions,
+        ].filter((font) => font.status !== "unsupported"),
+      ),
+    [filteredFontDescriptors, searchMatches, searchSuggestions],
+  );
+  const sceneFilteredFonts = useMemo(
+    () =>
+      filteredFontDescriptors.filter((font) => sceneFamilies.has(font.value)),
+    [filteredFontDescriptors, sceneFamilies],
+  );
+  const availableFilteredFonts = useMemo(
+    () =>
+      filteredFontDescriptors.filter((font) => !sceneFamilies.has(font.value)),
+    [filteredFontDescriptors, sceneFamilies],
+  );
+
+  return {
+    filteredFontDescriptors,
+    selectableFonts,
+    sceneFilteredFonts,
+    availableFilteredFonts,
+    searchMatches,
+    hiddenSearchMatchCount,
+    searchSuggestions,
+    searchFamilies,
+  };
+};

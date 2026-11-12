@@ -542,5 +542,7 @@ export class AppDuplicate {
       this.app.maybeCacheVisibleGaps(event, selectedElements, true);
       this.app.maybeCacheReferenceSnapPoints(event, selectedElements, true);
     });
+
+    this.app.fonts.onElementsDuplicated(duplicatedElements);
   };
 }
