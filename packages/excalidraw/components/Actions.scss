@@ -1,12 +1,16 @@
+@use "../css/variables.module" as *;
+
 .zoom-actions,
-.undo-redo-buttons {
+.undo-redo-buttons,
+.minimap-toggle {
   background-color: var(--color-surface-low);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
 
 .zoom-button,
-.undo-redo-buttons button {
+.undo-redo-buttons button,
+.minimap-toggle-button {
   border-radius: 0 !important;
   font-size: 0.875rem !important;
   width: var(--lg-button-size);
@@ -75,6 +79,21 @@
   .ToolIcon__icon {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
+  }
+}
+
+.minimap-toggle {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-inline-start: 0.6em;
+}
+
+.minimap-toggle-button {
+  @include toolbarButtonColorStates;
+
+  &,
+  .ToolIcon__icon {
+    border-radius: var(--border-radius-lg) !important;
   }
 }
 

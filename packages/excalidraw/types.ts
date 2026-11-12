@@ -517,6 +517,7 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
+  minimapEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;
@@ -1232,6 +1233,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   viewport: App["viewport"];
+  wheel: App["wheel"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];

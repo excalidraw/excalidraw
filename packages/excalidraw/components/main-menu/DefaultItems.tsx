@@ -15,6 +15,7 @@ import {
   actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
   actionToggleShowHints,
+  actionToggleMinimap,
   actionToggleStats,
   actionToggleTheme,
   actionToggleZenMode,
@@ -639,6 +640,27 @@ const PreferencesToggleViewModeItem = () => {
   );
 };
 
+const PreferencesToggleMinimapItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  if (!actionManager.isActionEnabled(actionToggleMinimap)) {
+    return null;
+  }
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.minimapEnabled}
+      shortcut={getShortcutFromShortcutName("minimap")}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleMinimap);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.minimap")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 const PreferencesToggleElementPropertiesItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -680,6 +702,7 @@ export const Preferences = ({
             <PreferencesToggleGridModeItem />
             <PreferencesToggleZenModeItem />
             <PreferencesToggleViewModeItem />
+            <PreferencesToggleMinimapItem />
             <PreferencesToggleElementPropertiesItem />
             <PreferencesToggleArrowBindingItem />
             <PreferencesToggleMidpointSnappingItem />
@@ -702,6 +725,7 @@ Preferences.ToggleShowHints = PreferencesToggleShowHintsItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
+Preferences.ToggleMinimap = PreferencesToggleMinimapItem;
 Preferences.ToggleElementProperties = PreferencesToggleElementPropertiesItem;
 
 Preferences.displayName = "Preferences";
