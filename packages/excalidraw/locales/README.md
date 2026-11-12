@@ -7,6 +7,6 @@ Please do not contribute changes directly to these files, as we manage them with
 
 ## Completion of translation
 
-[percentages.json](./percentages.json) holds a percentage of completion for each language. We generate these automatically [on build time](./../../.github/workflows/locales-coverage.yml) when a new translation PR appears.
+[percentages.json](./percentages.json) holds a percentage of completion for each language. We generate these automatically [on build time](./../../../.github/workflows/locales-coverage.yml) when a new translation PR appears.
 
 We only make a language available on the app if it exceeds a certain threshold of completion.
