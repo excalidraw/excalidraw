@@ -880,7 +880,7 @@ export const ZoomActions = ({
   renderAction: ActionManager["renderAction"];
 }) => (
   <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
-    <Stack.Row align="center">
+    <Stack.Row align="center" style={{ direction: "ltr" }}>
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
       {renderAction("zoomIn")}

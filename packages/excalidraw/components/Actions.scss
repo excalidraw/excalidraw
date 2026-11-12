@@ -5,6 +5,10 @@
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
 
+.zoom-actions {
+  direction: ltr;
+}
+
 .zoom-button,
 .undo-redo-buttons button {
   border-radius: 0 !important;
@@ -54,10 +58,6 @@
   border-top-left-radius: var(--border-radius-lg) !important;
   border-bottom-left-radius: var(--border-radius-lg) !important;
 
-  :root[dir="rtl"] & {
-    transform: scaleX(-1);
-  }
-
   .ToolIcon__icon {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
@@ -67,10 +67,6 @@
 .zoom-in-button {
   border-top-right-radius: var(--border-radius-lg) !important;
   border-bottom-right-radius: var(--border-radius-lg) !important;
-
-  :root[dir="rtl"] & {
-    transform: scaleX(-1);
-  }
 
   .ToolIcon__icon {
     border-top-left-radius: 0 !important;
