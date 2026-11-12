@@ -1,7 +1,7 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import { useMemo } from "react";
 
-import { isTextElement } from "@excalidraw/element";
+import { dragSelectedElements } from "@excalidraw/element";
 
 import { getCommonBounds } from "@excalidraw/element";
 
@@ -36,45 +36,27 @@ interface MultiPositionProps {
 }
 
 const moveElements = (
-  property: MultiPositionProps["property"],
-  changeInTopX: number,
-  changeInTopY: number,
+  offsetX: number,
+  offsetY: number,
   originalElements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
-  appState: AppState,
   renderEnvironment: RenderEnvironment,
 ) => {
-  for (let i = 0; i < originalElements.length; i++) {
-    const origElement = originalElements[i];
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const latestElements = originalElements
+    .map((element) => elementsMap.get(element.id))
+    .filter((element) => element !== undefined);
 
-    const [cx, cy] = [
-      origElement.x + origElement.width / 2,
-      origElement.y + origElement.height / 2,
-    ];
-    const [topLeftX, topLeftY] = pointRotateRads(
-      pointFrom(origElement.x, origElement.y),
-      pointFrom(cx, cy),
-      origElement.angle,
-    );
-
-    const newTopLeftX =
-      property === "x" ? Math.round(topLeftX + changeInTopX) : topLeftX;
-
-    const newTopLeftY =
-      property === "y" ? Math.round(topLeftY + changeInTopY) : topLeftY;
-
-    moveElement(
-      newTopLeftX,
-      newTopLeftY,
-      origElement,
-      scene,
-      appState,
-      originalElementsMap,
-      false,
-      renderEnvironment,
-    );
-  }
+  dragSelectedElements(
+    { originalElements: originalElementsMap },
+    latestElements,
+    { x: offsetX, y: offsetY },
+    scene,
+    { x: 0, y: 0 },
+    null,
+    renderEnvironment,
+  );
 };
 
 const moveGroupTo = (
@@ -83,47 +65,17 @@ const moveGroupTo = (
   originalElements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
-  appState: AppState,
   renderEnvironment: RenderEnvironment,
 ) => {
-  const elementsMap = scene.getNonDeletedElementsMap();
-  const [x1, y1, ,] = getCommonBounds(originalElements);
-  const offsetX = nextX - x1;
-  const offsetY = nextY - y1;
-
-  for (let i = 0; i < originalElements.length; i++) {
-    const origElement = originalElements[i];
-
-    const latestElement = elementsMap.get(origElement.id);
-    if (!latestElement) {
-      continue;
-    }
-
-    // bound texts are moved with their containers
-    if (!isTextElement(latestElement) || !latestElement.containerId) {
-      const [cx, cy] = [
-        latestElement.x + latestElement.width / 2,
-        latestElement.y + latestElement.height / 2,
-      ];
-
-      const [topLeftX, topLeftY] = pointRotateRads(
-        pointFrom(latestElement.x, latestElement.y),
-        pointFrom(cx, cy),
-        latestElement.angle,
-      );
-
-      moveElement(
-        topLeftX + offsetX,
-        topLeftY + offsetY,
-        origElement,
-        scene,
-        appState,
-        originalElementsMap,
-        false,
-        renderEnvironment,
-      );
-    }
-  }
+  const [x1, y1] = getCommonBounds(originalElements);
+  moveElements(
+    nextX - x1,
+    nextY - y1,
+    originalElements,
+    originalElementsMap,
+    scene,
+    renderEnvironment,
+  );
 };
 
 const handlePositionChange: DragInputCallbackType<
@@ -165,7 +117,6 @@ const handlePositionChange: DragInputCallbackType<
           elementsInUnit.map((el) => el.original),
           originalElementsMap,
           scene,
-          app.state,
           app.renderEnvironment,
         );
       } else {
@@ -214,13 +165,11 @@ const handlePositionChange: DragInputCallbackType<
   const changeInTopY = property === "y" ? change : 0;
 
   moveElements(
-    property,
     changeInTopX,
     changeInTopY,
     originalElements,
     originalElementsMap,
     scene,
-    app.state,
     app.renderEnvironment,
   );
 
