@@ -335,8 +335,8 @@ const renderLinkIcon = (
 /**
  * Paints `elements` in order (embeddables last), each clipped to its frame,
  * with bound text and link icons. Shared by the static scene and the new
- * element scene, which paints the elements covering a framed new element on
- * top of it.
+ * element scene, which paints the elements that may be drawn over a framed
+ * new element on top of it.
  */
 export const renderSceneElements = ({
   context,

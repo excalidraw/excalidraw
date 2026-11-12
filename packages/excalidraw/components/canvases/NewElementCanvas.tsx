@@ -22,7 +22,7 @@ interface NewElementCanvasProps {
   appState: AppState;
   newElement: NonNullable<AppState["newElement"]>;
   /** elements above a framed new element, drawn on top of it */
-  coveringElements?: readonly NonDeletedExcalidrawElement[];
+  elementsAboveNewElement?: readonly NonDeletedExcalidrawElement[];
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
@@ -43,7 +43,7 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
         canvas: canvasRef.current,
         scale: props.scale,
         newElement: props.newElement,
-        coveringElements: props.coveringElements,
+        elementsAboveNewElement: props.elementsAboveNewElement,
         elementsMap: props.elementsMap,
         allElementsMap: props.allElementsMap,
         rc: props.rc,

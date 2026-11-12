@@ -21,7 +21,7 @@ const _renderNewElementScene = ({
   canvas,
   rc,
   newElement,
-  coveringElements,
+  elementsAboveNewElement,
   elementsMap,
   allElementsMap,
   scale,
@@ -92,11 +92,11 @@ const _renderNewElementScene = ({
     // the elements above a framed new element, moved off the static canvas
     // (see Renderer.getNewElementLayers). Drawn even while the new element
     // isn't, as the static canvas no longer draws them.
-    if (coveringElements?.length) {
+    if (elementsAboveNewElement?.length) {
       renderSceneElements({
         context,
         rc,
-        elements: coveringElements,
+        elements: elementsAboveNewElement,
         elementsMap,
         allElementsMap,
         appState,

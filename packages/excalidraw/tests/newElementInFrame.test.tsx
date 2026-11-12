@@ -25,8 +25,8 @@ const lastStaticIds = () =>
   renderStaticScene.mock.lastCall![0].visibleElements.map(
     (element) => element.id,
   );
-const lastCoveringIds = () =>
-  (renderNewElementScene.mock.lastCall![0].coveringElements ?? []).map(
+const lastAboveNewElementIds = () =>
+  (renderNewElementScene.mock.lastCall![0].elementsAboveNewElement ?? []).map(
     (element) => element.id,
   );
 
@@ -122,7 +122,7 @@ describe("new element inside a frame", () => {
     mouse.move(10, 10);
 
     // the frame (its outline) and the overlapping rectangle
-    expect(lastCoveringIds()).toEqual(["frame", "covering"]);
+    expect(lastAboveNewElementIds()).toEqual(["frame", "covering"]);
     expect(lastStaticIds()).toEqual(["child", "elsewhere"]);
 
     mouse.up();
@@ -141,7 +141,7 @@ describe("new element inside a frame", () => {
     startDrawing("freedraw", 400, 400);
     mouse.move(10, 10);
 
-    expect(lastCoveringIds()).toEqual([]);
+    expect(lastAboveNewElementIds()).toEqual([]);
     expect(lastStaticIds()).toEqual([
       "child",
       "frame",
@@ -155,7 +155,7 @@ describe("new element inside a frame", () => {
   it("re-splits the layers when the scene changes mid-stroke", () => {
     startDrawing("freedraw", 50, 50);
     mouse.move(10, 10);
-    expect(lastCoveringIds()).toEqual(["frame", "covering"]);
+    expect(lastAboveNewElementIds()).toEqual(["frame", "covering"]);
 
     // e.g. a collaborator drops an element over the frame
     act(() => {
@@ -175,8 +175,71 @@ describe("new element inside a frame", () => {
     });
     mouse.move(10, 10);
 
-    expect(lastCoveringIds()).toEqual(["frame", "covering", "remote"]);
+    expect(lastAboveNewElementIds()).toEqual(["frame", "covering", "remote"]);
     expect(lastStaticIds()).toEqual(["child", "elsewhere"]);
+
+    mouse.up();
+  });
+
+  it("moves the elements drawn over a moved element along with it", () => {
+    API.updateScene({
+      elements: [
+        ...h.elements,
+        // above "covering", overlapping it outside of the frame only
+        API.createElement({
+          type: "rectangle",
+          id: "over-covering",
+          x: 220,
+          y: 220,
+          width: 50,
+          height: 50,
+        }),
+      ],
+    });
+
+    startDrawing("freedraw", 50, 50);
+    mouse.move(10, 10);
+
+    expect(lastAboveNewElementIds()).toEqual([
+      "frame",
+      "covering",
+      "over-covering",
+    ]);
+    expect(lastStaticIds()).toEqual(["child", "elsewhere"]);
+
+    mouse.up();
+  });
+
+  it("moves everything above a new element that isn't frame-clipped", () => {
+    // arrows aren't clipped to their frame
+    startDrawing("arrow", 50, 50);
+    mouse.move(10, 10);
+
+    expect(h.state.newElement?.frameId).toBe("frame");
+    expect(lastAboveNewElementIds()).toEqual([
+      "frame",
+      "covering",
+      "elsewhere",
+    ]);
+    expect(lastStaticIds()).toEqual(["child"]);
+
+    mouse.up();
+  });
+
+  it("moves everything above a new element when frame clipping is off", () => {
+    API.setAppState({
+      frameRendering: { ...h.state.frameRendering, clip: false },
+    });
+
+    startDrawing("freedraw", 50, 50);
+    mouse.move(10, 10);
+
+    expect(lastAboveNewElementIds()).toEqual([
+      "frame",
+      "covering",
+      "elsewhere",
+    ]);
+    expect(lastStaticIds()).toEqual(["child"]);
 
     mouse.up();
   });

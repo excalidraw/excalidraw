@@ -2360,9 +2360,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
-    // the elements covering a framed new element are drawn on top of it on
-    // the new-element canvas instead of the static canvas
-    const { staticElements, coveringElements } =
+    // the elements that may be drawn over a framed new element are drawn on
+    // top of it on the new-element canvas instead of the static canvas
+    const { staticElements, elementsAboveNewElement } =
       this.renderer.getNewElementLayers({
         visibleElements: this.elementRenderOffsets.size
           ? this.renderer.getVisibleElementsWithRenderOffsets(
@@ -2375,6 +2375,7 @@ class App extends React.Component<AppProps, AppState> {
         elementsMap: renderableElementsMap,
         newElementCanvasElement,
         offsets: this.elementRenderOffsets,
+        appState: this.state,
       });
 
     // a tool dragged out of the toolbar previews on the new-element canvas
@@ -2672,7 +2673,7 @@ class App extends React.Component<AppProps, AppState> {
                             <NewElementCanvas
                               appState={this.state}
                               newElement={previewElement}
-                              coveringElements={coveringElements}
+                              elementsAboveNewElement={elementsAboveNewElement}
                               scale={this.ownerWindow.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={renderableElementsMap}
@@ -2683,7 +2684,7 @@ class App extends React.Component<AppProps, AppState> {
                                 scale: this.ownerWindow.devicePixelRatio,
                                 renderEnvironment: this.renderEnvironment,
                                 renderGrid: false,
-                                // covering elements get their link icons
+                                // the elements above the new element get their link icons
                                 // as on the static canvas
                                 renderLinks: this.isLinksEnabled(),
                                 canvasBackgroundColor:
