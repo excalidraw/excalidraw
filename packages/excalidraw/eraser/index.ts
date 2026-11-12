@@ -1,4 +1,4 @@
-import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
+import { easeOut, THEME } from "@excalidraw/common";
 
 import {
   computeBoundTextPosition,
@@ -8,25 +8,28 @@ import {
   getElementLineSegments,
   getFreedrawOutlineAsSegments,
   getFreedrawOutlinePoints,
+  getBoundTextElementId,
+  getElementsInGroup,
+  hasBoundTextElement,
+  hitElementItself,
   intersectElementWithLineSegment,
   isArrowElement,
   isFreeDrawElement,
   isLineElement,
+  isBoundToContainer,
   isPointInElement,
+  shouldTestInside,
 } from "@excalidraw/element";
 import {
   lineSegment,
+  lineSegmentClosestParameter,
+  lineSegmentPointAt,
   lineSegmentsDistance,
   pointFrom,
+  pointDistance,
   polygon,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
-
-import { getElementsInGroup } from "@excalidraw/element";
-
-import { shouldTestInside } from "@excalidraw/element";
-import { hasBoundTextElement, isBoundToContainer } from "@excalidraw/element";
-import { getBoundTextElementId } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 
@@ -36,6 +39,19 @@ import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 import { AnimatedTrail } from "../animatedTrail";
 
 import type App from "../components/App";
+
+const ERASER_CONTACT_SAMPLE_SIZE = 4;
+const ERASER_CONTACT_RADIUS = 2.5;
+
+const getEraserHitThreshold = (element: ExcalidrawElement, zoom: number) => {
+  if (isFreeDrawElement(element)) {
+    return Math.max(2.25, 5 / zoom);
+  }
+  if (isArrowElement(element) || (isLineElement(element) && !element.polygon)) {
+    return Math.max(element.strokeWidth, (element.strokeWidth * 2) / zoom);
+  }
+  return ERASER_CONTACT_RADIUS / zoom;
+};
 
 export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
@@ -82,107 +98,193 @@ export class EraserTrail extends AnimatedTrail {
   }
 
   private updateElementsToBeErased(restoreToErase?: boolean) {
-    const eraserPath: GlobalPoint[] =
-      super
-        .getCurrentTrail()
-        ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) || [];
-
-    if (eraserPath.length < 2) {
+    const originalPoints = super.getCurrentTrail()?.originalPoints;
+    const lastPoint = originalPoints?.at(-1);
+    if (!lastPoint) {
       return [];
     }
 
-    // for efficiency and avoid unnecessary calculations,
-    // take only POINTS_ON_TRAIL points to form some number of segments
+    const previousPoint = originalPoints?.at(-2) || lastPoint;
     const pathSegment = lineSegment<GlobalPoint>(
-      eraserPath[eraserPath.length - 1],
-      eraserPath[eraserPath.length - 2],
+      pointFrom<GlobalPoint>(lastPoint[0], lastPoint[1]),
+      pointFrom<GlobalPoint>(previousPoint[0], previousPoint[1]),
     );
+    const elementsMap = this.app.scene.getNonDeletedElementsMap();
+    const zoom = this.app.state.zoom.value;
+    const isStationary =
+      pathSegment[0][0] === pathSegment[1][0] &&
+      pathSegment[0][1] === pathSegment[1][1];
 
-    const candidateElements = this.app.visibleElements.filter(
-      (el) => !el.locked,
+    // Keep scene order for hit testing; the last intersecting element is topmost.
+    const candidates = this.app.visibleElements.filter(
+      (element) =>
+        !element.locked &&
+        ((isStationary &&
+          hitElementItself({
+            point: pathSegment[0],
+            element,
+            threshold: ERASER_CONTACT_RADIUS / zoom,
+            elementsMap,
+          })) ||
+          eraserTest(pathSegment, element, elementsMap, zoom)),
     );
+    const candidateBounds = candidates.map((element) => {
+      const bounds = getElementBounds(element, elementsMap);
+      const margin =
+        2 * (isFreeDrawElement(element) ? 15 : element.strokeWidth / 2) +
+        ERASER_CONTACT_RADIUS / zoom;
 
-    const candidateElementsMap = arrayToMap(candidateElements);
+      return [
+        bounds[0] - margin,
+        bounds[1] - margin,
+        bounds[2] + margin,
+        bounds[3] + margin,
+      ] as Bounds;
+    });
 
-    for (const element of candidateElements) {
-      // restore only if already added to the to-be-erased set
-      if (restoreToErase && this.elementsToErase.has(element.id)) {
-        const intersects = eraserTest(
-          pathSegment,
-          element,
-          candidateElementsMap,
-          this.app.state.zoom.value,
-        );
+    const contactParameters = this.getContactParameters(
+      pathSegment,
+      candidates,
+      elementsMap,
+      zoom,
+    );
+    let previousParameter = -1;
 
-        if (intersects) {
-          const shallowestGroupId = element.groupIds.at(-1)!;
+    for (const parameter of contactParameters) {
+      if (parameter - previousParameter < 1e-6) {
+        continue;
+      }
+      previousParameter = parameter;
+      const point = lineSegmentPointAt(pathSegment, parameter);
 
-          if (this.groupsToErase.has(shallowestGroupId)) {
-            const elementsInGroup = getElementsInGroup(
-              this.app.scene.getNonDeletedElementsMap(),
-              shallowestGroupId,
-            );
-            for (const elementInGroup of elementsInGroup) {
-              this.elementsToErase.delete(elementInGroup.id);
-            }
-            this.groupsToErase.delete(shallowestGroupId);
-          }
-
-          if (isBoundToContainer(element)) {
-            this.elementsToErase.delete(element.containerId);
-          }
-
-          if (hasBoundTextElement(element)) {
-            const boundText = getBoundTextElementId(element);
-
-            if (boundText) {
-              this.elementsToErase.delete(boundText);
-            }
-          }
-
-          this.elementsToErase.delete(element.id);
+      for (let index = candidates.length - 1; index >= 0; index--) {
+        const element = candidates[index];
+        const bounds = candidateBounds[index];
+        if (
+          point[0] < bounds[0] ||
+          point[1] < bounds[1] ||
+          point[0] > bounds[2] ||
+          point[1] > bounds[3]
+        ) {
+          continue;
         }
-      } else if (!restoreToErase && !this.elementsToErase.has(element.id)) {
-        const intersects = eraserTest(
-          pathSegment,
-          element,
-          candidateElementsMap,
-          this.app.state.zoom.value,
-        );
-
-        if (intersects) {
-          const shallowestGroupId = element.groupIds.at(-1)!;
-
-          if (!this.groupsToErase.has(shallowestGroupId)) {
-            const elementsInGroup = getElementsInGroup(
-              this.app.scene.getNonDeletedElementsMap(),
-              shallowestGroupId,
-            );
-
-            for (const elementInGroup of elementsInGroup) {
-              this.elementsToErase.add(elementInGroup.id);
-            }
-            this.groupsToErase.add(shallowestGroupId);
-          }
-
-          if (hasBoundTextElement(element)) {
-            const boundText = getBoundTextElementId(element);
-
-            if (boundText) {
-              this.elementsToErase.add(boundText);
-            }
-          }
-
-          if (isBoundToContainer(element)) {
-            this.elementsToErase.add(element.containerId);
-          }
-
-          this.elementsToErase.add(element.id);
+        if (this.isEraserContact(point, element, elementsMap, zoom)) {
+          this.updateErasedElement(element, !!restoreToErase);
+          break;
         }
       }
     }
 
     return Array.from(this.elementsToErase);
+  }
+
+  private getContactParameters(
+    pathSegment: LineSegment<GlobalPoint>,
+    candidates: readonly ExcalidrawElement[],
+    elementsMap: ElementsMap,
+    zoom: number,
+  ) {
+    const steps = Math.max(
+      1,
+      Math.ceil(
+        (pointDistance(pathSegment[0], pathSegment[1]) * zoom) /
+          ERASER_CONTACT_SAMPLE_SIZE,
+      ),
+    );
+    const parameters = Array.from(
+      { length: steps + 1 },
+      (_, index) => index / steps,
+    );
+
+    for (const element of candidates) {
+      for (const intersection of intersectElementWithLineSegment(
+        element,
+        elementsMap,
+        pathSegment,
+      )) {
+        parameters.push(lineSegmentClosestParameter(intersection, pathSegment));
+      }
+    }
+
+    return parameters.sort((a, b) => a - b);
+  }
+
+  private isEraserContact(
+    point: GlobalPoint,
+    element: ExcalidrawElement,
+    elementsMap: ElementsMap,
+    zoom: number,
+  ) {
+    return hitElementItself({
+      point,
+      element,
+      threshold: getEraserHitThreshold(element, zoom),
+      elementsMap,
+    });
+  }
+
+  private updateErasedElement(
+    element: ExcalidrawElement,
+    restoreToErase: boolean,
+  ) {
+    const groupId = element.groupIds.at(-1);
+    if (restoreToErase) {
+      if (!this.elementsToErase.has(element.id)) {
+        return;
+      }
+
+      if (groupId && this.groupsToErase.has(groupId)) {
+        const elementsInGroup = getElementsInGroup(
+          this.app.scene.getNonDeletedElementsMap(),
+          groupId,
+        );
+        for (const elementInGroup of elementsInGroup) {
+          this.elementsToErase.delete(elementInGroup.id);
+        }
+        this.groupsToErase.delete(groupId);
+      }
+
+      if (isBoundToContainer(element)) {
+        this.elementsToErase.delete(element.containerId);
+      }
+
+      if (hasBoundTextElement(element)) {
+        const boundText = getBoundTextElementId(element);
+
+        if (boundText) {
+          this.elementsToErase.delete(boundText);
+        }
+      }
+
+      this.elementsToErase.delete(element.id);
+      return;
+    }
+
+    if (groupId && !this.groupsToErase.has(groupId)) {
+      const elementsInGroup = getElementsInGroup(
+        this.app.scene.getNonDeletedElementsMap(),
+        groupId,
+      );
+
+      for (const elementInGroup of elementsInGroup) {
+        this.elementsToErase.add(elementInGroup.id);
+      }
+      this.groupsToErase.add(groupId);
+    }
+
+    if (hasBoundTextElement(element)) {
+      const boundText = getBoundTextElementId(element);
+
+      if (boundText) {
+        this.elementsToErase.add(boundText);
+      }
+    }
+
+    if (isBoundToContainer(element)) {
+      this.elementsToErase.add(element.containerId);
+    }
+
+    this.elementsToErase.add(element.id);
   }
 
   endPath(): void {
@@ -241,7 +343,7 @@ const eraserTest = (
       outlinePoints,
       elementsMap,
     );
-    const tolerance = Math.max(2.25, 5 / zoom); // NOTE: Visually fine-tuned approximation
+    const tolerance = getEraserHitThreshold(element, zoom); // NOTE: Visually fine-tuned approximation
 
     for (const seg of strokeSegments) {
       if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
@@ -268,10 +370,7 @@ const eraserTest = (
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (isArrowElement(element) || (isLineElement(element) && !element.polygon)) {
-    const tolerance = Math.max(
-      element.strokeWidth,
-      (element.strokeWidth * 2) / zoom,
-    );
+    const tolerance = getEraserHitThreshold(element, zoom);
 
     // If the eraser movement is so fast that a large distance is covered
     // between the last two points, the distanceToElement miss, so we test
