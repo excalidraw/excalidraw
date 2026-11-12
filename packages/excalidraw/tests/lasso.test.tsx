@@ -24,7 +24,7 @@ import {
 
 import { getElementLineSegments } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { NonRestoredExcalidrawElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
@@ -89,7 +89,7 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
 
 describe("Basic lasso selection tests", () => {
   beforeEach(() => {
-    const elements: ExcalidrawElement[] = [
+    const elements: NonRestoredExcalidrawElement[] = [
       {
         id: "FLZN67ISZbMV-RH8SzS9W",
         type: "rectangle",
@@ -363,7 +363,7 @@ describe("Basic lasso selection tests", () => {
           angle: e.angle as Radians,
           index: null,
           created: null,
-        } as ExcalidrawElement),
+        } as NonRestoredExcalidrawElement),
     );
 
     act(() => {
@@ -1050,7 +1050,7 @@ describe("Special cases", () => {
         index: null,
         created: null,
         angle: e.angle as Radians,
-      })) as ExcalidrawElement[];
+      })) as NonRestoredExcalidrawElement[];
 
       h.elements = elements;
       h.app.setState({ boxSelectionMode: "overlap" });
@@ -1771,7 +1771,7 @@ describe("Special cases", () => {
         index: null,
         created: null,
         angle: e.angle as Radians,
-      })) as ExcalidrawElement[];
+      })) as NonRestoredExcalidrawElement[];
 
       h.elements = elements;
       h.app.setState({ boxSelectionMode: "overlap" });

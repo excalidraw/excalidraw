@@ -32,8 +32,6 @@ import {
   type ExcalidrawFlowchartNodeElement,
   type NonDeletedExcalidrawElement,
   type NonDeletedSceneElementsMap,
-  type Ordered,
-  type OrderedExcalidrawElement,
 } from "./types";
 
 import type { Scene } from "./Scene";
@@ -406,19 +404,10 @@ const createBindingArrow = (
     appState.zoom,
   );
 
-  const changedElements = new Map<string, OrderedExcalidrawElement>();
-  changedElements.set(
-    startBindingElement.id,
-    startBindingElement as OrderedExcalidrawElement,
-  );
-  changedElements.set(
-    endBindingElement.id,
-    endBindingElement as OrderedExcalidrawElement,
-  );
-  changedElements.set(
-    bindingArrow.id,
-    bindingArrow as OrderedExcalidrawElement,
-  );
+  const changedElements = new Map<string, ExcalidrawElement>();
+  changedElements.set(startBindingElement.id, startBindingElement);
+  changedElements.set(endBindingElement.id, endBindingElement);
+  changedElements.set(bindingArrow.id, bindingArrow);
 
   LinearElementEditor.movePoints(
     bindingArrow,
@@ -441,7 +430,7 @@ const createBindingArrow = (
         [startBindingElement.id, startBindingElement],
         [endBindingElement.id, endBindingElement],
         [bindingArrow.id, bindingArrow],
-      ] as [string, Ordered<NonDeletedExcalidrawElement>][]),
+      ] as [string, NonDeletedExcalidrawElement][]),
     ),
     { points: bindingArrow.points },
   );
