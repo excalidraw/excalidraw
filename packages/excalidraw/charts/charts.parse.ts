@@ -22,7 +22,21 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
-    const hasHeader = cells[0].every((cell) => tryParseNumber(cell) === null);
+    // A numeric first row is still a header when it has an empty top-left
+    // cell and the first column holds row labels (see #12401), e.g. years
+    // as column headers with an empty corner cell.
+    const hasNumericHeader =
+      cells[0][0].trim() === "" &&
+      cells[0].slice(1).every((cell) => tryParseNumber(cell) !== null) &&
+      cells
+        .slice(1)
+        .some(
+          (row) =>
+            row[0].trim() !== "" && tryParseNumber(row[0]) === null,
+        );
+    const hasHeader =
+      cells[0].every((cell) => tryParseNumber(cell) === null) ||
+      hasNumericHeader;
     const rows = hasHeader ? cells.slice(1) : cells;
 
     if (rows.length < 1) {
