@@ -1801,19 +1801,41 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  /**
+   * The scene's iframe-like elements, kept per non-deleted elements array
+   * (replaced on every scene change), so that rendering the embeddables
+   * doesn't scan the whole scene on every pan and zoom.
+   */
+  private iframeLikeElementsCache: {
+    elements: readonly Ordered<NonDeletedExcalidrawElement>[];
+    iframeLikes: Ordered<NonDeleted<ExcalidrawIframeLikeElement>>[];
+  } | null = null;
+
+  private getIframeLikeElements() {
+    const elements = this.scene.getNonDeletedElements();
+    if (this.iframeLikeElementsCache?.elements !== elements) {
+      this.iframeLikeElementsCache = {
+        elements,
+        iframeLikes: elements.filter(
+          (el): el is Ordered<NonDeleted<ExcalidrawIframeLikeElement>> =>
+            isIframeLikeElement(el),
+        ),
+      };
+    }
+    return this.iframeLikeElementsCache.iframeLikes;
+  }
+
   private renderEmbeddables() {
     const scale = this.state.zoom.value;
     const normalizedWidth = this.state.width;
     const normalizedHeight = this.state.height;
 
-    const embeddableElements = this.scene
-      .getNonDeletedElements()
-      .filter(
-        (el): el is Ordered<NonDeleted<ExcalidrawIframeLikeElement>> =>
-          (isEmbeddableElement(el) &&
-            this.embedsValidationStatus.get(el.id) === true) ||
-          isIframeElement(el),
-      );
+    const embeddableElements = this.getIframeLikeElements().filter(
+      (el) =>
+        (isEmbeddableElement(el) &&
+          this.embedsValidationStatus.get(el.id) === true) ||
+        isIframeElement(el),
+    );
 
     return (
       <>
