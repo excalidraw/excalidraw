@@ -128,7 +128,6 @@ const resizeElementInGroup = (
   );
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
-    updateBoundElements(latestElement, scene, { renderEnvironment });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
       scene.mutateElement(latestBoundTextElement, {
@@ -184,6 +183,15 @@ const resizeGroup = (
       scene,
       renderEnvironment,
     );
+  }
+
+  // Route external arrows against the group's final geometry. Arrows inside
+  // the group have already been scaled along with their bound elements.
+  for (const element of latestElements) {
+    updateBoundElements(element, scene, {
+      simultaneouslyUpdated: latestElements,
+      renderEnvironment,
+    });
   }
 };
 
