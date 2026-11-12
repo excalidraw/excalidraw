@@ -118,7 +118,7 @@
     "you": "Tu",
     "toggleGrid": "Comutare grilă",
     "minimap": "",
-    "zoom": "",
+    "zoom": "Apropiere/mărire",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
     "libraryLoadingMessage": "Se încarcă biblioteca…",
@@ -204,7 +204,7 @@
     "boxSelectionOverlap": "Suprapunere",
     "arrowBinding": "Legare săgeată",
     "midpointSnapping": "Ancorare la punctele medii",
-    "showHints": "",
+    "showHints": "Sugestii din bara de instrumente",
     "inputDevice": "Intrare",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Maus"
