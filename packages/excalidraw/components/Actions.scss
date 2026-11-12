@@ -58,6 +58,12 @@
 .zoom-in-button-wrapper {
   transition: opacity var(--zen-mode-transition-duration) ease-in-out,
     visibility var(--zen-mode-transition-duration);
+
+  // hidden along with the wrappers, at the end of their fade (see
+  // styles.scss)
+  .zoom-button {
+    transition: visibility var(--zen-mode-transition-duration);
+  }
 }
 
 .zoom-out-button {

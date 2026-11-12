@@ -733,6 +733,12 @@ body.excalidraw-cursor-resize * {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
+
+      // the buttons set their own `visibility: visible`
+      // (.ToolIcon_type_button--show), which would keep them focusable
+      .zoom-button {
+        visibility: hidden;
+      }
     }
 
     .reset-zoom-button {
