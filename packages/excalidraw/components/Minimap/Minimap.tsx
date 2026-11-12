@@ -7,10 +7,11 @@ import { useApp } from "../App";
 import "./Minimap.scss";
 
 /**
- * The vertical space (px) the minimap takes up above the footer (its height
- * + the gap, see Minimap.scss), for the UI above it to stay clear of it.
+ * The vertical space (px) the UI above the minimap gives up for it: its
+ * height + the gap below it (see Minimap.scss), less a part of the clearance
+ * that UI keeps from the footer anyway — the minimap can sit closer to it.
  */
-export const MINIMAP_RESERVED_HEIGHT = 152;
+export const MINIMAP_RESERVED_HEIGHT = 138;
 
 /**
  * The minimap isn't available in editors shorter than this (px): it shares

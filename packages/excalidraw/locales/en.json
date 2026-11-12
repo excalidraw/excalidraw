@@ -118,6 +118,7 @@
     "you": "You",
     "toggleGrid": "Toggle grid",
     "minimap": "Minimap",
+    "zoom": "Zoom",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",

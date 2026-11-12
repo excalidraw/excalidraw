@@ -52,9 +52,15 @@ const Footer = ({
           )}
           <Stack.Col gap={2}>
             <Section heading="canvasActions">
-              {zoomUIEnabled && app.isNavigationEnabled() && (
-                <ZoomActions renderAction={actionManager.renderAction} />
-              )}
+              {(zoomUIEnabled || minimapUIEnabled) &&
+                app.isNavigationEnabled() && (
+                  <ZoomActions
+                    actionManager={actionManager}
+                    zoomUIEnabled={zoomUIEnabled}
+                    minimapUIEnabled={minimapUIEnabled}
+                    zenModeEnabled={appState.zenModeEnabled}
+                  />
+                )}
 
               {defaultUIEnabled && !appState.viewModeEnabled && (
                 <UndoRedoActions
@@ -64,17 +70,6 @@ const Footer = ({
                       appState.zenModeEnabled,
                   })}
                 />
-              )}
-
-              {minimapUIEnabled && (
-                <div
-                  className={clsx("minimap-toggle zen-mode-transition", {
-                    "layer-ui__wrapper__footer-left--transition-bottom":
-                      appState.zenModeEnabled,
-                  })}
-                >
-                  {actionManager.renderAction("minimap")}
-                </div>
               )}
             </Section>
           </Stack.Col>

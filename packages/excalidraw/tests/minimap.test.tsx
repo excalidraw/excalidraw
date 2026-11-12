@@ -391,7 +391,7 @@ describe("minimap", () => {
     API.setSelectedElements([rectangle]);
     await waitFor(() =>
       expect(getPanel().style.maxHeight).toBe(
-        `${h.state.height - 166 - 152}px`,
+        `${h.state.height - 166 - 138}px`,
       ),
     );
 
@@ -400,7 +400,7 @@ describe("minimap", () => {
     });
     expect(document.querySelector(".ToolIcon__penMode")).not.toBe(null);
     expect(getPanel().style.maxHeight).toBe(
-      `${h.state.height - 166 - 152 - 54}px`,
+      `${h.state.height - 166 - 138 - 54}px`,
     );
   });
 

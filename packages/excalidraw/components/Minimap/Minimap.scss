@@ -6,7 +6,7 @@
 
     // floats above the canvas actions (zoom, undo/redo), without affecting
     // the footer layout
-    // (height + gap are mirrored in MINIMAP_RESERVED_HEIGHT)
+    // (height + gap are accounted for in MINIMAP_RESERVED_HEIGHT)
     position: absolute;
     bottom: calc(100% + 12px);
     inset-inline-start: 0;
