@@ -1,3 +1,5 @@
+@use "../css/variables.module" as *;
+
 .zoom-actions,
 .undo-redo-buttons {
   background-color: var(--color-surface-low);
@@ -5,8 +7,14 @@
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
 
+.zoom-actions {
+  display: flex;
+  align-items: center;
+}
+
 .zoom-button,
-.undo-redo-buttons button {
+.undo-redo-buttons button,
+.minimap-toggle-button {
   border-radius: 0 !important;
   font-size: 0.875rem !important;
   width: var(--lg-button-size);
@@ -23,6 +31,8 @@
   }
 }
 
+// the zoom out / zoom level / zoom in buttons, shown instead of the zoom menu
+// when there's no minimap toggle
 .reset-zoom-button {
   border-left: 0 !important;
   border-right: 0 !important;
@@ -48,6 +58,12 @@
 .zoom-in-button-wrapper {
   transition: opacity var(--zen-mode-transition-duration) ease-in-out,
     visibility var(--zen-mode-transition-duration);
+
+  // hidden along with the wrappers, at the end of their fade (see
+  // styles.scss)
+  .zoom-button {
+    transition: visibility var(--zen-mode-transition-duration);
+  }
 }
 
 .zoom-out-button {
@@ -75,6 +91,97 @@
   .ToolIcon__icon {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
+  }
+}
+
+// the zoom level, opening the zoom menu (overrides the dropdown trigger's
+// own, outlined look: it's a part of the zoom island)
+.excalidraw .zoom-actions .zoom-menu-trigger {
+  width: 3.75rem;
+  height: var(--lg-button-size);
+  padding: 0 0.625rem;
+  border: 0;
+  background-color: transparent;
+  color: var(--text-primary-color);
+  font-size: 0.875rem;
+
+  &:hover,
+  &[data-state="open"] {
+    background-color: var(--button-hover-bg);
+  }
+
+  // inset, as the minimap toggle next to it would cover an outer ring's edge
+  &:active {
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 1px var(--color-brand-hover);
+  }
+}
+
+.minimap-toggle {
+  position: relative;
+  display: flex;
+}
+
+// TEMPORARY (see MinimapAnnouncementDot)
+.minimap-announcement-dot {
+  position: absolute;
+  inset-inline-end: 5px;
+  bottom: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    animation: minimap-announcement-pulse 1.6s ease-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes minimap-announcement-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.minimap-toggle-button {
+  @include toolbarButtonColorStates;
+
+  &,
+  .ToolIcon__icon {
+    border-radius: var(--border-radius-lg) !important;
+  }
+}
+
+// when side by side, the zoom level and the minimap toggle are sharp where
+// they meet (same as undo & redo)
+.excalidraw .zoom-actions > :not(:last-child) .zoom-menu-trigger {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.zoom-actions > .minimap-toggle:not(:first-child) .minimap-toggle-button {
+  &,
+  .ToolIcon__icon {
+    border-start-start-radius: 0 !important;
+    border-end-start-radius: 0 !important;
   }
 }
 

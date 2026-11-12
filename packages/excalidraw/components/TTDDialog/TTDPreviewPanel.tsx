@@ -5,11 +5,14 @@ import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogOutput } from "./TTDDialogOutput";
 
 import type { TTDPanelAction } from "./TTDDialogPanel";
+import type { MermaidToExcalidrawLibProps } from "./types";
 
 interface TTDPreviewPanelProps {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   error: Error | null;
-  loaded: boolean;
+  loadStatus: MermaidToExcalidrawLibProps["status"];
+  loadErrorReloadRequired?: boolean;
+  onRetryLoad?: () => void;
   onInsert: () => void;
   hideErrorDetails?: boolean;
 }
@@ -17,7 +20,9 @@ interface TTDPreviewPanelProps {
 export const TTDPreviewPanel = ({
   canvasRef,
   error,
-  loaded,
+  loadStatus,
+  loadErrorReloadRequired,
+  onRetryLoad,
   onInsert,
   hideErrorDetails,
 }: TTDPreviewPanelProps) => {
@@ -39,7 +44,9 @@ export const TTDPreviewPanel = ({
       <TTDDialogOutput
         canvasRef={canvasRef}
         error={error}
-        loaded={loaded}
+        loadStatus={loadStatus}
+        loadErrorReloadRequired={loadErrorReloadRequired}
+        onRetryLoad={onRetryLoad}
         hideErrorDetails={hideErrorDetails}
       />
     </TTDDialogPanel>

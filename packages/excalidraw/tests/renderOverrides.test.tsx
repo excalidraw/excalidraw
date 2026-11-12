@@ -15,7 +15,7 @@ import { Excalidraw } from "../index";
 import { getDefaultAppState } from "../appState";
 import * as StaticScene from "../renderer/staticScene";
 import { Renderer } from "../scene/Renderer";
-import { exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 import { getNormalizedZoom } from "../scene";
 import { getElementRenderOffsets } from "../renderOverrides";
 
@@ -274,14 +274,22 @@ describe("setElementRenderOverrides", () => {
 
   it("leaves exported geometry and opacity unchanged", async () => {
     const { element, submit } = await setup();
-    const exportScene = async () =>
-      (await exportToSvg(h.app.api.getSceneElements(), h.state, null))
-        .outerHTML;
-    const before = await exportScene();
+    const exportSvg = async () =>
+      (
+        await exportScene({
+          type: "svg",
+          data: {
+            elements: h.app.api.getSceneElements(),
+            appState: h.state,
+            files: null,
+          },
+        })
+      ).outerHTML;
+    const before = await exportSvg();
     submit(
       new Map([[element.id, { opacity: 0, offset: { x: 1000, y: 1000 } }]]),
     );
-    expect(await exportScene()).toBe(before);
+    expect(await exportSvg()).toBe(before);
   });
 
   it("clears on reset and ignores submissions after unmount", async () => {
@@ -537,6 +545,18 @@ describe("setElementRenderOverrides", () => {
 });
 
 describe("render override geometry", () => {
+  // link icons are drawn only once their image decoded, which jsdom never
+  // does on its own
+  const renderEnvironment: Element.RenderEnvironment = {
+    createCanvas: () => document.createElement("canvas"),
+    createImage: () => {
+      const image = document.createElement("img");
+      Object.defineProperty(image, "complete", { value: true });
+      Object.defineProperty(image, "naturalWidth", { value: 16 });
+      return image;
+    },
+  };
+
   const setup = (elements: NonDeletedExcalidrawElement[]) => {
     const scene = new Element.Scene(elements, { skipValidation: true });
     const renderer = new Renderer(scene);
@@ -560,6 +580,8 @@ describe("render override geometry", () => {
       imageCache: new Map(),
       renderGrid: false,
       isExporting: false,
+      scale: 1,
+      renderEnvironment,
       canvasBackgroundColor: "#fff",
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),

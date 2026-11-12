@@ -117,6 +117,8 @@
     "collaborators": "Collaborators",
     "you": "You",
     "toggleGrid": "Toggle grid",
+    "minimap": "Minimap",
+    "zoom": "Zoom",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
@@ -202,7 +204,7 @@
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
-    "showHints": "Show hints",
+    "showHints": "Toolbar hints",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"
@@ -249,6 +251,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
+    "zoomToFit": "Zoom to fit",
     "menu": "Menu",
     "done": "Done",
     "edit": "Edit",
@@ -677,12 +680,15 @@
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "<flowchartLink>Flowcharts</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, <stateLink>State</stateLink> and <erdLink>Entity Relationship</erdLink> diagrams, <ganttLink>Gantt charts</ganttLink>, <quadrantLink>Quadrant charts</quadrantLink> and <timelineLink>Timelines</timelineLink> are converted to Excalidraw elements. Other types are inserted as an image.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
     "inputPlaceholder": "Write Mermaid diagram definition here...",
-    "autoFixAvailable": "Auto-fix is available"
+    "autoFixAvailable": "Auto-fix is available",
+    "loadError": "Couldn't load Mermaid. Check your internet connection and try again.",
+    "loadErrorReload": "Couldn't load Mermaid. Reload the page to try again.",
+    "reload": "Reload"
   },
   "ttd": {
     "error": "Error!"

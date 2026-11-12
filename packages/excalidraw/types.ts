@@ -52,6 +52,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  RenderEnvironment,
   OnDuplicateData,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
@@ -516,6 +517,7 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
+  minimapEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;
@@ -798,26 +800,52 @@ export type InteractionConfig = {
   };
 };
 
-export type UIConfig = {
-  /**
-   * Default UI controls that stay enabled while the rest of Excalidraw's
-   * default UI is hidden. Opt-in: anything omitted or `false` is disabled.
-   */
-  enabled: {
-    /**
-     * The zoom-out, reset-zoom, and zoom-in controls.
-     *
-     * @default false
-     */
-    zoom?: boolean;
-    /**
-     * The button shown when the viewport is scrolled away from all content.
-     *
-     * @default false
-     */
-    scrollBackToContent?: boolean;
-  };
-};
+export type UIConfig =
+  | {
+      /**
+       * Default UI controls that stay enabled while the rest of Excalidraw's
+       * default UI is hidden. Opt-in: anything omitted or `false` is
+       * disabled.
+       */
+      enabled: {
+        /**
+         * The zoom controls (zoom out, the zoom level resetting it, zoom in).
+         *
+         * @default false
+         */
+        zoom?: boolean;
+        /**
+         * The button shown when the viewport is scrolled away from all
+         * content.
+         *
+         * @default false
+         */
+        scrollBackToContent?: boolean;
+      };
+    }
+  | {
+      /**
+       * Default UI controls that are removed while the rest of Excalidraw's
+       * default UI is rendered. Opt-out: anything omitted or `false` stays.
+       */
+      disabled: {
+        /**
+         * The minimap, and every way to toggle it (its footer button, the
+         * Preferences menu item, and the command palette and context menu
+         * entries). Without the minimap toggle next to them, the zoom
+         * controls are the zoom out / zoom level / zoom in buttons instead of
+         * the zoom menu.
+         *
+         * @default false
+         */
+        minimap?: boolean;
+      };
+    };
+
+/** A default UI control that `UIConfig` can keep or remove. */
+export type UIControl =
+  | keyof Extract<UIConfig, { enabled: unknown }>["enabled"]
+  | keyof Extract<UIConfig, { disabled: unknown }>["disabled"];
 
 /** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
 export type ElementRenderOverride = Readonly<{
@@ -851,6 +879,30 @@ export interface ExcalidrawProps {
    * @default document
    */
   ownerDocument?: Document;
+  /**
+   * Host environment used by the renderer and export pipeline to create
+   * canvases and images. Supply a custom implementation to redirect canvas
+   * creation and image decoding to e.g. a host canvas pool, an
+   * `OffscreenCanvas`, or a non-DOM image decoder. When omitted, canvas and
+   * image creation fall back to `ownerDocument` / `ownerWindow`.
+   *
+   * The value must be referentially stable -- every render cache (element
+   * canvases, text metrics, char widths, link icons) is keyed by this
+   * object's identity, so a new identity is a full cache miss. Passing an
+   * inline object literal mints a fresh identity on every React render,
+   * which silently re-rasterizes every element on every frame; hoist it to a
+   * module constant or memoize it (e.g. `useMemo`) instead.
+   *
+   * Only `createCanvas` and `createImage` are required. `createPath` (used to
+   * fill freedraw strokes) falls back to the global `Path2D`, which every
+   * browser has -- a non-browser host without one must supply it. Pass
+   * `document` (the owner document) for SVG exports to be built in it rather
+   * than in the global `document`, and `textMetrics` to measure the editor's
+   * text with your own provider.
+   *
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new ownerWindow.Path2D(d), document: ownerDocument }
+   */
+  renderEnvironment?: RenderEnvironment;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -962,10 +1014,12 @@ export interface ExcalidrawProps {
    * `false`.
    *
    * Pass a config object to keep specific default controls rendered while the
-   * rest of the default UI is hidden (see `UIConfig`):
+   * rest of the default UI is hidden, or to remove specific controls from the
+   * otherwise full default UI (see `UIConfig`):
    *
    * ```tsx
    * <Excalidraw ui={{ enabled: { zoom: true } }} />
+   * <Excalidraw ui={{ disabled: { minimap: true } }} />
    * ```
    *
    * NOTE: this is WIP and what default UI is/is not rendered when ui=false
@@ -1182,6 +1236,7 @@ export type AppClassProperties = {
   state: AppState;
   readonly ownerDocument: Document;
   readonly ownerWindow: Window & typeof globalThis;
+  renderEnvironment: RenderEnvironment;
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
@@ -1206,6 +1261,7 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   viewport: App["viewport"];
+  wheel: App["wheel"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -1252,6 +1308,7 @@ export type AppClassProperties = {
 
   isInteractionEnabled: App["isInteractionEnabled"];
   isNavigationEnabled: App["isNavigationEnabled"];
+  isUIControlEnabled: App["isUIControlEnabled"];
 };
 
 export type PointerDownState = Readonly<{

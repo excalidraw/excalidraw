@@ -21,6 +21,7 @@ import {
   getElementBounds,
   intersectElementWithLineSegment,
   isBoundToContainer,
+  isFrameClippable,
   pointInsideBoundsInclusive,
 } from "@excalidraw/element";
 
@@ -158,7 +159,7 @@ const getFrameClipBounds = (
 ): Bounds | null => {
   const frame = getContainingFrame(element, elementsMap);
 
-  if (!frame) {
+  if (!frame || !isFrameClippable(element, elementsMap)) {
     return null;
   }
 

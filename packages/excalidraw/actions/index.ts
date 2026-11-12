@@ -85,6 +85,7 @@ export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
 export { actionToggleShowHints } from "./actionToggleShowHints";
 
 export { actionToggleStats } from "./actionToggleStats";
+export { actionToggleMinimap } from "./actionToggleMinimap";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionToggleWrap } from "./actionToggleWrap";
 export { actionLink } from "./actionLink";

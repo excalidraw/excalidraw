@@ -111,7 +111,11 @@ export class AppDuplicate {
       );
 
       return (
-        advanceDuplicatedListMarkers(duplicates, this.app.scene).length > 0
+        advanceDuplicatedListMarkers(
+          duplicates,
+          this.app.scene,
+          this.app.renderEnvironment,
+        ).length > 0
       );
     });
   };
@@ -224,10 +228,20 @@ export class AppDuplicate {
       return;
     }
 
-    applyListMarkerAdvances(advances, "prev", this.app.scene);
+    applyListMarkerAdvances(
+      advances,
+      "prev",
+      this.app.scene,
+      this.app.renderEnvironment,
+    );
 
     this.afterCommit(() => {
-      applyListMarkerAdvances(advances, "next", this.app.scene);
+      applyListMarkerAdvances(
+        advances,
+        "next",
+        this.app.scene,
+        this.app.renderEnvironment,
+      );
       editTextOnceCommitted();
       return true;
     });
@@ -503,6 +517,7 @@ export class AppDuplicate {
       pointerDownState.hit.advancedListMarkers = advanceDuplicatedListMarkers(
         duplicatedElements,
         this.app.scene,
+        this.app.renderEnvironment,
       );
 
       // (after advancing the list markers, which may resize the duplicates)
@@ -518,7 +533,9 @@ export class AppDuplicate {
           isBindableElement(element) &&
           element.boundElements?.some((other) => other.type === "arrow")
         ) {
-          updateBoundElements(element, this.app.scene);
+          updateBoundElements(element, this.app.scene, {
+            renderEnvironment: this.app.renderEnvironment,
+          });
         }
       });
 

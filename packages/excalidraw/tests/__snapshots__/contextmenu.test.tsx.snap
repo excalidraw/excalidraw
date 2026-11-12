@@ -950,6 +950,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1164,6 +1165,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1393,6 +1395,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1741,6 +1744,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2089,6 +2093,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2318,6 +2323,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2574,6 +2580,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2889,6 +2896,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -3278,6 +3286,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -3815,6 +3824,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -4155,6 +4165,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -4495,6 +4506,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -5797,6 +5809,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -7031,6 +7044,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -7878,6 +7892,57 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "viewMode": true,
       },
       {
+        "PanelComponent": [Function],
+        "checked": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={"1.25000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13"
+            />
+            <path
+              d="M9 4v13"
+            />
+            <path
+              d="M15 7v13"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "map",
+          "overview",
+          "navigator",
+          "navigation",
+        ],
+        "label": "labels.minimap",
+        "name": "minimap",
+        "navigation": true,
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      {
         "checked": [Function],
         "icon": <svg
           aria-hidden="true"
@@ -8005,6 +8070,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -9018,6 +9084,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -10022,6 +10089,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "isRotating": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
+  "minimapEnabled": false,
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,

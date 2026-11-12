@@ -1,5 +1,10 @@
 import { expect, vi } from "vitest";
 
+import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
+import { pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint } from "@excalidraw/math";
+
 import { Excalidraw } from "../index";
 
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
@@ -61,8 +66,8 @@ mockMermaidToExcalidraw({
               y: 44,
               strokeWidth: 2,
               points: [
-                [0, 0],
-                [0, 50],
+                pointFrom<LocalPoint>(0, 0),
+                pointFrom<LocalPoint>(0, 50),
               ],
               roundness: {
                 type: 2,
@@ -76,6 +81,12 @@ mockMermaidToExcalidraw({
             },
           ],
         });
+      } else if (firstLine === "sequenceDiagram") {
+        reject(
+          new TypeError(
+            "Failed to fetch dynamically imported module: http://localhost/assets/sequenceDiagram.js",
+          ),
+        );
       } else {
         reject(new Error("ERROR"));
       }
@@ -120,6 +131,12 @@ describe("Test <MermaidToExcalidraw/>", () => {
     const dialog = document.querySelector(".ttd-dialog")!;
     await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
     expect(normalizeDialogSnapshot(dialog)).toMatchSnapshot();
+    // flowchart edges as elbow arrows
+    expect(
+      MermaidToExcalidrawLib.parseMermaidToExcalidraw,
+    ).toHaveBeenCalledWith(expect.any(String), {
+      elbow: { flowchart: true },
+    });
   });
 
   it("should show error in preview when mermaid library throws error", async () => {
@@ -141,5 +158,22 @@ describe("Test <MermaidToExcalidraw/>", () => {
     expect(
       dialog.querySelector('[data-testid="mermaid-error"]'),
     ).toMatchInlineSnapshot("null");
+  });
+
+  it("should show a load error when a diagram chunk fails to load", async () => {
+    const dialog = document.querySelector(".ttd-dialog")!;
+    const selector = ".ttd-dialog-input";
+    const editor = await getTextEditor({ selector, waitForEditor: true });
+
+    updateTextEditor(editor, "sequenceDiagram");
+
+    await waitFor(() =>
+      expect(
+        dialog.querySelector('[data-testid="ttd-dialog-output-load-error"]'),
+      ).not.toBeNull(),
+    );
+    expect(
+      dialog.querySelector('[data-testid="ttd-dialog-output-error"]'),
+    ).toBeNull();
   });
 });
