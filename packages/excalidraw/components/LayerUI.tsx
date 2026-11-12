@@ -243,8 +243,7 @@ const LayerUI = ({
     );
   };
 
-  const minimapUIEnabled =
-    defaultUIEnabled && actionManager.isActionEnabled(actionToggleMinimap);
+  const minimapUIEnabled = actionManager.isActionEnabled(actionToggleMinimap);
 
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>

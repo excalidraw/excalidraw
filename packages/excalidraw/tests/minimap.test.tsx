@@ -3,6 +3,7 @@ import { vi } from "vitest";
 
 import { THEME, viewportCoordsToSceneCoords } from "@excalidraw/common";
 
+import { actionToggleMinimap } from "../actions";
 import { Excalidraw } from "../index";
 import { AnimationController } from "../renderer/animation";
 
@@ -96,6 +97,24 @@ describe("minimap", () => {
       await render(<Excalidraw initialData={withContent} />);
       expect(getDot()).toBe(null);
     });
+  });
+
+  it("is removed with every way to toggle it by ui.disabled.minimap", async () => {
+    await render(
+      <Excalidraw
+        ui={{ disabled: { minimap: true } }}
+        initialData={{ appState: { minimapEnabled: true } }}
+      />,
+    );
+
+    expect(getMinimap()).toBe(null);
+    expect(document.querySelector("[data-testid='button-minimap']")).toBe(null);
+    // the Preferences item, command palette and context menu go by it
+    expect(h.app.actionManager.isActionEnabled(actionToggleMinimap)).toBe(
+      false,
+    );
+    // the rest of the default UI stays
+    expect(document.querySelector(".main-menu-trigger")).not.toBe(null);
   });
 
   it("is toggled by the footer button", async () => {

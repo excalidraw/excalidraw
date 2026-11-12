@@ -12,6 +12,7 @@
   align-items: center;
 }
 
+.zoom-button,
 .undo-redo-buttons button,
 .minimap-toggle-button {
   border-radius: 0 !important;
@@ -27,6 +28,69 @@
   .ToolIcon__icon {
     width: 100%;
     height: 100%;
+  }
+}
+
+// the zoom out / zoom level / zoom in buttons, shown instead of the zoom menu
+// when there's no minimap toggle
+.reset-zoom-button {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  padding: 0 0.625rem !important;
+  width: 3.75rem !important;
+  justify-content: center;
+  color: var(--text-primary-color);
+
+  // unlike the other zoom buttons, has no .ToolIcon__icon to show the hover
+  .zoom-actions &:hover:not(:active) {
+    background-color: var(--button-hover-bg);
+  }
+}
+
+// shifted left in zen mode (the wrapper rather than the button, so that the
+// tooltip, positioned off the wrapper, moves along)
+.reset-zoom-button-wrapper {
+  transition: transform var(--zen-mode-transition-duration) ease-in-out;
+}
+
+// faded out in zen mode
+.zoom-out-button-wrapper,
+.zoom-in-button-wrapper {
+  transition: opacity var(--zen-mode-transition-duration) ease-in-out,
+    visibility var(--zen-mode-transition-duration);
+
+  // hidden along with the wrappers, at the end of their fade (see
+  // styles.scss)
+  .zoom-button {
+    transition: visibility var(--zen-mode-transition-duration);
+  }
+}
+
+.zoom-out-button {
+  border-top-left-radius: var(--border-radius-lg) !important;
+  border-bottom-left-radius: var(--border-radius-lg) !important;
+
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+
+  .ToolIcon__icon {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+}
+
+.zoom-in-button {
+  border-top-right-radius: var(--border-radius-lg) !important;
+  border-bottom-right-radius: var(--border-radius-lg) !important;
+
+  :root[dir="rtl"] & {
+    transform: scaleX(-1);
+  }
+
+  .ToolIcon__icon {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
   }
 }
 
