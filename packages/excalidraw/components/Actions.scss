@@ -57,7 +57,44 @@
 }
 
 .minimap-toggle {
+  position: relative;
   display: flex;
+}
+
+// TEMPORARY (see MinimapAnnouncementDot)
+.minimap-announcement-dot {
+  position: absolute;
+  inset-inline-end: 5px;
+  bottom: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  pointer-events: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    animation: minimap-announcement-pulse 1.6s ease-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+@keyframes minimap-announcement-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2.8);
+    opacity: 0;
+  }
 }
 
 .minimap-toggle-button {

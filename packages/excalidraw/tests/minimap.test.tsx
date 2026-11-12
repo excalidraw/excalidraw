@@ -1,13 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { CODES, THEME, viewportCoordsToSceneCoords } from "@excalidraw/common";
+import { THEME, viewportCoordsToSceneCoords } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 import { AnimationController } from "../renderer/animation";
 
 import { API } from "./helpers/api";
-import { Keyboard } from "./helpers/ui";
 import {
   act,
   fireEvent,
@@ -53,8 +52,54 @@ describe("minimap", () => {
     vi.restoreAllMocks();
   });
 
-  it("is toggled by the footer button and the shortcut", async () => {
-    await render(<Excalidraw handleKeyboardGlobally />);
+  describe("announcement dot (temporary)", () => {
+    const getDot = () => document.querySelector(".minimap-announcement-dot");
+    const withContent = {
+      elements: [API.createElement({ type: "rectangle" })],
+    };
+
+    beforeEach(() => {
+      localStorage.clear();
+      // before the announcement ends
+      vi.spyOn(Date, "now").mockReturnValue(Date.UTC(2026, 10, 12));
+    });
+
+    it("is shown until the minimap is opened", async () => {
+      await render(<Excalidraw initialData={withContent} />);
+      expect(getDot()).not.toBe(null);
+
+      fireEvent.click(getToggle());
+      expect(getDot()).toBe(null);
+
+      // nor in later sessions
+      fireEvent.click(getToggle());
+      expect(getDot()).toBe(null);
+      await render(<Excalidraw initialData={withContent} />);
+      expect(getDot()).toBe(null);
+    });
+
+    it("isn't shown in a session that loaded an empty canvas", async () => {
+      await render(<Excalidraw />);
+      expect(getDot()).toBe(null);
+
+      act(() => {
+        API.setElements([API.createElement({ type: "rectangle" })]);
+      });
+      expect(getDot()).toBe(null);
+
+      await render(<Excalidraw initialData={withContent} />);
+      expect(getDot()).not.toBe(null);
+    });
+
+    it("isn't shown once the announcement is over", async () => {
+      vi.spyOn(Date, "now").mockReturnValue(Date.UTC(2026, 10, 20));
+      await render(<Excalidraw initialData={withContent} />);
+      expect(getDot()).toBe(null);
+    });
+  });
+
+  it("is toggled by the footer button", async () => {
+    await render(<Excalidraw />);
 
     expect(getMinimap()).toBe(null);
     expect(getToggle().getAttribute("aria-pressed")).toBe("false");
@@ -64,9 +109,7 @@ describe("minimap", () => {
     expect(getMinimap()).not.toBe(null);
     expect(getToggle().getAttribute("aria-pressed")).toBe("true");
 
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.codePress(CODES.M);
-    });
+    fireEvent.click(getToggle());
     expect(h.state.minimapEnabled).toBe(false);
     expect(getMinimap()).toBe(null);
   });

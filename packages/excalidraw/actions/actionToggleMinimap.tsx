@@ -1,15 +1,13 @@
-import { CODES, KEYS } from "@excalidraw/common";
-
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { IconButton } from "../components/IconButton";
 import { MINIMAP_MIN_EDITOR_HEIGHT } from "../components/Minimap/Minimap";
-import { Tooltip } from "../components/Tooltip";
+import { MinimapAnnouncementDot } from "../components/Minimap/MinimapAnnouncementDot";
+import { Tooltip, hideTooltip } from "../components/Tooltip";
 import { minimapIcon } from "../components/icons";
 import { t } from "../i18n";
 
 import { register } from "./register";
-import { getShortcutFromShortcutName } from "./shortcuts";
 
 export const actionToggleMinimap = register({
   name: "minimap",
@@ -37,23 +35,31 @@ export const actionToggleMinimap = register({
     app.editorInterface.formFactor !== "phone" &&
     appState.height >= MINIMAP_MIN_EDITOR_HEIGHT &&
     app.isNavigationEnabled(),
-  keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.M,
-  PanelComponent: ({ appState, updateData }) => {
-    const shortcut = getShortcutFromShortcutName("minimap");
+  PanelComponent: ({ appState, updateData, app }) => {
     return (
-      <Tooltip label={`${t("labels.minimap")} — ${shortcut}`} delay>
-        <IconButton
-          type="toggle"
-          className="minimap-toggle-button"
-          icon={minimapIcon}
-          aria-label={t("labels.minimap")}
-          aria-keyshortcuts={shortcut}
-          checked={appState.minimapEnabled}
-          onSelect={() => updateData(null)}
-          data-testid="button-minimap"
+      <>
+        <Tooltip label={t("labels.minimap")} delay>
+          <IconButton
+            type="toggle"
+            className="minimap-toggle-button"
+            icon={minimapIcon}
+            aria-label={t("labels.minimap")}
+            checked={appState.minimapEnabled}
+            onSelect={() => {
+              // the tooltip would cover the minimap being opened
+              if (!appState.minimapEnabled) {
+                hideTooltip();
+              }
+              updateData(null);
+            }}
+            data-testid="button-minimap"
+          />
+        </Tooltip>
+        <MinimapAnnouncementDot
+          app={app}
+          minimapEnabled={appState.minimapEnabled}
         />
-      </Tooltip>
+      </>
     );
   },
 });

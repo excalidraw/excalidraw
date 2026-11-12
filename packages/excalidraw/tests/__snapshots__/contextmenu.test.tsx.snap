@@ -7925,7 +7925,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "map",
           "overview",

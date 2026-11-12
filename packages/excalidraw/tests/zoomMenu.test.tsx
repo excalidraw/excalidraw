@@ -47,15 +47,18 @@ describe("zoom menu", () => {
     ).toEqual([
       "zoom-menu-zoomIn",
       "zoom-menu-zoomOut",
-      "zoom-menu-resetZoom",
       "zoom-menu-zoomToFit",
       "zoom-menu-zoomToFitSelectionInViewport",
-      "zoom-menu-zoomToFitSelection",
+      "zoom-menu-resetZoom",
     ]);
-    expect(
-      getMenu()!.querySelector("[data-testid='zoom-menu-zoomToFit']")!
-        .textContent,
-    ).toContain("Shift+1");
+    const getItemText = (name: string) =>
+      getMenu()!.querySelector(`[data-testid='zoom-menu-${name}']`)!
+        .textContent;
+    expect(getItemText("zoomToFit")).toBe("Zoom to fitShift+1");
+    expect(getItemText("zoomToFitSelectionInViewport")).toBe(
+      "Zoom to selectionShift+2",
+    );
+    expect(getItemText("resetZoom")).toBe("Reset zoomShift+0");
 
     fireEvent.click(
       getMenu()!.querySelector("[data-testid='zoom-menu-zoomIn']")!,

@@ -650,7 +650,6 @@ const PreferencesToggleMinimapItem = () => {
   return (
     <DropdownMenuItemCheckbox
       checked={appState.minimapEnabled}
-      shortcut={getShortcutFromShortcutName("minimap")}
       onSelect={(event) => {
         actionManager.executeAction(actionToggleMinimap);
         event.preventDefault();

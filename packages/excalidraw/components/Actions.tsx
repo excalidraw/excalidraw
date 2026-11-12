@@ -18,10 +18,10 @@ import {
   actionZoomIn,
   actionZoomOut,
   actionZoomToFit,
-  actionZoomToFitSelection,
   actionZoomToFitSelectionInViewport,
 } from "../actions/actionCanvas";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { getShortcutKey } from "../shortcut";
 import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";
@@ -925,14 +925,16 @@ const ZoomMenu = ({ actionManager }: { actionManager: ActionManager }) => {
       | typeof actionZoomOut
       | typeof actionResetZoom
       | typeof actionZoomToFit
-      | typeof actionZoomToFitSelectionInViewport
-      | typeof actionZoomToFitSelection,
+      | typeof actionZoomToFitSelectionInViewport,
     label: string,
-    disabled = false,
+    {
+      disabled = false,
+      shortcut = getShortcutFromShortcutName(action.name),
+    }: { disabled?: boolean; shortcut?: string } = {},
   ) => (
     <DropdownMenu.Item
       icon={action.icon}
-      shortcut={getShortcutFromShortcutName(action.name)}
+      shortcut={shortcut}
       disabled={disabled}
       data-testid={`zoom-menu-${action.name}`}
       onSelect={() => actionManager.executeAction(action, "ui")}
@@ -960,16 +962,23 @@ const ZoomMenu = ({ actionManager }: { actionManager: ActionManager }) => {
         onClickOutside={() => setIsOpen(false)}
         onSelect={() => setIsOpen(false)}
       >
-        {renderItem(actionZoomIn, t("buttons.zoomIn"), zoomValue >= MAX_ZOOM)}
-        {renderItem(actionZoomOut, t("buttons.zoomOut"), zoomValue <= MIN_ZOOM)}
-        {renderItem(actionResetZoom, t("buttons.resetZoom"))}
+        {renderItem(actionZoomIn, t("buttons.zoomIn"), {
+          disabled: zoomValue >= MAX_ZOOM,
+        })}
+        {renderItem(actionZoomOut, t("buttons.zoomOut"), {
+          disabled: zoomValue <= MIN_ZOOM,
+        })}
         <DropdownMenu.Separator />
-        {renderItem(actionZoomToFit, t("helpDialog.zoomToFit"))}
+        {renderItem(actionZoomToFit, t("buttons.zoomToFit"))}
         {renderItem(
           actionZoomToFitSelectionInViewport,
-          t("labels.zoomToFitViewport"),
+          t("helpDialog.zoomToSelection"),
         )}
-        {renderItem(actionZoomToFitSelection, t("helpDialog.zoomToSelection"))}
+        {/* Shift+0 rather than its primary CtrlOrCmd+0, in line with the
+            Shift+1/2 above (it accepts both) */}
+        {renderItem(actionResetZoom, t("buttons.resetZoom"), {
+          shortcut: getShortcutKey("Shift+0"),
+        })}
       </DropdownMenu.Content>
     </DropdownMenu>
   );

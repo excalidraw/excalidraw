@@ -296,10 +296,6 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("Alt+Z")]}
             />
             <Shortcut
-              label={t("labels.minimap")}
-              shortcuts={[getShortcutKey("Alt+M")]}
-            />
-            <Shortcut
               label={t("buttons.objectsSnapMode")}
               shortcuts={[getShortcutKey("Alt+S")]}
             />

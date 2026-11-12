@@ -204,7 +204,7 @@
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
-    "showHints": "Show hints",
+    "showHints": "Toolbar hints",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"
@@ -251,6 +251,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
+    "zoomToFit": "Zoom to fit",
     "menu": "Menu",
     "done": "Done",
     "edit": "Edit",
