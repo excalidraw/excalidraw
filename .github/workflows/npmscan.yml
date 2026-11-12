@@ -1,0 +1,25 @@
+name: npmscan
+
+on:
+  pull_request:
+    paths:
+      - package.json
+      - yarn.lock
+      - packages/**/package.json
+      - examples/**/package.json
+      - excalidraw-app/**/package.json
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: NPMscan/npmscan-action@e2ff8c953f1a0b536abd70b4479984137c76e1fe # v1.4.1
+        with:
+          file: yarn.lock
+          mode: warn
+          fail-on-error: false
