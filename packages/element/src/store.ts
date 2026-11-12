@@ -155,7 +155,12 @@ export class Store {
         // also have the synced elements immutable, so that we don't mutate elements,
         // that are already in the scene, otherwise we wouldn't see any change
         params.elements
-          ? syncInvalidIndicesImmutable(params.elements)
+          ? syncInvalidIndicesImmutable(params.elements, {
+              // remote updates (NEVER) preserve versions during healing —
+              // must match the healing performed by `Scene.replaceAllElements`
+              // for the same update, otherwise the two copies diverge
+              preserveVersions: action === CaptureUpdateAction.NEVER,
+            })
           : undefined,
         params.appState,
       );
