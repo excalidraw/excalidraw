@@ -1,4 +1,5 @@
 import { tryParseSpreadsheet } from "../charts";
+import { splitRow } from "../charts/charts.parse";
 
 describe("tryParseSpreadsheet", () => {
   it("works for numbers with comma in them", () => {
@@ -159,6 +160,158 @@ B\t20`,
         labels: ["A", "B"],
         series: [{ title: "Value", values: [10, 20] }],
       },
+    });
+  });
+});
+
+// https://github.com/excalidraw/excalidraw/issues/5156
+describe("splitRow", () => {
+  it("splits on the delimiter and trims cells", () => {
+    expect(splitRow(" a , b,c ", ",")).toEqual(["a", "b", "c"]);
+  });
+
+  it("keeps the delimiter inside quoted cells", () => {
+    expect(splitRow('Jan,"1,000"', ",")).toEqual(["Jan", "1,000"]);
+    expect(splitRow('"Rio, RJ";"2;5"', ";")).toEqual(["Rio, RJ", "2;5"]);
+  });
+
+  it("turns doubled quotes inside a quoted cell into one quote", () => {
+    expect(splitRow('"say ""hi""",1', ",")).toEqual(['say "hi"', "1"]);
+  });
+
+  it("treats a quote in the middle of a cell as a normal character", () => {
+    expect(splitRow('5" screen,10', ",")).toEqual(['5" screen', "10"]);
+  });
+
+  it("ignores quoting when a quote is left open", () => {
+    expect(splitRow('"open,10', ",")).toEqual(['"open', "10"]);
+  });
+
+  it("treats runs of spaces as one delimiter, ignoring outer spaces", () => {
+    expect(splitRow("  a   b  c ", " ")).toEqual(["a", "b", "c"]);
+  });
+
+  it("keeps multiple words together when quoted with the space delimiter", () => {
+    expect(splitRow('"hello world" "1,000"', " ")).toEqual([
+      "hello world",
+      "1,000",
+    ]);
+  });
+
+  it("keeps empty cells", () => {
+    expect(splitRow("\tDunk\tEgg", "\t")).toEqual(["", "Dunk", "Egg"]);
+    expect(splitRow('a,"",c', ",")).toEqual(["a", "", "c"]);
+  });
+});
+
+describe("tryParseSpreadsheet with quoted and space-separated values", () => {
+  it("parses CSV with quoted values containing commas", () => {
+    const result = tryParseSpreadsheet(
+      `Month,Sales
+Jan,"1,000"
+Feb,"2,500"
+"Mar, partial",700`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Sales",
+        labels: ["Jan", "Feb", "Mar, partial"],
+        series: [{ title: "Sales", values: [1000, 2500, 700] }],
+      },
+    });
+  });
+
+  it("parses space-separated values, with quotes grouping words", () => {
+    const result = tryParseSpreadsheet(
+      `greeting points
+"hello world" "1,000"
+hi 300`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "points",
+        labels: ["hello world", "hi"],
+        series: [{ title: "points", values: [1000, 300] }],
+      },
+    });
+  });
+
+  it("parses multi-series space-separated values aligned with spaces", () => {
+    const result = tryParseSpreadsheet(
+      `Metric   A    B
+Speed    80   60
+Power    65   85`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Metric",
+        labels: ["Speed", "Power"],
+        series: [
+          { title: "A", values: [80, 65] },
+          { title: "B", values: [60, 85] },
+        ],
+      },
+    });
+  });
+
+  it("prefers comma over space when both split the rows evenly", () => {
+    const result = tryParseSpreadsheet(
+      `City name,Population
+New York,800
+Los Angeles,400`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "Population",
+        labels: ["New York", "Los Angeles"],
+        series: [{ title: "Population", values: [800, 400] }],
+      },
+    });
+  });
+
+  it("does not take spaces as columns without a header row", () => {
+    expect(tryParseSpreadsheet("Step 1\nStep 2\nStep 3").ok).toBe(false);
+  });
+
+  it("does not parse a single line of plain text", () => {
+    expect(tryParseSpreadsheet("hello world").ok).toBe(false);
+  });
+
+  it("fails when words without quotes break the space columns", () => {
+    expect(
+      tryParseSpreadsheet(`city count
+Rio de Janeiro 300
+Recife 200`).ok,
+    ).toBe(false);
+  });
+
+  it("parses the same data once the multi-word label is quoted", () => {
+    const result = tryParseSpreadsheet(`city count
+"Rio de Janeiro" 300
+Recife 200`);
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "count",
+        labels: ["Rio de Janeiro", "Recife"],
+        series: [{ title: "count", values: [300, 200] }],
+      },
+    });
+  });
+
+  it("still reports empty input", () => {
+    expect(tryParseSpreadsheet("  \n \n")).toEqual({
+      ok: false,
+      reason: "No values",
     });
   });
 });
