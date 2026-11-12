@@ -163,7 +163,7 @@ import {
   isFrameClippable,
   addElementsToFrame,
   replaceAllElementsInFrame,
-  removeArrowsWithoutEndInFrame,
+  updateArrowFrames,
   removeElementsFromFrame,
   getElementsInResizingFrame,
   getElementsInNewFrame,
@@ -5484,12 +5484,12 @@ class App extends React.Component<AppProps, AppState> {
           renderEnvironment: this.renderEnvironment,
         });
         // a moved arrow's ends may have left its frame
-        removeArrowsWithoutEndInFrame(
-          movedElements,
-          this.scene.getNonDeletedElementsMap(),
+        this.scene.replaceAllElements(
+          updateArrowFrames(
+            movedElements,
+            this.scene.getElementsIncludingDeleted(),
+          ),
         );
-
-        this.scene.triggerUpdate();
 
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {

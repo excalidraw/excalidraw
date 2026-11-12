@@ -44,7 +44,7 @@ import {
   transformElements,
   uncropElementSides,
   updateBoundElements,
-  removeArrowsWithoutEndInFrame,
+  updateArrowFrames,
   updateFrameMembershipOfSelectedElements,
 } from "@excalidraw/element";
 import {
@@ -1219,7 +1219,7 @@ export class AppSelectionTool {
       this.app,
     );
     // the dragged arrows, and those bound to the dragged elements
-    removeArrowsWithoutEndInFrame(selectedElements, nextElements);
+    nextElements = updateArrowFrames(selectedElements, nextElements);
 
     this.app.scene.replaceAllElements(nextElements);
   };

@@ -19,7 +19,7 @@ import { getFrameChildren } from "@excalidraw/element";
 import {
   getFrameArrowIdsToReattach,
   moveFrameArrows,
-  removeArrowsWithoutEndInFrame,
+  updateArrowFrames,
   updateBindings,
 } from "@excalidraw/element";
 import { DRAGGING_THRESHOLD } from "@excalidraw/common";
@@ -249,9 +249,8 @@ export const moveElement = (
   }
 
   // a moved arrow's ends may have left its frame
-  removeArrowsWithoutEndInFrame(
-    [latestElement],
-    scene.getNonDeletedElementsMap(),
+  scene.replaceAllElements(
+    updateArrowFrames([latestElement], scene.getElementsIncludingDeleted()),
   );
 };
 
