@@ -2,9 +2,11 @@
 
 import { RoughCanvas } from "roughjs/bin/canvas";
 
-import { newElement } from "@excalidraw/element";
+import { mutateElement, newElement } from "@excalidraw/element";
 
 import { vi } from "vitest";
+
+import { THEME } from "@excalidraw/common";
 
 import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
@@ -71,10 +73,12 @@ const makeConfig = (
     scale,
     renderEnvironment,
     canvas = makeScene(),
+    theme = appState.theme,
   }: {
     scale: number;
     renderEnvironment: RenderEnvironment;
     canvas?: HTMLCanvasElement;
+    theme?: StaticCanvasAppState["theme"];
   },
 ): StaticSceneRenderConfig => {
   const elementsMap = new Map(
@@ -88,7 +92,7 @@ const makeConfig = (
     allElementsMap: elementsMap as unknown as NonDeletedSceneElementsMap,
     visibleElements: elements,
     scale,
-    appState,
+    appState: { ...appState, theme },
     renderConfig: {
       canvasBackgroundColor: "",
       scale,
@@ -99,7 +103,7 @@ const makeConfig = (
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
       pendingFlowchartNodes: null,
-      theme: appState.theme,
+      theme,
       renderEnvironment,
     },
   };
@@ -180,6 +184,145 @@ describe("element canvas cache", () => {
     );
     expect(a.canvases).toHaveLength(2);
     expect(b.canvases).toHaveLength(1);
+  });
+
+  it("reuses the previous theme's bitmap when switching back", () => {
+    const { env, canvases } = makeEnv();
+    const elements = [rect()];
+
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.LIGHT,
+      }),
+    );
+    expect(canvases).toHaveLength(1);
+
+    // switching to dark theme generates the other theme's bitmap
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.DARK,
+      }),
+    );
+    expect(canvases).toHaveLength(2);
+
+    // switching back to light reuses the previous light bitmap
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.LIGHT,
+      }),
+    );
+    expect(canvases).toHaveLength(2);
+
+    // switching back to dark reuses the previous dark bitmap
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.DARK,
+      }),
+    );
+    expect(canvases).toHaveLength(2);
+  });
+
+  it("invalidates both themes on resize", () => {
+    const { env, canvases } = makeEnv();
+    const element = rect();
+    const elements = [element];
+
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.LIGHT,
+      }),
+    );
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.DARK,
+      }),
+    );
+    expect(canvases).toHaveLength(2);
+
+    mutateElement(element, new Map(), { width: 200 });
+
+    // dark theme was invalidated by resize -> regenerates with new size
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.DARK,
+      }),
+    );
+    expect(canvases).toHaveLength(3);
+    expect(canvases[2].width).toBe(200 * 1 + 40);
+
+    // light theme was also invalidated by resize -> regenerates with new size
+    renderStaticScene(
+      makeConfig(elements, {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.LIGHT,
+      }),
+    );
+    expect(canvases).toHaveLength(4);
+    expect(canvases[3].width).toBe(200 * 1 + 40);
+  });
+
+  it("draws a recolored element (new element object) afresh in both themes", () => {
+    const { env, canvases } = makeEnv();
+    const element = rect();
+
+    renderStaticScene(
+      makeConfig([element], {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.LIGHT,
+      }),
+    );
+    renderStaticScene(
+      makeConfig([element], {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.DARK,
+      }),
+    );
+    expect(canvases).toHaveLength(2);
+
+    const recolored = newElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+      strokeColor: "#ff0000",
+    }) as NonDeletedExcalidrawElement;
+
+    // a new element object must not reuse either cached bitmap
+    renderStaticScene(
+      makeConfig([recolored], {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.DARK,
+      }),
+    );
+    expect(canvases).toHaveLength(3);
+
+    renderStaticScene(
+      makeConfig([recolored], {
+        scale: 1,
+        renderEnvironment: env,
+        theme: THEME.LIGHT,
+      }),
+    );
+    expect(canvases).toHaveLength(4);
   });
 });
 
