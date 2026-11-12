@@ -270,6 +270,7 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggleMinimap,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -4319,6 +4320,13 @@ class App extends React.Component<AppProps, AppState> {
     this.handleForcedToolChange(prevProps, prevState);
     this.host.sync(prevProps);
 
+    // applied before the state change listeners below are notified, for
+    // those that read theme-dependent styles
+    this.excalidrawContainerRef.current?.classList.toggle(
+      "theme--dark",
+      this.state.theme === THEME.DARK,
+    );
+
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -4424,11 +4432,6 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.theme !== this.props.theme && this.props.theme) {
       this.setState({ theme: this.props.theme });
     }
-
-    this.excalidrawContainerRef.current?.classList.toggle(
-      "theme--dark",
-      this.state.theme === THEME.DARK,
-    );
 
     if (
       this.state.selectedLinearElement?.isEditing &&
@@ -11241,6 +11244,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleGridMode,
           actionToggleZenMode,
           actionToggleViewMode,
+          actionToggleMinimap,
           actionToggleStats,
         ];
       }
@@ -11261,6 +11265,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
+        actionToggleMinimap,
         actionToggleStats,
       ];
     }

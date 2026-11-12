@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Popover } from "radix-ui";
 
-import { CLASSES } from "@excalidraw/common";
+import { CLASSES, MAX_ZOOM, MIN_ZOOM } from "@excalidraw/common";
 
 import { isArrowElement } from "@excalidraw/element";
 
@@ -13,6 +13,16 @@ import type {
 } from "@excalidraw/element/types";
 
 import { actionToggleZenMode } from "../actions";
+import {
+  actionResetZoom,
+  actionZoomIn,
+  actionZoomOut,
+  actionZoomToFit,
+  actionZoomToFitSelectionInViewport,
+} from "../actions/actionCanvas";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { getShortcutKey } from "../shortcut";
+import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";
 import { getTargetElements } from "../scene";
@@ -25,8 +35,8 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import "./Actions.scss";
 
-import { useExcalidrawContainer } from "./App";
-import Stack from "./Stack";
+import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { Tooltip } from "./Tooltip";
 import { PropertiesPopover } from "./PropertiesPopover";
 import {
@@ -874,19 +884,105 @@ export const MobileShapeActions = ({
   );
 };
 
+/**
+ * The zoom level, opening a menu of the zoom actions, along with the minimap
+ * toggle.
+ */
 export const ZoomActions = ({
-  renderAction,
+  actionManager,
+  zoomUIEnabled,
+  minimapUIEnabled,
+  zenModeEnabled,
 }: {
-  renderAction: ActionManager["renderAction"];
+  actionManager: ActionManager;
+  zoomUIEnabled: boolean;
+  minimapUIEnabled: boolean;
+  zenModeEnabled: boolean;
 }) => (
-  <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
-    <Stack.Row align="center">
-      {renderAction("zoomOut")}
-      {renderAction("resetZoom")}
-      {renderAction("zoomIn")}
-    </Stack.Row>
-  </Stack.Col>
+  <div className={CLASSES.ZOOM_ACTIONS}>
+    {zoomUIEnabled && <ZoomMenu actionManager={actionManager} />}
+    {minimapUIEnabled && (
+      <div
+        className={clsx("minimap-toggle zen-mode-transition", {
+          "layer-ui__wrapper__footer-left--transition-bottom": zenModeEnabled,
+        })}
+      >
+        {actionManager.renderAction("minimap")}
+      </div>
+    )}
+  </div>
 );
+
+const ZoomMenu = ({ actionManager }: { actionManager: ActionManager }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const setAppState = useExcalidrawSetAppState();
+  const zoomValue = useAppStateValue((appState) => appState.zoom.value);
+  const zoomLevel = `${(zoomValue * 100).toFixed(0)}%`;
+
+  const renderItem = (
+    action:
+      | typeof actionZoomIn
+      | typeof actionZoomOut
+      | typeof actionResetZoom
+      | typeof actionZoomToFit
+      | typeof actionZoomToFitSelectionInViewport,
+    label: string,
+    {
+      disabled = false,
+      shortcut = getShortcutFromShortcutName(action.name),
+    }: { disabled?: boolean; shortcut?: string } = {},
+  ) => (
+    <DropdownMenu.Item
+      icon={action.icon}
+      shortcut={shortcut}
+      disabled={disabled}
+      data-testid={`zoom-menu-${action.name}`}
+      onSelect={() => actionManager.executeAction(action, "ui")}
+    >
+      {label}
+    </DropdownMenu.Item>
+  );
+
+  return (
+    <DropdownMenu open={isOpen}>
+      <DropdownMenu.Trigger
+        className="zoom-menu-trigger"
+        aria-label={`${t("labels.zoom")}: ${zoomLevel}`}
+        data-testid="zoom-menu-trigger"
+        onToggle={() => {
+          setIsOpen(!isOpen);
+          setAppState({ openMenu: null, openPopup: null });
+        }}
+      >
+        {zoomLevel}
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content
+        className="zoom-menu"
+        align="start"
+        onClickOutside={() => setIsOpen(false)}
+        onSelect={() => setIsOpen(false)}
+      >
+        {renderItem(actionZoomIn, t("buttons.zoomIn"), {
+          disabled: zoomValue >= MAX_ZOOM,
+        })}
+        {renderItem(actionZoomOut, t("buttons.zoomOut"), {
+          disabled: zoomValue <= MIN_ZOOM,
+        })}
+        <DropdownMenu.Separator />
+        {renderItem(actionZoomToFit, t("buttons.zoomToFit"))}
+        {renderItem(
+          actionZoomToFitSelectionInViewport,
+          t("helpDialog.zoomToSelection"),
+        )}
+        {/* Shift+0 rather than its primary CtrlOrCmd+0, in line with the
+            Shift+1/2 above (it accepts both) */}
+        {renderItem(actionResetZoom, t("buttons.resetZoom"), {
+          shortcut: getShortcutKey("Shift+0"),
+        })}
+      </DropdownMenu.Content>
+    </DropdownMenu>
+  );
+};
 
 export const UndoRedoActions = ({
   renderAction,

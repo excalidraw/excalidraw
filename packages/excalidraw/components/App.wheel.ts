@@ -119,8 +119,12 @@ export class AppWheel {
     }
   };
 
-  /** zooms around the pointer by a wheel delta (positive = zoom out) */
-  private zoomBy = (deltaY: number) => {
+  /**
+   * Zooms by a wheel delta (positive = zoom out) — around the pointer, or
+   * around the center of the viewport (when wheeling elsewhere than over
+   * the canvas, e.g. over the minimap).
+   */
+  zoomBy = (deltaY: number, anchor: "pointer" | "center" = "pointer") => {
     const { viewport } = this.app;
 
     const sign = Math.sign(deltaY);
@@ -133,7 +137,7 @@ export class AppWheel {
 
     // where the pointer is now — the updater below runs when React flushes,
     // by which time the pointer may have moved on (`lastPosition` is live)
-    const { x: viewportX, y: viewportY } = viewport.lastPosition;
+    const pointer = { ...viewport.lastPosition };
 
     const didTranslate = viewport.translate(
       // computed from the state the zoom applies to, not `app.state`: wheel
@@ -157,6 +161,14 @@ export class AppWheel {
           // flag would only redraw the scene on every tick
           return null;
         }
+
+        const { x: viewportX, y: viewportY } =
+          anchor === "center"
+            ? {
+                x: state.width / 2 + state.offsetLeft,
+                y: state.height / 2 + state.offsetTop,
+              }
+            : pointer;
 
         return {
           ...getViewportForZoomWithScrollConstraints(
