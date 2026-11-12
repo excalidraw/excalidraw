@@ -67,4 +67,29 @@ describe("zoom menu", () => {
     expect(getTrigger().textContent).toBe("110%");
     expect(getMenu()).toBe(null);
   });
+
+  it.each([
+    ["the reduced UI", { enabled: { zoom: true } }],
+    ["ui.disabled.minimap", { disabled: { minimap: true } }],
+  ] as const)(
+    "is replaced by the zoom buttons without the minimap toggle (%s)",
+    async (_, ui) => {
+      await render(<Excalidraw ui={ui} />);
+
+      expect(getTrigger()).toBe(null);
+      const getResetButton = () =>
+        document.querySelector<HTMLElement>(".reset-zoom-button")!;
+      expect(getResetButton().textContent).toBe("100%");
+
+      fireEvent.click(document.querySelector(".zoom-in-button")!);
+      expect(getResetButton().textContent).toBe("110%");
+
+      fireEvent.click(document.querySelector(".zoom-out-button")!);
+      fireEvent.click(document.querySelector(".zoom-out-button")!);
+      expect(getResetButton().textContent).toBe("90%");
+
+      fireEvent.click(getResetButton());
+      expect(h.state.zoom.value).toBe(1);
+    },
+  );
 });

@@ -31,6 +31,9 @@ export const actionToggleMinimap = register({
   },
   checked: (appState) => appState.minimapEnabled,
   predicate: (elements, appState, appProps, app) =>
+    // not part of the host's UI (`ui={false}`, `ui.enabled`, or
+    // `ui.disabled.minimap`)
+    app.isUIControlEnabled("minimap") &&
     // the minimap lives in the footer, which isn't rendered on phones
     app.editorInterface.formFactor !== "phone" &&
     appState.height >= MINIMAP_MIN_EDITOR_HEIGHT &&

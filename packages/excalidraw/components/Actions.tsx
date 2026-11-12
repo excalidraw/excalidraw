@@ -886,7 +886,8 @@ export const MobileShapeActions = ({
 
 /**
  * The zoom level, opening a menu of the zoom actions, along with the minimap
- * toggle.
+ * toggle. Without the minimap toggle (removed by the host's `ui` config), the
+ * zoom out / zoom level (resetting it) / zoom in buttons instead.
  */
 export const ZoomActions = ({
   actionManager,
@@ -900,7 +901,16 @@ export const ZoomActions = ({
   zenModeEnabled: boolean;
 }) => (
   <div className={CLASSES.ZOOM_ACTIONS}>
-    {zoomUIEnabled && <ZoomMenu actionManager={actionManager} />}
+    {zoomUIEnabled &&
+      (minimapUIEnabled ? (
+        <ZoomMenu actionManager={actionManager} />
+      ) : (
+        <>
+          {actionManager.renderAction("zoomOut")}
+          {actionManager.renderAction("resetZoom")}
+          {actionManager.renderAction("zoomIn")}
+        </>
+      ))}
     {minimapUIEnabled && (
       <div
         className={clsx("minimap-toggle zen-mode-transition", {

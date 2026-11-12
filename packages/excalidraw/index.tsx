@@ -40,6 +40,7 @@ import type {
   AppState,
   ExcalidrawImperativeAPI,
   ExcalidrawProps,
+  UIConfig,
 } from "./types";
 
 polyfill();
@@ -268,6 +269,22 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   );
 };
 
+/** Same form (`enabled` or `disabled`), with the same controls in it. */
+const isUIConfigSame = (prev: UIConfig, next: UIConfig) => {
+  const getControls = (config: UIConfig) =>
+    ("enabled" in config ? config.enabled : config.disabled) as
+      | Record<string, boolean | undefined>
+      | undefined;
+  if ("enabled" in prev !== "enabled" in next) {
+    return false;
+  }
+  const prevControls = getControls(prev) ?? {};
+  const nextControls = getControls(next) ?? {};
+  return [
+    ...new Set([...Object.keys(prevControls), ...Object.keys(nextControls)]),
+  ].every((control) => !!prevControls[control] === !!nextControls[control]);
+};
+
 const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   // short-circuit early
   if (prevProps.children !== nextProps.children) {
@@ -339,9 +356,7 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
       prevUI !== null &&
       typeof nextUI === "object" &&
       nextUI !== null &&
-      !!prevUI.enabled?.zoom === !!nextUI.enabled?.zoom &&
-      !!prevUI.enabled?.scrollBackToContent ===
-        !!nextUI.enabled?.scrollBackToContent);
+      isUIConfigSame(prevUI, nextUI));
 
   if (!isUISame) {
     return false;
