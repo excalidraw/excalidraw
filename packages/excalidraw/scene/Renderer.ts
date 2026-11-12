@@ -309,6 +309,25 @@ export class Renderer {
     ] as readonly T[];
   }
 
+  /**
+   * The renderable elements map doesn't depend on the viewport, so it's
+   * memoized separately from the visibility culling: panning and zooming
+   * only re-run the culling instead of rebuilding the map.
+   */
+  private _getRenderableElementsMap = memoize(
+    ({
+      editingTextElement,
+      newElement,
+    }: Pick<GetRenderableElementsOpts, "editingTextElement" | "newElement"> & {
+      canvasNonce: string;
+    }) =>
+      this.getRenderableElementsMap({
+        elements: this.scene.getNonDeletedElements(),
+        editingTextElement,
+        newElement,
+      }),
+  );
+
   private _getRenderableElements = memoize(
     ({
       canvasNonce,
@@ -329,11 +348,9 @@ export class Renderer {
     > & {
       canvasNonce: string;
     }) => {
-      const elements = this.scene.getNonDeletedElements();
-
       const { elementsMap, newElementCanvasElement } =
-        this.getRenderableElementsMap({
-          elements,
+        this._getRenderableElementsMap({
+          canvasNonce,
           editingTextElement,
           newElement,
         });
@@ -419,6 +436,7 @@ export class Renderer {
   public destroy(staticCanvas: HTMLCanvasElement) {
     cancelStaticSceneThrottle(staticCanvas);
     this._getRenderableElements.clear();
+    this._getRenderableElementsMap.clear();
     this._getVisibleElementsWithRenderOffsets.clear();
   }
 }
