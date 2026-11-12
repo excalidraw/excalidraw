@@ -156,85 +156,58 @@ Since Vite removes env variables by default, you can update the vite config to e
 ```
 :::
 
-## Browser
+## Browser without a React project
 
-To use it Excalidraw in a browser directly, use the following setup :point_down:
+You do not need a React project or a build tool to use Excalidraw in the browser. The React runtime is still required, so the example below loads React and ReactDOM from a CDN and uses native ES modules and an import map.
 
-> **Note**: We rely on import maps to de-duplicate `react`, `react-dom` and `react/jsx-runtime` versions.
-
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-
-<Tabs>
-  <TabItem value="html" label="html">
+Save this as `index.html`, then serve it through a local web server. It cannot be opened directly with `file://`, because browsers do not support import maps and ES module imports from local files.
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Excalidraw in browser</title>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Excalidraw in the browser</title>
     <link
       rel="stylesheet"
       href="https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.css"
     />
-    <link rel="stylesheet" href="./index.css" />
     <script>
-    	window.EXCALIDRAW_ASSET_PATH = "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/prod/";
-		</script>
+      window.EXCALIDRAW_ASSET_PATH =
+        "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/prod/";
+    </script>
     <script type="importmap">
       {
         "imports": {
           "react": "https://esm.sh/react@19.0.0",
           "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
           "react-dom": "https://esm.sh/react-dom@19.0.0"
-          }
+        }
       }
     </script>
   </head>
-
   <body>
-    <div class="container">
-      <h1>Excalidraw Embed Example</h1>
-      <div id="app"></div>
-    </div>
-    <script type="text/javascript" src="packages/excalidraw/index.js"></script>
+    <div id="app"></div>
+
+    <script type="module">
+      import { Excalidraw } from "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom";
+      import React from "react";
+      import ReactDOM from "react-dom";
+
+      const app = document.getElementById("app");
+      const root = ReactDOM.createRoot(app);
+
+      root.render(
+        React.createElement(
+          "div",
+          { style: { height: "500px" } },
+          React.createElement(Excalidraw),
+        ),
+      );
+    </script>
   </body>
 </html>
 ```
-
-</TabItem>
-<TabItem value="js" label="Javascript">
-
-```js showLineNumbers
-// See https://www.npmjs.com/package/@excalidraw/excalidraw documentation.
-import * as ExcalidrawLib from 'https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
-import React from "https://esm.sh/react@19.0.0";
-import ReactDOM from "https://esm.sh/react-dom@19.0.0"
-
-window.ExcalidrawLib = ExcalidrawLib;
-console.log("Excalidraw library", ExcalidrawLib);
-
-const App = () => {
-  return React.createElement(
-    React.Fragment,
-    null,
-    React.createElement(
-      "div",
-      {
-        style: { height: "500px" },
-      },
-      React.createElement(ExcalidrawLib.Excalidraw),
-    ),
-  );
-};
-
-const excalidrawWrapper = document.getElementById("app");
-const root = ReactDOM.createRoot(excalidrawWrapper);
-root.render(React.createElement(App));
-```
-
-</TabItem>
-</Tabs>
 
 You can try it out [here](https://jsfiddle.net/vfn6dm14/3/).
