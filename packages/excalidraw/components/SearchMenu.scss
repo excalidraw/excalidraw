@@ -59,6 +59,22 @@
     }
   }
 
+  .layer-ui__search-handwriting {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    [role="status"] {
+      margin-top: 0.5rem;
+      color: var(--color-gray-70);
+    }
+  }
+
   .layer-ui__search-result-container {
     overflow-y: auto;
     flex: 1 1 0;

@@ -2068,39 +2068,55 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
-  appState.searchMatches?.matches.forEach(({ id, focus, matchedLines }) => {
-    const element = elementsMap.get(id);
+  appState.searchMatches?.matches.forEach(
+    ({ id, focus, matchedLines, sceneBounds }) => {
+      const element = elementsMap.get(id);
 
-    if (element) {
-      const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
-        element,
-        elementsMap,
-        true,
-      );
+      if (element) {
+        const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
+          element,
+          elementsMap,
+          true,
+        );
 
-      context.save();
-      context.fillStyle =
-        SEARCH_MATCH_COLOR[appState.theme][focus ? "focus" : "match"];
+        context.save();
+        context.fillStyle =
+          SEARCH_MATCH_COLOR[appState.theme][focus ? "focus" : "match"];
 
-      const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
-
-      context.translate(appState.scrollX, appState.scrollY);
-      context.translate(cx, cy);
-      context.rotate(element.angle);
-
-      matchedLines.forEach((matchedLine) => {
-        (matchedLine.showOnCanvas || focus) &&
+        if (sceneBounds) {
+          context.translate(appState.scrollX, appState.scrollY);
           context.fillRect(
-            elementX1 + matchedLine.offsetX / zoomFactor - cx,
-            elementY1 + matchedLine.offsetY / zoomFactor - cy,
-            matchedLine.width / zoomFactor,
-            matchedLine.height / zoomFactor,
+            sceneBounds[0],
+            sceneBounds[1],
+            sceneBounds[2] - sceneBounds[0],
+            sceneBounds[3] - sceneBounds[1],
           );
-      });
+          context.restore();
+          return;
+        }
 
-      context.restore();
-    }
-  });
+        const zoomFactor = isFrameLikeElement(element)
+          ? appState.zoom.value
+          : 1;
+
+        context.translate(appState.scrollX, appState.scrollY);
+        context.translate(cx, cy);
+        context.rotate(element.angle);
+
+        matchedLines.forEach((matchedLine) => {
+          (matchedLine.showOnCanvas || focus) &&
+            context.fillRect(
+              elementX1 + matchedLine.offsetX / zoomFactor - cx,
+              elementY1 + matchedLine.offsetY / zoomFactor - cy,
+              matchedLine.width / zoomFactor,
+              matchedLine.height / zoomFactor,
+            );
+        });
+
+        context.restore();
+      }
+    },
+  );
 
   renderSnaps(context, appState);
 

@@ -32,6 +32,7 @@ import { getDefaultFrameName } from "@excalidraw/element/frame";
 import type { RenderEnvironment } from "@excalidraw/element";
 import type {
   ExcalidrawFrameLikeElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
@@ -39,6 +40,7 @@ import { atom, useAtom } from "../editor-jotai";
 
 import { useStable } from "../hooks/useStable";
 import { t } from "../i18n";
+import { useHandwritingSearch } from "../search/useHandwritingSearch";
 
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
@@ -53,6 +55,7 @@ import {
 
 import "./SearchMenu.scss";
 
+import type { HandwritingResult } from "../search/handwriting";
 import type { AppClassProperties, SearchMatch } from "../types";
 
 const searchQueryAtom = atom<string>("");
@@ -61,7 +64,11 @@ export const searchItemInFocusAtom = atom<number | null>(null);
 const SEARCH_DEBOUNCE = 350;
 
 type SearchMatchItem = {
-  element: ExcalidrawTextElement | ExcalidrawFrameLikeElement;
+  element:
+    | ExcalidrawTextElement
+    | ExcalidrawFrameLikeElement
+    | ExcalidrawFreeDrawElement;
+  sceneBounds?: SearchMatch["sceneBounds"];
   searchQuery: SearchQuery;
   index: number;
   preview: {
@@ -90,6 +97,15 @@ export const SearchMenu = () => {
   const searchQuery = inputValue.trim() as SearchQuery;
 
   const [isSearching, setIsSearching] = useState(false);
+  const [includeHandwriting, setIncludeHandwriting] = useState(false);
+  const handwriting = useHandwritingSearch(app, includeHandwriting);
+  const searchedHandwritingRef = useRef<HandwritingResult[]>([]);
+  // Debouncing is local to this panel, so multiple editors cannot cancel each other.
+  const handleSearch = useMemo(
+    () => debounce(findMatches, SEARCH_DEBOUNCE),
+    [],
+  );
+  useEffect(() => () => handleSearch.cancel(), [handleSearch]);
 
   const [searchMatches, setSearchMatches] = useState<SearchMatches>({
     nonce: null,
@@ -107,29 +123,37 @@ export const SearchMenu = () => {
     }
     if (
       searchQuery !== searchedQueryRef.current ||
+      handwriting.results !== searchedHandwritingRef.current ||
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
       searchedQueryRef.current = null;
-      handleSearch(searchQuery, app, (matchItems, index) => {
-        setSearchMatches({
-          nonce: randomInteger(),
-          items: matchItems,
-        });
-        searchedQueryRef.current = searchQuery;
-        lastSceneNonceRef.current = app.scene.getSceneNonce();
-        setAppState({
-          searchMatches: matchItems.length
-            ? {
-                focusedId: null,
-                matches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.element.id,
-                  focus: false,
-                  matchedLines: searchMatch.matchedLines,
-                })),
-              }
-            : null,
-        });
-      });
+      handleSearch(
+        searchQuery,
+        app,
+        handwriting.results,
+        (matchItems, index) => {
+          setSearchMatches({
+            nonce: randomInteger(),
+            items: matchItems,
+          });
+          searchedQueryRef.current = searchQuery;
+          searchedHandwritingRef.current = handwriting.results;
+          lastSceneNonceRef.current = app.scene.getSceneNonce();
+          setAppState({
+            searchMatches: matchItems.length
+              ? {
+                  focusedId: null,
+                  matches: matchItems.map((searchMatch) => ({
+                    id: searchMatch.element.id,
+                    focus: false,
+                    matchedLines: searchMatch.matchedLines,
+                    sceneBounds: searchMatch.sceneBounds,
+                  })),
+                }
+              : null,
+          });
+        },
+      );
     }
   }, [
     isSearching,
@@ -139,6 +163,8 @@ export const SearchMenu = () => {
     setAppState,
     setFocusIndex,
     lastSceneNonceRef,
+    handwriting.results,
+    handleSearch,
   ]);
 
   const goToNextItem = () => {
@@ -197,6 +223,15 @@ export const SearchMenu = () => {
       const match = searchMatches.items[focusIndex];
 
       if (match) {
+        if (match.sceneBounds) {
+          app.viewport.setViewport({
+            target: match.sceneBounds,
+            fit: "scale-down",
+            animation: { duration: 300 },
+            offsets: { ui: true },
+          });
+          return;
+        }
         const zoomValue = app.state.zoom.value;
 
         const matchAsElement = newTextElement({
@@ -205,12 +240,12 @@ export const SearchMenu = () => {
           y: match.element.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
-          fontSize: isFrameLikeElement(match.element)
-            ? FRAME_STYLE.nameFontSize
-            : match.element.fontSize,
-          fontFamily: isFrameLikeElement(match.element)
-            ? FONT_FAMILY.Assistant
-            : match.element.fontFamily,
+          fontSize: isTextElement(match.element)
+            ? match.element.fontSize
+            : FRAME_STYLE.nameFontSize,
+          fontFamily: isTextElement(match.element)
+            ? match.element.fontFamily
+            : FONT_FAMILY.Assistant,
         });
 
         const FONT_SIZE_LEGIBILITY_THRESHOLD = 14;
@@ -355,32 +390,61 @@ export const SearchMenu = () => {
             setInputValue(value);
             setIsSearching(true);
             const searchQuery = value.trim() as SearchQuery;
-            handleSearch(searchQuery, app, (matchItems, index) => {
-              setSearchMatches({
-                nonce: randomInteger(),
-                items: matchItems,
-              });
-              setFocusIndex(index);
-              searchedQueryRef.current = searchQuery;
-              lastSceneNonceRef.current = app.scene.getSceneNonce();
-              setAppState({
-                searchMatches: matchItems.length
-                  ? {
-                      focusedId: null,
-                      matches: matchItems.map((searchMatch) => ({
-                        id: searchMatch.element.id,
-                        focus: false,
-                        matchedLines: searchMatch.matchedLines,
-                      })),
-                    }
-                  : null,
-              });
+            handleSearch(
+              searchQuery,
+              app,
+              handwriting.results,
+              (matchItems, index) => {
+                setSearchMatches({
+                  nonce: randomInteger(),
+                  items: matchItems,
+                });
+                setFocusIndex(index);
+                searchedQueryRef.current = searchQuery;
+                searchedHandwritingRef.current = handwriting.results;
+                lastSceneNonceRef.current = app.scene.getSceneNonce();
+                setAppState({
+                  searchMatches: matchItems.length
+                    ? {
+                        focusedId: null,
+                        matches: matchItems.map((searchMatch) => ({
+                          id: searchMatch.element.id,
+                          focus: false,
+                          matchedLines: searchMatch.matchedLines,
+                          sceneBounds: searchMatch.sceneBounds,
+                        })),
+                      }
+                    : null,
+                });
 
-              setIsSearching(false);
-            });
+                setIsSearching(false);
+              },
+            );
           }}
           selectOnRender
         />
+      </div>
+
+      <div className="layer-ui__search-handwriting">
+        <label>
+          <input
+            type="checkbox"
+            checked={includeHandwriting}
+            onChange={(event) => setIncludeHandwriting(event.target.checked)}
+          />
+          {t("search.includeHandwriting")}
+        </label>
+        {includeHandwriting && (
+          <div role="status">
+            {t(
+              handwriting.status === "loading"
+                ? "search.handwritingLoading"
+                : handwriting.status === "error"
+                ? "search.handwritingError"
+                : "search.handwritingHint",
+            )}
+          </div>
+        )}
       </div>
 
       <div className="layer-ui__search-count">
@@ -487,7 +551,8 @@ const MatchListBase = (props: MatchListProps) => {
   );
 
   const textMatches = useMemo(
-    () => props.matches.items.filter((match) => isTextElement(match.element)),
+    () =>
+      props.matches.items.filter((match) => !isFrameLikeElement(match.element)),
     [props.matches],
   );
 
@@ -789,99 +854,110 @@ const escapeSpecialCharacters = (string: string) => {
   return string.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&");
 };
 
-const handleSearch = debounce(
-  (
-    searchQuery: SearchQuery,
-    app: AppClassProperties,
-    cb: (matchItems: SearchMatchItem[], focusIndex: number | null) => void,
-  ) => {
-    if (!searchQuery || searchQuery === "") {
-      cb([], null);
-      return;
-    }
+const findMatches = (
+  searchQuery: SearchQuery,
+  app: AppClassProperties,
+  handwriting: HandwritingResult[],
+  cb: (matchItems: SearchMatchItem[], focusIndex: number | null) => void,
+) => {
+  if (!searchQuery || searchQuery === "") {
+    cb([], null);
+    return;
+  }
 
-    const elements = app.scene.getNonDeletedElements();
-    const texts = elements.filter((el) =>
-      isTextElement(el),
-    ) as ExcalidrawTextElement[];
+  const elements = app.scene.getNonDeletedElements();
+  const texts = elements.filter((el) =>
+    isTextElement(el),
+  ) as ExcalidrawTextElement[];
 
-    const frames = elements.filter((el) =>
-      isFrameLikeElement(el),
-    ) as ExcalidrawFrameLikeElement[];
+  const frames = elements.filter((el) =>
+    isFrameLikeElement(el),
+  ) as ExcalidrawFrameLikeElement[];
 
-    texts.sort((a, b) => a.y - b.y);
-    frames.sort((a, b) => a.y - b.y);
+  texts.sort((a, b) => a.y - b.y);
+  frames.sort((a, b) => a.y - b.y);
 
-    const textMatches: SearchMatchItem[] = [];
+  const textMatches: SearchMatchItem[] = [];
 
-    const regex = new RegExp(escapeSpecialCharacters(searchQuery), "gi");
+  const regex = new RegExp(escapeSpecialCharacters(searchQuery), "gi");
 
-    for (const textEl of texts) {
-      let match = null;
-      const text = textEl.originalText;
+  for (const textEl of texts) {
+    let match = null;
+    const text = textEl.originalText;
 
-      while ((match = regex.exec(text)) !== null) {
-        const preview = getMatchPreview(text, match.index, searchQuery);
-        const matchedLines = getMatchedLines(
-          textEl,
+    while ((match = regex.exec(text)) !== null) {
+      const preview = getMatchPreview(text, match.index, searchQuery);
+      const matchedLines = getMatchedLines(
+        textEl,
+        searchQuery,
+        match.index,
+        app.renderEnvironment,
+      );
+
+      if (matchedLines.length > 0) {
+        textMatches.push({
+          element: textEl,
           searchQuery,
-          match.index,
-          app.renderEnvironment,
-        );
-
-        if (matchedLines.length > 0) {
-          textMatches.push({
-            element: textEl,
-            searchQuery,
-            preview,
-            index: match.index,
-            matchedLines,
-          });
-        }
+          preview,
+          index: match.index,
+          matchedLines,
+        });
       }
     }
+  }
 
-    const frameMatches: SearchMatchItem[] = [];
+  const frameMatches: SearchMatchItem[] = [];
 
-    for (const frame of frames) {
-      let match = null;
-      const name = frame.name ?? getDefaultFrameName(frame);
+  for (const line of handwriting) {
+    let match;
+    while ((match = regex.exec(line.text)) !== null) {
+      textMatches.push({
+        element: line.elements[0],
+        searchQuery,
+        preview: getMatchPreview(line.text, match.index, searchQuery),
+        index: match.index,
+        matchedLines: [],
+        sceneBounds: line.bounds,
+      });
+    }
+  }
 
-      while ((match = regex.exec(name)) !== null) {
-        const preview = getMatchPreview(name, match.index, searchQuery);
-        const matchedLines = getMatchInFrame(
-          frame,
+  for (const frame of frames) {
+    let match = null;
+    const name = frame.name ?? getDefaultFrameName(frame);
+
+    while ((match = regex.exec(name)) !== null) {
+      const preview = getMatchPreview(name, match.index, searchQuery);
+      const matchedLines = getMatchInFrame(
+        frame,
+        searchQuery,
+        match.index,
+        app.state.zoom.value,
+        app.renderEnvironment,
+      );
+
+      if (matchedLines.length > 0) {
+        frameMatches.push({
+          element: frame,
           searchQuery,
-          match.index,
-          app.state.zoom.value,
-          app.renderEnvironment,
-        );
-
-        if (matchedLines.length > 0) {
-          frameMatches.push({
-            element: frame,
-            searchQuery,
-            preview,
-            index: match.index,
-            matchedLines,
-          });
-        }
+          preview,
+          index: match.index,
+          matchedLines,
+        });
       }
     }
+  }
 
-    const visibleIds = new Set(
-      app.visibleElements.map((visibleElement) => visibleElement.id),
-    );
+  const visibleIds = new Set(
+    app.visibleElements.map((visibleElement) => visibleElement.id),
+  );
 
-    // putting frame matches first
-    const matchItems: SearchMatchItem[] = [...frameMatches, ...textMatches];
+  // putting frame matches first
+  const matchItems: SearchMatchItem[] = [...frameMatches, ...textMatches];
 
-    const focusIndex =
-      matchItems.findIndex((matchItem) =>
-        visibleIds.has(matchItem.element.id),
-      ) ?? null;
+  const focusIndex =
+    matchItems.findIndex((matchItem) => visibleIds.has(matchItem.element.id)) ??
+    null;
 
-    cb(matchItems, focusIndex);
-  },
-  SEARCH_DEBOUNCE,
-);
+  cb(matchItems, focusIndex);
+};
