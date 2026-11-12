@@ -954,56 +954,6 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        // initialState={{
-        //   viewport: {
-        //     lock: {
-        //       scroll: true,
-        //       overscroll: false,
-        //     },
-        //     target: { width: 2612, height: 2107, x: -1616.05, y: -1256.24 },
-        //   },
-        // }}
-        renderTopLeftUI={(_, appState) =>
-          isDevEnv() && excalidrawAPI ? (
-            <button
-              style={{ padding: "0.5rem", borderRadius: "0.5rem" }}
-              onClick={() => {
-                if (excalidrawAPI.getAppState().scrollConstraints) {
-                  excalidrawAPI.setViewport(null);
-                  return;
-                }
-
-                const { scrollX, scrollY, width, height, zoom } =
-                  excalidrawAPI.getAppState();
-                excalidrawAPI.updateScene({
-                  appState: { minimapEnabled: true },
-                });
-                // Lock to the current viewport so any minimap drag overscrolls.
-                excalidrawAPI.setViewport({
-                  target: {
-                    x: -scrollX,
-                    y: -scrollY,
-                    width: width / zoom.value,
-                    height: height / zoom.value,
-                  },
-                  fit: "none",
-                  animation: false,
-                  lock: { scroll: true, overscroll: 150 },
-                });
-                excalidrawAPI.setToast({
-                  message:
-                    "Drag the minimap viewport, then hold still without releasing. It snaps back while you are still holding.",
-                  duration: 10000,
-                  closable: true,
-                });
-              }}
-            >
-              {appState.scrollConstraints
-                ? "Unlock scroll"
-                : "Scroll lock demo"}
-            </button>
-          ) : null
-        }
         viewportStatusFrame={viewportStatusFrame}
         userToFollow={userToFollow}
         onChange={onChange}
