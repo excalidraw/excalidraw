@@ -806,6 +806,7 @@ class App extends React.Component<AppProps, AppState> {
         this.getSceneElementsMapIncludingDeleted,
       history: {
         clear: this.resetHistory,
+        prune: this.pruneHistory,
       },
       selection: this.selection,
       setViewport: this.viewport.setViewport,
@@ -3546,6 +3547,21 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetHistory = () => {
     this.history.clear();
+  };
+
+  /**
+   * Drops the undo and redo entries on top of their stacks that have nothing
+   * left to act on (see History.prune). For a host that replaced the scene without
+   * keeping the deleted elements. Runs once the state of an updateScene called
+   * just before has landed, the entries being judged against it.
+   */
+  private pruneHistory = () => {
+    this.setState({}, () => {
+      this.history.prune(
+        this.scene.getElementsMapIncludingDeleted(),
+        this.state,
+      );
+    });
   };
 
   private resetStore = () => {

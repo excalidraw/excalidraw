@@ -611,6 +611,9 @@ const ExcalidrawWrapper = () => {
             ...localDataState,
             captureUpdate: CaptureUpdateAction.NEVER,
           });
+          // the storage doesn't keep deleted elements: what the other tab
+          // deleted is gone, and this tab's entries for it with it
+          excalidrawAPI.history.prune();
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
               excalidrawAPI.updateLibrary({

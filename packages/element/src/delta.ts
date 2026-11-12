@@ -2170,7 +2170,12 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       new Map(),
     );
 
-    if (!flags.containsVisibleDifference && moved.size) {
+    if (
+      !flags.containsVisibleDifference &&
+      // a deleted element paints nothing wherever it is: i.e. one a delta
+      // brought back from the snapshot, still deleted
+      Array.from(moved.values()).some((element) => !element.isDeleted)
+    ) {
       // we found a difference in order!
       flags.containsVisibleDifference = true;
     }
