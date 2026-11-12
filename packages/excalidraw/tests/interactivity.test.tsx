@@ -717,6 +717,21 @@ describe("ui={{ enabled: ... }}", () => {
     ).toBe(true);
   });
 
+  it("preserves LTR direction for zoom controls in RTL locales", async () => {
+    await render(<Excalidraw langCode="he-IL" />);
+
+    const zoomActions = queryContainer(".zoom-actions")!;
+    expect(zoomActions).not.toBe(null);
+    const row = zoomActions.querySelector(".Stack_horizontal") as HTMLElement;
+    expect(row).not.toBe(null);
+    expect(row.style.direction).toBe("ltr");
+
+    const buttons = zoomActions.querySelectorAll("button");
+    expect(buttons[0].classList.contains("zoom-out-button")).toBe(true);
+    expect(buttons[1].classList.contains("reset-zoom-button")).toBe(true);
+    expect(buttons[2].classList.contains("zoom-in-button")).toBe(true);
+  });
+
   it("renders an opted-in scroll-back-to-content control", async () => {
     await render(
       <Excalidraw
