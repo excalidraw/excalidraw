@@ -15,6 +15,7 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
+  isIMEComposing,
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_STROKE_STREAMLINE,
@@ -2229,7 +2230,10 @@ class App extends React.Component<AppProps, AppState> {
               // for some inexplicable reason, `onBlur` triggered on ESC
               // does not reset `state.editingFrame` despite being called,
               // and we need to reset it here as well
-              if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+              if (
+                (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+                !isIMEComposing(event)
+              ) {
                 this.resetEditingFrame(f);
               }
             }}
@@ -5265,7 +5269,7 @@ class App extends React.Component<AppProps, AppState> {
         // inside an input
         (isWritableElement(event.target) &&
           // unless pressing escape (finalize action)
-          event.key !== KEYS.ESCAPE) ||
+          (event.key !== KEYS.ESCAPE || isIMEComposing(event))) ||
         // or unless using arrows (to move between buttons)
         (isArrowKey(event.key) && isInputLike(event.target))
       ) {
