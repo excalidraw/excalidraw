@@ -149,12 +149,12 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
-    expect(editor.textContent).toMatchSnapshot();
+    expect((editor as HTMLTextAreaElement).value).toMatchSnapshot();
 
     updateTextEditor(editor, "flowchart TD1");
     editor = await getTextEditor({ selector, waitForEditor: false });
 
-    expect(editor.textContent).toBe("flowchart TD1");
+    expect((editor as HTMLTextAreaElement).value).toBe("flowchart TD1");
     expect(
       dialog.querySelector('[data-testid="mermaid-error"]'),
     ).toMatchInlineSnapshot("null");
