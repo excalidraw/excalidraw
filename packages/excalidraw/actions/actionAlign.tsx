@@ -85,6 +85,10 @@ export const actionAlignTop = register({
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
   perform: (elements, appState, _, app) => {
+    if (!alignActionsPredicate(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
@@ -119,6 +123,10 @@ export const actionAlignBottom = register({
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
   perform: (elements, appState, _, app) => {
+    if (!alignActionsPredicate(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
@@ -153,6 +161,10 @@ export const actionAlignLeft = register({
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
   perform: (elements, appState, _, app) => {
+    if (!alignActionsPredicate(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
@@ -187,6 +199,10 @@ export const actionAlignRight = register({
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
   perform: (elements, appState, _, app) => {
+    if (!alignActionsPredicate(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
@@ -221,6 +237,10 @@ export const actionAlignVerticallyCentered = register({
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
   perform: (elements, appState, _, app) => {
+    if (!alignActionsPredicate(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
@@ -251,6 +271,10 @@ export const actionAlignHorizontallyCentered = register({
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
   perform: (elements, appState, _, app) => {
+    if (!alignActionsPredicate(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: alignSelectedElements(elements, appState, app, {
