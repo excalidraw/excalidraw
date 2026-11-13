@@ -1,10 +1,13 @@
 import {
-  getBoundTextElement,
   getBaseFontSize,
   getBaseFontSizeUpdate,
+  getBoundTextElement,
+  hasBoundTextElement,
+  isNonDeletedElement,
+  isTextElement,
   redrawTextBoundingBox,
+  updateBoundElements,
 } from "@excalidraw/element";
-import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -80,6 +83,19 @@ const handleFontSizeChange: DragInputCallbackType<
         scene,
         app.renderEnvironment,
       );
+
+      if (isNonDeletedElement(latestElement)) {
+        updateBoundElements(latestElement, scene, {
+          renderEnvironment: app.renderEnvironment,
+        });
+
+        const container = scene.getContainerElement(latestElement);
+        if (container && isNonDeletedElement(container)) {
+          updateBoundElements(container, scene, {
+            renderEnvironment: app.renderEnvironment,
+          });
+        }
+      }
     }
   }
 };
