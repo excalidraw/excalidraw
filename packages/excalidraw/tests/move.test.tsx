@@ -36,6 +36,41 @@ beforeEach(() => {
 const { h } = window;
 
 describe("move element", () => {
+  it("does not update selected arrow bindings for arrow keys in an input", async () => {
+    const { container } = await render(<Excalidraw handleKeyboardGlobally />);
+    const rectangle = API.createElement({ type: "rectangle", x: 0, y: 0 });
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 105,
+      y: 50,
+    });
+    API.setElements([rectangle, arrow]);
+    act(() => {
+      bindBindingElement(
+        arrow as NonDeleted<ExcalidrawArrowElement>,
+        rectangle as NonDeleted<ExcalidrawBindableElement>,
+        "orbit",
+        "start",
+        h.app.scene,
+        DEFAULT_ZOOM,
+      );
+    });
+    API.setSelectedElements([arrow]);
+
+    const input = document.createElement("input");
+    container.appendChild(input);
+    const mutateElement = vi.spyOn(h.app.scene, "mutateElement");
+    try {
+      fireEvent.keyUp(input, { key: KEYS.ARROW_DOWN });
+      expect(mutateElement).not.toHaveBeenCalled();
+
+      fireEvent.keyUp(document, { key: KEYS.ARROW_DOWN });
+      expect(mutateElement).toHaveBeenCalled();
+    } finally {
+      mutateElement.mockRestore();
+    }
+  });
+
   it("rectangle", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     const canvas = container.querySelector("canvas.interactive")!;
