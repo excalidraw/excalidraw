@@ -81,6 +81,7 @@ export const ColorInput = ({
         className={clsx("color-picker__input-label", {
           "has-error": errorMessage,
         })}
+        dir="ltr"
       >
         <div className="color-picker__input-hash">#</div>
         <input
