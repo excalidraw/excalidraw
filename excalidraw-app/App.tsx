@@ -80,6 +80,7 @@ import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
 
 import CustomStats from "./CustomStats";
+import { getDocumentTitle } from "./documentTitle";
 import {
   Provider,
   useAtom,
@@ -719,6 +720,12 @@ const ExcalidrawWrapper = () => {
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
+    }
+
+    // show the drawing's name in the browser tab / PWA window title
+    const documentTitle = getDocumentTitle(appState.name);
+    if (document.title !== documentTitle) {
+      document.title = documentTitle;
     }
 
     // this check is redundant, but since this is a hot path, it's best
