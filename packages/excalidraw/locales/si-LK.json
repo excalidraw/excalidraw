@@ -277,7 +277,7 @@
     "collabStopOverridePrompt": "සහයෝගිතාව නැවැත්වීම ආවරණය ගැන ඇඟවීම",
     "errorAddingToLibrary": "පුස්තකාලයට එක් කිරීමේ දෝෂය",
     "errorRemovingFromLibrary": "පුස්තකාලයෙන් ඉවත් කිරීමේ දෝෂය",
-    "confirmAddLibrary": "පුස්තකාලයට එක් කිරීම තහවුරු කරන්න",
+    "confirmAddLibrary": "පුස්තකාලයට එක් කිරීම තහවුරු කරන්න ({{numShapes}})",
     "imageDoesNotContainScene": "පින්තූරයේ දර්ශනයක් අඩංගු නොවේ",
     "cannotRestoreFromImage": "පින්තූරයෙන් ප්‍රතිස්ථාපනය කළ නොහැක",
     "invalidSceneUrl": "වලංගු නොවන දර්ශන URL",
@@ -290,7 +290,7 @@
   "errors": {
     "unsupportedFileType": "සහාය නොදක්වන ගොනු වර්ගය",
     "imageInsertError": "පින්තූර ඇතුළත් කිරීමේ දෝෂය",
-    "fileTooBig": "ගොනුව ඉතා විශාලයි",
+    "fileTooBig": "ගොනුව ඉතා විශාලයි ({{maxSize}})",
     "svgImageInsertError": "SVG පින්තූර ඇතුළත් කිරීමේ දෝෂය",
     "failedToFetchImage": "පින්තූරය ලබා ගැනීමට අසමත් විය",
     "cannotResolveCollabServer": "සහයෝගිතා සේවාදායකය විසඳිය නොහැක",
@@ -407,7 +407,7 @@
     "headingMain": "ප්‍රධාන දෝෂය",
     "clearCanvasMessage": "කැන්වසය පිරිසිදු කිරීමේ පණිවිඩය",
     "clearCanvasCaveat": "කැන්වසය පිරිසිදු කිරීමේ සීමාව",
-    "trackedToSentry": "Sentry වෙත ලුහුබඳින ලදි",
+    "trackedToSentry": "Sentry වෙත ලුහුබඳින ලදි ({{eventId}})",
     "openIssueMessage": "නිකුතුව විවෘත කිරීමේ පණිවිඩය",
     "sceneContent": "දර්ශන අන්තර්ගතය"
   },
