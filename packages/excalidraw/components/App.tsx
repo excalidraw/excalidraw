@@ -6869,6 +6869,9 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (this.isTouchDuringPenStroke(event)) {
+      return;
+    }
     if (!this.isInteractionEnabled()) {
       if (this.isToolSupported(this.state.activeTool.type)) {
         // keep broadcasting the pointer (`props.onPointerUpdate`) between
@@ -7544,9 +7547,23 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private isTouchDuringPenStroke = (event: { pointerType: string }) => {
+    return (
+      event.pointerType === "touch" &&
+      this.state.penMode &&
+      this.state.lastPointerDownWith === "pen" &&
+      this.state.newElement?.type === "freedraw"
+    );
+  };
+
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    // A palm landing during a pen stroke must not finalize the stroke via
+    // missing-pointerup cleanup or enroll in the two-pointer pan gesture.
+    if (this.isTouchDuringPenStroke(event)) {
+      return;
+    }
     if (
       !this.isInteractionEnabled() &&
       !this.isToolSupported(this.state.activeTool.type)
@@ -7980,6 +7997,9 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerCancel = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (this.isTouchDuringPenStroke(event)) {
+      return;
+    }
     this.removePointer(event);
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
   };
@@ -7987,6 +8007,9 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (this.isTouchDuringPenStroke(event)) {
+      return;
+    }
     if (!this.isInteractionEnabled()) {
       if (this.isLinksEnabled() || this.isEmbedsEnabled()) {
         this.handleInteractiveContentPointerUp(event);
@@ -9011,7 +9034,7 @@ class App extends React.Component<AppProps, AppState> {
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
-    return withBatchedUpdatesThrottled((event: PointerEvent) => {
+    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
@@ -9431,6 +9454,18 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     }, this.ownerWindow);
+
+    // Filter before throttling so a palm move cannot replace a queued pen
+    // move in the same animation frame. These listeners also receive events
+    // from outside the canvas.
+    return Object.assign(
+      (event: PointerEvent) => {
+        if (!this.isTouchDuringPenStroke(event)) {
+          onPointerMove(event);
+        }
+      },
+      { flush: onPointerMove.flush, cancel: onPointerMove.cancel },
+    );
   }
 
   // Returns whether the pointer move happened over either scrollbar
@@ -9470,6 +9505,9 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
+      if (this.isTouchDuringPenStroke(childEvent)) {
+        return;
+      }
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       this.removePointer(childEvent);
