@@ -998,9 +998,9 @@ export class AppStateDelta implements DeltaContainer<AppState> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [deleted, inserted];
     }
+
+    return [deleted, inserted];
   }
 
   private static orderAppStateKeys(partial: Partial<ObservedAppState>) {
@@ -2070,9 +2070,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return nextElements;
     }
+
+    return nextElements;
   }
 
   private static redrawTextBoundingBoxes(
@@ -2220,9 +2220,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [deleted, inserted];
     }
+
+    return [deleted, inserted];
   }
 
   private static stripIrrelevantProps(
