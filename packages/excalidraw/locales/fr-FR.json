@@ -27,6 +27,7 @@
     "copyStyles": "Copier les styles",
     "pasteStyles": "Coller les styles",
     "stroke": "Trait",
+    "textColor": "Couleur du texte",
     "changeStroke": "Changer la couleur du trait",
     "background": "Arrière-plan",
     "changeBackground": "Changer la couleur d'arrière-plan",

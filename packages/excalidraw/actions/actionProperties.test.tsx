@@ -1,4 +1,4 @@
-import { fireEvent, queryByTestId } from "@testing-library/react";
+import { act, fireEvent, queryByTestId } from "@testing-library/react";
 
 import {
   COLOR_PALETTE,
@@ -8,6 +8,7 @@ import {
   STROKE_WIDTH,
 } from "@excalidraw/common";
 
+import { defaultLang, setLanguage } from "../i18n";
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
@@ -92,6 +93,39 @@ describe("element locking", () => {
 
       const centerTextAlign = queryByTestId(document.body, `align-right`);
       expect(centerTextAlign).toBeChecked();
+    });
+
+    it("should translate text color label for sticky note across languages", async () => {
+      UI.clickTool("stickynote");
+      const getStrokePicker = () =>
+        document.querySelector<HTMLElement>(
+          ".color-picker__button[data-openpopup='elementStroke']",
+        );
+
+      expect(getStrokePicker()?.getAttribute("aria-label")).toBe("Text color");
+
+      await act(async () => {
+        await setLanguage({ code: "he-IL", label: "עברית", rtl: true });
+        API.setAppState({});
+      });
+      expect(getStrokePicker()?.getAttribute("aria-label")).toBe("צבע טקסט");
+
+      await act(async () => {
+        await setLanguage({ code: "ja-JP", label: "日本語" });
+        API.setAppState({});
+      });
+      expect(getStrokePicker()?.getAttribute("aria-label")).toBe("文字色");
+
+      await act(async () => {
+        await setLanguage({ code: "tr-TR", label: "Türkçe" });
+        API.setAppState({});
+      });
+      expect(getStrokePicker()?.getAttribute("aria-label")).toBe("Metin rengi");
+
+      await act(async () => {
+        await setLanguage(defaultLang);
+        API.setAppState({});
+      });
     });
   });
 
