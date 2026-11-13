@@ -199,7 +199,10 @@ export const getTransformHandlesFromCoords = (
     rotation: omitSides.rotation
       ? undefined
       : generateTransformHandle(
-          x1 + width / 2 - handleWidth / 2,
+          // place the handle on the rotation axis (cx), which isn't always
+          // the middle of the bounds (e.g. arrows whose label sits off-center)
+          // — otherwise the element jumps when you start rotating
+          cx - handleWidth / 2,
           y1 -
             dashedLineMargin -
             handleMarginY +
