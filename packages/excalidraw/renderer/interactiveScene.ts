@@ -571,9 +571,8 @@ const renderBindingHighlightForBindableElement_complex = (
       context.translate(element.x, element.y);
 
       context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-      context.strokeStyle = `rgba(${
-        BINDING_HIGHLIGHT_RGB[appState.theme]
-      }, ${opacity})`;
+      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]
+        }, ${opacity})`;
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -611,9 +610,8 @@ const renderBindingHighlightForBindableElement_complex = (
       context.lineWidth =
         clamp(2.5, element.strokeWidth * 1.75, 4) /
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, ${
-        opacity / 2
-      })`;
+      context.strokeStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, ${opacity / 2
+        })`;
 
       switch (element.type) {
         case "ellipse":
@@ -837,9 +835,8 @@ const renderBindingHighlightForBindableElement_complex = (
         );
       });
 
-      context.fillStyle = `rgba(${
-        BINDING_HIGHLIGHT_RGB[appState.theme]
-      }, ${opacity})`;
+      context.fillStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]
+        }, ${opacity})`;
 
       midpoints.forEach((midpoint) => {
         context.beginPath();
@@ -885,9 +882,9 @@ const renderBindingHighlightForBindableElement = (
   context.translate(appState.scrollX, appState.scrollY);
   const pointerCoords = app.lastPointerMoveCoords
     ? pointFrom<GlobalPoint>(
-        app.lastPointerMoveCoords.x,
-        app.lastPointerMoveCoords.y,
-      )
+      app.lastPointerMoveCoords.x,
+      app.lastPointerMoveCoords.y,
+    )
     : null;
   const angleLocked =
     !!app.lastPointerMoveEvent &&
@@ -1412,44 +1409,44 @@ const renderCropHandles = (
       [number, number],
     ]
   > = [
-    [
-      // x, y
-      [-HALF_WIDTH, -HALF_HEIGHT],
-      // horizontal line: first start and to
-      [0, ZOOMED_HALF_LINE_WIDTH],
-      [HORIZONTAL_LINE_LENGTH, ZOOMED_HALF_LINE_WIDTH],
-      // vertical line: second  start and to
-      [ZOOMED_HALF_LINE_WIDTH, 0],
-      [ZOOMED_HALF_LINE_WIDTH, VERTICAL_LINE_LENGTH],
-    ],
-    [
-      [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, -HALF_HEIGHT],
-      [ZOOMED_HALF_LINE_WIDTH, ZOOMED_HALF_LINE_WIDTH],
       [
-        -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
-        ZOOMED_HALF_LINE_WIDTH,
+        // x, y
+        [-HALF_WIDTH, -HALF_HEIGHT],
+        // horizontal line: first start and to
+        [0, ZOOMED_HALF_LINE_WIDTH],
+        [HORIZONTAL_LINE_LENGTH, ZOOMED_HALF_LINE_WIDTH],
+        // vertical line: second  start and to
+        [ZOOMED_HALF_LINE_WIDTH, 0],
+        [ZOOMED_HALF_LINE_WIDTH, VERTICAL_LINE_LENGTH],
       ],
-      [0, 0],
-      [0, VERTICAL_LINE_LENGTH],
-    ],
-    [
-      [-HALF_WIDTH, HALF_HEIGHT],
-      [0, -ZOOMED_HALF_LINE_WIDTH],
-      [HORIZONTAL_LINE_LENGTH, -ZOOMED_HALF_LINE_WIDTH],
-      [ZOOMED_HALF_LINE_WIDTH, 0],
-      [ZOOMED_HALF_LINE_WIDTH, -VERTICAL_LINE_LENGTH],
-    ],
-    [
-      [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, HALF_HEIGHT],
-      [ZOOMED_HALF_LINE_WIDTH, -ZOOMED_HALF_LINE_WIDTH],
       [
-        -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
-        -ZOOMED_HALF_LINE_WIDTH,
+        [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, -HALF_HEIGHT],
+        [ZOOMED_HALF_LINE_WIDTH, ZOOMED_HALF_LINE_WIDTH],
+        [
+          -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
+          ZOOMED_HALF_LINE_WIDTH,
+        ],
+        [0, 0],
+        [0, VERTICAL_LINE_LENGTH],
       ],
-      [0, 0],
-      [0, -VERTICAL_LINE_LENGTH],
-    ],
-  ];
+      [
+        [-HALF_WIDTH, HALF_HEIGHT],
+        [0, -ZOOMED_HALF_LINE_WIDTH],
+        [HORIZONTAL_LINE_LENGTH, -ZOOMED_HALF_LINE_WIDTH],
+        [ZOOMED_HALF_LINE_WIDTH, 0],
+        [ZOOMED_HALF_LINE_WIDTH, -VERTICAL_LINE_LENGTH],
+      ],
+      [
+        [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, HALF_HEIGHT],
+        [ZOOMED_HALF_LINE_WIDTH, -ZOOMED_HALF_LINE_WIDTH],
+        [
+          -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
+          -ZOOMED_HALF_LINE_WIDTH,
+        ],
+        [0, 0],
+        [0, -VERTICAL_LINE_LENGTH],
+      ],
+    ];
 
   handles.forEach((handle) => {
     const [[x, y], [x1s, y1s], [x1t, y1t], [x2s, y2s], [x2t, y2t]] = handle;
@@ -1548,9 +1545,9 @@ const renderTextToolHover = (
           appState,
           app.lastPointerMoveCoords
             ? pointFrom<GlobalPoint>(
-                app.lastPointerMoveCoords.x,
-                app.lastPointerMoveCoords.y,
-              )
+              app.lastPointerMoveCoords.x,
+              app.lastPointerMoveCoords.y,
+            )
             : null,
         );
         context.restore();
@@ -1562,14 +1559,14 @@ const renderTextToolHover = (
         const point =
           hover.anchor === "label"
             ? LinearElementEditor.getBoundTextElementCenter(
-                element,
-                elementsMap,
-              )
+              element,
+              elementsMap,
+            )
             : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                element,
-                hover.anchor === "start" ? 0 : -1,
-                elementsMap,
-              );
+              element,
+              hover.anchor === "start" ? 0 : -1,
+              elementsMap,
+            );
         highlightPoint(point, context, appState);
       }
     }
@@ -1811,8 +1808,8 @@ const _renderInteractiveScene = ({
       } else if (
         isElbowArrow(selectedLinearElement)
           ? linearState.hoverPointIndex === 0 ||
-            linearState.hoverPointIndex ===
-              selectedLinearElement.points.length - 1
+          linearState.hoverPointIndex ===
+          selectedLinearElement.points.length - 1
           : linearState.hoverPointIndex >= 0
       ) {
         renderLinearElementPointHighlight(context, appState, elementsMap);
@@ -1868,7 +1865,7 @@ const _renderInteractiveScene = ({
     const selectionColor =
       renderConfig.selectionColor || getThemedColor("#000", appState.theme);
     const lockedSelectionColor = getThemedColor("#ced4da", appState.theme);
-    const groupSelectionColor = getThemedColor("#000", appState.theme);
+    const groupSelectionColor = selectionColor;
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
@@ -1935,7 +1932,7 @@ const _renderInteractiveScene = ({
               appState.activeEmbeddable.state === "active",
             padding:
               element.id === appState.croppingElementId ||
-              isImageElement(element)
+                isImageElement(element)
                 ? 0
                 : undefined,
           });
@@ -2050,9 +2047,9 @@ const _renderInteractiveScene = ({
         "mouse",
         isFrameSelected
           ? {
-              ...getOmitSidesForEditorInterface(editorInterface),
-              rotation: true,
-            }
+            ...getOmitSidesForEditorInterface(editorInterface),
+            rotation: true,
+          }
           : getOmitSidesForEditorInterface(editorInterface),
       );
       if (selectedElements.some((element) => !element.locked)) {
