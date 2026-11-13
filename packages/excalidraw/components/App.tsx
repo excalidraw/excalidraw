@@ -3225,6 +3225,32 @@ class App extends React.Component<AppProps, AppState> {
       didUpdate = true;
     }
 
+    if (actionResult.elements) {
+      this.setState((prevAppState) => {
+        if (!prevAppState.multiElement) {
+          return null;
+        }
+
+        const nextElement = this.scene.getNonDeletedElement(
+          prevAppState.multiElement.id,
+        );
+        const multiElement = isLinearElement(nextElement) ? nextElement : null;
+        const newElement =
+          prevAppState.newElement?.id === prevAppState.multiElement.id
+            ? multiElement
+            : prevAppState.newElement;
+
+        if (
+          multiElement === prevAppState.multiElement &&
+          newElement === prevAppState.newElement
+        ) {
+          return null;
+        }
+
+        return { multiElement, newElement };
+      });
+    }
+
     if (!didUpdate) {
       this.scene.triggerUpdate();
     }
