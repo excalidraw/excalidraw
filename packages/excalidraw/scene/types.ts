@@ -54,6 +54,10 @@ export type StaticCanvasRenderConfig = {
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
+  /** Editor-only opt-in limit. Counted by the static scene renderer. */
+  maxVisibleElementsForDirectDraw?: number;
+  /** Internal per-scene decision; export uses its own direct path. */
+  directDraw?: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;

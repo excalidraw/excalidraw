@@ -339,13 +339,22 @@ const _renderStaticScene = ({
   visibleElements,
   scale,
   appState: unsnappedAppState,
-  renderConfig,
+  renderConfig: canvasRenderConfig,
 }: StaticSceneRenderConfig) => {
   if (canvas === null) {
     return;
   }
 
-  const { renderGrid = true, isExporting } = renderConfig;
+  const { renderGrid = true, isExporting } = canvasRenderConfig;
+  const directDrawLimit =
+    canvasRenderConfig.maxVisibleElementsForDirectDraw ?? 0;
+  const renderConfig: StaticCanvasRenderConfig = {
+    ...canvasRenderConfig,
+    directDraw:
+      !isExporting &&
+      directDrawLimit > 0 &&
+      visibleElements.length <= directDrawLimit,
+  };
   // export draws vectors, not cached bitmaps — nothing to keep on the grid
   const appState = isExporting
     ? unsnappedAppState
