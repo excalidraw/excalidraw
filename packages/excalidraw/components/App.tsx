@@ -267,6 +267,7 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggleMinimap,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -462,9 +463,13 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   UIConfig,
+  UIControl,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
+
+const isUIConfig = (ui: AppProps["ui"]): ui is UIConfig =>
+  typeof ui === "object" && ui !== null;
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1075,23 +1080,32 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  /** Whether Excalidraw's full default UI is rendered. */
+  /**
+   * Whether Excalidraw's default UI is rendered (with `ui.disabled`, minus the
+   * controls it removes).
+   */
   public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
     return (
-      props.ui !== false && (typeof props.ui !== "object" || props.ui === null)
+      props.ui !== false && !(isUIConfig(props.ui) && "enabled" in props.ui)
     );
   }
 
   /** Whether an individual default UI control is rendered. */
-  public isUIControlEnabled(
-    control: keyof UIConfig["enabled"],
+  public isUIControlEnabled = (
+    control: UIControl,
     props: Pick<AppProps, "ui"> = this.props,
-  ): boolean {
-    if (typeof props.ui === "object" && props.ui !== null) {
-      return props.ui.enabled?.[control] === true;
+  ): boolean => {
+    if (isUIConfig(props.ui)) {
+      return "enabled" in props.ui
+        ? (props.ui.enabled as Partial<Record<UIControl, boolean>>)?.[
+            control
+          ] === true
+        : (props.ui.disabled as Partial<Record<UIControl, boolean>>)?.[
+            control
+          ] !== true;
     }
     return props.ui !== false;
-  }
+  };
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
     atom: WritableAtom<Value, Args, Result>,
@@ -4318,6 +4332,13 @@ class App extends React.Component<AppProps, AppState> {
     this.handleForcedToolChange(prevProps, prevState);
     this.host.sync(prevProps);
 
+    // applied before the state change listeners below are notified, for
+    // those that read theme-dependent styles
+    this.excalidrawContainerRef.current?.classList.toggle(
+      "theme--dark",
+      this.state.theme === THEME.DARK,
+    );
+
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -4423,11 +4444,6 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.theme !== this.props.theme && this.props.theme) {
       this.setState({ theme: this.props.theme });
     }
-
-    this.excalidrawContainerRef.current?.classList.toggle(
-      "theme--dark",
-      this.state.theme === THEME.DARK,
-    );
 
     if (
       this.state.selectedLinearElement?.isEditing &&
@@ -11228,6 +11244,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleGridMode,
           actionToggleZenMode,
           actionToggleViewMode,
+          actionToggleMinimap,
           actionToggleStats,
         ];
       }
@@ -11248,6 +11265,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
+        actionToggleMinimap,
         actionToggleStats,
       ];
     }
