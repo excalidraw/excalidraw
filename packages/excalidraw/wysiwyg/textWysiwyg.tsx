@@ -13,7 +13,12 @@ import {
   isRTL,
   hasRTLChars,
 } from "@excalidraw/common";
-import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
+import {
+  clamp,
+  pointFrom,
+  pointRotateRads,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   getTextFromElements,
@@ -703,6 +708,22 @@ export const textWysiwyg = ({
   };
 
   /**
+   * Keyboard zoom keeps the caret where it is on screen (or, out of view, the
+   * nearest point of the canvas to it).
+   */
+  const getCaretZoomAnchor = () => {
+    const caret = getCaretViewportBounds();
+    if (!caret) {
+      return null;
+    }
+    const { width, height, offsetLeft, offsetTop } = app.state;
+    return {
+      viewportX: clamp((caret.left + caret.right) / 2, 0, width) + offsetLeft,
+      viewportY: clamp((caret.top + caret.bottom) / 2, 0, height) + offsetTop,
+    };
+  };
+
+  /**
    * A caret typed in under the stats or the styles panel (see
    * AppText.getTextSidePanels) is out of sight, yet inside the editor's box, so
    * the browser doesn't reveal it (unlike the sidebar, the panels don't span
@@ -870,15 +891,27 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionZoomIn);
+      app.actionManager.executeAction(
+        actionZoomIn,
+        "api",
+        getCaretZoomAnchor(),
+      );
       updateWysiwygStyle();
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionZoomOut);
+      app.actionManager.executeAction(
+        actionZoomOut,
+        "api",
+        getCaretZoomAnchor(),
+      );
       updateWysiwygStyle();
     } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionResetZoom);
+      app.actionManager.executeAction(
+        actionResetZoom,
+        "api",
+        getCaretZoomAnchor(),
+      );
       updateWysiwygStyle();
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
