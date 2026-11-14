@@ -1,4 +1,4 @@
-import { normalizeLink } from "../src/url";
+import { normalizeLink, toValidURL } from "../src/url";
 
 describe("normalizeLink", () => {
   // NOTE not an extensive XSS test suite, just to check if we're not
@@ -27,5 +27,33 @@ describe("normalizeLink", () => {
     expect(normalizeLink("[[test]]")).toBe("[[test]]");
     expect(normalizeLink("<test>")).toBe("<test>");
     expect(normalizeLink("test&")).toBe("test&");
+  });
+});
+
+describe("toValidURL", () => {
+  it("resolves protocol-relative library URLs against the current protocol", () => {
+    const url =
+      "//libraries.excalidraw.com/library.excalidrawlib?version=2#item";
+
+    expect(toValidURL(url)).toBe(`${location.protocol}${url}`);
+  });
+
+  it("preserves absolute and root-relative URLs", () => {
+    expect(toValidURL("https://example.com/path?query=1#fragment")).toBe(
+      "https://example.com/path?query=1#fragment",
+    );
+    expect(toValidURL("/path?query=1#fragment")).toBe(
+      `${location.origin}/path?query=1#fragment`,
+    );
+  });
+
+  it("rejects an empty protocol-relative host", () => {
+    expect(toValidURL("//")).toBe("about:blank");
+  });
+
+  it("continues to sanitize unsafe links and reject invalid URLs", () => {
+    // eslint-disable-next-line no-script-url
+    expect(toValidURL("javascript:alert(1)")).toBe("about:blank");
+    expect(toValidURL("not a URL")).toBe("about:blank");
   });
 });
