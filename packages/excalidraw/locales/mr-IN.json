@@ -1,8 +1,8 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
-    "paste": "चिटकवा",
+    "signUp": "साइन अप करा",
+    "signIn": "साइन इन करा",
+    "paste": "पेस्ट करा",
     "pasteAsPlaintext": "साधा मजकूर च्या रुपात पेस्ट करा",
     "pasteCharts": "चार्ट चिकटवा",
     "chartType_bar": "",
