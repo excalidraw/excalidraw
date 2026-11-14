@@ -1,6 +1,7 @@
 import { flushSync } from "react-dom";
 
 import {
+  DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   TEXT_MAX_WRAP_WIDTH,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
@@ -8,6 +9,7 @@ import {
   VERTICAL_ALIGN,
   getFontString,
   getLineHeight,
+  isRTL,
   sceneCoordsToViewportCoords,
   type Bounds,
   type StylesPanelMode,
@@ -29,6 +31,7 @@ import {
   getStickyNoteLayout,
   hitElementItself,
   isArrowElement,
+  isEndpointBoundText,
   isFrameLikeElement,
   isNonDeletedElement,
   isOpaqueForBinding,
@@ -184,6 +187,27 @@ export class AppText {
   ) {
     const elementsMap = this.app.scene.getElementsMapIncludingDeleted();
 
+    // Decided once per editing session: a text that starts out empty, free
+    // (not in a container, not attached to an arrow's endpoint) and with the
+    // default alignment follows what's typed — right-aligned while it starts
+    // with an RTL character, left-aligned otherwise. (`isExistingElement`
+    // can't tell: it's true for texts the text tool has just created.) It
+    // stops following as soon as the user picks an alignment mid-edit.
+    let autoTextAlign: ExcalidrawTextElement["textAlign"] | null =
+      !element.originalText &&
+      !element.containerId &&
+      !isEndpointBoundText(element, elementsMap) &&
+      element.textAlign === DEFAULT_TEXT_ALIGN
+        ? element.textAlign
+        : null;
+    // While it follows what's typed, a text that grows with its content stays
+    // where its editing started (where the caret first blinked): a
+    // right-aligned text ends there, a left-aligned one starts there.
+    // Otherwise each switch would keep the anchored edge of the previous
+    // alignment, and the first RTL character would land right of the caret.
+    const autoTextAlignAnchorX =
+      autoTextAlign && element.autoResize ? element.x : null;
+
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
       const latestTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
@@ -209,6 +233,22 @@ export class AppText {
       );
       const maxWidth = this.getMaxTextWidth(textViewportOffsets);
 
+      // the user picked an alignment mid-edit: stop following the text
+      if (autoTextAlign && latestTextElement.textAlign !== autoTextAlign) {
+        autoTextAlign = null;
+      }
+      const nextTextAlign: ExcalidrawTextElement["textAlign"] = autoTextAlign
+        ? (autoTextAlign = isRTL(nextOriginalText) ? "right" : "left")
+        : latestTextElement.textAlign;
+      // put the edge the text grows from at the anchor, so that the resize
+      // below keeps it there
+      const nextX =
+        autoTextAlign && autoTextAlignAnchorX !== null
+          ? nextTextAlign === "right"
+            ? autoTextAlignAnchorX - latestTextElement.width
+            : autoTextAlignAnchorX
+          : latestTextElement.x;
+
       this.app.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.app.scene.getElementsIncludingDeleted().map((_element) => {
@@ -222,11 +262,12 @@ export class AppText {
           if (_element.id === latestTextElement.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
+              textAlign: nextTextAlign,
               isDeleted: isDeleted ?? _element.isDeleted,
               ...(stickyLayout?.text ??
                 // returns (wrapped) text and new dimensions
                 refreshTextDimensions(
-                  _element,
+                  { ..._element, textAlign: nextTextAlign, x: nextX },
                   getContainerElement(_element, elementsMap),
                   elementsMap,
                   nextOriginalText,
