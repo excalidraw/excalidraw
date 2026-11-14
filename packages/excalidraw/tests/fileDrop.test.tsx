@@ -255,6 +255,31 @@ describe("dropping scenes", () => {
     expect(h.app.scene.getNonDeletedElements()).toHaveLength(2);
   });
 
+  it("Shift-drop leaves out the file's deleted elements", async () => {
+    const file = new h.app.ownerWindow.File(
+      [
+        serializeAsJSON(
+          [
+            API.createElement({ type: "ellipse" }),
+            API.createElement({ type: "rectangle", x: 5000, isDeleted: true }),
+          ],
+          h.state,
+          {},
+          "local",
+        ),
+      ],
+      "scene.excalidraw",
+      { type: MIME_TYPES.json },
+    );
+    drag(GlobalTestState.interactiveCanvas, "drop", {
+      files: [file],
+      shiftKey: true,
+    });
+    await waitFor(() => expect(h.elements).toHaveLength(2));
+    expect(h.elements[1]).toMatchObject({ type: "ellipse", x: 150, y: 150 });
+    expect(h.state.selectedElementIds).toEqual({ [h.elements[1].id]: true });
+  });
+
   it.each(["png", "svg"])(
     "Shift-drop adds the scene embedded in a %s",
     async (ext) => {
