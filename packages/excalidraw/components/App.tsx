@@ -5551,7 +5551,14 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
+      // with Ctrl/Cmd held, Space is an OS shortcut (e.g. the macOS emoji
+      // picker) that swallows the keyup and would leave us stuck panning
+      if (
+        event.key === KEYS.SPACE &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        gesture.pointers.size === 0
+      ) {
         this.pan.setSpaceHeld(true);
         this.cursor.set(CURSOR_TYPE.GRAB);
         event.preventDefault();
