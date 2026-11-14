@@ -1016,6 +1016,31 @@ describe("textWysiwyg", () => {
       expect(h.state.zoom.value).toBe(1);
     });
 
+    it("should keep the caret in place when zooming via keyboard", () => {
+      // "abc|def", 10px per character
+      updateTextEditor(textarea, "abcdef");
+      textarea.setSelectionRange(3, 3);
+      const getCaretViewportCoords = () => {
+        const text = h.elements.find(
+          (element) => element.id === textElement.id,
+        ) as ExcalidrawTextElement;
+        return [
+          (text.x + 30 + h.state.scrollX) * h.state.zoom.value,
+          (text.y + text.height / 2 + h.state.scrollY) * h.state.zoom.value,
+        ];
+      };
+      const [x, y] = getCaretViewportCoords();
+
+      for (const code of [CODES.EQUAL, CODES.EQUAL, CODES.MINUS, CODES.ZERO]) {
+        const zoom = h.state.zoom.value;
+        fireEvent.keyDown(textarea, { code, ctrlKey: true });
+        expect(h.state.zoom.value).not.toBe(zoom);
+        const [nextX, nextY] = getCaretViewportCoords();
+        expect(nextX).toBeCloseTo(x);
+        expect(nextY).toBeCloseTo(y);
+      }
+    });
+
     it("should not cut the editor off at the viewport's edges", async () => {
       Keyboard.exitTextEditor(textarea);
       // already wider than the 800x400 viewport: such a text keeps growing
