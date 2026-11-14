@@ -24,7 +24,12 @@ import { getWrappedLineOffsets } from "./textSpans";
  * space or tab (`-item` or `4.5` aren't list items). The item's content may
  * be empty (`- `), which is what the editor exits a list on.
  */
-export const MARKDOWN_LIST_ITEM_REGEX = /^([ \t]*)(?:(-)|(\d{1,9})\.)([ \t]+)/;
+export const MARKDOWN_LIST_ITEM_REGEX =
+  /^([ \t]*)(?:(-)[ \t]+(?:\[([ xX])\][ \t]+)?|(\d{1,9})\.[ \t]+)/;
+
+/** what a todo item's `[ ]` / `[x]` is drawn as */
+export const LIST_CHECKBOX_UNCHECKED = "☐";
+export const LIST_CHECKBOX_CHECKED = "☑";
 
 /** columns a tab counts for, when comparing indentations */
 export const LIST_TAB_SIZE = 4;
@@ -54,6 +59,8 @@ export type MarkdownListMarker = {
   marker: string;
   /** the typed number of an ordered item (with zero padding, e.g. `01`) */
   number: string | null;
+  /** `- [ ] todo` / `- [x] done`: whether it's checked; null if no checkbox */
+  checked: boolean | null;
   /** where the item's content (after the marker and whitespace) starts */
   contentStart: number;
 };
@@ -86,22 +93,27 @@ export const parseMarkdownListMarker = (
   if (!match) {
     return null;
   }
-  const [whole, indent, dash, number] = match;
+  const [whole, indent, dash, box, number] = match;
   return {
     kind: dash ? "unordered" : "ordered",
     indent,
     indentColumns: getIndentColumns(indent),
     marker: dash ?? `${number}.`,
     number: number ?? null,
+    checked: box === undefined ? null : box !== " ",
     contentStart: whole.length,
   };
 };
 
 export const getListDisplayMarker = (
-  marker: Pick<MarkdownListMarker, "kind" | "marker">,
+  marker: Pick<MarkdownListMarker, "kind" | "marker" | "checked">,
   level: number,
 ) =>
-  marker.kind === "unordered"
+  marker.checked !== null
+    ? marker.checked
+      ? LIST_CHECKBOX_CHECKED
+      : LIST_CHECKBOX_UNCHECKED
+    : marker.kind === "unordered"
     ? LIST_BULLETS[level % LIST_BULLETS.length]
     : marker.marker;
 
@@ -362,6 +374,8 @@ export const getListContinuation = (
   return {
     start: caret,
     end: caret,
-    text: `\n${marker.indent}${nextMarker} `,
+    text: `\n${marker.indent}${nextMarker} ${
+      marker.checked !== null ? "[ ] " : ""
+    }`,
   };
 };

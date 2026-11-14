@@ -31,7 +31,22 @@ describe("markdown list parsing", () => {
       indentColumns: 0,
       marker: "-",
       number: null,
+      checked: null,
       contentStart: 2,
+    });
+    expect(parseMarkdownListMarker("- [ ] todo")).toMatchObject({
+      kind: "unordered",
+      checked: false,
+      contentStart: 6,
+    });
+    expect(parseMarkdownListMarker("  - [X] done")).toMatchObject({
+      checked: true,
+      contentStart: 8,
+    });
+    // checkboxes are for `-` items only
+    expect(parseMarkdownListMarker("1. [ ] x")).toMatchObject({
+      checked: null,
+      contentStart: 3,
     });
     expect(parseMarkdownListMarker("  4.  item")).toMatchObject({
       kind: "ordered",
