@@ -97,6 +97,10 @@ export const SearchMenu = () => {
   });
   const searchedQueryRef = useRef<SearchQuery | null>(null);
   const lastSceneNonceRef = useRef<number | undefined>(undefined);
+  const lastResultsRef = useRef<{
+    searchQuery: SearchQuery;
+    items: SearchMatchItem[];
+  } | null>(null);
 
   const [focusIndex, setFocusIndex] = useAtom(searchItemInFocusAtom);
   const elementsMap = app.scene.getNonDeletedElementsMap();
@@ -109,27 +113,39 @@ export const SearchMenu = () => {
       searchQuery !== searchedQueryRef.current ||
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
+      // when only the scene changed, keep the results in the order the user
+      // is already looking at instead of re-sorting them under their hands
+      const previousItems =
+        lastResultsRef.current?.searchQuery === searchQuery
+          ? lastResultsRef.current.items
+          : [];
       searchedQueryRef.current = null;
-      handleSearch(searchQuery, app, (matchItems, index) => {
-        setSearchMatches({
-          nonce: randomInteger(),
-          items: matchItems,
-        });
-        searchedQueryRef.current = searchQuery;
-        lastSceneNonceRef.current = app.scene.getSceneNonce();
-        setAppState({
-          searchMatches: matchItems.length
-            ? {
-                focusedId: null,
-                matches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.element.id,
-                  focus: false,
-                  matchedLines: searchMatch.matchedLines,
-                })),
-              }
-            : null,
-        });
-      });
+      handleSearch(
+        searchQuery,
+        app,
+        (matchItems, index) => {
+          setSearchMatches({
+            nonce: randomInteger(),
+            items: matchItems,
+          });
+          searchedQueryRef.current = searchQuery;
+          lastSceneNonceRef.current = app.scene.getSceneNonce();
+          lastResultsRef.current = { searchQuery, items: matchItems };
+          setAppState({
+            searchMatches: matchItems.length
+              ? {
+                  focusedId: null,
+                  matches: matchItems.map((searchMatch) => ({
+                    id: searchMatch.element.id,
+                    focus: false,
+                    matchedLines: searchMatch.matchedLines,
+                  })),
+                }
+              : null,
+          });
+        },
+        previousItems,
+      );
     }
   }, [
     isSearching,
@@ -259,6 +275,7 @@ export const SearchMenu = () => {
       setFocusIndex(null);
       searchedQueryRef.current = null;
       lastSceneNonceRef.current = undefined;
+      lastResultsRef.current = null;
       setAppState({
         searchMatches: null,
       });
@@ -363,6 +380,7 @@ export const SearchMenu = () => {
               setFocusIndex(index);
               searchedQueryRef.current = searchQuery;
               lastSceneNonceRef.current = app.scene.getSceneNonce();
+              lastResultsRef.current = { searchQuery, items: matchItems };
               setAppState({
                 searchMatches: matchItems.length
                   ? {
@@ -789,11 +807,48 @@ const escapeSpecialCharacters = (string: string) => {
   return string.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&");
 };
 
+// identifies a match across searches by its element and its ordinal within
+// that element, so unrelated edits to the text don't change its identity
+const getMatchKeys = (items: readonly SearchMatchItem[]) => {
+  const ordinals = new Map<string, number>();
+  return items.map((item) => {
+    const ordinal = ordinals.get(item.element.id) ?? 0;
+    ordinals.set(item.element.id, ordinal + 1);
+    return `${item.element.id}:${ordinal}`;
+  });
+};
+
+// keeps the matches the user is already looking at in their current order,
+// so moving elements on canvas doesn't reshuffle the list, and appends new
+// matches in canvas order
+const preserveMatchOrder = (
+  items: SearchMatchItem[],
+  previousItems: readonly SearchMatchItem[],
+) => {
+  if (!previousItems.length) {
+    return items;
+  }
+
+  const previousRanks = new Map(
+    getMatchKeys(previousItems).map((key, index) => [key, index]),
+  );
+  const keys = getMatchKeys(items);
+
+  return items
+    .map((item, index) => ({
+      item,
+      rank: previousRanks.get(keys[index]) ?? previousItems.length + index,
+    }))
+    .sort((a, b) => a.rank - b.rank)
+    .map(({ item }) => item);
+};
+
 const handleSearch = debounce(
   (
     searchQuery: SearchQuery,
     app: AppClassProperties,
     cb: (matchItems: SearchMatchItem[], focusIndex: number | null) => void,
+    previousItems: readonly SearchMatchItem[] = [],
   ) => {
     if (!searchQuery || searchQuery === "") {
       cb([], null);
@@ -874,7 +929,10 @@ const handleSearch = debounce(
     );
 
     // putting frame matches first
-    const matchItems: SearchMatchItem[] = [...frameMatches, ...textMatches];
+    const matchItems = preserveMatchOrder(
+      [...frameMatches, ...textMatches],
+      previousItems,
+    );
 
     const focusIndex =
       matchItems.findIndex((matchItem) =>
