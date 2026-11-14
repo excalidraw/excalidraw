@@ -11,6 +11,8 @@ import { ExitViewModeButton, MobileShapeActions } from "./Actions";
 import { MobileToolbar } from "./MobileToolbar";
 import { FixedSideContainer } from "./FixedSideContainer";
 
+import { IconButton } from "./IconButton";
+import { eyeIcon, eyeClosedIcon } from "./icons";
 import { Island } from "./Island";
 
 import { PenModeButton } from "./PenModeButton";
@@ -63,6 +65,11 @@ export const MobileMenu = ({
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
+  const [toolbarHidden, setToolbarHidden] = React.useState(false);
+  const toolbarVisibilityLabel = toolbarHidden
+    ? t("toolBar.showToolbar")
+    : t("toolBar.hideToolbar");
+
   const renderAppTopBar = () => {
     if (appState.openDialog?.name === "elementLinkSelector") {
       return null;
@@ -179,9 +186,29 @@ export const MobileMenu = ({
             setAppState={setAppState}
           />
 
-          <Island className="App-toolbar">
-            {appState.openDialog?.name !== "elementLinkSelector" &&
-              renderToolbar()}
+          <Island
+            className="App-toolbar"
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              ...(toolbarHidden
+                ? { alignSelf: "flex-end", width: "max-content" }
+                : {}),
+            }}
+          >
+            {appState.openDialog?.name !== "elementLinkSelector" && (
+              <>
+                {!toolbarHidden && renderToolbar()}
+                <IconButton
+                  type="button"
+                  icon={toolbarHidden ? eyeIcon : eyeClosedIcon}
+                  aria-label={toolbarVisibilityLabel}
+                  title={toolbarVisibilityLabel}
+                  data-testid="toolbar-visibility-toggle"
+                  onClick={() => setToolbarHidden((hidden) => !hidden)}
+                />
+              </>
+            )}
           </Island>
         </div>
       )}
