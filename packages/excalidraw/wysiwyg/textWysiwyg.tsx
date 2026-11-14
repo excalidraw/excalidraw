@@ -81,7 +81,6 @@ import {
 import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
-import type { AppState } from "../types";
 
 /**
  * How much further than the browser's caret reveal the canvas pans, in
@@ -91,22 +90,67 @@ import type { AppState } from "../types";
 export const CARET_FOLLOW_PADDING = 5;
 
 /**
- * The editor is scaled and rotated about the text's center (its transform
- * origin), as the canvas draws the text. The zoom puts that center at half
- * the *scaled* size from the box's top-left, while the origin sits at half
- * the unscaled size — the translate makes up the difference.
+ * Where the editor goes, as the transform that places its box (with a
+ * `0 0` origin) and the box's width.
+ *
+ * Unless it wraps, the box is whole px wide, a fraction wider than its
+ * text: the browser centers (or right-aligns) each line by an offset rounded
+ * to its layout units, and with a fractional width that rounding would
+ * change as the width does. A box that wraps keeps its exact width, which
+ * is where the canvas wraps the text too.
+ *
+ * The transform pins the text's anchor — the point its alignment grows it
+ * away from (top left, center or right) — to its place on the canvas, then
+ * scales and rotates the box about the same point of the box. Typing on a
+ * line then only changes the box's anchor (a whole or half px), so that the
+ * other lines' glyphs stay exactly where they are. Placing the box by
+ * `left`/`top` instead, or about any point that moves with the width, would
+ * make them shimmer by up to a pixel: browsers round a scaled element's
+ * layout offset and its transform origin.
  */
-const getTransform = (
-  width: number,
-  height: number,
-  angle: number,
-  appState: AppState,
-) => {
-  const { zoom } = appState;
+const getEditorPlacement = ({
+  x,
+  y,
+  textWidth,
+  textHeight,
+  boxWidth,
+  wraps,
+  textAlign,
+  angle,
+  zoom,
+  getViewportCoords,
+}: {
+  /** the text's (unrotated) top left, in scene coords */
+  x: number;
+  y: number;
+  textWidth: number;
+  textHeight: number;
+  /** the width the box needs, in scene units */
+  boxWidth: number;
+  /** whether the editor wraps the text at the box's width */
+  wraps: boolean;
+  textAlign: ExcalidrawTextElement["textAlign"];
+  angle: number;
+  zoom: number;
+  getViewportCoords: (x: number, y: number) => [number, number];
+}) => {
+  const editorWidth = wraps ? boxWidth : Math.ceil(boxWidth);
+  const anchorRatio =
+    textAlign === "center" ? 0.5 : textAlign === "right" ? 1 : 0;
+  // the canvas rotates the text about its center
+  const [anchorX, anchorY] = pointRotateRads(
+    pointFrom(x + textWidth * anchorRatio, y),
+    pointFrom(x + textWidth / 2, y + textHeight / 2),
+    angle as Radians,
+  );
+  const [viewportX, viewportY] = getViewportCoords(anchorX, anchorY);
   const degree = (180 * angle) / Math.PI;
-  const translateX = (width * (zoom.value - 1)) / 2;
-  const translateY = (height * (zoom.value - 1)) / 2;
-  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+  return {
+    editorWidth,
+    transform: `translate(${viewportX}px, ${viewportY}px) rotate(${degree}deg) scale(${zoom}) translate(${
+      -editorWidth * anchorRatio
+    }px, 0px)`,
+  };
 };
 
 const getLineDirection = (text: string, offset: number) => {
@@ -458,7 +502,6 @@ export const textWysiwyg = ({
           }
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const angle = getTextElementAngle(updatedTextElement, container);
 
       // The editor box is the text's, never cut to the viewport: a caret past
@@ -473,6 +516,22 @@ export const textWysiwyg = ({
 
       const font = getFontString(updatedTextElement);
       const editorBoxLeft = updateEditorBoxInsets();
+      const { editorWidth, transform } = getEditorPlacement({
+        x: coordX,
+        y: coordY,
+        textWidth: updatedTextElement.width,
+        textHeight: updatedTextElement.height,
+        boxWidth: width,
+        // see the whiteSpace set below and at the editor's creation
+        wraps: !!container || !updatedTextElement.autoResize,
+        textAlign,
+        angle,
+        zoom: appState.zoom.value,
+        getViewportCoords: (x, y) => {
+          const [viewportX, viewportY] = getViewportCoords(x, y);
+          return [viewportX - editorBoxLeft, viewportY];
+        },
+      });
 
       // a free text that stopped growing at the viewport's width (see
       // AppText.getMaxTextWidth) wraps from then on, and so does its editor
@@ -488,21 +547,10 @@ export const textWysiwyg = ({
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${width}px`,
+        width: `${editorWidth}px`,
         height: `${height}px`,
-        left: `${viewportX - editorBoxLeft}px`,
-        top: `${viewportY}px`,
-        // about the text's center, whatever size the box itself ends up
-        // (the 5% buffer) — see getTransform
-        transformOrigin: `${updatedTextElement.width / 2}px ${
-          updatedTextElement.height / 2
-        }px`,
-        transform: getTransform(
-          updatedTextElement.width,
-          updatedTextElement.height,
-          angle,
-          appState,
-        ),
+        transformOrigin: "0 0",
+        transform,
         textAlign,
         verticalAlign,
         color: applyDarkModeFilter(
@@ -524,6 +572,13 @@ export const textWysiwyg = ({
         x: coordX,
         y: coordY,
       };
+      // a font's glyphs can reach past its lines, beyond the 5% buffer: the
+      // box then grows to its text, or the browser scrolls the text inside
+      // it to reveal the caret as you type, which shifts the lines you're
+      // not on (vertically, and by up to half a pixel sideways)
+      if (editable.scrollHeight > editable.clientHeight) {
+        editable.style.height = `${editable.scrollHeight}px`;
+      }
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
@@ -553,6 +608,9 @@ export const textWysiwyg = ({
   }
   Object.assign(editable.style, {
     position: "absolute",
+    // placed by its transform instead — see getEditorPlacement
+    left: 0,
+    top: 0,
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
