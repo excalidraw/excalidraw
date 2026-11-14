@@ -103,19 +103,22 @@ const LARGE_SCENE_GRID = {
   cellHeight: 110,
 };
 
-/**
- * The same 2,000 elements every run (seeded): shapes, text, arrows, lines and
- * freedraw strokes on a grid, zoomed out so all of them are drawn.
- */
-function createLargeScene() {
-  // mulberry32
-  let seed = 42;
-  const random = () => {
+/** A seeded random number generator (mulberry32), so scenes are the same every run. */
+function createRandom(seed) {
+  return () => {
     seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/**
+ * The same 2,000 elements every run (seeded): shapes, text, arrows, lines and
+ * freedraw strokes on a grid, zoomed out so all of them are drawn.
+ */
+function createLargeScene() {
+  const random = createRandom(42);
   const pick = (list) => list[Math.floor(random() * list.length)];
   const words = [
     "Idea",
@@ -234,6 +237,71 @@ function createLargeScene() {
 
   // everything in view: the grid's size times the zoom fits the viewport, centered
   const zoom = 0.2;
+  const { width, height } = PERF_ENVIRONMENT.viewport;
+  const appState = {
+    zoom: { value: zoom },
+    scrollX: (width / zoom - columns * cellWidth) / 2,
+    scrollY: (height / zoom - rows * cellHeight) / 2,
+  };
+
+  return { elements, appState };
+}
+
+const HUGE_SCENE_GRID = {
+  columns: 200,
+  rows: 100,
+  cellWidth: 140,
+  cellHeight: 110,
+};
+
+/**
+ * The same 20,000 elements every run (seeded): shapes and arrows on a grid,
+ * viewed at 100 % from its center, so only a few dozen of them are drawn and
+ * the work that scales with the scene, not the view, shows. Elements carry
+ * only what isn't a default (restoring fills the rest in) to fit the scene in
+ * local storage.
+ */
+function createHugeScene() {
+  const random = createRandom(7);
+  const pick = (list) => list[Math.floor(random() * list.length)];
+  const { columns, rows, cellWidth, cellHeight } = HUGE_SCENE_GRID;
+  const elements = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < columns; column++) {
+      const kind = random();
+      const base = {
+        id: `huge-${elements.length}`,
+        x: column * cellWidth,
+        y: row * cellHeight,
+        width: 100,
+        height: 70,
+        seed: Math.floor(random() * 2 ** 31),
+        strokeColor: pick(["#1e1e1e", "#e03131", "#2f9e44", "#1971c2"]),
+      };
+
+      if (kind < 0.8) {
+        elements.push({
+          ...base,
+          type: kind < 0.4 ? "rectangle" : kind < 0.65 ? "ellipse" : "diamond",
+          backgroundColor: pick(["transparent", "#ffc9c9", "#a5d8ff"]),
+          fillStyle: pick(["solid", "hachure"]),
+        });
+      } else {
+        elements.push({
+          ...base,
+          type: "arrow",
+          points: [
+            [0, 0],
+            [100, 70],
+          ],
+          endArrowhead: "arrow",
+        });
+      }
+    }
+  }
+
+  const zoom = 1;
   const { width, height } = PERF_ENVIRONMENT.viewport;
   const appState = {
     zoom: { value: zoom },
@@ -370,15 +438,34 @@ const PAN_ZOOM_STEPS = [
 ];
 
 /**
- * Plays `PAN_ZOOM_STEPS` over the canvas: each frame's main-thread work, the
- * time between the frames, and the static canvas's draws. Headless Chromium
- * ticks frames at a fixed 60 Hz (the frame-rate flags don't change it), so the
- * time between frames only moves in whole frames; a frame's work — from its
- * start until a task posted in it runs, after its rendering: the editor
- * drawing the previous wheel event, handling the current one, style, layout
- * and paint — shows every millisecond.
+ * The wheel events of the huge-scene scenario, as `PAN_ZOOM_STEPS`: from
+ * 100 %, pan right and down across a few screens, zoom out to 50 % (a few
+ * hundred elements in view), pan back and zoom back in. Its pauses stay under
+ * the app's local-save debounce (`SAVE_TO_LOCAL_STORAGE_TIMEOUT`): saving a
+ * scene this size would land in the measured frames.
  */
-function panAndZoom(steps) {
+const HUGE_PAN_STEPS = [
+  ...repeat(60, { shiftKey: true, deltaY: 40 }),
+  ...repeat(60, { ctrlKey: true, shiftKey: true, deltaY: 40 }),
+  ...repeat(25, { ctrlKey: true, deltaY: 2 }),
+  ...repeat(10, null),
+  ...repeat(60, { shiftKey: true, deltaY: -40 }),
+  ...repeat(60, { ctrlKey: true, shiftKey: true, deltaY: -40 }),
+  ...repeat(25, { ctrlKey: true, deltaY: -2 }),
+  ...repeat(10, null),
+];
+
+/** The `performance.mark` that `panAndZoom` sets as each frame starts. */
+const FRAME_MARK = "perf:frame";
+
+/**
+ * Plays `steps` (see `PAN_ZOOM_STEPS`) over the canvas, one per frame: the
+ * time between the frames, and the static canvas's draws. Marks each frame's
+ * start (`FRAME_MARK`, plus one after the last frame) for `getFrameWork`.
+ * Headless Chromium ticks frames at a fixed 60 Hz (the frame-rate flags don't
+ * change it), so the time between frames only moves in whole frames.
+ */
+function panAndZoom({ steps, frameMark }) {
   const canvas = document.querySelector(
     "canvas.excalidraw__canvas.interactive",
   );
@@ -386,12 +473,6 @@ function panAndZoom(steps) {
   const position = { clientX: left + width / 2, clientY: top + height / 2 };
   const nextFrame = () =>
     new Promise((resolve) => requestAnimationFrame(resolve));
-  const afterRendering = () =>
-    new Promise((resolve) => {
-      const channel = new MessageChannel();
-      channel.port1.onmessage = () => resolve(performance.now());
-      channel.port2.postMessage(null);
-    });
 
   // zooms anchor on the pointer's last position
   canvas.dispatchEvent(
@@ -405,9 +486,9 @@ function panAndZoom(steps) {
 
   return (async () => {
     const drawsBefore = window.__perf.staticDraws;
-    const work = [];
     const intervals = [];
     let frameStart = await nextFrame();
+    performance.mark(frameMark);
     for (const step of steps) {
       if (step) {
         canvas.dispatchEvent(
@@ -420,13 +501,74 @@ function panAndZoom(steps) {
           }),
         );
       }
-      work.push((await afterRendering()) - frameStart);
       const nextFrameStart = await nextFrame();
+      performance.mark(frameMark);
       intervals.push(nextFrameStart - frameStart);
       frameStart = nextFrameStart;
     }
-    return { work, intervals, draws: window.__perf.staticDraws - drawsBefore };
+    return { intervals, draws: window.__perf.staticDraws - drawsBefore };
   })();
+}
+
+/** The trace categories `getFrameWork` reads: every task, and the frame marks. */
+const FRAME_TRACE_CATEGORIES = ["toplevel", "blink.user_timing"];
+
+/**
+ * Each frame's main-thread work (ms), from a trace of `panAndZoom`: the time
+ * the page's main thread spent running tasks between the frame's mark and the
+ * next one — the editor handling the wheel event and drawing, style, layout,
+ * paint, garbage collection. Measured as busy time, not as how long until
+ * some task got to run: that also moves with how the browser orders the
+ * frame's work, by up to a few tenths of a millisecond either way, which can
+ * make more work look faster.
+ */
+function getFrameWork(traceEvents) {
+  const marks = traceEvents
+    .filter((event) => event.name === FRAME_MARK)
+    .sort((a, b) => a.ts - b.ts);
+  if (marks.length < 2) {
+    throw new Error("The trace has no frame marks");
+  }
+  // the thread that set the marks is the page's main thread
+  const { pid, tid } = marks[0];
+
+  // its tasks, merged where they nest or overlap
+  const tasks = traceEvents
+    .filter(
+      (event) =>
+        event.pid === pid &&
+        event.tid === tid &&
+        event.ph === "X" &&
+        event.cat.split(",").includes("toplevel"),
+    )
+    .map((event) => [event.ts, event.ts + (event.dur ?? 0)])
+    .sort((a, b) => a[0] - b[0]);
+  const busy = [];
+  for (const [start, end] of tasks) {
+    const last = busy[busy.length - 1];
+    if (last && start <= last[1]) {
+      last[1] = Math.max(last[1], end);
+    } else {
+      busy.push([start, end]);
+    }
+  }
+
+  const work = [];
+  let first = 0;
+  for (let frame = 0; frame < marks.length - 1; frame++) {
+    const frameStart = marks[frame].ts;
+    const frameEnd = marks[frame + 1].ts;
+    while (first < busy.length && busy[first][1] <= frameStart) {
+      first++;
+    }
+    let time = 0;
+    for (let i = first; i < busy.length && busy[i][0] < frameEnd; i++) {
+      time += Math.min(busy[i][1], frameEnd) - Math.max(busy[i][0], frameStart);
+    }
+    // trace timestamps are in microseconds
+    work.push(time / 1000);
+  }
+  return work;
 }
 
 /**
@@ -445,6 +587,32 @@ function getFrameMetrics({ work, intervals }) {
 }
 
 const LARGE_SCENE = createLargeScene();
+const HUGE_SCENE = createHugeScene();
+
+/** A scenario's `interact`: plays `steps` (see `panAndZoom`) once the page settled. */
+const playPanAndZoom = (steps) => async (page) => {
+  // fonts and lazy chunks loaded, so their redraws don't land in the frames
+  await page.waitForLoadState("networkidle", { timeout: LOAD_TIMEOUT_MS });
+  const browser = page.context().browser();
+  await browser.startTracing(page, { categories: FRAME_TRACE_CATEGORIES });
+  let frames;
+  let trace;
+  try {
+    frames = await page.evaluate(panAndZoom, { steps, frameMark: FRAME_MARK });
+  } finally {
+    trace = await browser.stopTracing();
+  }
+  if (!frames.draws) {
+    throw new Error("The scene didn't redraw while panning and zooming");
+  }
+  const work = getFrameWork(JSON.parse(trace.toString("utf8")).traceEvents);
+  if (work.length !== frames.intervals.length) {
+    throw new Error(
+      `The trace has ${work.length} frames, the interaction ${frames.intervals.length}`,
+    );
+  }
+  return getFrameMetrics({ ...frames, work });
+};
 
 /**
  * The scenarios, by their ids in the admin's catalogue (`PERF_SCENARIOS` in
@@ -470,15 +638,13 @@ const SCENARIOS = [
     id: "oss-pan-zoom",
     scene: LARGE_SCENE,
     readyAt: () => (window.__perf.staticDraws > 0 ? performance.now() : 0),
-    interact: async (page) => {
-      // fonts and lazy chunks loaded, so their redraws don't land in the frames
-      await page.waitForLoadState("networkidle", { timeout: LOAD_TIMEOUT_MS });
-      const frames = await page.evaluate(panAndZoom, PAN_ZOOM_STEPS);
-      if (!frames.draws) {
-        throw new Error("The scene didn't redraw while panning and zooming");
-      }
-      return getFrameMetrics(frames);
-    },
+    interact: playPanAndZoom(PAN_ZOOM_STEPS),
+  },
+  {
+    id: "oss-pan-huge-scene",
+    scene: HUGE_SCENE,
+    readyAt: () => (window.__perf.staticDraws > 0 ? performance.now() : 0),
+    interact: playPanAndZoom(HUGE_PAN_STEPS),
   },
 ];
 

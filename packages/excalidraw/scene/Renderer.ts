@@ -6,7 +6,13 @@ import {
   isTextElement,
 } from "@excalidraw/element";
 
-import { arrayToMap, memoize, toBrandedType } from "@excalidraw/common";
+import {
+  arrayToMap,
+  isTestEnv,
+  memoize,
+  toBrandedType,
+  viewportCoordsToSceneCoords,
+} from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -216,27 +222,97 @@ export class Renderer {
     height: AppState["height"];
     width: AppState["width"];
   }): readonly NonDeletedExcalidrawElement[] {
+    const viewTransformations = {
+      zoom,
+      offsetLeft,
+      offsetTop,
+      scrollX,
+      scrollY,
+    };
+    const topLeft = viewportCoordsToSceneCoords(
+      { clientX: offsetLeft, clientY: offsetTop },
+      viewTransformations,
+    );
+    const bottomRight = viewportCoordsToSceneCoords(
+      { clientX: offsetLeft + width, clientY: offsetTop + height },
+      viewTransformations,
+    );
+
+    // the index narrows the scene down to elements near the viewport (in
+    // z-order); `isElementInViewport` stays the authoritative check, as the
+    // renderable map may resolve bounds differently from the scene's (e.g.
+    // without the label being edited)
     const visibleElements: NonDeletedExcalidrawElement[] = [];
-    for (const element of elementsMap.values()) {
+    for (const element of this.scene.getNonDeletedElementsInBounds([
+      topLeft.x,
+      topLeft.y,
+      bottomRight.x,
+      bottomRight.y,
+    ])) {
       if (
+        elementsMap.has(element.id) &&
         isElementInViewport(
           element,
           width,
           height,
-          {
-            zoom,
-            offsetLeft,
-            offsetTop,
-            scrollX,
-            scrollY,
-          },
+          viewTransformations,
           elementsMap,
         )
       ) {
         visibleElements.push(element);
       }
     }
+
+    if (isTestEnv()) {
+      this.assertMatchesFullScan(
+        visibleElements,
+        elementsMap,
+        width,
+        height,
+        viewTransformations,
+      );
+    }
+
     return visibleElements;
+  }
+
+  /**
+   * Test-only guard: the index must never change what gets rendered, so every
+   * test that renders cross-checks it against the full scan it replaces.
+   */
+  private assertMatchesFullScan(
+    visibleElements: readonly NonDeletedExcalidrawElement[],
+    elementsMap: NonDeletedElementsMap,
+    width: AppState["width"],
+    height: AppState["height"],
+    viewTransformations: Parameters<typeof isElementInViewport>[3],
+  ) {
+    const expected: NonDeletedExcalidrawElement[] = [];
+    for (const element of elementsMap.values()) {
+      if (
+        isElementInViewport(
+          element,
+          width,
+          height,
+          viewTransformations,
+          elementsMap,
+        )
+      ) {
+        expected.push(element);
+      }
+    }
+    if (
+      expected.length !== visibleElements.length ||
+      expected.some((element, i) => element !== visibleElements[i])
+    ) {
+      throw new Error(
+        `Spatial index culling diverged from a full scan: expected [${expected
+          .map((element) => element.id)
+          .join(", ")}], got [${visibleElements
+          .map((element) => element.id)
+          .join(", ")}]`,
+      );
+    }
   }
 
   private getRenderableElementsMap({
@@ -309,6 +385,25 @@ export class Renderer {
     ] as readonly T[];
   }
 
+  /**
+   * The renderable elements map doesn't depend on the viewport, so it's
+   * memoized separately from the visibility culling: panning and zooming
+   * only re-run the culling instead of rebuilding the map.
+   */
+  private _getRenderableElementsMap = memoize(
+    ({
+      editingTextElement,
+      newElement,
+    }: Pick<GetRenderableElementsOpts, "editingTextElement" | "newElement"> & {
+      canvasNonce: string;
+    }) =>
+      this.getRenderableElementsMap({
+        elements: this.scene.getNonDeletedElements(),
+        editingTextElement,
+        newElement,
+      }),
+  );
+
   private _getRenderableElements = memoize(
     ({
       canvasNonce,
@@ -329,11 +424,9 @@ export class Renderer {
     > & {
       canvasNonce: string;
     }) => {
-      const elements = this.scene.getNonDeletedElements();
-
       const { elementsMap, newElementCanvasElement } =
-        this.getRenderableElementsMap({
-          elements,
+        this._getRenderableElementsMap({
+          canvasNonce,
           editingTextElement,
           newElement,
         });
@@ -419,6 +512,7 @@ export class Renderer {
   public destroy(staticCanvas: HTMLCanvasElement) {
     cancelStaticSceneThrottle(staticCanvas);
     this._getRenderableElements.clear();
+    this._getRenderableElementsMap.clear();
     this._getVisibleElementsWithRenderOffsets.clear();
   }
 }
