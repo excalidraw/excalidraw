@@ -102,6 +102,27 @@
       }
     }
 
+    &__padding {
+      width: 5rem;
+      margin-right: 0.5rem;
+      box-sizing: border-box;
+      padding: 0.375rem 0.5rem;
+      color: var(--text-primary-color);
+      background-color: var(--input-bg-color);
+      border: 1.5px solid var(--input-border-color);
+      border-radius: var(--space-factor);
+      font: inherit;
+
+      &:hover,
+      &:focus {
+        border-color: var(--color-brand-hover);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
     &__settings {
       display: flex;
       flex-direction: column;
