@@ -215,3 +215,98 @@ describe("duplicate element on move when ALT is clicked", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 });
+
+describe("axis lock during element dragging", () => {
+  it("preserves position when Shift is toggled during a drag", async () => {
+    await render(<Excalidraw />);
+
+    // Create a rectangle at (100, 100).
+    const rectangle = UI.createElement("rectangle", {
+      x: 100,
+      y: 100,
+      size: 80,
+    });
+
+    const mouse = new Pointer("mouse");
+
+    // Drag the rectangle 50 pixels down without Shift.
+    mouse.downAt(120, 100);
+    mouse.moveTo(120, 150);
+
+    expect([rectangle.x, rectangle.y]).toEqual([100, 150]);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      // Start moving horizontally with Shift held.
+      mouse.moveTo(140, 150);
+
+      // The previous vertical movement must be preserved.
+      expect([rectangle.x, rectangle.y]).toEqual([120, 150]);
+
+      // Moving vertically must not change the locked axis.
+      mouse.moveTo(140, 210);
+
+      expect([rectangle.x, rectangle.y]).toEqual([120, 150]);
+    });
+
+    // Releasing Shift must resume normal movement without jumping.
+    mouse.moveTo(150, 220);
+
+    expect([rectangle.x, rectangle.y]).toEqual([130, 160]);
+
+    mouse.upAt();
+  });
+});
+describe("axis lock during Alt-drag duplication", () => {
+  it("preserves duplicate position when Shift is toggled", async () => {
+    await render(<Excalidraw />);
+
+    // Create the original rectangle.
+    const rectangle = UI.createElement("rectangle", {
+      x: 100,
+      y: 100,
+      size: 80,
+    });
+
+    const mouse = new Pointer("mouse");
+
+    // Start dragging and duplicate with Alt.
+    mouse.downAt(120, 100);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(150, 130);
+    });
+
+    // Verify that duplication occurred.
+    expect(h.elements.length).toBe(2);
+    expect([rectangle.x, rectangle.y]).toEqual([100, 100]);
+
+    // Get the current position of the duplicate.
+    const duplicatePosition = () => {
+      const duplicate = h.elements.find(
+        (element) => element.id !== rectangle.id,
+      )!;
+
+      return [duplicate.x, duplicate.y];
+    };
+
+    // Continue dragging without modifiers.
+    mouse.moveTo(155, 135);
+    expect(duplicatePosition()).toEqual([135, 135]);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      // Lock horizontal movement without losing vertical position.
+      mouse.moveTo(175, 135);
+      expect(duplicatePosition()).toEqual([155, 135]);
+
+      // Vertical movement should be ignored.
+      mouse.moveTo(175, 175);
+      expect(duplicatePosition()).toEqual([155, 135]);
+    });
+
+    // Release Shift and continue dragging normally.
+    mouse.moveTo(180, 185);
+    expect(duplicatePosition()).toEqual([160, 145]);
+
+    mouse.upAt();
+  });
+});
