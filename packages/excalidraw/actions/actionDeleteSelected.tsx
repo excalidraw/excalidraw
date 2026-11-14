@@ -239,14 +239,21 @@ export const actionDeleteSelected = register<{
         return false;
       }
 
-      // case: deleting all points
+      // case: deleting all points deletes the element, along with its label
       if (selectedPointsIndices.length >= linearElement.points.length) {
+        const deletedElements: ExcalidrawElement[] = [];
         const nextElements = elements.map((el) => {
-          if (el.id === linearElement.id) {
-            return newElementWith(el, { isDeleted: true });
+          if (
+            el.id === linearElement.id ||
+            (isBoundToContainer(el) && el.containerId === linearElement.id)
+          ) {
+            const deletedElement = newElementWith(el, { isDeleted: true });
+            deletedElements.push(deletedElement);
+            return deletedElement;
           }
           return el;
         });
+        fixBindingsAfterDeletion(nextElements, deletedElements);
         const nextAppState = handleGroupEditingState(appState, nextElements);
 
         return {

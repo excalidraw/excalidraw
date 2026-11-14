@@ -1,5 +1,14 @@
 import React from "react";
 
+import { arrayToMap } from "@excalidraw/common";
+import { LinearElementEditor } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
+
+import type {
+  ExcalidrawArrowElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { act, assertElements, render } from "../tests/test-utils";
@@ -274,5 +283,63 @@ describe("cutting a selected frame takes its children along", () => {
       { id: r2.id, isDeleted: true },
       { id: t1.id, isDeleted: true },
     ]);
+  });
+});
+
+describe("deleting all points of an arrow in the line editor", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("deletes the arrow along with its label, and unbinds it", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: -50,
+      boundElements: [{ type: "arrow", id: "arrow" }],
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow",
+      width: 295,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(295, 0)],
+      endBinding: {
+        elementId: rectangle.id,
+        fixedPoint: [0, 0.5],
+        mode: "orbit",
+      },
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      containerId: arrow.id,
+    });
+    API.setElements([rectangle, arrow, label]);
+    API.setSelectedElements([arrow]);
+    act(() => {
+      h.setState({
+        selectedLinearElement: {
+          ...new LinearElementEditor(
+            arrow as NonDeleted<ExcalidrawArrowElement>,
+            arrayToMap(h.elements),
+          ),
+          isEditing: true,
+          selectedPointsIndices: [0, 1],
+        },
+      });
+    });
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDeleteSelected);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle.id, isDeleted: false, boundElements: [] },
+      { id: arrow.id, isDeleted: true },
+      { id: label.id, isDeleted: true },
+    ]);
+    expect(h.state.selectedLinearElement).toBe(null);
   });
 });
