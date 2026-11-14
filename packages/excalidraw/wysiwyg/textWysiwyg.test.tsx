@@ -51,7 +51,7 @@ import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getTextAutoResizeHandle } from "../textAutoResizeHandle";
 
-import { CARET_FOLLOW_PADDING } from "./textWysiwyg";
+import { CARET_FOLLOW_PADDING, WYSIWYG_CARET_PADDING } from "./textWysiwyg";
 
 const { h } = window;
 
@@ -1039,6 +1039,19 @@ describe("textWysiwyg", () => {
       expect(parseFloat(textarea.style.height)).toBeCloseTo(text.height * 1.05);
       expect(textarea.style.maxHeight).toBe("");
       Keyboard.exitTextEditor(textarea);
+    });
+
+    it("should keep padding past the text so the caret is not clipped", () => {
+      // a trailing space is the usual case: the caret sits just past the
+      // last glyph, and Gecko floors the editor width out from under it
+      updateTextEditor(textarea, "Hello ");
+      const text = h.elements[0] as ExcalidrawTextElement;
+      // width stays the advance width; wrapping and alignment depend on it.
+      // the room for the caret is padding, outside that width
+      expect(textarea.style.width).toBe(`${text.width}px`);
+      expect(textarea.style.paddingRight).toBe(`${WYSIWYG_CARET_PADDING}px`);
+      expect(textarea.style.paddingLeft).toBe("0px");
+      expect(textarea.scrollLeft).toBe(0);
     });
 
     it("should stop a growing text at the view's width and wrap it from there", () => {
