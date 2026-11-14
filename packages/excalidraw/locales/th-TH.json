@@ -2,9 +2,9 @@
   "labels": {
     "signUp": "สมัครสมาชิก",
     "signIn": "เข้าสู่ระบบ",
-    "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
+    "upgrade": "อัปเกรด",
+    "tryExcalidrawPlus": "ลองใช้ Excalidraw+",
+    "plusFreeTrial": "ทดลองใช้ฟรี 14 วัน",
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
@@ -30,7 +30,7 @@
     "copyStyles": "คัดลอกรูปแบบ",
     "pasteStyles": "วางรูปแบบ",
     "stroke": "เส้นขอบ",
-    "textColor": "",
+    "textColor": "สีข้อความ",
     "changeStroke": "เปลี่ยนสีเส้น",
     "background": "พื้นหลัง",
     "changeBackground": "เปลี่ยนสีพื้นหลัง",
@@ -43,7 +43,7 @@
     "sloppiness": "ความเลอะเทอะ",
     "pressure": "แรงกด",
     "pressure_constant": "คงที่",
-    "pressure_variable": "",
+    "pressure_variable": "แปรผัน",
     "opacity": "ความทึบแสง",
     "textAlign": "จัดข้อความ",
     "edges": "ขอบ",
@@ -59,17 +59,17 @@
     "arrowhead_triangle_outline": "สามเหลี่ยม (เส้นนขอบ)",
     "arrowhead_diamond": "ขอบเพชร",
     "arrowhead_diamond_outline": "ขอบเพชร (เส้นขอบ)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_crowfoot_many": "ตีนกา (หลาย)",
+    "arrowhead_crowfoot_one": "ตีนกา (หนึ่ง)",
+    "arrowhead_crowfoot_one_or_many": "ตีนกา (หนึ่งหรือหลาย)",
+    "arrowhead_cardinality_one": "คาร์ดินัลลิตี (หนึ่ง)",
+    "arrowhead_cardinality_many": "คาร์ดินัลลิตี (หลาย)",
+    "arrowhead_cardinality_one_or_many": "คาร์ดินัลลิตี (หนึ่งหรือหลาย)",
+    "arrowhead_cardinality_exactly_one": "คาร์ดินัลลิตี (หนึ่งเท่านั้น)",
     "arrowhead_cardinality_zero_or_one": "คาร์ดินัลลิตี (ศูนย์หรือหนึ่ง)",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_zero_or_many": "คาร์ดินัลลิตี (ศูนย์หรือหลาย)",
     "more_options": "ตัวเลือกเพิ่มเติม",
-    "cardinality": "",
+    "cardinality": "คาร์ดินัลลิตี",
     "arrowtypes": "ชนิดลูกศร",
     "arrowtype_sharp": "ลูกศรแหลม",
     "arrowtype_round": "ลูกศรโค้ง",
@@ -115,10 +115,10 @@
     "group": "จัดกลุ่ม",
     "ungroup": "ยกเลิกการจัดกลุ่ม",
     "collaborators": "ผู้ทำงานร่วมกัน",
-    "you": "",
+    "you": "คุณ",
     "toggleGrid": "แสดงกริด",
-    "minimap": "",
-    "zoom": "",
+    "minimap": "แผนที่ย่อ",
+    "zoom": "ซูม",
     "addToLibrary": "เพิ่มไปในคลัง",
     "removeFromLibrary": "นำออกจากคลัง",
     "libraryLoadingMessage": "กำลังโหลดคลัง...",
@@ -152,21 +152,21 @@
     "createContainerFromText": "จัดข้อความในที่บรรจุ",
     "link": {
       "edit": "แก้ไขลิงก์",
-      "editEmbed": "",
+      "editEmbed": "แก้ไขลิงก์ฝังเว็บ",
       "create": "เพิ่มลิงค์",
       "label": "ลิงค์",
       "labelEmbed": "ลิงค์และการฝัง",
       "empty": "ไม่ได้ใส่ลิงค์",
-      "hint": "",
-      "goToElement": ""
+      "hint": "พิมพ์หรือวางลิงก์ของคุณที่นี่",
+      "goToElement": "ไปยังองค์ประกอบเป้าหมาย"
     },
     "lineEditor": {
       "edit": "แก้ไขเส้น",
       "editArrow": "แก้ไขลูกศร"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "ยกเลิกรูปหลายเหลี่ยม",
+      "convertToPolygon": "แปลงเป็นรูปหลายเหลี่ยม"
     },
     "elementLock": {
       "lock": "ล็อก",
@@ -183,46 +183,46 @@
     "prompt": "พรอมต์",
     "followUs": "ติดตามเรา",
     "discordChat": "แชทดิสคอร์ด",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
-    "installPWA": "",
-    "autoResize": "",
+    "zoomToFitViewport": "ซูมให้พอดีกับพื้นที่แสดงผล",
+    "zoomToFitSelection": "ซูมให้พอดีกับสิ่งที่เลือก",
+    "zoomToFit": "ซูมให้พอดีกับองค์ประกอบทั้งหมด",
+    "installPWA": "ติดตั้ง Excalidraw ในเครื่อง (PWA)",
+    "autoResize": "เปิดใช้การปรับขนาดข้อความอัตโนมัติ",
     "imageCropping": "การครอบตัดรูปภาพ",
-    "unCroppedDimension": "",
+    "unCroppedDimension": "ขนาดก่อนครอบตัด",
     "copyElementLink": "คัดลอกลิงค์ไปสู่วัตถุ",
     "linkToElement": "ลิงค์ไปสู่วัตถุ",
-    "wrapSelectionInFrame": "",
-    "removeFrame": "",
-    "toggleWrap": "",
+    "wrapSelectionInFrame": "ครอบสิ่งที่เลือกด้วยกรอบ",
+    "removeFrame": "ลบกรอบ",
+    "toggleWrap": "ครอบหรือยกเลิกการครอบสิ่งที่เลือกด้วยกรอบ",
     "tab": "แท็บ",
-    "shapeSwitch": "",
+    "shapeSwitch": "สลับรูปร่าง",
     "preferences": "การตั้งค่า",
-    "preferences_toolLock": "",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
-    "arrowBinding": "",
-    "midpointSnapping": "",
-    "showHints": "",
-    "inputDevice": "",
-    "inputDeviceTrackpad": "",
-    "inputDeviceMouse": ""
+    "preferences_toolLock": "ล็อกเครื่องมือ",
+    "boxSelectionMode": "เลือกเมื่อ",
+    "boxSelectionContain": "ครอบทั้งหมด",
+    "boxSelectionOverlap": "ทับซ้อน",
+    "arrowBinding": "การผูกลูกศร",
+    "midpointSnapping": "สแนปกับจุดกึ่งกลาง",
+    "showHints": "คำแนะนำบนแถบเครื่องมือ",
+    "inputDevice": "อุปกรณ์ป้อนข้อมูล",
+    "inputDeviceTrackpad": "แทร็กแพด",
+    "inputDeviceMouse": "เมาส์"
   },
   "elementLink": {
     "title": "ลิงค์ไปสู่วัตถุ",
-    "desc": "",
-    "notFound": ""
+    "desc": "คลิกรูปร่างบนผืนผ้าใบ หรือวางลิงก์",
+    "notFound": "ไม่พบวัตถุที่ลิงก์ไว้บนผืนผ้าใบ"
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
-    "hint_emptyLibrary": "",
+    "hint_emptyLibrary": "เลือกรายการบนผืนผ้าใบเพื่อเพิ่มลงที่นี่ หรือติดตั้งคลังจากแหล่งรวมคลังสาธารณะด้านล่าง",
     "hint_emptyPrivateLibrary": "เลือกรายการบนแคนวาสเพื่อเพิ่มลงในที่นี้",
     "search": {
       "inputPlaceholder": "ค้นหาห้องสมุด",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "heading": "ผลลัพธ์ในคลัง",
+      "noResults": "ไม่พบรายการที่ตรงกัน...",
+      "clearSearch": "ล้างการค้นหา"
     }
   },
   "search": {
@@ -251,34 +251,34 @@
     "zoomIn": "ซูมเข้า",
     "zoomOut": "ซูมออก",
     "resetZoom": "รีเซ็ตการซูม",
-    "zoomToFit": "",
+    "zoomToFit": "ซูมให้พอดี",
     "menu": "เมนู",
     "done": "เสร็จสิ้น",
     "edit": "แก้ไข",
     "undo": "เลิกทำ",
     "redo": "ทำซ้ำ",
     "resetLibrary": "รีเซ็ตคลัง",
-    "reset": "",
+    "reset": "รีเซ็ต",
     "createNewRoom": "สร้างห้องใหม่",
     "fullScreen": "เต็มหน้าจอ",
     "darkMode": "โหมดกลางคืน",
     "lightMode": "โหมดกลางวัน",
-    "systemMode": "",
+    "systemMode": "โหมดตามระบบ",
     "zenMode": "โหมด Zen",
-    "objectsSnapMode": "",
+    "objectsSnapMode": "สแนปกับวัตถุ",
     "exitZenMode": "ออกจากโหมด Zen",
     "cancel": "ยกเลิก",
-    "saveLibNames": "",
+    "saveLibNames": "บันทึกชื่อและออก",
     "clear": "เคลียร์",
     "remove": "ลบ",
     "embed": "สลับการฝัง",
-    "publishLibrary": "",
+    "publishLibrary": "เปลี่ยนชื่อหรือเผยแพร่",
     "submit": "ตกลง",
     "confirm": "ยืนยัน",
     "embeddableInteractionButton": "คลิกเพื่อปฏิสัมพันธ์"
   },
   "alerts": {
-    "clearReset": "",
+    "clearReset": "การดำเนินการนี้จะล้างผืนผ้าใบทั้งหมด คุณแน่ใจหรือไม่?",
     "couldNotCreateShareableLink": "ไม่สามารถสร้างลิงค์ได้",
     "couldNotCreateShareableLinkTooBig": "ไม่สามารถสร้างลิงก์สำหรับแชร์ได้: ฉากมีขนาดใหญ่เกินไป",
     "couldNotLoadInvalidFile": "ไม่สามารถโหลดไฟล์ที่ผิดพลาดได้",
@@ -287,46 +287,46 @@
     "couldNotCopyToClipboard": "ไม่สามารถคัดลอกไปยังคลิปบอร์ดได้",
     "decryptFailed": "ไม่สามารถถอดรหัสข้อมูลได้",
     "uploadedSecurly": "การอัพโหลดได้ถูกเข้ารหัสแบบ end-to-end หมายความว่าเซิร์ฟเวอร์ของ Excalidraw และบุคคลอื่นไม่สามารถอ่านข้อมูลได้",
-    "loadSceneOverridePrompt": "",
-    "collabStopOverridePrompt": "",
+    "loadSceneOverridePrompt": "การโหลดภาพวาดจากภายนอกจะแทนที่เนื้อหาปัจจุบันของคุณ ต้องการดำเนินการต่อหรือไม่?",
+    "collabStopOverridePrompt": "การหยุดเซสชันจะเขียนทับภาพวาดก่อนหน้าของคุณที่บันทึกไว้ในเครื่อง คุณแน่ใจหรือไม่?\n\n(หากต้องการเก็บภาพวาดในเครื่องไว้ เพียงปิดแท็บเบราว์เซอร์แทน)",
     "errorAddingToLibrary": "ไม่สามารถเพิ่มรายการเข้าไปในคลังได้",
     "errorRemovingFromLibrary": "ไม่สามารถลบรายการนี้ออกจากคลังได้",
-    "confirmAddLibrary": "",
-    "imageDoesNotContainScene": "",
-    "cannotRestoreFromImage": "",
-    "invalidSceneUrl": "",
-    "resetLibrary": "",
-    "removeItemsFromsLibrary": "",
-    "invalidEncryptionKey": "",
-    "collabOfflineWarning": "",
-    "localStorageQuotaExceeded": ""
+    "confirmAddLibrary": "การดำเนินการนี้จะเพิ่มรูปร่าง {{numShapes}} รายการลงในคลังของคุณ คุณแน่ใจหรือไม่?",
+    "imageDoesNotContainScene": "รูปภาพนี้ดูเหมือนจะไม่มีข้อมูลฉากอยู่ คุณได้เปิดใช้การฝังฉากตอนส่งออกหรือไม่?",
+    "cannotRestoreFromImage": "ไม่สามารถกู้คืนฉากจากไฟล์รูปภาพนี้ได้",
+    "invalidSceneUrl": "ไม่สามารถนำเข้าฉากจาก URL ที่ระบุได้ เนื่องจาก URL มีรูปแบบไม่ถูกต้อง หรือไม่มีข้อมูล JSON ของ Excalidraw ที่ถูกต้อง",
+    "resetLibrary": "การดำเนินการนี้จะล้างคลังของคุณ คุณแน่ใจหรือไม่?",
+    "removeItemsFromsLibrary": "ลบ {{count}} รายการ (ที่เลือก) ออกจากคลังหรือไม่?",
+    "invalidEncryptionKey": "คีย์เข้ารหัสต้องมีความยาว 22 ตัวอักษร จึงปิดใช้งานการทำงานร่วมกันแบบเรียลไทม์แล้ว",
+    "collabOfflineWarning": "ไม่มีการเชื่อมต่ออินเทอร์เน็ต\nการเปลี่ยนแปลงของคุณจะไม่ถูกบันทึก!",
+    "localStorageQuotaExceeded": "พื้นที่จัดเก็บข้อมูลของเบราว์เซอร์เต็มแล้ว การเปลี่ยนแปลงจะไม่ถูกบันทึก"
   },
   "errors": {
     "unsupportedFileType": "ไม่รองรับชนิดของไฟล์นี้",
     "imageInsertError": "ไม่สามารถเพิ่มรูปภาพได้ ลองอีกครั้งในภายหลัง",
-    "fileTooBig": "",
-    "svgImageInsertError": "",
-    "failedToFetchImage": "",
+    "fileTooBig": "ไฟล์ใหญ่เกินไป ขนาดสูงสุดที่อนุญาตคือ {{maxSize}}",
+    "svgImageInsertError": "ไม่สามารถแทรกรูปภาพ SVG ได้ มาร์กอัป SVG ดูเหมือนจะไม่ถูกต้อง",
+    "failedToFetchImage": "ดึงรูปภาพไม่สำเร็จ",
     "cannotResolveCollabServer": "ไม่สามารถเชื่อต่อกับ collab เซิร์ฟเวอร์ได้ โปรดลองโหลดหน้านี้ใหม่และลองอีกครั้ง",
-    "importLibraryError": "",
-    "saveLibraryError": "",
+    "importLibraryError": "ไม่สามารถโหลดคลังได้",
+    "saveLibraryError": "ไม่สามารถบันทึกคลังลงในที่เก็บข้อมูลได้ โปรดบันทึกคลังเป็นไฟล์ในเครื่องเพื่อไม่ให้การเปลี่ยนแปลงสูญหาย",
     "collabSaveFailed": "ไม่สามารถบันทึกลงในฐานข้อมูลแบ็กเอนด์ได้ หากยังมีปัญหาอยู่ คุณควรบันทึกไฟล์ลงในเครื่องของคุณเพื่อให้แน่ใจว่างานของคุณจะไม่สูญหาย",
-    "collabSaveFailed_sizeExceeded": "",
-    "imageToolNotSupported": "",
+    "collabSaveFailed_sizeExceeded": "ไม่สามารถบันทึกลงฐานข้อมูลแบ็กเอนด์ได้ เนื่องจากผืนผ้าใบดูเหมือนจะมีขนาดใหญ่เกินไป คุณควรบันทึกไฟล์ลงในเครื่องเพื่อไม่ให้งานของคุณสูญหาย",
+    "imageToolNotSupported": "รูปภาพถูกปิดใช้งาน",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
+      "line1": "ดูเหมือนว่าคุณกำลังใช้เบราว์เซอร์ Brave โดยเปิดใช้การตั้งค่า <bold>Aggressively Block Fingerprinting</bold>",
+      "line2": "ซึ่งอาจทำให้<bold>องค์ประกอบข้อความ</bold>ในภาพวาดของคุณแสดงผลผิดพลาด",
+      "line3": "เราขอแนะนำอย่างยิ่งให้ปิดการตั้งค่านี้ คุณสามารถทำตาม<link>ขั้นตอนเหล่านี้</link>เพื่อปิดได้",
       "line4": "หากการปิดใช้งานการตั้งค่านี้ไม่สามารถแก้ไขการแสดงผลขององค์ประกอบข้อความได้ โปรดเปิด <issueLink>issue</issueLink> บน GitHub ของเรา หรือเขียนถึงเราผ่าน <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "การเพิ่มองค์ประกอบที่ฝังยังไม่สามารถเพิ่มเข้าไปในไลบลารีได้",
-      "iframe": "",
+      "iframe": "ไม่สามารถเพิ่มองค์ประกอบ IFrame ลงในคลังได้",
       "image": "การสนับสนุนสำหรับเพิ่มรูปภาพลงในไลบลารีจะมาในเร็ว ๆ นี้"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "ไม่สามารถวางได้ (อ่านจากคลิปบอร์ดของระบบไม่ได้)",
     "asyncPasteFailedOnParse": "ไม่สามารถวางได้",
-    "copyToSystemClipboardFailed": ""
+    "copyToSystemClipboardFailed": "ไม่สามารถคัดลอกไปยังคลิปบอร์ดได้"
   },
   "toolBar": {
     "selection": "การเลือก",
@@ -340,25 +340,25 @@
     "freedraw": "เขียนรูป",
     "text": "ข้อความ",
     "library": "คลัง",
-    "lock": "",
-    "penMode": "",
+    "lock": "คงเครื่องมือที่เลือกไว้หลังวาดเสร็จ",
+    "penMode": "โหมดปากกา - ป้องกันการสัมผัส",
     "link": "เพิ่ม / อัปเดตลิงก์สำหรับรูปร่างที่เลือก",
     "eraser": "ยางลบ",
     "frame": "เครื่องมือกรอบ",
     "magicframe": "ไวร์เฟรมเป็นโค้ด",
-    "stickynote": "",
+    "stickynote": "กระดาษโน้ต",
     "embeddable": "ฝังเว็บ",
     "laser": "ตัวชี้เลเซอร์",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "วาดเป็นรูปร่าง",
+    "bucketfill": "เทสี",
     "hand": "มือ (เครื่องมือเลื่อน)",
     "extraTools": "เครื่องมืออื่นๆ",
     "mermaidToExcalidraw": "เมอร์เมดเป็นเอกซ์คาลิดรอว์",
-    "convertElementType": ""
+    "convertElementType": "สลับประเภทรูปร่าง"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "ไม่พบบริเวณที่ปิดล้อมให้เติมสีตรงนี้",
+    "tooComplex": "บริเวณนี้ซับซ้อนเกินกว่าจะเติมสีได้"
   },
   "element": {
     "rectangle": "สี่เหลี่ยม",
@@ -372,7 +372,7 @@
     "group": "จัดกลุ่ม",
     "frame": "กรอบ",
     "magicframe": "ไวร์เฟรมเป็นโค้ด",
-    "stickynote": "",
+    "stickynote": "กระดาษโน้ต",
     "embeddable": "ฝังเว็บ",
     "selection": "การเลือก",
     "iframe": "ไอเฟรม"
@@ -383,81 +383,81 @@
     "shapes": "รูปร่าง"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "กด {{shortcut}} เพื่อปิดการค้นหา",
+    "canvasPanning": "หากต้องการเลื่อนผืนผ้าใบ ให้กด {{shortcut_1}} หรือ {{shortcut_2}} ค้างไว้ขณะลาก หรือใช้เครื่องมือเลื่อน",
     "linearElement": "คลิกเพื่อเริ่มหลายจุด ลากสำหรับเส้นเดียว",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
-    "freeDraw": "",
-    "text": "",
+    "arrowTool": "คลิกเพื่อเริ่มหลายจุด ลากสำหรับเส้นเดียว กด {{shortcut}} อีกครั้งเพื่อเปลี่ยนประเภทลูกศร",
+    "arrowBindModifiers": "กด {{shortcut_1}} ค้างไว้เพื่อปิดการผูก หรือกด {{shortcut_2}} ค้างไว้เพื่อผูกที่จุดคงที่",
+    "freeDraw": "คลิกและลาก แล้วปล่อยเมื่อวาดเสร็จ",
+    "text": "เคล็ดลับ: คุณยังเพิ่มข้อความได้โดยดับเบิลคลิกที่ใดก็ได้ด้วยเครื่องมือเลือก",
     "embeddable": "คลิกและลากเพื่อสร้างการฝังสำหรับเว็บไซต์",
-    "stickynote": "",
-    "autoshape": "",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "resizeStickyNote": "",
-    "rotate": "",
-    "toggleArrowhead": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "cycleSelection": "",
-    "eraserRevert": "",
-    "firefox_clipboard_write": "",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "stickynote": "คลิกเพื่อวางกระดาษโน้ต หรือลากเพื่อกำหนดขนาด",
+    "autoshape": "วาดสี่เหลี่ยมผืนผ้า วงกลม รูปเพชร เส้น และลูกศร",
+    "text_selected": "ดับเบิลคลิกหรือกด {{shortcut}} เพื่อแก้ไขข้อความ",
+    "text_editing": "กด {{shortcut_1}} หรือ {{shortcut_2}} เพื่อเสร็จสิ้นการแก้ไข",
+    "linearElementMulti": "คลิกที่จุดสุดท้าย หรือกด {{shortcut_1}} หรือ {{shortcut_2}} เพื่อเสร็จสิ้น",
+    "lockAngle": "คุณสามารถจำกัดมุมได้โดยกด {{shortcut}} ค้างไว้",
+    "resize": "คุณสามารถจำกัดสัดส่วนได้โดยกด {{shortcut_1}} ค้างไว้ขณะปรับขนาด\nกด {{shortcut_2}} ค้างไว้เพื่อปรับขนาดจากจุดกึ่งกลาง",
+    "resizeImage": "คุณสามารถปรับขนาดได้อย่างอิสระโดยกด {{shortcut_1}} ค้างไว้\nกด {{shortcut_2}} ค้างไว้เพื่อปรับขนาดจากจุดกึ่งกลาง",
+    "resizeStickyNote": "กด {{shortcut_1}} ค้างไว้เพื่อปรับขนาดอย่างอิสระ กด {{shortcut_2}} ค้างไว้เพื่อปรับขนาดจากจุดกึ่งกลาง",
+    "rotate": "คุณสามารถจำกัดมุมได้โดยกด {{shortcut}} ค้างไว้ขณะหมุน",
+    "toggleArrowhead": "ดับเบิลคลิกเพื่อสลับหัวลูกศร",
+    "lineEditor_info": "กด {{shortcut_1}} ค้างไว้แล้วดับเบิลคลิก หรือกด {{shortcut_2}} เพื่อแก้ไขจุด",
+    "lineEditor_line_info": "ดับเบิลคลิกหรือกด {{shortcut}} เพื่อแก้ไขจุด",
+    "lineEditor_pointSelected": "กด {{shortcut_1}} เพื่อลบจุด (ที่เลือก)\nกด {{shortcut_2}} เพื่อทำสำเนา หรือลากเพื่อย้าย",
+    "lineEditor_nothingSelected": "เลือกจุดที่ต้องการแก้ไข (กด {{shortcut_1}} ค้างไว้เพื่อเลือกหลายจุด)\nหรือกด {{shortcut_2}} ค้างไว้แล้วคลิกเพื่อเพิ่มจุดใหม่",
+    "publishLibrary": "เผยแพร่คลังของคุณเอง",
+    "bindTextToElement": "กด {{shortcut}} เพื่อเพิ่มข้อความ",
+    "createFlowchart": "กด {{shortcut}} เพื่อสร้างผังงาน",
+    "deepBoxSelect": "กด {{shortcut}} ค้างไว้เพื่อเลือกเชิงลึก และเพื่อป้องกันการลาก",
+    "cycleSelection": "กด {{shortcut}} ค้างไว้แล้วคลิกเพื่อวนเลือก หรือลากเพื่อทำสำเนา",
+    "eraserRevert": "กด {{shortcut}} ค้างไว้เพื่อยกเลิกการลบองค์ประกอบที่ทำเครื่องหมายไว้",
+    "firefox_clipboard_write": "ฟีเจอร์นี้น่าจะเปิดใช้งานได้โดยตั้งค่าแฟล็ก \"dom.events.asyncClipboard.clipboardItem\" เป็น \"true\" หากต้องการเปลี่ยนแฟล็กของเบราว์เซอร์ใน Firefox ให้ไปที่หน้า \"about:config\"",
+    "disableSnapping": "กด {{shortcut}} ค้างไว้เพื่อปิดการสแนป",
+    "enterCropEditor": "ดับเบิลคลิกที่รูปภาพหรือกด {{shortcut}} เพื่อครอบตัดรูปภาพ",
+    "leaveCropEditor": "คลิกนอกรูปภาพหรือกด {{shortcut_1}} หรือ {{shortcut_2}} เพื่อเสร็จสิ้นการครอบตัด"
   },
   "canvasError": {
-    "cannotShowPreview": "",
-    "canvasTooBig": "",
-    "canvasTooBigTip": ""
+    "cannotShowPreview": "ไม่สามารถแสดงตัวอย่างได้",
+    "canvasTooBig": "ผืนผ้าใบอาจมีขนาดใหญ่เกินไป",
+    "canvasTooBigTip": "เคล็ดลับ: ลองเลื่อนองค์ประกอบที่อยู่ไกลที่สุดให้เข้ามาใกล้กันมากขึ้น"
   },
   "errorSplash": {
     "headingMain": "<button>กำลังรีโหลดหน้า</button>",
     "clearCanvasMessage": "ถ้าโหลดไม่ได้ ให้ลอง <button>เคลียร์ผืนผ้าใบ</button>",
-    "clearCanvasCaveat": "",
-    "trackedToSentry": "",
-    "openIssueMessage": "",
-    "sceneContent": ""
+    "clearCanvasCaveat": " ซึ่งจะทำให้งานที่ทำไว้สูญหาย ",
+    "trackedToSentry": "ข้อผิดพลาดที่มีตัวระบุ {{eventId}} ถูกบันทึกไว้ในระบบของเราแล้ว",
+    "openIssueMessage": "เราระมัดระวังอย่างยิ่งที่จะไม่รวมข้อมูลฉากของคุณไว้ในรายงานข้อผิดพลาด หากฉากของคุณไม่ใช่ข้อมูลส่วนตัว โปรดพิจารณาแจ้งต่อที่<button>ระบบติดตามบั๊ก</button>ของเรา โดยคัดลอกข้อมูลด้านล่างไปวางใน GitHub issue",
+    "sceneContent": "เนื้อหาของฉาก:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "หรือ"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "เชิญผู้อื่นมาทำงานร่วมกันบนภาพวาดของคุณ",
+    "desc_privacy": "ไม่ต้องกังวล เซสชันนี้เข้ารหัสแบบ end-to-end และเป็นส่วนตัวอย่างสมบูรณ์ แม้แต่เซิร์ฟเวอร์ของเราก็มองไม่เห็นสิ่งที่คุณวาด",
     "button_startSession": "เริ่มเซสชัน",
     "button_stopSession": "หยุดเซสชัน",
-    "desc_inProgressIntro": "",
-    "desc_shareLink": "",
-    "desc_exitSession": "",
-    "shareTitle": ""
+    "desc_inProgressIntro": "เซสชันการทำงานร่วมกันแบบเรียลไทม์กำลังดำเนินอยู่",
+    "desc_shareLink": "แชร์ลิงก์นี้กับผู้ที่คุณต้องการทำงานร่วมด้วย:",
+    "desc_exitSession": "การหยุดเซสชันจะตัดการเชื่อมต่อของคุณจากห้อง แต่คุณยังทำงานกับฉากต่อได้ในเครื่อง โปรดทราบว่าการหยุดนี้จะไม่ส่งผลต่อผู้อื่น และพวกเขายังคงทำงานร่วมกันบนเวอร์ชันของตนเองได้",
+    "shareTitle": "เข้าร่วมเซสชันการทำงานร่วมกันแบบเรียลไทม์บน Excalidraw"
   },
   "errorDialog": {
     "title": "ข้อผิดพลาด"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "กำลังบันทึก",
+    "defaultMessage": "กำลังเตรียมบันทึก..."
   },
   "exportDialog": {
     "disk_title": "บันทึกไปยังดิสก์",
-    "disk_details": "",
+    "disk_details": "ส่งออกข้อมูลฉากเป็นไฟล์ที่สามารถนำเข้าได้ภายหลัง",
     "disk_button": "บันทึกเป็นไฟล์",
     "link_title": "ลิงก์ที่สามารถแชร์ได้",
-    "link_details": "",
+    "link_details": "ส่งออกเป็นลิงก์แบบอ่านอย่างเดียว",
     "link_button": "ส่งออกไปยังไฟล์",
-    "excalidrawplus_description": "",
+    "excalidrawplus_description": "บันทึกฉากไปยังพื้นที่ทำงาน Excalidraw+ ของคุณ",
     "excalidrawplus_button": "ส่งออก",
     "excalidrawplus_exportError": "ไม่สามารถส่งออกไปที่ Excalidraw+ ได้ในขณะนี้"
   },
@@ -465,73 +465,73 @@
     "blog": "อ่านบล็อกของพวกเรา",
     "click": "คลิก",
     "deepSelect": "การเลือเชิงลึก",
-    "deepBoxSelect": "",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "deepBoxSelect": "เลือกเชิงลึกภายในกรอบการเลือก และป้องกันการลาก",
+    "createFlowchart": "สร้างผังงานจากองค์ประกอบทั่วไป",
+    "navigateFlowchart": "นำทางในผังงาน",
     "curvedArrow": "ลูกศรโค้ง",
     "curvedLine": "เส้นโค้ง",
     "documentation": "เอกสารคู่มือ",
     "doubleClick": "ดับเบิลคลิก",
     "drag": "ลาก",
     "editor": "ตัวแก้ไข",
-    "editLineArrowPoints": "",
+    "editLineArrowPoints": "แก้ไขจุดของเส้น/ลูกศร",
     "editText": "แก้ไขข้อความ / เพิ่มข้อความ",
-    "github": "",
-    "howto": "",
+    "github": "พบปัญหา? ส่งรายงาน",
+    "howto": "ดูคู่มือของเรา",
     "or": "หรือ",
-    "preventBinding": "",
+    "preventBinding": "ป้องกันการผูกลูกศร",
     "tools": "เครื่องมือ",
     "shortcuts": "แป้นพิมพ์ลัด",
-    "textFinish": "",
-    "textNewLine": "",
+    "textFinish": "เสร็จสิ้นการแก้ไข (ตัวแก้ไขข้อความ)",
+    "textNewLine": "ขึ้นบรรทัดใหม่ (ตัวแก้ไขข้อความ)",
     "title": "ช่วยเหลือ",
     "view": "ดู",
-    "zoomToFit": "",
-    "zoomToSelection": "",
-    "toggleElementLock": "",
-    "movePageUpDown": "",
+    "zoomToFit": "ซูมให้พอดีกับองค์ประกอบทั้งหมด",
+    "zoomToSelection": "ซูมไปที่สิ่งที่เลือก",
+    "toggleElementLock": "ล็อก/ปลดล็อกสิ่งที่เลือก",
+    "movePageUpDown": "เลื่อนหน้าขึ้น/ลง",
     "movePageLeftRight": "ย้ายหน้าไปด้าน ซ้าย/ขวา",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "ครอบตัดรูปภาพ",
+    "cropFinish": "เสร็จสิ้นการครอบตัดรูปภาพ"
   },
   "clearCanvasDialog": {
     "title": "ล้างผืนผ้าใบ"
   },
   "publishDialog": {
-    "title": "",
+    "title": "เผยแพร่คลัง",
     "itemName": "ชื่อสิ่งของ",
     "authorName": "ชื่อเจ้าของ",
     "githubUsername": "ชื่อผู้ใช้ GitHub",
     "twitterUsername": "ชื่อผู้ใช้ Twitter",
     "libraryName": "ชื่อไลบรารี่",
-    "libraryDesc": "",
+    "libraryDesc": "คำอธิบายคลัง",
     "website": "เว็บไซต์",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "ชื่อหรือชื่อผู้ใช้ของคุณ",
+      "libraryName": "ชื่อคลังของคุณ",
+      "libraryDesc": "คำอธิบายคลังของคุณ เพื่อช่วยให้ผู้อื่นเข้าใจวิธีใช้งาน",
+      "githubHandle": "ชื่อผู้ใช้ GitHub (ไม่บังคับ) เพื่อให้คุณแก้ไขคลังได้หลังจากส่งไปตรวจสอบแล้ว",
+      "twitterHandle": "ชื่อผู้ใช้ Twitter (ไม่บังคับ) เพื่อให้เราทราบว่าควรให้เครดิตใครเมื่อโปรโมตผ่าน Twitter",
+      "website": "ลิงก์ไปยังเว็บไซต์ส่วนตัวของคุณหรือที่อื่น (ไม่บังคับ)"
     },
     "errors": {
       "required": "จำเป็น",
       "website": "ป้อน URL ที่ถูกต้อง"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
-    "noteItems": "",
-    "atleastOneLibItem": "",
-    "republishWarning": ""
+    "noteDescription": "ส่งคลังของคุณเพื่อรวมไว้ใน<link>แหล่งรวมคลังสาธารณะ</link> ให้ผู้อื่นนำไปใช้ในภาพวาดของตนเอง",
+    "noteGuidelines": "คลังจะต้องได้รับการตรวจสอบและอนุมัติโดยผู้ดูแลก่อน โปรดอ่าน<link>แนวทางปฏิบัติ</link>ก่อนส่ง คุณควรมีบัญชี GitHub เพื่อใช้สื่อสารและแก้ไขตามที่ร้องขอ แต่ไม่ได้บังคับ",
+    "noteLicense": "เมื่อส่ง ถือว่าคุณยอมรับให้เผยแพร่คลังภายใต้<link>สัญญาอนุญาต MIT</link> ซึ่งโดยสรุปคือทุกคนสามารถใช้งานได้โดยไม่มีข้อจำกัด",
+    "noteItems": "รายการในคลังแต่ละรายการต้องมีชื่อของตัวเองเพื่อให้กรองได้ รายการในคลังต่อไปนี้จะถูกรวมไว้:",
+    "atleastOneLibItem": "โปรดเลือกรายการในคลังอย่างน้อยหนึ่งรายการเพื่อเริ่มต้น",
+    "republishWarning": "หมายเหตุ: รายการที่เลือกบางรายการถูกทำเครื่องหมายว่าเผยแพร่/ส่งไปแล้ว คุณควรส่งซ้ำเฉพาะเมื่ออัปเดตคลังหรือการส่งที่มีอยู่เดิม"
   },
   "publishSuccessDialog": {
-    "title": "",
-    "content": ""
+    "title": "ส่งคลังแล้ว",
+    "content": "ขอบคุณ {{authorName}} คลังของคุณถูกส่งไปตรวจสอบแล้ว คุณสามารถติดตามสถานะได้<link>ที่นี่</link>"
   },
   "confirmDialog": {
     "resetLibrary": "รีเซ็ตคลัง",
-    "removeItemsFromLib": ""
+    "removeItemsFromLib": "นำรายการที่เลือกออกจากคลัง"
   },
   "imageExportDialog": {
     "header": "ส่งออกเป็นรูปภาพ",
@@ -539,12 +539,12 @@
       "withBackground": "พื้นหลัง",
       "onlySelected": "เฉพาะที่เลือก",
       "darkMode": "โหมดกลางคืน",
-      "embedScene": "",
+      "embedScene": "ฝังฉาก",
       "scale": "อัตราส่วน",
       "padding": "การเว้นระยะ"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "ข้อมูลฉากจะถูกบันทึกลงในไฟล์ PNG/SVG ที่ส่งออก เพื่อให้กู้คืนฉากจากไฟล์นั้นได้\nจะทำให้ไฟล์ที่ส่งออกมีขนาดใหญ่ขึ้น"
     },
     "title": {
       "exportToPng": "ส่งออกไปเป็น SVG",
@@ -558,8 +558,8 @@
     }
   },
   "encrypted": {
-    "tooltip": "",
-    "link": ""
+    "tooltip": "ภาพวาดของคุณเข้ารหัสแบบ end-to-end เซิร์ฟเวอร์ของ Excalidraw จึงไม่มีทางเห็นภาพวาดเหล่านั้น",
+    "link": "บทความบล็อกเกี่ยวกับการเข้ารหัสแบบ end-to-end ใน Excalidraw"
   },
   "stats": {
     "angle": "องศา",
@@ -568,29 +568,29 @@
     "scene": "ฉาก",
     "selected": "ถูกเลือกแล้ว",
     "storage": "การจัดเก็บข้อมูล",
-    "fullTitle": "",
+    "fullTitle": "คุณสมบัติของผืนผ้าใบและรูปร่าง",
     "title": "คุณสมบัติ",
     "generalStats": "ทั่วไป",
-    "elementProperties": "",
+    "elementProperties": "คุณสมบัติของรูปร่าง",
     "total": "รวมทั้งหมด",
     "version": "เวอร์ชั่น",
     "versionCopy": "คลิกเพื่อคัดลอก",
-    "versionNotAvailable": "",
+    "versionNotAvailable": "ไม่มีข้อมูลเวอร์ชัน",
     "width": "ความกว้าง"
   },
   "toast": {
     "addedToLibrary": "เพิ่มไปในคลังแล้ว",
     "copyStyles": "คัดลอกรูปแบบสำเร็จแล้ว",
     "copyToClipboard": "คัดลอกไปยังคลิปบอร์ดแล้ว",
-    "copyToClipboardAsPng": "",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsPng": "คัดลอก{{exportSelection}}ไปยังคลิปบอร์ดเป็น PNG แล้ว\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "คัดลอก{{exportSelection}}ไปยังคลิปบอร์ดเป็น SVG แล้ว\n({{exportColorScheme}})",
     "fileSaved": "ข้อมูลได้รับการบันทึก",
     "fileSavedToFilename": "บันทึกเป็น {filename}",
     "canvas": "ผืนผ้าใบ",
     "selection": "การเลือก",
-    "pasteAsSingleElement": "",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": "",
+    "pasteAsSingleElement": "ใช้ {{shortcut}} เพื่อวางเป็นองค์ประกอบเดียว\nหรือวางลงในตัวแก้ไขข้อความที่มีอยู่",
+    "unableToEmbed": "ขณะนี้ไม่อนุญาตให้ฝัง URL นี้ โปรดเปิด issue บน GitHub เพื่อขอให้เพิ่ม URL นี้ในรายการที่อนุญาต",
+    "unrecognizedLinkFormat": "ลิงก์ที่คุณฝังไม่ตรงกับรูปแบบที่คาดไว้ โปรดลองวางสตริง 'embed' ที่เว็บไซต์ต้นทางให้มา",
     "elementLinkCopied": "คัดลอกไปยังคลิปบอร์ดแล้ว"
   },
   "colors": {
@@ -612,127 +612,127 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
-      "center_heading_plus": "",
-      "menuHint": ""
+      "center_heading": "ภาพวาดของคุณถูกบันทึกไว้ในพื้นที่จัดเก็บข้อมูลของเบราว์เซอร์",
+      "center_heading_line2": "พื้นที่จัดเก็บข้อมูลของเบราว์เซอร์อาจถูกล้างได้โดยไม่คาดคิด",
+      "center_heading_line3": "บันทึกงานของคุณเป็นไฟล์เป็นประจำเพื่อไม่ให้สูญหาย",
+      "center_heading_plus": "คุณต้องการไปที่ Excalidraw+ แทนหรือไม่?",
+      "menuHint": "ส่งออก การตั้งค่า ภาษา ..."
     },
     "defaults": {
-      "menuHint": "",
-      "center_heading": "",
-      "toolbarHint": "",
+      "menuHint": "ส่งออก การตั้งค่า และอื่น ๆ...",
+      "center_heading": "สร้างแผนภาพได้ง่าย ๆ",
+      "toolbarHint": "เลือกเครื่องมือ แล้วเริ่มวาดได้เลย!",
       "helpHint": "ทางลัดและการช่วยเหลือ"
     }
   },
   "colorPicker": {
     "color": "สี",
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "สีกำหนดเองที่ใช้บ่อยที่สุด",
     "colors": "สี",
     "shades": "รูปร่าง",
     "hexCode": "Hex code",
-    "noShades": "",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "noShades": "ไม่มีเฉดสีสำหรับสีนี้",
+    "invalidColor": "สีไม่ถูกต้อง",
+    "invalidHexLength": "รหัส Hex ต้องมีความยาว 3, 4, 6 หรือ 8 ตัวอักษร",
+    "topPicksTip": "เคล็ดลับ: ลากสีใดก็ได้ไปวางที่สีโปรดเพื่อปักหมุด",
+    "resetTopPicks": "รีเซ็ตสีโปรดเป็นค่าเริ่มต้น"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
         "title": "ส่งออกเป็นภาพ",
         "button": "ส่งออกเป็นภาพ",
-        "description": ""
+        "description": "ส่งออกข้อมูลฉากเป็นรูปภาพที่สามารถนำเข้าได้ภายหลัง"
       },
       "saveToDisk": {
         "title": "บันทึกไปยังดิสก์",
         "button": "บันทึกไปยังดิสก์",
-        "description": ""
+        "description": "ส่งออกข้อมูลฉากเป็นไฟล์ที่สามารถนำเข้าได้ภายหลัง"
       },
       "excalidrawPlus": {
         "title": "Excalidraw+",
         "button": "นำออกไปยัง Excalidraw+",
-        "description": ""
+        "description": "บันทึกฉากไปยังพื้นที่ทำงาน Excalidraw+ ของคุณ"
       }
     },
     "modal": {
       "loadFromFile": {
         "title": "โหลดจากไฟล์",
         "button": "โหลดจากไฟล์",
-        "description": ""
+        "description": "การโหลดจากไฟล์จะ<bold>แทนที่เนื้อหาเดิมของคุณ</bold><br></br>คุณสามารถสำรองภาพวาดไว้ก่อนได้ด้วยตัวเลือกด้านล่าง"
       },
       "shareableLink": {
-        "title": "",
+        "title": "โหลดจากลิงก์",
         "button": "แทนที่เนื้อหาของฉัน",
-        "description": ""
+        "description": "การโหลดภาพวาดจากภายนอกจะ<bold>แทนที่เนื้อหาเดิมของคุณ</bold><br></br>คุณสามารถสำรองภาพวาดไว้ก่อนได้ด้วยตัวเลือกด้านล่าง"
       }
     }
   },
   "fileDrop": {
-    "replace": "",
-    "add": "",
-    "importLibrary": "",
-    "replaceHint": "",
-    "keepHint": "",
-    "libraryHint": "",
-    "replacedToast": ""
+    "replace": "วางเพื่อแทนที่เนื้อหา",
+    "add": "วางเพื่อเพิ่มลงในผืนผ้าใบ",
+    "importLibrary": "วางเพื่อนำเข้าคลัง",
+    "replaceHint": "กด <shift>Shift</shift> ค้างไว้เพื่อคงเนื้อหาเดิม",
+    "keepHint": "เนื้อหาเดิมของคุณจะยังคงอยู่",
+    "libraryHint": "ไฟล์คลังจะถูกเพิ่มต่อท้าย",
+    "replacedToast": "แทนที่เนื้อหาแล้ว กด {{shortcut}} เพื่อเลิกทำ"
   },
   "mermaid": {
-    "title": "",
+    "title": "Mermaid เป็น Excalidraw",
     "button": "แทรก",
-    "description": "",
-    "syntax": "",
+    "description": "<flowchartLink>ผังงาน</flowchartLink> <sequenceLink>แผนภาพลำดับ</sequenceLink> <classLink>แผนภาพคลาส</classLink> <stateLink>แผนภาพสถานะ</stateLink> <erdLink>แผนภาพความสัมพันธ์ระหว่างเอนทิตี</erdLink> <ganttLink>แผนภูมิแกนต์</ganttLink> <quadrantLink>แผนภูมิสี่ส่วน</quadrantLink> และ<timelineLink>ไทม์ไลน์</timelineLink> จะถูกแปลงเป็นองค์ประกอบของ Excalidraw ส่วนประเภทอื่นจะถูกแทรกเป็นรูปภาพ",
+    "syntax": "ไวยากรณ์ Mermaid",
     "preview": "ดูตัวอย่าง",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": "",
-    "loadError": "",
-    "loadErrorReload": "",
-    "reload": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "เขียนนิยามแผนภาพ Mermaid ที่นี่...",
+    "autoFixAvailable": "สามารถแก้ไขอัตโนมัติได้",
+    "loadError": "ไม่สามารถโหลด Mermaid ได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้ง",
+    "loadErrorReload": "ไม่สามารถโหลด Mermaid ได้ โปรดโหลดหน้านี้ใหม่แล้วลองอีกครั้ง",
+    "reload": "โหลดใหม่"
   },
   "ttd": {
-    "error": ""
+    "error": "เกิดข้อผิดพลาด!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
+    "inputPlaceholder": "พิมพ์ไอเดียแผนภาพของคุณที่นี่... (กด {{shortcut}} เพื่อขึ้นบรรทัดใหม่)",
+    "inputPlaceholderWithMessages": "ปรับแต่งแผนภาพของคุณต่อ...",
     "generating": "กำลังสร้าง...",
-    "rateLimitRemaining": "",
+    "rateLimitRemaining": "วันนี้เหลืออีก {{count}} คำขอ",
     "role": {
       "user": "คุณ",
       "assistant": "ผู้ช่วย AI",
       "system": "ระบบ"
     },
-    "aiBeta": "",
+    "aiBeta": "AI เบตา",
     "label": "แชท",
     "menu": "เมนู",
     "newChat": "แชทใหม่",
     "deleteChat": "ลบแชท",
     "deleteMessage": "ลบข้อความ",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "ดูเป็น Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "มาออกแบบแผนภาพของคุณกัน",
+      "description": "อธิบายแผนภาพที่ต้องการสร้าง แล้วเราจะสร้างให้คุณ",
+      "hint": "ขณะนี้รองรับผังงาน แผนภาพลำดับ แผนภาพคลาส แผนภาพสถานะ และแผนภาพความสัมพันธ์ระหว่างเอนทิตี"
     },
     "preview": "ดูตัวอย่าง",
     "insert": "แทรก",
     "retry": "ลองซ้ำ",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
+      "promptTooShort": "พรอมต์สั้นเกินไป (อย่างน้อย {{min}} ตัวอักษร)",
+      "promptTooLong": "พรอมต์ยาวเกินไป (ไม่เกิน {{max}} ตัวอักษร)",
       "generationFailed": "การสร้างล้มเหลว",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "invalidDiagram": "แผนภาพที่สร้างขึ้นไม่ถูกต้อง :( คุณสามารถแก้ไขเอง ลองใหม่ด้วยการแก้ไขอัตโนมัติ หรือลองใช้พรอมต์อื่น",
+      "fixInMermaid": "แก้ไข Mermaid เอง →",
+      "aiRepair": "สร้างใหม่ (แก้ไขอัตโนมัติ) →",
+      "requestAborted": "ยกเลิกคำขอแล้ว",
+      "requestFailed": "คำขอล้มเหลว",
+      "mermaidParseError": "ไวยากรณ์ Mermaid ผิดพลาด"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "คุณใช้ AI ครบโควตาของแผนฟรีแล้ว ลองใช้ Excalidraw+ เพื่อใช้งานได้มากขึ้น หรือกลับมาใหม่พรุ่งนี้",
+      "generalRateLimit": "ใจเย็น ๆ ก่อน คุณส่งคำขอเร็วเกินไป! โปรดรอสักครู่แล้วลองอีกครั้ง",
+      "messageLimitInputPlaceholder": "คุณส่งข้อความครบตามจำนวนที่กำหนดแล้ว"
     },
     "upsellBtnLabel": "อัปเกรดบัญชีเป็นแบบ Plus"
   },
@@ -744,10 +744,10 @@
       "old": "เก่า"
     },
     "sceneFonts": "ในฉากนี้",
-    "availableFonts": "",
+    "availableFonts": "แบบอักษรที่มี",
     "empty": "ไม่พบแบบอักษร",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "เคล็ดลับ: ลากแบบอักษรใดก็ได้ไปวางที่แบบอักษรโปรดเพื่อปักหมุด",
+    "resetTopPicks": "รีเซ็ตแบบอักษรโปรดเป็นค่าเริ่มต้น"
   },
   "userList": {
     "empty": "ไม่พบผู้ใช้",
@@ -768,11 +768,11 @@
     },
     "recents": "ใช้งานล่าสุด",
     "search": {
-      "placeholder": "",
+      "placeholder": "ค้นหาเมนู คำสั่ง และค้นพบฟีเจอร์ที่ซ่อนอยู่",
       "noMatch": "ไม่เจอคำสั่ง"
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "ไม่สามารถใช้คำสั่งนี้ได้...",
+    "shortcutHint": "กด {{shortcut}} เพื่อเปิดชุดคำสั่ง"
   },
   "keys": {
     "ctrl": "Ctrl",
@@ -784,6 +784,6 @@
     "shift": "เลื่อน",
     "spacebar": "อวกาศ",
     "delete": "ลบ",
-    "mmb": ""
+    "mmb": "ล้อเมาส์"
   }
 }
