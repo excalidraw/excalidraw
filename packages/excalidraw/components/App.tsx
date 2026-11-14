@@ -7233,6 +7233,15 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    const editedTextResizeHandle = this.text.getEditedTextResizeHandleAt(
+      scenePointer,
+      event.pointerType,
+    );
+    if (editedTextResizeHandle) {
+      this.cursor.set(getCursorForResizingElement(editedTextResizeHandle));
+      return;
+    }
+
     if (!isOverScrollBar) {
       // for linear elements, we'd like to prioritize point dragging over edge resizing
       // therefore, we update and check hovered point index first

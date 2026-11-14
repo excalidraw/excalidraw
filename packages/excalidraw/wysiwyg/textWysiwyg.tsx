@@ -1294,6 +1294,21 @@ export const textWysiwyg = ({
       return;
     }
 
+    // dragging a side of the text being edited resizes it (changing where it
+    // wraps) without leaving the editor; a mere click there still submits
+    if (
+      event.button === POINTER_BUTTON.MAIN &&
+      target instanceof ownerWindow.HTMLCanvasElement &&
+      app.text.resizeEditedTextOnPointerDown(event, handleSubmit)
+    ) {
+      // the press is the editor's: the canvas would otherwise act on it
+      // (deselect, box-select)
+      event.preventDefault();
+      event.stopPropagation();
+      temporarilyDisableSubmit();
+      return;
+    }
+
     const isPropertiesTrigger =
       target instanceof ownerWindow.HTMLElement &&
       target.classList.contains("properties-trigger");

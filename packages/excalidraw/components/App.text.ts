@@ -7,8 +7,11 @@ import {
   TEXT_VIEWPORT_PADDING,
   VERTICAL_ALIGN,
   getFontString,
+  getGridPoint,
   getLineHeight,
+  KEYS,
   sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
   type Bounds,
   type StylesPanelMode,
 } from "@excalidraw/common";
@@ -16,6 +19,7 @@ import { pointFrom, type Radians } from "@excalidraw/math";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  deepCopyElement,
   fixBindingsAfterDeletion,
   getActiveTextElement,
   getApproxMinLineHeight,
@@ -26,6 +30,7 @@ import {
   getElementAbsoluteCoords,
   getElementBounds,
   getLineHeightInPx,
+  getResizeOffsetXY,
   getStickyNoteLayout,
   hitElementItself,
   isArrowElement,
@@ -40,6 +45,8 @@ import {
   newElementWith,
   newTextElement,
   refreshTextDimensions,
+  resizeTest,
+  transformElements,
   updateBoundElements,
 } from "@excalidraw/element";
 
@@ -50,10 +57,12 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
+  PointerType,
 } from "@excalidraw/element/types";
 
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { withBatchedUpdates } from "../reactUtils";
+import { SnapCache, snapResizingElements } from "../snapping";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { scrollBoundsIntoView } from "../viewport";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
@@ -521,6 +530,176 @@ export class AppText {
       activeTextElement,
     );
     this.app.cursor.reset();
+    return true;
+  };
+
+  /**
+   * The side handle, at a scene point, of the free text being edited: dragging
+   * it sets the width the text wraps at, as it does for a selected text.
+   *
+   * (The edited text isn't selected, hence not handled by the selection's
+   * transform handles.)
+   */
+  public getEditedTextResizeHandleAt = (
+    point: Readonly<{ x: number; y: number }>,
+    pointerType: PointerType,
+  ): {
+    element: NonDeleted<ExcalidrawTextElement>;
+    transformHandleType: "e" | "w";
+  } | null => {
+    const { state } = this.app;
+    const element =
+      state.editingTextElement &&
+      this.app.scene.getNonDeletedElement(state.editingTextElement.id);
+
+    if (!element || !isTextElement(element) || element.containerId) {
+      return null;
+    }
+
+    const transformHandleType = resizeTest(
+      element,
+      this.app.scene.getNonDeletedElementsMap(),
+      { ...state, selectedElementIds: { [element.id]: true } },
+      point.x,
+      point.y,
+      state.zoom,
+      pointerType,
+      this.app.editorInterface,
+    );
+
+    return transformHandleType === "e" || transformHandleType === "w"
+      ? { element, transformHandleType }
+      : null;
+  };
+
+  /**
+   * Resizes the text being edited for as long as the pointer, pressed on one
+   * of its side handles, is dragged — without leaving the editor.
+   *
+   * @param onClick called on release if the pointer wasn't dragged
+   * @returns `false` if the press isn't on a side handle of the edited text
+   */
+  public resizeEditedTextOnPointerDown = (
+    event: PointerEvent,
+    onClick: () => void,
+  ): boolean => {
+    const origin = viewportCoordsToSceneCoords(event, this.app.state);
+    const handle = this.getEditedTextResizeHandleAt(
+      origin,
+      event.pointerType as PointerType,
+    );
+    if (!handle) {
+      return false;
+    }
+
+    const { element, transformHandleType } = handle;
+    const { ownerWindow } = this.app;
+    const originalElement = deepCopyElement(element);
+    const originalElements = new Map([[element.id, originalElement]]);
+    const getGridSize = (pointerEvent: PointerEvent) =>
+      pointerEvent[KEYS.CTRL_OR_CMD] ? null : this.app.getEffectiveGridSize();
+    const [originInGridX, originInGridY] = getGridPoint(
+      origin.x,
+      origin.y,
+      getGridSize(event),
+    );
+    const [offsetX, offsetY] = getResizeOffsetXY(
+      transformHandleType,
+      [element],
+      this.app.scene.getNonDeletedElementsMap(),
+      origin.x,
+      origin.y,
+    );
+    let dragged = false;
+
+    // the canvas stays the pointer's target, and so does its resize cursor,
+    // while the pointer is over the editor
+    const canvas = event.target as HTMLCanvasElement;
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {}
+
+    const stop = () => {
+      ownerWindow.removeEventListener("pointermove", onPointerMove, true);
+      ownerWindow.removeEventListener("pointerup", onPointerUp, true);
+      ownerWindow.removeEventListener("pointercancel", onPointerUp, true);
+      SnapCache.setReferenceSnapPoints(null);
+      if (this.app.state.snapLines.length) {
+        this.app.setState({ snapLines: [] });
+      }
+    };
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      // the editor may have been closed from the keyboard meanwhile
+      if (this.app.state.editingTextElement?.id !== element.id) {
+        stop();
+        return;
+      }
+      // the canvas' own handling is for hovering and for its selection
+      moveEvent.stopPropagation();
+
+      if (
+        !dragged &&
+        moveEvent.clientX === event.clientX &&
+        moveEvent.clientY === event.clientY
+      ) {
+        return;
+      }
+      dragged = true;
+
+      const pointer = viewportCoordsToSceneCoords(moveEvent, this.app.state);
+      const gridSize = getGridSize(moveEvent);
+      const [gridX, gridY] = getGridPoint(pointer.x, pointer.y, gridSize);
+      let [x, y] = getGridPoint(
+        pointer.x - offsetX,
+        pointer.y - offsetY,
+        gridSize,
+      );
+
+      // snap the dragged side to the other elements, as when resizing on the
+      // canvas
+      this.app.maybeCacheReferenceSnapPoints(moveEvent, [element]);
+      const { snapOffset, snapLines } = snapResizingElements(
+        [element],
+        [originalElement],
+        this.app,
+        moveEvent,
+        { x: gridX - originInGridX, y: gridY - originInGridY },
+        transformHandleType,
+      );
+      x += snapOffset.x;
+      y += snapOffset.y;
+      if (snapLines.length || this.app.state.snapLines.length) {
+        this.app.setState({ snapLines });
+      }
+
+      transformElements(
+        originalElements,
+        transformHandleType,
+        [element],
+        this.app.scene,
+        false,
+        moveEvent.altKey,
+        false,
+        x,
+        y,
+        origin.x,
+        origin.y,
+        this.app.renderEnvironment,
+      );
+    };
+
+    const onPointerUp = () => {
+      stop();
+      if (!dragged && this.app.state.editingTextElement?.id === element.id) {
+        onClick();
+      }
+    };
+
+    ownerWindow.addEventListener("pointermove", onPointerMove, true);
+    ownerWindow.addEventListener("pointerup", onPointerUp, true);
+    ownerWindow.addEventListener("pointercancel", onPointerUp, true);
+
     return true;
   };
 

@@ -3610,6 +3610,85 @@ describe("textWysiwyg", () => {
       expect(text.autoResize).toBe(true);
       expect(text.text).toBe(text.originalText);
     });
+
+    it("resizes a text dragged by its side while editing it", async () => {
+      API.setElements([
+        API.createElement({
+          type: "text",
+          text: "Excalidraw editor is great!",
+          x: 100,
+          y: 100,
+        }),
+      ]);
+      mouse.doubleClickAt(110, 110);
+      const editor = await getTextEditor();
+      // the editor listens for presses outside it from the next frame on
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      const { width, height } = text;
+      const x = text.x + text.width + 4;
+      const y = text.y + text.height / 2;
+      mouse.downAt(x, y);
+      mouse.moveTo(x - 40, y);
+      mouse.moveTo(x - 80, y);
+      mouse.upAt(x - 80, y);
+
+      const resized = h.elements[0] as ExcalidrawTextElement;
+      expect(resized.autoResize).toBe(false);
+      expect(resized.width).toBeCloseTo(width - 80);
+      expect(resized.height).toBeGreaterThan(height);
+      // still editing
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(editor);
+
+      // a click on the side submits, as anywhere else on the canvas
+      mouse.clickAt(resized.x + resized.width + 4, y);
+      expect(h.state.editingTextElement).toBe(null);
+    });
+
+    it("snaps the dragged side of a text being edited to other elements", async () => {
+      API.setElements([
+        API.createElement({
+          type: "text",
+          text: "Excalidraw editor is great!",
+          x: 100,
+          y: 100,
+        }),
+        API.createElement({
+          type: "rectangle",
+          x: 300,
+          y: 200,
+          width: 100,
+          height: 100,
+        }),
+      ]);
+      API.setAppState({
+        objectsSnapModeEnabled: true,
+        // (elements are snapped to only if in the viewport)
+        width: 1000,
+        height: 1000,
+      });
+      mouse.doubleClickAt(110, 110);
+      await getTextEditor();
+      // the editor listens for presses outside it from the next frame on
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      const x = text.x + text.width + 4;
+      const y = text.y + text.height / 2;
+      mouse.downAt(x, y);
+      // 3px short of the rectangle's left edge
+      mouse.moveTo(307, y);
+      expect(text.x + text.width).toBe(300);
+      // the guide line follows the snapped side
+      mouse.moveTo(306, y);
+      expect(h.state.snapLines.length).toBe(1);
+
+      mouse.upAt(306, y);
+      expect(h.state.snapLines.length).toBe(0);
+      expect(text.x + text.width).toBe(300);
+    });
   });
 
   describe("history", () => {
