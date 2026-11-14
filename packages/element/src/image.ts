@@ -113,6 +113,76 @@ export const isHTMLSVGElement = (node: Node | null): node is SVGElement => {
   return node?.nodeName.toLowerCase() === "svg";
 };
 
+/** attributes that may point to a resource that'd be fetched when the SVG is
+ * rendered in the page */
+const SVG_HREF_ATTRIBUTES = ["href", "xlink:href"];
+
+/**
+ * Measures the bounding box of the SVG content using the browser's layout
+ * engine. Needed for SVGs that specify neither width/height nor viewBox (e.g.
+ * those that only use absolute units like `mm` on child elements), as there's
+ * otherwise no way to tell how large they are.
+ *
+ * The SVG needs to be attached to the document to be measured, so we do so on
+ * a sanitized throwaway copy (no scripts, event handlers, foreignObject or
+ * external resources) to ensure that measuring never executes or fetches
+ * anything coming from the (untrusted) SVG.
+ *
+ * Returns `null` if the content couldn't be measured (e.g. no layout engine
+ * or empty content).
+ */
+const measureSVGContent = (svg: SVGElement) => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const clone = document.importNode(svg, true) as unknown as SVGSVGElement;
+
+  clone.querySelectorAll("script, foreignObject").forEach((node) => {
+    node.remove();
+  });
+  for (const node of [clone, ...Array.from(clone.querySelectorAll("*"))]) {
+    for (const attr of Array.from(node.attributes)) {
+      if (attr.name.toLowerCase().startsWith("on")) {
+        node.removeAttribute(attr.name);
+      }
+    }
+    // don't allow remote resources to be requested while measuring
+    for (const name of SVG_HREF_ATTRIBUTES) {
+      const value = node.getAttribute(name);
+      if (value != null && !/^\s*(#|data:)/i.test(value)) {
+        node.removeAttribute(name);
+      }
+    }
+  }
+
+  const container = document.createElement("div");
+  container.style.cssText =
+    "position:absolute;left:-99999px;top:-99999px;width:0;height:0;" +
+    "overflow:hidden;visibility:hidden;pointer-events:none;";
+  container.appendChild(clone);
+
+  try {
+    document.body.appendChild(container);
+    const box = clone.getBBox();
+    if (
+      Number.isFinite(box.x) &&
+      Number.isFinite(box.y) &&
+      Number.isFinite(box.width) &&
+      Number.isFinite(box.height) &&
+      box.width > 0 &&
+      box.height > 0
+    ) {
+      return box;
+    }
+  } catch (error) {
+    // getBBox is unavailable, or the SVG isn't rendered
+  } finally {
+    container.remove();
+  }
+  return null;
+};
+
 export const normalizeSVG = (SVGString: string) => {
   const doc = new DOMParser().parseFromString(SVGString, MIME_TYPES.svg);
   const svg = doc.querySelector("svg");
@@ -136,7 +206,22 @@ export const normalizeSVG = (SVGString: string) => {
       height = null;
     }
 
-    const viewBox = svg.getAttribute("viewBox");
+    let viewBox = svg.getAttribute("viewBox");
+
+    // If the SVG doesn't specify any size at all, then the only way to know how
+    // large it is, is to measure its content. Otherwise we'd default to a tiny
+    // 50x50 viewport and crop most of the drawing.
+    if (!width && !height && !viewBox) {
+      const box = measureSVGContent(svg);
+      if (box) {
+        width = `${box.width}`;
+        height = `${box.height}`;
+        viewBox = `${box.x} ${box.y} ${box.width} ${box.height}`;
+        svg.setAttribute("width", width);
+        svg.setAttribute("height", height);
+        svg.setAttribute("viewBox", viewBox);
+      }
+    }
 
     if (!width || !height) {
       width = width || "50";
