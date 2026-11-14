@@ -15,10 +15,7 @@ import {
   deriveStylesPanelMode,
 } from "@excalidraw/common";
 
-import type {
-  TextSpanStyleKey,
-  TextSpanStylePatch,
-} from "@excalidraw/element";
+import type { TextSpanStyleKey, TextSpanStylePatch } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,

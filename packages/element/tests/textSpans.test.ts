@@ -169,11 +169,12 @@ describe("text spans", () => {
       ],
     });
     // a smaller portion never makes its line shorter than the text's own
-    expect(lines?.map(({ top, height, fontSize }) => [top, height, fontSize]))
-      .toEqual([
-        [0, 50, 40],
-        [50, 25, 20],
-      ]);
+    expect(
+      lines?.map(({ top, height, fontSize }) => [top, height, fontSize]),
+    ).toEqual([
+      [0, 50, 40],
+      [50, 25, 20],
+    ]);
     expect(lines![0].baseline).toBeGreaterThan(lines![1].top - 50);
   });
 
@@ -189,11 +190,18 @@ describe("text spans", () => {
     ).toEqual([{ start: 0, end: 2, fontSize: 36, highlightColor: "#ffec99" }]);
     // a size equal to the element's own is no override
     expect(
-      applyTextSpanStyle(null, 4, 0, 4, { fontSize: 20 }, {
-        strokeColor: "#000",
-        fontFamily: FONT_FAMILY.Excalifont,
-        fontSize: 20,
-      }),
+      applyTextSpanStyle(
+        null,
+        4,
+        0,
+        4,
+        { fontSize: 20 },
+        {
+          strokeColor: "#000",
+          fontFamily: FONT_FAMILY.Excalifont,
+          fontSize: 20,
+        },
+      ),
     ).toBe(null);
   });
 });

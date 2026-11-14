@@ -1963,7 +1963,6 @@ export const actionChangePadding = register<number>({
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     const padding = normalizeContainerPadding(value);
-    const elementsMap = app.scene.getNonDeletedElementsMap();
     const updatedContainers = new Map<string, ExcalidrawElement>();
 
     const nextElements = changeProperty(elements, appState, (el) => {

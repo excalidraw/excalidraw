@@ -30,11 +30,7 @@ import type {
   TextSpanStylePatch,
 } from "@excalidraw/element";
 
-import type {
-  FontFamilyValues,
-  TextSpan,
-  TextSpanStyle,
-} from "@excalidraw/element/types";
+import type { TextSpan, TextSpanStyle } from "@excalidraw/element/types";
 
 export type SelectionDirection = "forward" | "backward" | "none";
 
@@ -59,10 +55,7 @@ export type RichEditableAPI = {
    * styles the selected portion; `false` when nothing is selected (the
    * caller then styles the whole text)
    */
-  applyStyle: (
-    patch: TextSpanStylePatch,
-    base: TextSpanBaseStyle,
-  ) => boolean;
+  applyStyle: (patch: TextSpanStylePatch, base: TextSpanBaseStyle) => boolean;
   /** the last selection inside the editable, also once it lost focus */
   getSelectionRange: () => {
     start: number;

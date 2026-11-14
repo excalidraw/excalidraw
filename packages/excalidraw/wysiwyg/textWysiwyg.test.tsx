@@ -1888,10 +1888,9 @@ describe("textWysiwyg", () => {
       // ...but the editor shows it as typed, so must be as wide (or it'd
       // break `    - bb` onto two lines)
       expect(parseFloat(editor.style.width)).toBeGreaterThanOrEqual(rawWidth);
-      // centered: the box is shifted left by half of what it grew
-      const growth = parseFloat(editor.style.width) - 0.5 - text.width;
-      expect(editor.style.transformOrigin).toBe(
-        `${growth / 2 + text.width / 2}px ${text.height / 2}px`,
+      // centered: the box is anchored by its center, so it grows both ways
+      expect(editor.style.transform).toContain(
+        `translate(${-parseFloat(editor.style.width) / 2}px, 0px)`,
       );
     });
 
