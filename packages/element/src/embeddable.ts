@@ -154,6 +154,7 @@ const ALLOWED_DOMAINS = new Set([
   "reddit.com",
   "forms.microsoft.com",
   "instagram.com",
+  "data.worldbank.org",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
