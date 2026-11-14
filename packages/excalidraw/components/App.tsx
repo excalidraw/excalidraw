@@ -405,6 +405,7 @@ import {
 import { AppSelectionTool } from "./App.selectionTool";
 import { AppWrap } from "./App.wrap";
 import BraveMeasureTextError from "./BraveMeasureTextError";
+import { colorPickerHotkeyBindings } from "./ColorPicker/colorPickerUtils";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
 import { FileDropOverlay } from "./FileDropOverlay";
@@ -5351,6 +5352,19 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
+        // While a color picker popup is open, its hotkeys (e.g. B for red)
+        // belong to the palette. The picker consumes them when focused, but
+        // if focus is elsewhere (e.g. the popup was opened with S), they
+        // must not fall through to tool switching (see #12405).
+        if (
+          (this.state.openPopup === "elementStroke" ||
+            this.state.openPopup === "elementBackground" ||
+            this.state.openPopup === "canvasBackground") &&
+          colorPickerHotkeyBindings.includes(event.key.toLowerCase())
+        ) {
+          event.stopPropagation();
+          return;
+        }
         const shape = findShapeByKey(event.key, this, event.shiftKey);
 
         if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
