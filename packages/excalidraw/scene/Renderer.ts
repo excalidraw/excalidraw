@@ -1,12 +1,21 @@
 import {
+  doBoundsIntersect,
+  getCanvasPadding,
   getCommonFrameId,
+  getElementBounds,
   getFrameChildrenInsertionIndex,
   getContainerElement,
   isElementInViewport,
+  isFrameLikeElement,
+  isIframeLikeElement,
   isTextElement,
+  shouldApplyFrameClip,
+  unionBounds,
 } from "@excalidraw/element";
 
 import { arrayToMap, memoize, toBrandedType } from "@excalidraw/common";
+
+import type { Bounds } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -18,11 +27,16 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
+import { DEFAULT_LINK_SIZE } from "../components/hyperlink/helpers";
 import { cancelStaticSceneThrottle } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState, ElementRenderOffsets } from "../types";
+import type {
+  AppState,
+  ElementRenderOffsets,
+  StaticCanvasAppState,
+} from "../types";
 
 type GetRenderableElementsOpts = {
   zoom: AppState["zoom"];
@@ -37,6 +51,84 @@ type GetRenderableElementsOpts = {
   selectedElements: readonly NonDeletedExcalidrawElement[];
   selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
   frameToHighlight: AppState["frameToHighlight"];
+};
+
+/** where an element may paint, conservatively, with offsets applied */
+const getPaintBounds = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
+  offsets: ElementRenderOffsets,
+): Bounds => {
+  const offset = offsets.get(element.id);
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+  // conservative: an extra moved element only costs a redraw
+  const padding =
+    getCanvasPadding(element) + (element.link ? DEFAULT_LINK_SIZE * 2 : 0);
+  const dx = offset?.x ?? 0;
+  const dy = offset?.y ?? 0;
+  return [
+    x1 + dx - padding,
+    y1 + dy - padding,
+    x2 + dx + padding,
+    y2 + dy + padding,
+  ];
+};
+
+/** a bound text is drawn with its container, it goes where it goes */
+const getRenderTarget = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
+) =>
+  (isTextElement(element) && element.containerId
+    ? elementsMap.get(element.containerId)
+    : null) ?? element;
+
+type NewElementLayersState = {
+  elementsMap: RenderableElementsMap;
+  offsets: ElementRenderOffsets;
+  /** the elements above the new element in z-order */
+  above: ReadonlySet<NonDeletedExcalidrawElement>;
+  /** where the new element may paint, null if anywhere */
+  newElementRegion: Bounds | null;
+  /** the bounds of the moved elements, and their union for a quick reject */
+  moved: Bounds[];
+  movedUnion: Bounds | null;
+  /** whether an element has to move to the new element canvas */
+  decided: Map<NonDeletedExcalidrawElement, boolean>;
+};
+
+/**
+ * Whether an element has to move to the new element canvas: it's drawn after
+ * the new element and may overlap it, or it's drawn after an element that
+ * moved and overlaps that. Has to be called in drawing order.
+ */
+const mustMoveToNewElementCanvas = (
+  element: NonDeletedExcalidrawElement,
+  state: NewElementLayersState,
+) => {
+  const decided = state.decided.get(element);
+  if (decided !== undefined) {
+    return decided;
+  }
+
+  const isDrawnAfterNewElement =
+    state.above.has(element) || isIframeLikeElement(element);
+  const bounds = getPaintBounds(element, state.elementsMap, state.offsets);
+  const mustMove =
+    (isDrawnAfterNewElement &&
+      (!state.newElementRegion ||
+        doBoundsIntersect(bounds, state.newElementRegion))) ||
+    (doBoundsIntersect(bounds, state.movedUnion) &&
+      state.moved.some((moved) => doBoundsIntersect(bounds, moved)));
+
+  if (mustMove) {
+    state.moved.push(bounds);
+    state.movedUnion = state.movedUnion
+      ? unionBounds(state.movedUnion, bounds)
+      : bounds;
+  }
+  state.decided.set(element, mustMove);
+  return mustMove;
 };
 
 export class Renderer {
@@ -249,7 +341,12 @@ export class Renderer {
     newElement: AppState["newElement"];
   }) {
     const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
-    const newElementCanvasElement = newElement?.frameId ? null : newElement;
+    // A new text doubles as `editingTextElement` (drawn by the wysiwyg), so a
+    // framed one isn't drawn on any canvas. Every other new element goes to
+    // the new element canvas, framed ones included: the elements that may be
+    // drawn over it are drawn there on top of it (see getNewElementLayers).
+    const newElementCanvasElement =
+      newElement?.frameId && isTextElement(newElement) ? null : newElement;
 
     for (const element of elements) {
       if (newElementCanvasElement?.id === element.id) {
@@ -361,15 +458,11 @@ export class Renderer {
   public getRenderableElements = (opts: GetRenderableElementsOpts) => {
     const { newElement } = opts;
     // A new element being drag-sized is mutated in place without informing
-    // the scene, so `sceneNonce` doesn't move. Fold the element's own nonce
-    // in where a canvas draws it from the live element but memoizes on this
-    // nonce: a framed new element stays in the static canvas' element map
-    // (see getRenderableElementsMap), and a new text gets its dashed text box
-    // drawn by the interactive canvas (it doubles as `editingTextElement`).
+    // the scene, so `sceneNonce` doesn't move. A new text gets its dashed text
+    // box drawn by the interactive canvas (it doubles as `editingTextElement`)
+    // which memoizes on this nonce, so fold the text's own nonce in.
     const canvasNonce = `${this.scene.getSceneNonce()}${
-      newElement?.frameId || isTextElement(newElement)
-        ? `:${newElement.versionNonce}`
-        : ""
+      isTextElement(newElement) ? `:${newElement.versionNonce}` : ""
     }`;
 
     const ret = this._getRenderableElements({
@@ -413,6 +506,144 @@ export class Renderer {
 
     return ret;
   };
+
+  /**
+   * Splits the static canvas' elements around a framed new element drawn on
+   * the new element canvas. The new element sits at its frame's children
+   * insertion index, so elements drawn after it that may overlap it have to
+   * be drawn on top of it. They're moved off the static canvas to the new
+   * element canvas, which draws them after the new element. Embeddables are
+   * drawn on top of everything on the static canvas, so overlapping ones move
+   * regardless of z-order.
+   *
+   * Source-over compositing is associative, so the two layers composite to
+   * the same pixels as drawing everything in order on one canvas as long as
+   * no static element drawn after a moved one overlaps it. Moving is
+   * therefore transitive: whatever is drawn after a moved element and
+   * overlaps it moves too. The static canvas then doesn't re-render while the
+   * new element is being sized.
+   *
+   * A frame-clipped new element can only ever paint inside its frame, so
+   * only elements overlapping the frame can cover it. One that isn't clipped
+   * (arrows, or frame clipping disabled) can paint anywhere, so everything
+   * drawn after it moves.
+   */
+  public getNewElementLayers = (opts: {
+    /** the static canvas' visible elements (with render offsets applied) */
+    visibleElements: readonly NonDeletedExcalidrawElement[];
+    elementsMap: RenderableElementsMap;
+    newElementCanvasElement: NonDeletedExcalidrawElement | null;
+    offsets: ElementRenderOffsets;
+    appState: StaticCanvasAppState;
+  }) => {
+    const { appState, ...rest } = opts;
+    const newElement = opts.newElementCanvasElement;
+    const frame = newElement?.frameId
+      ? opts.elementsMap.get(newElement.frameId)
+      : null;
+    // mirrors the new element canvas' decision to clip it
+    const isFrameClipped =
+      !!newElement &&
+      !!frame &&
+      isFrameLikeElement(frame) &&
+      appState.frameRendering.enabled &&
+      shouldApplyFrameClip(newElement, frame, appState, opts.elementsMap);
+
+    return this._getNewElementLayers({
+      ...rest,
+      // the new element is mutated in place, memoize on what matters
+      frameId: newElement?.frameId ?? null,
+      isFrameClipped,
+    });
+  };
+
+  private _getNewElementLayers = memoize(
+    ({
+      visibleElements,
+      elementsMap,
+      newElementCanvasElement: newElement,
+      offsets,
+      frameId,
+      isFrameClipped,
+    }: {
+      visibleElements: readonly NonDeletedExcalidrawElement[];
+      elementsMap: RenderableElementsMap;
+      newElementCanvasElement: NonDeletedExcalidrawElement | null;
+      offsets: ElementRenderOffsets;
+      frameId: string | null;
+      isFrameClipped: boolean;
+    }): {
+      staticElements: readonly NonDeletedExcalidrawElement[];
+      elementsAboveNewElement: readonly NonDeletedExcalidrawElement[];
+    } => {
+      const frame = frameId ? elementsMap.get(frameId) : null;
+
+      if (!newElement || !frame || !isFrameLikeElement(frame)) {
+        return { staticElements: visibleElements, elementsAboveNewElement: [] };
+      }
+
+      const elements = this.scene.getNonDeletedElements();
+      const newElementIndex = elements.findIndex(
+        (element) => element.id === newElement.id,
+      );
+      if (newElementIndex === -1) {
+        return { staticElements: visibleElements, elementsAboveNewElement: [] };
+      }
+      const above = new Set<NonDeletedExcalidrawElement>(
+        elements.slice(newElementIndex + 1),
+      );
+
+      const frameOffset = offsets.get(frame.id);
+      const fx1 = frame.x + (frameOffset?.x ?? 0);
+      const fy1 = frame.y + (frameOffset?.y ?? 0);
+
+      const state: NewElementLayersState = {
+        elementsMap,
+        offsets,
+        above,
+        newElementRegion: isFrameClipped
+          ? [fx1, fy1, fx1 + frame.width, fy1 + frame.height]
+          : null,
+        moved: [],
+        movedUnion: null,
+        decided: new Map(),
+      };
+
+      // decide in the static canvas' drawing order: embeddables last
+      for (const isIframePass of [false, true]) {
+        for (const element of visibleElements) {
+          if (
+            getRenderTarget(element, elementsMap) === element &&
+            isIframeLikeElement(element) === isIframePass
+          ) {
+            mustMoveToNewElementCanvas(element, state);
+          }
+        }
+      }
+
+      const staticElements: NonDeletedExcalidrawElement[] = [];
+      const elementsAboveNewElement: NonDeletedExcalidrawElement[] = [];
+
+      for (const element of visibleElements) {
+        // a bound text whose container isn't visible is decided here, on
+        // the container
+        if (
+          mustMoveToNewElementCanvas(
+            getRenderTarget(element, elementsMap),
+            state,
+          )
+        ) {
+          elementsAboveNewElement.push(element);
+        } else {
+          staticElements.push(element);
+        }
+      }
+
+      return elementsAboveNewElement.length
+        ? { staticElements, elementsAboveNewElement }
+        : { staticElements: visibleElements, elementsAboveNewElement };
+    },
+  );
 
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)

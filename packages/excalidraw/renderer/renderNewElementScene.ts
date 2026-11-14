@@ -13,7 +13,7 @@ import {
   snapScrollToDevicePixels,
 } from "./helpers";
 
-import { frameClip } from "./staticScene";
+import { frameClip, renderSceneElements } from "./staticScene";
 
 import type { NewElementSceneRenderConfig } from "../scene/types";
 
@@ -21,6 +21,7 @@ const _renderNewElementScene = ({
   canvas,
   rc,
   newElement,
+  elementsAboveNewElement,
   elementsMap,
   allElementsMap,
   scale,
@@ -47,14 +48,16 @@ const _renderNewElementScene = ({
     // Apply zoom
     context.scale(appState.zoom.value, appState.zoom.value);
 
-    if (newElement && newElement.type !== "selection") {
-      // e.g. when creating arrows and we're still below the arrow drag distance
-      // threshold
+    if (
+      newElement &&
+      newElement.type !== "selection" &&
+      // e.g. when creating arrows and we're still below the arrow drag
+      // distance threshold
       // (for now we skip render only with elements while we're creating to be
       // safe)
-      if (isInvisiblySmallElement(newElement)) {
-        return;
-      }
+      !isInvisiblySmallElement(newElement)
+    ) {
+      context.save();
 
       const frameId = newElement.frameId || appState.frameToHighlight?.id;
 
@@ -73,10 +76,8 @@ const _renderNewElementScene = ({
         }
       }
 
-      const renderTargetElement = newElement;
-
       renderElement(
-        renderTargetElement,
+        newElement,
         elementsMap,
         allElementsMap,
         rc,
@@ -84,19 +85,77 @@ const _renderNewElementScene = ({
         renderConfig,
         appState,
       );
-    } else {
-      context.clearRect(0, 0, normalizedWidth, normalizedHeight);
+
+      context.restore();
+    }
+
+    // the elements above a framed new element, moved off the static canvas
+    // (see Renderer.getNewElementLayers). Drawn even while the new element
+    // isn't, as the static canvas no longer draws them.
+    if (elementsAboveNewElement?.length) {
+      renderSceneElements({
+        context,
+        rc,
+        elements: elementsAboveNewElement,
+        elementsMap,
+        allElementsMap,
+        appState,
+        renderConfig,
+        scale,
+      });
     }
 
     context.restore();
   }
 };
 
-export const renderNewElementSceneThrottled = throttleRAF(
-  (config: NewElementSceneRenderConfig) => {
-    _renderNewElementScene(config);
-  },
-);
+type NewElementSceneThrottle = ReturnType<typeof throttleRAF>;
+
+const newElementSceneThrottles = new WeakMap<
+  HTMLCanvasElement,
+  { throttle: NewElementSceneThrottle; ownerWindow: Window }
+>();
+
+// mirrors getStaticSceneThrottle (see staticScene.ts): the new element canvas
+// must be scheduled on the same window's rAF as the static canvas underneath
+// it, or the two layers can be painted in different frames
+const getNewElementSceneThrottle = (canvas: HTMLCanvasElement) => {
+  const ownerWindow = canvas.ownerDocument.defaultView ?? window;
+  let entry = newElementSceneThrottles.get(canvas);
+  if (entry && entry.ownerWindow !== ownerWindow) {
+    entry.throttle.cancel();
+    entry = undefined;
+  }
+  if (!entry) {
+    entry = {
+      throttle: throttleRAF((config: NewElementSceneRenderConfig) => {
+        _renderNewElementScene(config);
+      }, ownerWindow),
+      ownerWindow,
+    };
+    newElementSceneThrottles.set(canvas, entry);
+  }
+  return entry.throttle;
+};
+
+/**
+ * Throttled to animation framerate, one throttle per canvas, scheduled on the
+ * canvas' owner window (same as the static scene).
+ */
+export const renderNewElementSceneThrottled = (
+  config: NewElementSceneRenderConfig,
+) => {
+  if (!config.canvas) {
+    return;
+  }
+  getNewElementSceneThrottle(config.canvas)(config);
+};
+
+/** Drops the canvas' pending frame; the throttle itself is dropped with the
+ * canvas. */
+export const cancelNewElementSceneThrottle = (canvas: HTMLCanvasElement) => {
+  newElementSceneThrottles.get(canvas)?.throttle.cancel();
+};
 
 export const renderNewElementScene = (
   renderConfig: NewElementSceneRenderConfig,

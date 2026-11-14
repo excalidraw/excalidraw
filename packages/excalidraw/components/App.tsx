@@ -2374,6 +2374,24 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
+    // the elements that may be drawn over a framed new element are drawn on
+    // top of it on the new-element canvas instead of the static canvas
+    const { staticElements, elementsAboveNewElement } =
+      this.renderer.getNewElementLayers({
+        visibleElements: this.elementRenderOffsets.size
+          ? this.renderer.getVisibleElementsWithRenderOffsets(
+              visibleElements,
+              renderableElementsMap,
+              this.state,
+              this.elementRenderOffsets,
+            )
+          : visibleElements,
+        elementsMap: renderableElementsMap,
+        newElementCanvasElement,
+        offsets: this.elementRenderOffsets,
+        appState: this.state,
+      });
+
     // a tool dragged out of the toolbar previews on the new-element canvas
     // (it is not in the scene until dropped)
     const previewElement = newElementCanvasElement ?? this.toolDrag.preview;
@@ -2639,16 +2657,7 @@ class App extends React.Component<AppProps, AppState> {
                             rc={this.rc}
                             elementsMap={renderableElementsMap}
                             allElementsMap={allElementsMap}
-                            visibleElements={
-                              this.elementRenderOffsets.size
-                                ? this.renderer.getVisibleElementsWithRenderOffsets(
-                                    visibleElements,
-                                    renderableElementsMap,
-                                    this.state,
-                                    this.elementRenderOffsets,
-                                  )
-                                : visibleElements
-                            }
+                            visibleElements={staticElements}
                             canvasNonce={canvasNonce}
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
@@ -2678,6 +2687,7 @@ class App extends React.Component<AppProps, AppState> {
                             <NewElementCanvas
                               appState={this.state}
                               newElement={previewElement}
+                              elementsAboveNewElement={elementsAboveNewElement}
                               scale={this.ownerWindow.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={renderableElementsMap}
@@ -2688,6 +2698,9 @@ class App extends React.Component<AppProps, AppState> {
                                 scale: this.ownerWindow.devicePixelRatio,
                                 renderEnvironment: this.renderEnvironment,
                                 renderGrid: false,
+                                // the elements above the new element get their link icons
+                                // as on the static canvas
+                                renderLinks: this.isLinksEnabled(),
                                 canvasBackgroundColor:
                                   this.state.viewBackgroundColor,
                                 embedsValidationStatus:
