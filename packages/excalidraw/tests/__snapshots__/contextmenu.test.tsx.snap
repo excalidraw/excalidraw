@@ -181,6 +181,95 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         },
         "viewMode": true,
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "save",
+        ],
+        "label": [Function],
+        "name": "downloadImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "original",
+          "save",
+        ],
+        "label": "labels.downloadOriginalImage",
+        "name": "downloadOriginalImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
       "separator",
       {
         "icon": <svg
@@ -4859,6 +4948,383 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
 ]
 `;
 
+exports[`contextMenu element > shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 100,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 20,
+  "offsetTop": 10,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": {
+    "duration": 3000,
+    "message": "File saved.",
+  },
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 200,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`contextMenu element > shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "crop": {
+    "height": 50,
+    "naturalHeight": 100,
+    "naturalWidth": 100,
+    "width": 50,
+    "x": 0,
+    "y": 0,
+  },
+  "customData": undefined,
+  "fileId": "test-file",
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "scale": [
+    1,
+    1,
+  ],
+  "seed": 1,
+  "status": "saved",
+  "strokeColor": "transparent",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "image",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 50,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`contextMenu element > shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image > [end of test] number of elements 1`] = `1`;
+
+exports[`contextMenu element > shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image > [end of test] number of renders 1`] = `5`;
+
+exports[`contextMenu element > shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image > [end of test] undo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows 'Download image' in context menu for uncropped image and triggers download > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 100,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 20,
+  "offsetTop": 10,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": {
+    "duration": 3000,
+    "message": "File saved.",
+  },
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 200,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`contextMenu element > shows 'Download image' in context menu for uncropped image and triggers download > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "crop": null,
+  "customData": undefined,
+  "fileId": "test-file",
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "scale": [
+    1,
+    1,
+  ],
+  "seed": 1,
+  "status": "saved",
+  "strokeColor": "transparent",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "image",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": 1278240551,
+  "width": 100,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`contextMenu element > shows 'Download image' in context menu for uncropped image and triggers download > [end of test] number of elements 1`] = `1`;
+
+exports[`contextMenu element > shows 'Download image' in context menu for uncropped image and triggers download > [end of test] number of renders 1`] = `5`;
+
+exports[`contextMenu element > shows 'Download image' in context menu for uncropped image and triggers download > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows 'Download image' in context menu for uncropped image and triggers download > [end of test] undo stack 1`] = `[]`;
+
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
@@ -5033,6 +5499,95 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         ],
         "label": "helpDialog.cropStart",
         "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "save",
+        ],
+        "label": [Function],
+        "name": "downloadImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "original",
+          "save",
+        ],
+        "label": "labels.downloadOriginalImage",
+        "name": "downloadOriginalImage",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -6268,6 +6823,95 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         ],
         "label": "helpDialog.cropStart",
         "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "save",
+        ],
+        "label": [Function],
+        "name": "downloadImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "original",
+          "save",
+        ],
+        "label": "labels.downloadOriginalImage",
+        "name": "downloadOriginalImage",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -8315,6 +8959,95 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
         "viewMode": true,
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "save",
+        ],
+        "label": [Function],
+        "name": "downloadImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "original",
+          "save",
+        ],
+        "label": "labels.downloadOriginalImage",
+        "name": "downloadOriginalImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
       "separator",
       {
         "icon": <svg
@@ -9320,6 +10053,95 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         },
         "viewMode": true,
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "save",
+        ],
+        "label": [Function],
+        "name": "downloadImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+            />
+            <path
+              d="M7 11l5 5l5 -5"
+            />
+            <path
+              d="M12 4l0 12"
+            />
+          </React.Fragment>
+        </svg>,
+        "keywords": [
+          "image",
+          "download",
+          "original",
+          "save",
+        ],
+        "label": "labels.downloadOriginalImage",
+        "name": "downloadOriginalImage",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
       "separator",
       {
         "icon": <svg
@@ -10317,3 +11139,195 @@ exports[`contextMenu element > shows context menu for element > [end of test] un
 `;
 
 exports[`contextMenu element > shows context menu for element > [end of test] undo stack 2`] = `[]`;
+
+exports[`contextMenu element > triggers original download for cropped image when clicking 'Download original image' > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 100,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "name": "Untitled-201933152653",
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 20,
+  "offsetTop": 10,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "scrolledOutside": false,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectedLinearElement": null,
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": {
+    "duration": 3000,
+    "message": "File saved.",
+  },
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 200,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`contextMenu element > triggers original download for cropped image when clicking 'Download original image' > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "crop": {
+    "height": 50,
+    "naturalHeight": 100,
+    "naturalWidth": 100,
+    "width": 50,
+    "x": 0,
+    "y": 0,
+  },
+  "customData": undefined,
+  "fileId": "test-file",
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "scale": [
+    1,
+    1,
+  ],
+  "seed": 1,
+  "status": "saved",
+  "strokeColor": "transparent",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "image",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": 449462985,
+  "width": 50,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`contextMenu element > triggers original download for cropped image when clicking 'Download original image' > [end of test] number of elements 1`] = `1`;
+
+exports[`contextMenu element > triggers original download for cropped image when clicking 'Download original image' > [end of test] number of renders 1`] = `5`;
+
+exports[`contextMenu element > triggers original download for cropped image when clicking 'Download original image' > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > triggers original download for cropped image when clicking 'Download original image' > [end of test] undo stack 1`] = `[]`;
