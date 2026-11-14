@@ -522,10 +522,12 @@
       "darkMode": "Modo escuro",
       "embedScene": "Incorporar cena",
       "scale": "Escala",
+      "svgDescription": "Descrição do SVG",
       "padding": "Margem interna"
     },
     "tooltip": {
-      "embedScene": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada a partir dele.\nIsso aumentará o tamanho do arquivo exportado."
+      "embedScene": "Os dados da cena serão salvos no arquivo PNG/SVG exportado para que a cena possa ser restaurada a partir dele.\nIsso aumentará o tamanho do arquivo exportado.",
+      "svgDescription": "Adiciona ao arquivo SVG uma descrição para ferramentas de acessibilidade. Ela não aparece na imagem."
     },
     "title": {
       "exportToPng": "Exportar como PNG",
