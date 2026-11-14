@@ -1116,6 +1116,35 @@ describe("Test Linear Elements", () => {
         ]
       `);
     });
+
+    it("should select and drag another linear element pressed in line editor", () => {
+      createTwoPointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const otherLine = API.createElement({
+        type: "line",
+        x: p1[0],
+        y: p1[1] + 100,
+        width: p2[0] - p1[0],
+        height: 0,
+        roughness: 0,
+        points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+      });
+      API.setElements([line, otherLine]);
+      enterLineEditingMode(line);
+
+      drag(
+        pointFrom(midpoint[0], midpoint[1] + 100),
+        pointFrom(midpoint[0] + delta, midpoint[1] + 100 + delta),
+      );
+
+      expect(h.state.selectedElementIds).toEqual({ [otherLine.id]: true });
+      expect(h.state.selectedLinearElement?.elementId).toBe(otherLine.id);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+      expect(otherLine.x).toBe(p1[0] + delta);
+      expect(otherLine.y).toBe(p1[1] + 100 + delta);
+      expect(line.x).toBe(p1[0]);
+      expect(line.y).toBe(p1[1]);
+    });
   });
 
   describe("Test bound text element", () => {
