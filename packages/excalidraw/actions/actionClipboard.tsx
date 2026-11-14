@@ -223,9 +223,10 @@ export const actionCopyAsPng = register({
         name: app.getName(),
         renderEnvironment: app.renderEnvironment,
       });
+      // off the live state: what was captured before the await is stale by now
       return {
         appState: {
-          ...appState,
+          ...app.state,
           toast: {
             message: t("toast.copyToClipboardAsPng", {
               exportSelection: selectedElements.length
@@ -243,7 +244,7 @@ export const actionCopyAsPng = register({
       console.error(error);
       return {
         appState: {
-          ...appState,
+          ...app.state,
           errorMessage: error.message,
         },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,

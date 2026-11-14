@@ -109,6 +109,46 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+/**
+ * Where an offset into `text` falls once the text changed under it, in one
+ * place: before the change it stays, past the change it moves with the
+ * change's length, and within the change it lands at the change's end.
+ */
+const mapOffsetToChangedText = (
+  text: string,
+  nextText: string,
+  offset: number,
+) => {
+  const maxCommon = Math.min(text.length, nextText.length);
+  let prefix = 0;
+  while (prefix < maxCommon && text[prefix] === nextText[prefix]) {
+    prefix++;
+  }
+  let suffix = 0;
+  while (
+    suffix < maxCommon - prefix &&
+    text[text.length - 1 - suffix] === nextText[nextText.length - 1 - suffix]
+  ) {
+    suffix++;
+  }
+  // the change's end never splits a surrogate pair: a suffix starting with
+  // the low half of one in the new text starts past the pair instead
+  if (
+    suffix > 0 &&
+    (nextText.charCodeAt(nextText.length - suffix) & 0xfc00) === 0xdc00 &&
+    (nextText.charCodeAt(nextText.length - suffix - 1) & 0xfc00) === 0xd800
+  ) {
+    suffix--;
+  }
+  if (offset <= prefix) {
+    return offset;
+  }
+  if (offset >= text.length - suffix) {
+    return offset + nextText.length - text.length;
+  }
+  return nextText.length - suffix;
+};
+
 const getLineDirection = (text: string, offset: number) => {
   const hardLineStart = text.lastIndexOf("\n", Math.max(0, offset - 1)) + 1;
   const hardLineEnd = text.indexOf("\n", offset);
@@ -772,6 +812,12 @@ export const textWysiwyg = ({
       };
     })();
 
+  // Set by a blur that keeps the edit open while the window is away (see
+  // handleBlur): the user can't be typing into the textarea then. The window
+  // coming back focuses it again, and anything typed is proof it is back too,
+  // should that focus never fire.
+  let isParked = false;
+
   if (onChange) {
     editable.onpaste = async (event) => {
       // we need to synchronously get the MIME types so we can preventDefault()
@@ -872,6 +918,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
+      isParked = false;
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
         const selectionStart = editable.selectionStart;
@@ -1071,19 +1118,23 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = app.scene.getElement(
+    // the element can be gone from the scene by now (see
+    // AppText.endEditOfGoneElement): the edit still ends, and leaves the
+    // container alone
+    const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
-    ) as ExcalidrawTextElement;
-    if (!updateElement) {
-      return;
-    }
-    const container = getContainerElement(
-      updateElement,
-      app.scene.getNonDeletedElementsMap(),
     );
+    const nextOriginalText = editable.value;
+    const container =
+      updateElement && !updateElement.isDeleted
+        ? getContainerElement(
+            updateElement,
+            app.scene.getNonDeletedElementsMap(),
+          )
+        : null;
 
-    if (container) {
-      if (editable.value.trim()) {
+    if (updateElement && container) {
+      if (nextOriginalText.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           app.scene.mutateElement(container, {
@@ -1117,13 +1168,56 @@ export const textWysiwyg = ({
 
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
-      nextOriginalText: editable.value,
+      nextOriginalText,
     });
+  };
+
+  // The textarea also blurs when the whole window loses focus (switching
+  // apps/tabs). It stays the active element and gets focus back when the
+  // window returns, so keep editing then: only submit when focus actually
+  // moved to something else in the document. Not in an iframe though: there
+  // a click on the embedding page blurs the window the same way, and can't
+  // be told from switching apps, so the edit still ends on any blur. Nor
+  // when collaborating: an open edit keeps the collaborators' changes to
+  // the text out (see reconcileElements), which shouldn't outlast the tab
+  // being looked at.
+  const keepsFocusOnWindowBlur = () =>
+    !app.props.isCollaborating &&
+    ownerWindow.parent === ownerWindow &&
+    ownerDocument.activeElement === editable;
+
+  editable.onfocus = () => {
+    isParked = false;
+  };
+
+  const handleBlur = () => {
+    if (keepsFocusOnWindowBlur()) {
+      isParked = true;
+      return;
+    }
+    handleSubmit();
+  };
+
+  // While submit is disabled for a press (see temporarilyDisableSubmit), the
+  // window losing focus means the pointerup that would re-enable it may never
+  // come (alt-tab mid-press). Settle the press here: submit if focus moved
+  // away, else re-arm submit on blur right away, so that the next focus move
+  // submits and no late pointerup steals the focus back to the textarea.
+  const onWindowBlur = () => {
+    ownerWindow.removeEventListener("blur", onWindowBlur);
+    ownerWindow.removeEventListener("pointerup", bindBlurEvent);
+    if (keepsFocusOnWindowBlur()) {
+      isParked = true;
+      editable.onblur = handleBlur;
+      return;
+    }
+    handleSubmit();
   };
 
   const cleanup = () => {
     // remove events to ensure they don't late-fire
     editable.onblur = null;
+    editable.onfocus = null;
     editable.oninput = null;
     editable.onkeydown = null;
 
@@ -1137,7 +1231,7 @@ export const textWysiwyg = ({
       capture: true,
     });
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
-    ownerWindow.removeEventListener("blur", handleSubmit);
+    ownerWindow.removeEventListener("blur", onWindowBlur);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -1181,7 +1275,7 @@ export const textWysiwyg = ({
       // let the focus scroll the container: for a box reaching past the
       // viewport, revealing the caret the textarea has until the click's is
       // placed (the end of the value) would pan the canvas there.
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
       editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
         editable.setSelectionRange(
@@ -1198,7 +1292,7 @@ export const textWysiwyg = ({
     ownerWindow.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    ownerWindow.addEventListener("blur", handleSubmit);
+    ownerWindow.addEventListener("blur", onWindowBlur);
   };
 
   // prevent blur when changing properties from the menu
@@ -1283,6 +1377,30 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
+    // The host's updateScene changed the text under an edit the window
+    // being away kept open: show that text, the draft it replaced is gone
+    // from the scene, with the caret kept to its place in the text. Not
+    // while the user can be typing: the draft is theirs until the submit,
+    // as it was before an edit could outlive the window's focus. (Replacing
+    // the value drops the textarea's undo history, which is right here: an
+    // undo past the change would bring the draft back over it. The replaced
+    // draft gets no undo entry either, unlike an update that ends the edit.)
+    const latestTextElement = app.scene.getElement<ExcalidrawTextElement>(
+      element.id,
+    );
+    if (
+      isParked &&
+      latestTextElement &&
+      isTextElement(latestTextElement) &&
+      latestTextElement.originalText !== editable.value
+    ) {
+      const { value, selectionStart, selectionEnd } = editable;
+      editable.value = latestTextElement.originalText;
+      editable.setSelectionRange(
+        mapOffsetToChangedText(value, editable.value, selectionStart),
+        mapOffsetToChangedText(value, editable.value, selectionEnd),
+      );
+    }
     updateWysiwygStyle();
     const isPopupOpened = !!ownerDocument.activeElement?.closest(
       ".properties-content",
