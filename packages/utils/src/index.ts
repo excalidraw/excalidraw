@@ -5,6 +5,8 @@ export {
   MIME_TYPES,
 } from "@excalidraw/excalidraw/scene/export";
 
+export { registerFontResolvers } from "@excalidraw/excalidraw/fonts/resolvers";
+
 export type {
   ExportSceneData,
   ExportSceneConfig,

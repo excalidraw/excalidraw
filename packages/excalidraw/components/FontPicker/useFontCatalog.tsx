@@ -23,8 +23,8 @@ import {
 
 import type { Fonts } from "../../fonts";
 
-import type { FontProviders } from "../../types";
-import type { ExcalidrawFontFace } from "../../fonts/ExcalidrawFontFace";
+import type { FontProviders, ProvidedFont } from "../../types";
+import type { RegisteredFont } from "../../fonts";
 
 import type { ProviderSearchResult } from "./useFontSearch";
 
@@ -93,17 +93,42 @@ export const getFontFamilyIcon = (
   }
 };
 
+/** `{ id, label }` for both forms a provider may give - see `ProvidedFont` */
+export const toProvidedFont = (font: ProvidedFont) =>
+  typeof font === "string" ? { id: font, label: font } : font;
+
+/** whether a provider's (host-supplied) entry is usable at all */
+const isProvidedFont = (font: unknown): font is ProvidedFont =>
+  (typeof font === "string" && !!font) ||
+  (typeof font === "object" &&
+    font !== null &&
+    typeof (font as { id?: unknown }).id === "string" &&
+    !!(font as { id: string }).id &&
+    typeof (font as { label?: unknown }).label === "string");
+
+/** the provider's entries as `{ id, label }`, dropping malformed ones */
+export const getProvidedFonts = (fonts: readonly unknown[]) =>
+  fonts.filter(isProvidedFont).map(toProvidedFont);
+
+/**
+ * The name to show for a family. A custom one goes by the label its resolver
+ * gave (see `FontDefinition.label`), else by the family part of its id.
+ */
 export const getFontFamilyLabel = (
   fontFamily: FontFamily,
-  fontFaces: ExcalidrawFontFace[],
+  registeredFont: RegisteredFont | undefined,
 ) => {
   if (isCustomFontFamily(fontFamily)) {
-    return parseProviderFontFamily(fontFamily)?.familyName ?? fontFamily;
+    return (
+      registeredFont?.label ??
+      parseProviderFontFamily(fontFamily)?.familyName ??
+      fontFamily
+    );
   }
 
   return (
     Object.entries(FONT_FAMILY).find(([, id]) => id === fontFamily)?.[0] ??
-    fontFaces[0]?.family ??
+    registeredFont?.fontFaces[0]?.family ??
     "Unknown"
   );
 };
@@ -115,7 +140,6 @@ interface FontCatalogOptions {
   failedResolutions: ReadonlyMap<string, unknown>;
   selectedFontFamily: FontFamily | null;
   hoveredFontFamily: FontFamily | null;
-  newSceneFamilies: ReadonlySet<FontFamily>;
   resolvingFamily: CustomFontFamily | null;
   searchTerm: string;
   searchResults: readonly ProviderSearchResult[];
@@ -129,7 +153,6 @@ export const useFontCatalog = ({
   failedResolutions,
   selectedFontFamily,
   hoveredFontFamily,
-  newSceneFamilies,
   resolvingFamily,
   searchTerm,
   searchResults,
@@ -147,17 +170,15 @@ export const useFontCatalog = ({
     () =>
       new Set([
         ...fonts.getSceneFamilies(),
-        ...newSceneFamilies,
         // the current default family may be in no element yet (i.e. searched
-        // & selected with nothing on canvas, then the picker reopened -
-        // `newSceneFamilies` dies with the popup) - it must still be listed
+        // & selected with nothing on canvas) - it must still be listed
         ...(selectedFontFamily != null ? [selectedFontFamily] : []),
       ]),
     // refresh after selection without recalculating on hover. `registeredFonts`
     // additionally refreshes the groups when a scene-only custom family arrives
     // while the picker is open (i.e. collab, paste), registering on load
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedFontFamily, newSceneFamilies, sceneRegisteredFonts],
+    [selectedFontFamily, sceneRegisteredFonts],
   );
 
   const getCustomFontStatus = useCallback(
@@ -183,8 +204,10 @@ export const useFontCatalog = ({
   const resultFamilies = useMemo(
     () =>
       new Set(
-        searchResults.flatMap(({ providerId, names }) =>
-          names.map((name) => createProviderFontFamily(providerId, name)),
+        searchResults.flatMap(({ providerId, fonts }) =>
+          getProvidedFonts(fonts).map(({ id }) =>
+            createProviderFontFamily(providerId, id),
+          ),
         ),
       ),
     [searchResults],
@@ -194,12 +217,12 @@ export const useFontCatalog = ({
     const descriptors = new Map<FontFamily, FontDescriptor>();
 
     for (const [providerId, provider] of Object.entries(fontProviders ?? {})) {
-      for (const familyName of provider.availableFonts) {
-        const familyId = createProviderFontFamily(providerId, familyName);
+      for (const { id, label } of getProvidedFonts(provider.availableFonts)) {
+        const familyId = createProviderFontFamily(providerId, id);
         descriptors.set(familyId, {
           value: familyId,
           icon: provider.icon,
-          text: familyName,
+          text: label,
           status: getCustomFontStatus(familyId),
         });
       }
@@ -218,12 +241,13 @@ export const useFontCatalog = ({
       descriptors.set(familyId, {
         value: familyId,
         icon: getFontFamilyIcon(familyId, fontProviders),
-        text: getFontFamilyLabel(familyId, []),
+        text: getFontFamilyLabel(familyId, registeredFonts.get(familyId)),
         status: getCustomFontStatus(familyId),
       });
     }
 
-    for (const [familyId, { metadata, fontFaces }] of registeredFonts) {
+    for (const [familyId, registeredFont] of registeredFonts) {
+      const { metadata } = registeredFont;
       if (metadata.private || metadata.fallback) {
         continue;
       }
@@ -239,7 +263,10 @@ export const useFontCatalog = ({
       const fontDescriptor: FontDescriptor = {
         value: familyId,
         icon: getFontFamilyIcon(familyId, fontProviders),
-        text: getFontFamilyLabel(familyId, fontFaces),
+        // an offered custom font keeps the label its provider offered it by
+        text:
+          descriptors.get(familyId)?.text ??
+          getFontFamilyLabel(familyId, registeredFont),
       };
 
       if (metadata.deprecated) {
@@ -291,13 +318,10 @@ export const useFontCatalog = ({
       const getDescriptors = (kind: ProviderSearchResult["kind"]) =>
         searchResults
           .filter((result) => result.kind === kind)
-          .map(({ providerId, names }) => {
+          .map(({ providerId, fonts }) => {
             const descriptors: FontDescriptor[] = [];
-            for (const name of names) {
-              if (typeof name !== "string" || !name) {
-                continue;
-              }
-              const familyId = createProviderFontFamily(providerId, name);
+            for (const { id, label } of getProvidedFonts(fonts)) {
+              const familyId = createProviderFontFamily(providerId, id);
               if (listed.has(familyId)) {
                 continue;
               }
@@ -305,7 +329,7 @@ export const useFontCatalog = ({
               descriptors.push({
                 value: familyId,
                 icon: getFontFamilyIcon(familyId, fontProviders),
-                text: name,
+                text: label,
                 status: getCustomFontStatus(familyId),
               });
             }
@@ -333,15 +357,6 @@ export const useFontCatalog = ({
       getCustomFontStatus,
     ]);
 
-  // only the rows listed as results - a family listed already isn't news
-  const searchFamilies = useMemo(
-    () =>
-      new Set(
-        [...searchMatches, ...searchSuggestions].map((font) => font.value),
-      ),
-    [searchMatches, searchSuggestions],
-  );
-
   const selectableFonts = useMemo(
     () =>
       arrayToList(
@@ -365,13 +380,11 @@ export const useFontCatalog = ({
   );
 
   return {
-    filteredFontDescriptors,
     selectableFonts,
     sceneFilteredFonts,
     availableFilteredFonts,
     searchMatches,
     hiddenSearchMatchCount,
     searchSuggestions,
-    searchFamilies,
   };
 };

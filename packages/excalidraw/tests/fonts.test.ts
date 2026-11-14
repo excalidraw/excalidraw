@@ -1,23 +1,44 @@
-import { Scene, syncInvalidIndices } from "@excalidraw/element";
+import rough from "roughjs/bin/rough";
 
 import {
+  elementWithCanvasCache,
+  renderElement,
+  Scene,
+  syncInvalidIndices,
+} from "@excalidraw/element";
+
+import {
+  arrayToMap,
   createProviderFontFamily,
   FONT_FAMILY,
+  getCustomFontCSSFamily,
+  getFontString,
   isFontMetadataAvailable,
   parseProviderFontFamily,
 } from "@excalidraw/common";
 
 import type { CustomFontFamily, FontMetadata } from "@excalidraw/common";
 
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawTextElement,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
 
+import { getDefaultAppState } from "../appState";
+import { AppFonts } from "../components/App.fonts";
 import { defaultFontRegistry, FontRegistry, Fonts } from "../fonts";
 import { ExcalidrawFontFace } from "../fonts/ExcalidrawFontFace";
 
 import { API } from "./helpers/api";
 import { muteExpectedFontErrors } from "./helpers/mocks";
 
+import type App from "../components/App";
 import type { FontResolver } from "../fonts";
+import type {
+  RenderableElementsMap,
+  StaticCanvasRenderConfig,
+} from "../scene/types";
+import type { AppState } from "../types";
 
 const METADATA: FontMetadata = {
   metrics: {
@@ -38,33 +59,47 @@ let counter = 0;
  * `Fonts.registered` is page-global and deliberately never torn down, so tests
  * which register would otherwise leak into each other.
  */
-const uniqueFamily = (): CustomFontFamily => `test:Roboto-${counter++}`;
+const uniqueFamily = (): CustomFontFamily => `test.test:Roboto-${counter++}`;
 
 describe("provider-qualified font families", () => {
   it("creates and parses provider-qualified family ids", () => {
-    const family = createProviderFontFamily("provider", "Font:Variant");
+    const family = createProviderFontFamily("test.provider", "Font:Variant");
 
-    expect(family).toBe("provider:Font:Variant");
+    expect(family).toBe("test.provider:Font:Variant");
     expect(parseProviderFontFamily(family)).toEqual({
-      providerId: "provider",
+      providerId: "test.provider",
       familyName: "Font:Variant",
     });
     expect(parseProviderFontFamily("Font")).toBeNull();
     expect(parseProviderFontFamily(":Font")).toBeNull();
   });
 
-  it("rejects invalid provider keys", () => {
-    expect(() => new Fonts(new Scene(), { "": vi.fn() })).toThrow(
-      "Font provider key must be non-empty",
-    );
-    expect(() => new Fonts(new Scene(), { "bad:key": vi.fn() })).toThrow(
-      "must not contain",
-    );
-    // CSS font-family matching is case-insensitive - "Google" and "google"
-    // would land in the same browser family bucket under different keys
-    expect(() => new Fonts(new Scene(), { Google: vi.fn() })).toThrow(
-      "lowercase",
-    );
+  it("only accepts `google` or a reverse-DNS provider key", () => {
+    const create = (key: string) => () =>
+      new Fonts(new Scene(), { [key]: vi.fn() });
+
+    expect(create("google")).not.toThrow();
+    expect(create("com.acme.fonts")).not.toThrow();
+    expect(create("fonts.acme-corp.io")).not.toThrow();
+
+    for (const key of [
+      "",
+      // dotless keys other than `google` are reserved for us
+      "acme",
+      "excalidraw",
+      // part of the id's own syntax
+      "bad:key",
+      "com.acme:fonts",
+      // "Google" next to "google" would read as one provider, but be two
+      "Google",
+      "com.Acme.fonts",
+      "com..acme",
+      ".com.acme",
+      "com.acme.",
+      "com.acme fonts",
+    ]) {
+      expect(create(key)).toThrow("Invalid font provider key");
+    }
   });
 });
 
@@ -83,14 +118,14 @@ describe("custom font registration", () => {
     const fonts = new Fonts(new Scene());
 
     await expect(
-      fonts.registerCustomFamilies(["missing:Font"]),
+      fonts.registerCustomFamilies(["test.missing:Font"]),
     ).resolves.toEqual([
       {
-        family: "missing:Font",
+        family: "test.missing:Font",
         status: "unsupported",
       },
     ]);
-    expect(fonts.failedResolutions.has("missing:Font")).toBe(false);
+    expect(fonts.failedResolutions.has("test.missing:Font")).toBe(false);
   });
 
   it("tracks resolver failures and clears them after a successful retry", async () => {
@@ -99,37 +134,37 @@ describe("custom font registration", () => {
       .fn()
       .mockRejectedValueOnce(failure)
       .mockResolvedValueOnce({ fontFaces: FONT_FACES, metadata: METADATA });
-    const fonts = new Fonts(new Scene(), { retry: resolve });
+    const fonts = new Fonts(new Scene(), { "test.retry": resolve });
     const initialRegisteredFonts = fonts.registered;
     const onRegisteredFontsChange = vi.fn();
     const unsubscribe = fonts.onRegisteredFontsChangeEmitter.on(
       onRegisteredFontsChange,
     );
 
-    await expect(fonts.registerCustomFamilies(["retry:Font"])).resolves.toEqual(
-      [
-        {
-          family: "retry:Font",
-          status: "failed",
-        },
-      ],
-    );
-    expect(fonts.failedResolutions.has("retry:Font")).toBe(true);
+    await expect(
+      fonts.registerCustomFamilies(["test.retry:Font"]),
+    ).resolves.toEqual([
+      {
+        family: "test.retry:Font",
+        status: "failed",
+      },
+    ]);
+    expect(fonts.failedResolutions.has("test.retry:Font")).toBe(true);
     // the rejection is retained, i.e. for debugging
-    expect(fonts.failedResolutions.get("retry:Font")).toBe(failure);
+    expect(fonts.failedResolutions.get("test.retry:Font")).toBe(failure);
     expect(fonts.registered).toBe(initialRegisteredFonts);
     expect(onRegisteredFontsChange).not.toHaveBeenCalled();
 
-    await expect(fonts.registerCustomFamilies(["retry:Font"])).resolves.toEqual(
-      [
-        {
-          family: "retry:Font",
-          status: "success",
-        },
-      ],
-    );
-    expect(fonts.failedResolutions.has("retry:Font")).toBe(false);
-    expect(fonts.registered.has("retry:Font")).toBe(true);
+    await expect(
+      fonts.registerCustomFamilies(["test.retry:Font"]),
+    ).resolves.toEqual([
+      {
+        family: "test.retry:Font",
+        status: "success",
+      },
+    ]);
+    expect(fonts.failedResolutions.has("test.retry:Font")).toBe(false);
+    expect(fonts.registered.has("test.retry:Font")).toBe(true);
     expect(fonts.registered).not.toBe(initialRegisteredFonts);
     expect(onRegisteredFontsChange).toHaveBeenCalledWith(fonts.registered);
     unsubscribe();
@@ -137,7 +172,7 @@ describe("custom font registration", () => {
 
   it("emits one registry update after bulk registration settles", async () => {
     const fonts = new Fonts(new Scene(), {
-      bulk: vi.fn().mockResolvedValue({
+      "test.bulk": vi.fn().mockResolvedValue({
         fontFaces: FONT_FACES,
         metadata: METADATA,
       }),
@@ -148,10 +183,10 @@ describe("custom font registration", () => {
     );
 
     await expect(
-      fonts.registerCustomFamilies(["bulk:First", "bulk:Second"]),
+      fonts.registerCustomFamilies(["test.bulk:First", "test.bulk:Second"]),
     ).resolves.toEqual([
-      { family: "bulk:First", status: "success" },
-      { family: "bulk:Second", status: "success" },
+      { family: "test.bulk:First", status: "success" },
+      { family: "test.bulk:Second", status: "success" },
     ]);
 
     expect(onRegisteredFontsChange).toHaveBeenCalledTimes(1);
@@ -168,18 +203,21 @@ describe("custom font registration", () => {
           })
         : Promise.resolve({ fontFaces: FONT_FACES, metadata: METADATA }),
     );
-    const fonts = new Fonts(new Scene(), { mixed: resolve });
+    const fonts = new Fonts(new Scene(), { "test.mixed": resolve });
     const onRegisteredFontsChange = vi.fn();
     const unsubscribe = fonts.onRegisteredFontsChangeEmitter.on(
       onRegisteredFontsChange,
     );
 
-    const batch = fonts.registerCustomFamilies(["mixed:Fast", "mixed:Slow"]);
+    const batch = fonts.registerCustomFamilies([
+      "test.mixed:Fast",
+      "test.mixed:Slow",
+    ]);
 
     // a slow (or hanging) batch-mate must not mute Fast's announcement -
     // pickers and other editors key their state off this emit
     await vi.waitFor(() => {
-      expect(fonts.registered.has("mixed:Fast")).toBe(true);
+      expect(fonts.registered.has("test.mixed:Fast")).toBe(true);
       expect(onRegisteredFontsChange).toHaveBeenCalledWith(fonts.registered);
     });
 
@@ -196,12 +234,13 @@ describe("custom font registration", () => {
           resolveFont = resolve;
         }),
     );
-    const firstFonts = new Fonts(new Scene(), { inflight: resolve });
-    const secondFonts = new Fonts(new Scene(), { inflight: resolve });
+    const firstFonts = new Fonts(new Scene(), { "test.inflight": resolve });
+    const secondFonts = new Fonts(new Scene(), { "test.inflight": resolve });
 
-    const firstRegistration = firstFonts.registerCustomFamily("inflight:Font");
+    const firstRegistration =
+      firstFonts.registerCustomFamily("test.inflight:Font");
     const secondRegistration =
-      secondFonts.registerCustomFamily("inflight:Font");
+      secondFonts.registerCustomFamily("test.inflight:Font");
 
     // the resolver runs once its concurrency slot is granted (a microtask)
     await vi.waitFor(() => expect(resolve).toHaveBeenCalledTimes(1));
@@ -211,8 +250,8 @@ describe("custom font registration", () => {
     await expect(
       Promise.all([firstRegistration, secondRegistration]),
     ).resolves.toEqual([
-      { family: "inflight:Font", status: "success" },
-      { family: "inflight:Font", status: "success" },
+      { family: "test.inflight:Font", status: "success" },
+      { family: "test.inflight:Font", status: "success" },
     ]);
     expect(resolve).toHaveBeenCalledTimes(1);
   });
@@ -221,12 +260,12 @@ describe("custom font registration", () => {
     const resolve = vi
       .fn()
       .mockResolvedValue({ fontFaces: FONT_FACES, metadata: METADATA });
-    const fonts = new Fonts(new Scene(), { scene: resolve });
+    const fonts = new Fonts(new Scene(), { "test.scene": resolve });
 
-    await fonts.loadSceneFonts(["scene:Current"]);
+    await fonts.loadSceneFonts(["test.scene:Current"]);
 
     expect(resolve).toHaveBeenCalledWith("Current");
-    expect(fonts.registered.has("scene:Current")).toBe(true);
+    expect(fonts.registered.has("test.scene:Current")).toBe(true);
   });
 
   it("loads families even when `document.fonts.check` passes", async () => {
@@ -253,7 +292,7 @@ describe("custom font registration", () => {
     const load = vi.spyOn(document.fonts, "load").mockResolvedValue([]);
     let resolveFont!: (font: Awaited<ReturnType<FontResolver>>) => void;
     const fonts = new Fonts(new Scene(), {
-      pending: vi.fn(
+      "test.pending": vi.fn(
         () =>
           new Promise<Awaited<ReturnType<FontResolver>>>((resolve) => {
             resolveFont = resolve;
@@ -264,7 +303,7 @@ describe("custom font registration", () => {
     try {
       const loading = fonts.loadSceneFonts([
         FONT_FAMILY.Excalifont,
-        "pending:Font",
+        "test.pending:Font",
       ]);
 
       // a resolver that never settles must not hold back the built-in font
@@ -274,13 +313,13 @@ describe("custom font registration", () => {
           expect.anything(),
         ),
       );
-      expect(fonts.registered.has("pending:Font")).toBe(false);
+      expect(fonts.registered.has("test.pending:Font")).toBe(false);
 
       await vi.waitFor(() => expect(resolveFont).toBeDefined());
       resolveFont({ fontFaces: FONT_FACES, metadata: METADATA });
       await loading;
 
-      expect(fonts.registered.has("pending:Font")).toBe(true);
+      expect(fonts.registered.has("test.pending:Font")).toBe(true);
     } finally {
       check.mockRestore();
       load.mockRestore();
@@ -289,18 +328,18 @@ describe("custom font registration", () => {
 
   it("keeps registered custom families loadable", async () => {
     const fonts = new Fonts(new Scene(), {
-      loadable: vi
+      "test.loadable": vi
         .fn()
         .mockResolvedValue({ fontFaces: FONT_FACES, metadata: METADATA }),
     });
 
-    expect(fonts.shouldLoadCustomFamily("loadable:Font")).toBe(true);
+    expect(fonts.shouldLoadCustomFamily("test.loadable:Font")).toBe(true);
 
-    await fonts.registerCustomFamily("loadable:Font");
+    await fonts.registerCustomFamily("test.loadable:Font");
 
     // registering only installs the font faces - they still need loading
-    expect(fonts.registered.has("loadable:Font")).toBe(true);
-    expect(fonts.shouldLoadCustomFamily("loadable:Font")).toBe(true);
+    expect(fonts.registered.has("test.loadable:Font")).toBe(true);
+    expect(fonts.shouldLoadCustomFamily("test.loadable:Font")).toBe(true);
     expect(fonts.shouldLoadCustomFamily(FONT_FAMILY.Excalifont)).toBe(false);
   });
 
@@ -309,14 +348,14 @@ describe("custom font registration", () => {
       fontFaces: [],
       metadata: METADATA,
     });
-    const fonts = new Fonts(new Scene(), { malformed: resolve });
+    const fonts = new Fonts(new Scene(), { "test.malformed": resolve });
 
     // garbage reported as success would crash metric consumers much later
-    await expect(fonts.registerCustomFamily("malformed:Font")).resolves.toEqual(
-      { family: "malformed:Font", status: "failed" },
-    );
-    expect(fonts.failedResolutions.has("malformed:Font")).toBe(true);
-    expect(fonts.registered.has("malformed:Font")).toBe(false);
+    await expect(
+      fonts.registerCustomFamily("test.malformed:Font"),
+    ).resolves.toEqual({ family: "test.malformed:Font", status: "failed" });
+    expect(fonts.failedResolutions.has("test.malformed:Font")).toBe(true);
+    expect(fonts.registered.has("test.malformed:Font")).toBe(false);
   });
 
   it("caps concurrent resolver invocations registry-wide", async () => {
@@ -329,11 +368,11 @@ describe("custom font registration", () => {
       active--;
       return { fontFaces: FONT_FACES, metadata: METADATA };
     });
-    const fonts = new Fonts(new Scene(), { capped: resolve });
+    const fonts = new Fonts(new Scene(), { "test.capped": resolve });
 
     const families = Array.from(
       { length: 12 },
-      (_, index): CustomFontFamily => `capped:Font-${index}`,
+      (_, index): CustomFontFamily => `test.capped:Font-${index}`,
     );
     const results = await fonts.registerCustomFamilies(families);
 
@@ -346,7 +385,7 @@ describe("custom font registration", () => {
 
   it("does not treat inherited object members as providers", async () => {
     const fonts = new Fonts(new Scene(), {
-      real: vi
+      "test.real": vi
         .fn()
         .mockResolvedValue({ fontFaces: FONT_FACES, metadata: METADATA }),
     });
@@ -361,18 +400,20 @@ describe("custom font registration", () => {
 
   it("shares resolution failures across instances", async () => {
     const resolve = vi.fn().mockRejectedValue(new Error("unavailable"));
-    const first = new Fonts(new Scene(), { sharedfailure: resolve });
-    const second = new Fonts(new Scene(), { sharedfailure: resolve });
+    const first = new Fonts(new Scene(), { "test.sharedfailure": resolve });
+    const second = new Fonts(new Scene(), { "test.sharedfailure": resolve });
     const onFailedResolutionsChange = vi.fn();
     const unsubscribe = second.onFailedResolutionsChangeEmitter.on(
       onFailedResolutionsChange,
     );
 
-    await first.registerCustomFamily("sharedfailure:Font");
+    await first.registerCustomFamily("test.sharedfailure:Font");
 
     // page-scoped, like the registry it guards
-    expect(second.failedResolutions.has("sharedfailure:Font")).toBe(true);
-    expect(second.shouldLoadCustomFamily("sharedfailure:Font")).toBe(false);
+    expect(second.failedResolutions.has("test.sharedfailure:Font")).toBe(true);
+    expect(second.shouldLoadCustomFamily("test.sharedfailure:Font")).toBe(
+      false,
+    );
     expect(onFailedResolutionsChange).toHaveBeenCalledWith(
       second.failedResolutions,
     );
@@ -381,29 +422,31 @@ describe("custom font registration", () => {
 
   it("does not record failures for headless element registration", async () => {
     const resolve = vi.fn().mockRejectedValue(new Error("offline"));
-    const fonts = new Fonts(new Scene(), { headless: resolve });
+    const fonts = new Fonts(new Scene(), { "test.headless": resolve });
 
-    await fonts.registerCustomFamilies(["headless:Font"], {
+    await fonts.registerCustomFamilies(["test.headless:Font"], {
       recordFailure: false,
     });
 
     expect(resolve).toHaveBeenCalledTimes(1);
-    expect(fonts.failedResolutions.has("headless:Font")).toBe(false);
+    expect(fonts.failedResolutions.has("test.headless:Font")).toBe(false);
   });
 
   it("does not let a speculative attempt clear a recorded failure", async () => {
     const resolve = vi.fn().mockRejectedValue(new Error("down"));
-    const fonts = new Fonts(new Scene(), { probe: resolve });
+    const fonts = new Fonts(new Scene(), { "test.probe": resolve });
 
-    await fonts.registerCustomFamily("probe:Font");
-    expect(fonts.failedResolutions.has("probe:Font")).toBe(true);
+    await fonts.registerCustomFamily("test.probe:Font");
+    expect(fonts.failedResolutions.has("test.probe:Font")).toBe(true);
 
     // i.e. a search probing this provider, or a headless export - failing
     // without recording must leave the recorded verdict untouched, or the
     // family would silently re-enter automatic loading
-    await fonts.registerCustomFamily("probe:Font", { recordFailure: false });
-    expect(fonts.failedResolutions.has("probe:Font")).toBe(true);
-    expect(fonts.shouldLoadCustomFamily("probe:Font")).toBe(false);
+    await fonts.registerCustomFamily("test.probe:Font", {
+      recordFailure: false,
+    });
+    expect(fonts.failedResolutions.has("test.probe:Font")).toBe(true);
+    expect(fonts.shouldLoadCustomFamily("test.probe:Font")).toBe(false);
   });
 
   it("clears a recorded failure when the family resolves, even speculatively", async () => {
@@ -411,75 +454,77 @@ describe("custom font registration", () => {
       .fn()
       .mockRejectedValueOnce(new Error("down"))
       .mockResolvedValue({ fontFaces: FONT_FACES, metadata: METADATA });
-    const fonts = new Fonts(new Scene(), { probeclear: resolve });
+    const fonts = new Fonts(new Scene(), { "test.probeclear": resolve });
 
-    await fonts.registerCustomFamily("probeclear:Font");
-    expect(fonts.failedResolutions.has("probeclear:Font")).toBe(true);
+    await fonts.registerCustomFamily("test.probeclear:Font");
+    expect(fonts.failedResolutions.has("test.probeclear:Font")).toBe(true);
 
     // the definition is registered page-wide at that point, so there is
     // nothing left to be failed about
-    await fonts.registerCustomFamily("probeclear:Font", {
+    await fonts.registerCustomFamily("test.probeclear:Font", {
       recordFailure: false,
     });
-    expect(fonts.failedResolutions.has("probeclear:Font")).toBe(false);
-    expect(fonts.registered.has("probeclear:Font")).toBe(true);
+    expect(fonts.failedResolutions.has("test.probeclear:Font")).toBe(false);
+    expect(fonts.registered.has("test.probeclear:Font")).toBe(true);
   });
 
   it("does not track speculative resolution failures", async () => {
     const resolve = vi.fn().mockRejectedValue(new Error("not carried"));
-    const fonts = new Fonts(new Scene(), { speculative: resolve });
+    const fonts = new Fonts(new Scene(), { "test.speculative": resolve });
 
     await expect(
-      fonts.registerCustomFamily("speculative:Font", { recordFailure: false }),
-    ).resolves.toEqual({ family: "speculative:Font", status: "failed" });
-    expect(fonts.failedResolutions.has("speculative:Font")).toBe(false);
+      fonts.registerCustomFamily("test.speculative:Font", {
+        recordFailure: false,
+      }),
+    ).resolves.toEqual({ family: "test.speculative:Font", status: "failed" });
+    expect(fonts.failedResolutions.has("test.speculative:Font")).toBe(false);
 
     await expect(
-      fonts.registerCustomFamily("speculative:Font"),
-    ).resolves.toEqual({ family: "speculative:Font", status: "failed" });
-    expect(fonts.failedResolutions.has("speculative:Font")).toBe(true);
+      fonts.registerCustomFamily("test.speculative:Font"),
+    ).resolves.toEqual({ family: "test.speculative:Font", status: "failed" });
+    expect(fonts.failedResolutions.has("test.speculative:Font")).toBe(true);
   });
 
   it("only retries failed automatic loads when explicitly requested", async () => {
     const resolve = vi.fn().mockRejectedValue(new Error("unavailable"));
-    const fonts = new Fonts(new Scene(), { automatic: resolve });
+    const fonts = new Fonts(new Scene(), { "test.automatic": resolve });
 
-    await fonts.loadSceneFonts(["automatic:Font"]);
-    await fonts.loadSceneFonts(["automatic:Font"]);
+    await fonts.loadSceneFonts(["test.automatic:Font"]);
+    await fonts.loadSceneFonts(["test.automatic:Font"]);
     expect(resolve).toHaveBeenCalledTimes(1);
 
-    await fonts.registerCustomFamily("automatic:Font");
+    await fonts.registerCustomFamily("test.automatic:Font");
     expect(resolve).toHaveBeenCalledTimes(2);
   });
 
   it("only marks resolvable missing definitions as loadable", async () => {
     const resolve = vi.fn().mockRejectedValue(new Error("unavailable"));
-    const fonts = new Fonts(new Scene(), { actionable: resolve });
+    const fonts = new Fonts(new Scene(), { "test.actionable": resolve });
 
-    expect(fonts.shouldLoadCustomFamily("actionable:Font")).toBe(true);
-    expect(fonts.shouldLoadCustomFamily("missing:Font")).toBe(false);
+    expect(fonts.shouldLoadCustomFamily("test.actionable:Font")).toBe(true);
+    expect(fonts.shouldLoadCustomFamily("test.missing:Font")).toBe(false);
     expect(fonts.shouldLoadCustomFamily(FONT_FAMILY.Assistant)).toBe(false);
 
-    await fonts.registerCustomFamily("actionable:Font");
-    expect(fonts.shouldLoadCustomFamily("actionable:Font")).toBe(false);
+    await fonts.registerCustomFamily("test.actionable:Font");
+    expect(fonts.shouldLoadCustomFamily("test.actionable:Font")).toBe(false);
   });
 
   it("reuses a resolved definition without a resolver", async () => {
     const resolve = vi
       .fn()
       .mockResolvedValue({ fontFaces: FONT_FACES, metadata: METADATA });
-    const resolvingFonts = new Fonts(new Scene(), { shared: resolve });
+    const resolvingFonts = new Fonts(new Scene(), { "test.shared": resolve });
     const resolverlessFonts = new Fonts(new Scene());
 
     await expect(
-      resolvingFonts.registerCustomFamily("shared:Font"),
-    ).resolves.toEqual({ family: "shared:Font", status: "success" });
+      resolvingFonts.registerCustomFamily("test.shared:Font"),
+    ).resolves.toEqual({ family: "test.shared:Font", status: "success" });
     await expect(
-      resolverlessFonts.registerCustomFamily("shared:Font"),
-    ).resolves.toEqual({ family: "shared:Font", status: "success" });
+      resolverlessFonts.registerCustomFamily("test.shared:Font"),
+    ).resolves.toEqual({ family: "test.shared:Font", status: "success" });
 
     expect(resolve).toHaveBeenCalledTimes(1);
-    expect(resolverlessFonts.registered.has("shared:Font")).toBe(true);
+    expect(resolverlessFonts.registered.has("test.shared:Font")).toBe(true);
   });
 
   it("logs resource-load failures for custom families", async () => {
@@ -487,14 +532,14 @@ describe("custom font registration", () => {
     const check = vi.spyOn(document.fonts, "check").mockReturnValue(false);
     const load = vi.spyOn(document.fonts, "load").mockRejectedValue(loadError);
     const fonts = new Fonts(new Scene(), {
-      resource: vi.fn().mockResolvedValue({
+      "test.resource": vi.fn().mockResolvedValue({
         fontFaces: [{ uri: "https://example.com/font.woff2" }],
         metadata: METADATA,
       }),
     });
 
     try {
-      await fonts.loadSceneFonts(["resource:Font"]);
+      await fonts.loadSceneFonts(["test.resource:Font"]);
 
       expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining("https://example.com/font.woff2"),
@@ -513,7 +558,7 @@ describe("custom font registration", () => {
       .mockResolvedValue({ fontFaces: FONT_FACES, metadata: METADATA });
     const isolated = new Fonts(
       new Scene(),
-      { test: resolve },
+      { "test.test": resolve },
       new FontRegistry(),
     );
 
@@ -549,7 +594,7 @@ describe("custom font registration", () => {
     const load = vi.spyOn(document.fonts, "load").mockResolvedValue([]);
     let resolveFont!: (font: Awaited<ReturnType<FontResolver>>) => void;
     const fonts = new Fonts(new Scene(), {
-      pendingelements: vi.fn(
+      "test.pendingelements": vi.fn(
         () =>
           new Promise<Awaited<ReturnType<FontResolver>>>((resolve) => {
             resolveFont = resolve;
@@ -562,7 +607,7 @@ describe("custom font registration", () => {
       const custom = API.createElement({
         type: "text",
         text: "b",
-        fontFamily: "pendingelements:Font",
+        fontFamily: "test.pendingelements:Font",
       });
       const loading = Fonts.loadElementsFonts([builtin, custom], fonts);
 
@@ -573,13 +618,13 @@ describe("custom font registration", () => {
           expect.anything(),
         ),
       );
-      expect(fonts.registered.has("pendingelements:Font")).toBe(false);
+      expect(fonts.registered.has("test.pendingelements:Font")).toBe(false);
 
       await vi.waitFor(() => expect(resolveFont).toBeDefined());
       resolveFont({ fontFaces: FONT_FACES, metadata: METADATA });
       await loading;
 
-      expect(fonts.registered.has("pendingelements:Font")).toBe(true);
+      expect(fonts.registered.has("test.pendingelements:Font")).toBe(true);
     } finally {
       check.mockRestore();
       load.mockRestore();
@@ -594,16 +639,16 @@ describe("custom font registration", () => {
         fontFaces: [{ uri: "https://example.com/font.woff2" }],
         metadata: METADATA,
       });
-    const fonts = new Fonts(new Scene(), { exportretry: resolve });
+    const fonts = new Fonts(new Scene(), { "test.exportretry": resolve });
 
     // an accountable attempt records the failure
-    await fonts.registerCustomFamily("exportretry:Font");
-    expect(fonts.failedResolutions.has("exportretry:Font")).toBe(true);
+    await fonts.registerCustomFamily("test.exportretry:Font");
+    expect(fonts.failedResolutions.has("test.exportretry:Font")).toBe(true);
 
     const text = API.createElement({
       type: "text",
       text: "a",
-      fontFamily: "exportretry:Font",
+      fontFamily: "test.exportretry:Font",
     });
 
     // a failure-recording load keeps respecting the verdict
@@ -613,7 +658,39 @@ describe("custom font registration", () => {
     // the export path (recordFailure: false) retries and recovers
     await Fonts.loadElementsFonts([text], fonts, { recordFailure: false });
     expect(resolve).toHaveBeenCalledTimes(2);
-    expect(fonts.registered.has("exportretry:Font")).toBe(true);
+    expect(fonts.registered.has("test.exportretry:Font")).toBe(true);
+  });
+});
+
+describe("Fonts.warnAboutUnresolvableFonts", () => {
+  it("warns once about a family no resolver or registration covers", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const registered = uniqueFamily();
+    Fonts.registerCustomFont(registered, METADATA, FONT_FACES[0]);
+
+    const elements = [
+      "com.unresolvable:Font",
+      // covered by a resolver, by the page's registry, or built in
+      "test.covered:Font",
+      registered,
+      FONT_FAMILY.Excalifont,
+      // not an id a provider could have written
+      "Comic Sans MS",
+    ].map((fontFamily) =>
+      API.createElement({
+        type: "text",
+        text: "a",
+        fontFamily: fontFamily as CustomFontFamily,
+      }),
+    );
+    const fonts = new Fonts(new Scene(), { "test.covered": vi.fn() });
+
+    Fonts.warnAboutUnresolvableFonts(elements, fonts);
+    Fonts.warnAboutUnresolvableFonts(elements, fonts);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('"com.unresolvable:Font"');
+    warn.mockRestore();
   });
 });
 
@@ -752,6 +829,118 @@ describe("Fonts.isFamilyLoaded", () => {
   });
 });
 
+describe("AppFonts.isFontBlocked", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const registerFamily = () => {
+    const family = uniqueFamily();
+    Fonts.registerCustomFont(family, METADATA, FONT_FACES[0]);
+    return family;
+  };
+
+  /** just the parts of `App` the block needs */
+  const createAppFonts = () => {
+    const scene = new Scene();
+    const app = {
+      scene,
+      props: {},
+      ownerDocument: document,
+      renderEnvironment: undefined,
+    } as unknown as App;
+    return {
+      scene,
+      appFonts: new AppFonts(app, { onBeforeSceneMutation: () => {} }),
+    };
+  };
+
+  it("never blocks built-in or unresolvable families", () => {
+    const { appFonts } = createAppFonts();
+
+    expect(appFonts.isFontBlocked(FONT_FAMILY.Excalifont)).toBe(false);
+    // no resolver for its provider - nothing to wait for
+    expect(appFonts.isFontBlocked(uniqueFamily())).toBe(false);
+  });
+
+  it("blocks a loading custom family until its faces load", () => {
+    const family = registerFamily();
+    const { appFonts } = createAppFonts();
+
+    expect(appFonts.isFontBlocked(family)).toBe(true);
+
+    appFonts.instance.onLoaded([
+      Fonts.registered.get(family)!.fontFaces[0].fontFace,
+    ]);
+
+    expect(appFonts.isFontBlocked(family)).toBe(false);
+  });
+
+  it("falls back for good once the block period runs out", () => {
+    const family = registerFamily();
+    const { scene, appFonts } = createAppFonts();
+    const triggerUpdate = vi.spyOn(scene, "triggerUpdate");
+
+    expect(appFonts.isFontBlocked(family)).toBe(true);
+
+    vi.advanceTimersByTime(Fonts.BLOCK_PERIOD);
+
+    // rerenders, this time drawing the fallback
+    expect(triggerUpdate).toHaveBeenCalledTimes(1);
+    expect(appFonts.isFontBlocked(family)).toBe(false);
+  });
+
+  it("cancels a pending fallback rerender on destroy", () => {
+    const family = registerFamily();
+    const { scene, appFonts } = createAppFonts();
+    const triggerUpdate = vi.spyOn(scene, "triggerUpdate");
+
+    expect(appFonts.isFontBlocked(family)).toBe(true);
+
+    appFonts.destroy();
+    vi.advanceTimersByTime(Fonts.BLOCK_PERIOD);
+
+    expect(triggerUpdate).not.toHaveBeenCalled();
+  });
+
+  it("leaves blocked text undrawn, and uncached", () => {
+    const element = API.createElement({ type: "text", text: "a" });
+    const elementsMap = arrayToMap([element]);
+    const canvas = document.createElement("canvas");
+    const renderConfig: StaticCanvasRenderConfig = {
+      imageCache: new Map(),
+      renderGrid: false,
+      isExporting: false,
+      scale: 1,
+      canvasBackgroundColor: "#fff",
+      embedsValidationStatus: new Map(),
+      elementsPendingErasure: new Set(),
+      pendingFlowchartNodes: null,
+      theme: "light",
+    };
+    const render = (isFontBlocked: () => boolean) =>
+      renderElement(
+        element,
+        elementsMap as unknown as RenderableElementsMap,
+        elementsMap as unknown as NonDeletedSceneElementsMap,
+        rough.canvas(canvas),
+        canvas.getContext("2d")!,
+        { ...renderConfig, isFontBlocked },
+        getDefaultAppState() as AppState,
+      );
+
+    render(() => true);
+    expect(elementWithCanvasCache.has(element)).toBe(false);
+
+    render(() => false);
+    expect(elementWithCanvasCache.has(element)).toBe(true);
+  });
+});
+
 describe("Fonts.mayHaveCustomFonts", () => {
   it("reports custom-font capability from resolvers or registered families", () => {
     // fresh isolated registry - the default one is page-global and other
@@ -762,10 +951,14 @@ describe("Fonts.mayHaveCustomFonts", () => {
       false,
     );
     expect(
-      new Fonts(new Scene(), { some: vi.fn() }, isolated).mayHaveCustomFonts(),
+      new Fonts(
+        new Scene(),
+        { "test.some": vi.fn() },
+        isolated,
+      ).mayHaveCustomFonts(),
     ).toBe(true);
 
-    isolated.add("direct:Font", "direct:Font", METADATA, []);
+    isolated.add("test.direct:Font", "test.direct:Font", METADATA, []);
     expect(new Fonts(new Scene(), {}, isolated).mayHaveCustomFonts()).toBe(
       true,
     );
@@ -773,21 +966,8 @@ describe("Fonts.mayHaveCustomFonts", () => {
 });
 
 describe("Fonts.runSceneRepair", () => {
-  it("defers the reflow while a gesture is in flight", () => {
-    const family = uniqueFamily();
-
-    // created before resolution - bakes in the fallback's line height
-    const element = API.createElement({
-      type: "text",
-      text: "a",
-      fontFamily: family,
-    });
-    expect(element.lineHeight).not.toBe(METADATA.metrics.lineHeight);
-
-    Fonts.registerCustomFont(family, METADATA, {
-      uri: "https://example.com/font.woff2",
-    });
-
+  it("defers a repair while a gesture is in flight", () => {
+    const element = API.createElement({ type: "text", text: "a" });
     const scene = new Scene();
     scene.replaceAllElements(syncInvalidIndices([element]));
 
@@ -798,16 +978,22 @@ describe("Fonts.runSceneRepair", () => {
       shouldDeferSceneMutation: () => gestureInFlight,
     });
 
-    const { fontFace } = Fonts.registered.get(family)!.fontFaces[0];
-    fonts.onLoaded([fontFace]);
+    const repaired = 2 as ExcalidrawTextElement["lineHeight"];
+    fonts.runSceneRepair(() =>
+      scene.mutateElement(
+        scene.getElement(element.id) as ExcalidrawTextElement,
+        { lineHeight: repaired },
+      ),
+    );
 
     // mid-gesture: no mutation and - crucially - no non-capturable
     // scheduling, which would fold the gesture's in-progress movement into
     // the store snapshot and corrupt its undo entry
     expect(scheduleNonCapturable).not.toHaveBeenCalled();
+    expect(fonts.hasPendingSceneRepairs()).toBe(true);
     expect(
       (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-    ).not.toBe(METADATA.metrics.lineHeight);
+    ).not.toBe(repaired);
 
     gestureInFlight = false;
     fonts.flushDeferredSceneRepairs();
@@ -815,19 +1001,44 @@ describe("Fonts.runSceneRepair", () => {
     expect(scheduleNonCapturable).toHaveBeenCalledTimes(1);
     expect(
       (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-    ).toBe(METADATA.metrics.lineHeight);
+    ).toBe(repaired);
   });
 });
 
-describe("ExcalidrawFontFace", () => {
-  it("passes the raw, unquoted family to the FontFace constructor", () => {
-    const fontFace = new ExcalidrawFontFace(
-      "test:Unquoted",
-      "https://example.com/font.woff2",
+describe("custom font CSS family", () => {
+  it("registers a custom family under its generated CSS name, never its id", async () => {
+    // `toCSS` below can't fetch the face, and falls back to its url
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const family = uniqueFamily();
+    const fonts = new Fonts(new Scene(), {
+      "test.test": async () => ({ fontFaces: FONT_FACES, metadata: METADATA }),
+    });
+
+    await fonts.registerCustomFamily(family);
+
+    const [fontFace] = fonts.registered.get(family)!.fontFaces;
+    const cssFamily = getCustomFontCSSFamily(family);
+
+    // the id stays our source of truth...
+    expect(fontFace.family).toBe(family);
+    // ...while the browser only ever sees the generated name - the one font
+    // strings (canvas, DOM, `document.fonts.load`) refer to
+    expect(fontFace.cssFamily).toBe(cssFamily);
+    expect(fontFace.fontFace.family).toBe(cssFamily);
+    expect(getFontString({ fontFamily: family, fontSize: 20 })).toContain(
+      `20px ${cssFamily},`,
     );
 
-    // unlike the emitted declaration below, which must be quoted
-    expect(fontFace.fontFace.family).toBe("test:Unquoted");
+    const css = await fontFace.toCSS("a");
+    expect(css).toContain(`font-family: "${cssFamily}"`);
+    expect(css).not.toContain(family);
+  });
+
+  it("keeps built-in families under their own name", () => {
+    const [fontFace] = Fonts.registered.get(FONT_FAMILY.Excalifont)!.fontFaces;
+
+    expect(fontFace.cssFamily).toBe("Excalifont");
+    expect(fontFace.fontFace.family).toBe("Excalifont");
   });
 });
 
@@ -835,14 +1046,14 @@ describe("ExcalidrawFontFace.toCSS", () => {
   it("carries non-default descriptors into the @font-face declaration", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const fontFace = new ExcalidrawFontFace(
-      "test:Descriptors",
+      "test.test:Descriptors",
       "https://example.com/font.woff2",
       { weight: "700", style: "italic", unicodeRange: "U+0000-00FF" },
     );
 
     const css = await fontFace.toCSS("a");
 
-    expect(css).toContain('font-family: "test:Descriptors"');
+    expect(css).toContain('font-family: "test.test:Descriptors"');
     expect(css).toContain("font-weight: 700;");
     expect(css).toContain("font-style: italic;");
     expect(css).toContain("unicode-range: U+0000-00FF;");
@@ -851,7 +1062,7 @@ describe("ExcalidrawFontFace.toCSS", () => {
   it("emits no descriptors for a default-descriptor face", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const fontFace = new ExcalidrawFontFace(
-      "test:Defaults",
+      "test.test:Defaults",
       "https://example.com/font.woff2",
     );
 
@@ -864,102 +1075,44 @@ describe("ExcalidrawFontFace.toCSS", () => {
 });
 
 describe("Fonts.onLoaded", () => {
-  it("converges the line height of elements written before their family resolved", () => {
-    const family = uniqueFamily();
-
-    // created before resolution - bakes in the fallback's line height
+  /** text written before its family resolved, as a document may hold it */
+  const createSceneWithText = (family: CustomFontFamily) => {
     const element = API.createElement({
       type: "text",
       text: "a",
       fontFamily: family,
     });
+    // the fallback's line height, as the family had no metrics yet
     expect(element.lineHeight).not.toBe(METADATA.metrics.lineHeight);
-
-    Fonts.registerCustomFont(family, METADATA, {
-      uri: "https://example.com/font.woff2",
-    });
 
     const scene = new Scene();
     scene.replaceAllElements(syncInvalidIndices([element]));
+    return { scene, element };
+  };
 
-    const { fontFace } = Fonts.registered.get(family)!.fontFaces[0];
-    new Fonts(scene).onLoaded([fontFace]);
-
-    expect(
-      (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-    ).toBe(METADATA.metrics.lineHeight);
-  });
-
-  it("reflows a loaded family's elements even when the line height already matches", () => {
-    const family = uniqueFamily();
-
+  const registerFamily = (family: CustomFontFamily) => {
     Fonts.registerCustomFont(family, METADATA, {
       uri: "https://example.com/font.woff2",
     });
+    return Fonts.registered.get(family)!.fontFaces[0].fontFace;
+  };
 
-    // created after registration - the line height is already the family's
-    // own, but the glyph measurements happened with the fallback font
-    const element = API.createElement({
-      type: "text",
-      text: "a",
-      fontFamily: family,
-    });
-    expect(element.lineHeight).toBe(METADATA.metrics.lineHeight);
-
-    const scene = new Scene();
-    scene.replaceAllElements(syncInvalidIndices([element]));
-    const versionBefore = (
-      scene.getElement(element.id) as ExcalidrawTextElement
-    ).version;
-
-    const { fontFace } = Fonts.registered.get(family)!.fontFaces[0];
-    new Fonts(scene).onLoaded([fontFace]);
-
-    // the reflow must not hinge on a line-height change - a family can share
-    // the fallback's ratio while having different glyph widths
-    expect(
-      (scene.getElement(element.id) as ExcalidrawTextElement).version,
-    ).toBeGreaterThan(versionBefore);
-  });
-
-  it("reports already-loaded faces so a later-mounted editor can reflow", async () => {
+  it("never rewrites text which was already in the document", () => {
     const family = uniqueFamily();
+    const { scene, element } = createSceneWithText(family);
+    const before = { ...scene.getElement(element.id) };
+    const triggerUpdate = vi.spyOn(scene, "triggerUpdate");
 
-    // created before resolution - bakes in the fallback's line height
-    const element = API.createElement({
-      type: "text",
-      text: "a",
-      fontFamily: family,
-    });
-    expect(element.lineHeight).not.toBe(METADATA.metrics.lineHeight);
+    new Fonts(scene).onLoaded([registerFamily(family)]);
 
-    Fonts.registerCustomFont(family, METADATA, {
-      uri: "https://example.com/font.woff2",
-    });
-
-    // the face loaded page-wide before this editor mounted, so this editor
-    // missed the `loadingdone` event and `document.fonts.check` passes
-    const { fontFace } = Fonts.registered.get(family)!.fontFaces[0];
-    (fontFace as { status: string }).status = "loaded";
-    const check = vi.spyOn(document.fonts, "check").mockReturnValue(true);
-
-    try {
-      const scene = new Scene();
-      scene.replaceAllElements(syncInvalidIndices([element]));
-      const fonts = new Fonts(scene);
-
-      // mimics the App: scene loads report faces, `onLoaded` processes them
-      fonts.onLoaded(await fonts.loadSceneFonts());
-
-      expect(
-        (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-      ).toBe(METADATA.metrics.lineHeight);
-    } finally {
-      check.mockRestore();
-    }
+    // a font arriving isn't an edit: whatever it rewrote would be saved and
+    // synced, pinning the document to what the provider returned that day.
+    // It only rerenders
+    expect(scene.getElement(element.id)).toEqual(before);
+    expect(triggerUpdate).toHaveBeenCalledTimes(1);
   });
 
-  it("never reflows built-in text on a built-in face load", () => {
+  it("never rewrites built-in text on a built-in face load", () => {
     const element = API.createElement({ type: "text", text: "builtin" });
     const scene = new Scene();
     scene.replaceAllElements(syncInvalidIndices([element]));
@@ -967,7 +1120,6 @@ describe("Fonts.onLoaded", () => {
       scene.getElement(element.id) as ExcalidrawTextElement
     ).version;
 
-    // a built-in face loading invalidates caches only (master behavior) -
     // persisted geometry, incl. legacy `detectLineHeight` documents, must
     // never be re-measured
     const { fontFace } = Fonts.registered.get(FONT_FAMILY.Excalifont)!
@@ -979,97 +1131,191 @@ describe("Fonts.onLoaded", () => {
     ).toBe(versionBefore);
   });
 
-  it("processes a face for each instance, even when another editor already did", () => {
+  it("rerenders once per face and instance, even when another editor processed it already", () => {
     const family = uniqueFamily();
-
-    // created before resolution - bakes in the fallback's line height
-    const element = API.createElement({
-      type: "text",
-      text: "a",
-      fontFamily: family,
-    });
-    expect(element.lineHeight).not.toBe(METADATA.metrics.lineHeight);
-
-    Fonts.registerCustomFont(family, METADATA, {
-      uri: "https://example.com/font.woff2",
-    });
-
-    const { fontFace } = Fonts.registered.get(family)!.fontFaces[0];
+    const { scene } = createSceneWithText(family);
+    const fontFace = registerFamily(family);
 
     // another editor on the page handles the `loadingdone` event first - the
     // page-global "loaded" state must not swallow this scene's own pass
     new Fonts(new Scene()).onLoaded([fontFace]);
 
-    const scene = new Scene();
-    scene.replaceAllElements(syncInvalidIndices([element]));
-    new Fonts(scene).onLoaded([fontFace]);
-
-    expect(
-      (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-    ).toBe(METADATA.metrics.lineHeight);
-  });
-
-  it("leaves the line height of other families' elements alone", () => {
-    const family = uniqueFamily();
-    const otherFamily = uniqueFamily();
-
-    // baked-in fallback line height, diverging from the family metric
-    const element = API.createElement({
-      type: "text",
-      text: "a",
-      fontFamily: family,
-    });
-    const baked = element.lineHeight;
-    expect(baked).not.toBe(METADATA.metrics.lineHeight);
-
-    Fonts.registerCustomFont(family, METADATA, {
-      uri: "https://example.com/font.woff2",
-    });
-    Fonts.registerCustomFont(otherFamily, METADATA, {
-      uri: "https://example.com/other.woff2",
-    });
-
-    const scene = new Scene();
-    scene.replaceAllElements(syncInvalidIndices([element]));
-
-    // an unrelated family's load must not converge this element
-    const { fontFace } = Fonts.registered.get(otherFamily)!.fontFaces[0];
-    new Fonts(scene).onLoaded([fontFace]);
-
-    expect(
-      (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-    ).toBe(baked);
-  });
-
-  it("never converges a line height set after the family's faces loaded", () => {
-    const family = uniqueFamily();
-
-    Fonts.registerCustomFont(family, METADATA, {
-      uri: "https://example.com/font.woff2",
-    });
-
-    const element = API.createElement({
-      type: "text",
-      text: "a",
-      fontFamily: family,
-    });
-    const scene = new Scene();
-    scene.replaceAllElements(syncInvalidIndices([element]));
+    const triggerUpdate = vi.spyOn(scene, "triggerUpdate");
     const fonts = new Fonts(scene);
 
-    const { fontFace } = Fonts.registered.get(family)!.fontFaces[0];
     fonts.onLoaded([fontFace]);
+    expect(triggerUpdate).toHaveBeenCalledTimes(1);
 
-    // a deliberately divergent (i.e. host-set) value must survive
-    // further load events
-    const deliberate = 2 as ExcalidrawTextElement["lineHeight"];
-    scene.mutateElement(scene.getElement(element.id) as ExcalidrawTextElement, {
-      lineHeight: deliberate,
+    fonts.onLoaded([fontFace]);
+    expect(triggerUpdate).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("AppFonts lifecycle", () => {
+  it("gets its repair hooks back on a remount (i.e. React StrictMode)", () => {
+    const scene = new Scene();
+    const onBeforeSceneMutation = vi.fn();
+    const appFonts = new AppFonts(
+      {
+        scene,
+        props: {},
+        state: {},
+        ownerDocument: document,
+        renderEnvironment: undefined,
+      } as unknown as App,
+      { onBeforeSceneMutation },
+    );
+
+    // unmount leaves a stand-in which must not reach back into the store...
+    appFonts.destroy();
+    appFonts.instance.runSceneRepair(() => {});
+    expect(onBeforeSceneMutation).not.toHaveBeenCalled();
+
+    // ...but the remounted editor needs the real thing
+    appFonts.onMount();
+    appFonts.instance.runSceneRepair(() => {});
+    expect(onBeforeSceneMutation).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("AppFonts.onSceneUpdated", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("stops loading a family on every update once it has arrived", () => {
+    const family = uniqueFamily();
+    Fonts.registerCustomFont(family, METADATA, FONT_FACES[0]);
+
+    const scene = new Scene();
+    const appFonts = new AppFonts(
+      {
+        scene,
+        props: {},
+        state: {},
+        ownerDocument: document,
+        renderEnvironment: undefined,
+      } as unknown as App,
+      { onBeforeSceneMutation: () => {} },
+    );
+    const elements = syncInvalidIndices([
+      API.createElement({ type: "text", text: "a", fontFamily: family }),
+    ]);
+    scene.replaceAllElements(elements);
+    const loadSceneFonts = vi.spyOn(appFonts.instance, "loadSceneFonts");
+
+    // i.e. a remote collab update - registered, but nothing of it loaded yet
+    appFonts.onSceneUpdated(elements, null);
+    expect(loadSceneFonts).toHaveBeenCalledTimes(1);
+
+    appFonts.instance.onLoaded([
+      Fonts.registered.get(family)!.fontFaces[0].fontFace,
+    ]);
+
+    // past the throttle, so that only the family's state can hold a pass back
+    vi.advanceTimersByTime(5000);
+    appFonts.onSceneUpdated(elements, null);
+    vi.advanceTimersByTime(5000);
+
+    expect(loadSceneFonts).toHaveBeenCalledTimes(1);
+    appFonts.destroy();
+  });
+});
+
+describe("AppFonts.repairTextOnFontLoad", () => {
+  const resolver: FontResolver = async () => ({
+    fontFaces: FONT_FACES,
+    metadata: METADATA,
+  });
+
+  /** just the parts of `App` the repair needs */
+  const createAppFonts = () => {
+    const scene = new Scene();
+    const app = {
+      scene,
+      props: {
+        fontProviders: {
+          // the provider `uniqueFamily` qualifies its families with
+          "test.test": { icon: null, availableFonts: [], resolve: resolver },
+        },
+      },
+      state: {},
+      ownerDocument: document,
+      renderEnvironment: undefined,
+      unmounted: false,
+    } as unknown as App;
+    return {
+      scene,
+      appFonts: new AppFonts(app, { onBeforeSceneMutation: () => {} }),
+    };
+  };
+
+  const createText = (scene: Scene, family: CustomFontFamily) => {
+    const element = API.createElement({
+      type: "text",
+      text: "a",
+      fontFamily: family,
     });
-    fonts.onLoaded([fontFace]);
+    scene.replaceAllElements(syncInvalidIndices([element]));
+    return element;
+  };
 
-    expect(
-      (scene.getElement(element.id) as ExcalidrawTextElement).lineHeight,
-    ).toBe(deliberate);
+  const getText = (scene: Scene, element: ExcalidrawTextElement) =>
+    scene.getElement(element.id) as ExcalidrawTextElement;
+
+  it("converges text measured before its family resolved, once it has", async () => {
+    const { scene, appFonts } = createAppFonts();
+    // measured in the fallback font, with the fallback's line height
+    const element = createText(scene, uniqueFamily());
+    expect(element.lineHeight).not.toBe(METADATA.metrics.lineHeight);
+
+    appFonts.repairTextOnFontLoad([element]);
+
+    await vi.waitFor(() =>
+      expect(getText(scene, element).lineHeight).toBe(
+        METADATA.metrics.lineHeight,
+      ),
+    );
+  });
+
+  it("leaves text alone when its font is in already", async () => {
+    const { scene, appFonts } = createAppFonts();
+    const family = uniqueFamily();
+    Fonts.registerCustomFont(family, METADATA, FONT_FACES[0]);
+    appFonts.instance.onLoaded([
+      Fonts.registered.get(family)!.fontFaces[0].fontFace,
+    ]);
+
+    // i.e. a line height the user (or a host) chose
+    const deliberate = 2 as ExcalidrawTextElement["lineHeight"];
+    const element = createText(scene, family);
+    scene.mutateElement(getText(scene, element), { lineHeight: deliberate });
+    const loadElementsFonts = vi.spyOn(Fonts, "loadElementsFonts");
+
+    appFonts.repairTextOnFontLoad([getText(scene, element)]);
+
+    expect(loadElementsFonts).not.toHaveBeenCalled();
+    expect(getText(scene, element).lineHeight).toBe(deliberate);
+  });
+
+  it("skips text which moved on to another family meanwhile", async () => {
+    const { scene, appFonts } = createAppFonts();
+    const element = createText(scene, uniqueFamily());
+    const loadElementsFonts = vi.spyOn(Fonts, "loadElementsFonts");
+
+    appFonts.repairTextOnFontLoad([element]);
+    scene.mutateElement(getText(scene, element), {
+      fontFamily: FONT_FAMILY.Nunito,
+    });
+    const before = { ...getText(scene, element) };
+
+    await loadElementsFonts.mock.results[0].value;
+    await Promise.resolve();
+
+    expect(getText(scene, element)).toEqual(before);
   });
 });

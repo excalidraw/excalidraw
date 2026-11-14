@@ -12780,11 +12780,11 @@ exports[`history > singleplayer undo/redo > keeps a font repair deferred during 
   "created": 1,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": "historyrepair:Font",
+  "fontFamily": "test.historyrepair:Font",
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
-  "height": 40,
+  "height": 100,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -12803,9 +12803,9 @@ exports[`history > singleplayer undo/redo > keeps a font repair deferred during 
   "textAlign": "left",
   "type": "text",
   "updated": 1,
-  "version": 6,
+  "version": 5,
   "verticalAlign": "top",
-  "width": 70,
+  "width": 100,
   "x": 10,
   "y": 10,
 }
@@ -12813,7 +12813,7 @@ exports[`history > singleplayer undo/redo > keeps a font repair deferred during 
 
 exports[`history > singleplayer undo/redo > keeps a font repair deferred during a drag out of the drag's undo entry > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > keeps a font repair deferred during a drag out of the drag's undo entry > [end of test] number of renders 1`] = `10`;
+exports[`history > singleplayer undo/redo > keeps a font repair deferred during a drag out of the drag's undo entry > [end of test] number of renders 1`] = `9`;
 
 exports[`history > singleplayer undo/redo > keeps a font repair deferred during a drag out of the drag's undo entry > [end of test] redo stack 1`] = `
 [
@@ -12836,11 +12836,11 @@ exports[`history > singleplayer undo/redo > keeps a font repair deferred during 
       "updated": {
         "id0": {
           "deleted": {
-            "version": 6,
+            "version": 5,
             "x": 10,
           },
           "inserted": {
-            "version": 5,
+            "version": 4,
             "x": 40,
           },
         },
@@ -12874,7 +12874,7 @@ exports[`history > singleplayer undo/redo > keeps a font repair deferred during 
             "created": 1,
             "customData": undefined,
             "fillStyle": "solid",
-            "fontFamily": "historyrepair:Font",
+            "fontFamily": "test.historyrepair:Font",
             "fontSize": 20,
             "frameId": null,
             "groupIds": [],

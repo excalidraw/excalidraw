@@ -15,8 +15,8 @@ import type { CustomFontFamily, FontFamily } from "./constants";
 export interface FontMetadata {
   /** for head & hhea metrics read the woff2 with https://fontdrop.info/ */
   metrics: {
-    /** head.unitsPerEm metric */
-    unitsPerEm: 1000 | 1024 | 2048;
+    /** head.unitsPerEm metric - any positive value a font declares */
+    unitsPerEm: number;
     /** hhea.ascender metric */
     ascender: number;
     /** hhea.descender metric */

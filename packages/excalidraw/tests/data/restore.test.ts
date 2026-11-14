@@ -175,10 +175,10 @@ describe("restoreElements", () => {
     });
   });
 
-  describe("fontFamily normalization", () => {
+  describe("fontFamily", () => {
     const restoreFontFamily = (
-      // wider than `FontFamily` on purpose - restore exists precisely to
-      // normalize values the type doesn't admit (i.e. "Random Font")
+      // wider than `FontFamily` on purpose - documents hold values the type
+      // doesn't admit (i.e. "Random Font")
       fontFamily: unknown,
     ) => {
       // assigned post-creation - `API.createElement` would default it away
@@ -212,24 +212,20 @@ describe("restoreElements", () => {
       expect(restoreFontFamily("google:Lilita One")).toBe("google:Lilita One");
     });
 
-    it("should default non-prefixed unknown font names", () => {
-      // would otherwise render with whatever the host's CSS resolves locally
-      expect(restoreFontFamily("Random Font")).toBe(DEFAULT_FONT_FAMILY);
-      expect(restoreFontFamily("Comic Sans MS")).toBe(DEFAULT_FONT_FAMILY);
+    it("should keep values it can't interpret, as master does", () => {
+      // rewriting them here would be saved & synced, so no later version
+      // could ever introduce a new shape - they're handled at render instead
+      expect(restoreFontFamily("Comic Sans MS")).toBe("Comic Sans MS");
+      expect(restoreFontFamily(":Roboto")).toBe(":Roboto");
+      expect(restoreFontFamily("google:")).toBe("google:");
+      expect(restoreFontFamily("")).toBe("");
+      const futureShape = { family: "Roboto", weight: 700 };
+      expect(restoreFontFamily(futureShape)).toBe(futureShape);
     });
 
-    it("should default malformed provider prefixes", () => {
-      expect(restoreFontFamily(":Roboto")).toBe(DEFAULT_FONT_FAMILY);
-      expect(restoreFontFamily("google:")).toBe(DEFAULT_FONT_FAMILY);
-      expect(restoreFontFamily(":")).toBe(DEFAULT_FONT_FAMILY);
-      expect(restoreFontFamily("")).toBe(DEFAULT_FONT_FAMILY);
-    });
-
-    it("should default values which aren't a family at all", () => {
+    it("should default a missing family", () => {
       expect(restoreFontFamily(undefined)).toBe(DEFAULT_FONT_FAMILY);
       expect(restoreFontFamily(null)).toBe(DEFAULT_FONT_FAMILY);
-      expect(restoreFontFamily(NaN)).toBe(DEFAULT_FONT_FAMILY);
-      expect(restoreFontFamily(Infinity)).toBe(DEFAULT_FONT_FAMILY);
     });
 
     it("should map legacy `font` names to built-in families", () => {
@@ -1125,7 +1121,7 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
-  it("should normalize currentItemFontFamily like element fontFamily", () => {
+  it("should normalize currentItemFontFamily, unlike element fontFamily", () => {
     // valid values pass through untouched
     expect(
       restore.restoreAppState({ currentItemFontFamily: "google:Roboto" }, null)

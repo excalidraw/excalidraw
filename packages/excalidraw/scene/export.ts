@@ -65,7 +65,7 @@ import { serializeAsJSON } from "../data/json";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { encodePngMetadata } from "../data/image";
 
-import { Fonts } from "../fonts";
+import { Fonts, getExportFontResolvers } from "../fonts";
 
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
@@ -357,9 +357,13 @@ type ExportSceneBaseConfig = {
    * id - without the matching resolver that text falls back to a generic font.
    * Pass the same resolvers given to `fontProviders`.
    *
-   * Required even when an editor on the page has the fonts registered, if
+   * Rather than passing them to every export, register them once with
+   * `registerFontResolvers()`. What is passed here wins over a registered
+   * resolver for the same provider.
+   *
+   * Needed even when an editor on the page has the fonts registered, if
    * exporting through `@excalidraw/utils` - it ships its own copy of the font
-   * registry.
+   * registry (and of the registered resolvers).
    *
    * Exports render persisted geometry as-is - text measured before its font
    * loaded keeps those (fallback-derived) measurements.
@@ -585,16 +589,19 @@ const configExportDimension = async ({
 
   // exports never record resolution failures - a transient one must not mark
   // the family failed for a live editor sharing the page-scoped failure set
-  const fonts = new Fonts(new Scene(), cfg.fontResolvers);
+  const fontResolvers = getExportFontResolvers(cfg.fontResolvers);
+  const fonts = new Fonts(new Scene(), fontResolvers);
 
   // resolve custom families before `restore` - a programmatic text element
   // (one without `lineHeight`/`height`) derives its line height from the
   // family metrics, which only exist once registered
-  if (cfg.fontResolvers) {
+  if (Object.keys(fontResolvers).length) {
     await Fonts.registerElementsFonts(data.elements, fonts, {
       recordFailure: false,
     });
   }
+  // nothing else would tell: the text just comes out in another font
+  Fonts.warnAboutUnresolvableFonts(data.elements, fonts);
 
   // restore elements (normalizes & drops invisible elements) and filter out
   // deleted ones. The type contract requires non-deleted elements already,
@@ -1415,6 +1422,27 @@ export function exportScene(
 }
 
 // ---------------------------------------------------------------------------
+// serializeSvg
+// ---------------------------------------------------------------------------
+
+/**
+ * The SVG as markup, for anything which leaves the page (a file, the
+ * clipboard).
+ *
+ * `outerHTML` is *HTML* serialization, which writes a non-breaking space as
+ * `&nbsp;` - an entity XML doesn't define, so the result fails to parse
+ * everywhere but inside an HTML document. It's the only such entity: the
+ * others it writes (`&amp;`, `&lt;`, `&gt;`, `&quot;`) are XML's own, and a
+ * literal "&nbsp;" in the text comes out as `&amp;nbsp;`, so replacing it is
+ * exact.
+ *
+ * Not `XMLSerializer`, as engines disagree on our `xmlns` attribute - jsdom
+ * declares the namespace twice, which is no more parseable.
+ */
+export const serializeSvg = (svg: SVGSVGElement): string =>
+  svg.outerHTML.replace(/&nbsp;/g, "&#160;");
+
+// ---------------------------------------------------------------------------
 // exportToClipboard
 // ---------------------------------------------------------------------------
 
@@ -1427,7 +1455,7 @@ export const exportToClipboard = async (
 ) => {
   if (opts.type === "svg") {
     const svg = await exportScene(opts);
-    await copyTextToSystemClipboard(svg.outerHTML);
+    await copyTextToSystemClipboard(serializeSvg(svg));
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportScene(opts));
   } else if (opts.type === "json") {

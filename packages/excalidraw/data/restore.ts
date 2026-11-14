@@ -289,6 +289,7 @@ const restoreFreedrawStrokeOptions = (
   };
 };
 
+/** for the legacy `font` property only, i.e. "20px Virgil" */
 const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
     return FONT_FAMILY[
@@ -296,25 +297,33 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
     ] as FontFamily;
   }
 
-  // Keep only provider-qualified custom families.
-  // Any other unknown name falls back to the default family for compatibility.
-  if (isProviderQualifiedFontFamily(fontFamilyName)) {
-    return fontFamilyName;
-  }
-
   return DEFAULT_FONT_FAMILY;
 };
 
 /**
- * Normalize a restored `fontFamily`. Built-in (numeric) families pass through
- * untouched, so a file written by a newer version keeps its id. String
- * families are only kept when provider-qualified - a bare local font name
- * would render with whatever the host's CSS resolves, which differs per
- * machine and is nothing we can load or export.
+ * Keeps whatever the document holds, as master always has - only a missing
+ * value gets the default.
+ *
+ * WARN: don't normalize here. Restore runs on every path a document takes
+ * (files, collab, library, paste) and its output gets saved, so a value this
+ * version rewrites is a value no later version can ever introduce: a future
+ * `fontFamily` shape would be turned into the default font by every deployed
+ * client and synced back. Values we can't interpret are instead dealt with
+ * where they are *read* - see `getFontFamilyString`.
  */
-const restoreFontFamily = (fontFamily: unknown): FontFamily => {
+const restoreFontFamily = (fontFamily: unknown): FontFamily =>
+  fontFamily == null ? DEFAULT_FONT_FAMILY : (fontFamily as FontFamily);
+
+/**
+ * Unlike element families, the default for *new* text is normalized - it's
+ * browser-only state, and a value we can't interpret must not be written into
+ * every text element created from now on.
+ */
+const restoreCurrentItemFontFamily = (fontFamily: unknown): FontFamily => {
   if (typeof fontFamily === "string") {
-    return getFontFamilyByName(fontFamily);
+    return isProviderQualifiedFontFamily(fontFamily)
+      ? fontFamily
+      : DEFAULT_FONT_FAMILY;
   }
 
   return isFiniteNumber(fontFamily) ? fontFamily : DEFAULT_FONT_FAMILY;
@@ -1368,9 +1377,9 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
-    // normalize the default font like element `fontFamily`, or a bare name
-    // from persisted data leaks into every newly created text element
-    currentItemFontFamily: restoreFontFamily(
+    // or a bare name from persisted data leaks into every newly created
+    // text element
+    currentItemFontFamily: restoreCurrentItemFontFamily(
       nextAppState.currentItemFontFamily,
     ),
     cursorButton: localAppState?.cursorButton || "up",

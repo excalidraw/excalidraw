@@ -545,7 +545,7 @@ describe("actionDuplicateSelection", () => {
             const prevIds = new Set(prevElements.map(({ id }) => id));
             return nextElements.map((element) =>
               !prevIds.has(element.id) && element.type === "text"
-                ? { ...element, fontFamily: "dupcontract:Font" as const }
+                ? { ...element, fontFamily: "test.dupcontract:Font" as const }
                 : element,
             );
           }}
@@ -553,7 +553,7 @@ describe("actionDuplicateSelection", () => {
       );
 
       Fonts.registerCustomFont(
-        "dupcontract:Font",
+        "test.dupcontract:Font",
         {
           metrics: {
             unitsPerEm: 1000,
@@ -565,8 +565,8 @@ describe("actionDuplicateSelection", () => {
         { uri: "https://example.com/font.woff2" },
       );
       // the family was fully processed by this editor long ago
-      const { fontFace } =
-        Fonts.registered.get("dupcontract:Font")!.fontFaces[0];
+      const { fontFace } = Fonts.registered.get("test.dupcontract:Font")!
+        .fontFaces[0];
       act(() => {
         window.h.app.fonts.instance.onLoaded([fontFace]);
       });
@@ -585,7 +585,7 @@ describe("actionDuplicateSelection", () => {
       const duplicate = h.elements.find(
         (element) => element.type === "text" && element.id !== text.id,
       ) as typeof text;
-      expect(duplicate.fontFamily).toBe("dupcontract:Font");
+      expect(duplicate.fontFamily).toBe("test.dupcontract:Font");
       // geometry stays the original family's - the host owns it
       expect(duplicate.lineHeight).toBe(text.lineHeight);
       expect(duplicate.height).toBe(text.height);

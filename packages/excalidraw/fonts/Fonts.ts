@@ -17,13 +17,10 @@ import { containsCJK } from "@excalidraw/element";
 import {
   type FontMetadata,
   getFontString,
-  reconcileLineHeight,
   setCustomFontMetadata,
   PromisePool,
   promiseTry,
 } from "@excalidraw/common";
-
-import { redrawTextBoundingBox } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 
@@ -40,13 +37,20 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
-import { defaultFontRegistry, getFontFaceSet } from "./FontRegistry";
+import {
+  createFontFaces,
+  defaultFontRegistry,
+  getFontFaceSet,
+} from "./FontRegistry";
+import { validateFontProviderKey } from "./providerKey";
 
 import type { FontRegistry, RegisteredFont } from "./FontRegistry";
 
 /** warned once per process, not per export (e.g. on a server) */
 let warnedNoFontFaceSet = false;
+
+/** families already warned about - once per process, not per export */
+const warnedUnresolvableFamilies = new Set<string>();
 
 /** definition of a custom font, returned by a font resolver */
 export interface FontDefinition {
@@ -55,6 +59,12 @@ export interface FontDefinition {
     ...ExcalidrawFontFaceDescriptor[],
   ];
   metadata: FontMetadata;
+  /**
+   * The name to show for the font, where it isn't the family part of its id
+   * (see `ProvidedFont`) - for a font used in a scene without being offered
+   * in `availableFonts`. The id itself is shown when omitted.
+   */
+  label?: string;
 }
 
 /**
@@ -104,6 +114,13 @@ type ResolvabilityOptions = {
 export class Fonts {
   public static readonly FONT_PROVIDER_SEPARATOR = FONT_PROVIDER_SEPARATOR;
 
+  /**
+   * How long (ms) the editor keeps text in a still-loading custom family
+   * undrawn before drawing it in the fallback font (like CSS
+   * `font-display: block`, but short). `0` disables blocking.
+   */
+  public static BLOCK_PERIOD = 300;
+
   /** the default registry's registered fonts - see {@link FontRegistry} */
   public static get registered() {
     return defaultFontRegistry.registered;
@@ -111,23 +128,6 @@ export class Fonts {
 
   public static isFamilyLoaded = (family: FontFamily): boolean =>
     defaultFontRegistry.isFamilyLoaded(family);
-
-  private static validateProviderKey = (provider: string) => {
-    if (!provider || provider.includes(FONT_PROVIDER_SEPARATOR)) {
-      throw new Error(
-        `Font provider key must be non-empty and must not contain "${FONT_PROVIDER_SEPARATOR}": "${provider}"`,
-      );
-    }
-
-    // CSS font-family matching is ASCII case-insensitive, so "google:Roboto"
-    // and "Google:Roboto" would be distinct registry keys landing in the same
-    // browser family bucket - canonical lowercase keys rule that out
-    if (provider !== provider.toLowerCase()) {
-      throw new Error(
-        `Font provider key must be lowercase (CSS font-family matching is case-insensitive): "${provider}"`,
-      );
-    }
-  };
 
   private static validateFontMetadata = (metadata: FontMetadata) => {
     const metrics = metadata?.metrics;
@@ -219,8 +219,9 @@ export class Fonts {
   public readonly fontResolvers: FontResolvers;
 
   /**
-   * Font faces this instance's scene has converged for (see `onLoaded`) - per
-   * instance, as every editor gets the same page-global "loadingdone" event.
+   * Font faces this instance's scene has rerendered for (see `onLoaded`) -
+   * per instance, as every editor gets the same page-global "loadingdone"
+   * event.
    */
   private readonly processedFaces = new WeakSet<FontFace>();
 
@@ -250,7 +251,7 @@ export class Fonts {
     },
   ) {
     for (const provider of Object.keys(fontResolvers)) {
-      Fonts.validateProviderKey(provider);
+      validateFontProviderKey(provider);
     }
     this.scene = scene;
     this.fontResolvers = fontResolvers;
@@ -338,6 +339,19 @@ export class Fonts {
     );
   };
 
+  /**
+   * Whether a face of the family has already arrived in this editor (see
+   * `onLoaded`). From then on the family is as good as a built-in one: its
+   * faces are installed, and one needed later - i.e. another `unicode-range`
+   * subset, for characters a collaborator types - is fetched by the browser
+   * once the canvas draws with it, `loadingdone` rerendering the scene.
+   */
+  public hasLoadedFamily = (family: FontFamily): boolean =>
+    this.registry.registered
+      .get(family)
+      ?.fontFaces.some(({ fontFace }) => this.processedFaces.has(fontFace)) ??
+    false;
+
   private isResolvableFamily = (
     family: FontFamily,
     { ignoreFailures = false }: ResolvabilityOptions = {},
@@ -367,49 +381,35 @@ export class Fonts {
    *
    * Invalidates text elements and rerenders scene, provided that at least one
    * of the supplied fontFaces has not already been processed.
+   *
+   * WARN: never write to elements here - a font arriving is not an edit.
+   * Whatever a load rewrote (line height, wrapping, a grown container) would
+   * be saved and synced, so a document's geometry would become whatever the
+   * provider returned that day, and every deployed client would keep
+   * enforcing it. Text which was in the document keeps the geometry it came
+   * with, as it does for the built-in fonts. Text this session measured
+   * before its font arrived is repaired by whoever measured it - see
+   * `AppFonts.repairTextOnFontLoad`.
    */
   public onLoaded = (fontFaces: readonly FontFace[]): void => {
-    const newFaces = new Set<FontFace>();
+    let hasNewFaces = false;
     for (const fontFace of fontFaces) {
       // "loaded" is page-global, "processed" is per instance
       this.registry.loadedFaces.add(fontFace);
 
       if (!this.processedFaces.has(fontFace)) {
         this.processedFaces.add(fontFace);
-        newFaces.add(fontFace);
+        hasNewFaces = true;
       }
     }
 
-    // TRADE-OFF: convergence happens once per family per instance, at load
-    // time - elements arriving after their family's load event (paste,
-    // `updateScene`, host-swapped duplicates) keep their persisted geometry.
-    // See `reconcileLineHeight`'s contract and the `onDuplicate` JSDoc
-    if (!newFaces.size) {
+    if (!hasNewFaces) {
       return;
-    }
-
-    // the *custom* families the newly loaded faces belong to - the only ones
-    // whose elements may reflow below. Scoped per loaded family, or an
-    // unscoped sweep would clobber divergent (i.e. host-set) line heights at
-    // every unrelated load event; custom-only, as built-in text is never
-    // re-measured on load (master behavior), which also keeps no-provider
-    // editors out of the face walk (Xiaolai alone carries ~200 faces)
-    const loadedFamilies = new Set<FontFamily>();
-    for (const [family, registeredFont] of this.registry.registered) {
-      if (!isCustomFontFamily(family)) {
-        continue;
-      }
-      if (
-        registeredFont.fontFaces.some(({ fontFace }) => newFaces.has(fontFace))
-      ) {
-        loadedFamilies.add(family);
-      }
     }
 
     let didUpdate = false;
 
     const elementsMap = this.scene.getNonDeletedElementsMap();
-    const elementsToReflow: ExcalidrawTextElement[] = [];
 
     for (const element of this.scene.getNonDeletedElements()) {
       if (isTextElement(element)) {
@@ -423,40 +423,7 @@ export class Fonts {
         if (container) {
           ShapeCache.delete(container);
         }
-
-        // measured with the fallback font while the faces were pending -
-        // reflow it now, converging the line height first when the stored
-        // value is still the baked-in fallback metric (`reconcileLineHeight`).
-        // Not conditional on that: a family can share the fallback's
-        // line-height ratio while having different glyph widths
-        if (loadedFamilies.has(element.fontFamily)) {
-          elementsToReflow.push(element);
-        }
       }
-    }
-
-    if (elementsToReflow.length) {
-      this.runSceneRepair(() => {
-        const latestElementsMap = this.scene.getNonDeletedElementsMap();
-        for (const element of elementsToReflow) {
-          // re-fetch - a deferred repair runs after further edits
-          const latest = this.scene.getElement(element.id);
-          if (!latest || !isTextElement(latest)) {
-            continue;
-          }
-
-          const lineHeight = reconcileLineHeight(latest);
-          if (lineHeight !== null) {
-            this.scene.mutateElement(latest, { lineHeight });
-          }
-          redrawTextBoundingBox(
-            latest,
-            getContainerElement(latest, latestElementsMap),
-            this.scene,
-            this.getRenderEnvironment(),
-          );
-        }
-      });
     }
 
     if (didUpdate) {
@@ -519,10 +486,11 @@ export class Fonts {
 
       const nextRegisteredFont: RegisteredFont = {
         metadata: definition.metadata,
-        fontFaces: definition.fontFaces.map(
-          ({ uri, descriptors }) =>
-            new ExcalidrawFontFace(family, uri, descriptors),
-        ),
+        fontFaces: createFontFaces(family, family, definition.fontFaces),
+        label:
+          typeof definition.label === "string" && definition.label
+            ? definition.label
+            : undefined,
       };
       this.registry.installFontFaces(
         nextRegisteredFont.fontFaces,
@@ -699,6 +667,39 @@ export class Fonts {
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
     return fonts.splitLoadFontFaces(families, charsPerFamily, options);
+  };
+
+  /**
+   * Warn about the elements' custom families nothing here can supply: not
+   * registered on the page, and no resolver for their provider. Such text is
+   * drawn in a fallback font, inside the layout it was saved with - easy to
+   * miss in an export, which is the one place a host has to hand the
+   * resolvers over by itself (`registerFontResolvers`).
+   */
+  public static warnAboutUnresolvableFonts = (
+    elements: readonly ExcalidrawElement[],
+    fonts: Fonts,
+  ) => {
+    for (const family of Fonts.getUniqueFamilies(elements)) {
+      if (
+        typeof family !== "string" ||
+        warnedUnresolvableFamilies.has(family) ||
+        fonts.registry.registered.has(family)
+      ) {
+        continue;
+      }
+
+      const parsed = parseProviderFontFamily(family);
+      // not an id any provider could have written - nothing to hand over
+      if (!parsed || fonts.getResolver(parsed.providerId)) {
+        continue;
+      }
+
+      warnedUnresolvableFamilies.add(family);
+      console.warn(
+        `Excalidraw: no font resolver for "${family}", so its text is exported in a fallback font. Register one for the "${parsed.providerId}" provider with \`registerFontResolvers()\`, or pass it in \`config.fontResolvers\`.`,
+      );
+    }
   };
 
   /**
@@ -929,7 +930,7 @@ export class Fonts {
       );
     }
 
-    Fonts.validateProviderKey(parsed.providerId);
+    validateFontProviderKey(parsed.providerId);
     Fonts.validateFontMetadata(metadata);
     Fonts.validateFontFaceDescriptors(fontFaceDescriptors);
 

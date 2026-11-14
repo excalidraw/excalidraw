@@ -1292,7 +1292,7 @@ export const actionChangeFontFamily = register<{
 
       // a custom family only has metrics once resolved - substituting the
       // fallback's line height would bake a wrong value in permanently, so
-      // leave it to `onLoaded`'s `reconcileLineHeight` pass
+      // it's converged once the family is in (`repairTextOnFontLoad` below)
       const hasFontMetrics =
         !nextFontFamily || isFontMetadataAvailable(nextFontFamily);
 
@@ -1346,6 +1346,14 @@ export const actionChangeFontFamily = register<{
           true,
         ),
       });
+
+      if (!hasFontMetrics) {
+        // switched before the family resolved - the line height and the
+        // dimensions come out right only once it has
+        app.fonts.repairTextOnFontLoad(
+          Array.from(elementContainerMapping.keys()),
+        );
+      }
 
       // size is irrelevant, but necessary
       const fontString = `10px ${getFontFamilyString({

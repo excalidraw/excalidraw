@@ -4,6 +4,8 @@ import {
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
   getFontMetadata,
+  getCustomFontCSSFamily,
+  isCustomFontFamily,
   Emitter,
 } from "@excalidraw/common";
 
@@ -36,10 +38,31 @@ export const getFontFaceSet = (ownerDocument?: Document): FontFaceSet | null =>
     ? (self as unknown as { fonts: FontFaceSet }).fonts
     : null);
 
+/**
+ * Font faces for a family registered under `key`. A custom family (keyed by
+ * its id) goes by a generated CSS name - the id itself never reaches CSS.
+ */
+export const createFontFaces = (
+  key: FontFamily,
+  family: string,
+  fontFaceDescriptors: readonly ExcalidrawFontFaceDescriptor[],
+): ExcalidrawFontFace[] => {
+  const cssFamily = isCustomFontFamily(key)
+    ? getCustomFontCSSFamily(key)
+    : family;
+
+  return fontFaceDescriptors.map(
+    ({ uri, descriptors }) =>
+      new ExcalidrawFontFace(family, uri, descriptors, cssFamily),
+  );
+};
+
 /** a registered font, as held by {@link Fonts.registered} */
 export type RegisteredFont = {
   metadata: FontMetadata;
   fontFaces: ExcalidrawFontFace[];
+  /** custom fonts only - see `FontDefinition.label` */
+  label?: string;
 };
 
 /**
@@ -189,10 +212,7 @@ export class FontRegistry {
     if (!registered.has(key)) {
       registered.set(key, {
         metadata,
-        fontFaces: fontFaceDescriptors.map(
-          ({ uri, descriptors }) =>
-            new ExcalidrawFontFace(family, uri, descriptors),
-        ),
+        fontFaces: createFontFaces(key, family, fontFaceDescriptors),
       });
     }
   }

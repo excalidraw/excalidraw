@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  createProviderFontFamily,
-  isCustomFontFamily,
-  parseProviderFontFamily,
-} from "@excalidraw/common";
+import { isCustomFontFamily } from "@excalidraw/common";
 
 import type { CustomFontFamily, FontFamily } from "@excalidraw/common";
 
@@ -14,8 +10,6 @@ import {
 } from "../../hooks/useTextEditorFocus";
 
 import type { Fonts } from "../../fonts";
-
-import type { FontProviders } from "../../types";
 
 /**
  * Minimum time a retry stays in the loading state. A resolution served from the
@@ -35,14 +29,10 @@ export type FontSelectionOptions = {
   keepOpen?: boolean;
 };
 
-type FontResolution =
-  | { type: "family"; family: CustomFontFamily }
-  | { type: "search" }
-  | null;
+type FontResolution = { type: "family"; family: CustomFontFamily } | null;
 
 interface FontResolutionOptions {
   fonts: Fonts;
-  fontProviders?: FontProviders;
   registeredFonts: Fonts["registered"];
   failedResolutions: ReadonlyMap<string, unknown>;
   isEditingText: boolean;
@@ -51,21 +41,15 @@ interface FontResolutionOptions {
 
 export const useFontResolution = ({
   fonts,
-  fontProviders,
   registeredFonts,
   failedResolutions,
   isEditingText,
   onSelect,
 }: FontResolutionOptions) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [failedSearchTerm, setFailedSearchTerm] = useState<string | null>(null);
   const [fontResolution, setFontResolution] = useState<FontResolution>(null);
-  const [newSceneFamilies, setNewSceneFamilies] = useState<Set<FontFamily>>(
-    new Set(),
-  );
   const inputRef = useRef<HTMLInputElement>(null);
   const requestIdRef = useRef(0);
-  const isResolving = fontResolution !== null;
   const resolvingFamily =
     fontResolution?.type === "family" ? fontResolution.family : null;
 
@@ -96,22 +80,6 @@ export const useFontResolution = ({
   useEffect(() => {
     cancelResolution();
   }, [fonts, cancelResolution]);
-
-  const notifyNewFontUsed = useCallback(
-    (provider: string, familyName: string) => {
-      try {
-        fontProviders?.[provider]?.onNewFontUsed?.(familyName);
-      } catch (error) {
-        // a host callback failing is not this selection's failure - contain
-        // it instead of rejecting the (unawaited) event-handler promise
-        console.error(
-          `onNewFontUsed callback failed for provider "${provider}"`,
-          error,
-        );
-      }
-    },
-    [fontProviders],
-  );
 
   /** @returns whether the family got selected */
   const selectFontFamily = useCallback(
@@ -154,106 +122,17 @@ export const useFontResolution = ({
     [cancelResolution, failedResolutions, fonts, registeredFonts, select],
   );
 
-  const selectSearchedFontFamily = useCallback(
-    async (fontFamily: CustomFontFamily) => {
-      const parsed = parseProviderFontFamily(fontFamily);
-      if (
-        (await selectFontFamily(fontFamily)) &&
-        parsed &&
-        // a suggestion may name an offered family, i.e. "Roboto" for "rovoto"
-        !fontProviders?.[parsed.providerId]?.availableFonts.includes(
-          parsed.familyName,
-        )
-      ) {
-        notifyNewFontUsed(parsed.providerId, parsed.familyName);
-      }
-    },
-    [fontProviders, notifyNewFontUsed, selectFontFamily],
-  );
-
-  /** @param providers the ones to probe for the typed name, in order */
-  const resolveFontFamily = useCallback(
-    async (providers: readonly string[]) => {
-      const familyName = searchTerm.trim();
-      if (!familyName || isResolving || !providers.length) {
-        return;
-      }
-
-      const isRetry = failedSearchTerm === searchTerm;
-      const retryDelay = retryFeedbackDelay(isRetry);
-      const requestId = ++requestIdRef.current;
-      setFontResolution({ type: "search" });
-
-      try {
-        for (const provider of providers) {
-          const family = createProviderFontFamily(provider, familyName);
-          // probing each provider for the searched name - a provider not
-          // carrying it must not leave its catalog entry marked as failed, the
-          // search reports its own failure via `failedSearchTerm`
-          const result = await fonts.registerCustomFamily(family, {
-            recordFailure: false,
-          });
-          if (requestIdRef.current !== requestId) {
-            return;
-          }
-          if (result.status !== "success") {
-            continue;
-          }
-
-          await retryDelay;
-          if (requestIdRef.current !== requestId) {
-            return;
-          }
-          setFailedSearchTerm(null);
-          setNewSceneFamilies((families) => new Set(families).add(family));
-          setSearchTerm("");
-          if (inputRef.current) {
-            inputRef.current.value = "";
-          }
-
-          select(family, { keepOpen: true });
-          notifyNewFontUsed(provider, familyName);
-
-          return;
-        }
-
-        await retryDelay;
-        if (requestIdRef.current === requestId) {
-          setFailedSearchTerm(searchTerm);
-        }
-      } finally {
-        if (requestIdRef.current === requestId) {
-          setFontResolution(null);
-        }
-      }
-    },
-    [
-      failedSearchTerm,
-      fonts,
-      isResolving,
-      notifyNewFontUsed,
-      searchTerm,
-      select,
-    ],
-  );
-
   const onSearchChange = useCallback((term: string) => {
     requestIdRef.current += 1;
     setFontResolution(null);
     setSearchTerm(term);
-    setFailedSearchTerm(null);
   }, []);
 
   return {
     inputRef,
     searchTerm,
-    failedSearchTerm,
-    isResolving,
     resolvingFamily,
-    newSceneFamilies,
     selectFontFamily,
-    selectSearchedFontFamily,
-    resolveFontFamily,
     onSearchChange,
     cancelResolution,
   };

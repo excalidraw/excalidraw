@@ -17,6 +17,7 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
+  getCustomFontCSSFamily,
   isCustomFontFamily,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
@@ -140,11 +141,14 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamily;
 }) => {
-  // Custom font - the qualified family is the CSS family name itself, quoted
-  // (":" is not an ident character), plus the generic fallbacks
+  // Custom font - referred to by its generated CSS name, never by the id
+  // itself (see `getCustomFontCSSFamily`), plus the generic fallbacks. Also
+  // covers a string we can't resolve (i.e. a bare "Comic Sans MS" kept by
+  // `restore`): its generated name matches no font, so it renders in the
+  // fallbacks on every machine rather than in whatever happens to be installed
   if (isCustomFontFamily(fontFamily)) {
     const fallbacks = getFontFamilyFallbacks(fontFamily);
-    return `${JSON.stringify(fontFamily)}${fallbacks
+    return `${getCustomFontCSSFamily(fontFamily)}${fallbacks
       .map((x) => `, ${x}`)
       .join("")}`;
   }

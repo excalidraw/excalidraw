@@ -10,19 +10,17 @@ export class ExcalidrawFontFace {
 
   /**
    * The family as we know it, i.e. "Excalifont" or "google:Roboto" - our
-   * source of truth. Prefer it over `fontFace.family`, the browser's
-   * *serialized* CSS value, which comes back quoted for some families.
+   * source of truth, for lookups and messages.
    */
   public readonly family: string;
 
   /**
-   * The family as a CSS `<family-name>`, always quoted - for *emitted CSS*
-   * only. Plenty of real families are not a valid ident sequence: our
-   * provider-qualified ones (":" is not an ident character), but also catalog
-   * names with a digit-leading word, i.e. "Press Start 2P". Quoting covers all
-   * of them; strict implementations throw a SyntaxError on the rest.
+   * The name the browser knows the family by: the same as `family` for the
+   * built-ins, a generated one for custom fonts (`getCustomFontCSSFamily`),
+   * whose id must never reach CSS. What `getFontFamilyString` refers to.
    */
-  private readonly cssFontFamily: string;
+  public readonly cssFamily: string;
+
   private readonly descriptors?: FontFaceDescriptors;
 
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
@@ -31,19 +29,24 @@ export class ExcalidrawFontFace {
       : "@excalidraw/excalidraw" // fallback to the latest package version (i.e. for app)
   }/dist/prod/`;
 
-  constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
+  constructor(
+    family: string,
+    uri: string,
+    descriptors?: FontFaceDescriptors,
+    cssFamily: string = family,
+  ) {
     this.urls = ExcalidrawFontFace.createUrls(uri);
     this.family = family;
-    this.cssFontFamily = JSON.stringify(family);
+    this.cssFamily = cssFamily;
     this.descriptors = descriptors;
 
     const sources = this.urls
       .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
       .join(", ");
 
-    // WARN: the raw family, *not* `cssFontFamily` - it takes the name itself,
-    // so a pre-quoted value double-quotes and matches nothing
-    this.fontFace = new FontFace(this.family, sources, {
+    // WARN: the bare name, unquoted - it takes the name itself, so a
+    // pre-quoted value double-quotes and matches nothing
+    this.fontFace = new FontFace(this.cssFamily, sources, {
       display: "swap",
       style: "normal",
       weight: "400",
@@ -85,9 +88,10 @@ export class ExcalidrawFontFace {
 
     return this.getContent(codepoints).then(
       (content) =>
-        `@font-face { font-family: ${
-          this.cssFontFamily
-        }; src: url(${content});${
+        // quoted, as not every built-in name is a valid ident sequence
+        `@font-face { font-family: ${JSON.stringify(
+          this.cssFamily,
+        )}; src: url(${content});${
           cssDescriptors ? ` ${cssDescriptors}` : ""
         } }`,
     );

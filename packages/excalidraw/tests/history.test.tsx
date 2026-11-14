@@ -52,7 +52,6 @@ import {
   actionSendToBack,
 } from "../actions";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { Fonts } from "../fonts";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import * as StaticScene from "../renderer/staticScene";
 import { getDefaultAppState } from "../appState";
@@ -149,13 +148,13 @@ describe("history", () => {
     it("keeps a font repair deferred during a drag out of the drag's undo entry", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
-      // created before the family registers - bakes in the fallback metrics
+      // created before its family is in - bakes in the fallback metrics
       const text = API.createElement({
         type: "text",
         text: "drag me",
         x: 10,
         y: 10,
-        fontFamily: "historyrepair:Font",
+        fontFamily: "test.historyrepair:Font",
       });
       API.updateScene({
         elements: [text],
@@ -163,18 +162,6 @@ describe("history", () => {
       });
       API.setSelectedElements([text]);
 
-      Fonts.registerCustomFont(
-        "historyrepair:Font",
-        {
-          metrics: {
-            unitsPerEm: 1000,
-            ascender: 800,
-            descender: -200,
-            lineHeight: 2,
-          },
-        },
-        { uri: "https://example.com/font.woff2" },
-      );
       const originalLineHeight = text.lineHeight;
       expect(originalLineHeight).not.toBe(2);
 
@@ -182,13 +169,17 @@ describe("history", () => {
       mouse.downAt(text.x + text.width / 2, text.y + text.height / 2);
       mouse.moveTo(text.x + text.width / 2 + 30, text.y + text.height / 2);
 
-      // ...and let the font face settle mid-drag - the repair must defer
-      // (mutating mid-gesture would corrupt the gesture's undo entry, as
-      // `CaptureUpdateAction.NEVER` outranks the gesture's `EVENTUALLY`)
-      const { fontFace } =
-        Fonts.registered.get("historyrepair:Font")!.fontFaces[0];
+      // ...and let its font settle mid-drag - the repair of text measured
+      // before that (see `AppFonts.repairTextOnFontLoad`) must defer, as
+      // mutating mid-gesture would corrupt the gesture's undo entry
+      // (`CaptureUpdateAction.NEVER` outranks the gesture's `EVENTUALLY`)
       act(() => {
-        h.app.fonts.instance.onLoaded([fontFace]);
+        h.app.fonts.instance.runSceneRepair(() => {
+          h.app.scene.mutateElement(
+            h.app.scene.getElement(text.id) as ExcalidrawTextElement,
+            { lineHeight: 2 as ExcalidrawTextElement["lineHeight"] },
+          );
+        });
       });
       expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(
         originalLineHeight,

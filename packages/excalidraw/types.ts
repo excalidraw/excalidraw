@@ -724,30 +724,18 @@ export interface FontProvider {
    * definition.
    *
    * WARN: family names are treated as *exact* - reject a name you don't
-   * recognise verbatim rather than normalising it. Resolving both "Roboto" and
-   * "roboto" registers two families which then collide in a single browser
-   * bucket, and the name is persisted into `fontFamily`, so it has to mean one
-   * thing: the canonical spelling.
+   * recognise verbatim rather than normalising it. The name is persisted into
+   * `fontFamily`, so it has to mean one thing: resolving both "Roboto" and
+   * "roboto" puts two ids for one font into documents.
    */
   resolve: FontResolver;
   /**
-   * Bare family names (i.e. "Roboto") to offer up front in the font picker.
+   * The fonts to offer up front in the font picker - see {@link ProvidedFont}.
    *
    * Taken as-is: keep them unique, and mind that a name shadowing a built-in
    * font (i.e. "Nunito") shows up as a separate entry next to it.
    */
-  availableFonts: readonly string[];
-  /**
-   * Called once when a family found by search - i.e. one outside
-   * `availableFonts` - is first used, on the provider that resolved it. A
-   * searched font is listed only while it's on an element, so a host wanting
-   * it listed across reloads should persist it here and surface it through
-   * `availableFonts`.
-   *
-   * @param fontFamily bare family name, i.e. "Roboto" - not the qualified
-   * "google:Roboto" - so it can be fed straight back into `availableFonts`
-   */
-  onNewFontUsed?(fontFamily: string): void;
+  availableFonts: readonly ProvidedFont[];
   /**
    * Text previewing a family when pinned to the font picker's top picks,
    * written in that family - "Aa" when omitted, empty or failed, and while a
@@ -757,7 +745,7 @@ export interface FontProvider {
    *
    * Asked once per family, the answer is kept for the session.
    *
-   * @param fontFamily bare family name, i.e. "Roboto"
+   * @param fontFamily the family's id, i.e. "Roboto" - see {@link ProvidedFont}
    */
   getPreviewText?(fontFamily: string): string | Promise<string>;
   /**
@@ -765,8 +753,11 @@ export interface FontProvider {
    * picker's search (debounced, and aborted via `signal` once superseded).
    *
    * Return every hit, most relevant first - the picker lists only the first
-   * few, so the user narrows down by typing more. Names follow `resolve`'s
+   * few, so the user narrows down by typing more. Ids follow `resolve`'s
    * exactness rule: return the canonical spelling.
+   *
+   * Only what this returns is offered: a typed name is never tried as a font
+   * of its own, as ids aren't necessarily something a user could type.
    *
    * @param query trimmed search text, i.e. "rob"
    */
@@ -776,29 +767,54 @@ export interface FontProvider {
   ): Promise<FontSearchResult>;
 }
 
+/**
+ * A font a provider offers. `id` is the family part of its font id
+ * (`"<provider>:<id>"`) - what gets saved into `fontFamily` and handed to
+ * `resolve` - and `label` the name the font picker shows and searches by. A
+ * plain string is shorthand for the two being the same, i.e. "Roboto" for a
+ * Google font.
+ *
+ * Tell them apart wherever the id isn't a name - an uploaded font's id
+ * should be something stable (i.e. a hash or a uuid), so that renaming the
+ * font or another organization uploading one under the same name doesn't
+ * change what a document refers to.
+ */
+export type ProvidedFont = string | { id: string; label: string };
+
 export type FontSearchResult = {
   /**
-   * "match" when every name contains the query (case-insensitive substring),
-   * "suggestion" when none does and the names are merely similar, i.e.
+   * "match" when every label contains the query (case-insensitive substring),
+   * "suggestion" when none does and the labels are merely similar, i.e.
    * "Roboto" for "rovoto" - listed only while nothing matches
    */
   kind: "match" | "suggestion";
-  /** bare family names, i.e. "Roboto" */
-  names: readonly string[];
+  fonts: readonly ProvidedFont[];
 };
 
 /**
- * Provider keys are persisted as part of the font family id:
- * `<provider>:<family>`. They must be non-empty, must not contain `:`, and
- * must be lowercase - CSS font-family matching is ASCII case-insensitive, so
- * `"google:Roboto"` and `"Google:Roboto"` would be distinct registry keys
- * landing in the same browser family bucket. See
- * {@link ExcalidrawProps.fontProviders} for how to pick one.
+ * Font providers, by provider key. The key is persisted as part of every font
+ * family id it resolves (`<provider>:<family>`, i.e. "com.acme.fonts:Brand
+ * Sans") and travels with the document, so it can never change. It must be:
  *
- * A qualified family identifies exactly one font definition. It is resolved
- * once, then cached and shared across every editor on the page until reload,
- * so resolvers must return equivalent faces and metadata for the same key and
- * family.
+ * - `"google"` ({@link GOOGLE_FONT_PROVIDER_KEY}) for Google Fonts, or
+ * - a lowercase reverse-DNS key under a domain you own, containing at least
+ *   one dot, i.e. "com.acme.fonts". Keys without a dot are reserved.
+ *
+ * The key names the catalog, not whoever serves the files: a mirror of Google
+ * Fonts still registers as `"google"`.
+ *
+ * The contract every provider signs up to, as ids end up in files, libraries
+ * and the clipboard, and are read by other hosts:
+ *
+ * - One id means one rendering. A family is resolved once, then cached and
+ *   shared across every editor on the page until reload, so resolvers must
+ *   return equivalent faces and metadata for the same family.
+ * - Ids are exact. Resolve only the names you publish, verbatim, and reject
+ *   the rest rather than normalizing them.
+ * - Never stop resolving a family you once offered - documents using it are
+ *   out there for good.
+ * - A family is a family: don't publish its weights or styles as separate
+ *   families (i.e. "Roboto Light").
  *
  * A rejection is not retried automatically - the family is shown as failed in
  * the picker until a deliberate user action, which keeps host code off the
@@ -1200,20 +1216,25 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   /**
-   * Font providers for custom font support, keyed by provider id. Custom fonts
-   * are identified by that id as a prefix in `fontFamily`, i.e.
-   * `"google:Roboto"`; built-in fonts are unaffected.
-   *
-   * WARN: provider ids are a *global namespace*. They get persisted into
-   * element `fontFamily` and travel with the document - across collab, export
-   * and reload - so the same id has to denote the same font source everywhere.
-   * Pick something specific and stable (i.e. `"google"`, `"acme-brand"`), never
-   * a generic `"fonts"` or `"custom"`.
+   * Font providers for custom font support, keyed by provider key. Custom
+   * fonts are identified by that key as a prefix in `fontFamily`, i.e.
+   * `"google:Roboto"`; built-in fonts are unaffected. See
+   * {@link FontProviders} for which keys are allowed.
    *
    * Providers are scoped to this editor; resolved font faces are shared
    * page-wide, so a family any editor resolved renders in all of them.
    */
   fontProviders?: FontProviders;
+  /**
+   * Replaces the tip at the bottom of the font picker ("drag any font onto
+   * your top picks to pin it"), i.e. to say where the fonts offered there
+   * come from and where to change them. `null` shows none.
+   *
+   * Replaces the whole text rather than adding to it, so that the tip never
+   * mixes the host's translations with the editor's - localize it yourself.
+   * The editor's reset link for customized top picks stays next to it.
+   */
+  fontPickerTip?: React.ReactNode;
   renderScrollbars?: boolean;
   viewportStatusFrame?: ViewportStatusFrame | null;
   /**

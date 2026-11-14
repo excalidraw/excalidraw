@@ -222,6 +222,62 @@ export const createProviderFontFamily = (
   familyName: string,
 ): CustomFontFamily => `${providerId}${FONT_PROVIDER_SEPARATOR}${familyName}`;
 
+const CSS_FONT_FAMILY_PREFIX = "xf-";
+const CSS_FONT_FAMILY_SLUG_LENGTH = 40;
+
+/** per page, as it's asked for on every text measure & render */
+const cssFontFamilies = new Map<string, string>();
+
+/** 32-bit FNV-1a over UTF-16 code units, so lone surrogates stay distinct */
+const hashFontFamily = (fontFamily: string) => {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < fontFamily.length; i++) {
+    hash ^= fontFamily.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+};
+
+/**
+ * The CSS family name a custom font is registered and referred to by, i.e.
+ * "google:Press Start 2P" -> "xf-press-start-2p-b5b3c1d0".
+ *
+ * The persisted id itself never reaches CSS, canvas or SVG. That is what lets
+ * its family part be any string (as `text` can): CSS matches family names
+ * case-insensitively and has its own escaping, so ids differing only by case
+ * would share a font, and control characters, quotes or a lone surrogate
+ * would match no font at all. The result is a plain CSS identifier - nothing
+ * to quote or escape anywhere it ends up.
+ *
+ * - prefix: keeps a bare name (i.e. "Nunito") from matching an installed or
+ *   built-in font
+ * - slug: the family part, for readability only
+ * - hash: of the whole id, which is what makes the name unique
+ *
+ * WARN: one-way and never persisted, so the format is free to change - don't
+ * parse it back into an id, and don't store it.
+ */
+export const getCustomFontCSSFamily = (fontFamily: string): string => {
+  let cssFamily = cssFontFamilies.get(fontFamily);
+
+  if (cssFamily === undefined) {
+    const familyName =
+      parseProviderFontFamily(fontFamily)?.familyName ?? fontFamily;
+    const slug = familyName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .slice(0, CSS_FONT_FAMILY_SLUG_LENGTH)
+      .replace(/^-+|-+$/g, "");
+
+    cssFamily = `${CSS_FONT_FAMILY_PREFIX}${
+      slug ? `${slug}-` : ""
+    }${hashFontFamily(fontFamily)}`;
+    cssFontFamilies.set(fontFamily, cssFamily);
+  }
+
+  return cssFamily;
+};
+
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it
 export const SANS_SERIF_GENERIC_FONT = "sans-serif";

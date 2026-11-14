@@ -2673,6 +2673,7 @@ class App extends React.Component<AppProps, AppState> {
                               pendingFlowchartNodes:
                                 this.flowchart.pendingNodes,
                               theme: this.state.theme,
+                              isFontBlocked: this.fonts.isFontBlocked,
                               ...this.getRenderOverrideConfig(),
                             }}
                           />
@@ -3827,6 +3828,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public async componentDidMount() {
     this.unmounted = false;
+    this.fonts.onMount();
     this.api = this.createExcalidrawAPI();
     this.host.sync();
 

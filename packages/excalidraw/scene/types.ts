@@ -1,4 +1,8 @@
-import type { UserIdleState, EditorInterface } from "@excalidraw/common";
+import type {
+  UserIdleState,
+  EditorInterface,
+  FontFamily,
+} from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -59,6 +63,11 @@ export type StaticCanvasRenderConfig = {
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   theme: AppState["theme"];
   elementRenderOverrides?: ElementRenderOverrides;
+  /**
+   * editor only: text in a family this returns true for is left undrawn,
+   * rather than drawn in the fallback font - see `AppFonts.isFontBlocked`
+   */
+  isFontBlocked?: (fontFamily: FontFamily) => boolean;
 };
 
 export type SVGRenderConfig = {

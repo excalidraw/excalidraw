@@ -623,6 +623,8 @@ export class AppClipboard {
     } else {
       this.app.insertNewElements(textElements);
     }
+    // measured above, in the fallback font if their own is still on its way
+    this.app.fonts.repairTextOnFontLoad(textElements);
     this.app.store.scheduleCapture();
     this.app.setState({ selectedElementIds: getSelectedElementIds() });
 

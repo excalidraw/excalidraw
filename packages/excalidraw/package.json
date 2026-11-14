@@ -18,6 +18,12 @@
     "./utils/*": {
       "types": "./dist/types/utils/src/*.d.ts"
     },
+    "./fonts/google": {
+      "types": "./dist/types/excalidraw/fonts/google/index.d.ts",
+      "development": "./dist/dev/fonts-google.js",
+      "production": "./dist/prod/fonts-google.js",
+      "default": "./dist/prod/fonts-google.js"
+    },
     "./*": {
       "types": "./dist/types/excalidraw/*.d.ts"
     },

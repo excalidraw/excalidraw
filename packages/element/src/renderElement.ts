@@ -1037,6 +1037,16 @@ export const renderElement = (
     allElementsMap,
   ),
 ) => {
+  // its font is still loading - drawn once it arrives (or its block period
+  // runs out), instead of flashing in the fallback font first
+  if (
+    isTextElement(element) &&
+    !renderConfig.isExporting &&
+    renderConfig.isFontBlocked?.(element.fontFamily)
+  ) {
+    return;
+  }
+
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&

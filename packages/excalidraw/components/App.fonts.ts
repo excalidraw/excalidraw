@@ -1,6 +1,11 @@
 import throttle from "lodash.throttle";
 
-import { isCustomFontFamily, isSafari } from "@excalidraw/common";
+import {
+  isCustomFontFamily,
+  isFontMetadataAvailable,
+  isSafari,
+  reconcileLineHeight,
+} from "@excalidraw/common";
 
 import {
   getContainerElement,
@@ -66,6 +71,17 @@ export class AppFonts {
    */
   private pendingSceneFontFamilies = new Set<FontFamily>();
 
+  /**
+   * Per family: its block-period timer while its text is held back, `null`
+   * once settled - a family blocks at most once per editor, so text which got
+   * drawn (even in the fallback) never vanishes again. Lives here rather than
+   * on `Fonts`, so that a `fontProviders` swap doesn't restart it.
+   */
+  private fontBlocks = new Map<
+    FontFamily,
+    ReturnType<typeof setTimeout> | null
+  >();
+
   constructor(private app: App, private dependencies: AppFontsDependencies) {
     this.instance = this.createFonts();
   }
@@ -91,6 +107,54 @@ export class AppFonts {
     state.isResizing ||
     state.isRotating ||
     state.cursorButton === "down";
+
+  /**
+   * Whether text in the family should stay undrawn for now, rather than be
+   * drawn in the fallback font - like CSS `font-display: block`, but short.
+   *
+   * A custom family still loading blocks for {@link Fonts.BLOCK_PERIOD} from
+   * its first render, then swaps to the fallback until its faces arrive - most
+   * fonts arrive within it, sparing a fallback flash and the reflow which
+   * follows. Built-ins never block - they're bundled and preloaded.
+   *
+   * Called per text element on every render - keep it cheap.
+   */
+  public isFontBlocked = (family: FontFamily): boolean => {
+    const timer = this.fontBlocks.get(family);
+    if (timer === null) {
+      return false;
+    }
+
+    if (
+      Fonts.BLOCK_PERIOD <= 0 ||
+      !isCustomFontFamily(family) ||
+      this.instance.isFamilyLoaded(family) ||
+      // unresolvable or failed - nothing to wait for
+      !this.instance.shouldLoadCustomFamily(family)
+    ) {
+      clearTimeout(timer);
+      this.fontBlocks.set(family, null);
+      return false;
+    }
+
+    if (timer === undefined) {
+      // timer-driven rather than a deadline compared on render, so a timer
+      // firing a tick early can't leave the text blocked with no rerender left
+      this.fontBlocks.set(
+        family,
+        setTimeout(() => {
+          this.fontBlocks.set(family, null);
+          // rerender in the fallback - a load arriving first already
+          // rerendered through `onLoaded`
+          if (!this.instance.isFamilyLoaded(family)) {
+            this.app.scene.triggerUpdate();
+          }
+        }, Fonts.BLOCK_PERIOD),
+      );
+    }
+
+    return true;
+  };
 
   private loadSceneFontFamilies = (additionalFamilies: FontFamily[]) => {
     // captured, as a `fontProviders` swap replaces the instance mid-flight
@@ -211,23 +275,45 @@ export class AppFonts {
       return;
     }
 
+    // Nothing of the family has arrived here yet. Once something has, there
+    // is nothing left for a pass to do on every update: the family's faces
+    // are installed, and the browser fetches whichever one later text needs
+    // (as it does for the built-in fonts)
+    //
+    // Not in Safari, which may not fire `loadingdone` for a face the canvas
+    // asked for (see `onElementsInserted`) - text needing one would stay in
+    // the fallback font. There the pass stays what loads and announces it
+    const needsLoading = (family: FontFamily) =>
+      this.instance.shouldLoadCustomFamily(family) &&
+      (isSafari || !this.instance.hasLoadedFamily(family));
+
     // the incoming default font may not be used by any element yet
     const currentItemFontFamily = appState?.currentItemFontFamily;
     const additionalFamily =
-      currentItemFontFamily !== undefined &&
-      this.instance.shouldLoadCustomFamily(currentItemFontFamily)
+      currentItemFontFamily !== undefined && needsLoading(currentItemFontFamily)
         ? currentItemFontFamily
         : undefined;
 
-    const shouldLoadFonts =
-      additionalFamily !== undefined ||
+    let shouldLoadFonts = additionalFamily !== undefined;
+
+    if (!shouldLoadFonts && elements) {
+      // asked once per family rather than per element - this runs on every
+      // update, and a family can hold over a hundred faces
+      const families = new Set<FontFamily>();
+      for (const element of elements) {
+        if (isTextElement(element) && isCustomFontFamily(element.fontFamily)) {
+          families.add(element.fontFamily);
+        }
+      }
       // unlike built-ins, custom families aren't lazily loadable by the
       // browser until resolved
-      !!elements?.some(
-        (element) =>
-          isTextElement(element) &&
-          this.instance.shouldLoadCustomFamily(element.fontFamily),
-      );
+      for (const family of families) {
+        if (needsLoading(family)) {
+          shouldLoadFonts = true;
+          break;
+        }
+      }
+    }
 
     if (shouldLoadFonts) {
       if (additionalFamily !== undefined) {
@@ -236,6 +322,75 @@ export class AppFonts {
       }
       this.loadUpdatedSceneFontsThrottled();
     }
+  };
+
+  /**
+   * Whether text in the family, measured right now, comes out in the fallback
+   * font's geometry: a custom family whose metrics or glyphs aren't in yet.
+   */
+  private isFontPending = (family: FontFamily) =>
+    isCustomFontFamily(family) &&
+    !(isFontMetadataAvailable(family) && this.instance.isFamilyLoaded(family));
+
+  /**
+   * For text this session has just measured (created, pasted as text,
+   * switched to a family) while its custom font was still on its way: once
+   * the font is in, converge the line height on the family's and measure
+   * again.
+   *
+   * This is the only way a font load changes an element - text which was in
+   * the document already is never rewritten (see `Fonts.onLoaded`).
+   */
+  public repairTextOnFontLoad = (elements: readonly ExcalidrawElement[]) => {
+    const pending = new Map<ExcalidrawElement["id"], FontFamily>();
+    for (const element of elements) {
+      if (isTextElement(element) && this.isFontPending(element.fontFamily)) {
+        pending.set(element.id, element.fontFamily);
+      }
+    }
+
+    if (!pending.size) {
+      return;
+    }
+
+    // captured, as a `fontProviders` swap replaces the instance mid-flight
+    const fonts = this.instance;
+    Fonts.loadElementsFonts(
+      elements.filter((element) => pending.has(element.id)),
+      fonts,
+    ).then((fontFaces) => {
+      if (this.app.unmounted) {
+        return;
+      }
+
+      fonts.onLoaded(fontFaces);
+
+      fonts.runSceneRepair(() => {
+        const elementsMap = this.app.scene.getNonDeletedElementsMap();
+        for (const [elementId, fontFamily] of pending) {
+          // re-fetched - the repair may run late, after further edits
+          const latestElement = elementsMap.get(elementId);
+          if (
+            !latestElement ||
+            !isTextElement(latestElement) ||
+            latestElement.fontFamily !== fontFamily
+          ) {
+            continue;
+          }
+
+          const lineHeight = reconcileLineHeight(latestElement);
+          if (lineHeight !== null) {
+            this.app.scene.mutateElement(latestElement, { lineHeight });
+          }
+          redrawTextBoundingBox(
+            latestElement,
+            getContainerElement(latestElement, elementsMap),
+            this.app.scene,
+            this.app.renderEnvironment,
+          );
+        }
+      });
+    });
   };
 
   /**
@@ -356,8 +511,32 @@ export class AppFonts {
     );
   };
 
+  /**
+   * `destroy` isn't final: React StrictMode unmounts and remounts the same
+   * `App` instance, and the editor must not go on with the stand-in `Fonts`
+   * left behind there - it has none of the hooks keeping font repairs out of
+   * gestures and undo entries.
+   */
+  public onMount = () => {
+    if (this.isDestroyed) {
+      this.isDestroyed = false;
+      this.instance = this.createFonts();
+    }
+  };
+
+  private isDestroyed = false;
+
   public destroy = () => {
+    this.isDestroyed = true;
     this.loadUpdatedSceneFontsThrottled.cancel();
+    for (const timer of this.fontBlocks.values()) {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+    // cleared rather than settled, so a (StrictMode) remount blocks afresh
+    // instead of keeping a family blocked with its timer gone
+    this.fontBlocks.clear();
     // deliberately built without the options bag: this instance only exists so
     // lingering references don't crash, and a repair running past unmount must
     // not reach back into the store

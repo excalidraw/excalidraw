@@ -491,7 +491,7 @@ describe("Paste bound text container", () => {
             appState: { zoom: { value: 1 as NormalizedZoomValue } },
           }}
           fontProviders={{
-            paste: {
+            "test.paste": {
               icon: <span />,
               availableFonts: ["Deferred"],
               resolve,
@@ -508,7 +508,7 @@ describe("Paste bound text container", () => {
           type: "excalidraw/clipboard",
           elements: [
             container,
-            { ...textElement, fontFamily: "paste:Deferred" },
+            { ...textElement, fontFamily: "test.paste:Deferred" },
           ],
         }),
       );

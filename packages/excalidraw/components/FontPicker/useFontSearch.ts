@@ -54,8 +54,8 @@ export const useFontSearch = ({
         Promise.resolve()
           .then(() => provider.search!(query, { signal: controller.signal }))
           .then((result) => {
-            if (!Array.isArray(result?.names)) {
-              throw new Error("expected { kind, names }");
+            if (!Array.isArray(result?.fonts)) {
+              throw new Error("expected { kind, fonts }");
             }
             if (!controller.signal.aborted) {
               settle(providerId, result);
@@ -81,26 +81,22 @@ export const useFontSearch = ({
 
   return useMemo(() => {
     const results: ProviderSearchResult[] = [];
-    // providers to try the typed name with - those it may be news to
-    const resolvableProviders: string[] = [];
     let isSearching = false;
 
     for (const [providerId, provider] of Object.entries(fontProviders ?? {})) {
       if (!provider.search) {
-        resolvableProviders.push(providerId);
         continue;
       }
       const result =
         search?.query === query ? search.results.get(providerId) : undefined;
       if (result) {
         results.push({ ...result, providerId });
-      } else if (result === null) {
-        resolvableProviders.push(providerId);
-      } else if (query) {
+      } else if (result === undefined && query) {
+        // `null` is a failed search, which leaves nothing to wait for
         isSearching = true;
       }
     }
 
-    return { results, resolvableProviders, isSearching };
+    return { results, isSearching };
   }, [search, query, fontProviders]);
 };

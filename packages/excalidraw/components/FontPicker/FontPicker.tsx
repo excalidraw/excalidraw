@@ -19,6 +19,7 @@ import {
 
 import type { FontFamily } from "@excalidraw/common";
 
+import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
 import { useApp, useAppProps } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
@@ -98,7 +99,7 @@ const getTopPickFont = (fontFamily: FontFamily) =>
   DEFAULT_FONTS.find((font) => font.value === fontFamily) ?? {
     value: fontFamily,
     icon: getFontFamilyIcon(fontFamily),
-    text: getFontFamilyLabel(fontFamily, []),
+    text: getFontFamilyLabel(fontFamily, Fonts.registered.get(fontFamily)),
     testId: `font-family-${fontFamily}`,
   };
 

@@ -24,8 +24,7 @@ interface FontPickerListItemProps {
   setItemRef: (fontFamily: FontFamily, node: HTMLButtonElement | null) => void;
 }
 
-/** shared with the add-by-search row, so the two can't drift apart */
-export const getFontStatusClassName = (status: FontDescriptor["status"]) =>
+const getFontStatusClassName = (status: FontDescriptor["status"]) =>
   status ? ` FontPicker__font--${status}` : "";
 
 const renderRetryIcon = (isLoading: boolean) => (
@@ -120,5 +119,3 @@ export const FontPickerListItem = ({
     </button>
   );
 };
-
-export const FontPickerRetryIcon = renderRetryIcon;

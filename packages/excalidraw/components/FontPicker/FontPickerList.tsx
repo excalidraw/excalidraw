@@ -7,7 +7,7 @@ import React, {
   type KeyboardEventHandler,
 } from "react";
 
-import { isCustomFontFamily, KEYS } from "@excalidraw/common";
+import { isCustomFontFamily } from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
@@ -23,17 +23,10 @@ import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
 import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
-import MenuItemContent from "../dropdownMenu/DropdownMenuItemContent";
-import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
-import { PlusIcon } from "../icons";
 
 import { useFontPickerDnD } from "./fontTopPicksDnD";
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
-import {
-  FontPickerListItem,
-  FontPickerRetryIcon,
-  getFontStatusClassName,
-} from "./FontPickerListItem";
+import { FontPickerListItem } from "./FontPickerListItem";
 import { useFontCatalog, type FontDescriptor } from "./useFontCatalog";
 import {
   useFontResolution,
@@ -71,7 +64,7 @@ export const FontPickerList = React.memo(
     const { container } = useExcalidrawContainer();
     const app = useApp();
     const fonts = app.fonts.instance;
-    const { showDeprecatedFonts, fontProviders } = useAppProps();
+    const { showDeprecatedFonts, fontProviders, fontPickerTip } = useAppProps();
     const stylesPanelMode = useStylesPanelMode();
     const hasFontProviders = useMemo(
       () => !!Object.keys(fontProviders ?? {}).length,
@@ -107,37 +100,29 @@ export const FontPickerList = React.memo(
     const {
       inputRef,
       searchTerm,
-      failedSearchTerm,
-      isResolving,
       resolvingFamily,
-      newSceneFamilies,
       selectFontFamily,
-      selectSearchedFontFamily,
-      resolveFontFamily,
       onSearchChange,
       cancelResolution,
     } = useFontResolution({
       fonts,
-      fontProviders,
       registeredFonts,
       failedResolutions,
       isEditingText: !!app.state.editingTextElement,
       onSelect,
     });
+    const { results: searchResults, isSearching } = useFontSearch({
+      fonts,
+      fontProviders,
+      searchTerm,
+    });
     const {
-      results: searchResults,
-      resolvableProviders,
-      isSearching,
-    } = useFontSearch({ fonts, fontProviders, searchTerm });
-    const {
-      filteredFontDescriptors,
       selectableFonts,
       sceneFilteredFonts,
       availableFilteredFonts,
       searchMatches,
       hiddenSearchMatchCount,
       searchSuggestions,
-      searchFamilies,
     } = useFontCatalog({
       fonts,
       fontProviders,
@@ -145,33 +130,11 @@ export const FontPickerList = React.memo(
       failedResolutions,
       selectedFontFamily,
       hoveredFontFamily,
-      newSceneFamilies,
       resolvingFamily,
       searchTerm,
       searchResults,
       showDeprecatedFonts: !!showDeprecatedFonts,
     });
-
-    // with nothing listed, only providers that couldn't search may still
-    // carry the typed name
-    const canResolveTypedName =
-      !!searchTerm.trim() &&
-      !!resolvableProviders.length &&
-      !filteredFontDescriptors.length &&
-      !searchMatches.length;
-    const resolveTypedFontFamily = useCallback(() => {
-      if (canResolveTypedName) {
-        resolveFontFamily(resolvableProviders);
-      }
-    }, [canResolveTypedName, resolveFontFamily, resolvableProviders]);
-
-    const onSelectFont = useCallback(
-      (fontFamily: FontFamily) =>
-        isCustomFontFamily(fontFamily) && searchFamilies.has(fontFamily)
-          ? selectSearchedFontFamily(fontFamily)
-          : selectFontFamily(fontFamily),
-      [searchFamilies, selectFontFamily, selectSearchedFontFamily],
-    );
 
     const hoverFontFamily = useCallback(
       (fontFamily: FontFamily) => {
@@ -271,10 +234,9 @@ export const FontPickerList = React.memo(
           inputRef,
           hoveredFont,
           filteredFonts: selectableFonts,
-          onSelect: onSelectFont,
+          onSelect: selectFontFamily,
           onHover: hoverFontFamily,
           onClose,
-          onResolve: resolveTypedFontFamily,
         });
 
         if (handled) {
@@ -285,10 +247,9 @@ export const FontPickerList = React.memo(
       [
         hoveredFont,
         selectableFonts,
-        onSelectFont,
+        selectFontFamily,
         hoverFontFamily,
         onClose,
-        resolveTypedFontFamily,
         inputRef,
       ],
     );
@@ -323,7 +284,7 @@ export const FontPickerList = React.memo(
               order={order++}
               isHovered={font.value === hoveredFont?.value}
               isSelected={font.value === selectedFontFamily}
-              onSelect={onSelectFont}
+              onSelect={selectFontFamily}
               onHover={hoverFontFamily}
               setItemRef={setFontItemRef}
             />
@@ -346,50 +307,6 @@ export const FontPickerList = React.memo(
       ),
     );
     pushGroup(t("fontList.didYouMean"), "group_suggestions", searchSuggestions);
-
-    if (canResolveTypedName) {
-      groups.push(
-        <button
-          key="resolve"
-          type="button"
-          className={`${getDropdownMenuItemClassName(
-            "",
-            false,
-            // Enter's target while no suggestion is hovered
-            !hoveredFont,
-          )}${getFontStatusClassName(
-            failedSearchTerm === searchTerm
-              ? isResolving
-                ? "loading"
-                : "failed"
-              : undefined,
-          )}`}
-          disabled={isResolving}
-          aria-busy={isResolving}
-          onClick={resolveTypedFontFamily}
-        >
-          <MenuItemContent
-            icon={PlusIcon}
-            badge={
-              failedSearchTerm === searchTerm
-                ? FontPickerRetryIcon(isResolving)
-                : null
-            }
-            shortcut={
-              failedSearchTerm === searchTerm
-                ? undefined
-                : isResolving
-                ? "..."
-                : hoveredFont
-                ? undefined
-                : KEYS.ENTER
-            }
-          >
-            {searchTerm.trim()}
-          </MenuItemContent>
-        </button>,
-      );
-    }
 
     return (
       <PropertiesPopover
@@ -435,7 +352,11 @@ export const FontPickerList = React.memo(
         {dnd && (
           <TopPicksTip
             className="FontPicker__tip"
-            tip={t("fontList.topPicksTip")}
+            tip={
+              fontPickerTip === undefined
+                ? t("fontList.topPicksTip")
+                : fontPickerTip
+            }
             onReset={onResetTopPicks}
             resetTitle={t("fontList.resetTopPicks")}
           />
