@@ -477,6 +477,7 @@ export class AppText {
     const activeTextElement = getActiveTextElement(
       selectedElements,
       this.app.state,
+      this.app.scene.getNonDeletedElementsMap(),
     );
 
     if (
@@ -503,6 +504,7 @@ export class AppText {
     const activeTextElement = getActiveTextElement(
       selectedElements,
       this.app.state,
+      this.app.scene.getNonDeletedElementsMap(),
     );
     if (
       !activeTextElement ||
