@@ -15,9 +15,13 @@ export const getTEXtChunk = async (
   blob: Blob,
 ): Promise<{ keyword: string; text: string } | null> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
-  const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
-  if (metadataChunk) {
-    return tEXt.decode(metadataChunk.data);
+  for (const chunk of chunks) {
+    if (chunk.name === "tEXt") {
+      const metadata = tEXt.decode(chunk.data);
+      if (metadata.keyword === MIME_TYPES.excalidraw) {
+        return metadata;
+      }
+    }
   }
   return null;
 };
