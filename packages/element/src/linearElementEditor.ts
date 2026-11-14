@@ -393,6 +393,7 @@ export class LinearElementEditor {
           app.state.isMidpointSnappingEnabled &&
           !angleLocked &&
           !app.state.gridModeEnabled,
+        informMutation: app.state.newElement?.id !== element.id,
       },
     );
     // Set the suggested binding from the updates if available
@@ -597,6 +598,7 @@ export class LinearElementEditor {
           app.state.isMidpointSnappingEnabled &&
           !angleLocked &&
           !app.state.gridModeEnabled,
+        informMutation: app.state.newElement?.id !== element.id,
       },
     );
 
@@ -1663,6 +1665,7 @@ export class LinearElementEditor {
       isBindingEnabled?: boolean;
       isMidpointSnappingEnabled?: boolean;
       moveMidPointsWithElement?: boolean;
+      informMutation?: boolean;
     },
   ) {
     const { points } = element;
@@ -1734,6 +1737,7 @@ export class LinearElementEditor {
         isDragging: Array.from(pointUpdates.values()).some((t) => t.isDragging),
         isBindingEnabled: options?.isBindingEnabled,
         isMidpointSnappingEnabled: options?.isMidpointSnappingEnabled,
+        informMutation: options?.informMutation,
       },
     );
   }
@@ -1850,8 +1854,11 @@ export class LinearElementEditor {
       sceneElementsMap?: NonDeletedSceneElementsMap;
       isBindingEnabled?: boolean;
       isMidpointSnappingEnabled?: boolean;
+      informMutation?: boolean;
     },
   ) {
+    const informMutation = options?.informMutation ?? true;
+
     if (isElbowArrow(element)) {
       const updates: {
         startBinding?: FixedPointBinding | null;
@@ -1868,7 +1875,7 @@ export class LinearElementEditor {
       updates.points = Array.from(nextPoints);
 
       scene.mutateElement(element, updates, {
-        informMutation: true,
+        informMutation,
         isDragging: options?.isDragging ?? false,
         isBindingEnabled: options?.isBindingEnabled,
         isMidpointSnappingEnabled: options?.isMidpointSnappingEnabled,
@@ -1888,12 +1895,16 @@ export class LinearElementEditor {
         pointFrom(dX, dY),
         element.angle,
       );
-      scene.mutateElement(element, {
-        ...otherUpdates,
-        points: nextPoints,
-        x: element.x + rotatedOffset[0],
-        y: element.y + rotatedOffset[1],
-      });
+      scene.mutateElement(
+        element,
+        {
+          ...otherUpdates,
+          points: nextPoints,
+          x: element.x + rotatedOffset[0],
+          y: element.y + rotatedOffset[1],
+        },
+        { informMutation, isDragging: false },
+      );
     }
   }
 

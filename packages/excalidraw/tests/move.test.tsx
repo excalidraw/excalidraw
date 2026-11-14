@@ -130,7 +130,7 @@ describe("move element", () => {
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
       `16`,
     );
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`15`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`13`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
