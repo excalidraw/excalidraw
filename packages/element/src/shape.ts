@@ -56,6 +56,11 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
+import {
+  FreehandOutline,
+  OutlineSvgPath,
+  getOutlinePoints,
+} from "./freedrawOutline";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -80,6 +85,8 @@ import type {
   ExcalidrawLineElement,
   Arrowhead,
 } from "./types";
+
+import type { FreehandOptions, OutlineParts } from "./freedrawOutline";
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -115,6 +122,7 @@ export class ShapeCache {
 
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
+    lastFreedrawOutline = null;
   };
 
   /**
@@ -1262,11 +1270,10 @@ export const toggleLinePolygonState = (
 //                         freedraw shape helper
 // -----------------------------------------------------------------------------
 
-// NOTE not cached (-> for SVG export)
+// NOTE not cached (-> for SVG export), except for the outline of the last
+// outlined element (see `getFreedrawOutline`)
 const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
-  return getSvgPathFromStroke(
-    getFreedrawOutlinePoints(element),
-  ) as SVGPathString;
+  return getFreedrawOutline(element).getSvgPath() as SVGPathString;
 };
 
 /**
@@ -1296,6 +1303,17 @@ const CONSTANT_WIDTH_FREEDRAW = {
 const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
   element.strokeOptions?.streamline ?? DEFAULT_STROKE_STREAMLINE;
 
+const getVariableWidthFreehandOptions = (
+  element: ExcalidrawFreeDrawElement,
+): FreehandOptions => ({
+  simulatePressure: element.simulatePressure,
+  size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+  thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
+  smoothing: VARIABLE_WIDTH_FREEDRAW.SMOOTHING,
+  streamline: getFreedrawStreamline(element),
+  easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+});
+
 /**
  * Pressure-sensitive (variable width) freedraw outline, rendered with
  * perfect-freehand. This is the original Excalidraw freedraw look.
@@ -1313,12 +1331,7 @@ const getVariableWidthFreedrawOutline = (
     : [[0, 0, 0.5]];
 
   return getStroke(inputPoints as number[][], {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
-    thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
-    smoothing: VARIABLE_WIDTH_FREEDRAW.SMOOTHING,
-    streamline: getFreedrawStreamline(element),
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+    ...getVariableWidthFreehandOptions(element),
     last: true,
   }) as [number, number][];
 };
@@ -1331,29 +1344,160 @@ const createLaserPointer = (element: ExcalidrawFreeDrawElement) =>
     sizeMapping: (details) => Math.max(0.1, details.pressure),
   });
 
+/** Computes a freedraw outline as points get appended to the element. */
+type FreedrawOutlineGenerator = {
+  /** takes into account the element's points from index `from` on */
+  addPoints: (element: ExcalidrawFreeDrawElement, from: number) => void;
+  getParts: (element: ExcalidrawFreeDrawElement) => OutlineParts;
+};
+
+const createVariableWidthOutlineGenerator = (
+  element: ExcalidrawFreeDrawElement,
+): FreedrawOutlineGenerator => {
+  const outline = new FreehandOutline(getVariableWidthFreehandOptions(element));
+
+  return {
+    addPoints: (element) =>
+      outline.update(
+        element.points,
+        element.simulatePressure ? null : element.pressures,
+      ),
+    getParts: (element) =>
+      outline.getParts() ?? {
+        head: [],
+        middle: getVariableWidthFreedrawOutline(element),
+        footReversed: [],
+      },
+  };
+};
+
 /**
  * Uniform (constant width) freedraw outline, rendered with the laser-pointer
  * geometry. Pressure is pinned to 1 so the stroke keeps a constant width.
  */
-const getConstantWidthFreedrawOutline = (
+const createConstantWidthOutlineGenerator = (
   element: ExcalidrawFreeDrawElement,
-): [number, number][] => {
+): FreedrawOutlineGenerator => {
   const laserPointer = createLaserPointer(element);
-  element.points.map(([x, y]) => laserPointer.addPoint([x, y, 1]));
 
-  return laserPointer
-    .getStrokeOutline()
-    .map(([x, y]) => [x, y] as [number, number]);
+  return {
+    addPoints: (element, from) => {
+      for (let i = from; i < element.points.length; i++) {
+        const [x, y] = element.points[i];
+        laserPointer.addPoint([x, y, 1]);
+      }
+    },
+    getParts: () =>
+      laserPointer.getStrokeOutlineParts() ?? {
+        head: [],
+        middle: laserPointer.getStrokeOutline(),
+        footReversed: [],
+      },
+  };
+};
+
+/**
+ * The outline of a freedraw element, which can be updated after points are
+ * appended to the element (while it is drawn) at the cost of the new points
+ * only (#12620).
+ */
+class IncrementalFreedrawOutline {
+  private readonly isConstantWidth: boolean;
+  private readonly strokeWidth: number;
+  private readonly simulatePressure: boolean;
+  private readonly streamline: number;
+  private readonly generator: FreedrawOutlineGenerator;
+  private readonly svgPath = new OutlineSvgPath();
+
+  /** the element's points (and their pressures) taken into account */
+  private pointCount = 0;
+  private firstPoint: LocalPoint | undefined;
+  private lastPoint: LocalPoint | undefined;
+  private lastPressure: number | undefined;
+
+  private parts: OutlineParts | null = null;
+  private path: string | null = null;
+
+  constructor(private readonly element: ExcalidrawFreeDrawElement) {
+    // Unknown/absent variability falls back to the original variable rendering.
+    this.isConstantWidth = element.strokeOptions?.variability === "constant";
+    this.strokeWidth = element.strokeWidth;
+    this.simulatePressure = element.simulatePressure;
+    this.streamline = getFreedrawStreamline(element);
+    this.generator = this.isConstantWidth
+      ? createConstantWidthOutlineGenerator(element)
+      : createVariableWidthOutlineGenerator(element);
+  }
+
+  /**
+   * Updates the outline to the current points of the element, unless they
+   * aren't the points it was computed from, possibly followed by more (or
+   * other properties the outline depends on changed): returns `false` then.
+   * Points are immutable, so checking the first and last one is enough.
+   */
+  update(element: ExcalidrawFreeDrawElement): boolean {
+    const { points, pressures } = element;
+    const count = this.pointCount;
+
+    if (
+      element !== this.element ||
+      (element.strokeOptions?.variability === "constant") !==
+        this.isConstantWidth ||
+      element.strokeWidth !== this.strokeWidth ||
+      element.simulatePressure !== this.simulatePressure ||
+      getFreedrawStreamline(element) !== this.streamline ||
+      points.length < count ||
+      (count > 0 &&
+        (points[0] !== this.firstPoint ||
+          points[count - 1] !== this.lastPoint ||
+          (!element.simulatePressure &&
+            pressures[count - 1] !== this.lastPressure)))
+    ) {
+      return false;
+    }
+
+    if (!this.parts || points.length > count) {
+      this.generator.addPoints(element, count);
+      this.pointCount = points.length;
+      this.firstPoint = points[0];
+      this.lastPoint = points[points.length - 1];
+      this.lastPressure = pressures[points.length - 1];
+      this.parts = this.generator.getParts(element);
+      this.path = null;
+    }
+
+    return true;
+  }
+
+  getPoints() {
+    return getOutlinePoints(this.parts!);
+  }
+
+  getSvgPath() {
+    return (this.path ??= this.svgPath.build(this.parts!));
+  }
+}
+
+/**
+ * The outline of the freedraw element outlined last, from which the next
+ * outline of the same element resumes if the element only got points
+ * appended, as the element being drawn does between renders. One is enough:
+ * a single stroke grows at a time, and ShapeCache keeps the shapes of the
+ * others.
+ */
+let lastFreedrawOutline: IncrementalFreedrawOutline | null = null;
+
+const getFreedrawOutline = (element: ExcalidrawFreeDrawElement) => {
+  if (!lastFreedrawOutline?.update(element)) {
+    lastFreedrawOutline = new IncrementalFreedrawOutline(element);
+    lastFreedrawOutline.update(element);
+  }
+  return lastFreedrawOutline;
 };
 
 export const getFreedrawOutlinePoints = (
   element: ExcalidrawFreeDrawElement,
-): [number, number][] => {
-  // Unknown/absent variability falls back to the original variable rendering.
-  return element.strokeOptions?.variability === "constant"
-    ? getConstantWidthFreedrawOutline(element)
-    : getVariableWidthFreedrawOutline(element);
-};
+): [number, number][] => getFreedrawOutline(element).getPoints();
 
 /**
  * Upper bound on how far a freedraw stroke's ink reaches past its centerline
@@ -1389,37 +1533,5 @@ export const getFreedrawStrokeCenterPoints = (
     streamline: getFreedrawStreamline(element),
     last: true,
   }).map((strokePoint) => strokePoint.point as [number, number]);
-
-const med = (A: number[], B: number[]) => {
-  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
-};
-
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
-
-const getSvgPathFromStroke = (points: number[][]): string => {
-  if (!points.length) {
-    return "";
-  }
-
-  const max = points.length - 1;
-
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
-};
 
 // -----------------------------------------------------------------------------
