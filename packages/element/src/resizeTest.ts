@@ -112,6 +112,10 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       );
 
       for (const [dir, side] of Object.entries(sides)) {
+        // a table's height is sized by its content: only its width resizes
+        if (element.type === "dbtable" && dir !== "e" && dir !== "w") {
+          continue;
+        }
         // test to see if x, y are on the line segment
         if (
           pointOnLineSegment(

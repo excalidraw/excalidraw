@@ -56,6 +56,13 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
+import {
+  getDBTableBodyColor,
+  getDBTableColorWithOpacity,
+  getDBTableExampleColumnColor,
+  getDBTableLayout,
+  DB_TABLE_COLUMN_DIVIDER_OPACITY,
+} from "./dbTable";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -78,6 +85,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  ExcalidrawDBTableElement,
   Arrowhead,
 } from "./types";
 
@@ -231,6 +239,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "dbtable":
     case "iframe":
     case "embeddable":
     case "diamond":
@@ -889,6 +898,9 @@ const _generateElementShape = (
       }
       return shape;
     }
+    case "dbtable": {
+      return generateDBTableShape(element, generator, isDarkMode);
+    }
     case "diamond": {
       let shape: ElementShapes[typeof element.type];
 
@@ -1159,6 +1171,155 @@ export const generateElbowArrowShape = (
   return d.join(" ");
 };
 
+const getRoundedRectPath = (w: number, h: number, r: number) =>
+  `M ${r} 0 L ${w - r} 0 Q ${w} 0, ${w} ${r} L ${w} ${h - r} Q ${w} ${h}, ${
+    w - r
+  } ${h} L ${r} ${h} Q 0 ${h}, 0 ${h - r} L 0 ${r} Q 0 0, ${r} 0`;
+
+/** a rectangle with only its top corners rounded (the header over a body) */
+const getTopRoundedRectPath = (w: number, h: number, r: number) =>
+  `M 0 ${h} L 0 ${r} Q 0 0, ${r} 0 L ${
+    w - r
+  } 0 Q ${w} 0, ${w} ${r} L ${w} ${h} Z`;
+
+/** the rectangle (x0, y0)–(x1, y1) with only its bottom-right corner rounded */
+const getBottomRightRoundedRectPath = (
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  r: number,
+) =>
+  `M ${x0} ${y0} L ${x1} ${y0} L ${x1} ${y1 - r} Q ${x1} ${y1}, ${
+    x1 - r
+  } ${y1} L ${x0} ${y1} Z`;
+
+/**
+ * A table is drawn as layered roughjs drawables, bottom to top, so that the
+ * outline always sits on top of the fills:
+ *
+ * 1. body fill (a tint of the header color, always solid for legibility),
+ *    and the lighter examples column fill when examples are shown
+ * 2. header fill (the element's background, honoring its fill style)
+ * 3. header divider, the subtle key/name column divider and the dashed
+ *    examples divider
+ * 4. the outline
+ *
+ * The text is painted separately (`drawDBTableText` / the SVG renderer).
+ */
+const generateDBTableShape = (
+  element: ExcalidrawDBTableElement,
+  generator: RoughGenerator,
+  isDarkMode: boolean,
+): Drawable[] => {
+  const layout = getDBTableLayout(element);
+  const { width: w, height: h } = element;
+  const headerHeight = layout.header.height;
+  const radius = element.roundness
+    ? Math.min(getCornerRadius(Math.min(w, h), element), headerHeight / 2)
+    : 0;
+
+  const options = generateRoughOptions(element, true, isDarkMode);
+  const strokeOnly: Options = { ...options, fill: undefined };
+  const hasFill = !isTransparent(element.backgroundColor);
+  const shapes: Drawable[] = [];
+
+  if (hasFill && layout.body) {
+    shapes.push(
+      generator.path(getRoundedRectPath(w, h, radius), {
+        ...options,
+        seed: element.seed + 1,
+        stroke: "none",
+        fillStyle: "solid",
+        fill: applyDarkModeFilter(
+          getDBTableBodyColor(element.backgroundColor),
+          isDarkMode,
+        ),
+      }),
+    );
+  }
+
+  if (hasFill && layout.body && layout.examplesColumnWidth) {
+    shapes.push(
+      generator.path(
+        getBottomRightRoundedRectPath(
+          layout.examplesX,
+          headerHeight,
+          w,
+          h,
+          radius,
+        ),
+        {
+          ...options,
+          seed: element.seed + 5,
+          stroke: "none",
+          fillStyle: "solid",
+          fill: applyDarkModeFilter(
+            getDBTableExampleColumnColor(element.backgroundColor),
+            isDarkMode,
+          ),
+        },
+      ),
+    );
+  }
+
+  if (hasFill) {
+    shapes.push(
+      generator.path(
+        layout.body
+          ? getTopRoundedRectPath(w, headerHeight, radius)
+          : getRoundedRectPath(w, headerHeight, radius),
+        { ...options, seed: element.seed + 2, stroke: "none" },
+      ),
+    );
+  }
+
+  if (layout.body) {
+    shapes.push(
+      generator.line(0, headerHeight, w, headerHeight, {
+        ...strokeOnly,
+        seed: element.seed + 3,
+      }),
+    );
+    if (element.rows.length) {
+      const x = layout.keyColumnWidth;
+      shapes.push(
+        generator.line(x, headerHeight, x, h, {
+          ...strokeOnly,
+          seed: element.seed + 4,
+          strokeWidth: Math.max(1, element.strokeWidth * 0.75),
+          stroke: getDBTableColorWithOpacity(
+            options.stroke!,
+            DB_TABLE_COLUMN_DIVIDER_OPACITY,
+          ),
+        }),
+      );
+    }
+    if (layout.examplesColumnWidth) {
+      // dashed: what is right of it is sample data, not part of the schema
+      const x = layout.examplesX;
+      const dash = 5 * layout.unit;
+      shapes.push(
+        generator.line(x, headerHeight, x, h, {
+          ...strokeOnly,
+          seed: element.seed + 6,
+          strokeWidth: Math.max(1, element.strokeWidth * 0.75),
+          strokeLineDash: [dash, dash * 1.2],
+          disableMultiStroke: true,
+          stroke: getDBTableColorWithOpacity(
+            options.stroke!,
+            DB_TABLE_COLUMN_DIVIDER_OPACITY * 1.6,
+          ),
+        }),
+      );
+    }
+  }
+
+  shapes.push(generator.path(getRoundedRectPath(w, h, radius), strokeOnly));
+
+  return shapes;
+};
+
 /**
  * get the pure geometric shape of an excalidraw elementw
  * which is then used for hit detection
@@ -1170,6 +1331,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   switch (element.type) {
     case "rectangle":
     case "stickynote":
+    case "dbtable":
     case "diamond":
     case "frame":
     case "magicframe":

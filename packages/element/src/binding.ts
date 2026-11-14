@@ -52,6 +52,7 @@ import {
   isArrowElement,
   isBindableElement,
   isBoundToContainer,
+  isDBTableElement,
   isElbowArrow,
   isRectangularElement,
   isRectanguloidElement,
@@ -61,6 +62,13 @@ import {
 import { aabbForElement, elementCenterPoint } from "./bounds";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import {
+  getDBTableConnectionSide,
+  getDBTableRowAnchorPoint,
+  getDBTableRowFixedPoint,
+  getDBTableRowIdAtPoint,
+  getDBTableSideFacing,
+} from "./dbTable";
+import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   getElbowArrowSnapMidPoint,
@@ -69,6 +77,7 @@ import {
 
 import { isNonDeletedElement } from ".";
 
+import type { DBTableSide } from "./dbTable";
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
@@ -77,6 +86,7 @@ import type {
   BindMode,
   ElementsMap,
   ExcalidrawArrowElement,
+  ExcalidrawDBTableElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
@@ -262,6 +272,7 @@ const bindOrUnbindBindingElementEdge = (
       focusPoint,
       shouldSnapToOutline,
       isMidpointSnappingEnabled,
+      true,
     );
   }
 };
@@ -1150,10 +1161,44 @@ export const bindBindingElement = (
   focusPoint?: GlobalPoint,
   shouldSnapToOutline = true,
   isMidpointSnappingEnabled = true,
+  /** the end was placed by the user (not programmatically): keep its side */
+  lockDBTableSide = false,
 ): void => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
   let binding: FixedPointBinding;
+
+  if (isDBTableElement(hoveredElement)) {
+    const point =
+      focusPoint ??
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
+    const scenePoint = { x: point[0], y: point[1] };
+    const rowId = getDBTableRowIdAtPoint(hoveredElement, scenePoint);
+    const facingSide = getDBTableSideFacing(hoveredElement, scenePoint);
+    binding = {
+      elementId: hoveredElement.id,
+      // a row connection always attaches at the table's edge
+      mode: "orbit",
+      fixedPoint: getDBTableRowFixedPoint(
+        hoveredElement,
+        hoveredElement.collapsed ? null : rowId,
+        facingSide,
+      ),
+      ...(rowId ? { rowId } : {}),
+      ...(lockDBTableSide ? { sideLocked: true } : {}),
+    };
+    applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
+    refreshElbowArrowDBTableSides(
+      arrow,
+      scene,
+      scene.getNonDeletedElementsMap(),
+    );
+    return;
+  }
 
   if (isElbowArrow(arrow)) {
     binding = {
@@ -1432,6 +1477,8 @@ export const updateBoundArrow = (
    */
   boundElementMoved = true,
 ) => {
+  refreshElbowArrowDBTableSides(arrow, scene, elementsMap);
+
   const startBindingElement = arrow.startBinding
     ? elementsMap.get(arrow.startBinding.elementId)
     : null;
@@ -1890,6 +1937,22 @@ export const bindPointToSnapToElementOutline = (
     return point;
   }
 
+  // database tables connect rows: the end snaps to the side edge of the row
+  // under the pointer (or the header's center line)
+  if (isDBTableElement(bindableElement)) {
+    return getDBTableRowAnchorPoint(
+      bindableElement,
+      bindableElement.collapsed
+        ? null
+        : getDBTableRowIdAtPoint(bindableElement, {
+            x: point[0],
+            y: point[1],
+          }),
+      getDBTableSideFacing(bindableElement, { x: point[0], y: point[1] }),
+      getBindingGap(bindableElement),
+    );
+  }
+
   const edgePoint =
     isRectanguloidElement(bindableElement) && elbowed
       ? avoidRectangularCorner(
@@ -2245,6 +2308,41 @@ export const updateBoundPoint = (
     return null;
   }
 
+  // database table rows: the end sits on the row's center line, on the side
+  // facing the other end (elbow arrows keep the side they were bound on, as
+  // their route is planned from it)
+  if (isDBTableElement(bindableElement) && !isElbowArrow(arrow)) {
+    const side =
+      (!binding.sideLocked &&
+        getDBTableOtherEndTarget(
+          arrow,
+          startOrEnd,
+          bindableElement,
+          elementsMap,
+        )?.side) ||
+      (binding.fixedPoint[0] < 0.5 ? "left" : "right");
+    const rowAnchorY = binding.fixedPoint[1] * bindableElement.height;
+    const anchor = pointRotateRads(
+      pointFrom<GlobalPoint>(
+        side === "left"
+          ? bindableElement.x - getBindingGap(bindableElement)
+          : bindableElement.x +
+              bindableElement.width +
+              getBindingGap(bindableElement),
+        bindableElement.y + rowAnchorY,
+      ),
+      elementCenterPoint(bindableElement, elementsMap),
+      bindableElement.angle as Radians,
+    );
+    return LinearElementEditor.createPointAt(
+      arrow,
+      elementsMap,
+      anchor[0],
+      anchor[1],
+      null,
+    );
+  }
+
   const focusPoint = getGlobalFixedPointForBindableElement(
     normalizeFixedPoint(binding.fixedPoint),
     bindableElement,
@@ -2380,6 +2478,87 @@ export const updateBoundPoint = (
     outlinePoint?.[1] || focusPoint[1],
     null,
   );
+};
+
+/**
+ * What the far end of `arrow` points at, as seen from the table bound at
+ * `startOrEnd`: the element bound there (its center), or else the adjacent
+ * arrow point — and the table side facing it.
+ */
+const getDBTableOtherEndTarget = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  startOrEnd: "startBinding" | "endBinding",
+  table: ExcalidrawDBTableElement,
+  elementsMap: ElementsMap,
+): { side: DBTableSide } | null => {
+  const otherBinding =
+    arrow[startOrEnd === "startBinding" ? "endBinding" : "startBinding"];
+  // (an elbow's inner points are its route, planned from the sides)
+  const elbowed = isElbowArrow(arrow);
+  const otherElement =
+    (arrow.points.length === 2 || elbowed) && otherBinding
+      ? elementsMap.get(otherBinding.elementId)
+      : null;
+  let target: GlobalPoint;
+  if (otherElement && otherElement.id !== table.id) {
+    target = elementCenterPoint(otherElement, elementsMap);
+  } else if (otherElement && isDBTableElement(otherElement)) {
+    // a self-relation (e.g. `parent_id`) loops out of one side and back in
+    return { side: "right" };
+  } else {
+    target = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      elbowed
+        ? startOrEnd === "startBinding"
+          ? -1
+          : 0
+        : startOrEnd === "startBinding"
+        ? 1
+        : -2,
+      elementsMap,
+    );
+  }
+  if (!target || !Number.isFinite(target[0])) {
+    return null;
+  }
+  return {
+    side: getDBTableConnectionSide(table, { x: target[0], y: target[1] }),
+  };
+};
+
+/**
+ * Elbow arrows plan their route from the side their binding names, so an
+ * elbow connecting database table rows has its sides re-picked (towards the
+ * other end) whenever it is re-placed: tables moved past each other then
+ * still connect facing sides.
+ */
+const refreshElbowArrowDBTableSides = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  scene: Scene,
+  elementsMap: ElementsMap,
+) => {
+  if (!isElbowArrow(arrow)) {
+    return;
+  }
+  for (const prop of ["startBinding", "endBinding"] as const) {
+    const binding = arrow[prop];
+    const table = binding && elementsMap.get(binding.elementId);
+    if (!binding || binding.sideLocked || !isDBTableElement(table)) {
+      continue;
+    }
+    const side = getDBTableOtherEndTarget(
+      arrow,
+      prop,
+      table,
+      elementsMap,
+    )?.side;
+    const ratioX = side === "left" ? 0 : side === "right" ? 1 : null;
+    if (ratioX !== null && ratioX !== binding.fixedPoint[0]) {
+      scene.mutateElement(arrow, {
+        [prop]: { ...binding, fixedPoint: [ratioX, binding.fixedPoint[1]] },
+      });
+    }
+  }
 };
 
 export const calculateFixedPointForElbowArrowBinding = (

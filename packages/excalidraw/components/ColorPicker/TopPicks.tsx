@@ -53,7 +53,7 @@ export const TopPicks = ({
     colors = DEFAULT_ELEMENT_STROKE_PICKS;
   }
 
-  if (type === "elementBackground") {
+  if (type === "elementBackground" || type === "textHighlight") {
     colors = DEFAULT_ELEMENT_BACKGROUND_PICKS;
   }
 

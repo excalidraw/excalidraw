@@ -185,12 +185,16 @@ export const SelectedShapeActions = ({
 
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
 
+      {predicates.padding && renderAction("changePadding")}
+
       {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
 
       {predicates.text && (
         <>
           <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
+          {renderAction("toggleTextStyle")}
+          <div>{renderAction("changeTextHighlightColor")}</div>
           {predicates.textAlign && renderAction("changeTextAlign")}
         </>
       )}
@@ -305,6 +309,7 @@ const CombinedShapeProperties = ({
               )}
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
+              {predicates.padding && renderAction("changePadding")}
               {predicates.opacity && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
@@ -486,6 +491,8 @@ const CombinedTextProperties = ({
           >
             <div className="selected-shape-actions">
               {predicates.text && renderAction("changeFontSize")}
+              {predicates.text && renderAction("toggleTextStyle")}
+              {predicates.text && renderAction("changeTextHighlightColor")}
               {predicates.textAlign && renderAction("changeTextAlign")}
               {predicates.verticalAlign && renderAction("changeVerticalAlign")}
             </div>

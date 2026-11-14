@@ -28,9 +28,15 @@ import {
   normalizeStickyNoteBackgroundColor,
   normalizeStickyNoteStrokeColor,
 } from "./stickyNote";
+import {
+  newDBTableRow,
+  normalizeDBTable,
+  DB_TABLE_DEFAULT_ROWS,
+  DB_TABLE_DEFAULT_TITLE,
+} from "./dbTable";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { measureTextElementText, wrapTextElementText } from "./richTextLayout";
 
 import { isLineElement } from "./typeChecks";
 
@@ -58,6 +64,8 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
+  ExcalidrawDBTableElement,
+  ExcalidrawDBTableRow,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -244,6 +252,37 @@ export const newStickyNoteElement = (
   });
 };
 
+export const newDBTableElement = (
+  opts: {
+    type: "dbtable";
+    title?: string;
+    rows?: readonly Partial<Omit<ExcalidrawDBTableRow, "id">>[];
+    collapsed?: boolean;
+    showExamples?: boolean;
+    fontSize?: number;
+    fontFamily?: FontFamilyValues;
+    renderEnvironment?: RenderEnvironment;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawDBTableElement> => {
+  const base = _newElementBase<ExcalidrawDBTableElement>("dbtable", opts);
+
+  // the size is derived from the content, never taken from `opts`
+  return normalizeDBTable(
+    {
+      ...base,
+      title: opts.title ?? DB_TABLE_DEFAULT_TITLE,
+      rows: (opts.rows ?? DB_TABLE_DEFAULT_ROWS).map((row) =>
+        newDBTableRow(row),
+      ),
+      collapsed: opts.collapsed ?? false,
+      ...(opts.showExamples ? { showExamples: true } : {}),
+      fontSize: opts.fontSize || DEFAULT_FONT_SIZE,
+      fontFamily: opts.fontFamily || DEFAULT_FONT_FAMILY,
+    },
+    opts.renderEnvironment,
+  );
+};
+
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
@@ -401,16 +440,18 @@ const getAdjustedDimensions = (
   /** the width the text is to take regardless of its content */
   nextFixedWidth?: number,
   renderEnvironment?: RenderEnvironment,
+  /** the unwrapped `nextText`, mapping its lines to the element's spans */
+  nextOriginalText: string = nextText,
 ): {
   x: number;
   y: number;
   width: number;
   height: number;
 } => {
-  let { width: nextWidth, height: nextHeight } = measureText(
+  let { width: nextWidth, height: nextHeight } = measureTextElementText(
+    element,
     nextText,
-    getFontString(element),
-    element.lineHeight,
+    nextOriginalText,
     renderEnvironment,
   );
 
@@ -430,10 +471,10 @@ const getAdjustedDimensions = (
     !element.containerId &&
     element.autoResize
   ) {
-    const prevMetrics = measureText(
+    const prevMetrics = measureTextElementText(
+      element,
       element.text,
-      getFontString(element),
-      element.lineHeight,
+      element.originalText,
       renderEnvironment,
     );
     const offsets = getTextElementPositionOffsets(element, {
@@ -560,12 +601,16 @@ export const refreshTextDimensions = (
     textElement.autoResize &&
     textElement.width <= maxWidth
   ) {
-    const font = getFontString(textElement);
     if (
-      measureText(text, font, textElement.lineHeight, renderEnvironment).width >
+      measureTextElementText(textElement, text, text, renderEnvironment).width >
       maxWidth
     ) {
-      const wrappedText = wrapText(text, font, maxWidth, renderEnvironment);
+      const wrappedText = wrapTextElementText(
+        textElement,
+        text,
+        maxWidth,
+        renderEnvironment,
+      );
       return {
         text: wrappedText,
         autoResize: false,
@@ -575,14 +620,16 @@ export const refreshTextDimensions = (
           wrappedText,
           maxWidth,
           renderEnvironment,
+          text,
         ),
       };
     }
   }
+  const originalText = text;
   if (container || !textElement.autoResize) {
-    text = wrapText(
+    text = wrapTextElementText(
+      textElement,
       text,
-      getFontString(textElement),
       container
         ? getBoundTextMaxWidth(container, textElement)
         : textElement.width,
@@ -595,6 +642,7 @@ export const refreshTextDimensions = (
     text,
     undefined,
     renderEnvironment,
+    originalText,
   );
   return { text, ...dimensions };
 };

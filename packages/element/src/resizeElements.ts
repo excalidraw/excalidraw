@@ -44,11 +44,10 @@ import {
 } from "./textElement";
 import {
   getMinTextElementWidth,
-  measureText,
   getApproxMinLineWidth,
   getApproxMinLineHeight,
 } from "./textMeasurements";
-import { wrapText } from "./textWrapping";
+import { measureTextElementText, wrapTextElementText } from "./richTextLayout";
 
 import {
   isArrowElement,
@@ -60,6 +59,7 @@ import {
   isImageElement,
   isLinearElement,
   isStickyNoteElement,
+  isDBTableElement,
   isTextElement,
 } from "./typeChecks";
 
@@ -69,6 +69,7 @@ import {
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
+import { getDBTableLayout, syncDBTableRowBindings } from "./dbTable";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 
@@ -386,16 +387,16 @@ export const resizeSingleTextElement = (
 
     const newWidth = Math.max(minWidth, nextWidth);
 
-    const text = wrapText(
+    const text = wrapTextElementText(
+      element,
       element.originalText,
-      getFontString(element),
       Math.abs(newWidth),
       renderEnvironment,
     );
-    const metrics = measureText(
+    const metrics = measureTextElementText(
+      element,
       text,
-      getFontString(element),
-      element.lineHeight,
+      element.originalText,
       renderEnvironment,
     );
 
@@ -768,6 +769,43 @@ export const resizeSingleElement = (
     renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
+  // a table's height is derived from its content (see `normalizeDBTable`);
+  // only its width can be set, and never below what the content needs
+  if (isDBTableElement(latestElement)) {
+    if (handleDirection !== "e" && handleDirection !== "w") {
+      return;
+    }
+    const minLayout = getDBTableLayout(
+      { ...latestElement, customWidth: null },
+      renderEnvironment,
+    );
+    const width = Math.max(Math.abs(nextWidth), minLayout.width);
+    const origin = getResizedOrigin(
+      pointFrom<GlobalPoint>(origElement.x, origElement.y),
+      origElement.width,
+      origElement.height,
+      width,
+      origElement.height,
+      origElement.angle,
+      handleDirection,
+      false,
+      !!shouldResizeFromCenter,
+    );
+    scene.mutateElement(
+      latestElement,
+      {
+        ...origin,
+        width,
+        // the examples column is added on top of the custom width
+        customWidth: width - minLayout.examplesColumnWidth,
+      },
+      { informMutation: shouldInformMutation, isDragging: false },
+    );
+    syncDBTableRowBindings(latestElement, scene);
+    updateBoundElements(latestElement, scene, { renderEnvironment });
+    return;
+  }
+
   if (isTextElement(latestElement) && isTextElement(origElement)) {
     return resizeSingleTextElement(
       origElement,
@@ -1403,6 +1441,8 @@ export const resizeMultipleElements = (
         (item) =>
           item.latest.angle !== 0 ||
           isTextElement(item.latest) ||
+          // tables scale through their font size, which keeps proportions
+          isDBTableElement(item.latest) ||
           isInGroup(item.latest),
       );
 
@@ -1428,6 +1468,7 @@ export const resizeMultipleElements = (
       > & {
         points?: ExcalidrawLinearElement["points"];
         fontSize?: ExcalidrawTextElement["fontSize"];
+        customWidth?: number | null;
         scale?: ExcalidrawImageElement["scale"];
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
         startBinding?: ExcalidrawElbowArrowElement["startBinding"];
@@ -1524,6 +1565,35 @@ export const resizeMultipleElements = (
           return;
         }
         update.fontSize = metrics.size;
+      }
+
+      if (isDBTableElement(orig)) {
+        const fontSize = orig.fontSize * scale;
+        if (fontSize < MIN_FONT_SIZE) {
+          return;
+        }
+        update.fontSize = fontSize;
+        const customWidth = orig.customWidth
+          ? orig.customWidth * scale
+          : orig.customWidth;
+        update.customWidth = customWidth;
+        // the size follows from the scaled font (≈ the scaled box, without
+        // drift from rounding)
+        const layout = getDBTableLayout(
+          { ...orig, fontSize, customWidth },
+          renderEnvironment,
+        );
+        update.width = layout.width;
+        update.height = layout.height;
+        // keep the anchor-relative position consistent with the new size
+        update.x =
+          anchorX +
+          flipFactorX * (offsetX * scaleX) -
+          (flipByX ? layout.width : 0);
+        update.y =
+          anchorY +
+          flipFactorY * (offsetY * scaleY) -
+          (flipByY ? layout.height : 0);
       }
 
       const boundTextElement = originalElementsMap.get(

@@ -6,6 +6,7 @@ import {
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -27,6 +28,17 @@ import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
+  getAlignedLineXs,
+  getListLineContent,
+  getListLineLayouts,
+  isTextElementListLine,
+} from "@excalidraw/element";
+import {
+  getLineWidth,
+  getTextElementLines,
+  getTextSegmentFontString,
+} from "@excalidraw/element";
+import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
@@ -38,6 +50,14 @@ import { getContainingFrame, isFrameClippable } from "@excalidraw/element";
 import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
+import {
+  getDBTableKeyFontSize,
+  getDBTableLayout,
+  getDBTableTextBaselineOffset,
+  DB_TABLE_EXAMPLE_FONT_STYLE,
+  DB_TABLE_EXAMPLE_TEXT_OPACITY,
+  DB_TABLE_KEY_TEXT_OPACITY,
+} from "@excalidraw/element";
 import {
   getStickyNoteFooter,
   getStickyNotePathCommands,
@@ -259,6 +279,157 @@ const renderElementToSvg = (
         dateText.setAttribute("fill-opacity", `${STICKY_NOTE_FOOTER.opacity}`);
         dateText.textContent = footer.text;
         group.appendChild(dateText);
+      }
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group],
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+
+      addToRoot(g || group, element);
+      break;
+    }
+    case "dbtable": {
+      const doc = svgRoot.ownerDocument;
+      const isDarkMode = renderConfig.theme === THEME.DARK;
+      const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
+      const layout = getDBTableLayout(element);
+
+      const group = doc.createElementNS(SVG_NS, "g");
+      group.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      if (opacity !== 1) {
+        group.setAttribute("opacity", `${opacity}`);
+      }
+
+      for (const shape of ShapeCache.generateElementShape(
+        element,
+        renderConfig,
+      )) {
+        const node = roughSVGDrawWithPrecision(
+          rsvg,
+          shape,
+          MAX_DECIMALS_FOR_SVG_EXPORT,
+        );
+        node.setAttribute("stroke-linecap", "round");
+        group.appendChild(node);
+      }
+
+      // collapse toggle (kept in exports: it tells the table is collapsible)
+      const { toggle, unit } = layout;
+      const arm = toggle.width * 0.27;
+      const toggleCx = toggle.x + toggle.width / 2;
+      const toggleCy = toggle.y + toggle.height / 2;
+      const toggleNode = doc.createElementNS(SVG_NS, "path");
+      toggleNode.setAttribute(
+        "d",
+        [
+          `M ${toggleCx - arm} ${toggleCy} L ${toggleCx + arm} ${toggleCy}`,
+          element.collapsed
+            ? `M ${toggleCx} ${toggleCy - arm} L ${toggleCx} ${toggleCy + arm}`
+            : "",
+        ].join(" "),
+      );
+      const toggleRect = doc.createElementNS(SVG_NS, "rect");
+      toggleRect.setAttribute("x", `${toggle.x}`);
+      toggleRect.setAttribute("y", `${toggle.y}`);
+      toggleRect.setAttribute("width", `${toggle.width}`);
+      toggleRect.setAttribute("height", `${toggle.height}`);
+      toggleRect.setAttribute("rx", `${2.5 * unit}`);
+      for (const node of [toggleRect, toggleNode]) {
+        node.setAttribute("fill", "none");
+        node.setAttribute("stroke", color);
+        node.setAttribute("stroke-opacity", "0.8");
+        node.setAttribute("stroke-width", `${Math.max(1, 1.25 * unit)}`);
+        node.setAttribute("stroke-linecap", "round");
+        group.appendChild(node);
+      }
+
+      const fontFamily = getFontFamilyString(element);
+      const createText = (
+        content: string,
+        x: number,
+        y: number,
+        fontSize: number,
+        anchor: "start" | "middle",
+      ) => {
+        const text = doc.createElementNS(SVG_NS, "text");
+        text.textContent = content;
+        text.setAttribute("x", `${x}`);
+        text.setAttribute("y", `${y}`);
+        text.setAttribute("font-family", fontFamily);
+        text.setAttribute("font-size", `${fontSize}px`);
+        text.setAttribute("fill", color);
+        text.setAttribute("text-anchor", anchor);
+        text.setAttribute("direction", "ltr");
+        text.setAttribute("dominant-baseline", "alphabetic");
+        text.setAttribute("style", "white-space: pre;");
+        group.appendChild(text);
+        return text;
+      };
+
+      if (element.title) {
+        createText(
+          element.title,
+          layout.width / 2,
+          layout.titleY +
+            getDBTableTextBaselineOffset(
+              element.fontFamily,
+              layout.fontSize,
+              layout.lineHeight,
+            ),
+          layout.fontSize,
+          "middle",
+        );
+      }
+      const keyFontSize = getDBTableKeyFontSize(element.fontSize);
+      const keyBaseline = getDBTableTextBaselineOffset(
+        element.fontFamily,
+        keyFontSize,
+        layout.lineHeight,
+      );
+      const nameBaseline = getDBTableTextBaselineOffset(
+        element.fontFamily,
+        layout.fontSize,
+        layout.lineHeight,
+      );
+      for (const row of layout.rows) {
+        if (row.row.key) {
+          createText(
+            row.row.key,
+            row.key.x + layout.paddingX,
+            row.keyTextY + keyBaseline,
+            keyFontSize,
+            "start",
+          ).setAttribute("fill-opacity", `${DB_TABLE_KEY_TEXT_OPACITY}`);
+        }
+        if (row.row.name) {
+          createText(
+            row.row.name,
+            row.name.x + layout.paddingX,
+            row.nameTextY + nameBaseline,
+            layout.fontSize,
+            "start",
+          );
+        }
+        if (row.example && row.row.example) {
+          const text = createText(
+            row.row.example,
+            row.example.x + layout.paddingX,
+            row.nameTextY + nameBaseline,
+            layout.fontSize,
+            "start",
+          );
+          text.setAttribute("font-style", DB_TABLE_EXAMPLE_FONT_STYLE);
+          text.setAttribute("fill-opacity", `${DB_TABLE_EXAMPLE_TEXT_OPACITY}`);
+        }
       }
 
       const g = maybeWrapNodesInFrameClipPath(
@@ -816,24 +987,180 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+        const isDarkMode = renderConfig.theme === THEME.DARK;
+        // rich text (styled portions): a <tspan> per piece, flowing in one
+        // <text> per line so the line's anchor still aligns it
+        const richLines =
+          direction === "ltr" ? getTextElementLines(element) : null;
+        // markdown list items: markers drawn as bullets / numbers, and their
+        // text (also on the lines they wrap into) hanging past them
+        const fontString = getFontString(element);
+        const listLayouts = richLines
+          ? null
+          : getListLineLayouts(
+              element.text,
+              element.originalText,
+              element.fontSize,
+              (marker) => getLineWidth(marker, fontString),
+            );
+        // the widths of each rich line's pieces
+        const richWidths = richLines?.map((richLine) =>
+          richLine.segments.map((segment) =>
+            getLineWidth(
+              segment.text,
+              getTextSegmentFontString(element, segment.style),
+            ),
+          ),
+        );
+        // where each line starts (a run of list lines aligned as a block)
+        const lineXs = getAlignedLineXs(
+          lines.map((line, index) => {
+            const richLine = richLines?.[index];
+            if (richLine && richWidths) {
+              return {
+                width:
+                  richLine.contentX +
+                  richWidths[index].reduce((sum, width) => sum + width, 0),
+                isListLine: isTextElementListLine(richLine),
+              };
+            }
+            const listLayout = listLayouts?.[index] ?? null;
+            return {
+              width:
+                (listLayout?.contentX ?? 0) +
+                getLineWidth(
+                  getListLineContent(line, listLayout).text,
+                  fontString,
+                ),
+              isListLine: !!listLayout,
+            };
+          }),
+          element.textAlign,
+          element.width,
+        );
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
-          text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
-          text.setAttribute("font-family", getFontFamilyString(element));
-          text.setAttribute("font-size", `${element.fontSize}px`);
+          const richLine = richLines?.[i];
+          const listLayout = listLayouts?.[i] ?? null;
+          // a list line is laid out from its start, as on the canvas
+          let lineX: number | null = null;
+          let contentX = 0;
+          let listMarker: { text: string; x: number } | null = null;
+          if (richLine) {
+            // highlights: rects behind the line's text, laid out with the
+            // same measurements as the canvas
+            const widths = richWidths![i];
+            const alignedX = lineXs[i];
+            if (isTextElementListLine(richLine)) {
+              lineX = alignedX;
+              contentX = richLine.contentX;
+              listMarker = richLine.listMarker;
+            }
+            let x = alignedX + richLine.contentX;
+            richLine.segments.forEach((segment, index) => {
+              if (segment.style.highlightColor) {
+                const rect = svgRoot.ownerDocument.createElementNS(
+                  SVG_NS,
+                  "rect",
+                );
+                rect.setAttribute("x", `${x}`);
+                rect.setAttribute("y", `${richLine.top}`);
+                rect.setAttribute("width", `${widths[index]}`);
+                rect.setAttribute("height", `${richLine.height}`);
+                rect.setAttribute(
+                  "fill",
+                  applyDarkModeFilter(segment.style.highlightColor, isDarkMode),
+                );
+                node.appendChild(rect);
+              }
+              x += widths[index];
+            });
+
+            for (const segment of richLine.segments) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = segment.text;
+              const { style } = segment;
+              if (style.strokeColor) {
+                tspan.setAttribute(
+                  "fill",
+                  applyDarkModeFilter(style.strokeColor, isDarkMode),
+                );
+              }
+              if (style.fontFamily) {
+                tspan.setAttribute(
+                  "font-family",
+                  getFontFamilyString({ fontFamily: style.fontFamily }),
+                );
+              }
+              if (style.fontSize) {
+                tspan.setAttribute("font-size", `${style.fontSize}px`);
+              }
+              if (style.bold) {
+                tspan.setAttribute("font-weight", "bold");
+              }
+              if (style.italic) {
+                tspan.setAttribute("font-style", "italic");
+              }
+              const decorations = [
+                style.underline && "underline",
+                style.strikethrough && "line-through",
+              ].filter(Boolean);
+              if (decorations.length) {
+                tspan.setAttribute("text-decoration", decorations.join(" "));
+              }
+              text.appendChild(tspan);
+            }
+          } else if (listLayout) {
+            const content = getListLineContent(lines[i], listLayout).text;
+            contentX = listLayout.contentX;
+            lineX = lineXs[i];
+            listMarker = listLayout.item
+              ? { text: listLayout.item.displayMarker, x: listLayout.markerX }
+              : null;
+            text.textContent = content;
+          } else {
+            text.textContent = lines[i];
+          }
+          const baseline = richLine
+            ? richLine.baseline
+            : i * lineHeightPx + verticalOffset;
+          const setTextAttributes = (textNode: Element) => {
+            textNode.setAttribute("y", `${baseline}`);
+            textNode.setAttribute("font-family", getFontFamilyString(element));
+            textNode.setAttribute("font-size", `${element.fontSize}px`);
+            textNode.setAttribute(
+              "fill",
+              applyDarkModeFilter(
+                element.strokeColor,
+                renderConfig.theme === THEME.DARK,
+              ),
+            );
+            textNode.setAttribute(
+              "text-anchor",
+              lineX === null ? textAnchor : "start",
+            );
+            textNode.setAttribute("style", "white-space: pre;");
+            textNode.setAttribute("direction", direction);
+            textNode.setAttribute("dominant-baseline", "alphabetic");
+          };
+          if (lineX !== null && listMarker) {
+            const markerNode = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "text",
+            );
+            markerNode.textContent = listMarker.text;
+            markerNode.setAttribute("x", `${lineX + listMarker.x}`);
+            setTextAttributes(markerNode);
+            node.appendChild(markerNode);
+          }
           text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
+            "x",
+            `${lineX === null ? horizontalOffset : lineX + contentX}`,
           );
-          text.setAttribute("text-anchor", textAnchor);
-          text.setAttribute("style", "white-space: pre;");
-          text.setAttribute("direction", direction);
-          text.setAttribute("dominant-baseline", "alphabetic");
+          setTextAttributes(text);
           node.appendChild(text);
         }
 

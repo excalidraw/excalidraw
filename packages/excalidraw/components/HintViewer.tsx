@@ -114,6 +114,14 @@ const getHints = ({
     return t("hints.stickynote");
   }
 
+  if (activeTool.type === "dbtable") {
+    return t("hints.dbtable");
+  }
+
+  if (appState.editingDBTableId) {
+    return t("hints.dbtable_editing");
+  }
+
   if (activeTool.type === "autoshape") {
     return t("hints.autoshape");
   }
@@ -172,6 +180,14 @@ const getHints = ({
     return t("hints.cycleSelection", {
       shortcut: getTaggedShortcutKey("Alt"),
     });
+  }
+
+  if (
+    selectedElements.length === 1 &&
+    selectedElements[0].type === "dbtable" &&
+    isSelectionLikeTool(activeTool.type)
+  ) {
+    return t("hints.dbtable_selected");
   }
 
   if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {

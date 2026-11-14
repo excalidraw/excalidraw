@@ -43,6 +43,7 @@ import {
   isValidPolygon,
   projectFixedPointOntoDiagonal,
   isNonDeletedElement,
+  normalizeTextSpans,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
 import {
@@ -61,6 +62,7 @@ import {
 } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { isStickyNoteElement } from "@excalidraw/element";
+import { newDBTableRow, normalizeDBTable } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
   isArrowBoundToElement,
@@ -90,6 +92,7 @@ import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawArrowElement,
+  ExcalidrawDBTableElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
@@ -232,6 +235,7 @@ export const AllowedExcalidrawActiveTools: Record<
   arrow: true,
   freedraw: true,
   stickynote: true,
+  dbtable: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -359,6 +363,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
           elementId: binding.elementId,
           mode: binding.mode,
           fixedPoint: normalizeFixedPoint(binding.fixedPoint),
+          // a database table row connection
+          ...(typeof binding.rowId === "string" && binding.rowId
+            ? { rowId: binding.rowId }
+            : {}),
+          ...(binding.sideLocked === true ? { sideLocked: true } : {}),
         } as FixedPointBinding | null;
       }
       return null;
@@ -594,6 +603,19 @@ export const restoreElement = (
           : null,
       });
 
+      // rich text: keep valid spans only (in normal form, within the text)
+      if ("spans" in element) {
+        const spans = normalizeTextSpans(
+          element.spans as unknown[] | null | undefined,
+          element.originalText.length,
+        );
+        if (spans) {
+          element = { ...element, spans };
+        } else {
+          delete (element as { spans?: unknown }).spans;
+        }
+      }
+
       // if empty text, mark as deleted. We keep in array
       // for data integrity purposes (collab etc.)
       if (opts?.deleteInvisibleElements && !text && !element.isDeleted) {
@@ -752,6 +774,29 @@ export const restoreElement = (
             element.height,
         }),
       );
+    case "dbtable": {
+      const fontFamily = Object.values(FONT_FAMILY).includes(
+        element.fontFamily as any,
+      )
+        ? element.fontFamily
+        : DEFAULT_FONT_FAMILY;
+      return normalizeDBTable(
+        restoreElementWithProperties(element, {
+          title: typeof element.title === "string" ? element.title : "",
+          rows: restoreDBTableRows(element.rows),
+          collapsed: element.collapsed === true,
+          ...(element.showExamples === true ? { showExamples: true } : {}),
+          fontSize:
+            isFiniteNumber(element.fontSize) && element.fontSize > 0
+              ? element.fontSize
+              : DEFAULT_FONT_SIZE,
+          fontFamily,
+          ...(isFiniteNumber(element.customWidth) && element.customWidth > 0
+            ? { customWidth: element.customWidth }
+            : {}),
+        }),
+      );
+    }
     case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
@@ -763,6 +808,35 @@ export const restoreElement = (
     // out these unsupported elements from the restored array.
   }
   return null;
+};
+
+/** keeps well-formed rows, with unique ids, dropping anything else */
+const restoreDBTableRows = (
+  rows: unknown,
+): ExcalidrawDBTableElement["rows"] => {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
+  const seenIds = new Set<string>();
+  const restored: ExcalidrawDBTableElement["rows"][number][] = [];
+  for (const row of rows) {
+    if (!row || typeof row !== "object") {
+      continue;
+    }
+    const key = typeof row.key === "string" ? row.key : "";
+    const name = typeof row.name === "string" ? row.name : "";
+    const id =
+      typeof row.id === "string" && row.id && !seenIds.has(row.id)
+        ? row.id
+        : newDBTableRow().id;
+    seenIds.add(id);
+    restored.push(
+      typeof row.example === "string" && row.example
+        ? { id, key, name, example: row.example }
+        : { id, key, name },
+    );
+  }
+  return restored;
 };
 
 /**

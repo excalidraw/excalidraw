@@ -38,6 +38,7 @@ import {
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
+  getContainerPadding,
   getBoundTextElement,
 } from "@excalidraw/element";
 import { getTextWidth } from "@excalidraw/element";
@@ -46,6 +47,13 @@ import { getLineWidth } from "@excalidraw/element";
 import { normalizeText } from "@excalidraw/element";
 import { wrapText } from "@excalidraw/element";
 import { getWrappedTextLines } from "@excalidraw/element";
+import { textSpansEqual } from "@excalidraw/element";
+import { getTextElementLines } from "@excalidraw/element";
+import {
+  getListContinuation,
+  getTextElementRawWidth,
+  parseMarkdownListLines,
+} from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -59,6 +67,7 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
   ExcalidrawTextContainer,
+  TextSpan,
 } from "@excalidraw/element/types";
 
 import { actionSaveFileToDisk, actionSaveToActiveFile } from "../actions";
@@ -77,6 +86,15 @@ import {
   actionZoomIn,
   actionZoomOut,
 } from "../actions/actionCanvas";
+
+import {
+  actionToggleTextStyle,
+  getTextStyleForShortcut,
+} from "../actions/actionTextStyle";
+
+import { createRichEditable, setActiveRichEditor } from "./richEditable";
+
+import type { RichEditable } from "./richEditable";
 
 import type { ParsedDataTranferList } from "../clipboard";
 
@@ -314,8 +332,15 @@ export const textWysiwyg = ({
    * Note: `text`, which can be wrapped and therefore different from `originalText`,
    *       is derived from `originalText`
    */
-  onChange?: (nextOriginalText: string) => void;
-  onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
+  onChange?: (
+    nextOriginalText: string,
+    nextSpans: readonly TextSpan[] | null,
+  ) => void;
+  onSubmit: (data: {
+    viaKeyboard: boolean;
+    nextOriginalText: string;
+    nextSpans: readonly TextSpan[] | null;
+  }) => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -363,7 +388,7 @@ export const textWysiwyg = ({
 
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
-    editable: HTMLTextAreaElement,
+    editable: RichEditable,
   ) => {
     if (!editable.style.fontFamily || !editable.style.fontSize) {
       return false;
@@ -465,6 +490,7 @@ export const textWysiwyg = ({
             const targetContainerHeight = computeContainerDimensionForBoundText(
               height,
               container.type,
+              getContainerPadding(container),
             );
 
             app.scene.mutateElement(container, {
@@ -484,6 +510,7 @@ export const textWysiwyg = ({
             const targetContainerHeight = computeContainerDimensionForBoundText(
               height,
               container.type,
+              getContainerPadding(container),
             );
             app.scene.mutateElement(container, {
               height: targetContainerHeight,
@@ -511,6 +538,26 @@ export const textWysiwyg = ({
         width += 0.5;
       }
 
+      // markdown list items: the editor shows their markers as typed
+      // (`    - item`), which can take more room than the bullets and indents
+      // the canvas lays out — widen the box to the lines as typed, so that it
+      // wraps them where the canvas does (rather than breaking `- item`), and
+      // shift it so that the text stays aligned where it is
+      let listOverflowX = 0;
+      if (parseMarkdownListLines(updatedTextElement.originalText)) {
+        const extraWidth =
+          getTextElementRawWidth(updatedTextElement, app.renderEnvironment) -
+          updatedTextElement.width;
+        if (extraWidth > 0) {
+          width += extraWidth;
+          listOverflowX =
+            textAlign === "center"
+              ? extraWidth / 2
+              : textAlign === "right"
+              ? extraWidth
+              : 0;
+        }
+      }
       // add 5% buffer otherwise it causes wysiwyg to jump
       height *= 1.05;
 
@@ -568,8 +615,9 @@ export const textWysiwyg = ({
           updatedTextElement.lineHeight,
         ),
         textAlign,
-        width: updatedTextElement.width,
-        x: coordX,
+        // the editor's box (wider than the text with raw list markers)
+        width: width - (container ? 0.5 : 0),
+        x: coordX - listOverflowX,
         y: coordY,
       };
       // a font's glyphs can reach past its lines, beyond the 5% buffer: the
@@ -580,6 +628,33 @@ export const textWysiwyg = ({
         editable.style.height = `${editable.scrollHeight}px`;
       }
       editable.scrollTop = 0;
+      editable.refreshStyles();
+      // the selection layer sits exactly on the editor
+      Object.assign(selectionLayer.style, {
+        left: editable.style.left,
+        top: editable.style.top,
+        width: editable.style.width,
+        height: editable.style.height,
+        transform: editable.style.transform,
+        transformOrigin: editable.style.transformOrigin,
+      });
+      // rotated, the selection's client rects can't be mapped back onto
+      // the text's lines: keep the browser's own highlight then
+      editable.classList.toggle(
+        "excalidraw-wysiwyg--uniform-selection",
+        angle === 0,
+      );
+      renderSelectionLayer();
+      // styled portions changed from outside the editor (e.g. by an action)
+      if (
+        updatedTextElement.originalText === editable.value &&
+        !textSpansEqual(updatedTextElement.spans, editable.spans)
+      ) {
+        editable.setContent(
+          updatedTextElement.originalText,
+          updatedTextElement.spans ?? null,
+        );
+      }
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
@@ -590,13 +665,169 @@ export const textWysiwyg = ({
     }
   };
 
-  const editable = ownerDocument.createElement("textarea");
+  /**
+   * The editor's selection, drawn as one band per line spanning the line's
+   * full height (as the canvas lays the lines out). The browser's own
+   * highlight is only as tall as each font's glyph box, so a text mixing
+   * fonts or sizes would get a ragged selection.
+   */
+  const selectionLayer = ownerDocument.createElement("div");
+  selectionLayer.classList.add("excalidraw-wysiwyg-selection");
+  Object.assign(selectionLayer.style, {
+    position: "absolute",
+    pointerEvents: "none",
+    zIndex: "var(--zIndex-wysiwyg)",
+  });
+
+  /** the lines' tops and heights, in the text's own (unzoomed) px */
+  const getLineBoxes = (textElement: ExcalidrawTextElement) => {
+    const richLines = getTextElementLines(textElement);
+    if (richLines) {
+      return richLines.map(({ top, height }) => ({ top, height }));
+    }
+    const height = getLineHeightInPx(
+      textElement.fontSize,
+      textElement.lineHeight,
+    );
+    return textElement.text
+      .split("\n")
+      .map((_, index) => ({ top: index * height, height }));
+  };
+
+  /**
+   * Maps a range's client rects onto the text's lines: one band per line,
+   * from the leftmost to the rightmost piece, in the text's own px.
+   */
+  const getLineBands = (
+    range: Range,
+    lines: readonly { top: number; height: number }[],
+  ) => {
+    const zoom = app.state.zoom.value;
+    const origin = editable.getBoundingClientRect();
+    const bands = new Map<number, { left: number; right: number }>();
+    for (const rect of Array.from(range.getClientRects())) {
+      if (rect.width <= 0) {
+        continue;
+      }
+      const centerY = ((rect.top + rect.bottom) / 2 - origin.top) / zoom;
+      let lineIndex = lines.findIndex(
+        (line) => centerY >= line.top && centerY < line.top + line.height,
+      );
+      if (lineIndex === -1) {
+        lineIndex = centerY < 0 ? 0 : lines.length - 1;
+      }
+      const left = (rect.left - origin.left) / zoom;
+      const right = (rect.right - origin.left) / zoom;
+      const band = bands.get(lineIndex);
+      bands.set(
+        lineIndex,
+        band
+          ? {
+              left: Math.min(band.left, left),
+              right: Math.max(band.right, right),
+            }
+          : { left, right },
+      );
+    }
+    return bands;
+  };
+
+  const drawLineBands = (
+    bands: Map<number, { left: number; right: number }>,
+    lines: readonly { top: number; height: number }[],
+    className: string,
+    background?: string,
+  ) => {
+    for (const [lineIndex, { left, right }] of bands) {
+      const line = lines[lineIndex];
+      const band = ownerDocument.createElement("div");
+      band.className = className;
+      Object.assign(band.style, {
+        position: "absolute",
+        left: `${left}px`,
+        top: `${line.top}px`,
+        width: `${right - left}px`,
+        height: `${line.height}px`,
+        ...(background ? { background } : {}),
+      });
+      selectionLayer.appendChild(band);
+    }
+  };
+
+  /**
+   * The overlay under the text: the portions' highlights and the selection,
+   * both in bands of the lines' full height.
+   */
+  const renderSelectionLayer = () => {
+    selectionLayer.replaceChildren();
+    // (also runs before the editor is attached, and after it's removed)
+    const textElement = app.scene.getElement(element.id);
+    if (
+      !editable.isConnected ||
+      !textElement ||
+      !isTextElement(textElement) ||
+      typeof ownerDocument.createRange !== "function"
+    ) {
+      return;
+    }
+    const lines = getLineBoxes(textElement);
+    if (!lines.length) {
+      return;
+    }
+    const range = ownerDocument.createRange();
+    if (typeof range.getClientRects !== "function") {
+      return;
+    }
+
+    // highlights (the spans' backgrounds stay transparent)
+    editable.querySelectorAll<HTMLElement>("span[data-rt]").forEach((span) => {
+      let highlightColor: string | undefined;
+      try {
+        highlightColor = JSON.parse(
+          span.getAttribute("data-rt") || "{}",
+        ).highlightColor;
+      } catch {
+        return;
+      }
+      if (!highlightColor) {
+        return;
+      }
+      range.selectNodeContents(span);
+      drawLineBands(
+        getLineBands(range, lines),
+        lines,
+        "excalidraw-wysiwyg-highlight",
+        applyDarkModeFilter(highlightColor, app.state.theme === THEME.DARK),
+      );
+    });
+
+    // the selection (where the browser's own is hidden, see updateWysiwygStyle)
+    const selection = ownerWindow.getSelection();
+    if (
+      !editable.classList.contains("excalidraw-wysiwyg--uniform-selection") ||
+      !selection ||
+      !selection.rangeCount ||
+      selection.isCollapsed ||
+      !editable.contains(selection.anchorNode)
+    ) {
+      return;
+    }
+    drawLineBands(
+      getLineBands(selection.getRangeAt(0), lines),
+      lines,
+      "excalidraw-wysiwyg-selection-band",
+    );
+  };
+
+  // a contenteditable whose styled portions are <span>s, with the textarea
+  // API this editor uses (see richEditable.ts)
+  const editable = createRichEditable(ownerDocument, {
+    isDarkMode: () => app.state.theme === THEME.DARK,
+  });
 
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
-  // prevent line wrapping on Safari
-  editable.wrap = "off";
   editable.classList.add("excalidraw-wysiwyg");
 
   let whiteSpace = "pre";
@@ -620,7 +851,10 @@ export const textWysiwyg = ({
     outline: 0,
     resize: "none",
     background: "transparent",
-    overflow: "hidden",
+    // never cut the text off: glyphs reaching past their advance (italics)
+    // or a line the browser lays out a bit taller than the canvas would be
+    // (the box itself is sized by the canvas' measurements)
+    overflow: "visible",
     // must be specified because in dark mode canvas creates a stacking context
     zIndex: "var(--zIndex-wysiwyg)",
     wordBreak,
@@ -628,8 +862,24 @@ export const textWysiwyg = ({
     whiteSpace,
     overflowWrap: "break-word",
     boxSizing: "content-box",
+    cursor: "text",
+    // a textarea gets these regardless; a contenteditable inherits the
+    // editor root's `pointer-events` / `user-select: none`
+    pointerEvents: "auto",
+    userSelect: "text",
+    webkitUserSelect: "text",
   });
-  editable.value = element.originalText;
+  editable.setContent(element.originalText, element.spans ?? null);
+  setActiveRichEditor({ elementId: element.id, editable });
+  ownerDocument.addEventListener("selectionchange", renderSelectionLayer);
+  // dragging a selection past the editor's edge scrolls it (overflow or
+  // not), shifting the text off its place on the canvas: keep it in place
+  editable.addEventListener("scroll", () => {
+    if (editable.scrollLeft || editable.scrollTop) {
+      editable.scrollLeft = 0;
+      editable.scrollTop = 0;
+    }
+  });
   updateWysiwygStyle();
 
   const getCaretIndexFromInitialSceneCoords = () => {
@@ -881,6 +1131,18 @@ export const textWysiwyg = ({
         }
       }
 
+      if (!dataList) {
+        // a contenteditable would paste rich content: insert the plain text
+        // (synchronously, while the clipboard data is still readable)
+        event.preventDefault();
+        const plainText = normalizeText(
+          event.clipboardData?.getData(MIME_TYPES.text) ?? "",
+        );
+        if (plainText) {
+          editable.insertText(plainText);
+        }
+      }
+
       dataList = dataList || (await parseDataTransferEvent(event));
 
       const textItem = dataList.findByType(MIME_TYPES.text);
@@ -939,7 +1201,8 @@ export const textWysiwyg = ({
         editable.selectionStart = selectionStart;
         editable.selectionEnd = selectionStart;
       }
-      onChange(editable.value);
+      onChange(editable.value, editable.spans);
+      renderSelectionLayer();
       // once the update, and any scroll it made (see
       // AppText.handleTextWysiwyg), is in the app's state
       queueMicrotask(followCaretFromUnderPanels);
@@ -947,6 +1210,18 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    const textStyle = getTextStyleForShortcut(event);
+    if (textStyle) {
+      // bold / italic / underline / strikethrough the selected portion (or
+      // the whole text, when nothing is selected)
+      event.preventDefault();
+      app.actionManager.executeAction(
+        actionToggleTextStyle,
+        "keyboard",
+        textStyle,
+      );
+      return;
+    }
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(
@@ -994,6 +1269,27 @@ export const textWysiwyg = ({
       }
       submittedViaKeyboard = true;
       handleSubmit();
+    } else if (
+      event.key === KEYS.ENTER &&
+      !event.shiftKey &&
+      !event.altKey &&
+      !event.isComposing &&
+      event.keyCode !== 229 &&
+      editable.selectionStart === editable.selectionEnd
+    ) {
+      // markdown lists: Enter in a list item starts the next item (`- `,
+      // `N+1. `), and in an empty one ends the list (Shift+Enter just
+      // breaks the line)
+      const continuation = getListContinuation(
+        editable.value,
+        editable.selectionStart,
+      );
+      if (continuation) {
+        event.preventDefault();
+        editable.setSelectionRange(continuation.start, continuation.end);
+        // (types over the range, keeping the spans, and dispatches `input`)
+        editable.insertText(continuation.text);
+      }
     } else if (
       event.key === KEYS.TAB ||
       (event[KEYS.CTRL_OR_CMD] &&
@@ -1176,6 +1472,7 @@ export const textWysiwyg = ({
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
       nextOriginalText: editable.value,
+      nextSpans: editable.spans,
     });
   };
 
@@ -1184,6 +1481,10 @@ export const textWysiwyg = ({
     editable.onblur = null;
     editable.oninput = null;
     editable.onkeydown = null;
+    editable.dispose();
+    setActiveRichEditor(null);
+    ownerDocument.removeEventListener("selectionchange", renderSelectionLayer);
+    selectionLayer.remove();
 
     if (observer) {
       observer.disconnect();
@@ -1268,7 +1569,7 @@ export const textWysiwyg = ({
       // before the pan starts: it focuses the container, blurring the editor
       temporarilyDisableSubmit();
       // trying to pan by clicking inside text area itself -> handle here
-      if (target instanceof ownerWindow.HTMLTextAreaElement) {
+      if (target instanceof ownerWindow.Node && editable.contains(target)) {
         event.preventDefault();
         app.pan.start(event);
       }
@@ -1282,7 +1583,8 @@ export const textWysiwyg = ({
       event.altKey &&
       !event[KEYS.CTRL_OR_CMD] &&
       event.button === POINTER_BUTTON.MAIN &&
-      target === editable &&
+      target instanceof ownerWindow.Node &&
+      editable.contains(target) &&
       (app.state.activeTool.type === "selection" ||
         app.state.activeTool.type === "lasso")
     ) {
@@ -1418,6 +1720,7 @@ export const textWysiwyg = ({
     });
   });
   ownerWindow.addEventListener("beforeunload", handleSubmit);
+  editorBox!.appendChild(selectionLayer);
   editorBox!.appendChild(editable);
 
   return handleSubmit;

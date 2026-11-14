@@ -13,14 +13,20 @@ easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should match styles for text editor 1`] = `
-<textarea
-  class="excalidraw-wysiwyg"
+<div
+  aria-multiline="true"
+  class="excalidraw-wysiwyg excalidraw-wysiwyg--uniform-selection"
+  contenteditable="true"
   data-type="wysiwyg"
   dir="auto"
-  style="position: absolute; left: 0px; top: 0px; display: inline-block; min-height: 1em; backface-visibility: hidden; margin: 0px; padding: 0px; border: 0px; outline: 0; resize: none; background: transparent; overflow: hidden; z-index: var(--zIndex-wysiwyg); word-break: break-word; white-space: pre-wrap; overflow-wrap: break-word; box-sizing: content-box; width: 10.5px; height: 26.25px; transform-origin: 0 0; transform: translate(40px, 7.5px) rotate(0deg) scale(1) translate(-5.25px, 0px); text-align: center; vertical-align: middle; color: rgb(30, 30, 30); opacity: 1; font: Emoji 20px 20px; line-height: 1.25; font-family: Excalifont, Xiaolai, sans-serif, Segoe UI Emoji;"
+  role="textbox"
+  style="position: absolute; left: 0px; top: 0px; display: inline-block; min-height: 1em; backface-visibility: hidden; margin: 0px; padding: 0px; border: 0px; outline: 0; resize: none; background: transparent; overflow: visible; z-index: var(--zIndex-wysiwyg); word-break: break-word; white-space: pre-wrap; overflow-wrap: break-word; box-sizing: content-box; cursor: text; pointer-events: auto; user-select: text; webkit-user-select: text; width: 10.5px; height: 26.25px; transform-origin: 0 0; transform: translate(40px, 7.5px) rotate(0deg) scale(1) translate(-5.25px, 0px); text-align: center; vertical-align: middle; color: rgb(30, 30, 30); opacity: 1; font: Emoji 20px 20px; line-height: 1.25; font-family: Excalifont, Xiaolai, sans-serif, Segoe UI Emoji;"
   tabindex="0"
-  wrap="off"
-/>
+>
+  <br
+    data-rt-sentinel=""
+  />
+</div>
 `;
 
 exports[`Test Linear Elements > Test bound text element > should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized 2`] = `

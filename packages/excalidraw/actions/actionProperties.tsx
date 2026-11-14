@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
+  CONTAINER_PADDING,
+  MAX_CONTAINER_PADDING,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
@@ -32,6 +34,7 @@ import {
   getNonDeletedElements,
   isNonDeletedElement,
   syncStickyNoteInk,
+  stripTextSpanStyle,
 } from "@excalidraw/element";
 
 import {
@@ -46,6 +49,9 @@ import { newElementWith } from "@excalidraw/element";
 import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
+  canHaveContainerPadding,
+  getContainerPadding,
+  normalizeContainerPadding,
   getBoundTextElement,
   getBaseFontSize,
   getBaseFontSizeUpdate,
@@ -109,6 +115,10 @@ import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
 import {
+  PaddingCustomIcon,
+  PaddingMediumIcon,
+  PaddingNoneIcon,
+  PaddingSmallIcon,
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
   ArrowheadCircleIcon,
@@ -171,12 +181,17 @@ import {
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
+import { getRichEditorWithSelection } from "../wysiwyg/richEditable";
 
 import {
   getColorTargetAppStateUpdates,
   resolveColorTarget,
 } from "./colorTargets";
 import { register } from "./register";
+import {
+  applyStyleToSelectedTextPortion,
+  scaleFontSizeOfSelectedTextPortion,
+} from "./actionTextStyle";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
@@ -298,6 +313,11 @@ const changeFontSize = (
   app: AppClassProperties,
   getNewFontSize: (element: ExcalidrawTextElement) => number,
   fallbackValue?: ExcalidrawTextElement["fontSize"],
+  /**
+   * what happens to portions with a size of their own: a size picked for the
+   * whole text replaces theirs, a relative change scales them along
+   */
+  spanFontSizes: "replace" | "scale" = "replace",
 ) => {
   const newFontSizes = new Set<number>();
   const elementsMap = app.scene.getNonDeletedElementsMap();
@@ -311,10 +331,28 @@ const changeFontSize = (
         newFontSizes.add(newFontSize);
         const container = app.scene.getContainerElement(oldElement);
 
-        let newElement: ExcalidrawTextElement = newElementWith(
-          oldElement,
-          getBaseFontSizeUpdate(oldElement, newFontSize, elementsMap),
-        );
+        const ratio = newFontSize / oldElement.fontSize;
+        let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
+          ...getBaseFontSizeUpdate(oldElement, newFontSize, elementsMap),
+          ...(oldElement.spans?.some((span) => span.fontSize)
+            ? {
+                spans:
+                  spanFontSizes === "replace"
+                    ? stripTextSpanStyle(oldElement.spans, ["fontSize"])
+                    : oldElement.spans.map((span) =>
+                        span.fontSize
+                          ? {
+                              ...span,
+                              fontSize: Math.max(
+                                1,
+                                Math.round(span.fontSize * ratio),
+                              ),
+                            }
+                          : span,
+                      ),
+              }
+            : {}),
+        } as ElementUpdate<ExcalidrawTextElement>);
         redrawTextBoundingBox(
           newElement,
           container,
@@ -369,12 +407,21 @@ export const actionChangeStrokeColor = register<
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     const { color, ...appStateUpdates } = value ?? {};
     if (color === undefined) {
       return {
         appState: { ...appState, ...appStateUpdates },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+    // part of the text selected in the editor: color just that part
+    if (
+      applyStyleToSelectedTextPortion(appState, app, { strokeColor: color })
+    ) {
+      return {
+        appState: { ...appState, ...appStateUpdates },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
     // resolved from the state the action runs against — never from the
@@ -391,10 +438,13 @@ export const actionChangeStrokeColor = register<
           appState,
           (el) =>
             hasStrokeColor(el.type)
-              ? newElementWith(
-                  el,
-                  getColorUpdate(el, "strokeColor", color, elementsMap),
-                )
+              ? newElementWith(el, {
+                  ...getColorUpdate(el, "strokeColor", color, elementsMap),
+                  // the whole text takes the color, portions included
+                  ...(isTextElement(el) && el.spans?.length
+                    ? { spans: stripTextSpanStyle(el.spans, ["strokeColor"]) }
+                    : {}),
+                } as ElementUpdate<NonDeletedExcalidrawElement>)
               : el,
           true,
         ),
@@ -1010,6 +1060,13 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
     label: "labels.fontSize",
     trackEvent: false,
     perform: (elements, appState, value, app) => {
+      // part of the text selected in the editor: size just that part
+      if (
+        value &&
+        applyStyleToSelectedTextPortion(appState, app, { fontSize: value })
+      ) {
+        return { appState, captureUpdate: CaptureUpdateAction.IMMEDIATELY };
+      }
       return changeFontSize(
         elements,
         appState,
@@ -1106,13 +1163,25 @@ export const actionDecreaseFontSize = register({
   icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
+    const decrease = (fontSize: number) =>
       Math.round(
         // get previous value before relative increase (doesn't work fully
         // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) *
+        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * fontSize,
+      );
+    if (scaleFontSizeOfSelectedTextPortion(appState, app, decrease)) {
+      return { appState, captureUpdate: CaptureUpdateAction.IMMEDIATELY };
+    }
+    return changeFontSize(
+      elements,
+      appState,
+      app,
+      (element) =>
+        decrease(
           getBaseFontSize(element, app.scene.getNonDeletedElementsMap()),
-      ),
+        ),
+      undefined,
+      "scale",
     );
   },
   keyTest: (event) => {
@@ -1131,11 +1200,21 @@ export const actionIncreaseFontSize = register({
   icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, (element) =>
-      Math.round(
-        getBaseFontSize(element, app.scene.getNonDeletedElementsMap()) *
-          (1 + FONT_SIZE_RELATIVE_INCREASE_STEP),
-      ),
+    const increase = (fontSize: number) =>
+      Math.round(fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP));
+    if (scaleFontSizeOfSelectedTextPortion(appState, app, increase)) {
+      return { appState, captureUpdate: CaptureUpdateAction.IMMEDIATELY };
+    }
+    return changeFontSize(
+      elements,
+      appState,
+      app,
+      (element) =>
+        increase(
+          getBaseFontSize(element, app.scene.getNonDeletedElementsMap()),
+        ),
+      undefined,
+      "scale",
     );
   },
   keyTest: (event) => {
@@ -1208,6 +1287,26 @@ export const actionChangeFontFamily = register<{
     invariant(value, "actionChangeFontFamily: value must be defined");
 
     const { currentItemFontFamily, currentHoveredFontFamily } = value;
+
+    // part of the text selected in the editor: picking a font sets it for
+    // just that part (and hovering doesn't preview it on the whole text)
+    if (
+      appState.editingTextElement &&
+      getRichEditorWithSelection(appState.editingTextElement.id)
+    ) {
+      if (currentItemFontFamily) {
+        applyStyleToSelectedTextPortion(appState, app, {
+          fontFamily: currentItemFontFamily,
+        });
+      }
+      const { currentItemFontFamily: _, ...restAppState } = nextAppState;
+      return {
+        appState: { ...appState, ...restAppState },
+        captureUpdate: currentItemFontFamily
+          ? CaptureUpdateAction.IMMEDIATELY
+          : CaptureUpdateAction.EVENTUALLY,
+      };
+    }
 
     let nextCaptureUpdateAction: CaptureUpdateActionType =
       CaptureUpdateAction.EVENTUALLY;
@@ -1294,6 +1393,14 @@ export const actionChangeFontFamily = register<{
                 {
                   fontFamily: nextFontFamily,
                   lineHeight: getLineHeight(nextFontFamily!),
+                  // the whole text takes the font, portions included
+                  ...(oldElement.spans?.length && currentItemFontFamily
+                    ? {
+                        spans: stripTextSpanStyle(oldElement.spans, [
+                          "fontFamily",
+                        ]),
+                      }
+                    : {}),
                 },
               );
 
@@ -1838,6 +1945,134 @@ export const actionChangeRoundness = register<"sharp" | "round">({
           />
           {renderAction("togglePolygon")}
         </div>
+      </fieldset>
+    );
+  },
+});
+
+type PaddingPreset = keyof typeof CONTAINER_PADDING | "custom";
+
+const getPaddingPreset = (padding: number): PaddingPreset =>
+  (Object.keys(CONTAINER_PADDING) as (keyof typeof CONTAINER_PADDING)[]).find(
+    (key) => CONTAINER_PADDING[key] === padding,
+  ) ?? "custom";
+
+export const actionChangePadding = register<number>({
+  name: "changePadding",
+  label: "labels.padding",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const padding = normalizeContainerPadding(value);
+    const updatedContainers = new Map<string, ExcalidrawElement>();
+
+    const nextElements = changeProperty(elements, appState, (el) => {
+      if (!canHaveContainerPadding(el)) {
+        return el;
+      }
+      const nextElement = newElementWith(el, { padding });
+      updatedContainers.set(el.id, nextElement);
+      return nextElement;
+    });
+
+    // re-layout the bound text of every updated container (this can grow the
+    // container when the new padding no longer fits the text)
+    return {
+      elements: nextElements.map((el) => {
+        const container =
+          isTextElement(el) && el.containerId
+            ? updatedContainers.get(el.containerId)
+            : undefined;
+        if (!container || !isTextElement(el)) {
+          return el;
+        }
+        const nextText = newElementWith(el, {});
+        redrawTextBoundingBox(
+          nextText,
+          container,
+          app.scene,
+          app.renderEnvironment,
+        );
+        return nextText;
+      }),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, updateData, app }) => {
+    const padding = getFormValue<number | null>(
+      elements,
+      app,
+      // while editing a label, reflect its container's padding
+      (element) =>
+        getContainerPadding(
+          (isTextElement(element) && app.scene.getContainerElement(element)) ||
+            element,
+        ),
+      (element) => canHaveContainerPadding(element),
+      null,
+    );
+    const [isCustomOpen, setIsCustomOpen] = useState(false);
+    const preset: PaddingPreset | null =
+      padding === null
+        ? null
+        : isCustomOpen
+        ? "custom"
+        : getPaddingPreset(padding);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.padding")}</legend>
+        <div className="buttonList">
+          <RadioSelection<PaddingPreset>
+            group="padding"
+            options={[
+              {
+                value: "none",
+                text: t("labels.padding_none"),
+                icon: PaddingNoneIcon,
+                testId: "padding-none",
+              },
+              {
+                value: "small",
+                text: t("labels.padding_small"),
+                icon: PaddingSmallIcon,
+                testId: "padding-small",
+              },
+              {
+                value: "medium",
+                text: t("labels.padding_medium"),
+                icon: PaddingMediumIcon,
+                testId: "padding-medium",
+              },
+              {
+                value: "custom",
+                text: t("labels.padding_custom"),
+                icon: PaddingCustomIcon,
+                testId: "padding-custom",
+              },
+            ]}
+            value={preset}
+            onChange={(value) => {
+              if (value === "custom") {
+                setIsCustomOpen(true);
+                return;
+              }
+              setIsCustomOpen(false);
+              updateData(CONTAINER_PADDING[value]);
+            }}
+          />
+        </div>
+        {preset === "custom" && (
+          <Range
+            label={t("labels.padding_customValue")}
+            value={padding ?? CONTAINER_PADDING.small}
+            onChange={updateData}
+            min={0}
+            max={MAX_CONTAINER_PADDING}
+            step={1}
+            testId="padding-custom-value"
+          />
+        )}
       </fieldset>
     );
   },

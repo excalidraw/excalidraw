@@ -90,9 +90,16 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
   type: "selection";
 };
 
-export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
-  type: "rectangle";
-};
+/**
+ * Inner padding (px) between a container's edge and its bound text. Omitted
+ * means the default (`BOUND_TEXT_PADDING`).
+ */
+type ContainerPaddingProps = Readonly<{ padding?: number }>;
+
+export type ExcalidrawRectangleElement = _ExcalidrawElementBase &
+  ContainerPaddingProps & {
+    type: "rectangle";
+  };
 
 export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
   Readonly<{
@@ -104,13 +111,57 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
     baseHeight: number;
   }>;
 
-export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
-  type: "diamond";
-};
+/**
+ * One row of a table's body: the key column holds the constraint (`PK`,
+ * `FK`, …) or the datatype, the name column the field name.
+ */
+export type ExcalidrawDBTableRow = Readonly<{
+  /** stable across edits, for collaboration and React keys */
+  id: string;
+  key: string;
+  name: string;
+  /**
+   * Sample value for the field (instance data, not schema), shown in a
+   * separate column while the table's `showExamples` is on.
+   */
+  example?: string;
+}>;
 
-export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
-  type: "ellipse";
-};
+/**
+ * A database table (ER diagram entity): a header with the table name and a
+ * collapse toggle, over a two-column body. Its `width` and `height` are
+ * derived from the content (see `getDBTableLayout`) and kept in sync by
+ * `normalizeDBTable`, so bounds, binding and hit testing treat it as a plain
+ * rectangle.
+ */
+export type ExcalidrawDBTableElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "dbtable";
+    title: string;
+    rows: readonly ExcalidrawDBTableRow[];
+    /** only the header is shown */
+    collapsed: boolean;
+    /** an extra column at the right shows each field's `example` value */
+    showExamples?: boolean;
+    fontSize: number;
+    fontFamily: FontFamilyValues;
+    /**
+     * Width set by resizing horizontally. The table is never narrower than its
+     * content needs; unset, it is exactly as wide as the content. It excludes
+     * the examples column, which is added on top of it while shown.
+     */
+    customWidth?: number | null;
+  }>;
+
+export type ExcalidrawDiamondElement = _ExcalidrawElementBase &
+  ContainerPaddingProps & {
+    type: "diamond";
+  };
+
+export type ExcalidrawEllipseElement = _ExcalidrawElementBase &
+  ContainerPaddingProps & {
+    type: "ellipse";
+  };
 
 export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
   Readonly<{
@@ -207,6 +258,7 @@ export type ExcalidrawFlowchartNodeElement =
 export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
   | ExcalidrawStickyNoteElement
+  | ExcalidrawDBTableElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
@@ -223,6 +275,7 @@ export type ExcalidrawRectanguloidElement =
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawStickyNoteElement
+  | ExcalidrawDBTableElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
@@ -288,11 +341,41 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * so it survives midpoint insertion and other geometry changes.
      * */
     labelPosition?: number | null;
+    /**
+     * Styles applied to portions of the text (rich text). Offsets are
+     * end-exclusive code-unit offsets into `originalText`; spans are sorted,
+     * non-overlapping, and only carry the properties that differ from the
+     * element's own (`strokeColor`, `fontFamily`). Anything not covered by a
+     * span is drawn with the element's own style.
+     */
+    spans?: readonly TextSpan[] | null;
   }>;
+
+/** the style a portion of a text element can override */
+export type TextSpanStyle = {
+  strokeColor?: string;
+  fontFamily?: FontFamilyValues;
+  /** px, like the element's `fontSize` */
+  fontSize?: number;
+  /** a background behind the glyphs (highlighter) */
+  highlightColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+};
+
+export type TextSpan = Readonly<
+  {
+    start: number;
+    end: number;
+  } & TextSpanStyle
+>;
 
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawStickyNoteElement
+  | ExcalidrawDBTableElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
@@ -330,6 +413,19 @@ export type FixedPointBinding = {
   // Determines whether the arrow remains outside the shape or is allowed to
   // go all the way inside the shape up to the exact fixed point.
   mode: BindMode;
+
+  /**
+   * Database tables only: the row the arrow connects to (see
+   * `syncDBTableRowBindings`). Absent for every other bindable, and for
+   * connections to a table's header.
+   */
+  rowId?: string;
+  /**
+   * Database tables only: the user placed this end (dragged or dropped it), so
+   * its side is kept instead of being re-picked towards the other end.
+   * Programmatic bindings and older files leave it unset and auto-orient.
+   */
+  sideLocked?: boolean;
 };
 
 type Index = number;

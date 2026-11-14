@@ -60,6 +60,17 @@ import {
 } from "./textElement";
 import { getLineHeightInPx } from "./textMeasurements";
 import {
+  getTextDecorationMetrics,
+  getTextElementLines,
+  isTextElementListLine,
+} from "./richTextLayout";
+import { getTextSegmentFontString } from "./textSpans";
+import {
+  getAlignedLineXs,
+  getListLineContent,
+  getListLineLayouts,
+} from "./markdownList";
+import {
   isTextElement,
   isLinearElement,
   isFreeDrawElement,
@@ -80,10 +91,24 @@ import {
   type StickyNotePathCommand,
 } from "./stickyNote";
 
+import {
+  getDBTableExampleFontString,
+  getDBTableFontString,
+  getDBTableKeyFontString,
+  getDBTableLayout,
+  getDBTableTextBaselineOffset,
+  DB_TABLE_EXAMPLE_TEXT_OPACITY,
+  DB_TABLE_KEY_TEXT_OPACITY,
+} from "./dbTable";
+
+import type { DBTableRect } from "./dbTable";
+
 import type { RenderEnvironment } from "./renderEnvironment";
+import type { TextElementLine } from "./richTextLayout";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawDBTableElement,
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -218,7 +243,18 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
+  /** a table's text is left out while its cells are edited in place */
+  hideDBTableText: boolean;
 }
+
+/** whether `element` is the table whose cells are being edited in place */
+const isDBTableBeingEdited = (
+  element: ExcalidrawElement,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+) =>
+  element.type === "dbtable" &&
+  "editingDBTableId" in appState &&
+  appState.editingDBTableId === element.id;
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
@@ -324,7 +360,8 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  const hideDBTableText = isDBTableBeingEdited(element, appState);
+  drawElementOnCanvas(element, rc, context, renderConfig, { hideDBTableText });
 
   context.restore();
 
@@ -341,6 +378,7 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
+    hideDBTableText,
   };
 };
 
@@ -462,8 +500,29 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  options?: { hideDBTableText?: boolean },
 ) => {
   switch (element.type) {
+    case "dbtable": {
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      for (const shape of ShapeCache.generateElementShape(
+        element,
+        renderConfig,
+      )) {
+        rc.draw(shape);
+      }
+      withSavedContext(context, () => {
+        drawDBTableChrome(
+          context,
+          element,
+          renderConfig.theme === THEME.DARK,
+          !options?.hideDBTableText,
+          !renderConfig.isExporting,
+        );
+      });
+      break;
+    }
     case "stickynote": {
       withSavedContext(context, () => {
         context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
@@ -703,12 +762,79 @@ const drawElementOnCanvas = (
             lineHeightPx,
           );
 
-          for (let index = 0; index < lines.length; index++) {
-            context.fillText(
-              lines[index],
-              horizontalOffset,
-              index * lineHeightPx + verticalOffset,
+          // rich text (styled portions): drawn piece by piece, so RTL text
+          // (which needs the browser's bidi layout of the whole line) keeps
+          // the plain path
+          const richLines = rtl
+            ? null
+            : getTextElementLines(
+                element,
+                getRenderEnvironment(renderConfig.renderEnvironment),
+              );
+
+          if (richLines) {
+            drawTextElementLines(
+              context,
+              element,
+              richLines,
+              renderConfig.theme === THEME.DARK,
             );
+            return;
+          }
+
+          // markdown list items: markers drawn as bullets / numbers, and
+          // their text (also on the lines they wrap into) hanging past them
+          const listLayouts = getListLineLayouts(
+            element.text,
+            element.originalText,
+            element.fontSize,
+            (marker) => context.measureText(marker).width,
+          );
+
+          if (!listLayouts) {
+            for (let index = 0; index < lines.length; index++) {
+              context.fillText(
+                lines[index],
+                horizontalOffset,
+                index * lineHeightPx + verticalOffset,
+              );
+            }
+            return;
+          }
+
+          const contents = lines.map(
+            (line, index) =>
+              getListLineContent(line, listLayouts[index] ?? null).text,
+          );
+          const lineXs = getAlignedLineXs(
+            contents.map((content, index) => ({
+              width:
+                (listLayouts[index]?.contentX ?? 0) +
+                context.measureText(content).width,
+              isListLine: !!listLayouts[index],
+            })),
+            element.textAlign,
+            element.width,
+          );
+          context.textAlign = "left";
+
+          for (let index = 0; index < lines.length; index++) {
+            const baseline = index * lineHeightPx + verticalOffset;
+            const listLayout = listLayouts[index];
+            const lineX = lineXs[index];
+            if (!listLayout) {
+              context.fillText(contents[index], lineX, baseline);
+              continue;
+            }
+            const content = contents[index];
+            if (listLayout.item) {
+              context.fillText(
+                listLayout.item.displayMarker,
+                lineX + listLayout.markerX,
+                baseline,
+              );
+            }
+            context.fillText(content, lineX + listLayout.contentX, baseline);
           }
         });
         if (shouldTemporarilyAttach) {
@@ -718,6 +844,247 @@ const drawElementOnCanvas = (
         throw new Error(`Unimplemented type ${element.type}`);
       }
     }
+  }
+};
+
+/** a rounded square path (manual: not every canvas backend has `roundRect`) */
+const traceDBTableToggle = (
+  context: CanvasRenderingContext2D,
+  { x, y, width: w, height: h }: DBTableRect,
+  r: number,
+) => {
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
+};
+
+/**
+ * Paints a table's header toggles and (unless edited in place) its text:
+ * the centered title, the key column (smaller and muted), the names and,
+ * when shown, the examples (muted italic). The examples toggle is an editing
+ * control, so it is left out of exports.
+ */
+const drawDBTableChrome = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawDBTableElement,
+  isDarkMode: boolean,
+  withText: boolean,
+  withExamplesToggle: boolean,
+) => {
+  const layout = getDBTableLayout(element);
+  const color = applyDarkModeFilter(element.strokeColor, isDarkMode);
+
+  // --- examples toggle: two panes, the right one filled while shown ----------
+  const { toggle, unit, examplesToggle } = layout;
+  const toggleRadius = 2.5 * unit;
+  if (withExamplesToggle && examplesToggle) {
+    const isOn = !!element.showExamples;
+    const split = examplesToggle.x + examplesToggle.width * 0.5;
+    context.save();
+    context.globalAlpha *= isOn ? 0.8 : 0.45;
+    context.strokeStyle = color;
+    context.fillStyle = color;
+    context.lineWidth = Math.max(1, 1.25 * unit);
+    context.lineCap = "round";
+    if (isOn) {
+      context.save();
+      context.beginPath();
+      traceDBTableToggle(context, examplesToggle, toggleRadius);
+      context.clip();
+      context.globalAlpha *= 0.55;
+      context.fillRect(
+        split,
+        examplesToggle.y,
+        examplesToggle.x + examplesToggle.width - split,
+        examplesToggle.height,
+      );
+      context.restore();
+    }
+    context.beginPath();
+    traceDBTableToggle(context, examplesToggle, toggleRadius);
+    context.moveTo(split, examplesToggle.y);
+    context.lineTo(split, examplesToggle.y + examplesToggle.height);
+    context.stroke();
+    context.restore();
+  }
+
+  // --- toggle: a small rounded square with a minus (expanded) or plus ---------
+  context.save();
+  context.globalAlpha *= 0.8;
+  context.strokeStyle = color;
+  context.lineWidth = Math.max(1, 1.25 * unit);
+  context.lineCap = "round";
+  context.beginPath();
+  traceDBTableToggle(context, toggle, toggleRadius);
+  const cx = toggle.x + toggle.width / 2;
+  const cy = toggle.y + toggle.height / 2;
+  const arm = toggle.width * 0.27;
+  context.moveTo(cx - arm, cy);
+  context.lineTo(cx + arm, cy);
+  if (element.collapsed) {
+    context.moveTo(cx, cy - arm);
+    context.lineTo(cx, cy + arm);
+  }
+  context.stroke();
+  context.restore();
+
+  if (!withText) {
+    return;
+  }
+
+  context.fillStyle = color;
+  context.textBaseline = "alphabetic";
+
+  // --- title ------------------------------------------------------------------
+  context.font = getDBTableFontString(element);
+  context.textAlign = "center";
+  context.fillText(
+    element.title,
+    layout.width / 2,
+    layout.titleY +
+      getDBTableTextBaselineOffset(
+        element.fontFamily,
+        layout.fontSize,
+        layout.lineHeight,
+      ),
+  );
+
+  // --- rows -------------------------------------------------------------------
+  context.textAlign = "left";
+  const nameBaseline = getDBTableTextBaselineOffset(
+    element.fontFamily,
+    layout.fontSize,
+    layout.lineHeight,
+  );
+  const keyBaseline = getDBTableTextBaselineOffset(
+    element.fontFamily,
+    layout.keyFontSize,
+    layout.lineHeight,
+  );
+  const keyFont = getDBTableKeyFontString(element);
+  const nameFont = getDBTableFontString(element);
+  const exampleFont = getDBTableExampleFontString(element);
+  const opacity = context.globalAlpha;
+
+  for (const row of layout.rows) {
+    if (row.row.key) {
+      context.font = keyFont;
+      context.globalAlpha = opacity * DB_TABLE_KEY_TEXT_OPACITY;
+      context.fillText(
+        row.row.key,
+        row.key.x + layout.paddingX,
+        row.keyTextY + keyBaseline,
+      );
+      context.globalAlpha = opacity;
+    }
+    if (row.row.name) {
+      context.font = nameFont;
+      context.fillText(
+        row.row.name,
+        row.name.x + layout.paddingX,
+        row.nameTextY + nameBaseline,
+      );
+    }
+    if (row.example && row.row.example) {
+      context.font = exampleFont;
+      context.globalAlpha = opacity * DB_TABLE_EXAMPLE_TEXT_OPACITY;
+      context.fillText(
+        row.row.example,
+        row.example.x + layout.paddingX,
+        row.nameTextY + nameBaseline,
+      );
+      context.globalAlpha = opacity;
+    }
+  }
+};
+
+const drawTextElementLines = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawTextElement,
+  lines: readonly TextElementLine[],
+  isDarkMode: boolean,
+) => {
+  context.textAlign = "left";
+
+  const lineWidths = lines.map((line) =>
+    line.segments.map((segment) => {
+      context.font = getTextSegmentFontString(element, segment.style);
+      return context.measureText(segment.text).width;
+    }),
+  );
+  const lineXs = getAlignedLineXs(
+    lines.map((line, index) => ({
+      width:
+        line.contentX +
+        lineWidths[index].reduce((sum, width) => sum + width, 0),
+      isListLine: isTextElementListLine(line),
+    })),
+    element.textAlign,
+    element.width,
+  );
+
+  for (const [lineIndex, line] of lines.entries()) {
+    const widths = lineWidths[lineIndex];
+    const lineX = lineXs[lineIndex];
+
+    if (line.listMarker) {
+      context.font = getFontString(element);
+      context.fillStyle = applyDarkModeFilter(element.strokeColor, isDarkMode);
+      context.fillText(
+        line.listMarker.text,
+        lineX + line.listMarker.x,
+        line.baseline,
+      );
+    }
+
+    // highlights first, so that no piece's glyphs end up beneath the next
+    // piece's highlight; each the line's full height, so that they're even
+    // whatever the fonts and sizes on the line
+    let x = lineX + line.contentX;
+    line.segments.forEach((segment, index) => {
+      if (segment.style.highlightColor) {
+        context.fillStyle = applyDarkModeFilter(
+          segment.style.highlightColor,
+          isDarkMode,
+        );
+        context.fillRect(x, line.top, widths[index], line.height);
+      }
+      x += widths[index];
+    });
+
+    x = lineX + line.contentX;
+    line.segments.forEach((segment, index) => {
+      const width = widths[index];
+      const decoration = getTextDecorationMetrics(
+        segment.style.fontSize ?? element.fontSize,
+      );
+      context.font = getTextSegmentFontString(element, segment.style);
+      context.fillStyle = applyDarkModeFilter(
+        segment.style.strokeColor ?? element.strokeColor,
+        isDarkMode,
+      );
+      context.fillText(segment.text, x, line.baseline);
+      if (segment.style.underline) {
+        context.fillRect(
+          x,
+          line.baseline + decoration.underlineOffset,
+          width,
+          decoration.thickness,
+        );
+      }
+      if (segment.style.strikethrough) {
+        context.fillRect(
+          x,
+          line.baseline + decoration.strikethroughOffset,
+          width,
+          decoration.thickness,
+        );
+      }
+      x += width;
+    });
   }
 };
 
@@ -753,7 +1120,9 @@ const generateElementWithCanvas = (
     prevElementWithCanvas.deviceScale !== renderConfig.scale ||
     prevElementWithCanvas.environment !== renderEnvironment ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    prevElementWithCanvas.hideDBTableText !==
+      isDBTableBeingEdited(element, appState)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -1161,6 +1530,7 @@ const drawElement = (
     }
     case "rectangle":
     case "stickynote":
+    case "dbtable":
     case "diamond":
     case "ellipse":
     case "line":

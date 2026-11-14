@@ -5,6 +5,7 @@ import { pointFrom } from "@excalidraw/math";
 import {
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
+  getTextElementRawWidth,
   isTextElement,
   newElementWith,
 } from "@excalidraw/element";
@@ -826,6 +827,33 @@ describe("textWysiwyg", () => {
 
     afterAll(() => {
       restoreOriginalGetBoundingClientRect();
+    });
+
+    it("should continue a markdown list on Enter", async () => {
+      textarea.value = "- foo";
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      expect(textarea.value).toEqual("- foo\n- ");
+      expect(textarea.selectionStart).toEqual(8);
+
+      textarea.value = "  9. foo";
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      expect(textarea.value).toEqual("  9. foo\n  10. ");
+
+      // an empty item ends the list
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      expect(textarea.value).toEqual("  9. foo\n");
+
+      // Shift+Enter is left to the browser
+      textarea.value = "- foo";
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER, shiftKey: true });
+      expect(textarea.value).toEqual("- foo");
+
+      // the element keeps the raw markers
+      fireEvent.keyDown(textarea, { key: KEYS.ENTER });
+      Keyboard.exitTextEditor(textarea);
+      expect((h.elements[0] as ExcalidrawTextElement).originalText).toEqual(
+        "- foo\n- ",
+      );
     });
 
     it("should add a tab at the start of the first line", () => {
@@ -1846,6 +1874,24 @@ describe("textWysiwyg", () => {
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
+    });
+
+    it("should not wrap a label's nested list items in the editor", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "- a\n    - bb");
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      // the canvas lays the nested item out narrower than it's typed...
+      const rawWidth = getTextElementRawWidth(text);
+      expect(text.width).toBeLessThan(rawWidth);
+      // ...but the editor shows it as typed, so must be as wide (or it'd
+      // break `    - bb` onto two lines)
+      expect(parseFloat(editor.style.width)).toBeGreaterThanOrEqual(rawWidth);
+      // centered: the box is anchored by its center, so it grows both ways
+      expect(editor.style.transform).toContain(
+        `translate(${-parseFloat(editor.style.width) / 2}px, 0px)`,
+      );
     });
 
     it("should bind text to container when double clicked on container stroke", async () => {

@@ -1998,6 +1998,19 @@ export const stickyNoteToolIcon = createIcon(
   tablerIconProps,
 );
 
+// a database table: header band over a key/name two-column body
+export const tableToolIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+    <path d="M4 9h16"></path>
+    <path d="M9 9v11"></path>
+    <path d="M12 13.5h5"></path>
+    <path d="M12 16.5h3"></path>
+  </g>,
+  tablerIconProps,
+);
+
 export const mermaidLogoIcon = createIcon(
   <path
     fill="currentColor"
@@ -2600,4 +2613,36 @@ export const settingsIcon = createIcon(
     <path d="M19 18l1 0" />
   </g>,
   tablerIconProps,
+);
+
+// container padding presets: an outer box with text lines inset by the
+// padding amount
+const paddingIcon = (inset: number) =>
+  createIcon(
+    <g strokeWidth="1.5">
+      <rect x="2.5" y="2.5" width="15" height="15" rx="2" />
+      <path d={`M${2.5 + inset} 8H${17.5 - inset}`} />
+      <path d={`M${2.5 + inset} 12H${17.5 - inset}`} />
+    </g>,
+    modifiedTablerIconProps,
+  );
+
+export const PaddingNoneIcon = paddingIcon(0);
+export const PaddingSmallIcon = paddingIcon(3);
+export const PaddingMediumIcon = paddingIcon(5.5);
+
+export const PaddingCustomIcon = createIcon(
+  <g strokeWidth="1.5">
+    <rect x="2.5" y="2.5" width="15" height="15" rx="2" />
+    <rect
+      x="6"
+      y="6"
+      width="8"
+      height="8"
+      rx="1"
+      strokeDasharray="2 2"
+      strokeWidth="1.25"
+    />
+  </g>,
+  modifiedTablerIconProps,
 );

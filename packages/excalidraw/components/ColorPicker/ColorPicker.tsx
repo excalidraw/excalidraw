@@ -262,6 +262,7 @@ const isColorPickerPopup = (
 ): popup is ColorPickerType =>
   popup === "elementStroke" ||
   popup === "elementBackground" ||
+  popup === "textHighlight" ||
   popup === "canvasBackground";
 
 const ColorPickerTrigger = ({
