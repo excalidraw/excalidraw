@@ -60,7 +60,10 @@ unmountComponent();
 const tab = "    ";
 const mouse = new Pointer("mouse");
 
-/** where the editor is placed: its transform's first translate, in px */
+/**
+ * where the editor is placed: its transform's first translate, in px — the
+ * text's anchor (its top left, for left-aligned text)
+ */
 const getEditorOffset = (textarea: HTMLTextAreaElement) => {
   const [, left, top] = textarea.style.transform.match(
     /^translate\((\S+)px, (\S+)px\)/,
@@ -1071,6 +1074,32 @@ describe("textWysiwyg", () => {
       expect(textarea.style.width).toBe(`${text.width}px`);
       expect(parseFloat(textarea.style.height)).toBeCloseTo(text.height * 1.05);
       expect(textarea.style.maxHeight).toBe("");
+      Keyboard.exitTextEditor(textarea);
+    });
+
+    it("should keep a wrapping editor at its text's exact width", async () => {
+      Keyboard.exitTextEditor(textarea);
+      // fixed-width, fractionally wide: the editor wraps the text where the
+      // canvas does only at the same width (a growing text's editor is a
+      // whole px wide instead — see getEditorPlacement)
+      const text = {
+        ...API.createElement({
+          type: "text",
+          text: "Hello world",
+          width: 98.46,
+          textAlign: "center",
+        }),
+        autoResize: false,
+      } as ExcalidrawTextElement;
+      API.setElements([text]);
+      API.setAppState({ selectedElementIds: { [text.id]: true } });
+      Keyboard.keyPress(KEYS.ENTER);
+      textarea = await getTextEditor();
+
+      expect(textarea.style.whiteSpace).toBe("pre-wrap");
+      expect(textarea.style.width).toBe("98.46px");
+      // and centered on the text's center
+      expect(textarea.style.transform).toContain("translate(-49.23px, 0px)");
       Keyboard.exitTextEditor(textarea);
     });
 
