@@ -73,7 +73,7 @@ export function runLength(ps: Point[]): number {
     len += dist(ps[i - 1], ps[i]);
   }
 
-  len += dist(ps[ps.length - 2], ps[ps.length - 1]);
+  //len += dist(ps[ps.length - 2], ps[ps.length - 1]);
 
   return len;
 }
