@@ -52,6 +52,19 @@ export const actionCopy = register<ClipboardEvent | null>({
   keyTest: undefined,
 });
 
+/** whether the browser has blocked clipboard reads for this site (as opposed
+ * to the user just dismissing the permission prompt) */
+const isClipboardReadDenied = async () => {
+  try {
+    const status = await navigator.permissions?.query({
+      name: "clipboard-read" as PermissionName,
+    });
+    return status?.state === "denied";
+  } catch {
+    return false;
+  }
+};
+
 export const actionPaste = register({
   name: "paste",
   label: "labels.paste",
@@ -61,9 +74,25 @@ export const actionPaste = register({
     try {
       types = await readSystemClipboard();
     } catch (error: any) {
-      if (error.name === "AbortError" || error.name === "NotAllowedError") {
+      if (error.name === "AbortError") {
         // user probably aborted the action. Though not 100% sure, it's best
         // to not annoy them with an error message.
+        return false;
+      }
+
+      if (error.name === "NotAllowedError") {
+        // either the user dismissed the permission prompt (stay quiet), or
+        // clipboard access is blocked for this site, in which case Paste
+        // would silently do nothing every time, so tell the user
+        if (await isClipboardReadDenied()) {
+          return {
+            captureUpdate: CaptureUpdateAction.EVENTUALLY,
+            appState: {
+              ...appState,
+              errorMessage: t("errors.asyncPasteFailedOnRead"),
+            },
+          };
+        }
         return false;
       }
 
