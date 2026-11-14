@@ -60,6 +60,14 @@ unmountComponent();
 const tab = "    ";
 const mouse = new Pointer("mouse");
 
+/** where the editor is placed: its transform's first translate, in px */
+const getEditorOffset = (textarea: HTMLTextAreaElement) => {
+  const [, left, top] = textarea.style.transform.match(
+    /^translate\((\S+)px, (\S+)px\)/,
+  )!;
+  return { left: parseFloat(left), top: parseFloat(top) };
+};
+
 const exitTextEditorAndAssertSelection = async ({
   editor,
   selectedIds,
@@ -1261,9 +1269,7 @@ describe("textWysiwyg", () => {
       // it fitted vertically already
       expect(h.state.scrollY).toBe(scrollY);
       // and the editor moved along
-      expect(parseFloat(textarea.style.left)).toBeCloseTo(
-        TEXT_VIEWPORT_PADDING,
-      );
+      expect(getEditorOffset(textarea).left).toBeCloseTo(TEXT_VIEWPORT_PADDING);
     });
 
     it("should leave the vertical to the caret when a text that starts wrapping is taller than the view", async () => {
@@ -1315,7 +1321,7 @@ describe("textWysiwyg", () => {
       const editorBox = textarea.parentElement!;
       const root = textarea.closest<HTMLElement>(".excalidraw")!;
       const { scrollX, scrollY } = h.state;
-      const editorTop = parseFloat(textarea.style.top);
+      const editorTop = getEditorOffset(textarea).top;
 
       // what the browser does to reveal a caret below and right of the
       // editor's box (the canvas area)
@@ -1330,7 +1336,7 @@ describe("textWysiwyg", () => {
       expect(h.state.scrollX).toBe(scrollX - (40 + CARET_FOLLOW_PADDING) / 2);
       expect(h.state.scrollY).toBe(scrollY - (120 + CARET_FOLLOW_PADDING) / 2);
       // with the editor on it
-      expect(parseFloat(textarea.style.top)).toBe(
+      expect(getEditorOffset(textarea).top).toBe(
         editorTop - (120 + CARET_FOLLOW_PADDING),
       );
       // the reveal never reaches the root
@@ -1392,14 +1398,14 @@ describe("textWysiwyg", () => {
     it("should keep the editor's box off a docked sidebar", () => {
       const editorBox = textarea.parentElement!;
       const sidebar = dockSidebar(500, 300);
-      const editorLeft = parseFloat(textarea.style.left);
+      const editorLeft = getEditorOffset(textarea).left;
 
       // docked on the right: the box ends where the sidebar starts, so a
       // caret behind the sidebar is outside it (and revealed by a pan)
       updateTextEditor(textarea, "Hello");
       expect(editorBox.style.right).toBe("300px");
       expect(editorBox.style.left).toBe("0px");
-      expect(parseFloat(textarea.style.left)).toBe(editorLeft);
+      expect(getEditorOffset(textarea).left).toBe(editorLeft);
 
       // docked on the left (RTL): the box starts where the sidebar ends, and
       // the editor keeps its place on the canvas
@@ -1407,7 +1413,7 @@ describe("textWysiwyg", () => {
       updateTextEditor(textarea, "Hello!");
       expect(editorBox.style.left).toBe("300px");
       expect(editorBox.style.right).toBe("0px");
-      expect(parseFloat(textarea.style.left)).toBe(editorLeft - 300);
+      expect(getEditorOffset(textarea).left).toBe(editorLeft - 300);
 
       // not docked: the whole canvas
       sidebar.remove();

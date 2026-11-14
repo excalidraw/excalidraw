@@ -91,12 +91,21 @@ import type { AppState } from "../types";
 export const CARET_FOLLOW_PADDING = 5;
 
 /**
- * The editor is scaled and rotated about the text's center (its transform
+ * The editor is placed at `left`/`top` (in px, relative to the editor's box)
+ * by the transform's first translate, not by its `left`/`top` styles (which
+ * stay 0): the browser rounds a scaled element's layout offset to whole
+ * pixels, so as a text grows from its center or right edge (moving the
+ * editor by fractions of a pixel) its other lines would jitter by a pixel,
+ * while a transform's translation is kept exact.
+ *
+ * It's then scaled and rotated about the text's center (its transform
  * origin), as the canvas draws the text. The zoom puts that center at half
  * the *scaled* size from the box's top-left, while the origin sits at half
- * the unscaled size — the translate makes up the difference.
+ * the unscaled size — the second translate makes up the difference.
  */
 const getTransform = (
+  left: number,
+  top: number,
   width: number,
   height: number,
   angle: number,
@@ -106,7 +115,7 @@ const getTransform = (
   const degree = (180 * angle) / Math.PI;
   const translateX = (width * (zoom.value - 1)) / 2;
   const translateY = (height * (zoom.value - 1)) / 2;
-  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+  return `translate(${left}px, ${top}px) translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
 const getLineDirection = (text: string, offset: number) => {
@@ -490,14 +499,14 @@ export const textWysiwyg = ({
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX - editorBoxLeft}px`,
-        top: `${viewportY}px`,
         // about the text's center, whatever size the box itself ends up
         // (the 5% buffer) — see getTransform
         transformOrigin: `${updatedTextElement.width / 2}px ${
           updatedTextElement.height / 2
         }px`,
         transform: getTransform(
+          viewportX - editorBoxLeft,
+          viewportY,
           updatedTextElement.width,
           updatedTextElement.height,
           angle,
@@ -553,6 +562,9 @@ export const textWysiwyg = ({
   }
   Object.assign(editable.style, {
     position: "absolute",
+    // placed by its transform instead — see getTransform
+    left: 0,
+    top: 0,
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
