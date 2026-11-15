@@ -7237,10 +7237,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.state.editingTextElement) {
-      const editedTextResizeHandle = this.text.getEditedTextResizeHandleAt(
-        scenePointer,
-        event.pointerType,
-      );
+      const editedTextResizeHandle =
+        this.text.getEditedTextResizeHandleAt(scenePointer);
       // (a wrapped text shows its whole box as is)
       this.text.setEditedTextHoveredSide(
         editedTextResizeHandle?.element.autoResize

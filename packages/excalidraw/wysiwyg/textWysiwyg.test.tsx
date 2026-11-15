@@ -3747,6 +3747,30 @@ describe("textWysiwyg", () => {
       expect(canvas.style.cursor).not.toContain("resize");
     });
 
+    it("gives the canvas, from over the editor, the cursor of where the pointer would leave it", async () => {
+      API.setElements([wrappedText()]);
+      const canvas = GlobalTestState.interactiveCanvas;
+      mouse.doubleClickAt(110, 110);
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+      const y = text.y + text.height / 2;
+
+      // nearest a side: its handle's, which the canvas would otherwise only
+      // set a frame after the pointer got there
+      fireEvent.pointerMove(editor, {
+        clientX: text.x + text.width - 5,
+        clientY: y,
+      });
+      expect(canvas.style.cursor).toBe("ew-resize");
+
+      // nearest the top or bottom: the canvas' own
+      fireEvent.pointerMove(editor, {
+        clientX: text.x + text.width / 2,
+        clientY: y,
+      });
+      expect(canvas.style.cursor).not.toContain("resize");
+    });
+
     it("resizes a text dragged by its side while editing it", async () => {
       API.setElements([
         API.createElement({

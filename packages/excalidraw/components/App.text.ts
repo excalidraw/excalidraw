@@ -16,10 +16,16 @@ import {
   type Bounds,
   type StylesPanelMode,
 } from "@excalidraw/common";
-import { pointFrom, type Radians } from "@excalidraw/math";
+import {
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  canResizeFromSides,
   deepCopyElement,
   fixBindingsAfterDeletion,
   getActiveTextElement,
@@ -28,6 +34,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  getCursorForResizingElement,
   getElementAbsoluteCoords,
   getElementBounds,
   getLineHeightInPx,
@@ -46,7 +53,6 @@ import {
   newElementWith,
   newTextElement,
   refreshTextDimensions,
-  resizeTest,
   transformElements,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -58,18 +64,31 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
-  PointerType,
 } from "@excalidraw/element/types";
 
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { withBatchedUpdates } from "../reactUtils";
 import { SnapCache, snapResizingElements } from "../snapping";
-import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
+import {
+  getTextBoxPadding,
+  isPointHittingTextAutoResizeHandle,
+} from "../textAutoResizeHandle";
 import { scrollBoundsIntoView } from "../viewport";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 
 import type App from "./App";
 import type { AppState, Offsets, ViewportUIName } from "../types";
+
+/** the scene point in the (rotated) text's own axes */
+const unrotatePoint = (
+  point: Readonly<{ x: number; y: number }>,
+  text: ExcalidrawTextElement,
+) =>
+  pointRotateRads(
+    pointFrom<GlobalPoint>(point.x, point.y),
+    pointFrom<GlobalPoint>(text.x + text.width / 2, text.y + text.height / 2),
+    -text.angle as Radians,
+  );
 
 type AppTextDependencies = {
   getContainer: () => HTMLDivElement | null;
@@ -561,41 +580,94 @@ export class AppText {
    * The side handle, at a scene point, of the free text being edited: dragging
    * it sets the width the text wraps at, as it does for a selected text.
    *
-   * (The edited text isn't selected, hence not handled by the selection's
-   * transform handles.)
+   * A side's handle is the strip from the text's edge — where the editor
+   * ends, leaving no gap between the two — to as far past the box drawn
+   * around a wrapped text as the box is from the text.
+   *
+   * (The edited text isn't necessarily selected, and has no transform handles
+   * of the selection's: see `AppSelectionTool.getTransformHandleAt()`.)
    */
   public getEditedTextResizeHandleAt = (
     point: Readonly<{ x: number; y: number }>,
-    pointerType: PointerType,
   ): {
     element: NonDeleted<ExcalidrawTextElement>;
     transformHandleType: "e" | "w";
   } | null => {
-    const { state } = this.app;
-    const element =
-      state.editingTextElement &&
-      this.app.scene.getNonDeletedElement(state.editingTextElement.id);
-
-    if (!element || !isTextElement(element) || element.containerId) {
+    const element = this.getEditedTextResizableFromSides();
+    if (!element) {
       return null;
     }
 
-    const transformHandleType = resizeTest(
-      element,
-      this.app.scene.getNonDeletedElementsMap(),
-      // (the edited text isn't necessarily selected)
-      { selectedElementIds: { [element.id]: true }, croppingElementId: null },
-      point.x,
-      point.y,
-      state.zoom,
-      pointerType,
-      this.app.editorInterface,
+    const padding = getTextBoxPadding(this.app.state.zoom.value);
+    const [x, y] = unrotatePoint(point, element);
+
+    if (y < element.y - padding || y > element.y + element.height + padding) {
+      return null;
+    }
+
+    const right = element.x + element.width;
+    const transformHandleType =
+      x >= right && x <= right + padding * 2
+        ? "e"
+        : x <= element.x && x >= element.x - padding * 2
+        ? "w"
+        : null;
+
+    return transformHandleType ? { element, transformHandleType } : null;
+  };
+
+  /**
+   * Gives the canvas, while the pointer is over the editor (at the scene
+   * point), the cursor of what the pointer would leave the editor onto: the
+   * side handle (see `getEditedTextResizeHandleAt()`) if a side is its
+   * nearest edge, the canvas itself otherwise.
+   *
+   * The browser shows the canvas' cursor as it is when the pointer gets
+   * there, and what the canvas then sets only a frame later — a flash of
+   * another cursor between the editor's and the handle's.
+   */
+  public primeCursorAroundEditedText = (
+    point: Readonly<{ x: number; y: number }>,
+  ) => {
+    const element = this.getEditedTextResizableFromSides();
+    if (!element) {
+      return;
+    }
+    const [x, y] = unrotatePoint(point, element);
+    const toLeft = x - element.x;
+    const toRight = element.x + element.width - x;
+    const toSide = Math.min(toLeft, toRight);
+    const toTopOrBottom = Math.min(
+      y - element.y,
+      element.y + element.height - y,
     );
 
-    return transformHandleType === "e" || transformHandleType === "w"
-      ? { element, transformHandleType }
-      : null;
+    if (toSide < toTopOrBottom) {
+      this.app.cursor.set(
+        getCursorForResizingElement({
+          element,
+          transformHandleType: toLeft < toRight ? "w" : "e",
+        }),
+      );
+    } else {
+      this.app.cursor.reset();
+    }
   };
+
+  /** the free text being edited, where texts are resized from their sides */
+  private getEditedTextResizableFromSides() {
+    const { editingTextElement } = this.app.state;
+    const element =
+      editingTextElement &&
+      this.app.scene.getNonDeletedElement(editingTextElement.id);
+
+    return element &&
+      isTextElement(element) &&
+      !element.containerId &&
+      canResizeFromSides(this.app.editorInterface)
+      ? element
+      : null;
+  }
 
   /**
    * Resizes the text being edited for as long as the pointer, pressed on one
@@ -609,10 +681,7 @@ export class AppText {
     onClick: () => void,
   ): boolean => {
     const origin = viewportCoordsToSceneCoords(event, this.app.state);
-    const handle = this.getEditedTextResizeHandleAt(
-      origin,
-      event.pointerType as PointerType,
-    );
+    const handle = this.getEditedTextResizeHandleAt(origin);
     if (!handle) {
       return false;
     }
