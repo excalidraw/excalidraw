@@ -49,7 +49,7 @@ const isInsideTransformHandle = (
 export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
-  appState: AppState,
+  appState: Pick<AppState, "selectedElementIds" | "croppingElementId">,
   x: number,
   y: number,
   zoom: Zoom,

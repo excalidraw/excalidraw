@@ -3742,6 +3742,13 @@ describe("textWysiwyg", () => {
       const { width, height } = text;
       const x = text.x + text.width + 4;
       const y = text.y + text.height / 2;
+
+      // the side under the pointer is the one drawn, to show it can be dragged
+      mouse.moveTo(x, y);
+      expect(h.app.text.editedTextHoveredSide).toBe("e");
+      mouse.moveTo(x + 40, y);
+      expect(h.app.text.editedTextHoveredSide).toBe(null);
+
       mouse.downAt(x, y);
       mouse.moveTo(x - 40, y);
       mouse.moveTo(x - 80, y);

@@ -1205,8 +1205,10 @@ export const textWysiwyg = ({
   };
 
   const cleanup = () => {
+    app.text.setEditedTextHoveredSide(null);
     // remove events to ensure they don't late-fire
     editable.onblur = null;
+    editable.onpointerenter = null;
     editable.oninput = null;
     editable.onkeydown = null;
 
@@ -1449,6 +1451,8 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
+  // (the pointer left the canvas, and with it the text's side handles)
+  editable.onpointerenter = () => app.text.setEditedTextHoveredSide(null);
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg

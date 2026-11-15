@@ -48,6 +48,8 @@ type InteractiveCanvasProps = {
   app: AppClassProperties;
   interactionEnabled: boolean;
   navigationEnabled: boolean;
+  /** see `AppText.editedTextHoveredSide`: here for the canvas to re-render */
+  editedTextHoveredSide: "e" | "w" | null;
   renderInteractiveSceneCallback: (
     data: RenderInteractiveSceneCallback,
   ) => void;
@@ -302,7 +304,8 @@ const areEqual = (
     prevProps.selectedElements !== nextProps.selectedElements ||
     prevProps.renderScrollbars !== nextProps.renderScrollbars ||
     prevProps.interactionEnabled !== nextProps.interactionEnabled ||
-    prevProps.navigationEnabled !== nextProps.navigationEnabled
+    prevProps.navigationEnabled !== nextProps.navigationEnabled ||
+    prevProps.editedTextHoveredSide !== nextProps.editedTextHoveredSide
   ) {
     return false;
   }
