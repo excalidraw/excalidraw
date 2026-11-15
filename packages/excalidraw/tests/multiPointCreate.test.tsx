@@ -10,8 +10,11 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+
 import {
   render,
+  act,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
@@ -92,6 +95,90 @@ describe("remove shape in non linear elements", () => {
 });
 
 describe("multi point mode in linear elements", () => {
+  it.each([
+    ["arrow", "selection"],
+    ["arrow", "rectangle"],
+    ["arrow", "line"],
+    ["line", "selection"],
+    ["line", "rectangle"],
+    ["line", "arrow"],
+  ] as const)(
+    "cancels an unfinished %s when switching to %s",
+    async (drawingTool, nextTool) => {
+      await render(<Excalidraw />);
+      const mouse = new Pointer("mouse");
+      UI.clickTool(drawingTool);
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+
+      expect(h.state.multiElement?.type).toBe(drawingTool);
+      expect(h.elements).toHaveLength(1);
+
+      UI.clickTool(nextTool);
+
+      expect(h.state.activeTool.type).toBe(nextTool);
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+
+      mouse.moveTo(150, 150);
+      UI.clickTool(drawingTool);
+      mouse.downAt(200, 200);
+      mouse.moveTo(300, 300);
+      mouse.up();
+
+      const elements = h.app.scene.getNonDeletedElements();
+      expect(elements).toHaveLength(1);
+      expect(elements[0]).toMatchObject({
+        type: drawingTool,
+        x: 200,
+        y: 200,
+        points: [
+          [0, 0],
+          [100, 100],
+        ],
+      });
+    },
+  );
+
+  it.each(["arrow", "line"] as const)(
+    "preserves committed %s points when switching tools through the API",
+    async (drawingTool) => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const mouse = new Pointer("mouse");
+      UI.clickTool(drawingTool);
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+
+      mouse.click();
+      mouse.moveTo(150, 50);
+      expect(h.state.multiElement?.points).toHaveLength(3);
+
+      act(() => h.app.setActiveTool({ type: "rectangle" }));
+
+      expect(h.state.activeTool.type).toBe("rectangle");
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+      const committedPoints = [
+        [0, 0],
+        [70, 70],
+      ];
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(h.app.scene.getNonDeletedElements()[0]).toMatchObject({
+        type: drawingTool,
+        points: committedPoints,
+      });
+
+      Keyboard.undo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+      Keyboard.redo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(h.app.scene.getNonDeletedElements()[0]).toMatchObject({
+        points: committedPoints,
+      });
+    },
+  );
+
   it("arrow", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     // select tool

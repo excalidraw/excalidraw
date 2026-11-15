@@ -5806,10 +5806,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.drawShape.hasPendingGesture()) {
-      // switching tools mid-sketch (e.g. paste resets to the selection tool)
-      // must not strand the gesture — commit it through the finalize funnel
-      // while the drawShape tool is still active
+    if (
+      (this.state.multiElement && !isElbowArrow(this.state.multiElement)) ||
+      this.drawShape.hasPendingGesture()
+    ) {
+      // Finalize before switching tools to discard any uncommitted point.
       this.actionManager.executeAction(actionFinalize);
     }
 
