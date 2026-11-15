@@ -3,6 +3,7 @@ import { flushSync } from "react-dom";
 import {
   DEFAULT_VERTICAL_ALIGN,
   TEXT_MAX_WRAP_WIDTH,
+  TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TEXT_VIEWPORT_PADDING,
   VERTICAL_ALIGN,
@@ -162,15 +163,19 @@ export class AppText {
 
   /**
    * The widest a text may grow to as it's typed or pasted, in scene units:
-   * TEXT_MAX_WRAP_WIDTH, or less, so that a text never outgrows the part of
-   * the canvas it's kept within.
+   * TEXT_MAX_WRAP_WIDTH — when zoomed out, that much on screen, up to
+   * TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT — or less, so that a text never outgrows
+   * the part of the canvas it's kept within.
    */
   public getMaxTextWidth = (offsets: Required<Offsets>) => {
     const { left, right } = offsets;
+    const zoom = this.app.state.zoom.value;
     const viewWidth = this.app.state.width - left - right;
     return Math.min(
-      viewWidth > 0 ? viewWidth / this.app.state.zoom.value : Infinity,
-      TEXT_MAX_WRAP_WIDTH,
+      viewWidth > 0 ? viewWidth / zoom : Infinity,
+      zoom < 1
+        ? Math.min(TEXT_MAX_WRAP_WIDTH / zoom, TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT)
+        : TEXT_MAX_WRAP_WIDTH,
     );
   };
 

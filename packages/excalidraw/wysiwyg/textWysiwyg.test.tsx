@@ -21,6 +21,7 @@ import {
   applyDarkModeFilter,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
+  TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT,
 } from "@excalidraw/common";
 
 import type {
@@ -1142,9 +1143,16 @@ describe("textWysiwyg", () => {
       sidebar.remove();
     });
 
-    it.each([0.5, 2])(
-      "should stop a growing text at TEXT_MAX_WRAP_WIDTH at any zoom, however wide the view (zoom %s)",
-      (zoom) => {
+    it.each([
+      // zoomed in: in scene units (the view would allow 980)
+      { zoom: 2, width: TEXT_MAX_WRAP_WIDTH },
+      // zoomed out: on screen...
+      { zoom: 0.5, width: TEXT_MAX_WRAP_WIDTH / 0.5 },
+      // ...up to a limit
+      { zoom: 0.2, width: TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT },
+    ])(
+      "should stop a growing text at TEXT_MAX_WRAP_WIDTH, scaled when zoomed out, however wide the view (zoom $zoom)",
+      ({ zoom, width }) => {
         API.setAppState({
           width: 2000,
           zoom: { value: zoom as typeof h.state.zoom.value },
@@ -1152,12 +1160,13 @@ describe("textWysiwyg", () => {
 
         updateTextEditor(
           textarea,
-          "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+          "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! ".repeat(
+            4,
+          ),
         );
         const text = h.elements[0] as ExcalidrawTextElement;
         expect(text.autoResize).toBe(false);
-        // in scene units: at 200%, the view would allow 980
-        expect(text.width).toBe(TEXT_MAX_WRAP_WIDTH);
+        expect(text.width).toBe(width);
       },
     );
 
