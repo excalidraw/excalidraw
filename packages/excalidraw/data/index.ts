@@ -107,6 +107,7 @@ export const exportCanvas = async (
     fileHandle = null,
     exportingFrame = null,
     renderEnvironment,
+    onFilePickerShown,
   }: {
     exportPadding?: number;
     /** filename, if applicable */
@@ -114,6 +115,7 @@ export const exportCanvas = async (
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
     renderEnvironment?: RenderEnvironment;
+    onFilePickerShown?: (handle: FileSystemFileHandle | null) => void;
   },
 ) => {
   if (elements.length === 0) {
@@ -157,6 +159,7 @@ export const exportCanvas = async (
           mimeTypes: [IMAGE_MIME_TYPES.svg],
           fileHandle,
         },
+        onFilePickerShown,
       );
     } else if (type === "clipboard-svg") {
       const svg = await svgPromise.then((svg) => svg.outerHTML);
@@ -193,13 +196,17 @@ export const exportCanvas = async (
       );
     }
 
-    return fileSave(blob, {
-      description: "Export to PNG",
-      name,
-      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
-      mimeTypes: [IMAGE_MIME_TYPES.png],
-      fileHandle,
-    });
+    return fileSave(
+      blob,
+      {
+        description: "Export to PNG",
+        name,
+        extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
+        mimeTypes: [IMAGE_MIME_TYPES.png],
+        fileHandle,
+      },
+      onFilePickerShown,
+    );
   } else if (type === "clipboard") {
     try {
       const blob = canvasToBlob(tempCanvas);
