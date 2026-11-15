@@ -1,4 +1,4 @@
-import { CODES, KEYS } from "@excalidraw/common";
+import { KEYS, matchKey } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -32,5 +32,5 @@ export const actionToggleZenMode = register({
     );
   },
   keyTest: (event) =>
-    !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,
+    !event[KEYS.CTRL_OR_CMD] && event.altKey && matchKey(event, KEYS.Z),
 });

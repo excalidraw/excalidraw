@@ -490,6 +490,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("W")]}
             />
             <Shortcut
+              label={t("labels.toggleAutoResize")}
+              shortcuts={[getShortcutKey("Alt+W")]}
+            />
+            <Shortcut
               label={t("labels.flipHorizontal")}
               shortcuts={[getShortcutKey("Shift+H")]}
             />

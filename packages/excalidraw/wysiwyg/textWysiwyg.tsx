@@ -12,6 +12,7 @@ import {
   applyDarkModeFilter,
   isRTL,
   hasRTLChars,
+  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 import {
   clamp,
@@ -68,6 +69,10 @@ import {
   parseDataTransferEvent,
   parseDataTransferEventMimeTypes,
 } from "../clipboard";
+import {
+  actionTextAutoResize,
+  isTextAutoResizeShortcut,
+} from "../actions/actionTextAutoResize";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -542,6 +547,15 @@ export const textWysiwyg = ({
         editable.style.whiteSpace = "pre-wrap";
         editable.style.wordBreak = "break-word";
       }
+      // ...and no longer once the text grows with its content again
+      if (
+        !container &&
+        updatedTextElement.autoResize &&
+        editable.style.whiteSpace !== "pre"
+      ) {
+        editable.style.whiteSpace = "pre";
+        editable.style.wordBreak = "normal";
+      }
 
       Object.assign(editable.style, {
         font,
@@ -971,6 +985,18 @@ export const textWysiwyg = ({
         getCaretZoomAnchor(),
       );
       updateWysiwygStyle();
+    } else if (
+      isTextAutoResizeShortcut(event) &&
+      !isBoundToContainer(element)
+    ) {
+      event.preventDefault();
+      // (not for the canvas, which acts on the selection)
+      event.stopPropagation();
+      app.actionManager.executeAction(
+        actionTextAutoResize,
+        "keyboard",
+        app.scene.getElement(element.id),
+      );
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
@@ -1180,8 +1206,13 @@ export const textWysiwyg = ({
   };
 
   const cleanup = () => {
+    app.text.setEditedTextHoveredSide(null);
+    // (the canvas takes the editor's place under the pointer, with the
+    // cursor given to it for around the editor: see the pointermove below)
+    app.cursor.reset();
     // remove events to ensure they don't late-fire
     editable.onblur = null;
+    editable.onpointerenter = null;
     editable.oninput = null;
     editable.onkeydown = null;
 
@@ -1291,6 +1322,21 @@ export const textWysiwyg = ({
       submittedViaKeyboard = true;
       handleSubmit();
       app.duplicate.handOverTextEditorPress(event, element.id);
+      return;
+    }
+
+    // dragging a side of the text being edited resizes it (changing where it
+    // wraps) without leaving the editor; a mere click there still submits
+    if (
+      event.button === POINTER_BUTTON.MAIN &&
+      target instanceof ownerWindow.HTMLCanvasElement &&
+      app.text.resizeEditedTextOnPointerDown(event, handleSubmit)
+    ) {
+      // the press is the editor's: the canvas would otherwise act on it
+      // (deselect, box-select)
+      event.preventDefault();
+      event.stopPropagation();
+      temporarilyDisableSubmit();
       return;
     }
 
@@ -1409,6 +1455,14 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
+  // (the pointer left the canvas, and with it the text's side handles)
+  editable.onpointerenter = () => app.text.setEditedTextHoveredSide(null);
+  // (the cursor the canvas will have once the pointer leaves the editor)
+  editable.addEventListener("pointermove", (event) =>
+    app.text.primeCursorAroundEditedText(
+      viewportCoordsToSceneCoords(event, app.state),
+    ),
+  );
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg

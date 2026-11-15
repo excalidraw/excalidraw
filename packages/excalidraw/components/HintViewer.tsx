@@ -174,17 +174,30 @@ const getHints = ({
     });
   }
 
-  if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
-    return t("hints.text_selected", {
-      shortcut: getTaggedShortcutKey("Enter"),
-    });
-  }
+  const toggleTextAutoResize = t("hints.toggleTextAutoResize", {
+    shortcut: getTaggedShortcutKey(["Alt", "W"]),
+  });
 
+  // (before the selected text: one just created is selected while edited)
   if (appState.editingTextElement) {
-    return t("hints.text_editing", {
+    const finishEditing = t("hints.text_editing", {
       shortcut_1: getTaggedShortcutKey("Escape"),
       shortcut_2: getTaggedShortcutKey(["CtrlOrCmd", "Enter"]),
     });
+    // (a label follows its container)
+    return appState.editingTextElement.containerId
+      ? finishEditing
+      : [finishEditing, toggleTextAutoResize];
+  }
+
+  if (selectedElements.length === 1 && isTextElement(selectedElements[0])) {
+    const editText = t("hints.text_selected", {
+      shortcut: getTaggedShortcutKey("Enter"),
+    });
+    // a wrapped text: its handle unwraps it too, but only on desktop
+    return selectedElements[0].autoResize
+      ? editText
+      : [editText, toggleTextAutoResize];
   }
 
   if (appState.croppingElementId) {
