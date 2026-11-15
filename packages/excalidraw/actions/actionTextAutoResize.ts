@@ -37,10 +37,19 @@ const getSelectedFreeTexts = (
   );
 
 /**
+ * Room past its text for a text made to keep its width (px). One exactly as
+ * wide as its longest line is on the verge of wrapping, and Chrome lays the
+ * editor's text out in 1/64px steps, rounding each run of it up — a line
+ * being split into more runs as it's edited. The line can so come out a hair
+ * wider there than measured here, and wrap in the editor alone.
+ */
+const KEPT_TEXT_WIDTH_SLACK = 1;
+
+/**
  * The text with auto-resizing toggled: growing with its content again,
- * unwrapped — or keeping its width, wrapping at it, which is at most the
- * width a typed text stops growing at (see `AppText.getMaxTextWidth()`), even
- * for a text already wider.
+ * unwrapped — or keeping its width (and some: see `KEPT_TEXT_WIDTH_SLACK`),
+ * wrapping at it, which is at most the width a typed text stops growing at
+ * (see `AppText.getMaxTextWidth()`), even for a text already wider.
  */
 const toggleTextAutoResize = (
   text: ExcalidrawTextElement,
@@ -51,7 +60,7 @@ const toggleTextAutoResize = (
   const width = autoResize
     ? null
     : Math.min(
-        text.width,
+        text.width + KEPT_TEXT_WIDTH_SLACK,
         app.text.getMaxTextWidth(
           app.text.getTextViewportOffsets(
             getElementBounds(text, app.scene.getNonDeletedElementsMap()),

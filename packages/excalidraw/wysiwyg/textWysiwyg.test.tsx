@@ -3650,9 +3650,11 @@ describe("textWysiwyg", () => {
 
       toggle();
       expect(texts().map((text) => text.autoResize)).toEqual([false, false]);
+      // (a text keeping its width gets a pixel to spare, not to be on the
+      // verge of wrapping)
       expect(texts().map((text) => text.width)).toEqual([
         TEXT_MAX_WRAP_WIDTH,
-        shortWidth,
+        shortWidth + 1,
       ]);
       expect(texts()[0].text).toContain("\n");
 
