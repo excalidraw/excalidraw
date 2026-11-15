@@ -4704,13 +4704,17 @@ class App extends React.Component<AppProps, AppState> {
       this.addMissingFiles(opts.files);
     }
 
+    this.setActiveTool(
+      { type: this.state.preferredSelectionTool.type },
+      { keepSelection: true },
+    );
+
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(duplicatedElements);
 
     this.store.scheduleCapture();
     this.setState(
       {
-        ...this.state,
         // keep sidebar (presumably the library) open if it's docked and
         // can fit.
         //
@@ -4734,11 +4738,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool(
-      { type: this.state.preferredSelectionTool.type },
-      { keepSelection: true },
-    );
-
     if (opts.fit) {
       this.viewport.setViewport({
         target: duplicatedElements,
@@ -5806,10 +5805,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (
-      (this.state.multiElement && !isElbowArrow(this.state.multiElement)) ||
-      this.drawShape.hasPendingGesture()
-    ) {
+    if (this.state.multiElement || this.drawShape.hasPendingGesture()) {
       // Finalize before switching tools to discard any uncommitted point.
       this.actionManager.executeAction(actionFinalize);
     }

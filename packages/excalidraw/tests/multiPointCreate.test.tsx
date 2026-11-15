@@ -6,11 +6,13 @@ import { KEYS, reseed } from "@excalidraw/common";
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
 import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { API } from "./helpers/api";
 
 import {
   render,
@@ -19,6 +21,8 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
+  waitFor,
+  GlobalTestState,
 } from "./test-utils";
 
 unmountComponent();
@@ -95,6 +99,115 @@ describe("remove shape in non linear elements", () => {
 });
 
 describe("multi point mode in linear elements", () => {
+  it.each(["selection", "rectangle", "line"] as const)(
+    "finalizes an elbow arrow without changing its route when switching to %s",
+    async (nextTool) => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const mouse = new Pointer("mouse");
+      UI.clickTool("arrow");
+      API.setAppState({ currentItemArrowType: "elbow" });
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+
+      expect(h.state.multiElement).toMatchObject({ elbowed: true });
+      expect(h.state.multiElement!.points.length).toBeGreaterThan(2);
+      const preview = h.state.multiElement!;
+      const points = [...preview.points];
+
+      UI.clickTool(nextTool);
+
+      expect(h.state.activeTool.type).toBe(nextTool);
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(preview.points).toEqual(points);
+
+      mouse.moveTo(150, 150);
+      expect(preview.points).toEqual(points);
+      UI.clickTool("arrow");
+      mouse.clickAt(200, 200);
+      mouse.moveTo(300, 300);
+      mouse.click();
+
+      const elements = h.app.scene.getNonDeletedElements();
+      expect(elements).toHaveLength(2);
+      const arrow = elements[1] as ExcalidrawLinearElement;
+      expect(arrow).toMatchObject({ type: "arrow", elbowed: true });
+      expect(arrow.points.length).toBeGreaterThan(2);
+      expect(arrow.points[0]).toEqual([0, 0]);
+      expect(arrow.points[arrow.points.length - 1]).toEqual([100, 100]);
+
+      Keyboard.undo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(h.app.scene.getNonDeletedElements()[0]).toMatchObject({
+        id: preview.id,
+        points,
+      });
+      Keyboard.redo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(2);
+      expect(h.app.scene.getNonDeletedElements()[1]).toMatchObject({
+        id: arrow.id,
+        points: arrow.points,
+      });
+    },
+  );
+
+  it.each(["clipboard", "library"] as const)(
+    "selects elements inserted through %s when finalizing an in-progress arrow",
+    async (source) => {
+      await render(<Excalidraw autoFocus handleKeyboardGlobally={true} />);
+      Object.assign(document, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+      const mouse = new Pointer("mouse");
+      UI.clickTool("arrow");
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+      mouse.click();
+      mouse.moveTo(150, 50);
+
+      expect(h.state.multiElement?.points).toHaveLength(3);
+
+      const elements = [API.createElement({ type: "rectangle" })];
+      await act(async () => {
+        if (source === "clipboard") {
+          document.dispatchEvent(
+            createPasteEvent({
+              types: {
+                "text/plain": serializeAsClipboardJSON({
+                  elements,
+                  files: null,
+                }),
+              },
+            }),
+          );
+        } else {
+          h.app.addElementsFromPasteOrLibrary({
+            elements,
+            files: null,
+            position: "cursor",
+          });
+        }
+      });
+
+      await waitFor(() => {
+        expect(h.app.scene.getNonDeletedElements()).toHaveLength(2);
+      });
+      const [arrow, rectangle] = h.app.scene.getNonDeletedElements();
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        points: [
+          [0, 0],
+          [70, 70],
+        ],
+      });
+      expect(rectangle.type).toBe("rectangle");
+      expect(h.state.selectedElementIds).toEqual({ [rectangle.id]: true });
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+    },
+  );
+
   it.each([
     ["arrow", "selection"],
     ["arrow", "rectangle"],
