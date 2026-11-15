@@ -3684,6 +3684,27 @@ describe("textWysiwyg", () => {
       },
     );
 
+    it("hints at Alt+W for a selected wrapped text, and while editing a text", async () => {
+      const hint = () =>
+        h.app.ownerDocument.querySelector(".HintViewer")?.textContent ?? "";
+      const toggleHint = "to toggle text auto-resize";
+
+      API.setElements([wrappedText()]);
+      API.setAppState({ selectedElementIds: { text: true } });
+      await waitFor(() => expect(hint()).toContain(toggleHint));
+
+      // not for a text that doesn't wrap...
+      API.executeAction(actionTextAutoResize);
+      await waitFor(() => expect(hint()).toContain("to edit text"));
+      expect(hint()).not.toContain(toggleHint);
+
+      // ...until it's edited
+      mouse.doubleClickAt(110, 110);
+      await getTextEditor();
+      await waitFor(() => expect(hint()).toContain("to finish editing"));
+      expect(hint()).toContain(toggleHint);
+    });
+
     it("toggles auto-resizing of the text being edited with Alt+W", async () => {
       API.setElements([wrappedText()]);
       mouse.doubleClickAt(110, 110);

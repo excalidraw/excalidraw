@@ -396,6 +396,7 @@
     "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
+    "toggleTextAutoResize": "{{shortcut}} to toggle text auto-resize",
     "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
     "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
