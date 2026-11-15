@@ -93,7 +93,7 @@ const SUB: CharMap = zipIt(
 );
 
 // One pass for both ^{...} and _{...} scripts
-const SCRIPT_RE = /([\p{L}\p{N}])([\^_])\{([^{}]+)\}/gu;
+const SCRIPT_RE = /([\p{L}\p{N})])([\^_])\{([^{}]+)\}/gu;
 
 const convertScript = (
   match: string,
