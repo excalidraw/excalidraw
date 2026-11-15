@@ -1,7 +1,7 @@
 import React from "react";
 
 import { COLOR_PALETTE, KEYS, arrayToMap } from "@excalidraw/common";
-import { LinearElementEditor } from "@excalidraw/element";
+import { CaptureUpdateAction, LinearElementEditor } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
 import type {
@@ -564,6 +564,136 @@ describe("wrap (w)", () => {
         width: 300,
         height: 200,
       });
+    });
+
+    it("frames the deselected elements within the selection, below the rest", () => {
+      const rectangle = (
+        id: string,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+      ) => API.createElement({ type: "rectangle", id, x, y, width, height });
+
+      const selected = rectangle("selected", 0, 0, 300, 200);
+      const inside = rectangle("inside", 200, 50, 50, 50);
+      // reaching out of the selection by the frame's padding, and beyond it
+      const near = rectangle("near", 20, 150, 100, 66);
+      const far = rectangle("far", 150, 150, 100, 67);
+      // within the padding, yet not overlapping the selection
+      const beside = rectangle("beside", 305, 50, 10, 50);
+      API.setElements([selected, far, inside, near, beside]);
+      API.setSelectedElements([selected]);
+
+      pressW();
+
+      const frame = getElement(getElement("selected").frameId!);
+      expect(frame).toMatchObject({ x: -16, y: -16, width: 332, height: 248 });
+      expect(h.elements.map((element) => element.id)).toEqual([
+        "selected",
+        "inside",
+        "near",
+        frame.id,
+        "far",
+        "beside",
+      ]);
+      expect(
+        h.elements.map((element) => element.frameId).filter(Boolean),
+      ).toEqual([frame.id, frame.id, frame.id]);
+    });
+
+    it("frames a group whole, along with its locked elements", () => {
+      const selected = API.createElement({
+        type: "rectangle",
+        id: "selected",
+        width: 300,
+        height: 200,
+      });
+      const group = [50, 150].map((x, index) =>
+        API.createElement({
+          type: "rectangle",
+          x,
+          y: 50,
+          width: 50,
+          height: 50,
+          groupIds: ["group"],
+          locked: index === 1,
+        }),
+      );
+      API.setElements([selected, ...group]);
+      API.setSelectedElements([selected]);
+
+      pressW();
+
+      const frameId = getElement("selected").frameId;
+      expect(frameId).toBeTruthy();
+      expect(group.map((element) => getElement(element.id).frameId)).toEqual([
+        frameId,
+        frameId,
+      ]);
+    });
+
+    it("restores the stacking order when undoing wraps", () => {
+      const rectangle = (id: string, x: number, width: number) =>
+        API.createElement({
+          type: "rectangle",
+          id,
+          x,
+          y: 0,
+          width,
+          height: 200,
+        });
+      // `z` gets framed along with `A`, `c` along with `B`
+      API.updateScene({
+        elements: [
+          rectangle("A", 0, 200),
+          rectangle("B", 300, 200),
+          rectangle("z", 150, 60),
+          rectangle("c", 290, 50),
+        ],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      const order = () =>
+        h.elements
+          .filter((element) => !element.isDeleted)
+          .map((element) => element.id);
+
+      for (const id of ["A", "B"]) {
+        API.setSelectedElements([getElement(id)]);
+        pressW();
+      }
+      expect(getElement("z").frameId).toBe(getElement("A").frameId);
+      expect(getElement("c").frameId).toBe(getElement("B").frameId);
+
+      Keyboard.undo();
+      Keyboard.undo();
+
+      expect(order()).toEqual(["A", "B", "z", "c"]);
+    });
+
+    it("frames what reaches out of an image, edge to edge with the image", () => {
+      const image = API.createElement({
+        type: "image",
+        id: "image",
+        width: 300,
+        height: 200,
+      });
+      const mark = API.createElement({
+        type: "rectangle",
+        id: "mark",
+        x: 250,
+        y: 50,
+        width: 60,
+        height: 50,
+      });
+      API.setElements([image, mark]);
+      API.setSelectedElements([image]);
+
+      pressW();
+
+      const frame = getElement(getElement("image").frameId!);
+      expect(getElement("mark").frameId).toBe(frame.id);
+      expect(frame).toMatchObject({ x: 0, y: 0, width: 300, height: 200 });
     });
   });
 });
