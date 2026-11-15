@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
-import { KEYS, capitalizeString } from "@excalidraw/common";
+import { KEYS, capitalizeString, matchKey } from "@excalidraw/common";
 
 import type { PointerType } from "@excalidraw/element/types";
 
@@ -190,35 +190,54 @@ export const getToolShortcut = (type: ToolbarToolType) => {
 };
 
 export const findShapeByKey = (
-  key: string,
+  eventOrKey: string | React.KeyboardEvent | KeyboardEvent,
   app: AppClassProperties,
   shiftKey: boolean = false,
 ) => {
-  // CapsLock-insensitive: the caller excludes every modifier but shift, and
-  // shift is matched explicitly below, so a capital letter on its own means
-  // CapsLock
-  const lowerKey = key.toLowerCase();
+  const isString = typeof eventOrKey === "string";
+  const lowerKey = isString ? eventOrKey.toLowerCase() : "";
 
   for (const type of Object.keys(TOOLS) as ToolbarToolType[]) {
     const { letterKey, numericKey, shiftKey: requiresShift } = TOOLS[type];
+    
     // shift-bound tools require shift; plain-bound ones require its absence
     if (shiftKey !== Boolean(requiresShift)) {
       continue;
     }
-    if (
-      (numericKey != null && key === numericKey) ||
-      (letterKey &&
-        (typeof letterKey === "string"
-          ? letterKey === lowerKey
-          : letterKey.includes(lowerKey)))
-    ) {
-      // the selection shortcut activates whichever selection tool the user
-      // prefers (selection or lasso)
+
+    let isNumericMatch = false;
+    if (numericKey != null) {
+      if (isString) {
+        isNumericMatch = eventOrKey === String(numericKey) || eventOrKey === numericKey;
+      } else {
+        isNumericMatch = matchKey(eventOrKey, numericKey as any);
+      }
+    }
+
+    let isLetterMatch = false;
+    if (letterKey) {
+      if (isString) {
+        if (typeof letterKey === "string") {
+          isLetterMatch = letterKey.toLowerCase() === lowerKey;
+        } else {
+          isLetterMatch = letterKey.some((k) => k.toLowerCase() === lowerKey);
+        }
+      } else {
+        if (typeof letterKey === "string") {
+          isLetterMatch = matchKey(eventOrKey, letterKey as any);
+        } else {
+          isLetterMatch = letterKey.some((k) => matchKey(eventOrKey, k as any));
+        }
+      }
+    }
+
+    if (isNumericMatch || isLetterMatch) {
       return type === "selection"
         ? app.state.preferredSelectionTool.type
         : type;
     }
   }
+  
   return null;
 };
 

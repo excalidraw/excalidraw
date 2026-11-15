@@ -123,6 +123,18 @@ describe("findShapeByKey()", () => {
     expect(findShapeByKey("R", app, true)).toBeNull();
     expect(findShapeByKey("V", app, true)).toBeNull();
   });
+
+  it("matches shape by keyboard event with non-latin layout and physical code fallback", () => {
+    const app = appWithPreferredTool("selection");
+
+    
+    const hebrewEvent = new KeyboardEvent("keydown", {
+      key: "ר",
+      code: "KeyR",
+    });
+
+    expect(findShapeByKey(hebrewEvent, app, false)).toBe("rectangle");
+  });
 });
 
 describe("props.activeTool (forced tool)", () => {
