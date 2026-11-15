@@ -1,7 +1,11 @@
 import React from "react";
 
 import { COLOR_PALETTE, KEYS, arrayToMap } from "@excalidraw/common";
-import { CaptureUpdateAction, LinearElementEditor } from "@excalidraw/element";
+import {
+  CaptureUpdateAction,
+  LinearElementEditor,
+  newElementWith,
+} from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
 import type {
@@ -72,6 +76,24 @@ const createLabeled = (
     verticalAlign: "middle",
   });
   return [container, label] as const;
+};
+
+/**
+ * wraps a text in a new container and unwraps it again, removing the
+ * container — returning the container as it was
+ */
+const wrapAndUnwrapText = (elements: readonly ExcalidrawElement[] = []) => {
+  const text = API.createElement({ type: "text", id: "text", x: 0, y: 0 });
+  API.setElements([...elements, text]);
+  API.setSelectedElements([text]);
+
+  pressW();
+  const containerId = getElement<ExcalidrawTextElement>("text").containerId!;
+  const { x, y } = getElement(containerId);
+  pressW();
+  expect(getElement(containerId).isDeleted).toBe(true);
+
+  return { containerId, x, y };
 };
 
 describe("wrap (w)", () => {
@@ -147,13 +169,25 @@ describe("wrap (w)", () => {
 
     pressW();
 
-    expect(getElement("rect").isDeleted).toBe(true);
+    // only the container it made is removed
     expect(getElement(containerId).isDeleted).toBe(true);
+    expect(getElement("rect").isDeleted).toBe(false);
     expect(getElement<ExcalidrawTextElement>("rect-label").containerId).toBe(
       null,
     );
     expect(getElement<ExcalidrawTextElement>("text").containerId).toBe(null);
-    expect(selectedIds().sort()).toEqual(["rect-label", "text"]);
+    expect(selectedIds().sort()).toEqual(["rect", "rect-label", "text"]);
+
+    pressW();
+
+    expect(getElement(containerId).isDeleted).toBe(false);
+    expect(getElement<ExcalidrawTextElement>("text").containerId).toBe(
+      containerId,
+    );
+    expect(getElement<ExcalidrawTextElement>("rect-label").containerId).toBe(
+      "rect",
+    );
+    expect(selectedIds().sort()).toEqual([containerId, "rect"].sort());
   });
 
   it("unwraps a text as it rendered, at a fixed width", () => {
@@ -194,71 +228,99 @@ describe("wrap (w)", () => {
     });
   });
 
-  it("brings back the unwrapped containers, arrows included", () => {
-    const [diamond, label] = createLabeled("diamond", "diamond", [
-      { type: "text", id: "diamond-label" },
-      { type: "arrow", id: "arrow" },
-    ]);
+  it("brings back the container it made and removed, arrows included", () => {
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      y: 0,
+      boundElements: [{ type: "arrow", id: "arrow" }],
+    });
     const arrow = API.createElement({
       type: "arrow",
       id: "arrow",
-      x: 100,
+      x: 50,
       y: 400,
       width: 0,
       height: -300,
       points: [pointFrom(0, 0), pointFrom(0, -300)],
-      endBinding: { elementId: "diamond", fixedPoint: [0.5, 1], mode: "orbit" },
+      endBinding: { elementId: "text", fixedPoint: [0.5, 1], mode: "orbit" },
     });
-    API.setElements([diamond, label, arrow]);
-    API.setSelectedElements([diamond]);
+    API.setElements([text, arrow]);
+    API.setSelectedElements([text]);
 
     pressW();
 
-    expect(getElement("diamond").isDeleted).toBe(true);
-    expect(
-      getElement<ExcalidrawArrowElement>("arrow").endBinding?.elementId,
-    ).toBe("diamond-label");
-    expect(getElement("diamond-label").boundElements).toEqual([
-      { type: "arrow", id: "arrow" },
-    ]);
-    expect(selectedIds()).toEqual(["diamond-label"]);
-
-    pressW();
-
-    expect(getElement("diamond").isDeleted).toBe(false);
-    expect(getElement<ExcalidrawTextElement>("diamond-label").containerId).toBe(
-      "diamond",
-    );
-    expect(getElement<ExcalidrawArrowElement>("arrow").endBinding).toEqual({
-      elementId: "diamond",
+    const containerId = getElement<ExcalidrawTextElement>("text").containerId!;
+    const endBinding = {
+      elementId: containerId,
       fixedPoint: [0.5, 1],
       mode: "orbit",
-    });
-    expect(getElement("diamond").boundElements).toEqual([
-      { type: "text", id: "diamond-label" },
+    };
+    expect(getElement<ExcalidrawArrowElement>("arrow").endBinding).toEqual(
+      endBinding,
+    );
+
+    pressW();
+
+    expect(getElement(containerId).isDeleted).toBe(true);
+    expect(
+      getElement<ExcalidrawArrowElement>("arrow").endBinding?.elementId,
+    ).toBe("text");
+    expect(getElement("text").boundElements).toEqual([
       { type: "arrow", id: "arrow" },
     ]);
-    expect(getElement("diamond-label").boundElements).toBe(null);
-    expect(selectedIds()).toEqual(["diamond"]);
+    expect(selectedIds()).toEqual(["text"]);
+
+    pressW();
+
+    expect(getElement(containerId).isDeleted).toBe(false);
+    expect(getElement<ExcalidrawTextElement>("text").containerId).toBe(
+      containerId,
+    );
+    expect(getElement<ExcalidrawArrowElement>("arrow").endBinding).toEqual(
+      endBinding,
+    );
+    expect(getElement(containerId).boundElements).toEqual([
+      { type: "text", id: "text" },
+      { type: "arrow", id: "arrow" },
+    ]);
+    expect(getElement("text").boundElements).toBe(null);
+    expect(selectedIds()).toEqual([containerId]);
   });
 
-  it("brings back an unwrapped arrow", () => {
-    const [arrow, label] = API.createLabeledArrow();
-    API.setElements([arrow, label]);
-    API.setSelectedElements([arrow]);
+  it("unbinds the texts of other containers, keeping both selected", () => {
+    const [rectangle, label] = createLabeled("rectangle", "rect");
+    const [arrow, arrowLabel] = API.createLabeledArrow();
+    API.setElements([
+      rectangle,
+      newElementWith(label, { textAlign: "left" }),
+      arrow,
+      arrowLabel,
+    ]);
+    API.setSelectedElements([rectangle, arrow]);
 
     pressW();
 
-    expect(getElement(arrow.id).isDeleted).toBe(true);
-    expect(selectedIds()).toEqual([label.id]);
+    expect(h.elements.some((element) => element.isDeleted)).toBe(false);
+    expect(getElement<ExcalidrawTextElement>(label.id).containerId).toBe(null);
+    expect(getElement<ExcalidrawTextElement>(arrowLabel.id).containerId).toBe(
+      null,
+    );
+    expect(selectedIds().sort()).toEqual(
+      [rectangle.id, label.id, arrow.id, arrowLabel.id].sort(),
+    );
 
     pressW();
 
-    expect(getElement(arrow.id).isDeleted).toBe(false);
-    expect(getElement<ExcalidrawTextElement>(label.id).containerId).toBe(
+    // back as they sat in their containers
+    expect(getElement<ExcalidrawTextElement>(label.id)).toMatchObject({
+      containerId: rectangle.id,
+      textAlign: "left",
+    });
+    expect(getElement<ExcalidrawTextElement>(arrowLabel.id).containerId).toBe(
       arrow.id,
     );
-    expect(selectedIds()).toEqual([arrow.id]);
+    expect(selectedIds().sort()).toEqual([rectangle.id, arrow.id].sort());
   });
 
   it("drops the point editor of an unwrapped arrow", () => {
@@ -282,7 +344,7 @@ describe("wrap (w)", () => {
     expect(h.state.selectedLinearElement).toBe(null);
   });
 
-  it("brings a note back with the label's font size and color", () => {
+  it("binds a note's label back with its new font size and color", () => {
     const note = API.createElement({ type: "stickynote", id: "note" });
     const text = API.createElement({
       type: "text",
@@ -313,60 +375,71 @@ describe("wrap (w)", () => {
     expect(getElement("note").strokeColor).toBe(COLOR_PALETTE.red[4]);
   });
 
-  it("wraps in a new container once the selection changed", () => {
-    const [diamond, label] = createLabeled("diamond", "diamond");
-    API.setElements([diamond, label]);
-    API.setSelectedElements([diamond]);
+  it("forgets the container it made once the selection changed", () => {
+    const text = API.createElement({ type: "text", id: "text" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
 
+    pressW();
+    const containerId = getElement<ExcalidrawTextElement>("text").containerId!;
+    API.setSelectedElements([]);
+    API.setSelectedElements([getElement(containerId)]);
+    pressW();
+
+    // kept, as any other container
+    expect(getElement(containerId).isDeleted).toBe(false);
+    expect(getElement<ExcalidrawTextElement>("text").containerId).toBe(null);
+    expect(selectedIds().sort()).toEqual([containerId, "text"].sort());
+  });
+
+  it("wraps in a new container once the selection changed", () => {
+    const text = API.createElement({ type: "text", id: "text" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    pressW();
+    const containerId = getElement<ExcalidrawTextElement>("text").containerId!;
     pressW();
     API.setSelectedElements([]);
-    API.setSelectedElements([getElement(label.id)]);
+    API.setSelectedElements([getElement("text")]);
     pressW();
 
-    expect(getElement("diamond").isDeleted).toBe(true);
-    const container = getElement(
-      getElement<ExcalidrawTextElement>(label.id).containerId!,
+    expect(getElement(containerId).isDeleted).toBe(true);
+    expect(getElement<ExcalidrawTextElement>("text").containerId).not.toBe(
+      containerId,
     );
-    expect(container.type).toBe("rectangle");
   });
 
   it("brings the container back where its text was moved", () => {
-    const [diamond, label] = createLabeled("diamond", "diamond");
-    API.setElements([diamond, label]);
-    API.setSelectedElements([diamond]);
+    const { containerId, x, y } = wrapAndUnwrapText();
 
-    pressW();
-    dragBy(getElement(label.id), 100, 50);
+    dragBy(getElement("text"), 100, 50);
     pressW();
 
-    expect(getElement("diamond")).toMatchObject({
+    expect(getElement(containerId)).toMatchObject({
       isDeleted: false,
-      x: 100,
-      y: 50,
+      x: x + 100,
+      y: y + 50,
     });
-    expect(getElement<ExcalidrawTextElement>(label.id).containerId).toBe(
-      "diamond",
+    expect(getElement<ExcalidrawTextElement>("text").containerId).toBe(
+      containerId,
     );
   });
 
   it("doesn't count resizing the text as moving it", () => {
-    const [rectangle, label] = createLabeled("rectangle", "rect");
-    API.setElements([rectangle, label]);
-    API.setSelectedElements([rectangle]);
+    const { containerId, x, y } = wrapAndUnwrapText();
 
-    pressW();
     act(() => {
       h.app.actionManager.executeAction(actionChangeFontSize, "ui", 36);
     });
-    dragBy(getElement(label.id), 100, 50);
+    dragBy(getElement("text"), 100, 50);
     pressW();
 
-    expect(getElement("rect").x).toBeCloseTo(100);
-    expect(getElement("rect").y).toBeCloseTo(50);
+    expect(getElement(containerId).x).toBeCloseTo(x + 100);
+    expect(getElement(containerId).y).toBeCloseTo(y + 50);
   });
 
   it("brings the container back into the frame its text was moved to", () => {
-    const [diamond, label] = createLabeled("diamond", "diamond");
     const frame = API.createElement({
       type: "frame",
       id: "frame",
@@ -375,60 +448,15 @@ describe("wrap (w)", () => {
       width: 400,
       height: 400,
     });
-    API.setElements([frame, diamond, label]);
-    API.setSelectedElements([diamond]);
+    const { containerId } = wrapAndUnwrapText([frame]);
 
-    pressW();
-    dragBy(getElement(label.id), 500, 0);
-    expect(getElement(label.id).frameId).toBe("frame");
+    dragBy(getElement("text"), 500, 0);
+    expect(getElement("text").frameId).toBe("frame");
     pressW();
 
-    expect(getElement("diamond").frameId).toBe("frame");
+    expect(getElement(containerId).frameId).toBe("frame");
     const ids = h.elements.map((element) => element.id);
-    expect(ids.indexOf("diamond")).toBe(ids.indexOf(label.id) - 1);
-  });
-
-  it("leaves an arrow connecting elements in place", () => {
-    const rectangle = API.createElement({
-      type: "rectangle",
-      id: "rect",
-      x: 300,
-      width: 100,
-      height: 100,
-      boundElements: [{ type: "arrow", id: "arrow" }],
-    });
-    const arrow = API.createElement({
-      type: "arrow",
-      id: "arrow",
-      y: 50,
-      width: 295,
-      height: 0,
-      points: [pointFrom(0, 0), pointFrom(295, 0)],
-      endBinding: { elementId: "rect", fixedPoint: [0, 0.5], mode: "orbit" },
-      boundElements: [{ type: "text", id: "label" }],
-    });
-    const label = API.createElement({
-      type: "text",
-      id: "label",
-      x: 120,
-      y: 40,
-      text: "label",
-      containerId: "arrow",
-    });
-    API.setElements([rectangle, arrow, label]);
-    API.setSelectedElements([arrow]);
-
-    pressW();
-    dragBy(getElement("label"), 100, 200);
-    pressW();
-
-    expect(getElement("arrow")).toMatchObject({ isDeleted: false, x: 0 });
-    expect(getElement<ExcalidrawTextElement>("label").containerId).toBe(
-      "arrow",
-    );
-    expect(getElement("rect").boundElements).toEqual([
-      { type: "arrow", id: "arrow" },
-    ]);
+    expect(ids.indexOf(containerId)).toBe(ids.indexOf("text") - 1);
   });
 
   describe("frames", () => {

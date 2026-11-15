@@ -1,5 +1,4 @@
 import {
-  BoundElement,
   CaptureUpdateAction,
   fixBindingsAfterDeletion,
   getBoundTextElement,
@@ -13,6 +12,7 @@ import {
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
   updateBoundElements,
+  updateOriginalContainerCache,
 } from "@excalidraw/element";
 
 import type {
@@ -30,6 +30,7 @@ import {
   bindTextToContainer,
   getStickyNoteInk,
   pushContainerBelowText,
+  pushTextAboveContainer,
   unbindTextFromContainer,
   wrapTextsInContainers,
 } from "../actions/actionBoundText";
@@ -45,10 +46,12 @@ import type { ActionResult } from "../actions/types";
 import type { AppState } from "../types";
 import type App from "./App";
 
-/** a container unwrapping removed, and how its text sat in it */
+/** a container unwrapping freed the text of, and how the text sat in it */
 type UnwrappedContainer = {
   containerId: ExcalidrawTextContainer["id"];
   textId: ExcalidrawTextElement["id"];
+  /** whether the container was removed (one that wrapping made) */
+  isRemoved: boolean;
   baseFontSize: ExcalidrawTextElement["baseFontSize"];
   labelPosition: ExcalidrawTextElement["labelPosition"];
   autoResize: ExcalidrawTextElement["autoResize"];
@@ -58,7 +61,7 @@ type UnwrappedContainer = {
    * resized
    */
   text: Pick<ExcalidrawTextElement, "x" | "y" | "fontSize">;
-  /** the arrows bound to the container, as they were bound */
+  /** the arrows bound to a removed container, as they were bound */
   arrows: Pick<ExcalidrawArrowElement, "id" | "startBinding" | "endBinding">[];
 };
 
@@ -74,19 +77,25 @@ const rebind = (
  * over frames:
  *
  * 1. a text and a container without one: binds the text to the container
- * 2. texts, with any labeled containers: wraps each text in a container
- * 3. labeled containers: unwraps their texts, removing the containers
+ * 2. texts, with any labeled containers: wraps each text in a new container
+ * 3. labeled containers: unbinds their texts, keeping both selected
  * 4. a frame with any of its children, or all of a frame's children: removes
  *    the frame
  * 5. anything else without a frame: wraps it in a frame
  *
- * The containers (3) removed come back in place of new ones while the
- * selection it left stands, so diamonds, notes and arrows survive a toggle.
+ * While the selection it left stands, the next toggle takes (2) and (3) back:
+ * the new containers (2) are removed rather than kept, and the unwrapped texts
+ * (3) go back into their containers as they sat in them, bringing the removed
+ * containers back.
  */
 export class AppWrap {
-  private unwrapped: {
+  /** what the last toggle did, to take back while its selection stands */
+  private last: {
     selectedElementIds: AppState["selectedElementIds"];
-    containers: readonly UnwrappedContainer[];
+    /** the containers it wrapped texts in (or brought back) */
+    created?: ReadonlySet<ExcalidrawElement["id"]>;
+    /** the containers it unwrapped */
+    unwrapped?: readonly UnwrappedContainer[];
   } | null = null;
 
   constructor(private app: App) {}
@@ -95,11 +104,18 @@ export class AppWrap {
     elements: readonly ExcalidrawElement[],
     appState: Readonly<AppState>,
   ): ActionResult => {
-    const unwrapped =
-      this.unwrapped?.selectedElementIds === appState.selectedElementIds
-        ? this.unwrapped
+    const last =
+      this.last?.selectedElementIds === appState.selectedElementIds
+        ? this.last
         : null;
-    this.unwrapped = null;
+    this.last = null;
+
+    if (last?.unwrapped) {
+      const rewrapped = this.rewrap(elements, appState, last.unwrapped);
+      if (rewrapped) {
+        return rewrapped;
+      }
+    }
 
     const selectedElements = this.app.scene
       .getSelectedElements(appState)
@@ -136,33 +152,28 @@ export class AppWrap {
       texts.length &&
       texts.length + labeledContainers.length === selectedElements.length
     ) {
-      const rewrapped =
-        unwrapped && this.rewrap(elements, appState, unwrapped.containers);
-      if (rewrapped) {
-        return rewrapped;
-      }
-
       const result = wrapTextsInContainers(elements, appState, texts, this.app);
-      return (
-        result && {
-          ...result,
-          appState: {
-            ...result.appState,
-            // the labeled containers stay selected, to unwrap next along
-            // with the new ones
-            selectedElementIds: {
-              ...result.appState?.selectedElementIds,
-              ...Object.fromEntries(
-                labeledContainers.map((element) => [element.id, true] as const),
-              ),
-            },
-          },
-        }
+      if (!result) {
+        return result;
+      }
+      const created = Object.keys(result.appState?.selectedElementIds ?? {});
+      // the labeled containers stay selected, to unwrap next along with the
+      // new ones
+      const selectedElementIds = Object.fromEntries(
+        [...created, ...labeledContainers.map((element) => element.id)].map(
+          (id) => [id, true] as const,
+        ),
       );
+      this.last = { selectedElementIds, created: new Set(created) };
+
+      return {
+        ...result,
+        appState: { ...result.appState, selectedElementIds },
+      };
     }
 
     if (labeledContainers.length === selectedElements.length) {
-      return this.unwrap(elements, appState, labeledContainers);
+      return this.unwrap(elements, appState, labeledContainers, last?.created);
     }
 
     const frameToUnwrap = getFrameToUnwrap(
@@ -183,15 +194,21 @@ export class AppWrap {
     return false;
   };
 
-  /** frees the containers' texts, moving the containers' arrows onto them */
+  /**
+   * frees the containers' texts, keeping the containers selected along with
+   * them — except the `created` ones, removed with their arrows moved onto the
+   * texts
+   */
   private unwrap(
     elements: readonly ExcalidrawElement[],
     appState: Readonly<AppState>,
-    containers: readonly ExcalidrawElement[],
+    containers: readonly NonDeletedExcalidrawElement[],
+    created: ReadonlySet<ExcalidrawElement["id"]> | undefined,
   ): ActionResult {
     const { scene } = this.app;
     const elementsMap = scene.getNonDeletedElementsMap();
-    const texts: NonDeletedExcalidrawElement[] = [];
+    const freed: NonDeletedExcalidrawElement[] = [];
+    const removed: ExcalidrawElement[] = [];
     const unwrapped: UnwrappedContainer[] = [];
 
     for (const container of containers) {
@@ -199,16 +216,20 @@ export class AppWrap {
       if (!text) {
         continue;
       }
-      const arrows = (container.boundElements ?? []).flatMap(({ id }) => {
-        const arrow = elementsMap.get(id);
-        return arrow && isArrowElement(arrow) ? [arrow] : [];
-      });
+      const isRemoved = !!created?.has(container.id);
+      const arrows = isRemoved
+        ? (container.boundElements ?? []).flatMap(({ id }) => {
+            const arrow = elementsMap.get(id);
+            return arrow && isArrowElement(arrow) ? [arrow] : [];
+          })
+        : [];
 
       const { baseFontSize, labelPosition, autoResize } = text;
-      unbindTextFromContainer(container, text, scene);
+      unbindTextFromContainer(container, text, this.app);
       unwrapped.push({
         containerId: container.id,
         textId: text.id,
+        isRemoved,
         baseFontSize,
         labelPosition,
         autoResize,
@@ -220,47 +241,49 @@ export class AppWrap {
         })),
       });
 
-      if (arrows.length) {
-        for (const arrow of arrows) {
-          scene.mutateElement(arrow, {
-            startBinding: rebind(arrow.startBinding, container.id, text.id),
-            endBinding: rebind(arrow.endBinding, container.id, text.id),
+      if (isRemoved) {
+        if (arrows.length) {
+          for (const arrow of arrows) {
+            scene.mutateElement(arrow, {
+              startBinding: rebind(arrow.startBinding, container.id, text.id),
+              endBinding: rebind(arrow.endBinding, container.id, text.id),
+            });
+          }
+          scene.mutateElement(text, {
+            boundElements: [
+              ...(text.boundElements ?? []),
+              ...arrows.map(({ id }) => ({ id, type: "arrow" as const })),
+            ],
           });
         }
-        scene.mutateElement(text, {
-          boundElements: [
-            ...(text.boundElements ?? []),
-            ...arrows.map(({ id }) => ({ id, type: "arrow" as const })),
-          ],
+        scene.mutateElement(container as ExcalidrawElement, {
+          isDeleted: true,
+          boundElements: container.boundElements?.filter(
+            ({ id }) => !arrows.some((arrow) => arrow.id === id),
+          ),
         });
+        updateBoundElements(text, scene, {
+          renderEnvironment: this.app.renderEnvironment,
+        });
+        removed.push(container);
+      } else {
+        freed.push(container);
       }
-      scene.mutateElement(container, {
-        isDeleted: true,
-        boundElements: container.boundElements?.filter(
-          ({ id }) => !arrows.some((arrow) => arrow.id === id),
-        ),
-      });
-      updateBoundElements(text, scene, {
-        renderEnvironment: this.app.renderEnvironment,
-      });
 
-      texts.push(text);
+      freed.push(text);
     }
 
-    fixBindingsAfterDeletion(
-      elements,
-      containers.filter((container) => container.isDeleted),
-    );
+    fixBindingsAfterDeletion(elements, removed);
 
     // also drops the line editor of an unwrapped arrow
     const selection = getSelectionStateForElements(
-      texts,
+      freed,
       getNonDeletedElements(elements),
       appState,
     );
-    this.unwrapped = {
+    this.last = {
       selectedElementIds: selection.selectedElementIds,
-      containers: unwrapped,
+      unwrapped,
     };
 
     return {
@@ -271,8 +294,9 @@ export class AppWrap {
   }
 
   /**
-   * puts the unwrapped texts back into their containers, along with the
-   * containers' arrows — `null` when any of them is gone
+   * puts the unwrapped texts back into their containers as they sat in them,
+   * bringing back the removed containers along with their arrows — `null`
+   * when any of them is gone
    */
   private rewrap(
     elements: readonly ExcalidrawElement[],
@@ -287,8 +311,10 @@ export class AppWrap {
       const container = allElementsMap.get(entry.containerId);
       const text = allElementsMap.get(entry.textId);
       if (
-        !container?.isDeleted ||
+        !container ||
+        container.isDeleted !== entry.isRemoved ||
         !isTextBindableContainer(container) ||
+        hasBoundTextElement(container) ||
         !text ||
         text.isDeleted ||
         !isTextElement(text) ||
@@ -296,11 +322,13 @@ export class AppWrap {
       ) {
         return null;
       }
-      pairs.push({ entry, deletedContainer: container, text });
+      pairs.push({ entry, container, text });
     }
 
-    for (const { deletedContainer } of pairs) {
-      scene.mutateElement(deletedContainer, { isDeleted: false });
+    for (const { entry, container } of pairs) {
+      if (entry.isRemoved) {
+        scene.mutateElement(container, { isDeleted: false });
+      }
     }
     // so that the restored containers resolve as bindings again
     scene.replaceAllElements(scene.getElementsIncludingDeleted());
@@ -313,50 +341,42 @@ export class AppWrap {
 
     for (const { entry, text } of pairs) {
       const container = elementsMap.get(entry.containerId)!;
-      const isArrowContainer = isArrowElement(container);
-      // the container comes back wherever its text went in the meantime,
-      // except an arrow anchored to the elements it connects
-      const isAnchored =
-        isArrowContainer && !!(container.startBinding || container.endBinding);
-      const [dx, dy] = isAnchored
-        ? [0, 0]
-        : [text.x - entry.text.x, text.y - entry.text.y];
-      const stickyInk = getStickyNoteInk(text, container);
-      scene.mutateElement(container, {
-        frameId: text.frameId,
-        x: container.x + dx,
-        y: container.y + dy,
-        ...(stickyInk ? { strokeColor: stickyInk } : null),
-        ...(isArrowContainer ? null : { angle: text.angle }),
-      });
-      // an arrow container rejoins the elements it connects
-      BoundElement.rebindAffected(elementsMap, container, (element, updates) =>
-        scene.mutateElement(element, updates),
-      );
-
       const arrowIds = new Set<ExcalidrawElement["id"]>();
-      for (const { id, startBinding, endBinding } of entry.arrows) {
-        const arrow = elementsMap.get(id);
-        if (!arrow || !isArrowElement(arrow)) {
-          continue;
-        }
-        const isStartOnText = arrow.startBinding?.elementId === text.id;
-        const isEndOnText = arrow.endBinding?.elementId === text.id;
-        if (isStartOnText || isEndOnText) {
-          scene.mutateElement(arrow, {
-            startBinding: isStartOnText ? startBinding : arrow.startBinding,
-            endBinding: isEndOnText ? endBinding : arrow.endBinding,
-          });
-          arrowIds.add(id);
+
+      if (entry.isRemoved) {
+        // the container comes back wherever its text went in the meantime
+        scene.mutateElement(container, {
+          frameId: text.frameId,
+          x: container.x + text.x - entry.text.x,
+          y: container.y + text.y - entry.text.y,
+          angle: text.angle,
+        });
+
+        for (const { id, startBinding, endBinding } of entry.arrows) {
+          const arrow = elementsMap.get(id);
+          if (!arrow || !isArrowElement(arrow)) {
+            continue;
+          }
+          const isStartOnText = arrow.startBinding?.elementId === text.id;
+          const isEndOnText = arrow.endBinding?.elementId === text.id;
+          if (isStartOnText || isEndOnText) {
+            scene.mutateElement(arrow, {
+              startBinding: isStartOnText ? startBinding : arrow.startBinding,
+              endBinding: isEndOnText ? endBinding : arrow.endBinding,
+            });
+            arrowIds.add(id);
+          }
         }
       }
 
+      const stickyInk = getStickyNoteInk(text, container);
       scene.mutateElement(container, {
         boundElements: [
           ...(container.boundElements ?? []),
           { id: text.id, type: "text" as const },
           ...Array.from(arrowIds, (id) => ({ id, type: "arrow" as const })),
         ],
+        ...(stickyInk ? { strokeColor: stickyInk } : null),
       });
       scene.mutateElement(text, {
         containerId: container.id,
@@ -370,29 +390,42 @@ export class AppWrap {
         ...(stickyInk ? { strokeColor: stickyInk } : null),
         // a label carries no arrows of its own
         boundElements: null,
-        ...(isArrowContainer ? { angle: 0 as Radians } : null),
+        angle: (isArrowElement(container) ? 0 : container.angle) as Radians,
       });
+      // the height to go back to when unbound
+      const originalContainerHeight = container.height;
       redrawTextBoundingBox(text, container, scene, this.app.renderEnvironment);
+      updateOriginalContainerCache(container.id, originalContainerHeight);
       updateBoundElements(container, scene, {
         renderEnvironment: this.app.renderEnvironment,
       });
-      // the text may have changed layers since
-      nextElements = pushContainerBelowText(nextElements, container, text);
+      // a removed container joins its text, which may have changed layers
+      nextElements = entry.isRemoved
+        ? pushContainerBelowText(nextElements, container, text)
+        : pushTextAboveContainer(nextElements, container, text);
 
       containers.push(container);
     }
 
+    const selection = getSelectionStateForElements(
+      containers,
+      getNonDeletedElements(nextElements),
+      appState,
+    );
+    this.last = {
+      selectedElementIds: selection.selectedElementIds,
+      // removed again by the next toggle
+      created: new Set(
+        unwrapped
+          .filter((entry) => entry.isRemoved)
+          .map((entry) => entry.containerId),
+      ),
+    };
+
     return {
       elements: nextElements,
-      appState: {
-        ...appState,
-        // with the line editor of a restored arrow
-        ...getSelectionStateForElements(
-          containers,
-          getNonDeletedElements(nextElements),
-          appState,
-        ),
-      },
+      // with the line editor of an arrow
+      appState: { ...appState, ...selection },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   }
