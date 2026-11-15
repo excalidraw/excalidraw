@@ -287,6 +287,56 @@ describe("ElementsDelta", () => {
     });
   });
 
+  describe("index collisions", () => {
+    const rectangle = (id: string, index: string, isDeleted = false) => ({
+      ...API.createElement({
+        type: "rectangle",
+        id,
+        index: index as FractionalIndex,
+      }),
+      isDeleted,
+    });
+    const reindex = (
+      elements: SceneElementsMap,
+      indices: Record<string, string>,
+    ): SceneElementsMap => {
+      const next = new Map(elements) as SceneElementsMap;
+      for (const [id, index] of Object.entries(indices)) {
+        next.set(
+          id,
+          newElementWith(elements.get(id)!, {
+            index: index as FractionalIndex,
+          }),
+        );
+      }
+      return ElementsDelta.calculate(elements, next).applyTo(elements)[0];
+    };
+    const indices = (elements: SceneElementsMap) =>
+      Array.from(elements.values(), ({ id, index }) => `${id}:${index}`);
+
+    it("doesn't change the elements it's given", () => {
+      // an element given the index of the next one
+      let elements = arrayToMap([
+        rectangle("a", "a1"),
+        rectangle("b", "a2"),
+      ]) as SceneElementsMap;
+      let next = reindex(elements, { a: "a2" });
+      expect(indices(elements)).toEqual(["a:a1", "b:a2"]);
+      expect(next.get("b")).toBe(elements.get("b"));
+
+      // an element and a deleted one given the index of a third
+      elements = arrayToMap([
+        rectangle("c", "a1"),
+        rectangle("a", "a2"),
+        rectangle("b", "a3", true),
+      ]) as SceneElementsMap;
+      next = reindex(elements, { a: "a1", b: "a1" });
+      expect(indices(elements)).toEqual(["c:a1", "a:a2", "b:a3"]);
+      expect(next.get("c")).toBe(elements.get("c"));
+      expect(Array.from(next.keys())).toEqual(["a", "b", "c"]);
+    });
+  });
+
   describe("elements delta calculation", () => {
     it("should not throw when element gets removed but was already deleted", () => {
       const element = API.createElement({

@@ -1,6 +1,9 @@
+import { arrayToMap } from "@excalidraw/common";
+
 import { getNonDeletedElements } from "@excalidraw/element";
 import { mutateElement } from "@excalidraw/element";
 import { newFrameElement } from "@excalidraw/element";
+import { syncMovedIndices } from "@excalidraw/element";
 import {
   isBoundToContainer,
   isFrameLikeElement,
@@ -8,6 +11,7 @@ import {
 } from "@excalidraw/element";
 import {
   addElementsToFrame,
+  getElementsInNewFrame,
   removeAllElementsFromFrame,
 } from "@excalidraw/element";
 import { getFrameChildren } from "@excalidraw/element";
@@ -17,11 +21,14 @@ import { getElementsInGroup } from "@excalidraw/element";
 
 import {
   boundsContainBounds,
+  doBoundsIntersect,
   getCommonBounds,
   getElementBounds,
 } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { Bounds } from "@excalidraw/common";
 
 import type {
   ElementsMap,
@@ -207,7 +214,49 @@ export const unwrapFrame = (
   };
 };
 
-/** wraps the selection in a new frame — edge to edge when it's an image */
+const padBounds = ([x1, y1, x2, y2]: Bounds, padding: number) => ({
+  x: x1 - padding,
+  y: y1 - padding,
+  width: x2 - x1 + padding * 2,
+  height: y2 - y1 + padding * 2,
+});
+
+/**
+ * The deselected elements framed along with the selection: those within its
+ * bounds, or reaching out of them by no more than the frame's padding.
+ */
+const getElementsFramedWithSelection = (
+  selectedElements: readonly NonDeletedExcalidrawElement[],
+  selectionBounds: Bounds,
+  app: AppClassProperties,
+) => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const selected = new Set<ExcalidrawElement>(selectedElements);
+  const overlapsSelection = (element: ExcalidrawElement) =>
+    doBoundsIntersect(getElementBounds(element, elementsMap), selectionBounds);
+
+  // what drawing a frame around the padded selection would take in
+  return getElementsInNewFrame(
+    app.scene.getNonDeletedElements(),
+    newFrameElement(padBounds(selectionBounds, FRAME_PADDING)),
+    elementsMap,
+  ).flatMap((element) => {
+    if (selected.has(element)) {
+      return [];
+    }
+    // groups go in whole, along with their locked elements (as when dragged
+    // into a frame)
+    const group = element.groupIds.length
+      ? getElementsInGroup(elementsMap, element.groupIds.at(-1)!)
+      : [element];
+    return group.some(overlapsSelection) ? group : [];
+  });
+};
+
+/**
+ * Wraps the selection in a new frame, along with the deselected elements
+ * within it — edge to edge when it's an image.
+ */
 export const wrapInFrame = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -216,22 +265,26 @@ export const wrapInFrame = (
 ): ActionResult => {
   const elementsMap = app.scene.getNonDeletedElementsMap();
 
-  const bounds = getCommonBounds(selectedElements, elementsMap);
-  // an image framed along with what's drawn on it keeps no margin
-  const padding = selectedElements.some(
+  const selectionBounds = getCommonBounds(selectedElements, elementsMap);
+  const children = new Set<ExcalidrawElement>([
+    ...selectedElements,
+    ...getElementsFramedWithSelection(selectedElements, selectionBounds, app),
+  ]);
+  // an image framed along with what's drawn on it keeps no margin, clipping
+  // what reaches out of it
+  const isImageFrame = selectedElements.some(
     (element) =>
       isImageElement(element) &&
-      boundsContainBounds(getElementBounds(element, elementsMap), bounds),
-  )
-    ? 0
-    : FRAME_PADDING;
-  const [x1, y1, x2, y2] = bounds;
-  const frame = newFrameElement({
-    x: x1 - padding,
-    y: y1 - padding,
-    width: x2 - x1 + padding * 2,
-    height: y2 - y1 + padding * 2,
-  });
+      boundsContainBounds(
+        getElementBounds(element, elementsMap),
+        selectionBounds,
+      ),
+  );
+  const frame = newFrameElement(
+    isImageFrame
+      ? padBounds(selectionBounds, 0)
+      : padBounds(getCommonBounds([...children], elementsMap), FRAME_PADDING),
+  );
 
   // for a selected partial group, we want to remove it from the remainder of the group
   if (appState.editingGroupId) {
@@ -249,9 +302,22 @@ export const wrapInFrame = (
     }
   }
 
+  // the frame takes the place of its lowest child, so that it stays below
+  // the elements on top of it
+  const sceneElements = app.scene.getElementsIncludingDeleted();
+  const frameIndex = sceneElements.findIndex((element) =>
+    children.has(element),
+  );
   const nextElements = addElementsToFrame(
-    [...app.scene.getElementsIncludingDeleted(), frame],
-    selectedElements,
+    syncMovedIndices(
+      [
+        ...sceneElements.slice(0, frameIndex),
+        frame,
+        ...sceneElements.slice(frameIndex),
+      ],
+      arrayToMap([frame]),
+    ),
+    sceneElements.filter((element) => children.has(element)),
     frame,
   );
 
