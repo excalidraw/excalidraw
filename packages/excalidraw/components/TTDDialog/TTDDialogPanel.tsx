@@ -2,8 +2,7 @@ import clsx from "clsx";
 
 import { Fragment } from "react";
 
-import { Button } from "../Button";
-import Spinner from "../Spinner";
+import { FilledButton } from "../FilledButton";
 
 import type { ReactNode } from "react";
 
@@ -67,17 +66,14 @@ export const TTDDialogPanel = ({
 
     if (panelAction?.variant === "button") {
       return (
-        <Button
+        <FilledButton
           className={clsx("ttd-dialog-panel-button", panelAction.className)}
-          onSelect={panelAction.action ? panelAction.action : () => {}}
+          onClick={panelAction.action ? panelAction.action : () => {}}
           disabled={panelAction?.disabled || onTextSubmitInProgess}
-        >
-          <div className={clsx({ invisible: onTextSubmitInProgess })}>
-            {panelAction?.label}
-            {panelAction?.icon && <span>{panelAction.icon}</span>}
-          </div>
-          {onTextSubmitInProgess && <Spinner />}
-        </Button>
+          label={panelAction?.label}
+          icon={panelAction.icon}
+          status={onTextSubmitInProgess ? "loading" : null}
+        />
       );
     }
 
