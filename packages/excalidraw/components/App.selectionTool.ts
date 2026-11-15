@@ -1230,8 +1230,9 @@ export class AppSelectionTool {
    *
    * A lone selected element has none while the line editor is open or one of
    * its line points is hovered, nor does an elbow arrow, a two-point line or
-   * arrow, or (on mobile devices) any line or arrow. The selection has none in
-   * the element link selector.
+   * arrow, (on mobile devices) any line or arrow, or the text being edited
+   * (none are drawn for it; see `AppText.getEditedTextResizeHandleAt()` for
+   * its sides). The selection has none in the element link selector.
    */
   getTransformHandleAt(
     selectedElements: readonly NonDeletedExcalidrawElement[],
@@ -1254,6 +1255,7 @@ export class AppSelectionTool {
         (state.selectedLinearElement &&
           state.selectedLinearElement.hoverPointIndex !== -1) ||
         isElbowArrow(element) ||
+        element.id === state.editingTextElement?.id ||
         // HACK: Disable transform handles for linear elements on mobile until a
         // better way of showing them is found
         (isLinearElement(element) &&

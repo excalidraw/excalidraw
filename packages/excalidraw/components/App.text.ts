@@ -391,6 +391,10 @@ export class AppText {
     });
     // deselect all other elements when inserting text
     this.app.selection.clear();
+    // the canvas keeps the cursor of what was hovered (the selected text's
+    // move cursor, a resize handle's…) until the pointer next moves over it:
+    // it would flash once the pointer leaves the editor
+    this.app.cursor.reset();
     // (the linear element editor stays up, to come back to on submit — but
     // without the hover affordances, which are for the selection)
     if (this.app.state.selectedLinearElement) {

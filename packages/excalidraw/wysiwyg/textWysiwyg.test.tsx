@@ -755,7 +755,7 @@ describe("textWysiwyg", () => {
       // enter text editing mode
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
-      const editor = await getTextEditor();
+      let editor = await getTextEditor();
       Keyboard.exitTextEditor(editor);
       // restore after unwrapping
       UI.resize(text, "e", [40, 0]);
@@ -763,18 +763,19 @@ describe("textWysiwyg", () => {
 
       // wrap again and add a new line
       UI.resize(text, "e", [-30, 0]);
-      const wrappedText = text.text;
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
-      updateTextEditor(editor, `${wrappedText}\nA new line!`);
+      editor = await getTextEditor();
+      updateTextEditor(editor, `${originalText}\nA new line!`);
       Keyboard.exitTextEditor(editor);
       // remove the newly added line
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
-      updateTextEditor(editor, wrappedText);
+      editor = await getTextEditor();
+      updateTextEditor(editor, originalText);
       Keyboard.exitTextEditor(editor);
       // unwrap
-      UI.resize(text, "e", [30, 0]);
+      UI.resize(h.elements[0], "e", [30, 0]);
       // expect the text to be restored the same
       expect((h.elements[0] as ExcalidrawTextElement).text).toBe(originalText);
     });
@@ -3722,6 +3723,28 @@ describe("textWysiwyg", () => {
       text = h.elements[0] as ExcalidrawTextElement;
       expect(text.autoResize).toBe(false);
       expect(editor.style.whiteSpace).toBe("pre-wrap");
+    });
+
+    it("leaves the canvas no cursor of the text's own while it's edited", async () => {
+      API.setElements([wrappedText()]);
+      const canvas = GlobalTestState.interactiveCanvas;
+
+      // selected: the move cursor over it, a resize cursor over its handles
+      mouse.clickAt(110, 110);
+      expect(canvas.style.cursor).toBe(CURSOR_TYPE.MOVE);
+
+      // edited: neither would show until the pointer next moves over the
+      // canvas, flashing once it leaves the editor
+      mouse.clickAt(110, 110);
+      await getTextEditor();
+      expect(canvas.style.cursor).not.toBe(CURSOR_TYPE.MOVE);
+
+      // nor has the edited text the transform handles it isn't drawn with
+      // (it is selected here, as a text just created is)
+      API.setAppState({ selectedElementIds: { text: true } });
+      const text = h.elements[0] as ExcalidrawTextElement;
+      mouse.moveTo(text.x + text.width / 2, text.y - 4);
+      expect(canvas.style.cursor).not.toContain("resize");
     });
 
     it("resizes a text dragged by its side while editing it", async () => {
