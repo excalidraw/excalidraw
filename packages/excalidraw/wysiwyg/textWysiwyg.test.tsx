@@ -3620,6 +3620,89 @@ describe("textWysiwyg", () => {
       expect(text.text).toBe(text.originalText);
     });
 
+    it("toggles auto-resizing of the selected texts with Alt+W, wrapping at the max width at most", () => {
+      const line = "Excalidraw is an opensource virtual collaborative ";
+      // (10px a character in tests)
+      API.setElements([
+        API.createElement({
+          type: "text",
+          id: "long",
+          text: line.repeat(5).trim(),
+          width: 2490,
+          height: 25,
+        }),
+        API.createElement({
+          type: "text",
+          id: "short",
+          text: "short",
+          y: 200,
+          width: 50,
+          height: 25,
+        }),
+      ]);
+      API.setAppState({ selectedElementIds: { long: true, short: true } });
+      const texts = () => h.elements as ExcalidrawTextElement[];
+      const [longWidth, shortWidth] = texts().map((text) => text.width);
+
+      const toggle = () =>
+        Keyboard.withModifierKeys({ alt: true }, () => Keyboard.keyPress("w"));
+
+      toggle();
+      expect(texts().map((text) => text.autoResize)).toEqual([false, false]);
+      expect(texts().map((text) => text.width)).toEqual([
+        TEXT_MAX_WRAP_WIDTH,
+        shortWidth,
+      ]);
+      expect(texts()[0].text).toContain("\n");
+
+      toggle();
+      expect(texts().map((text) => text.autoResize)).toEqual([true, true]);
+      expect(texts().map((text) => text.width)).toEqual([
+        longWidth,
+        shortWidth,
+      ]);
+    });
+
+    // Alt shortcuts go by the key's letter where the layout gives one, and
+    // by its (QWERTY) position otherwise — e.g. on macOS, where Alt changes
+    // the character
+    it.each([
+      { layout: "AZERTY", w: { key: "w", code: "KeyZ" } },
+      { layout: "AZERTY", z: { key: "z", code: "KeyW" } },
+      { layout: "macOS", w: { key: "∑", code: "KeyW" } },
+      { layout: "macOS", z: { key: "Ω", code: "KeyZ" } },
+    ])(
+      "tells Alt+W from Alt+Z (zen mode) on $layout ($w.key$z.key)",
+      ({ w, z }) => {
+        API.setElements([wrappedText()]);
+        API.setAppState({ selectedElementIds: { text: true } });
+
+        fireEvent.keyDown(document, { ...(w ?? z), altKey: true });
+
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(!!w);
+        expect(h.state.zenModeEnabled).toBe(!!z);
+      },
+    );
+
+    it("toggles auto-resizing of the text being edited with Alt+W", async () => {
+      API.setElements([wrappedText()]);
+      mouse.doubleClickAt(110, 110);
+      const editor = await getTextEditor();
+      expect(editor.style.whiteSpace).toBe("pre-wrap");
+
+      fireEvent.keyDown(editor, { key: "w", altKey: true });
+      let text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      expect(text.text).toBe(text.originalText);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      expect(editor.style.whiteSpace).toBe("pre");
+
+      fireEvent.keyDown(editor, { key: "w", altKey: true });
+      text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(editor.style.whiteSpace).toBe("pre-wrap");
+    });
+
     it("resizes a text dragged by its side while editing it", async () => {
       API.setElements([
         API.createElement({

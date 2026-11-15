@@ -69,6 +69,10 @@ import {
   parseDataTransferEventMimeTypes,
 } from "../clipboard";
 import {
+  actionTextAutoResize,
+  isTextAutoResizeShortcut,
+} from "../actions/actionTextAutoResize";
+import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
@@ -542,6 +546,15 @@ export const textWysiwyg = ({
         editable.style.whiteSpace = "pre-wrap";
         editable.style.wordBreak = "break-word";
       }
+      // ...and no longer once the text grows with its content again
+      if (
+        !container &&
+        updatedTextElement.autoResize &&
+        editable.style.whiteSpace !== "pre"
+      ) {
+        editable.style.whiteSpace = "pre";
+        editable.style.wordBreak = "normal";
+      }
 
       Object.assign(editable.style, {
         font,
@@ -971,6 +984,18 @@ export const textWysiwyg = ({
         getCaretZoomAnchor(),
       );
       updateWysiwygStyle();
+    } else if (
+      isTextAutoResizeShortcut(event) &&
+      !isBoundToContainer(element)
+    ) {
+      event.preventDefault();
+      // (not for the canvas, which acts on the selection)
+      event.stopPropagation();
+      app.actionManager.executeAction(
+        actionTextAutoResize,
+        "keyboard",
+        app.scene.getElement(element.id),
+      );
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {

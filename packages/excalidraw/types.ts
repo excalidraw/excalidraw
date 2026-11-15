@@ -1275,6 +1275,7 @@ export type AppClassProperties = {
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
   arrowText: App["arrowText"];
+  text: App["text"];
   textTool: App["textTool"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
