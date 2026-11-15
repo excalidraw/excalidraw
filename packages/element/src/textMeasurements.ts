@@ -69,12 +69,57 @@ export const isMeasureTextSupported = () => {
   return width > 0;
 };
 
-export const normalizeText = (text: string) => {
-  return (
-    normalizeEOL(text)
-      // replace tabs with spaces so they render and measure correctly
-      .replace(/\t/g, "        ")
-  );
+// char map for subscripts/superscripts
+type CharMap = ReadonlyMap<string, string>;
+
+// zip two strings into a char -> char map
+const zipIt = (from: string, to: string): CharMap => {
+  const src = [...from];
+  const dst = [...to];
+  if (src.length !== dst.length) {
+    throw new Error(`zipIt: length mismatch (${src.length} vs ${dst.length})`);
+  }
+  return new Map(src.map((c, i): [string, string] => [c, dst[i]]));
+};
+
+const SUP: CharMap = zipIt(
+  "0123456789+-=()abcdefghijklmnoprstuvwxyzABDEGHIJKLMNOPRTUVW",
+  "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ",
+);
+
+const SUB: CharMap = zipIt(
+  "0123456789+-=()aehijklmnoprstuvx",
+  "₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ",
+);
+
+// One pass for both ^{...} and _{...} scripts
+const SCRIPT_RE = /([\p{L}\p{N}])([\^_])\{([^{}]+)\}/gu;
+
+const convertScript = (
+  match: string,
+  base: string,
+  op: string,
+  body: string,
+): string => {
+  const map = op === "^" ? SUP : SUB;
+  let out = "";
+  for (const c of body) {
+    const mapped = map.get(c);
+    if (mapped === undefined) return match; // unmappable char: leave untouched
+    out += mapped;
+  }
+  return base + out;
+};
+
+export const normalizeText = (text: string): string => {
+  // replace tabs with spaces so they render and measure correctly
+  const normalized = normalizeEOL(text).replace(/\t/g, "        ");
+
+  // cheap pre-check: skip the regex entirely for the common case
+  if (!normalized.includes("{")) return normalized;
+
+  // convert tex-like sub/superscripts to unicode equivalents - little helper for non-technical users
+  return normalized.replace(SCRIPT_RE, convertScript);
 };
 
 const splitIntoLines = (text: string) => {
