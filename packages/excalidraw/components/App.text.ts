@@ -714,6 +714,7 @@ export class AppText {
     } catch {}
 
     const stop = () => {
+      disposeUnmount();
       ownerWindow.removeEventListener("pointermove", onPointerMove, true);
       ownerWindow.removeEventListener("pointerup", onPointerUp, true);
       ownerWindow.removeEventListener("pointercancel", onPointerUp, true);
@@ -793,6 +794,7 @@ export class AppText {
     ownerWindow.addEventListener("pointermove", onPointerMove, true);
     ownerWindow.addEventListener("pointerup", onPointerUp, true);
     ownerWindow.addEventListener("pointercancel", onPointerUp, true);
+    const disposeUnmount = this.app.onEvent("editor:unmount", stop);
 
     return true;
   };
