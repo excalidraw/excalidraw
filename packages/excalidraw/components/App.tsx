@@ -5805,7 +5805,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.multiElement || this.drawShape.hasPendingGesture()) {
+    if (
+      // Batched tool changes can still reference a draft already discarded.
+      (this.state.multiElement &&
+        this.scene
+          .getNonDeletedElementsMap()
+          .has(this.state.multiElement.id)) ||
+      this.drawShape.hasPendingGesture()
+    ) {
       // Finalize before switching tools to discard any uncommitted point.
       this.actionManager.executeAction(actionFinalize);
     }

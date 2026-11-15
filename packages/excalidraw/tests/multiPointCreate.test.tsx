@@ -199,21 +199,33 @@ describe("multi point mode in linear elements", () => {
     });
   });
 
-  it.each(["clipboard", "library"] as const)(
-    "selects elements inserted through %s when finalizing an in-progress arrow",
-    async (source) => {
+  it.each([
+    ["arrow", "clipboard", false],
+    ["arrow", "clipboard", true],
+    ["arrow", "library", false],
+    ["arrow", "library", true],
+    ["line", "clipboard", false],
+    ["line", "clipboard", true],
+    ["line", "library", false],
+    ["line", "library", true],
+  ] as const)(
+    "finalizes an in-progress %s and selects elements inserted through %s (committed segment %s)",
+    async (drawingTool, source, hasCommittedSegment) => {
       await render(<Excalidraw autoFocus handleKeyboardGlobally={true} />);
       Object.assign(h.app.ownerDocument, {
         elementFromPoint: () => GlobalTestState.canvas,
       });
       const mouse = new Pointer("mouse");
-      UI.clickTool("arrow");
+      UI.clickTool(drawingTool);
       mouse.clickAt(30, 30);
       mouse.moveTo(100, 100);
-      mouse.click();
-      mouse.moveTo(150, 50);
+      if (hasCommittedSegment) {
+        mouse.click();
+        mouse.moveTo(150, 50);
+      }
 
-      expect(h.state.multiElement?.points).toHaveLength(3);
+      const preview = h.state.multiElement!;
+      expect(preview.points).toHaveLength(hasCommittedSegment ? 3 : 2);
 
       const elements = [API.createElement({ type: "rectangle" })];
       await act(async () => {
@@ -238,17 +250,31 @@ describe("multi point mode in linear elements", () => {
       });
 
       await waitFor(() => {
-        expect(h.app.scene.getNonDeletedElements()).toHaveLength(2);
+        expect(h.app.scene.getNonDeletedElements()).toHaveLength(
+          hasCommittedSegment ? 2 : 1,
+        );
       });
-      const [arrow, rectangle] = h.app.scene.getNonDeletedElements();
-      expect(arrow).toMatchObject({
-        type: "arrow",
-        points: [
-          [0, 0],
-          [70, 70],
-        ],
-      });
+      expect(preview.points).toEqual(
+        hasCommittedSegment
+          ? [
+              [0, 0],
+              [70, 70],
+            ]
+          : [[0, 0]],
+      );
+      const sceneElements = h.app.scene.getNonDeletedElements();
+      if (hasCommittedSegment) {
+        expect(sceneElements[0]).toMatchObject({
+          type: drawingTool,
+          points: [
+            [0, 0],
+            [70, 70],
+          ],
+        });
+      }
+      const rectangle = sceneElements[sceneElements.length - 1];
       expect(rectangle.type).toBe("rectangle");
+      expect(h.state.activeTool.type).toBe("selection");
       expect(h.state.selectedElementIds).toEqual({ [rectangle.id]: true });
       expect(h.state.multiElement).toBeNull();
       expect(h.state.newElement).toBeNull();
