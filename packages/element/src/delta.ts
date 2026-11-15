@@ -2167,7 +2167,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         return acc;
       },
-      new Map(),
+      new Map<string, OrderedExcalidrawElement>(),
     );
 
     if (!flags.containsVisibleDifference && moved.size) {
@@ -2175,9 +2175,37 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       flags.containsVisibleDifference = true;
     }
 
-    // synchronize all elements that were actually moved
+    // The elements keep the indices they were given, as other history entries
+    // refer to them. Of those sharing one, a single element keeps it: one that
+    // isn't changed, or else one that isn't deleted (a deleted one is given
+    // its own index again when restored). The rest get new ones.
+    const rank = (element: OrderedExcalidrawElement) =>
+      element.isDeleted ? 0 : changed.has(element.id) ? 1 : 2;
+    let conflicting = new Map<string, OrderedExcalidrawElement>();
+    let keeper = 0;
+    for (let i = 0; i < ordered.length; i++) {
+      if (!ordered[i].index) {
+        // not all are ordered by their indices: all the moved get new ones
+        conflicting = moved;
+        break;
+      }
+      if (i === keeper || ordered[i].index !== ordered[keeper].index) {
+        keeper = i;
+        continue;
+      }
+      const loser = rank(ordered[i]) > rank(ordered[keeper]) ? keeper : i;
+      keeper = loser === i ? keeper : i;
+      // (a copy of an unchanged element, as the instance is the caller's)
+      ordered[loser] = changed.has(ordered[loser].id)
+        ? ordered[loser]
+        : { ...ordered[loser] };
+      conflicting.set(ordered[loser].id, ordered[loser]);
+    }
+
     // could fallback to synchronizing all invalid indices
-    return arrayToMap(syncMovedIndices(ordered, moved)) as typeof elements;
+    return arrayToMap(
+      syncMovedIndices(ordered, conflicting),
+    ) as typeof elements;
   }
 
   /**
