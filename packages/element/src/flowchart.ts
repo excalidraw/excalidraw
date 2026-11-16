@@ -454,21 +454,35 @@ const createBindingArrow = (
 };
 
 // Alt+arrow navigation moves to whichever node of the flowchart *looks* next
-// in the pressed direction, picking the nearest node of the first non-empty
-// tier:
-// 1. nodes in line with the current one (sharing its row for left/right, its
-//    column for up/down)
-// 2. nodes linked to the current one whose center lies past its edge in the
-//    pressed direction, at any angle
-// 3. nodes whose center lies within the 45° cone of the pressed direction
-//    (an X through the current node's center)
-// 4. any other node whose center lies past the current one's edge, so a
-//    direction only does nothing when there's nothing that way at all
+// in the pressed direction. Picture a bubble growing out of the current node
+// that way: an ellipse that always touches the node's center, with its own
+// center on the pressed axis, somewhat longer than it's wide. The first node
+// it reaches wins, which makes a node count as far as
+//
+//   forward + (NAVIGATION_SIDEWAYS_WEIGHT * sideways)² / forward
+//
+// - straight ahead that's just how far the node is
+// - the more off to the side, the farther it counts: twice its forward
+//   distance at about 35°, and steeply more past that, so a node that's
+//   mostly beside the current one only wins when little else lies that way
+//
+// The offsets are measured between centers. When the two nodes differ in
+// size, the bigger one counts as a node of the smaller one's size, slid within
+// itself as close to the other as it gets — so a wide node is in line with
+// every node above or below it, and as near as its nearest end.
+//
+// Only nodes whose center lies past the current one's edge in the pressed
+// direction take part: a node right above or below it isn't to its left.
+//
 // Near-ties (within 10%) go to a node the current one links to, then to one
 // linking to it, then to the one more level with the current one's center,
 // then reading order (the upper one for left/right, the left one for
 // up/down).
 const NAVIGATION_TIE_TOLERANCE = 0.1;
+// How much longer than wide the bubble is. The higher, the more often a node
+// straight ahead wins over nearer ones off to the side; from about 1.75 on, a
+// near node at 50° stops beating a far one at 30°.
+const NAVIGATION_SIDEWAYS_WEIGHT = 1.5;
 
 export class FlowChartNavigator {
   isExploring: boolean = false;
@@ -511,9 +525,10 @@ export class FlowChartNavigator {
     const [minX, minY, maxX, maxY] = aabbForElement(node, elementsMap);
     const [nodeMainStart, nodeMainEnd, nodeCrossStart, nodeCrossEnd] =
       horizontal ? [minX, maxX, minY, maxY] : [minY, maxY, minX, maxX];
+    const nodeMainSize = nodeMainEnd - nodeMainStart;
+    const nodeCrossSize = nodeCrossEnd - nodeCrossStart;
     const nodeMainCenter = (nodeMainStart + nodeMainEnd) / 2;
     const nodeCrossCenter = (nodeCrossStart + nodeCrossEnd) / 2;
-    const nodeEdge = sign > 0 ? nodeMainEnd : nodeMainStart;
 
     const successors = new Set<string>();
     const predecessors = new Set<string>();
@@ -540,56 +555,32 @@ export class FlowChartNavigator {
         const [mainStart, mainEnd, crossStart, crossEnd] = horizontal
           ? [bounds[0], bounds[2], bounds[1], bounds[3]]
           : [bounds[1], bounds[3], bounds[0], bounds[2]];
+        const mainSize = mainEnd - mainStart;
+        const crossSize = crossEnd - crossStart;
         const mainCenter = (mainStart + mainEnd) / 2;
         const crossCenter = (crossStart + crossEnd) / 2;
 
-        if ((mainCenter - nodeMainCenter) * sign <= 0) {
-          return [];
-        }
-
-        // positive when the boxes are apart along that axis, negative when
-        // they overlap
-        const mainGap = Math.max(
-          mainStart - nodeMainEnd,
-          nodeMainStart - mainEnd,
+        // offsets between the centers, less the room the bigger node has to
+        // slide toward the other within itself
+        const forward =
+          (mainCenter - nodeMainCenter) * sign -
+          Math.abs(mainSize - nodeMainSize) / 2;
+        const sideways = Math.max(
+          Math.abs(crossCenter - nodeCrossCenter) -
+            Math.abs(crossSize - nodeCrossSize) / 2,
+          0,
         );
-        const crossGap = Math.max(
-          crossStart - nodeCrossEnd,
-          nodeCrossStart - crossEnd,
-        );
-        const inCone =
-          Math.abs(mainCenter - nodeMainCenter) >=
-          Math.abs(crossCenter - nodeCrossCenter);
-        // either center falls within the other node's span, so the two mostly
-        // share a row (column) — a sliver of overlap between neighboring rows
-        // doesn't count
-        const inLine =
-          (nodeCrossStart < crossCenter && crossCenter < nodeCrossEnd) ||
-          (crossStart < nodeCrossCenter && nodeCrossCenter < crossEnd);
-        const pastEdge = (mainCenter - nodeEdge) * sign > 0;
 
-        const tier = inLine
-          ? 0
-          : pastEdge && linkRank(candidate.id) < 2
-          ? 1
-          : inCone
-          ? 2
-          : pastEdge
-          ? 3
-          : null;
-
-        if (tier === null) {
+        // the center has to lie past the current node's edge
+        if (forward <= Math.min(mainSize, nodeMainSize) / 2) {
           return [];
         }
 
         return [
           {
             node: candidate,
-            tier,
             distance:
-              tier === 0
-                ? Math.max(mainGap, 0)
-                : Math.hypot(Math.max(mainGap, 0), Math.max(crossGap, 0)),
+              forward + (NAVIGATION_SIDEWAYS_WEIGHT * sideways) ** 2 / forward,
             crossCenter,
           },
         ];
@@ -600,18 +591,20 @@ export class FlowChartNavigator {
       return null;
     }
 
-    const topTier = Math.min(...candidates.map((candidate) => candidate.tier));
-    const pool = candidates.filter((candidate) => candidate.tier === topTier);
-    const nearest = Math.min(...pool.map((candidate) => candidate.distance));
+    const nearest = Math.min(
+      ...candidates.map((candidate) => candidate.distance),
+    );
     const tolerance = Math.max(nearest * NAVIGATION_TIE_TOLERANCE, 1);
     // how far a candidate's center is off the current node's center line;
     // within a pixel it's a tie (symmetric layouts), left to reading order
-    const offset = (candidate: typeof pool[number]) =>
+    const offset = (candidate: typeof candidates[number]) =>
       Math.abs(candidate.crossCenter - nodeCrossCenter);
-    const compareOffsets = (a: typeof pool[number], b: typeof pool[number]) =>
-      Math.abs(offset(a) - offset(b)) > 1 ? offset(a) - offset(b) : 0;
+    const compareOffsets = (
+      a: typeof candidates[number],
+      b: typeof candidates[number],
+    ) => (Math.abs(offset(a) - offset(b)) > 1 ? offset(a) - offset(b) : 0);
 
-    return pool
+    return candidates
       .filter((candidate) => candidate.distance <= nearest + tolerance)
       .sort(
         (a, b) =>
