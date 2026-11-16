@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { focusNearestParent, KEYS } from "@excalidraw/common";
+import { focusNearestParent, isIMEComposing, KEYS } from "@excalidraw/common";
 
 import { useExcalidrawContainer } from "./App";
 
@@ -31,7 +31,7 @@ export const ProjectName = (props: Props) => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key === KEYS.ENTER) {
       event.preventDefault();
-      if (event.nativeEvent.isComposing || event.keyCode === 229) {
+      if (isIMEComposing(event)) {
         return;
       }
       event.currentTarget.blur();

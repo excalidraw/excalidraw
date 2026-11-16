@@ -14,6 +14,7 @@ import {
   EVENT,
   isDevEnv,
   KEYS,
+  isIMEComposing,
   updateObject,
 } from "@excalidraw/common";
 
@@ -129,6 +130,7 @@ export const SidebarInner = forwardRef(
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           event.key === KEYS.ESCAPE &&
+          !isIMEComposing(event) &&
           (!docked || !editorInterface.canFitSidebar)
         ) {
           closeLibrary();

@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 
-import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
+import { EVENT, KEYS, cloneJSON, isIMEComposing } from "@excalidraw/common";
 
 import { deepCopyElement } from "@excalidraw/element";
 
@@ -373,7 +373,8 @@ const StatsDragInput = <
             const eventTarget = event.currentTarget;
             if (
               eventTarget instanceof ownerWindow.HTMLInputElement &&
-              event.key === KEYS.ENTER
+              event.key === KEYS.ENTER &&
+              !isIMEComposing(event)
             ) {
               handleInputValue(eventTarget.value, elements, appState);
               app.focusContainer();

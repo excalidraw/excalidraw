@@ -19,6 +19,7 @@ import { measureText } from "@excalidraw/element";
 
 import {
   KEYS,
+  isIMEComposing,
   randomInteger,
   addEventListener,
   getFontString,
@@ -274,6 +275,10 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
+      if (isIMEComposing(event)) {
+        return;
+      }
+
       const target = event.target;
       if (
         event.key === KEYS.ESCAPE &&

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { createPortal } from "react-dom";
 
-import { KEYS } from "@excalidraw/common";
+import { KEYS, isIMEComposing } from "@excalidraw/common";
 
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
@@ -37,7 +37,7 @@ export const Modal: React.FC<{
   }
 
   const handleKeydown = (event: React.KeyboardEvent) => {
-    if (event.key === KEYS.ESCAPE) {
+    if (event.key === KEYS.ESCAPE && !isIMEComposing(event)) {
       event.preventDefault();
       event.nativeEvent.stopImmediatePropagation();
       event.stopPropagation();

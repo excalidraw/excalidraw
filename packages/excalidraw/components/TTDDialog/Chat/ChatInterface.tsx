@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useLayoutEffect } from "react";
-import { KEYS } from "@excalidraw/common";
+import { KEYS, isIMEComposing } from "@excalidraw/common";
 
 import { ArrowRightIcon, stop as StopIcon } from "../../icons";
 import { InlineIcon } from "../../InlineIcon";
@@ -88,7 +88,7 @@ export const ChatInterface = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === KEYS.ENTER && !event.shiftKey) {
       event.preventDefault();
-      if (!isGenerating) {
+      if (!isGenerating && !isIMEComposing(event)) {
         handleSubmit();
       }
     }

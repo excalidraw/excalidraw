@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS, isIMEComposing } from "@excalidraw/common";
 
 import type { Node } from "@excalidraw/common";
 
@@ -23,6 +23,10 @@ export const fontPickerKeyHandler = ({
   onSelect,
   onHover,
 }: FontPickerKeyNavHandlerProps) => {
+  if (isIMEComposing(event)) {
+    return false;
+  }
+
   if (
     !event[KEYS.CTRL_OR_CMD] &&
     event.shiftKey &&

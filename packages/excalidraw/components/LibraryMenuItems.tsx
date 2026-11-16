@@ -8,6 +8,7 @@ import React, {
 
 import {
   KEYS,
+  isIMEComposing,
   MIME_TYPES,
   arrayToMap,
   nextAnimationFrame,
@@ -407,7 +408,11 @@ export default function LibraryMenuItems({
             onKeyDown={(event) => {
               // clear the search ourselves and stop the event, or the
               // sidebar's Escape listener closes an undocked sidebar
-              if (event.key === KEYS.ESCAPE && searchInputValue) {
+              if (
+                event.key === KEYS.ESCAPE &&
+                searchInputValue &&
+                !isIMEComposing(event)
+              ) {
                 event.preventDefault();
                 event.stopPropagation();
                 setSearchInputValue("");

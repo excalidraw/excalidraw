@@ -12,6 +12,7 @@ import {
   EVENT,
   HYPERLINK_TOOLTIP_DELAY,
   KEYS,
+  isIMEComposing,
   getTargetWindow,
 } from "@excalidraw/common";
 
@@ -331,7 +332,10 @@ export const Hyperlink = ({
             if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
               event.preventDefault();
             }
-            if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
+            if (
+              (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) &&
+              !isIMEComposing(event)
+            ) {
               handleSubmit();
               setAppState({ showHyperlinkPopup: "info" });
             }
