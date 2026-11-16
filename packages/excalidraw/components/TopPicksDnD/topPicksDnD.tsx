@@ -12,6 +12,10 @@ import "./TopPicksDnD.scss";
  *
  * The strip must be registered via `setStripEl`, and render its picks with
  * `data-top-pick-index` (hit-testing and the drop animation measure these).
+ *
+ * A picker may register one more drop target beside the strip, via
+ * `setDropZoneEl` (e.g. the font picker's favorites) - a dragged value
+ * dropped there is handed to `onDropZoneDrop`, leaving the picks alone.
  */
 
 const GHOST_CLASS = "excalidraw-top-picks-dnd-ghost";
@@ -38,6 +42,8 @@ export type TopPicksDragState<T> = {
   duplicateIndex: number | null;
   /** signed distance between strip slot centers (for reorder preview) */
   slotSpan: number;
+  /** the pointer is over the extra drop zone (see `setDropZoneEl`) */
+  isOverDropZone: boolean;
 } | null;
 
 export type TopPicksGhost = {
@@ -86,6 +92,7 @@ type DragSession<T> = {
   hitRect: { left: number; right: number; top: number; bottom: number } | null;
   overIndex: number | null;
   duplicateIndex: number | null;
+  isOverDropZone: boolean;
 };
 
 export type TopPicksDnD<T> = {
@@ -93,6 +100,11 @@ export type TopPicksDnD<T> = {
   startSourceDrag: (event: React.PointerEvent, value: T | null) => void;
   startPickDrag: (event: React.PointerEvent, index: number, value: T) => void;
   setStripEl: (el: HTMLDivElement | null) => void;
+  /**
+   * An extra drop target beside the strip. May mount only once a drag is in
+   * flight (it's measured on every move), i.e. to replace other UI meanwhile.
+   */
+  setDropZoneEl: (el: HTMLElement | null) => void;
 };
 
 /**
@@ -143,6 +155,7 @@ export const useTopPicksDnD = <T,>({
   onPicksChange,
   isSamePick = (a, b) => a === b,
   createGhost,
+  onDropZoneDrop,
 }: {
   enabled: boolean;
   picks: readonly T[];
@@ -150,9 +163,12 @@ export const useTopPicksDnD = <T,>({
   /** value-equality — pins identical to an existing pick are refused */
   isSamePick?: (a: T, b: T) => boolean;
   createGhost: CreateTopPicksGhost<T>;
+  /** a value got dropped on the extra drop zone (see `setDropZoneEl`) */
+  onDropZoneDrop?: (value: T) => void;
 }): TopPicksDnD<T> => {
   const [dragState, setDragState] = useState<TopPicksDragState<T>>(null);
   const stripRef = useRef<HTMLDivElement | null>(null);
+  const dropZoneRef = useRef<HTMLElement | null>(null);
 
   const latestRef = useRef({
     enabled,
@@ -160,6 +176,7 @@ export const useTopPicksDnD = <T,>({
     onPicksChange,
     isSamePick,
     createGhost,
+    onDropZoneDrop,
   });
   latestRef.current = {
     enabled,
@@ -167,6 +184,7 @@ export const useTopPicksDnD = <T,>({
     onPicksChange,
     isSamePick,
     createGhost,
+    onDropZoneDrop,
   };
 
   const controller = useMemo(() => {
@@ -180,6 +198,7 @@ export const useTopPicksDnD = <T,>({
           overIndex: session.overIndex,
           duplicateIndex: session.duplicateIndex,
           slotSpan: session.slotSpan,
+          isOverDropZone: session.isOverDropZone,
         });
       } else {
         setDragState(null);
@@ -318,16 +337,37 @@ export const useTopPicksDnD = <T,>({
         }
       }
 
+      // the extra drop zone - measured live, as it may mount mid-drag
+      let isOverDropZone = false;
+      const dropZoneRect =
+        overIndex === null && duplicateIndex === null
+          ? dropZoneRef.current?.getBoundingClientRect()
+          : null;
+      if (
+        dropZoneRect &&
+        x >= dropZoneRect.left &&
+        x <= dropZoneRect.right &&
+        y >= dropZoneRect.top &&
+        y <= dropZoneRect.bottom
+      ) {
+        isOverDropZone = true;
+      }
+
       if (
         overIndex !== session.overIndex ||
-        duplicateIndex !== session.duplicateIndex
+        duplicateIndex !== session.duplicateIndex ||
+        isOverDropZone !== session.isOverDropZone
       ) {
         session.overIndex = overIndex;
         session.duplicateIndex = duplicateIndex;
+        session.isOverDropZone = isOverDropZone;
 
         const { ghost } = session;
         if (ghost) {
-          ghost.classList.toggle(`${GHOST_CLASS}--over`, overIndex !== null);
+          ghost.classList.toggle(
+            `${GHOST_CLASS}--over`,
+            overIndex !== null || isOverDropZone,
+          );
           ghost.classList.toggle(
             `${GHOST_CLASS}--blocked`,
             duplicateIndex !== null,
@@ -535,8 +575,12 @@ export const useTopPicksDnD = <T,>({
       event.stopPropagation();
       suppressNextClick();
 
-      const { overIndex, origin, value, slotRects } = session;
-      const { picks, onPicksChange, isSamePick } = latestRef.current;
+      const { overIndex, origin, value, slotRects, isOverDropZone } = session;
+      const { picks, onPicksChange, isSamePick, onDropZoneDrop } =
+        latestRef.current;
+      const dropZoneRect = isOverDropZone
+        ? dropZoneRef.current?.getBoundingClientRect()
+        : null;
 
       settleStripInstantly();
 
@@ -554,6 +598,17 @@ export const useTopPicksDnD = <T,>({
           onPicksChange(next);
         }
         releaseGhost({ rect: slotRects[overIndex] });
+      } else if (dropZoneRect && onDropZoneDrop) {
+        onDropZoneDrop(value);
+        // lands in the middle of the zone, at its own size
+        releaseGhost({
+          rect: new DOMRect(
+            dropZoneRect.left + (dropZoneRect.width - session.ghostW) / 2,
+            dropZoneRect.top + (dropZoneRect.height - session.ghostH) / 2,
+            session.ghostW,
+            session.ghostH,
+          ),
+        });
       } else {
         releaseGhost({ rect: session.homeRect });
       }
@@ -631,6 +686,7 @@ export const useTopPicksDnD = <T,>({
         hitRect: null,
         overIndex: null,
         duplicateIndex: null,
+        isOverDropZone: false,
       };
       ownerWindow.addEventListener("pointermove", onPointerMove, true);
       ownerWindow.addEventListener("pointerup", onPointerUp, true);
@@ -657,6 +713,9 @@ export const useTopPicksDnD = <T,>({
         controller.begin(event, value, { kind: "pick", index }),
       setStripEl: (el) => {
         stripRef.current = el;
+      },
+      setDropZoneEl: (el) => {
+        dropZoneRef.current = el;
       },
     }),
     [dragState, controller],

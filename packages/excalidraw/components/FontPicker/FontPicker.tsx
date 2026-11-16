@@ -316,10 +316,22 @@ export const FontPicker = React.memo(
 
     const resetTopPicks = () => onTopPicksChange(null);
 
+    const { fontFavorites } = useAppProps();
+
     const dnd = useFontTopPicksDnD({
       enabled: isTopPicksCustomizable,
       picks,
       onPicksChange: onTopPicksChange,
+      onFavoriteToggle: fontFavorites
+        ? (fontFamily) => {
+            const { fonts, onChange } = fontFavorites;
+            onChange(
+              fonts.includes(fontFamily)
+                ? fonts.filter((favorite) => favorite !== fontFamily)
+                : [...fonts, fontFamily],
+            );
+          }
+        : undefined,
     });
 
     return (

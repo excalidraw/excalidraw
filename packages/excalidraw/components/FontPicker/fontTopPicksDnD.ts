@@ -96,20 +96,24 @@ export const FontPickerDnDContext = createContext<FontPickerDnD | null>(null);
 
 export const useFontPickerDnD = () => useContext(FontPickerDnDContext);
 
-/** pinning fonts from the font picker list to the top-picks strip, and
- * reordering the strip */
+/** pinning fonts from the font picker list to the top-picks strip,
+ * reordering the strip, and dropping fonts onto the favorites drop zone */
 export const useFontTopPicksDnD = ({
   enabled,
   picks,
   onPicksChange,
+  onFavoriteToggle,
 }: {
   enabled: boolean;
   picks: readonly FontFamily[];
   onPicksChange: (picks: FontFamily[]) => void;
+  /** a font got dropped on the favorites drop zone */
+  onFavoriteToggle?: (fontFamily: FontFamily) => void;
 }): FontPickerDnD =>
   useTopPicksDnD({
     enabled,
     picks,
     onPicksChange,
     createGhost: createFontGhost,
+    onDropZoneDrop: onFavoriteToggle,
   });

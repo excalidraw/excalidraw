@@ -116,6 +116,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     showDeprecatedFonts,
     fontProviders,
     fontPickerTip,
+    fontFavorites,
     renderScrollbars,
     viewportStatusFrame,
     currentUserControls,
@@ -261,6 +262,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           showDeprecatedFonts={showDeprecatedFonts}
           fontProviders={fontProviders}
           fontPickerTip={fontPickerTip}
+          fontFavorites={fontFavorites}
           renderScrollbars={renderScrollbars}
           viewportStatusFrame={viewportStatusFrame}
           currentUserControls={currentUserControls}

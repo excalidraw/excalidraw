@@ -27,6 +27,18 @@ import type { FontProviders, ProvidedFont } from "../../types";
 import type { RegisteredFont } from "../../fonts";
 
 import type { ProviderSearchResult } from "./useFontSearch";
+import type { MoreFont } from "./useMoreFonts";
+
+/**
+ * Our own fonts lead the available ones, in this order - what a host's
+ * providers offer comes after them.
+ */
+const LEADING_FONT_FAMILIES: readonly FontFamily[] = [
+  FONT_FAMILY.Excalifont,
+  FONT_FAMILY.Nunito,
+  FONT_FAMILY["Comic Shanns"],
+  FONT_FAMILY["Lilita One"],
+];
 
 /** shared by all providers, the rest is left to narrowing down the search */
 const SEARCH_MATCHES_LIMIT = 10;
@@ -140,6 +152,10 @@ interface FontCatalogOptions {
   failedResolutions: ReadonlyMap<string, unknown>;
   selectedFontFamily: FontFamily | null;
   hoveredFontFamily: FontFamily | null;
+  /** the user's favorites - see `ExcalidrawProps.fontFavorites` */
+  favoriteFamilies: ReadonlySet<FontFamily>;
+  /** fonts loaded on demand, in the order they arrived - see `useMoreFonts` */
+  moreFonts: readonly MoreFont[];
   resolvingFamily: CustomFontFamily | null;
   searchTerm: string;
   searchResults: readonly ProviderSearchResult[];
@@ -153,6 +169,8 @@ export const useFontCatalog = ({
   failedResolutions,
   selectedFontFamily,
   hoveredFontFamily,
+  favoriteFamilies,
+  moreFonts,
   resolvingFamily,
   searchTerm,
   searchResults,
@@ -166,14 +184,10 @@ export const useFontCatalog = ({
     setSceneRegisteredFonts(registeredFonts);
   }
 
+  // the families of the elements on canvas - the current one (what the next
+  // text gets) isn't the scene's until an element uses it
   const sceneFamilies = useMemo(
-    () =>
-      new Set([
-        ...fonts.getSceneFamilies(),
-        // the current default family may be in no element yet (i.e. searched
-        // & selected with nothing on canvas) - it must still be listed
-        ...(selectedFontFamily != null ? [selectedFontFamily] : []),
-      ]),
+    () => new Set(fonts.getSceneFamilies()),
     // refresh after selection without recalculating on hover. `registeredFonts`
     // additionally refreshes the groups when a scene-only custom family arrives
     // while the picker is open (i.e. collab, paste), registering on load
@@ -213,8 +227,10 @@ export const useFontCatalog = ({
     [searchResults],
   );
 
-  const allFonts = useMemo(() => {
+  const { allFonts, moreOnlyFamilies } = useMemo(() => {
     const descriptors = new Map<FontFamily, FontDescriptor>();
+    // loaded on demand, and listed for no other reason
+    const moreOnlyFamilies = new Set<FontFamily>();
 
     for (const [providerId, provider] of Object.entries(fontProviders ?? {})) {
       for (const { id, label } of getProvidedFonts(provider.availableFonts)) {
@@ -230,6 +246,15 @@ export const useFontCatalog = ({
 
     for (const familyId of [
       ...sceneFamilies,
+      // listed whether or not their provider (still) offers them
+      ...favoriteFamilies,
+      // the current family may be in no element yet (i.e. found by search
+      // and picked with nothing on canvas) - it must still be listed. One
+      // loaded on demand is, and keeps its place there
+      ...(selectedFontFamily != null &&
+      !moreFonts.some((font) => font.value === selectedFontFamily)
+        ? [selectedFontFamily]
+        : []),
       // a search result resolves in place rather than jumping into the list
       ...(resolvingFamily && !resultFamilies.has(resolvingFamily)
         ? [resolvingFamily]
@@ -244,6 +269,18 @@ export const useFontCatalog = ({
         text: getFontFamilyLabel(familyId, registeredFonts.get(familyId)),
         status: getCustomFontStatus(familyId),
       });
+    }
+
+    for (const { value, text } of moreFonts) {
+      if (!descriptors.has(value)) {
+        moreOnlyFamilies.add(value);
+        descriptors.set(value, {
+          value,
+          icon: getFontFamilyIcon(value, fontProviders),
+          text,
+          status: getCustomFontStatus(value),
+        });
+      }
     }
 
     for (const [familyId, registeredFont] of registeredFonts) {
@@ -280,37 +317,84 @@ export const useFontCatalog = ({
       descriptors.set(familyId, fontDescriptor);
     }
 
-    return Array.from(descriptors.values()).sort((a, b) =>
-      a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
-    );
+    return {
+      allFonts: Array.from(descriptors.values()).sort((a, b) =>
+        a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
+      ),
+      moreOnlyFamilies,
+    };
   }, [
+    moreFonts,
     registeredFonts,
     fontProviders,
     getCustomFontStatus,
     resolvingFamily,
     resultFamilies,
     sceneFamilies,
+    favoriteFamilies,
+    selectedFontFamily,
   ]);
 
+  // a font is listed once: with the scene's, else among the favorites, else
+  // among the available ones
   const sceneFonts = useMemo(
     () => allFonts.filter((font) => sceneFamilies.has(font.value)),
     [allFonts, sceneFamilies],
   );
-  const availableFonts = useMemo(
+  const favoriteFonts = useMemo(
     () =>
       allFonts.filter(
         (font) =>
-          !sceneFamilies.has(font.value) &&
-          (showDeprecatedFonts || !font.deprecated),
+          favoriteFamilies.has(font.value) && !sceneFamilies.has(font.value),
       ),
-    [allFonts, sceneFamilies, showDeprecatedFonts],
+    [allFonts, favoriteFamilies, sceneFamilies],
   );
+  // Ours lead (the current ones, then the deprecated ones), a host's follow
+  // by name, and what got loaded on demand comes last in the order it
+  // arrived - so that loading more never moves a font listed before.
+  const availableFonts = useMemo(() => {
+    const available = allFonts.filter(
+      (font) =>
+        !sceneFamilies.has(font.value) &&
+        !favoriteFamilies.has(font.value) &&
+        // the current font is listed even when deprecated
+        (showDeprecatedFonts ||
+          !font.deprecated ||
+          font.value === selectedFontFamily),
+    );
+    const byValue = new Map(available.map((font) => [font.value, font]));
+    const leading = LEADING_FONT_FAMILIES.flatMap(
+      (fontFamily) => byValue.get(fontFamily) ?? [],
+    );
+    const deprecated = available.filter(
+      (font) => font.deprecated && !leading.includes(font),
+    );
+    const more = moreFonts.flatMap(({ value }) =>
+      moreOnlyFamilies.has(value) ? byValue.get(value) ?? [] : [],
+    );
+    const placed = new Set([...leading, ...deprecated, ...more]);
+
+    return [
+      ...leading,
+      ...deprecated,
+      ...available.filter((font) => !placed.has(font)),
+      ...more,
+    ];
+  }, [
+    allFonts,
+    moreFonts,
+    moreOnlyFamilies,
+    sceneFamilies,
+    favoriteFamilies,
+    showDeprecatedFonts,
+    selectedFontFamily,
+  ]);
   const filteredFontDescriptors = useMemo(
     () =>
-      [...sceneFonts, ...availableFonts].filter((font) =>
+      [...sceneFonts, ...favoriteFonts, ...availableFonts].filter((font) =>
         font.text.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [sceneFonts, availableFonts, searchTerm],
+    [sceneFonts, favoriteFonts, availableFonts, searchTerm],
   );
   const { searchMatches, hiddenSearchMatchCount, searchSuggestions } =
     useMemo(() => {
@@ -373,15 +457,33 @@ export const useFontCatalog = ({
       filteredFontDescriptors.filter((font) => sceneFamilies.has(font.value)),
     [filteredFontDescriptors, sceneFamilies],
   );
+  const favoriteFilteredFonts = useMemo(
+    () =>
+      filteredFontDescriptors.filter(
+        (font) =>
+          favoriteFamilies.has(font.value) && !sceneFamilies.has(font.value),
+      ),
+    [filteredFontDescriptors, favoriteFamilies, sceneFamilies],
+  );
   const availableFilteredFonts = useMemo(
     () =>
-      filteredFontDescriptors.filter((font) => !sceneFamilies.has(font.value)),
-    [filteredFontDescriptors, sceneFamilies],
+      filteredFontDescriptors.filter(
+        (font) =>
+          !sceneFamilies.has(font.value) && !favoriteFamilies.has(font.value),
+      ),
+    [filteredFontDescriptors, sceneFamilies, favoriteFamilies],
+  );
+
+  const listedFamilies = useMemo(
+    () => new Set(allFonts.map((font) => font.value)),
+    [allFonts],
   );
 
   return {
+    listedFamilies,
     selectableFonts,
     sceneFilteredFonts,
+    favoriteFilteredFonts,
     availableFilteredFonts,
     searchMatches,
     hiddenSearchMatchCount,

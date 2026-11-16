@@ -765,6 +765,25 @@ export interface FontProvider {
     query: string,
     opts: { signal: AbortSignal },
   ): Promise<FontSearchResult>;
+  /**
+   * More of the provider's fonts than `availableFonts`, a page at a time -
+   * turns "Browse more fonts" on at the end of the font picker's list. The
+   * picker asks for the next page when the user clicks it, and from then on
+   * whenever they reach the end of the list.
+   *
+   * Return the fonts in an order which stays the same between calls (i.e.
+   * most popular first), `limit` of them at most - fewer mean there are no
+   * more. Fonts the picker lists already are skipped, and what gets loaded is
+   * appended as it comes, not sorted. It stays listed when the picker closes
+   * and reopens, until `fontProviders` changes.
+   *
+   * @param opts.offset how many fonts the earlier calls returned
+   */
+  loadMore?(opts: {
+    offset: number;
+    limit: number;
+    signal: AbortSignal;
+  }): Promise<readonly ProvidedFont[]>;
 }
 
 /**
@@ -1225,6 +1244,21 @@ export interface ExcalidrawProps {
    * page-wide, so a family any editor resolved renders in all of them.
    */
   fontProviders?: FontProviders;
+  /**
+   * The user's favorite fonts, and what to do when they change - turns
+   * favorites on in the font picker. A font is added by dragging it from the
+   * picker's list onto the drop zone which takes the search's place for the
+   * drag, and removed the same way. Favorites are listed in a section of
+   * their own, below the fonts the scene uses.
+   *
+   * Controlled: the editor keeps nothing, so that the host can store the
+   * list where it stores the user's other preferences.
+   */
+  fontFavorites?: {
+    /** font ids as in `fontFamily`, i.e. `5` or `"google:Roboto"` */
+    fonts: readonly FontFamily[];
+    onChange: (fonts: FontFamily[]) => void;
+  };
   /**
    * Replaces the tip at the bottom of the font picker ("drag any font onto
    * your top picks to pin it"), i.e. to say where the fonts offered there

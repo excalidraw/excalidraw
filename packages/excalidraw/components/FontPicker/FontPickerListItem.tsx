@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { memo, useCallback } from "react";
 
 import { getFontFamilyString } from "@excalidraw/common";
 
@@ -16,13 +16,21 @@ import type { FontDescriptor } from "./useFontCatalog";
 
 interface FontPickerListItemProps {
   font: FontDescriptor;
-  order: number;
   isHovered: boolean;
   isSelected: boolean;
+  /** the callbacks must be stable - a changed one re-renders every row */
   onSelect: (fontFamily: FontFamily) => void;
   onHover: (fontFamily: FontFamily) => void;
   setItemRef: (fontFamily: FontFamily, node: HTMLButtonElement | null) => void;
 }
+
+const FONT_DESCRIPTOR_KEYS: readonly (keyof FontDescriptor)[] = [
+  "value",
+  "text",
+  "icon",
+  "status",
+  "deprecated",
+];
 
 const getFontStatusClassName = (status: FontDescriptor["status"]) =>
   status ? ` FontPicker__font--${status}` : "";
@@ -38,36 +46,19 @@ const renderRetryIcon = (isLoading: boolean) => (
   </span>
 );
 
-export const FontPickerListItem = ({
+const FontPickerListItemComponent = ({
   font,
-  order,
   isHovered,
   isSelected,
   onSelect,
   onHover,
   setItemRef,
 }: FontPickerListItemProps) => {
-  const ref = useRef<HTMLButtonElement>(null);
   const dnd = useFontPickerDnD();
   const isUnsupported = font.status === "unsupported";
 
-  useEffect(() => {
-    if (!isHovered) {
-      return;
-    }
-    if (order === 0) {
-      // scroll into the first item differently, so it's visible what is above (i.e. group title)
-      ref.current?.scrollIntoView?.({ block: "end" });
-    } else {
-      ref.current?.scrollIntoView?.({ block: "nearest" });
-    }
-  }, [isHovered, order]);
-
   const setRef = useCallback(
-    (node: HTMLButtonElement | null) => {
-      ref.current = node;
-      setItemRef(font.value, node);
-    },
+    (node: HTMLButtonElement | null) => setItemRef(font.value, node),
     [font.value, setItemRef],
   );
 
@@ -119,3 +110,21 @@ export const FontPickerListItem = ({
     </button>
   );
 };
+
+/**
+ * A row re-renders only when what it shows changed. The list can get long
+ * ("Browse more fonts"), and it re-renders on every move of the highlight and
+ * on every font which registers.
+ */
+export const FontPickerListItem = memo(
+  FontPickerListItemComponent,
+  (prev, next) =>
+    prev.isHovered === next.isHovered &&
+    prev.isSelected === next.isSelected &&
+    prev.onSelect === next.onSelect &&
+    prev.onHover === next.onHover &&
+    prev.setItemRef === next.setItemRef &&
+    // the descriptors are rebuilt along with the list (the badge follows
+    // `deprecated`)
+    FONT_DESCRIPTOR_KEYS.every((key) => prev.font[key] === next.font[key]),
+);

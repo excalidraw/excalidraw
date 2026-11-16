@@ -32,6 +32,14 @@
     opacity: 0.5;
   }
 
+  // The list can get long ("Browse more fonts"). Every font which registers or
+  // arrives would lay all of it out again - this lets the browser skip the
+  // rows out of view.
+  .dropdown-menu.fonts .dropdown-menu-item {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 2rem;
+  }
+
   .FontPicker__more-results {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -82,6 +90,83 @@
 
   .FontPicker__tip {
     margin-top: 0.5rem;
+  }
+
+  // anchor for the favorites drop zone, which covers the search for a drag
+  .FontPicker__search {
+    position: relative;
+  }
+
+  .FontPicker__favorites-drop-zone {
+    position: absolute;
+    inset: 0;
+    // above the search's own icon
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: var(--popup-bg-color);
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    transition: background-color 0.14s ease;
+
+    // the outline hugs the zone, rather than overhang it as on the strip
+    .top-picks-dnd__outline {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    &--over {
+      background: var(--color-surface-primary-container);
+    }
+
+    &--remove {
+      color: var(--color-danger);
+
+      .top-picks-dnd__outline rect {
+        stroke: var(--color-danger);
+      }
+
+      &.FontPicker__favorites-drop-zone--over {
+        background: var(--color-danger-icon-background);
+        color: var(--color-danger-icon-color);
+      }
+    }
+  }
+
+  // closes the available fonts once there are no more to load
+  .FontPicker__search-for-more {
+    margin-top: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--color-gray-50);
+  }
+
+  // "Browse more fonts", closing the available ones
+  .FontPicker__load-more {
+    display: block;
+    margin: 0.25rem auto 0;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: var(--border-radius-md);
+    background: none;
+    font: inherit;
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      color: var(--color-gray-50);
+      cursor: default;
+    }
   }
 }
 

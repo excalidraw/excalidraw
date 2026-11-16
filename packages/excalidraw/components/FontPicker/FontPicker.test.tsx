@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from "@testing-library/react";
+import React from "react";
 
 import { FONT_FAMILY, KEYS } from "@excalidraw/common";
 import { Scene } from "@excalidraw/element";
@@ -1412,6 +1413,364 @@ describe("FontPicker", () => {
     });
   });
 
+  describe("list", () => {
+    const resolve: FontResolver = async () => ({ fontFaces, metadata });
+
+    const open = async (
+      props?: Pick<ExcalidrawProps, "fontProviders" | "fontFavorites">,
+      /** what's on canvas as the picker opens */
+      elements: readonly ExcalidrawElement[] = [],
+    ) => {
+      const { queryByTestId } = await render(
+        <Excalidraw handleKeyboardGlobally={true} {...props} />,
+      );
+      API.setElements(elements);
+      Keyboard.keyPress(KEYS.T);
+      fireEvent.click(queryByTestId("font-family-show-fonts")!);
+      await screen.findByText("Available fonts");
+    };
+
+    const getGroupFamilies = (title: string) =>
+      Array.from(
+        screen
+          .getByText(title)
+          .closest(".dropdown-menu-group")!
+          .querySelectorAll<HTMLElement>("button[value]"),
+      ).map((button) => button.title);
+
+    it("leads the available fonts with our own, ahead of a provider's", async () => {
+      await open({
+        fontProviders: {
+          "test.provider": {
+            icon: <span />,
+            resolve,
+            // would sort first
+            availableFonts: ["Aardvark", "Zebra"],
+          },
+        },
+      });
+
+      expect(getGroupFamilies("Available fonts")).toEqual([
+        "Excalifont",
+        "Nunito",
+        "Comic Shanns",
+        "Lilita One",
+        "Aardvark",
+        "Zebra",
+      ]);
+    });
+
+    it("counts a font as the scene's only once an element uses it", async () => {
+      await open(undefined, [
+        API.createElement({
+          type: "text",
+          text: "x",
+          fontFamily: FONT_FAMILY.Nunito,
+        }),
+      ]);
+
+      // Excalifont is the current font (what the next text gets), in no
+      // element as yet
+      expect(getGroupFamilies("In this scene")).toEqual(["Nunito"]);
+      expect(getGroupFamilies("Available fonts")).toEqual([
+        "Excalifont",
+        "Comic Shanns",
+        "Lilita One",
+      ]);
+    });
+
+    it("lists deprecated fonts of ours right below the current ones", async () => {
+      const { queryByTestId } = await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          showDeprecatedFonts={true}
+          fontProviders={{
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark"],
+            },
+          }}
+        />,
+      );
+      Keyboard.keyPress(KEYS.T);
+      fireEvent.click(queryByTestId("font-family-show-fonts")!);
+      await screen.findByText("Available fonts");
+
+      expect(getGroupFamilies("Available fonts")).toEqual([
+        "Excalifont",
+        "Nunito",
+        "Comic Shanns",
+        "Lilita One",
+        "Cascadia",
+        "Helvetica",
+        "Virgil",
+        "Aardvark",
+      ]);
+    });
+
+    describe("loading more", () => {
+      // jsdom has no layout: a list of 1000px in a 100px viewport, so that
+      // only a scroll gets to its end
+      beforeEach(() => {
+        vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(
+          1000,
+        );
+        vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(
+          100,
+        );
+      });
+
+      const page = (prefix: string, count: number) =>
+        Array.from({ length: count }, (_, i) => `${prefix} ${i}`);
+
+      it("appends a provider's fonts on demand, then as the list's end is reached", async () => {
+        const loadMore = vi
+          .fn<NonNullable<FontProvider["loadMore"]>>()
+          // not in alphabetical order, and holding a font listed already
+          .mockResolvedValueOnce(["Zulu", "Aardvark", ...page("First", 18)])
+          .mockResolvedValueOnce(page("Second", 3));
+        await open({
+          fontProviders: {
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark", "Mango"],
+              loadMore,
+            },
+          },
+        });
+        const input = document.querySelector<HTMLInputElement>(
+          ".properties-content .QuickSearch__input",
+        )!;
+        input.focus();
+
+        fireEvent.click(screen.getByText("Browse more fonts"));
+        expect(loadMore).toHaveBeenCalledWith(
+          expect.objectContaining({ offset: 0, limit: 20 }),
+        );
+
+        // at the end, as they came - what was listed doesn't move
+        await waitFor(() =>
+          expect(getGroupFamilies("Available fonts")).toEqual([
+            "Excalifont",
+            "Nunito",
+            "Comic Shanns",
+            "Lilita One",
+            "Aardvark",
+            "Mango",
+            "Zulu",
+            ...page("First", 18),
+          ]),
+        );
+        expect(document.activeElement).toBe(input);
+        expect(loadMore).toHaveBeenCalledTimes(1);
+
+        // from now on, reaching the end of the list is enough
+        const list = document.querySelector<HTMLElement>(
+          ".properties-content .dropdown-menu.fonts",
+        )!;
+        list.scrollTop = 900;
+        fireEvent.scroll(list);
+
+        await waitFor(() =>
+          expect(getGroupFamilies("Available fonts").slice(-3)).toEqual(
+            page("Second", 3),
+          ),
+        );
+        expect(loadMore).toHaveBeenLastCalledWith(
+          expect.objectContaining({ offset: 20 }),
+        );
+        // a short page was the last one
+        expect(screen.queryByText("Browse more fonts")).toBe(null);
+        // nothing says the provider has more
+        expect(screen.queryByText("Use search for more")).toBe(null);
+      });
+
+      it("points at the search once a provider able to search has no more to load", async () => {
+        await open({
+          fontProviders: {
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark"],
+              loadMore: vi
+                .fn<NonNullable<FontProvider["loadMore"]>>()
+                .mockResolvedValueOnce(page("Only", 3)),
+              search: async () => ({ kind: "match", fonts: [] }),
+            },
+          },
+        });
+        expect(screen.queryByText("Use search for more")).toBe(null);
+
+        fireEvent.click(screen.getByText("Browse more fonts"));
+
+        expect(
+          await screen.findByText("Use search for more"),
+        ).toBeInTheDocument();
+        expect(screen.queryByText("Browse more fonts")).toBe(null);
+      });
+
+      it("keeps what got loaded, and loading at the list's end, when the picker reopens", async () => {
+        const loadMore = vi
+          .fn<NonNullable<FontProvider["loadMore"]>>()
+          .mockResolvedValueOnce(page("First", 20))
+          .mockResolvedValueOnce(page("Second", 20));
+        await open({
+          fontProviders: {
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark"],
+              loadMore,
+            },
+          },
+        });
+
+        fireEvent.click(screen.getByText("Browse more fonts"));
+        await screen.findByTitle("First 19");
+
+        // close (picking a font does), and open again
+        fireEvent.click(screen.getByTitle("Nunito"));
+        await waitFor(() =>
+          expect(document.querySelector(".properties-content")).toBe(null),
+        );
+        fireEvent.click(screen.getByTestId("font-family-show-fonts"));
+        await screen.findByText("Available fonts");
+
+        expect(getGroupFamilies("Available fonts").slice(-2)).toEqual([
+          "First 18",
+          "First 19",
+        ]);
+        expect(loadMore).toHaveBeenCalledTimes(1);
+
+        // no click needed this time
+        const list = document.querySelector<HTMLElement>(
+          ".properties-content .dropdown-menu.fonts",
+        )!;
+        list.scrollTop = 900;
+        fireEvent.scroll(list);
+        await screen.findByTitle("Second 19");
+        // carrying on from where it was
+        expect(loadMore).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({ offset: 20 }),
+        );
+      });
+
+      it("doesn't load on a scroll before it was asked for, nor offer it while searching", async () => {
+        const loadMore = vi
+          .fn<NonNullable<FontProvider["loadMore"]>>()
+          .mockResolvedValue([]);
+        await open({
+          fontProviders: {
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark"],
+              loadMore,
+            },
+          },
+        });
+        const list = document.querySelector<HTMLElement>(
+          ".properties-content .dropdown-menu.fonts",
+        )!;
+        list.scrollTop = 900;
+        fireEvent.scroll(list);
+        expect(loadMore).not.toHaveBeenCalled();
+
+        fireEvent.input(
+          document.querySelector(".properties-content .QuickSearch__input")!,
+          { target: { value: "aard" } },
+        );
+        await waitFor(() =>
+          expect(screen.queryByText("Browse more fonts")).toBe(null),
+        );
+      });
+
+      it("offers nothing more without a provider able to page", async () => {
+        await open({
+          fontProviders: {
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark"],
+              search: async () => ({ kind: "match", fonts: [] }),
+            },
+          },
+        });
+
+        expect(screen.queryByText("Browse more fonts")).toBe(null);
+      });
+    });
+
+    it("lists a favorite once, below the scene's fonts", async () => {
+      await open(
+        {
+          fontFavorites: {
+            // the scene's font stays with the scene
+            fonts: [FONT_FAMILY.Nunito, FONT_FAMILY.Excalifont],
+            onChange: vi.fn(),
+          },
+        },
+        [API.createElement({ type: "text", text: "x" })],
+      );
+
+      expect(getGroupFamilies("In this scene")).toEqual(["Excalifont"]);
+      expect(getGroupFamilies("Favorites")).toEqual(["Nunito"]);
+      expect(getGroupFamilies("Available fonts")).toEqual([
+        "Comic Shanns",
+        "Lilita One",
+      ]);
+      expect(
+        Array.from(
+          document.querySelectorAll(".dropdown-menu-group-title"),
+          (title) => title.textContent,
+        ),
+      ).toEqual(["In this scene", "Favorites", "Available fonts"]);
+    });
+
+    it("scrolls to the highlighted font on open and on keyboard navigation only", async () => {
+      const scrollIntoView = vi.fn();
+      const original = HTMLElement.prototype.scrollIntoView;
+      HTMLElement.prototype.scrollIntoView = scrollIntoView;
+
+      try {
+        await open();
+        const popup = document.querySelector(".properties-content")!;
+        const getRow = (title: string) =>
+          document.querySelector<HTMLElement>(
+            `.dropdown-menu.fonts [title="${title}"]`,
+          )!;
+
+        // the selected font, as the picker opens
+        expect(scrollIntoView).toHaveBeenCalledTimes(1);
+        expect(scrollIntoView.mock.contexts[0]).toBe(getRow("Excalifont"));
+
+        // a hover preview, and its end - when the highlight falls back to the
+        // selected font - leave the list where it is
+        fireEvent.mouseMove(getRow("Lilita One"));
+        await waitFor(() =>
+          expect(h.state.currentHoveredFontFamily).toBe(
+            FONT_FAMILY["Lilita One"],
+          ),
+        );
+        fireEvent.pointerLeave(popup);
+        await waitFor(() =>
+          expect(h.state.currentHoveredFontFamily).toBe(null),
+        );
+        expect(scrollIntoView).toHaveBeenCalledTimes(1);
+
+        // the keyboard moves the highlight where the pointer isn't
+        fireEvent.keyDown(popup, { key: KEYS.ARROW_DOWN });
+        await waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(2));
+        expect(scrollIntoView.mock.contexts[1]).toBe(getRow("Nunito"));
+      } finally {
+        HTMLElement.prototype.scrollIntoView = original;
+      }
+    });
+  });
+
   describe("top picks drag & drop", () => {
     const SLOT_SIZE = 32;
     const SLOT_SPAN = 40;
@@ -1434,6 +1793,9 @@ describe("FontPicker", () => {
         }
         if (this.classList.contains("top-picks-dnd")) {
           return new DOMRect(0, 0, SLOT_SPAN * 2 + SLOT_SIZE, SLOT_SIZE);
+        }
+        if (this.classList.contains("FontPicker__favorites-drop-zone")) {
+          return new DOMRect(0, 100, 200, 30);
         }
         return new DOMRect(0, 300, SLOT_SIZE, SLOT_SIZE);
       });
@@ -1470,7 +1832,7 @@ describe("FontPicker", () => {
       ).map((button) => button.title);
 
     const openFontPicker = async (
-      props?: Pick<ExcalidrawProps, "fontPickerTip">,
+      props?: Pick<ExcalidrawProps, "fontPickerTip" | "fontFavorites">,
     ) => {
       const utils = await render(
         <Excalidraw handleKeyboardGlobally={true} {...props} />,
@@ -1626,6 +1988,104 @@ describe("FontPicker", () => {
           FONT_FAMILY["Comic Shanns"],
           FONT_FAMILY.Nunito,
         ]),
+      );
+    });
+
+    const getFavoritesDropZone = () =>
+      document.querySelector<HTMLElement>(".FontPicker__favorites-drop-zone");
+
+    // the zone only mounts once a drag is in flight, so it takes a move to
+    // start the drag and another one to get onto it
+    const dragToFavorites = async (source: HTMLElement) => {
+      fireEvent.pointerDown(source, {
+        pointerId: 1,
+        button: 0,
+        clientX: 16,
+        clientY: 316,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      fireEvent.pointerMove(window, {
+        pointerId: 1,
+        clientX: 16,
+        clientY: 200,
+      });
+      const label = getFavoritesDropZone()?.textContent ?? null;
+      fireEvent.pointerMove(window, {
+        pointerId: 1,
+        clientX: 100,
+        clientY: 115,
+      });
+      fireEvent.pointerUp(window, { pointerId: 1, clientX: 100, clientY: 115 });
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      return label;
+    };
+
+    const getGroupFamilies = (title: string) =>
+      Array.from(
+        screen
+          .queryByText(title)
+          ?.closest(".dropdown-menu-group")
+          ?.querySelectorAll<HTMLElement>("button[value]") ?? [],
+      ).map((button) => button.title);
+
+    it("adds a font dropped on the favorites zone, and removes it the same way", async () => {
+      const Host = () => {
+        const [fonts, setFonts] = React.useState<
+          NonNullable<ExcalidrawProps["fontFavorites"]>["fonts"]
+        >([]);
+        return (
+          <Excalidraw
+            handleKeyboardGlobally={true}
+            fontFavorites={{ fonts, onChange: setFonts }}
+          />
+        );
+      };
+      const { queryByTestId } = await render(<Host />);
+      Keyboard.keyPress(KEYS.T);
+      act(() => {
+        queryByTestId("font-family-show-fonts")!.click();
+      });
+      const getRow = () =>
+        document.querySelector<HTMLElement>(
+          '.dropdown-menu.fonts [title="Lilita One"]',
+        )!;
+      await waitFor(() => expect(getRow()).not.toBeNull());
+      expect(getFavoritesDropZone()).toBe(null);
+
+      const input = document.querySelector<HTMLInputElement>(
+        ".properties-content .QuickSearch__input",
+      )!;
+      input.blur();
+
+      expect(await dragToFavorites(getRow())).toBe("Add to favorites");
+      // the drag took the focus - the search has it back
+      expect(document.activeElement).toBe(input);
+
+      // in a section of its own, and no longer among the available ones
+      await waitFor(() =>
+        expect(getGroupFamilies("Favorites")).toEqual(["Lilita One"]),
+      );
+      expect(getGroupFamilies("Available fonts")).not.toContain("Lilita One");
+      expect(getFavoritesDropZone()).toBe(null);
+      // dropping is not selecting
+      expect(h.state.currentItemFontFamily).toBe(FONT_FAMILY.Excalifont);
+
+      expect(await dragToFavorites(getRow())).toBe("Remove from favorites");
+
+      await waitFor(() => expect(screen.queryByText("Favorites")).toBe(null));
+      expect(getGroupFamilies("Available fonts")).toContain("Lilita One");
+    });
+
+    it("offers no favorites zone unless the host keeps favorites", async () => {
+      await openFontPicker();
+      const row = document.querySelector<HTMLElement>(
+        '.dropdown-menu.fonts [title="Lilita One"]',
+      )!;
+
+      expect(await dragToFavorites(row)).toBe(null);
+      // a drag which went nowhere hands the focus back all the same
+      expect(document.activeElement).toBe(
+        document.querySelector(".properties-content .QuickSearch__input"),
       );
     });
 

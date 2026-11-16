@@ -1,5 +1,7 @@
+import clsx from "clsx";
 import React, {
   useMemo,
+  useRef,
   useState,
   useEffect,
   useCallback,
@@ -7,10 +9,11 @@ import React, {
   type KeyboardEventHandler,
 } from "react";
 
-import { isCustomFontFamily } from "@excalidraw/common";
+import { isCustomFontFamily, KEYS } from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
+import { useStableCallback } from "../../hooks/useStableCallback";
 import { t } from "../../i18n";
 import {
   useApp,
@@ -22,6 +25,7 @@ import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
 import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
+import { TopPicksDnDOutline } from "../TopPicksDnD/topPicksDnD";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
 
 import { useFontPickerDnD } from "./fontTopPicksDnD";
@@ -33,6 +37,7 @@ import {
   type FontSelectionOptions,
 } from "./useFontResolution";
 import { useFontSearch } from "./useFontSearch";
+import { useMoreFonts } from "./useMoreFonts";
 import { useVisibleFontRegistration } from "./useVisibleFontRegistration";
 
 export type { FontSelectionOptions } from "./useFontResolution";
@@ -50,6 +55,9 @@ interface FontPickerListProps {
   onResetTopPicks?: () => void;
 }
 
+/** how close (px) to the end of the list the next batch of fonts loads */
+const LOAD_MORE_DISTANCE = 40;
+
 export const FontPickerList = React.memo(
   ({
     selectedFontFamily,
@@ -64,11 +72,22 @@ export const FontPickerList = React.memo(
     const { container } = useExcalidrawContainer();
     const app = useApp();
     const fonts = app.fonts.instance;
-    const { showDeprecatedFonts, fontProviders, fontPickerTip } = useAppProps();
+    const { showDeprecatedFonts, fontProviders, fontPickerTip, fontFavorites } =
+      useAppProps();
     const stylesPanelMode = useStylesPanelMode();
     const hasFontProviders = useMemo(
       () => !!Object.keys(fontProviders ?? {}).length,
       [fontProviders],
+    );
+    const favoriteFamilies = useMemo(
+      () =>
+        new Set(
+          (fontFavorites?.fonts ?? []).filter(
+            (fontFamily) =>
+              typeof fontFamily === "number" || typeof fontFamily === "string",
+          ),
+        ),
+      [fontFavorites?.fonts],
     );
     // present only when the top picks are customizable
     const dnd = useFontPickerDnD();
@@ -116,9 +135,20 @@ export const FontPickerList = React.memo(
       fontProviders,
       searchTerm,
     });
+    const listedFamiliesRef = useRef<ReadonlySet<FontFamily>>(new Set());
     const {
+      moreFonts,
+      hasMore: hasMoreFonts,
+      isAtEnd: isAtMoreFontsEnd,
+      isLoading: isLoadingMoreFonts,
+      isActive: isLoadingMoreOnScroll,
+      loadMore: loadMoreFonts,
+    } = useMoreFonts({ fonts, fontProviders, listedFamiliesRef });
+    const {
+      listedFamilies,
       selectableFonts,
       sceneFilteredFonts,
+      favoriteFilteredFonts,
       availableFilteredFonts,
       searchMatches,
       hiddenSearchMatchCount,
@@ -130,11 +160,67 @@ export const FontPickerList = React.memo(
       failedResolutions,
       selectedFontFamily,
       hoveredFontFamily,
+      favoriteFamilies,
+      moreFonts,
       resolvingFamily,
       searchTerm,
       searchResults,
       showDeprecatedFonts: !!showDeprecatedFonts,
     });
+    listedFamiliesRef.current = listedFamilies;
+
+    // more is on offer at the end of the list, unless it's being searched
+    const isSearchShown = stylesPanelMode === "full";
+    const canLoadMoreFonts = hasMoreFonts && !searchTerm.trim();
+    // what a provider pages through may be a part of what it has (i.e. its
+    // most popular fonts) - the rest is found by searching
+    const hasSearchForMore =
+      isAtMoreFontsEnd &&
+      isSearchShown &&
+      !searchTerm.trim() &&
+      Object.values(fontProviders ?? {}).some(
+        (provider) => provider.loadMore && provider.search,
+      );
+
+    // Once the user has asked for more, reaching the end of the list - by
+    // scrolling, or by moving the highlight there with the keyboard, which
+    // scrolls - loads the next batch by itself.
+    const loadMoreFontsAtListEnd = useCallback(() => {
+      const scrollContainer = scrollContainerRef.current;
+      if (
+        scrollContainer &&
+        scrollContainer.scrollTop + scrollContainer.clientHeight >=
+          scrollContainer.scrollHeight - LOAD_MORE_DISTANCE
+      ) {
+        loadMoreFonts();
+      }
+    }, [loadMoreFonts]);
+    const isLoadingMoreAtListEnd =
+      isLoadingMoreOnScroll && canLoadMoreFonts && !isLoadingMoreFonts;
+    useEffect(() => {
+      const scrollContainer = scrollContainerRef.current;
+      if (!isLoadingMoreAtListEnd || !scrollContainer) {
+        return;
+      }
+      // a batch may not have been enough to push the end out of view
+      loadMoreFontsAtListEnd();
+      scrollContainer.addEventListener("scroll", loadMoreFontsAtListEnd, {
+        passive: true,
+      });
+      return () =>
+        scrollContainer.removeEventListener("scroll", loadMoreFontsAtListEnd);
+    }, [isLoadingMoreAtListEnd, loadMoreFontsAtListEnd, moreFonts]);
+
+    // dragging a font takes the focus along - hand it back to the search
+    // once the drag is over, wherever the font got dropped (if anywhere)
+    const isDragging = !!dnd?.dragState;
+    const wasDraggingRef = useRef(false);
+    useEffect(() => {
+      if (wasDraggingRef.current && !isDragging) {
+        inputRef.current?.focus();
+      }
+      wasDraggingRef.current = isDragging;
+    }, [isDragging, inputRef]);
 
     const hoverFontFamily = useCallback(
       (fontFamily: FontFamily) => {
@@ -157,29 +243,55 @@ export const FontPickerList = React.memo(
       [onHover, onLeave, registeredFonts],
     );
 
+    // stable for the rows, which re-render only when what they show changes
+    const selectRowFontFamily = useStableCallback((fontFamily: FontFamily) =>
+      selectFontFamily(fontFamily),
+    );
+    const hoverRowFontFamily = useStableCallback(hoverFontFamily);
+
     const leaveFontFamily = useCallback(() => {
       setLocalHoveredFontFamily(null);
       onLeave();
     }, [onLeave]);
 
+    // Once the family has registered, its hover moves on to the canvas
+    // preview. The picker's own hover is dropped only when that has caught up
+    // (it takes a few renders): in between, the highlight would fall back to
+    // the selected font, and a key pressed right then would carry on from
+    // there - back at the top of the list.
+    const promotedHoverRef = useRef<FontFamily | null>(null);
     useEffect(() => {
-      if (
-        localHoveredFontFamily !== null &&
-        isCustomFontFamily(localHoveredFontFamily) &&
-        registeredFonts.has(localHoveredFontFamily)
-      ) {
+      if (localHoveredFontFamily === null) {
+        promotedHoverRef.current = null;
+      } else if (hoveredFontFamily === localHoveredFontFamily) {
         setLocalHoveredFontFamily(null);
+      } else if (
+        isCustomFontFamily(localHoveredFontFamily) &&
+        registeredFonts.has(localHoveredFontFamily) &&
+        promotedHoverRef.current !== localHoveredFontFamily
+      ) {
+        promotedHoverRef.current = localHoveredFontFamily;
         onHover(localHoveredFontFamily);
       }
-    }, [localHoveredFontFamily, onHover, registeredFonts]);
+    }, [localHoveredFontFamily, hoveredFontFamily, onHover, registeredFonts]);
 
-    const { setScrollContainerRef, setFontItemRef } =
-      useVisibleFontRegistration({
-        fonts,
-        registeredFonts,
-        failedResolutions,
-        enabled: hasFontProviders,
-      });
+    const {
+      setScrollContainerRef: setRegistrationScrollContainerRef,
+      setFontItemRef,
+    } = useVisibleFontRegistration({
+      fonts,
+      registeredFonts,
+      failedResolutions,
+      enabled: hasFontProviders,
+    });
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const setScrollContainerRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        scrollContainerRef.current = node;
+        setRegistrationScrollContainerRef(node);
+      },
+      [setRegistrationScrollContainerRef],
+    );
 
     const hoveredFont = useMemo(() => {
       const activeHoveredFontFamily =
@@ -227,8 +339,52 @@ export const FontPickerList = React.memo(
       leaveFontFamily,
     ]);
 
+    // The highlighted row is scrolled into view on two occasions only: as the
+    // picker opens (the selected font), and when the highlight moves by
+    // keyboard. Never when it moves for another reason - a hover preview
+    // ending (the highlight falls back to the selected font), a font getting
+    // selected, the pointer - as the list would jump away from under it.
+    const shouldRevealHoveredFontRef = useRef(true);
+    const hoveredFontValue = hoveredFont?.value;
+    const isFirstFontHovered = selectableFonts[0]?.value === hoveredFontValue;
+    useEffect(() => {
+      if (!shouldRevealHoveredFontRef.current) {
+        return;
+      }
+      shouldRevealHoveredFontRef.current = false;
+      if (hoveredFontValue === undefined) {
+        return;
+      }
+      const row = Array.from(
+        scrollContainerRef.current?.querySelectorAll<HTMLButtonElement>(
+          "button[value]",
+        ) ?? [],
+      ).find((button) => button.value === String(hoveredFontValue));
+      // the first row differently, so that what's above (its group's title)
+      // shows as well
+      row?.scrollIntoView?.({ block: isFirstFontHovered ? "end" : "nearest" });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hoveredFontValue]);
+
     const onKeyDown = useCallback<KeyboardEventHandler<HTMLDivElement>>(
       (event) => {
+        if (event.key === KEYS.ARROW_DOWN || event.key === KEYS.ARROW_UP) {
+          shouldRevealHoveredFontRef.current = true;
+        }
+        if (
+          event.key === KEYS.ARROW_DOWN &&
+          isLoadingMoreOnScroll &&
+          canLoadMoreFonts &&
+          hoveredFont &&
+          !hoveredFont.next
+        ) {
+          // on the last font, with more to come: load it rather than wrap
+          // around to the first one
+          loadMoreFonts();
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
         const handled = fontPickerKeyHandler({
           event,
           inputRef,
@@ -251,6 +407,9 @@ export const FontPickerList = React.memo(
         hoverFontFamily,
         onClose,
         inputRef,
+        isLoadingMoreOnScroll,
+        canLoadMoreFonts,
+        loadMoreFonts,
       ],
     );
 
@@ -265,7 +424,6 @@ export const FontPickerList = React.memo(
     }, []);
 
     const groups: React.ReactNode[] = [];
-    let order = 0;
     const pushGroup = (
       title: string,
       key: string,
@@ -281,11 +439,10 @@ export const FontPickerList = React.memo(
             <FontPickerListItem
               key={font.value}
               font={font}
-              order={order++}
               isHovered={font.value === hoveredFont?.value}
               isSelected={font.value === selectedFontFamily}
-              onSelect={selectFontFamily}
-              onHover={hoverFontFamily}
+              onSelect={selectRowFontFamily}
+              onHover={hoverRowFontFamily}
               setItemRef={setFontItemRef}
             />
           ))}
@@ -295,7 +452,41 @@ export const FontPickerList = React.memo(
     };
 
     pushGroup(t("fontList.sceneFonts"), "group_1", sceneFilteredFonts);
-    pushGroup(t("fontList.availableFonts"), "group_2", availableFilteredFonts);
+    pushGroup(
+      t("fontList.favoriteFonts"),
+      "group_favorites",
+      favoriteFilteredFonts,
+    );
+    pushGroup(
+      t("fontList.availableFonts"),
+      "group_2",
+      availableFilteredFonts,
+      canLoadMoreFonts ? (
+        <button
+          type="button"
+          className="FontPicker__load-more"
+          disabled={isLoadingMoreFonts}
+          // keeps the focus where it is (the search), and with it the
+          // picker's keyboard handling
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => loadMoreFonts()}
+          onKeyDown={(event) => {
+            // the picker acts on these (Enter picks the highlighted font)
+            if (event.key === KEYS.ENTER || event.key === KEYS.SPACE) {
+              event.stopPropagation();
+            }
+          }}
+        >
+          {t(isLoadingMoreFonts ? "fontList.loadingMore" : "fontList.loadMore")}
+        </button>
+      ) : (
+        hasSearchForMore && (
+          <div className="FontPicker__search-for-more">
+            {t("fontList.searchForMore")}
+          </div>
+        )
+      ),
+    );
     pushGroup(
       t("fontList.searchResults"),
       "group_search",
@@ -332,15 +523,37 @@ export const FontPickerList = React.memo(
         onKeyDown={onKeyDown}
         preventAutoFocusOnTouch={!!app.state.editingTextElement}
       >
-        {stylesPanelMode === "full" && (
-          <QuickSearch
-            ref={inputRef}
-            placeholder={t("quickSearch.placeholder")}
-            onChange={(term) => {
-              setLocalHoveredFontFamily(null);
-              onSearchChange(term);
-            }}
-          />
+        {isSearchShown && (
+          <div className="FontPicker__search">
+            <QuickSearch
+              ref={inputRef}
+              placeholder={t("quickSearch.placeholder")}
+              onChange={(term) => {
+                setLocalHoveredFontFamily(null);
+                onSearchChange(term);
+              }}
+            />
+            {/* takes the search's place for the drag - on top of it rather
+                than instead of it, so that the query and the focus survive */}
+            {fontFavorites && dnd?.dragState && (
+              <div
+                ref={dnd.setDropZoneEl}
+                className={clsx("FontPicker__favorites-drop-zone", {
+                  "FontPicker__favorites-drop-zone--over":
+                    dnd.dragState.isOverDropZone,
+                  "FontPicker__favorites-drop-zone--remove":
+                    favoriteFamilies.has(dnd.dragState.value),
+                })}
+              >
+                <TopPicksDnDOutline />
+                {t(
+                  favoriteFamilies.has(dnd.dragState.value)
+                    ? "fontList.removeFromFavorites"
+                    : "fontList.addToFavorites",
+                )}
+              </div>
+            )}
+          </div>
         )}
         <ScrollableList
           ref={setScrollContainerRef}
