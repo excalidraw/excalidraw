@@ -115,7 +115,13 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
+import type {
+  AppState,
+  BinaryFiles,
+  LibraryItem,
+  ScenePage,
+  ScenePages,
+} from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -1261,6 +1267,71 @@ const restoreFontTopPicks = (
   return fontFamilies.size ? [...fontFamilies] : null;
 };
 
+const restorePageViewport = (
+  viewport: ScenePage["viewport"] | undefined,
+): ScenePage["viewport"] | undefined => {
+  if (
+    !viewport ||
+    !isFiniteNumber(viewport.scrollX) ||
+    !isFiniteNumber(viewport.scrollY) ||
+    !isFiniteNumber(viewport.zoom)
+  ) {
+    return undefined;
+  }
+  return {
+    scrollX: viewport.scrollX,
+    scrollY: viewport.scrollY,
+    zoom: getNormalizedZoom(viewport.zoom),
+  };
+};
+
+export const restorePages = (
+  pages: ImportedDataState["pages"] | AppState["pages"] | undefined,
+): ScenePages | null => {
+  if (!pages || !Array.isArray(pages.list)) {
+    return null;
+  }
+
+  const ids = new Set<ScenePage["id"]>();
+  const list: ScenePage[] = [];
+
+  for (const page of pages.list as readonly Partial<ScenePage>[]) {
+    if (!page || typeof page.id !== "string" || ids.has(page.id)) {
+      continue;
+    }
+    ids.add(page.id);
+    list.push({
+      id: page.id,
+      name: typeof page.name === "string" ? page.name : "",
+      // inactive pages persist deleted elements only within a session
+      // (for undo/redo), so drop them on restore
+      elements: getNonDeletedElements(
+        restoreElements(page.elements, null, {
+          repairBindings: true,
+          deleteInvisibleElements: true,
+        }),
+      ),
+      viewport: restorePageViewport(page.viewport),
+    });
+  }
+
+  let activeId = pages.activeId;
+  // the scene elements must belong to a page, so if the active page went
+  // missing, give them a new one rather than overwriting an existing page
+  if (typeof activeId !== "string" || !ids.has(activeId)) {
+    activeId = randomId();
+    list.unshift({ id: activeId, name: "" });
+  }
+
+  return {
+    activeId,
+    list: list.map((page) =>
+      // the active page's elements are the scene elements
+      page.id === activeId ? { id: page.id, name: page.name } : page,
+    ),
+  };
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1378,6 +1449,9 @@ export const restoreAppState = (
       nextAppState.currentItemStickynoteBackgroundColor,
     ),
     editingFrame: null,
+    // pages are document data rather than a user preference, so never
+    // inherit them from the local appState (e.g. when opening a file)
+    pages: restorePages(appState.pages),
   };
 };
 

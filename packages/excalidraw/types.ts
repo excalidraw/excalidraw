@@ -587,7 +587,34 @@ export interface AppState {
   /** user-customized font-picker top picks (pinned via drag & drop from the
    * font picker popup). `null` means no customization (defaults are used) */
   fontTopPicks: readonly FontFamilyValues[] | null;
+  /**
+   * pages of the document. `null` means the document has a single (implicit)
+   * page, whose elements are the scene elements.
+   */
+  pages: ScenePages | null;
 }
+
+export type ScenePage = {
+  id: string;
+  name: string;
+  /**
+   * elements of an inactive page. The active page's elements live in the
+   * scene, so its entry has none.
+   */
+  elements?: readonly ExcalidrawElement[];
+  /** viewport of an inactive page as it was left, restored on switching back */
+  viewport?: {
+    scrollX: number;
+    scrollY: number;
+    zoom: NormalizedZoomValue;
+  };
+};
+
+export type ScenePages = {
+  /** id of the page whose elements are loaded into the scene */
+  activeId: ScenePage["id"];
+  list: readonly ScenePage[];
+};
 
 export type SearchMatch = {
   id: string;
@@ -1137,6 +1164,12 @@ export type CanvasActions = Partial<{
    * */
   toggleTheme: boolean | null;
   saveAsImage: boolean;
+  /**
+   * whether to show the page switcher. Defaults to false, as the host app
+   * must persist `appState.pages` (which holds the inactive pages' elements)
+   * alongside the scene elements, else inactive pages are lost.
+   */
+  pages: boolean;
 }>;
 
 export type UIOptions = Partial<{
@@ -1227,6 +1260,7 @@ export type AppClassProperties = {
   activeResizeHandle: App["activeResizeHandle"];
   selectionTool: App["selectionTool"];
   wrap: App["wrap"];
+  pages: App["pages"];
   modifiers: App["modifiers"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];

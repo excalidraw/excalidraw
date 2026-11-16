@@ -27,6 +27,7 @@ import {
 } from "idb-keyval";
 
 import { getNonDeletedElements } from "@excalidraw/element";
+import { getInactivePagesElements } from "@excalidraw/excalidraw/pages";
 
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
@@ -125,7 +126,8 @@ export class LocalData {
       saveDataStateToLocalStorage(elements, appState);
 
       await this.fileStorage.saveFiles({
-        elements,
+        // e.g. an opened file can bring images on inactive pages
+        elements: [...elements, ...getInactivePagesElements(appState.pages)],
         files,
       });
       onFilesSaved();

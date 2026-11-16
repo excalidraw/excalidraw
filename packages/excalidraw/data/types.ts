@@ -9,6 +9,8 @@ import type {
   LibraryItem,
   LibraryItems,
   LibraryItems_anyVersion,
+  ScenePage,
+  ScenePages,
 } from "../types";
 
 export interface ExportedDataState {
@@ -18,7 +20,17 @@ export interface ExportedDataState {
   elements: readonly ExcalidrawElement[];
   appState: ReturnType<typeof cleanAppStateForExport>;
   files: BinaryFiles | undefined;
+  /**
+   * pages of a multi-page document. Top-level `elements` are the elements of
+   * the active page, so its entry has none.
+   */
+  pages?: ExportedScenePages;
 }
+
+export type ExportedScenePages = {
+  activeId: ScenePages["activeId"];
+  list: readonly Pick<ScenePage, "id" | "name" | "elements">[];
+};
 
 /**
  * Map of legacy AppState keys, with values of:
@@ -47,6 +59,7 @@ export interface ImportedDataState {
   scrollToContent?: boolean;
   libraryItems?: LibraryItems_anyVersion;
   files?: BinaryFiles;
+  pages?: ExportedScenePages | null;
 }
 
 export interface ExportedLibraryData {

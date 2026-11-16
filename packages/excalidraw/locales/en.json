@@ -753,6 +753,14 @@
       "isSpeaking": "User is speaking"
     }
   },
+  "pages": {
+    "title": "Pages",
+    "defaultName": "Page {{number}}",
+    "add": "Add page",
+    "rename": "Rename page",
+    "delete": "Delete page",
+    "confirmDelete": "Delete \"{{name}}\"? This can't be undone."
+  },
   "commandPalette": {
     "title": "Command palette",
     "shortcuts": {

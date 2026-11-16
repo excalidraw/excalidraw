@@ -171,6 +171,7 @@ export const loadSceneOrLibraryFromBlob = async (
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
+              pages: data.pages,
               ...(localAppState
                 ? getScrollToContentState(elements, localAppState)
                 : {}),

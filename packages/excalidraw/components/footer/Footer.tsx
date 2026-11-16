@@ -5,6 +5,7 @@ import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
 import { useApp } from "../App";
 import { HelpButton } from "../HelpButton";
+import { PageSwitcher } from "../PageSwitcher";
 import { Section } from "../Section";
 import Stack from "../Stack";
 
@@ -53,6 +54,19 @@ const Footer = ({
                   })}
                 />
               )}
+
+              {defaultUIEnabled &&
+                app.props.UIOptions.canvasActions.pages &&
+                // inactive pages aren't synced, so collaborate on one page
+                !app.props.isCollaborating && (
+                  <PageSwitcher
+                    appState={appState}
+                    className={clsx("zen-mode-transition", {
+                      "layer-ui__wrapper__footer-left--transition-bottom":
+                        appState.zenModeEnabled,
+                    })}
+                  />
+                )}
             </Section>
           </Stack.Col>
         </div>

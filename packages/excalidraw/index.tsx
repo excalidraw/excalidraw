@@ -417,7 +417,9 @@ export {
   restoreElement,
   restoreElements,
   restoreLibraryItems,
+  restorePages,
 } from "./data/restore";
+export { getInactivePagesElements } from "./pages";
 
 export { reconcileElements } from "./data/reconcile";
 
@@ -491,6 +493,7 @@ export type {
   SavedChats,
 } from "./components/TTDDialog/types";
 
+export type { ScenePage, ScenePages } from "./types";
 export type {
   ViewportStatusFrame,
   ElementRenderOverride,

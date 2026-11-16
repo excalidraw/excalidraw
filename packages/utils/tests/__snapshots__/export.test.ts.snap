@@ -88,6 +88,7 @@ exports[`exportToSvg > with default arguments 1`] = `
     "x": 0,
     "y": 0,
   },
+  "pages": null,
   "penDetected": false,
   "penMode": false,
   "preferredSelectionTool": {

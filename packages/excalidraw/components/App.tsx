@@ -395,6 +395,7 @@ import {
 } from "./App.selection";
 import { AppSelectionTool } from "./App.selectionTool";
 import { AppWrap } from "./App.wrap";
+import { AppPages } from "./App.pages";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -686,6 +687,10 @@ class App extends React.Component<AppProps, AppState> {
   public selection: AppSelection = new AppSelection(this);
   public selectionTool: AppSelectionTool = new AppSelectionTool(this);
   public wrap: AppWrap = new AppWrap(this);
+  public pages: AppPages = new AppPages(this, {
+    getHistory: () => this.history,
+    onSceneElementsSwapped: () => this.addNewImagesToImageCache(),
+  });
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
@@ -3521,6 +3526,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private resetHistory = () => {
     this.history.clear();
+    this.pages.clearHistories();
   };
 
   private resetStore = () => {
@@ -10776,7 +10782,9 @@ class App extends React.Component<AppProps, AppState> {
               isLoading: false,
             },
             replaceFiles: true,
-            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            captureUpdate: this.pages.prepareDocumentReplace(
+              scene.appState.pages,
+            ),
           });
           this.showSceneReplacedToast();
           return;
@@ -10941,7 +10949,9 @@ class App extends React.Component<AppProps, AppState> {
             isLoading: false,
           },
           replaceFiles: true,
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          captureUpdate: this.pages.prepareDocumentReplace(
+            ret.data.appState.pages,
+          ),
         });
         return true;
       } else if (ret.type === MIME_TYPES.excalidrawlib) {

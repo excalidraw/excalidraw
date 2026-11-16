@@ -35,6 +35,7 @@ import {
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
+import { getInactivePagesElements } from "@excalidraw/excalidraw/pages";
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import {
@@ -498,13 +499,15 @@ const ExcalidrawWrapper = () => {
             });
         }
       } else {
-        const fileIds =
-          data.scene.elements?.reduce((acc, element) => {
-            if (isInitializedImageElement(element)) {
-              return acc.concat(element.fileId);
-            }
-            return acc;
-          }, [] as FileId[]) || [];
+        const fileIds = [
+          ...(data.scene.elements || []),
+          ...getInactivePagesElements(data.scene.appState?.pages),
+        ].reduce((acc, element) => {
+          if (isInitializedImageElement(element)) {
+            return acc.concat(element.fileId);
+          }
+          return acc;
+        }, [] as FileId[]);
 
         if (data.isExternalScene) {
           if (fileIds.length) {
@@ -622,10 +625,13 @@ const ExcalidrawWrapper = () => {
         }
 
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
-          const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
+          const elements = [
+            ...excalidrawAPI.getSceneElementsIncludingDeleted(),
+            ...getInactivePagesElements(excalidrawAPI.getAppState().pages),
+          ];
           const currFiles = excalidrawAPI.getFiles();
           const fileIds =
-            elements?.reduce((acc, element) => {
+            elements.reduce((acc, element) => {
               if (
                 isInitializedImageElement(element) &&
                 // only load and update images that aren't already loaded
@@ -956,6 +962,7 @@ const ExcalidrawWrapper = () => {
         UIOptions={{
           canvasActions: {
             toggleTheme: true,
+            pages: true,
             export: {
               onExportToBackend,
               renderCustomUI: excalidrawAPI

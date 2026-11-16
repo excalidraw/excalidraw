@@ -410,7 +410,7 @@ export const actionLoadScene = register({
         elements: loadedElements,
         appState: loadedAppState,
         files,
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        captureUpdate: app.pages.prepareDocumentReplace(loadedAppState.pages),
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {

@@ -87,6 +87,11 @@ export class HistoryChangedEvent {
   ) {}
 }
 
+export type HistoryStacks = {
+  undoStack: readonly HistoryDelta[];
+  redoStack: readonly HistoryDelta[];
+};
+
 export class History {
   public readonly onHistoryChangedEmitter = new Emitter<
     [HistoryChangedEvent]
@@ -108,6 +113,29 @@ export class History {
   public clear() {
     this.undoStack.length = 0;
     this.redoStack.length = 0;
+  }
+
+  /**
+   * Replaces the undo & redo stacks with the supplied ones (e.g. when swapping
+   * the scene for another one with its own history), returning the replaced
+   * stacks.
+   */
+  public replaceStacks(
+    stacks: HistoryStacks = { undoStack: [], redoStack: [] },
+  ): HistoryStacks {
+    const prevStacks: HistoryStacks = {
+      undoStack: [...this.undoStack],
+      redoStack: [...this.redoStack],
+    };
+
+    this.undoStack.splice(0, this.undoStack.length, ...stacks.undoStack);
+    this.redoStack.splice(0, this.redoStack.length, ...stacks.redoStack);
+
+    this.onHistoryChangedEmitter.trigger(
+      new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
+    );
+
+    return prevStacks;
   }
 
   /**

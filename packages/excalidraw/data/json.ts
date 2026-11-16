@@ -5,11 +5,15 @@ import {
   VERSIONS,
 } from "@excalidraw/common";
 
+import { getNonDeletedElements } from "@excalidraw/element";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
+
+import { getInactivePagesElements } from "../pages";
 
 import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
@@ -17,6 +21,7 @@ import { fileOpen, fileSave } from "./filesystem";
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import type {
   ExportedDataState,
+  ExportedScenePages,
   ImportedDataState,
   ExportedLibraryData,
   ImportedLibraryData,
@@ -49,12 +54,31 @@ const filterOutDeletedFiles = (
   return nextFiles;
 };
 
+const serializePages = (
+  pages: NonNullable<AppState["pages"]>,
+): ExportedScenePages => ({
+  activeId: pages.activeId,
+  // viewports are session state, like the top-level scroll & zoom
+  list: pages.list.map(({ id, name, elements }) =>
+    elements
+      ? { id, name, elements: getNonDeletedElements(elements) }
+      : { id, name },
+  ),
+});
+
 export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
   type: "local" | "database",
 ): string => {
+  // pages are kept only in local files (share links & collab rooms carry
+  // the active page)
+  const pages =
+    type === "local" && appState.pages
+      ? serializePages(appState.pages)
+      : undefined;
+
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
@@ -66,9 +90,13 @@ export const serializeAsJSON = (
         : clearAppStateForDatabase(appState),
     files:
       type === "local"
-        ? filterOutDeletedFiles(elements, files)
+        ? filterOutDeletedFiles(
+            [...elements, ...getInactivePagesElements(appState.pages)],
+            files,
+          )
         : // will be stripped from JSON
           undefined,
+    pages,
   };
 
   return JSON.stringify(data, null, 2);
