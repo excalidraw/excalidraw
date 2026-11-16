@@ -2,6 +2,8 @@ import { isValidFontProviderKey } from "../fonts";
 import {
   createGoogleFontResolver,
   getGoogleFontPreviewText,
+  loadMoreGoogleFonts,
+  GOOGLE_FONT_BROWSE_LIMIT,
   GOOGLE_FONT_DEFAULT_PICKS,
   GOOGLE_FONT_PROVIDER_KEY,
   GoogleFontError,
@@ -54,6 +56,41 @@ describe("Google Fonts catalog", () => {
     for (const name of ["Buda", "Sunflower", "UnifrakturCook", "Molle"]) {
       expect(catalog.get(name)).toBe(undefined);
     }
+  });
+
+  it("leaves out families which aren't text fonts", async () => {
+    const catalog = await loadGoogleFontCatalog();
+
+    for (const name of [
+      // classified as "Symbols" by Google
+      "Yarndings 20 Charted",
+      "Libre Barcode 39",
+      "Redacted",
+      // not classified as such
+      "Noto Color Emoji",
+      "Jersey 10 Charted",
+    ]) {
+      expect(catalog.get(name)).toBe(undefined);
+    }
+    // letters are letters in a math family
+    expect(catalog.get("STIX Two Math")).not.toBe(undefined);
+    // ...but this one draws relation signs over the letter before them
+    expect(catalog.get("Libertinus Math")).toBe(undefined);
+  });
+
+  it("leaves out families which are slow to draw", async () => {
+    const catalog = await loadGoogleFontCatalog();
+
+    // seconds, not milliseconds, for a line of text
+    for (const name of ["Rubik Pixels", "Rubik 80s Fade", "Bitcount Ink"]) {
+      expect(catalog.get(name)).toBe(undefined);
+    }
+    // over 10 ms, where the median family takes 1.5 ms
+    for (const name of ["Protest Revolution", "Rubik Doodle Shadow"]) {
+      expect(catalog.get(name)).toBe(undefined);
+    }
+    // the family they are variants of stays
+    expect(catalog.get("Rubik")).not.toBe(undefined);
   });
 
   it("holds every default pick", async () => {
@@ -217,5 +254,45 @@ describe("searchGoogleFonts", () => {
     await expect(
       searchGoogleFonts("rob", { signal: controller.signal }),
     ).rejects.toThrow();
+  });
+});
+
+describe("loadMoreGoogleFonts", () => {
+  it("pages through the most popular families", async () => {
+    const { fonts } = await loadGoogleFontCatalog();
+    const names = fonts.map((font) => font.name);
+
+    expect(await loadMoreGoogleFonts({ offset: 0, limit: 20 })).toEqual(
+      names.slice(0, 20),
+    );
+    expect(await loadMoreGoogleFonts({ offset: 20, limit: 20 })).toEqual(
+      names.slice(20, 40),
+    );
+  });
+
+  it("ends at the browse limit, which the search isn't bound by", async () => {
+    const { fonts } = await loadGoogleFontCatalog();
+    expect(fonts.length).toBeGreaterThan(GOOGLE_FONT_BROWSE_LIMIT);
+
+    // fewer than asked for: the end
+    expect(
+      await loadMoreGoogleFonts({
+        offset: GOOGLE_FONT_BROWSE_LIMIT - 5,
+        limit: 20,
+      }),
+    ).toHaveLength(5);
+    expect(
+      await loadMoreGoogleFonts({
+        offset: GOOGLE_FONT_BROWSE_LIMIT,
+        limit: 20,
+      }),
+    ).toEqual([]);
+
+    // i.e. the math families, which are far from the most popular ones
+    const names = fonts.map((font) => font.name);
+    expect(names.indexOf("STIX Two Math")).toBeGreaterThan(
+      GOOGLE_FONT_BROWSE_LIMIT,
+    );
+    expect((await searchGoogleFonts("stix")).fonts).toContain("STIX Two Math");
   });
 });

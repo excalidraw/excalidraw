@@ -408,6 +408,38 @@ export const searchGoogleFonts = async (
 };
 
 /**
+ * How many of the catalog's families `loadMoreGoogleFonts` pages through:
+ * the most popular ones. The rest is found by `searchGoogleFonts`, which
+ * covers the whole catalog.
+ *
+ * A font picker draws each family's name in its own font, so browsing costs
+ * a download per family (about 20 KB) and the memory of a loaded font, which
+ * the page keeps until it's reloaded.
+ */
+export const GOOGLE_FONT_BROWSE_LIMIT = 100;
+
+/**
+ * A font provider's `loadMore`, over the catalog: its most popular families
+ * (`GOOGLE_FONT_BROWSE_LIMIT` of them) a page at a time, most popular first.
+ */
+export const loadMoreGoogleFonts = async ({
+  offset,
+  limit,
+  signal,
+}: {
+  offset: number;
+  limit: number;
+  signal?: AbortSignal;
+}): Promise<string[]> => {
+  const { fonts } = await loadGoogleFontCatalog();
+  signal?.throwIfAborted();
+
+  return fonts
+    .slice(offset, Math.min(offset + limit, GOOGLE_FONT_BROWSE_LIMIT))
+    .map((font) => font.name);
+};
+
+/**
  * A font provider's `getPreviewText`: a sample in the family's own script
  * where it has one, "" otherwise (which the editor previews as "Aa").
  */
@@ -419,6 +451,8 @@ export const getGoogleFontPreviewText = async (
 /**
  * A hand-picked starting set for a font picker (`availableFonts`), a few
  * families of each kind.
+ *
+ * PROVISIONAL: a placeholder selection, to be picked anew before release.
  */
 export const GOOGLE_FONT_DEFAULT_PICKS: readonly string[] = [
   // handwriting
@@ -449,7 +483,6 @@ export const GOOGLE_FONT_DEFAULT_PICKS: readonly string[] = [
   "Pacifico",
   "Lobster",
   "Press Start 2P",
-  "Rubik Doodle Shadow",
   // non-latin
   "Noto Sans JP",
   "Klee One",
