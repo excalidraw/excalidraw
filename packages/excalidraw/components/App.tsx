@@ -5210,8 +5210,16 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         // Shape switching
-        if (event.key === KEYS.ESCAPE) {
+        if (
+          (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+          editorJotaiStore.get(convertElementTypePopupAtom)
+        ) {
+          // only close the popup — don't fall through to deselecting (Esc)
+          // or entering text/line editing (Enter)
+          event.preventDefault();
           this.updateEditorAtom(convertElementTypePopupAtom, null);
+          this.focusContainer();
+          return;
         } else if (
           event.key === KEYS.TAB &&
           (this.ownerDocument.activeElement ===
