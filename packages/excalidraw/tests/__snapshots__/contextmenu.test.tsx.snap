@@ -395,6 +395,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "icon": null,
+        "keyTest": [Function],
         "label": "labels.autoResize",
         "name": "autoResize",
         "perform": [Function],
@@ -5254,6 +5255,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "icon": null,
+        "keyTest": [Function],
         "label": "labels.autoResize",
         "name": "autoResize",
         "perform": [Function],
@@ -6489,6 +6491,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "icon": null,
+        "keyTest": [Function],
         "label": "labels.autoResize",
         "name": "autoResize",
         "perform": [Function],
@@ -8529,6 +8532,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "icon": null,
+        "keyTest": [Function],
         "label": "labels.autoResize",
         "name": "autoResize",
         "perform": [Function],
@@ -9534,6 +9538,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "icon": null,
+        "keyTest": [Function],
         "label": "labels.autoResize",
         "name": "autoResize",
         "perform": [Function],

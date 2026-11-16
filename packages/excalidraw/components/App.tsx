@@ -2730,6 +2730,9 @@ class App extends React.Component<AppProps, AppState> {
                             editorInterface={this.editorInterface}
                             interactionEnabled={this.isInteractionEnabled()}
                             navigationEnabled={this.isNavigationEnabled()}
+                            editedTextHoveredSide={
+                              this.text.editedTextHoveredSide
+                            }
                             renderInteractiveSceneCallback={
                               this.renderInteractiveSceneCallback
                             }
@@ -7218,6 +7221,21 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.cursor.set(CURSOR_TYPE.POINTER);
       return;
+    }
+
+    if (this.state.editingTextElement) {
+      const editedTextResizeHandle =
+        this.text.getEditedTextResizeHandleAt(scenePointer);
+      // (a wrapped text shows its whole box as is)
+      this.text.setEditedTextHoveredSide(
+        editedTextResizeHandle?.element.autoResize
+          ? editedTextResizeHandle.transformHandleType
+          : null,
+      );
+      if (editedTextResizeHandle) {
+        this.cursor.set(getCursorForResizingElement(editedTextResizeHandle));
+        return;
+      }
     }
 
     if (!isOverScrollBar) {
