@@ -143,6 +143,7 @@ import DebugCanvas, {
 import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { fontProviders } from "./data/googleFonts";
 
 import "./index.scss";
 
@@ -954,6 +955,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        fontProviders={fontProviders}
         viewportStatusFrame={viewportStatusFrame}
         userToFollow={userToFollow}
         onChange={onChange}
