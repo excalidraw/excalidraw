@@ -16,7 +16,6 @@ import {
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
-  isFrameClippable,
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
@@ -331,6 +330,63 @@ const renderLinkIcon = (
     context.restore();
   }
 };
+
+const BOOKMARK_INDICATOR_RADIUS = 9;
+const BOOKMARK_INDICATOR_GAP = 2;
+
+const renderBookmarkIndicator = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+  appState: StaticCanvasAppState,
+  elementsMap: ElementsMap,
+  renderState: ElementRenderState,
+  avoidLinkIcon: boolean,
+) => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+  );
+  const zoom = appState.zoom.value;
+  const unit = 1 / zoom;
+  const radius = BOOKMARK_INDICATOR_RADIUS * unit;
+  const gap = BOOKMARK_INDICATOR_GAP * unit;
+  const linkOffset = avoidLinkIcon ? radius * 2 + gap : 0;
+  const markerOffsetX = Math.abs(x2 - x1) / 2 + radius + gap + linkOffset;
+  const markerOffsetY = -Math.abs(y2 - y1) / 2 - radius - gap;
+  const cos = Math.cos(element.angle);
+  const sin = Math.sin(element.angle);
+  const centerX = markerOffsetX * cos - markerOffsetY * sin;
+  const centerY = markerOffsetX * sin + markerOffsetY * cos;
+  const iconHalfWidth = 4 * unit;
+  const iconTop = -5 * unit;
+  const iconBottom = 5 * unit;
+
+  context.save();
+  context.translate(
+    appState.scrollX + cx + renderState.offset.x + centerX,
+    appState.scrollY + cy + renderState.offset.y + centerY,
+  );
+  context.globalAlpha = renderState.opacity;
+  context.lineWidth = unit;
+  context.fillStyle = COLOR_WHITE;
+  context.strokeStyle = "#1b1b1f";
+  context.beginPath();
+  context.arc(0, 0, radius, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+
+  context.fillStyle = "#1b1b1f";
+  context.beginPath();
+  context.moveTo(-iconHalfWidth, iconTop);
+  context.lineTo(iconHalfWidth, iconTop);
+  context.lineTo(iconHalfWidth, iconBottom);
+  context.lineTo(0, iconBottom - 3 * unit);
+  context.lineTo(-iconHalfWidth, iconBottom);
+  context.closePath();
+  context.fill();
+  context.restore();
+};
+
 const _renderStaticScene = ({
   canvas,
   rc,
@@ -350,6 +406,7 @@ const _renderStaticScene = ({
   const appState = isExporting
     ? unsnappedAppState
     : snapScrollToDevicePixels(unsnappedAppState, scale);
+  const bookmarkedElementIds = new Set(appState.bookmarkedElementIds);
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -434,8 +491,7 @@ const _renderStaticScene = ({
     if (
       !(element.frameId || appState.frameToHighlight?.id) ||
       !appState.frameRendering.enabled ||
-      !appState.frameRendering.clip ||
-      !isFrameClippable(element, elementsMap)
+      !appState.frameRendering.clip
     ) {
       return;
     }
@@ -475,7 +531,17 @@ const _renderStaticScene = ({
           element.containerId &&
           elementsMap.has(element.containerId)
         ) {
-          // will be rendered with the container
+          if (!isExporting && bookmarkedElementIds.has(element.id)) {
+            renderBookmarkIndicator(
+              element,
+              context,
+              appState,
+              elementsMap,
+              getRenderState(element),
+              false,
+            );
+          }
+          // The text itself is rendered with its container.
           return;
         }
 
@@ -517,6 +583,18 @@ const _renderStaticScene = ({
             renderState,
             scale,
             getRenderEnvironment(renderConfig.renderEnvironment),
+          );
+        }
+        if (!isExporting && bookmarkedElementIds.has(element.id)) {
+          renderBookmarkIndicator(
+            element,
+            context,
+            appState,
+            elementsMap,
+            renderState,
+            !!element.link &&
+              !appState.selectedElementIds[element.id] &&
+              renderConfig.renderLinks !== false,
           );
         }
       } catch (error: any) {
@@ -581,6 +659,18 @@ const _renderStaticScene = ({
               renderState,
               scale,
               getRenderEnvironment(renderConfig.renderEnvironment),
+            );
+          }
+          if (!isExporting && bookmarkedElementIds.has(element.id)) {
+            renderBookmarkIndicator(
+              element,
+              context,
+              appState,
+              elementsMap,
+              renderState,
+              !!element.link &&
+                !appState.selectedElementIds[element.id] &&
+                renderConfig.renderLinks !== false,
             );
           }
         });

@@ -20,7 +20,6 @@ import { isNonDeletedElement } from ".";
 import type {
   ElementsMap,
   ElementsMapOrArray,
-  ExcalidrawTextElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -248,19 +247,9 @@ export const makeNextSelectedElementIds = (
 export const getActiveTextElement = (
   selectedElements: readonly NonDeleted<ExcalidrawElement>[],
   appState: Pick<AppState, "editingTextElement">,
-  elementsMap: ElementsMap,
 ) => {
-  // `editingTextElement` is the element as it was when editing started, so
-  // resolve the current one (typing changes its dimensions and position)
-  const editingTextElement =
-    appState.editingTextElement &&
-    ((elementsMap.get(appState.editingTextElement.id) as
-      | ExcalidrawTextElement
-      | undefined) ||
-      appState.editingTextElement);
-
   const activeTextElement =
-    editingTextElement ||
+    appState.editingTextElement ||
     (selectedElements.length === 1 &&
       isTextElement(selectedElements[0]) &&
       selectedElements[0]);

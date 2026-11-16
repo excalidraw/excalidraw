@@ -168,6 +168,12 @@
       "lockAll": "Vergrendel alles",
       "unlockAll": "Ontgrendel alles"
     },
+    "elementBookmark": {
+      "bookmark": "Bladwijzer toevoegen",
+      "removeBookmark": "Bladwijzer verwijderen",
+      "next": "Volgende bladwijzer",
+      "previous": "Vorige bladwijzer"
+    },
     "statusPublished": "Gepubliceerd",
     "sidebarLock": "Zijbalk open houden",
     "selectAllElementsInFrame": "Selecteer alle elementen in het frame",
@@ -221,6 +227,11 @@
     "placeholder": "Zoek text op canvas...",
     "frames": "Frames",
     "texts": "Teksten"
+  },
+  "bookmarks": {
+    "title": "Bladwijzers",
+    "empty": "Nog geen bladwijzers...",
+    "emptyHint": "Klik met de rechtermuisknop op een element om een bladwijzer toe te voegen."
   },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",

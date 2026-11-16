@@ -35,6 +35,30 @@ import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
 
+const removeBookmarksForDeletedElements = (
+  elements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  const deletedElementIds = new Set(
+    nextElements
+      .filter(
+        (element, index) => element.isDeleted && !elements[index]?.isDeleted,
+      )
+      .map((element) => element.id),
+  );
+  if (!deletedElementIds.size) {
+    return appState;
+  }
+
+  const bookmarkedElementIds = appState.bookmarkedElementIds.filter(
+    (id) => !deletedElementIds.has(id),
+  );
+  return bookmarkedElementIds.length === appState.bookmarkedElementIds.length
+    ? appState
+    : { ...appState, bookmarkedElementIds };
+};
+
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -176,20 +200,26 @@ const deleteSelectedElements = (
     }
   }
 
+  const nextAppState = {
+    ...appState,
+    ...selectGroupsForSelectedElements(
+      {
+        selectedElementIds,
+        editingGroupId: nextEditingGroupId,
+      },
+      getNonDeletedElements(nextElements),
+      appState,
+      null,
+    ),
+  };
+
   return {
     elements: nextElements,
-    appState: {
-      ...appState,
-      ...selectGroupsForSelectedElements(
-        {
-          selectedElementIds,
-          editingGroupId: nextEditingGroupId,
-        },
-        getNonDeletedElements(nextElements),
-        appState,
-        null,
-      ),
-    },
+    appState: removeBookmarksForDeletedElements(
+      elements,
+      nextElements,
+      nextAppState,
+    ),
   };
 };
 
@@ -248,11 +278,17 @@ export const actionDeleteSelected = register<{
           return el;
         });
         const nextAppState = handleGroupEditingState(appState, nextElements);
+        const nextAppStateWithBookmarkCleanup =
+          removeBookmarksForDeletedElements(
+            elements,
+            nextElements,
+            nextAppState,
+          );
 
         return {
           elements: nextElements,
           appState: {
-            ...nextAppState,
+            ...nextAppStateWithBookmarkCleanup,
             selectedLinearElement: null,
           },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,

@@ -97,9 +97,11 @@ export const actionSendToBack = register({
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
+        !event.shiftKey &&
         event.code === CODES.BRACKET_LEFT
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
+        !event.altKey &&
         event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
@@ -135,9 +137,11 @@ export const actionBringToFront = register({
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
+        !event.shiftKey &&
         event.code === CODES.BRACKET_RIGHT
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
+        !event.altKey &&
         event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button

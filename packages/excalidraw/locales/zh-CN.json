@@ -168,6 +168,12 @@
       "lockAll": "全部锁定",
       "unlockAll": "全部解锁"
     },
+    "elementBookmark": {
+      "bookmark": "添加书签",
+      "removeBookmark": "移除书签",
+      "next": "下一个书签",
+      "previous": "上一个书签"
+    },
     "statusPublished": "已发布",
     "sidebarLock": "侧边栏常驻",
     "selectAllElementsInFrame": "选择画框中的所有元素",
@@ -221,6 +227,11 @@
     "placeholder": "在画布上查找文本…",
     "frames": "画框",
     "texts": "文本"
+  },
+  "bookmarks": {
+    "title": "书签",
+    "empty": "暂无书签...",
+    "emptyHint": "右键单击元素以添加书签。"
   },
   "buttons": {
     "clearReset": "重置画布",

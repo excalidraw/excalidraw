@@ -168,6 +168,12 @@
       "lockAll": "Bloquear tudo",
       "unlockAll": "Desbloquear tudo"
     },
+    "elementBookmark": {
+      "bookmark": "Adicionar marcador",
+      "removeBookmark": "Remover marcador",
+      "next": "Próximo marcador",
+      "previous": "Marcador anterior"
+    },
     "statusPublished": "Publicado",
     "sidebarLock": "Manter a barra lateral aberta",
     "selectAllElementsInFrame": "Selecionar todos os elementos na moldura",
@@ -221,6 +227,11 @@
     "placeholder": "Pesquisar texto na área de desenho...",
     "frames": "Molduras",
     "texts": "Textos"
+  },
+  "bookmarks": {
+    "title": "Marcadores",
+    "empty": "Nenhum marcador ainda...",
+    "emptyHint": "Clique com o botão direito num elemento para adicioná-lo aos marcadores."
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho",

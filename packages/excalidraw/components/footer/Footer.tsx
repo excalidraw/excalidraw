@@ -5,7 +5,6 @@ import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
 import { useApp } from "../App";
 import { HelpButton } from "../HelpButton";
-import { Minimap } from "../Minimap/Minimap";
 import { Section } from "../Section";
 import Stack from "../Stack";
 
@@ -19,7 +18,6 @@ const Footer = ({
   renderWelcomeScreen,
   defaultUIEnabled,
   zoomUIEnabled,
-  minimapUIEnabled,
 }: {
   appState: UIAppState;
   actionManager: ActionManager;
@@ -27,8 +25,6 @@ const Footer = ({
   renderWelcomeScreen: boolean;
   defaultUIEnabled: boolean;
   zoomUIEnabled: boolean;
-  /** whether the minimap (when toggled on) and its toggle are rendered */
-  minimapUIEnabled: boolean;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
   const app = useApp();
@@ -42,25 +38,11 @@ const Footer = ({
           which stay visible (chrome-less). Its children opt in individually. */}
       {(defaultUIEnabled || (zoomUIEnabled && app.isNavigationEnabled())) && (
         <div className="layer-ui__wrapper__footer-left zen-mode-transition">
-          {minimapUIEnabled && appState.minimapEnabled && (
-            <Minimap
-              className={clsx("zen-mode-transition", {
-                "layer-ui__wrapper__footer-left--transition-bottom":
-                  appState.zenModeEnabled,
-              })}
-            />
-          )}
           <Stack.Col gap={2}>
             <Section heading="canvasActions">
-              {(zoomUIEnabled || minimapUIEnabled) &&
-                app.isNavigationEnabled() && (
-                  <ZoomActions
-                    actionManager={actionManager}
-                    zoomUIEnabled={zoomUIEnabled}
-                    minimapUIEnabled={minimapUIEnabled}
-                    zenModeEnabled={appState.zenModeEnabled}
-                  />
-                )}
+              {zoomUIEnabled && app.isNavigationEnabled() && (
+                <ZoomActions renderAction={actionManager.renderAction} />
+              )}
 
               {defaultUIEnabled && !appState.viewModeEnabled && (
                 <UndoRedoActions

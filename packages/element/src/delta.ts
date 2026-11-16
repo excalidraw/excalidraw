@@ -597,6 +597,24 @@ export class AppStateDelta implements DeltaContainer<AppState> {
 
     const mergedInserted: Partial<ObservedAppState> = {};
     const mergedDeleted: Partial<ObservedAppState> = {};
+    const mergedDeletedBookmarkedElementIds =
+      this.delta.deleted.bookmarkedElementIds ??
+      delta.delta.deleted.bookmarkedElementIds;
+    const mergedInsertedBookmarkedElementIds =
+      delta.delta.inserted.bookmarkedElementIds ??
+      this.delta.inserted.bookmarkedElementIds;
+
+    if (
+      typeof mergedDeletedBookmarkedElementIds !== "undefined" &&
+      typeof mergedInsertedBookmarkedElementIds !== "undefined" &&
+      !isShallowEqual(
+        mergedDeletedBookmarkedElementIds,
+        mergedInsertedBookmarkedElementIds,
+      )
+    ) {
+      mergedDeleted.bookmarkedElementIds = mergedDeletedBookmarkedElementIds;
+      mergedInserted.bookmarkedElementIds = mergedInsertedBookmarkedElementIds;
+    }
 
     if (
       Object.keys(mergedDeletedSelectedElementIds).length ||
@@ -623,12 +641,25 @@ export class AppStateDelta implements DeltaContainer<AppState> {
         mergedInsertedLockedMultiSelections;
     }
 
-    this.delta = Delta.merge(
+    const mergedDelta = Delta.merge(
       this.delta,
       delta.delta,
       Delta.create(mergedDeleted, mergedInserted),
     );
 
+    if (
+      typeof mergedDeletedBookmarkedElementIds !== "undefined" &&
+      typeof mergedInsertedBookmarkedElementIds !== "undefined" &&
+      isShallowEqual(
+        mergedDeletedBookmarkedElementIds,
+        mergedInsertedBookmarkedElementIds,
+      )
+    ) {
+      delete mergedDelta.deleted.bookmarkedElementIds;
+      delete mergedDelta.inserted.bookmarkedElementIds;
+    }
+
+    this.delta = mergedDelta;
     return this;
   }
 
@@ -954,8 +985,13 @@ export class AppStateDelta implements DeltaContainer<AppState> {
     delta: Partial<ObservedAppState>,
   ): Partial<ObservedElementsAppState> {
     // WARN: Do not remove the type-casts as they here to ensure proper type checks
-    const { name, viewBackgroundColor, ...elementsProps } =
-      delta as ObservedAppState;
+    const {
+      name,
+      viewBackgroundColor,
+      bookmarkedElementIds,
+      ...elementsProps
+    } = delta as ObservedAppState;
+    void bookmarkedElementIds;
 
     return elementsProps as SubtypeOf<
       typeof elementsProps,
@@ -2167,7 +2203,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         return acc;
       },
-      new Map<string, OrderedExcalidrawElement>(),
+      new Map(),
     );
 
     if (!flags.containsVisibleDifference && moved.size) {
@@ -2175,37 +2211,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       flags.containsVisibleDifference = true;
     }
 
-    // The elements keep the indices they were given, as other history entries
-    // refer to them. Of those sharing one, a single element keeps it: one that
-    // isn't changed, or else one that isn't deleted (a deleted one is given
-    // its own index again when restored). The rest get new ones.
-    const rank = (element: OrderedExcalidrawElement) =>
-      element.isDeleted ? 0 : changed.has(element.id) ? 1 : 2;
-    let conflicting = new Map<string, OrderedExcalidrawElement>();
-    let keeper = 0;
-    for (let i = 0; i < ordered.length; i++) {
-      if (!ordered[i].index) {
-        // not all are ordered by their indices: all the moved get new ones
-        conflicting = moved;
-        break;
-      }
-      if (i === keeper || ordered[i].index !== ordered[keeper].index) {
-        keeper = i;
-        continue;
-      }
-      const loser = rank(ordered[i]) > rank(ordered[keeper]) ? keeper : i;
-      keeper = loser === i ? keeper : i;
-      // (a copy of an unchanged element, as the instance is the caller's)
-      ordered[loser] = changed.has(ordered[loser].id)
-        ? ordered[loser]
-        : { ...ordered[loser] };
-      conflicting.set(ordered[loser].id, ordered[loser]);
-    }
-
+    // synchronize all elements that were actually moved
     // could fallback to synchronizing all invalid indices
-    return arrayToMap(
-      syncMovedIndices(ordered, conflicting),
-    ) as typeof elements;
+    return arrayToMap(syncMovedIndices(ordered, moved)) as typeof elements;
   }
 
   /**

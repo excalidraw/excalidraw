@@ -101,9 +101,6 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
   updateBoundElements,
-  getFrameArrowIdsToReattach,
-  isBoundToElementNotIn,
-  moveFrameArrows,
   LinearElementEditor,
   newElementWith,
   newFrameElement,
@@ -160,10 +157,8 @@ import {
   hasBoundingBox,
   getFrameChildrenInsertionIndex,
   isCursorInFrame,
-  isFrameClippable,
   addElementsToFrame,
   replaceAllElementsInFrame,
-  removeArrowsWithoutEndInFrame,
   removeElementsFromFrame,
   getElementsInResizingFrame,
   getElementsInNewFrame,
@@ -270,7 +265,6 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
-  actionToggleMinimap,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -278,6 +272,7 @@ import {
   actionUngroup,
   actionLink,
   actionToggleElementLock,
+  actionToggleElementBookmark,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
   actionToggleArrowBinding,
@@ -466,13 +461,9 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   UIConfig,
-  UIControl,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
-
-const isUIConfig = (ui: AppProps["ui"]): ui is UIConfig =>
-  typeof ui === "object" && ui !== null;
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -663,6 +654,7 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
+  private lastBookmarkCleanupSceneNonce: number | undefined;
 
   private _initialized = false;
 
@@ -1078,32 +1070,23 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  /**
-   * Whether Excalidraw's default UI is rendered (with `ui.disabled`, minus the
-   * controls it removes).
-   */
+  /** Whether Excalidraw's full default UI is rendered. */
   public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
     return (
-      props.ui !== false && !(isUIConfig(props.ui) && "enabled" in props.ui)
+      props.ui !== false && (typeof props.ui !== "object" || props.ui === null)
     );
   }
 
   /** Whether an individual default UI control is rendered. */
-  public isUIControlEnabled = (
-    control: UIControl,
+  public isUIControlEnabled(
+    control: keyof UIConfig["enabled"],
     props: Pick<AppProps, "ui"> = this.props,
-  ): boolean => {
-    if (isUIConfig(props.ui)) {
-      return "enabled" in props.ui
-        ? (props.ui.enabled as Partial<Record<UIControl, boolean>>)?.[
-            control
-          ] === true
-        : (props.ui.disabled as Partial<Record<UIControl, boolean>>)?.[
-            control
-          ] !== true;
+  ): boolean {
+    if (typeof props.ui === "object" && props.ui !== null) {
+      return props.ui.enabled?.[control] === true;
     }
     return props.ui !== false;
-  };
+  }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
     atom: WritableAtom<Value, Args, Result>,
@@ -2728,9 +2711,6 @@ class App extends React.Component<AppProps, AppState> {
                             editorInterface={this.editorInterface}
                             interactionEnabled={this.isInteractionEnabled()}
                             navigationEnabled={this.isNavigationEnabled()}
-                            editedTextHoveredSide={
-                              this.text.editedTextHoveredSide
-                            }
                             renderInteractiveSceneCallback={
                               this.renderInteractiveSceneCallback
                             }
@@ -3644,7 +3624,11 @@ class App extends React.Component<AppProps, AppState> {
       repairBindings: true,
       deleteInvisibleElements: true,
     });
-    let restoredAppState = restoreAppState(initialData?.appState, null);
+    let restoredAppState = restoreAppState(
+      initialData?.appState,
+      null,
+      restoredElements,
+    );
     const activeTool = restoredAppState.activeTool;
 
     if (!restoredAppState.preferredSelectionTool.initialized) {
@@ -4336,13 +4320,6 @@ class App extends React.Component<AppProps, AppState> {
     this.handleForcedToolChange(prevProps, prevState);
     this.host.sync(prevProps);
 
-    // applied before the state change listeners below are notified, for
-    // those that read theme-dependent styles
-    this.excalidrawContainerRef.current?.classList.toggle(
-      "theme--dark",
-      this.state.theme === THEME.DARK,
-    );
-
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -4449,6 +4426,11 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ theme: this.props.theme });
     }
 
+    this.excalidrawContainerRef.current?.classList.toggle(
+      "theme--dark",
+      this.state.theme === THEME.DARK,
+    );
+
     if (
       this.state.selectedLinearElement?.isEditing &&
       !this.state.selectedElementIds[this.state.selectedLinearElement.elementId]
@@ -4488,6 +4470,24 @@ class App extends React.Component<AppProps, AppState> {
             ),
           };
         });
+      }
+    }
+
+    const sceneNonce = this.scene.getSceneNonce();
+    const shouldValidateBookmarks =
+      sceneNonce !== this.lastBookmarkCleanupSceneNonce ||
+      prevState.bookmarkedElementIds !== this.state.bookmarkedElementIds;
+    this.lastBookmarkCleanupSceneNonce = sceneNonce;
+
+    const bookmarkedElementIds = this.state.bookmarkedElementIds;
+    if (shouldValidateBookmarks && bookmarkedElementIds.length) {
+      const nextBookmarkedElementIds = bookmarkedElementIds.filter((id) => {
+        const element = this.scene.getElement(id);
+        return element && !element.isDeleted;
+      });
+
+      if (nextBookmarkedElementIds.length !== bookmarkedElementIds.length) {
+        this.setState({ bookmarkedElementIds: nextBookmarkedElementIds });
       }
     }
 
@@ -5437,22 +5437,35 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
-        const selectedElements = this.scene.getSelectedElements({
+        let selectedElements = this.scene.getSelectedElements({
           selectedElementIds: this.state.selectedElementIds,
           includeBoundTextElement: true,
           includeElementsInFrames: true,
         });
-        const selectedElementIds = new Set(
-          selectedElements.map((element) => element.id),
-        );
-        const frameArrowIds = getFrameArrowIdsToReattach(selectedElements);
-        // arrows bound to unselected elements are moved only by the selected
-        // ones they're bound to (if any), unless their frame moves them
-        const movedElements = selectedElements.filter(
-          (element) =>
-            !isBindingElement(element) ||
-            frameArrowIds.has(element.id) ||
-            !isBoundToElementNotIn(element, selectedElementIds),
+
+        const arrowIdsToRemove = new Set<string>();
+
+        selectedElements
+          .filter((el): el is NonDeleted<ExcalidrawArrowElement> =>
+            isBindingElement(el),
+          )
+          .filter((arrow) => {
+            const startElementNotInSelection =
+              arrow.startBinding &&
+              !selectedElements.some(
+                (el) => el.id === arrow.startBinding?.elementId,
+              );
+            const endElementNotInSelection =
+              arrow.endBinding &&
+              !selectedElements.some(
+                (el) => el.id === arrow.endBinding?.elementId,
+              );
+            return startElementNotInSelection || endElementNotInSelection;
+          })
+          .forEach((arrow) => arrowIdsToRemove.add(arrow.id));
+
+        selectedElements = selectedElements.filter(
+          (el) => !arrowIdsToRemove.has(el.id),
         );
 
         const step =
@@ -5477,11 +5490,7 @@ class App extends React.Component<AppProps, AppState> {
           offsetY = step;
         }
 
-        movedElements.forEach((element) => {
-          if (frameArrowIds.has(element.id)) {
-            // moved with their frame once the rest has (below)
-            return;
-          }
+        selectedElements.forEach((element) => {
           this.scene.mutateElement(
             element,
             {
@@ -5492,18 +5501,10 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           updateBoundElements(element, this.scene, {
-            simultaneouslyUpdated: movedElements,
+            simultaneouslyUpdated: selectedElements,
             renderEnvironment: this.renderEnvironment,
           });
         });
-        moveFrameArrows(frameArrowIds, { x: offsetX, y: offsetY }, this.scene, {
-          renderEnvironment: this.renderEnvironment,
-        });
-        // a moved arrow's ends may have left its frame
-        removeArrowsWithoutEndInFrame(
-          movedElements,
-          this.scene.getNonDeletedElementsMap(),
-        );
 
         this.scene.triggerUpdate();
 
@@ -6120,7 +6121,6 @@ class App extends React.Component<AppProps, AppState> {
       // iframe-like elements are rendered as DOM overlays and are not
       // visually clipped by their containing frames
       !isIframeLikeElement(element) &&
-      isFrameClippable(element, elementsMap) &&
       !isCursorInFrame(
         { x, y },
         containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
@@ -7234,21 +7234,6 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.cursor.set(CURSOR_TYPE.POINTER);
       return;
-    }
-
-    if (this.state.editingTextElement) {
-      const editedTextResizeHandle =
-        this.text.getEditedTextResizeHandleAt(scenePointer);
-      // (a wrapped text shows its whole box as is)
-      this.text.setEditedTextHoveredSide(
-        editedTextResizeHandle?.element.autoResize
-          ? editedTextResizeHandle.transformHandleType
-          : null,
-      );
-      if (editedTextResizeHandle) {
-        this.cursor.set(getCursorForResizingElement(editedTextResizeHandle));
-        return;
-      }
     }
 
     if (!isOverScrollBar) {
@@ -10344,6 +10329,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private eraseElements = () => {
     let didChange = false;
+    const newlyDeletedElementIds = new Set<string>();
 
     // Binding is double accounted on both elements and if one of them is
     // deleted, the binding should be removed
@@ -10413,6 +10399,9 @@ class App extends React.Component<AppProps, AppState> {
           this.elementsPendingErasure.has(ele.containerId))
       ) {
         didChange = true;
+        if (!ele.isDeleted) {
+          newlyDeletedElementIds.add(ele.id);
+        }
         return newElementWith(ele, { isDeleted: true });
       }
       return ele;
@@ -10422,6 +10411,16 @@ class App extends React.Component<AppProps, AppState> {
 
     if (didChange) {
       this.store.scheduleCapture();
+      if (newlyDeletedElementIds.size) {
+        const bookmarkedElementIds = this.state.bookmarkedElementIds.filter(
+          (id) => !newlyDeletedElementIds.has(id),
+        );
+        if (
+          bookmarkedElementIds.length !== this.state.bookmarkedElementIds.length
+        ) {
+          this.setState({ bookmarkedElementIds });
+        }
+      }
       this.scene.replaceAllElements(elements);
     }
   };
@@ -11275,7 +11274,6 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleGridMode,
           actionToggleZenMode,
           actionToggleViewMode,
-          actionToggleMinimap,
           actionToggleStats,
         ];
       }
@@ -11296,7 +11294,6 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
-        actionToggleMinimap,
         actionToggleStats,
       ];
     }
@@ -11358,6 +11355,7 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,
+      actionToggleElementBookmark,
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];

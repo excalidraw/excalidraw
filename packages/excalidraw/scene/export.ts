@@ -581,6 +581,7 @@ const configExportDimension = async ({
   const appState = restoreAppState(
     cleanAppStateForExport(data.appState ?? {}),
     null,
+    elements,
   );
 
   const theme = cfg.theme ?? THEME.LIGHT;

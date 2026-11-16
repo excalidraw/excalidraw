@@ -7,6 +7,7 @@ import {
   DEFAULT_SIDEBAR,
   FONT_FAMILY,
   getLineHeight,
+  MIME_TYPES,
   ROUNDNESS,
   STICKY_NOTE_MAX_FONT_SIZE,
   DEFAULT_STICKY_NOTE_BG,
@@ -34,6 +35,7 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
 import { getDefaultAppState } from "../../appState";
+import { loadSceneOrLibraryFromBlob } from "../../data/blob";
 import { serializeAsJSON } from "../../data/json";
 
 import type { ImportedDataState } from "../../data/types";
@@ -1034,6 +1036,182 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("round-trips bookmarks through .excalidraw serialization and restoration", async () => {
+    const first = API.createElement({
+      type: "rectangle",
+      id: "bookmark-first",
+    });
+    const deleted = API.createElement({
+      type: "ellipse",
+      id: "bookmark-deleted",
+      isDeleted: true,
+    });
+    const unbookmarked = API.createElement({
+      type: "rectangle",
+      id: "bookmark-unbookmarked",
+    });
+    const last = API.createElement({ type: "diamond", id: "bookmark-last" });
+    const elements = [first, deleted, unbookmarked, last];
+    const appState = {
+      ...getDefaultAppState(),
+      bookmarkedElementIds: [last.id, deleted.id, "bookmark-missing", first.id],
+    };
+    const serialized = serializeAsJSON(elements, appState, {}, "local");
+    const restored = await loadSceneOrLibraryFromBlob(
+      new Blob([serialized], { type: MIME_TYPES.json }),
+      null,
+      null,
+    );
+    if (restored.type !== MIME_TYPES.excalidraw) {
+      throw new Error("Expected an Excalidraw file");
+    }
+
+    expect(restored.data.elements.map(({ id }) => id)).toEqual([
+      first.id,
+      deleted.id,
+      unbookmarked.id,
+      last.id,
+    ]);
+    expect(restored.data.appState.bookmarkedElementIds).toEqual([
+      last.id,
+      first.id,
+    ]);
+  });
+
+  it("restores an empty bookmark list from a legacy .excalidraw file", async () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "legacy-bookmark-element",
+    });
+    const serialized = serializeAsJSON(
+      [element],
+      getDefaultAppState(),
+      {},
+      "local",
+    );
+    const legacyData = JSON.parse(serialized);
+    delete legacyData.appState.bookmarkedElementIds;
+    const restored = await loadSceneOrLibraryFromBlob(
+      new Blob([JSON.stringify(legacyData)], { type: MIME_TYPES.json }),
+      null,
+      null,
+    );
+    if (restored.type !== MIME_TYPES.excalidraw) {
+      throw new Error("Expected an Excalidraw file");
+    }
+
+    expect(restored.data.appState.bookmarkedElementIds).toEqual([]);
+  });
+
+  it("preserves bookmarks for active elements", () => {
+    const element = API.createElement({ type: "rectangle" });
+    const appState = getDefaultAppState();
+    appState.bookmarkedElementIds = [element.id];
+
+    expect(
+      restore.restoreAppState(appState, null, [element]).bookmarkedElementIds,
+    ).toEqual([element.id]);
+  });
+
+  it("removes bookmarks for missing elements", () => {
+    const appState = getDefaultAppState();
+    appState.bookmarkedElementIds = ["missing-element"];
+
+    expect(
+      restore.restoreAppState(appState, null, []).bookmarkedElementIds,
+    ).toEqual([]);
+  });
+
+  it("removes bookmarks for deleted elements", () => {
+    const element = API.createElement({ type: "rectangle" });
+    const deletedElement = newElementWith(element as ExcalidrawElement, {
+      isDeleted: true,
+    });
+    const appState = getDefaultAppState();
+    appState.bookmarkedElementIds = [element.id];
+
+    expect(
+      restore.restoreAppState(appState, null, [deletedElement])
+        .bookmarkedElementIds,
+    ).toEqual([]);
+  });
+
+  it("preserves bookmark order", () => {
+    const first = API.createElement({ type: "rectangle" });
+    const second = API.createElement({ type: "rectangle" });
+    const third = API.createElement({ type: "rectangle" });
+    const appState = getDefaultAppState();
+    appState.bookmarkedElementIds = [third.id, first.id, second.id];
+
+    expect(
+      restore.restoreAppState(appState, null, [first, second, third])
+        .bookmarkedElementIds,
+    ).toEqual([third.id, first.id, second.id]);
+  });
+
+  it("deduplicates bookmarks while preserving first occurrence order", () => {
+    const first = API.createElement({ type: "rectangle", id: "element-a" });
+    const second = API.createElement({ type: "rectangle", id: "element-b" });
+    const third = API.createElement({ type: "rectangle", id: "element-c" });
+    const appState = getDefaultAppState();
+    appState.bookmarkedElementIds = [
+      first.id,
+      second.id,
+      first.id,
+      third.id,
+      second.id,
+    ];
+
+    expect(
+      restore.restoreAppState(appState, null, [first, second, third])
+        .bookmarkedElementIds,
+    ).toEqual([first.id, second.id, third.id]);
+  });
+
+  it("removes invalid bookmark IDs when restoring elements", () => {
+    const element = API.createElement({ type: "rectangle", id: "valid" });
+    const deleted = newElementWith(
+      API.createElement({
+        type: "rectangle",
+        id: "deleted",
+      }) as ExcalidrawElement,
+      { isDeleted: true },
+    );
+    const appState = {
+      ...getDefaultAppState(),
+      bookmarkedElementIds: ["valid", 42, null, "missing", "deleted"],
+    } as unknown as ImportedDataState["appState"];
+
+    expect(
+      restore.restoreAppState(appState, null, [element, deleted])
+        .bookmarkedElementIds,
+    ).toEqual([element.id]);
+  });
+
+  it("preserves existing bookmarks when restored elements are omitted", () => {
+    const appState = getDefaultAppState();
+    appState.bookmarkedElementIds = ["missing-element"];
+
+    expect(
+      restore.restoreAppState(appState, null).bookmarkedElementIds,
+    ).toEqual(["missing-element"]);
+  });
+
+  it("defaults bookmarks for older files without bookmark state", () => {
+    expect(restore.restoreAppState({}, null).bookmarkedElementIds).toEqual([]);
+  });
+
+  it("falls back to an empty array for invalid bookmark values", () => {
+    const appState = {
+      ...getDefaultAppState(),
+      bookmarkedElementIds: "invalid",
+    } as unknown as ImportedDataState["appState"];
+
+    expect(
+      restore.restoreAppState(appState, null).bookmarkedElementIds,
+    ).toEqual([]);
+  });
+
   it("should restore freedraw mode app state values", () => {
     expect(
       restore.restoreAppState(

@@ -1,8 +1,9 @@
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { arrayToMap } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 
-import type { ObservedAppState } from "@excalidraw/excalidraw/types";
+import type { AppState, ObservedAppState } from "@excalidraw/excalidraw/types";
 import type { LinearElementEditor } from "@excalidraw/element";
 import type {
   ExcalidrawTextElement,
@@ -10,6 +11,11 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
+import {
+  CaptureUpdateAction,
+  StoreSnapshot,
+  getObservedAppState,
+} from "../src/store";
 import { AppStateDelta, Delta, ElementsDelta } from "../src/delta";
 import { mutateElement, newElementWith } from "../src/mutateElement";
 
@@ -284,56 +290,6 @@ describe("ElementsDelta", () => {
         newElementWith(arrow, { startBinding: null }),
       ]) as SceneElementsMap;
       expect(apply(before, after)[1]).toBe(true);
-    });
-  });
-
-  describe("index collisions", () => {
-    const rectangle = (id: string, index: string, isDeleted = false) => ({
-      ...API.createElement({
-        type: "rectangle",
-        id,
-        index: index as FractionalIndex,
-      }),
-      isDeleted,
-    });
-    const reindex = (
-      elements: SceneElementsMap,
-      indices: Record<string, string>,
-    ): SceneElementsMap => {
-      const next = new Map(elements) as SceneElementsMap;
-      for (const [id, index] of Object.entries(indices)) {
-        next.set(
-          id,
-          newElementWith(elements.get(id)!, {
-            index: index as FractionalIndex,
-          }),
-        );
-      }
-      return ElementsDelta.calculate(elements, next).applyTo(elements)[0];
-    };
-    const indices = (elements: SceneElementsMap) =>
-      Array.from(elements.values(), ({ id, index }) => `${id}:${index}`);
-
-    it("doesn't change the elements it's given", () => {
-      // an element given the index of the next one
-      let elements = arrayToMap([
-        rectangle("a", "a1"),
-        rectangle("b", "a2"),
-      ]) as SceneElementsMap;
-      let next = reindex(elements, { a: "a2" });
-      expect(indices(elements)).toEqual(["a:a1", "b:a2"]);
-      expect(next.get("b")).toBe(elements.get("b"));
-
-      // an element and a deleted one given the index of a third
-      elements = arrayToMap([
-        rectangle("c", "a1"),
-        rectangle("a", "a2"),
-        rectangle("b", "a3", true),
-      ]) as SceneElementsMap;
-      next = reindex(elements, { a: "a1", b: "a1" });
-      expect(indices(elements)).toEqual(["c:a1", "a:a2", "b:a3"]);
-      expect(next.get("c")).toBe(elements.get("c"));
-      expect(Array.from(next.keys())).toEqual(["a", "b", "c"]);
     });
   });
 
@@ -673,6 +629,7 @@ describe("AppStateDelta", () => {
 
       const commonAppState = {
         viewBackgroundColor: "#ffffff",
+        bookmarkedElementIds: [],
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
@@ -717,6 +674,7 @@ describe("AppStateDelta", () => {
       const commonAppState = {
         name: "",
         viewBackgroundColor: "#ffffff",
+        bookmarkedElementIds: [],
         selectedGroupIds: {},
         editingGroupId: null,
         croppingElementId: null,
@@ -763,6 +721,7 @@ describe("AppStateDelta", () => {
       const commonAppState = {
         name: "",
         viewBackgroundColor: "#ffffff",
+        bookmarkedElementIds: [],
         selectedElementIds: {},
         editingGroupId: null,
         croppingElementId: null,
@@ -805,6 +764,138 @@ describe("AppStateDelta", () => {
       const delta2 = AppStateDelta.calculate(prevAppState2, nextAppState2);
 
       expect(JSON.stringify(delta1)).toBe(JSON.stringify(delta2));
+    });
+  });
+
+  describe("bookmarkedElementIds", () => {
+    const makeAppState = (
+      bookmarkedElementIds: string[],
+      selectedElementIds: AppState["selectedElementIds"] = {},
+    ): AppState => ({
+      ...getDefaultAppState(),
+      bookmarkedElementIds,
+      selectedElementIds,
+      width: 0,
+      height: 0,
+      offsetLeft: 0,
+      offsetTop: 0,
+    });
+
+    it("detects bookmark array changes in Store snapshots", () => {
+      const before = makeAppState(["first"]);
+      const after = makeAppState(["second", "first"]);
+      const snapshot = StoreSnapshot.create(
+        new Map() as SceneElementsMap,
+        before,
+      );
+
+      const nextSnapshot = snapshot.maybeClone(
+        CaptureUpdateAction.IMMEDIATELY,
+        undefined,
+        after,
+      );
+
+      expect(nextSnapshot).not.toBe(snapshot);
+      expect(nextSnapshot.metadata.didAppStateChange).toBe(true);
+      expect(nextSnapshot.appState.bookmarkedElementIds).toEqual([
+        "second",
+        "first",
+      ]);
+      expect(nextSnapshot.getChangedAppState(snapshot)).toEqual({
+        bookmarkedElementIds: ["second", "first"],
+      });
+    });
+
+    it("calculates, applies, and inverts bookmark array deltas", () => {
+      const previousState = makeAppState(["first"]);
+      const nextState = makeAppState(["second", "first"]);
+      const delta = AppStateDelta.calculate(
+        getObservedAppState(previousState),
+        getObservedAppState(nextState),
+      );
+      const elements = new Map() as SceneElementsMap;
+
+      expect(delta.isEmpty()).toBe(false);
+      expect(delta.delta).toEqual(
+        Delta.create(
+          { bookmarkedElementIds: ["first"] },
+          { bookmarkedElementIds: ["second", "first"] },
+        ),
+      );
+
+      const [appliedState, wasApplied] = delta.applyTo(previousState, elements);
+      expect(wasApplied).toBe(true);
+      expect(appliedState.bookmarkedElementIds).toEqual(["second", "first"]);
+
+      const [restoredState, wasRestored] = delta
+        .inverse()
+        .applyTo(appliedState, elements);
+      expect(wasRestored).toBe(true);
+      expect(restoredState.bookmarkedElementIds).toEqual(["first"]);
+    });
+
+    it("preserves the original and final bookmark arrays when squashing deltas", () => {
+      const firstState = makeAppState(["first"]);
+      const secondState = makeAppState(["second"]);
+      const thirdState = makeAppState(["third", "second"]);
+      const firstDelta = AppStateDelta.calculate(
+        getObservedAppState(firstState),
+        getObservedAppState(secondState),
+      );
+      const secondDelta = AppStateDelta.calculate(
+        getObservedAppState(secondState),
+        getObservedAppState(thirdState),
+      );
+
+      firstDelta.squash(secondDelta);
+
+      expect(firstDelta.delta).toEqual(
+        Delta.create(
+          { bookmarkedElementIds: ["first"] },
+          { bookmarkedElementIds: ["third", "second"] },
+        ),
+      );
+
+      const [restoredState] = firstDelta
+        .inverse()
+        .applyTo(thirdState, new Map() as SceneElementsMap);
+      expect(restoredState.bookmarkedElementIds).toEqual(["first"]);
+    });
+
+    it("removes bookmark changes that cancel when squashed", () => {
+      const before = makeAppState(["first"]);
+      const after = makeAppState(["second"]);
+      const forward = AppStateDelta.calculate(
+        getObservedAppState(before),
+        getObservedAppState(after),
+      );
+      const backward = AppStateDelta.calculate(
+        getObservedAppState(after),
+        getObservedAppState(before),
+      );
+
+      forward.squash(backward);
+
+      expect(forward.isEmpty()).toBe(true);
+    });
+
+    it("keeps selected-element deltas element-related", () => {
+      const element = API.createElement({ type: "rectangle", id: "selected" });
+      const elements = arrayToMap([element]) as SceneElementsMap;
+      const previousState = makeAppState([], {});
+      const nextState = makeAppState([], { [element.id]: true });
+      const delta = AppStateDelta.calculate(
+        getObservedAppState(previousState),
+        getObservedAppState(nextState),
+      );
+
+      const [appliedState, wasApplied] = delta.applyTo(previousState, elements);
+
+      expect(wasApplied).toBe(true);
+      expect(appliedState.selectedElementIds).toEqual({
+        [element.id]: true,
+      });
+      expect(appliedState.bookmarkedElementIds).toEqual([]);
     });
   });
 

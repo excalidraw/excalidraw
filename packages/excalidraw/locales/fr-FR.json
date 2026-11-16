@@ -168,6 +168,12 @@
       "lockAll": "Tout verrouiller",
       "unlockAll": "Tout déverrouiller"
     },
+    "elementBookmark": {
+      "bookmark": "Ajouter un signet",
+      "removeBookmark": "Supprimer le signet",
+      "next": "Signet suivant",
+      "previous": "Signet précédent"
+    },
     "statusPublished": "Publié",
     "sidebarLock": "Maintenir la barre latérale ouverte",
     "selectAllElementsInFrame": "Sélectionner tous les éléments du cadre",
@@ -221,6 +227,11 @@
     "placeholder": "Rechercher du texte sur la toile...",
     "frames": "Cadres",
     "texts": "Textes"
+  },
+  "bookmarks": {
+    "title": "Signets",
+    "empty": "Aucun signet pour le moment...",
+    "emptyHint": "Faites un clic droit sur un élément pour l'ajouter aux signets."
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",

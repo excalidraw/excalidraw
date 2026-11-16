@@ -95,6 +95,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     gridStep: appState.gridStep,
     frameRendering: appState.frameRendering,
     selectedElementIds: appState.selectedElementIds,
+    bookmarkedElementIds: appState.bookmarkedElementIds,
     frameToHighlight: appState.frameToHighlight,
     editingGroupId: appState.editingGroupId,
     currentHoveredFontFamily: appState.currentHoveredFontFamily,

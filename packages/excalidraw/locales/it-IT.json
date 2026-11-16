@@ -168,6 +168,12 @@
       "lockAll": "Blocca tutto",
       "unlockAll": "Sblocca tutto"
     },
+    "elementBookmark": {
+      "bookmark": "Aggiungi segnalibro",
+      "removeBookmark": "Rimuovi segnalibro",
+      "next": "Segnalibro successivo",
+      "previous": "Segnalibro precedente"
+    },
     "statusPublished": "Pubblicato",
     "sidebarLock": "Mantieni aperta la barra laterale",
     "selectAllElementsInFrame": "Seleziona tutti gli elementi nel riquadro",
@@ -221,6 +227,11 @@
     "placeholder": "Trova testo sulla tela...",
     "frames": "Fotogrammi",
     "texts": "Testi"
+  },
+  "bookmarks": {
+    "title": "Segnalibri",
+    "empty": "Nessun segnalibro ancora...",
+    "emptyHint": "Fai clic destro su un elemento per aggiungerlo ai segnalibri."
   },
   "buttons": {
     "clearReset": "Svuota la tela",

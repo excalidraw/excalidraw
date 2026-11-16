@@ -21,7 +21,6 @@ import {
   applyDarkModeFilter,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
-  TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT,
 } from "@excalidraw/common";
 
 import type {
@@ -60,17 +59,6 @@ unmountComponent();
 
 const tab = "    ";
 const mouse = new Pointer("mouse");
-
-/**
- * where the editor is placed: its transform's first translate, in px — the
- * text's anchor (its top left, for left-aligned text)
- */
-const getEditorOffset = (textarea: HTMLTextAreaElement) => {
-  const [, left, top] = textarea.style.transform.match(
-    /^translate\((\S+)px, (\S+)px\)/,
-  )!;
-  return { left: parseFloat(left), top: parseFloat(top) };
-};
 
 const exitTextEditorAndAssertSelection = async ({
   editor,
@@ -755,7 +743,7 @@ describe("textWysiwyg", () => {
       // enter text editing mode
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
-      let editor = await getTextEditor();
+      const editor = await getTextEditor();
       Keyboard.exitTextEditor(editor);
       // restore after unwrapping
       UI.resize(text, "e", [40, 0]);
@@ -763,19 +751,18 @@ describe("textWysiwyg", () => {
 
       // wrap again and add a new line
       UI.resize(text, "e", [-30, 0]);
+      const wrappedText = text.text;
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
-      editor = await getTextEditor();
-      updateTextEditor(editor, `${originalText}\nA new line!`);
+      updateTextEditor(editor, `${wrappedText}\nA new line!`);
       Keyboard.exitTextEditor(editor);
       // remove the newly added line
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
-      editor = await getTextEditor();
-      updateTextEditor(editor, originalText);
+      updateTextEditor(editor, wrappedText);
       Keyboard.exitTextEditor(editor);
       // unwrap
-      UI.resize(h.elements[0], "e", [30, 0]);
+      UI.resize(text, "e", [30, 0]);
       // expect the text to be restored the same
       expect((h.elements[0] as ExcalidrawTextElement).text).toBe(originalText);
     });
@@ -1029,31 +1016,6 @@ describe("textWysiwyg", () => {
       expect(h.state.zoom.value).toBe(1);
     });
 
-    it("should keep the caret in place when zooming via keyboard", () => {
-      // "abc|def", 10px per character
-      updateTextEditor(textarea, "abcdef");
-      textarea.setSelectionRange(3, 3);
-      const getCaretViewportCoords = () => {
-        const text = h.elements.find(
-          (element) => element.id === textElement.id,
-        ) as ExcalidrawTextElement;
-        return [
-          (text.x + 30 + h.state.scrollX) * h.state.zoom.value,
-          (text.y + text.height / 2 + h.state.scrollY) * h.state.zoom.value,
-        ];
-      };
-      const [x, y] = getCaretViewportCoords();
-
-      for (const code of [CODES.EQUAL, CODES.EQUAL, CODES.MINUS, CODES.ZERO]) {
-        const zoom = h.state.zoom.value;
-        fireEvent.keyDown(textarea, { code, ctrlKey: true });
-        expect(h.state.zoom.value).not.toBe(zoom);
-        const [nextX, nextY] = getCaretViewportCoords();
-        expect(nextX).toBeCloseTo(x);
-        expect(nextY).toBeCloseTo(y);
-      }
-    });
-
     it("should not cut the editor off at the viewport's edges", async () => {
       Keyboard.exitTextEditor(textarea);
       // already wider than the 800x400 viewport: such a text keeps growing
@@ -1076,32 +1038,6 @@ describe("textWysiwyg", () => {
       expect(textarea.style.width).toBe(`${text.width}px`);
       expect(parseFloat(textarea.style.height)).toBeCloseTo(text.height * 1.05);
       expect(textarea.style.maxHeight).toBe("");
-      Keyboard.exitTextEditor(textarea);
-    });
-
-    it("should keep a wrapping editor at its text's exact width", async () => {
-      Keyboard.exitTextEditor(textarea);
-      // fixed-width, fractionally wide: the editor wraps the text where the
-      // canvas does only at the same width (a growing text's editor is a
-      // whole px wide instead — see getEditorPlacement)
-      const text = {
-        ...API.createElement({
-          type: "text",
-          text: "Hello world",
-          width: 98.46,
-          textAlign: "center",
-        }),
-        autoResize: false,
-      } as ExcalidrawTextElement;
-      API.setElements([text]);
-      API.setAppState({ selectedElementIds: { [text.id]: true } });
-      Keyboard.keyPress(KEYS.ENTER);
-      textarea = await getTextEditor();
-
-      expect(textarea.style.whiteSpace).toBe("pre-wrap");
-      expect(textarea.style.width).toBe("98.46px");
-      // and centered on the text's center
-      expect(textarea.style.transform).toContain("translate(-49.23px, 0px)");
       Keyboard.exitTextEditor(textarea);
     });
 
@@ -1144,16 +1080,9 @@ describe("textWysiwyg", () => {
       sidebar.remove();
     });
 
-    it.each([
-      // zoomed in: in scene units (the view would allow 980)
-      { zoom: 2, width: TEXT_MAX_WRAP_WIDTH },
-      // zoomed out: on screen...
-      { zoom: 0.5, width: TEXT_MAX_WRAP_WIDTH / 0.5 },
-      // ...up to a limit
-      { zoom: 0.2, width: TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT },
-    ])(
-      "should stop a growing text at TEXT_MAX_WRAP_WIDTH, scaled when zoomed out, however wide the view (zoom $zoom)",
-      ({ zoom, width }) => {
+    it.each([0.5, 2])(
+      "should stop a growing text at TEXT_MAX_WRAP_WIDTH at any zoom, however wide the view (zoom %s)",
+      (zoom) => {
         API.setAppState({
           width: 2000,
           zoom: { value: zoom as typeof h.state.zoom.value },
@@ -1161,13 +1090,12 @@ describe("textWysiwyg", () => {
 
         updateTextEditor(
           textarea,
-          "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! ".repeat(
-            4,
-          ),
+          "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
         );
         const text = h.elements[0] as ExcalidrawTextElement;
         expect(text.autoResize).toBe(false);
-        expect(text.width).toBe(width);
+        // in scene units: at 200%, the view would allow 980
+        expect(text.width).toBe(TEXT_MAX_WRAP_WIDTH);
       },
     );
 
@@ -1308,7 +1236,9 @@ describe("textWysiwyg", () => {
       // it fitted vertically already
       expect(h.state.scrollY).toBe(scrollY);
       // and the editor moved along
-      expect(getEditorOffset(textarea).left).toBeCloseTo(TEXT_VIEWPORT_PADDING);
+      expect(parseFloat(textarea.style.left)).toBeCloseTo(
+        TEXT_VIEWPORT_PADDING,
+      );
     });
 
     it("should leave the vertical to the caret when a text that starts wrapping is taller than the view", async () => {
@@ -1360,7 +1290,7 @@ describe("textWysiwyg", () => {
       const editorBox = textarea.parentElement!;
       const root = textarea.closest<HTMLElement>(".excalidraw")!;
       const { scrollX, scrollY } = h.state;
-      const editorTop = getEditorOffset(textarea).top;
+      const editorTop = parseFloat(textarea.style.top);
 
       // what the browser does to reveal a caret below and right of the
       // editor's box (the canvas area)
@@ -1375,7 +1305,7 @@ describe("textWysiwyg", () => {
       expect(h.state.scrollX).toBe(scrollX - (40 + CARET_FOLLOW_PADDING) / 2);
       expect(h.state.scrollY).toBe(scrollY - (120 + CARET_FOLLOW_PADDING) / 2);
       // with the editor on it
-      expect(getEditorOffset(textarea).top).toBe(
+      expect(parseFloat(textarea.style.top)).toBe(
         editorTop - (120 + CARET_FOLLOW_PADDING),
       );
       // the reveal never reaches the root
@@ -1437,14 +1367,14 @@ describe("textWysiwyg", () => {
     it("should keep the editor's box off a docked sidebar", () => {
       const editorBox = textarea.parentElement!;
       const sidebar = dockSidebar(500, 300);
-      const editorLeft = getEditorOffset(textarea).left;
+      const editorLeft = parseFloat(textarea.style.left);
 
       // docked on the right: the box ends where the sidebar starts, so a
       // caret behind the sidebar is outside it (and revealed by a pan)
       updateTextEditor(textarea, "Hello");
       expect(editorBox.style.right).toBe("300px");
       expect(editorBox.style.left).toBe("0px");
-      expect(getEditorOffset(textarea).left).toBe(editorLeft);
+      expect(parseFloat(textarea.style.left)).toBe(editorLeft);
 
       // docked on the left (RTL): the box starts where the sidebar ends, and
       // the editor keeps its place on the canvas
@@ -1452,7 +1382,7 @@ describe("textWysiwyg", () => {
       updateTextEditor(textarea, "Hello!");
       expect(editorBox.style.left).toBe("300px");
       expect(editorBox.style.right).toBe("0px");
-      expect(getEditorOffset(textarea).left).toBe(editorLeft - 300);
+      expect(parseFloat(textarea.style.left)).toBe(editorLeft - 300);
 
       // not docked: the whole canvas
       sidebar.remove();
@@ -3619,244 +3549,6 @@ describe("textWysiwyg", () => {
       const text = h.elements[0] as ExcalidrawTextElement;
       expect(text.autoResize).toBe(true);
       expect(text.text).toBe(text.originalText);
-    });
-
-    it("toggles auto-resizing of the selected texts with Alt+W, wrapping at the max width at most", () => {
-      const line = "Excalidraw is an opensource virtual collaborative ";
-      // (10px a character in tests)
-      API.setElements([
-        API.createElement({
-          type: "text",
-          id: "long",
-          text: line.repeat(5).trim(),
-          width: 2490,
-          height: 25,
-        }),
-        API.createElement({
-          type: "text",
-          id: "short",
-          text: "short",
-          y: 200,
-          width: 50,
-          height: 25,
-        }),
-      ]);
-      API.setAppState({ selectedElementIds: { long: true, short: true } });
-      const texts = () => h.elements as ExcalidrawTextElement[];
-      const [longWidth, shortWidth] = texts().map((text) => text.width);
-
-      const toggle = () =>
-        Keyboard.withModifierKeys({ alt: true }, () => Keyboard.keyPress("w"));
-
-      toggle();
-      expect(texts().map((text) => text.autoResize)).toEqual([false, false]);
-      // (a text keeping its width gets a pixel to spare, not to be on the
-      // verge of wrapping)
-      expect(texts().map((text) => text.width)).toEqual([
-        TEXT_MAX_WRAP_WIDTH,
-        shortWidth + 1,
-      ]);
-      expect(texts()[0].text).toContain("\n");
-
-      toggle();
-      expect(texts().map((text) => text.autoResize)).toEqual([true, true]);
-      expect(texts().map((text) => text.width)).toEqual([
-        longWidth,
-        shortWidth,
-      ]);
-    });
-
-    // Alt shortcuts go by the key's letter where the layout gives one, and
-    // by its (QWERTY) position otherwise — e.g. on macOS, where Alt changes
-    // the character
-    it.each([
-      { layout: "AZERTY", w: { key: "w", code: "KeyZ" } },
-      { layout: "AZERTY", z: { key: "z", code: "KeyW" } },
-      { layout: "macOS", w: { key: "∑", code: "KeyW" } },
-      { layout: "macOS", z: { key: "Ω", code: "KeyZ" } },
-    ])(
-      "tells Alt+W from Alt+Z (zen mode) on $layout ($w.key$z.key)",
-      ({ w, z }) => {
-        API.setElements([wrappedText()]);
-        API.setAppState({ selectedElementIds: { text: true } });
-
-        fireEvent.keyDown(document, { ...(w ?? z), altKey: true });
-
-        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(!!w);
-        expect(h.state.zenModeEnabled).toBe(!!z);
-      },
-    );
-
-    it("hints at Alt+W for a selected wrapped text, and while editing a text", async () => {
-      const hint = () =>
-        h.app.ownerDocument.querySelector(".HintViewer")?.textContent ?? "";
-      const toggleHint = "to toggle text auto-resize";
-
-      API.setElements([wrappedText()]);
-      API.setAppState({ selectedElementIds: { text: true } });
-      await waitFor(() => expect(hint()).toContain(toggleHint));
-
-      // not for a text that doesn't wrap...
-      API.executeAction(actionTextAutoResize);
-      await waitFor(() => expect(hint()).toContain("to edit text"));
-      expect(hint()).not.toContain(toggleHint);
-
-      // ...until it's edited
-      mouse.doubleClickAt(110, 110);
-      await getTextEditor();
-      await waitFor(() => expect(hint()).toContain("to finish editing"));
-      expect(hint()).toContain(toggleHint);
-    });
-
-    it("toggles auto-resizing of the text being edited with Alt+W", async () => {
-      API.setElements([wrappedText()]);
-      mouse.doubleClickAt(110, 110);
-      const editor = await getTextEditor();
-      expect(editor.style.whiteSpace).toBe("pre-wrap");
-
-      fireEvent.keyDown(editor, { key: "w", altKey: true });
-      let text = h.elements[0] as ExcalidrawTextElement;
-      expect(text.autoResize).toBe(true);
-      expect(text.text).toBe(text.originalText);
-      expect(h.state.editingTextElement?.id).toBe(text.id);
-      expect(editor.style.whiteSpace).toBe("pre");
-
-      fireEvent.keyDown(editor, { key: "w", altKey: true });
-      text = h.elements[0] as ExcalidrawTextElement;
-      expect(text.autoResize).toBe(false);
-      expect(editor.style.whiteSpace).toBe("pre-wrap");
-    });
-
-    it("leaves the canvas no cursor of the text's own while it's edited", async () => {
-      API.setElements([wrappedText()]);
-      const canvas = GlobalTestState.interactiveCanvas;
-
-      // selected: the move cursor over it, a resize cursor over its handles
-      mouse.clickAt(110, 110);
-      expect(canvas.style.cursor).toBe(CURSOR_TYPE.MOVE);
-
-      // edited: neither would show until the pointer next moves over the
-      // canvas, flashing once it leaves the editor
-      mouse.clickAt(110, 110);
-      await getTextEditor();
-      expect(canvas.style.cursor).not.toBe(CURSOR_TYPE.MOVE);
-
-      // nor has the edited text the transform handles it isn't drawn with
-      // (it is selected here, as a text just created is)
-      API.setAppState({ selectedElementIds: { text: true } });
-      const text = h.elements[0] as ExcalidrawTextElement;
-      mouse.moveTo(text.x + text.width / 2, text.y - 4);
-      expect(canvas.style.cursor).not.toContain("resize");
-    });
-
-    it("gives the canvas, from over the editor, the cursor of where the pointer would leave it", async () => {
-      API.setElements([wrappedText()]);
-      const canvas = GlobalTestState.interactiveCanvas;
-      mouse.doubleClickAt(110, 110);
-      const editor = await getTextEditor();
-      const text = h.elements[0] as ExcalidrawTextElement;
-      const y = text.y + text.height / 2;
-
-      // nearest a side: its handle's, which the canvas would otherwise only
-      // set a frame after the pointer got there
-      fireEvent.pointerMove(editor, {
-        clientX: text.x + text.width - 5,
-        clientY: y,
-      });
-      expect(canvas.style.cursor).toBe("ew-resize");
-
-      // nearest the top or bottom: the canvas' own
-      fireEvent.pointerMove(editor, {
-        clientX: text.x + text.width / 2,
-        clientY: y,
-      });
-      expect(canvas.style.cursor).not.toContain("resize");
-    });
-
-    it("resizes a text dragged by its side while editing it", async () => {
-      API.setElements([
-        API.createElement({
-          type: "text",
-          text: "Excalidraw editor is great!",
-          x: 100,
-          y: 100,
-        }),
-      ]);
-      mouse.doubleClickAt(110, 110);
-      const editor = await getTextEditor();
-      // the editor listens for presses outside it from the next frame on
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-
-      const text = h.elements[0] as ExcalidrawTextElement;
-      const { width, height } = text;
-      const x = text.x + text.width + 4;
-      const y = text.y + text.height / 2;
-
-      // the side under the pointer is the one drawn, to show it can be dragged
-      mouse.moveTo(x, y);
-      expect(h.app.text.editedTextHoveredSide).toBe("e");
-      mouse.moveTo(x + 40, y);
-      expect(h.app.text.editedTextHoveredSide).toBe(null);
-
-      mouse.downAt(x, y);
-      mouse.moveTo(x - 40, y);
-      mouse.moveTo(x - 80, y);
-      mouse.upAt(x - 80, y);
-
-      const resized = h.elements[0] as ExcalidrawTextElement;
-      expect(resized.autoResize).toBe(false);
-      expect(resized.width).toBeCloseTo(width - 80);
-      expect(resized.height).toBeGreaterThan(height);
-      // still editing
-      expect(h.state.editingTextElement?.id).toBe(text.id);
-      expect(await getTextEditor({ waitForEditor: false })).toBe(editor);
-
-      // a click on the side submits, as anywhere else on the canvas
-      mouse.clickAt(resized.x + resized.width + 4, y);
-      expect(h.state.editingTextElement).toBe(null);
-    });
-
-    it("snaps the dragged side of a text being edited to other elements", async () => {
-      API.setElements([
-        API.createElement({
-          type: "text",
-          text: "Excalidraw editor is great!",
-          x: 100,
-          y: 100,
-        }),
-        API.createElement({
-          type: "rectangle",
-          x: 300,
-          y: 200,
-          width: 100,
-          height: 100,
-        }),
-      ]);
-      API.setAppState({
-        objectsSnapModeEnabled: true,
-        // (elements are snapped to only if in the viewport)
-        width: 1000,
-        height: 1000,
-      });
-      mouse.doubleClickAt(110, 110);
-      await getTextEditor();
-      // the editor listens for presses outside it from the next frame on
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-
-      const text = h.elements[0] as ExcalidrawTextElement;
-      const x = text.x + text.width + 4;
-      const y = text.y + text.height / 2;
-      mouse.downAt(x, y);
-      // 3px short of the rectangle's left edge
-      mouse.moveTo(307, y);
-      expect(text.x + text.width).toBe(300);
-      // the guide line follows the snapped side
-      mouse.moveTo(306, y);
-      expect(h.state.snapLines.length).toBe(1);
-
-      mouse.upAt(306, y);
-      expect(h.state.snapLines.length).toBe(0);
-      expect(text.x + text.width).toBe(300);
     });
   });
 

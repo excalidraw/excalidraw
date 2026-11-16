@@ -117,8 +117,6 @@
     "collaborators": "Collaborators",
     "you": "You",
     "toggleGrid": "Toggle grid",
-    "minimap": "Minimap",
-    "zoom": "Zoom",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
@@ -174,6 +172,12 @@
       "lockAll": "Lock all",
       "unlockAll": "Unlock all"
     },
+    "elementBookmark": {
+      "bookmark": "Bookmark",
+      "removeBookmark": "Remove bookmark",
+      "next": "Next bookmark",
+      "previous": "Previous bookmark"
+    },
     "statusPublished": "Published",
     "sidebarLock": "Keep sidebar open",
     "selectAllElementsInFrame": "Select all elements in frame",
@@ -188,7 +192,6 @@
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
     "autoResize": "Enable text auto-resizing",
-    "toggleAutoResize": "Toggle text auto-resizing",
     "imageCropping": "Image cropping",
     "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
@@ -205,7 +208,7 @@
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
-    "showHints": "Toolbar hints",
+    "showHints": "Show hints",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"
@@ -235,6 +238,11 @@
     "frames": "Frames",
     "texts": "Texts"
   },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "empty": "No bookmarks yet...",
+    "emptyHint": "Right-click an element to bookmark it."
+  },
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
@@ -252,7 +260,6 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
-    "zoomToFit": "Zoom to fit",
     "menu": "Menu",
     "done": "Done",
     "edit": "Edit",
@@ -396,7 +403,6 @@
     "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
-    "toggleTextAutoResize": "{{shortcut}} to toggle text auto-resize",
     "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
     "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
@@ -682,7 +688,7 @@
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "<flowchartLink>Flowcharts</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, <stateLink>State</stateLink> and <erdLink>Entity Relationship</erdLink> diagrams, <ganttLink>Gantt charts</ganttLink>, <quadrantLink>Quadrant charts</quadrantLink> and <timelineLink>Timelines</timelineLink> are converted to Excalidraw elements. Other types are inserted as an image.",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",

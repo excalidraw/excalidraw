@@ -18,7 +18,7 @@ import { ShapeCache } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { actionToggleMinimap, actionToggleStats } from "../actions";
+import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
@@ -41,7 +41,6 @@ import Stack from "./Stack";
 import { UserList } from "./UserList";
 import { PenModeButton } from "./PenModeButton";
 import Footer from "./footer/Footer";
-import { MINIMAP_RESERVED_HEIGHT } from "./Minimap/Minimap";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
@@ -108,12 +107,6 @@ interface LayerUIProps {
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
   currentUserControls?: ExcalidrawProps["currentUserControls"];
 }
-
-/**
- * The space (px) the floating pen mode button of the compact UI takes up
- * below the styles panel: the button (`--lg-button-size`) + the gap above.
- */
-const PEN_MODE_BUTTON_RESERVED_HEIGHT = 54;
 
 const DefaultMainMenu: React.FC<{
   UIOptions: AppProps["UIOptions"];
@@ -243,8 +236,6 @@ const LayerUI = ({
     );
   };
 
-  const minimapUIEnabled = actionManager.isActionEnabled(actionToggleMinimap);
-
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
       <div className="excalidraw-ui-top-left">
@@ -256,22 +247,6 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
-    // we want to make sure this doesn't overflow so subtracting the
-    // approximate height of hamburgerMenu + footer
-    let stylesPanelMaxHeight = appState.height - 166;
-    // the minimap sits above the footer, in the way of this column
-    if (minimapUIEnabled && appState.minimapEnabled) {
-      stylesPanelMaxHeight -= MINIMAP_RESERVED_HEIGHT;
-      // ...which, in compact UI, ends with the pen mode button (see below)
-      if (
-        isCompactStylesPanel &&
-        appState.penDetected &&
-        !appState.viewModeEnabled
-      ) {
-        stylesPanelMaxHeight -= PEN_MODE_BUTTON_RESERVED_HEIGHT;
-      }
-    }
-
     return (
       <Section
         heading="selectedShapeActions"
@@ -286,7 +261,9 @@ const LayerUI = ({
             data-viewport-ui="side"
             data-viewport-ui-name="stylesPanel"
             style={{
-              maxHeight: `${stylesPanelMaxHeight}px`,
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
             }}
           >
             <CompactShapeActions
@@ -302,7 +279,9 @@ const LayerUI = ({
             className={CLASSES.SHAPE_ACTIONS_MENU}
             padding={2}
             style={{
-              maxHeight: `${stylesPanelMaxHeight}px`,
+              // we want to make sure this doesn't overflow so subtracting the
+              // approximate height of hamburgerMenu + footer
+              maxHeight: `${appState.height - 166}px`,
             }}
             data-viewport-ui="side"
             data-viewport-ui-name="stylesPanel"
@@ -682,7 +661,6 @@ const LayerUI = ({
               renderWelcomeScreen={renderWelcomeScreen}
               defaultUIEnabled={defaultUIEnabled}
               zoomUIEnabled={zoomUIEnabled}
-              minimapUIEnabled={minimapUIEnabled}
             />
             {(appState.toast ||
               (scrollBackToContentUIEnabled && appState.scrolledOutside) ||

@@ -1265,9 +1265,13 @@ const restoreFontTopPicks = (
   return fontFamilies.size ? [...fontFamilies] : null;
 };
 
+const isUnknownArray = (value: unknown): value is unknown[] =>
+  Array.isArray(value);
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
+  restoredElements?: readonly ExcalidrawElement[],
 ): RestoredAppState => {
   appState = appState || {};
   const defaultAppState = getDefaultAppState();
@@ -1303,6 +1307,34 @@ export const restoreAppState = (
         : localValue !== undefined
         ? localValue
         : defaultValue;
+  }
+
+  const bookmarkedElementIds: unknown = nextAppState.bookmarkedElementIds;
+  if (!isUnknownArray(bookmarkedElementIds)) {
+    nextAppState.bookmarkedElementIds = [];
+  } else {
+    const restoredElementIds =
+      restoredElements === undefined
+        ? null
+        : new Set(
+            restoredElements
+              .filter((element) => !element.isDeleted)
+              .map((element) => element.id),
+          );
+    const seenBookmarkIds = new Set<string>();
+    nextAppState.bookmarkedElementIds = bookmarkedElementIds.filter(
+      (id): id is ExcalidrawElement["id"] => {
+        if (
+          typeof id !== "string" ||
+          (restoredElementIds !== null && !restoredElementIds.has(id)) ||
+          seenBookmarkIds.has(id)
+        ) {
+          return false;
+        }
+        seenBookmarkIds.add(id);
+        return true;
+      },
+    );
   }
 
   const boxSelectionMode =

@@ -25,12 +25,9 @@ export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
 // room left at each side of the visible canvas when a text stops growing at
 // its width, or is brought into view once it wraps
 export const TEXT_VIEWPORT_PADDING = 20; // px
-// the widest a typed or pasted text gets before it wraps, however wide the
-// view: in scene units when zoomed in or at 100%, on screen when zoomed out
-// (so the further out, the wider in scene units)...
+// the widest a typed or pasted text gets before it wraps (in scene units, so
+// at any zoom), however wide the view
 export const TEXT_MAX_WRAP_WIDTH = 800; // px
-// ...up to this width, in scene units
-export const TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT = 2000; // px
 export const DRAGGING_THRESHOLD = 10; // px
 export const MINIMUM_ARROW_SIZE = 20; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
@@ -539,6 +536,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 
 export const LIBRARY_SIDEBAR_TAB = "library";
 export const CANVAS_SEARCH_TAB = "search";
+export const BOOKMARKS_SIDEBAR_TAB = "bookmarks";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
@@ -579,8 +577,6 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
-  // TEMPORARY (see MinimapAnnouncementDot)
-  MINIMAP_ANNOUNCEMENT_DISMISSED: "excalidraw-minimap-announcement-dismissed",
 } as const;
 
 /**

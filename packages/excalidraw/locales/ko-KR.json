@@ -168,6 +168,12 @@
       "lockAll": "모두 잠금",
       "unlockAll": "모두 잠금 해제"
     },
+    "elementBookmark": {
+      "bookmark": "북마크 추가",
+      "removeBookmark": "북마크 제거",
+      "next": "다음 북마크",
+      "previous": "이전 북마크"
+    },
     "statusPublished": "게시 됨",
     "sidebarLock": "사이드 바 유지",
     "selectAllElementsInFrame": "프레임의 모든 요소 선택",
@@ -221,6 +227,11 @@
     "placeholder": "캔버스에서 텍스트 찾기...",
     "frames": "프레임",
     "texts": "텍스트"
+  },
+  "bookmarks": {
+    "title": "북마크",
+    "empty": "아직 북마크가 없습니다...",
+    "emptyHint": "요소를 마우스 오른쪽 버튼으로 클릭하여 북마크하세요."
   },
   "buttons": {
     "clearReset": "캔버스 초기화",

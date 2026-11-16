@@ -168,6 +168,12 @@
       "lockAll": "Zamknúť všetko",
       "unlockAll": "Odomknúť všetko"
     },
+    "elementBookmark": {
+      "bookmark": "Pridať záložku",
+      "removeBookmark": "Odstrániť záložku",
+      "next": "Nasledujúca záložka",
+      "previous": "Predchádzajúca záložka"
+    },
     "statusPublished": "Zverejnené",
     "sidebarLock": "Nechať bočný panel otvorený",
     "selectAllElementsInFrame": "Vybrať všetky prvky v ráme",
@@ -221,6 +227,11 @@
     "placeholder": "Vyhľadať text v plátne...",
     "frames": "Rámce",
     "texts": "Texty"
+  },
+  "bookmarks": {
+    "title": "Záložky",
+    "empty": "Zatiaľ žiadne záložky...",
+    "emptyHint": "Kliknite pravým tlačidlom myši na prvok, aby ste ho pridali do záložiek."
   },
   "buttons": {
     "clearReset": "Obnoviť plátno",

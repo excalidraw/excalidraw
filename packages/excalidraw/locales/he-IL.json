@@ -168,6 +168,12 @@
       "lockAll": "לנעול הכל",
       "unlockAll": "שחרור הכול"
     },
+    "elementBookmark": {
+      "bookmark": "הוסף סימנייה",
+      "removeBookmark": "הסר סימנייה",
+      "next": "הסימנייה הבאה",
+      "previous": "הסימנייה הקודמת"
+    },
     "statusPublished": "פורסם",
     "sidebarLock": "להשאיר את סרגל הצד פתוח",
     "selectAllElementsInFrame": "בחירת כל הרכיבים במסגרת",
@@ -221,6 +227,11 @@
     "placeholder": "איתור טקסט בלוח הציור…",
     "frames": "מסגרות",
     "texts": "טקסט"
+  },
+  "bookmarks": {
+    "title": "סימניות",
+    "empty": "אין סימניות עדיין...",
+    "emptyHint": "לחץ באמצעות הלחצן הימני על אלמנט כדי להוסיף אותו לסימניות."
   },
   "buttons": {
     "clearReset": "איפוס לוח הציור",

@@ -178,6 +178,7 @@ export const loadSceneOrLibraryFromBlob = async (
                 : {}),
             },
             localAppState,
+            elements,
           ),
           files: data.files || {},
         },

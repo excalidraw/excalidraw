@@ -168,6 +168,12 @@
       "lockAll": "Bloquear tudo",
       "unlockAll": "Desbloquear tudo"
     },
+    "elementBookmark": {
+      "bookmark": "Adicionar marcador",
+      "removeBookmark": "Remover marcador",
+      "next": "Próximo marcador",
+      "previous": "Marcador anterior"
+    },
     "statusPublished": "Publicado",
     "sidebarLock": "Manter barra lateral aberta",
     "selectAllElementsInFrame": "Selecionar todos os elementos no quadro",
@@ -221,6 +227,11 @@
     "placeholder": "Procurar texto na tela...",
     "frames": "Quadros",
     "texts": "Textos"
+  },
+  "bookmarks": {
+    "title": "Favoritos",
+    "empty": "Nenhum favorito ainda...",
+    "emptyHint": "Clique com o botão direito em um elemento para favoritá-lo."
   },
   "buttons": {
     "clearReset": "Limpar a tela",

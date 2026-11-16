@@ -168,6 +168,12 @@
       "lockAll": "Kuncikan semua",
       "unlockAll": "Lepas semua"
     },
+    "elementBookmark": {
+      "bookmark": "Tambahkan penanda buku",
+      "removeBookmark": "Hapus penanda buku",
+      "next": "Penanda buku berikutnya",
+      "previous": "Penanda buku sebelumnya"
+    },
     "statusPublished": "Telah terbit",
     "sidebarLock": "Biarkan sidebar tetap terbuka",
     "selectAllElementsInFrame": "Pilih semua unsur di bingkai",
@@ -221,6 +227,11 @@
     "placeholder": "Temukan teks di kanvas...",
     "frames": "Bingkai",
     "texts": "Teks"
+  },
+  "bookmarks": {
+    "title": "Bookmark",
+    "empty": "Belum ada bookmark...",
+    "emptyHint": "Klik kanan pada elemen untuk mem-bookmark."
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",

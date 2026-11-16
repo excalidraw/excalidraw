@@ -35,11 +35,6 @@
     &__footer {
       width: 100%;
 
-      &-left {
-        // anchors the minimap
-        position: relative;
-      }
-
       &-right {
         z-index: 100;
         display: flex;
