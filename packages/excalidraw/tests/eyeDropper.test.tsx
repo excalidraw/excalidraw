@@ -5,7 +5,8 @@ import { KEYS, THEME } from "@excalidraw/common";
 import { Excalidraw } from "../index";
 
 import { Keyboard } from "./helpers/ui";
-import { fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
+import { fireEvent, render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

@@ -17,7 +17,7 @@ import {
 } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 import { getMinTextElementWidth } from "./textMeasurements";
 import {
   isArrowElement,

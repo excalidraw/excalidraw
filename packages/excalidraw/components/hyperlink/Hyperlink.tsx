@@ -56,7 +56,7 @@ import {
   useAppProps,
   useEditorInterface,
   useExcalidrawAppState,
-} from "../App";
+} from "../App.context";
 import { IconButton } from "../IconButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { getSelectedElements } from "../../scene";

@@ -17,10 +17,8 @@ import {
   getSelectedGroupForElement,
 } from "./groups";
 
-import {
-  bindElementsToFramesAfterDuplication,
-  getFrameChildren,
-} from "./frame";
+import { bindElementsToFramesAfterDuplication } from "./frame";
+import { getFrameChildren } from "./frameChildren";
 
 import { normalizeElementOrder } from "./sortElements";
 
@@ -33,7 +31,7 @@ import {
   isFrameLikeElement,
 } from "./typeChecks";
 
-import { getBoundTextElement, getContainerElement } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./boundText";
 
 import { fixDuplicatedBindingsAfterDuplication } from "./binding";
 

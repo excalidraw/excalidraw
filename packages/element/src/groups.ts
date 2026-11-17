@@ -1,4 +1,4 @@
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 
 import { isBoundToContainer } from "./typeChecks";
 

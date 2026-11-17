@@ -4,7 +4,7 @@ import React from "react";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { t } from "../i18n";
 
-import { useExcalidrawAppState, useExcalidrawElements } from "./App";
+import { useExcalidrawAppState, useExcalidrawElements } from "./App.context";
 
 import { Popover } from "./Popover";
 

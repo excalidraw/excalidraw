@@ -18,7 +18,7 @@ import {
 } from "../actions/actionProperties";
 import { Excalidraw } from "../index";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";

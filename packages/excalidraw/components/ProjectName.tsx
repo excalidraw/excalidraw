@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { focusNearestParent, KEYS } from "@excalidraw/common";
 
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App.context";
 
 import "./TextInput.scss";
 import "./ProjectName.scss";

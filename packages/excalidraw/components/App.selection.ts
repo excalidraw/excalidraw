@@ -24,7 +24,7 @@ import type {
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { type CaptureUpdateActionType } from "../store";
+import { type CaptureUpdateActionType } from "../captureUpdate";
 
 import type {
   AppClassProperties,

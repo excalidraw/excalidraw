@@ -36,7 +36,6 @@ import { UI, Keyboard, Pointer } from "../helpers/ui";
 import { getTextEditor } from "../queries/dom";
 
 import {
-  GlobalTestState,
   act,
   assertElements,
   fireEvent,
@@ -44,6 +43,7 @@ import {
   render,
   waitFor,
 } from "../test-utils";
+import { GlobalTestState } from "../test-utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

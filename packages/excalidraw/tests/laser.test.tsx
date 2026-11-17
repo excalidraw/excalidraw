@@ -8,7 +8,8 @@ import { getLinkHandleFromCoords } from "../components/hyperlink/helpers";
 
 import { API } from "./helpers/api";
 import { Pointer } from "./helpers/ui";
-import { act, GlobalTestState, render, waitFor } from "./test-utils";
+import { act, render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { Collaborator, ExcalidrawProps, SocketId } from "../types";
 

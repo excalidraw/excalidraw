@@ -5,8 +5,11 @@ import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
+import { isLibraryMenuOpenAtom } from "./libraryMenuAtoms";
+import {
+  useExcalidrawContainer,
+  useExcalidrawSetAppState,
+} from "./App.context";
 
 import "./ConfirmDialog.scss";
 

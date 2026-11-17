@@ -6,7 +6,7 @@ import { KEYS, MIME_TYPES } from "@excalidraw/common";
 
 import { useI18n } from "../i18n";
 
-import { useApp, useExcalidrawContainer } from "./App";
+import { useApp, useExcalidrawContainer } from "./App.context";
 import Trans from "./Trans";
 
 import "./FileDropOverlay.scss";

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useContext } from "react";
 
 import { t } from "../../i18n";
-import { useEditorInterface } from "../App";
+import { useEditorInterface } from "../App.context";
 import { Button } from "../Button";
 import { Tooltip } from "../Tooltip";
 import { CloseIcon, PinIcon } from "../icons";

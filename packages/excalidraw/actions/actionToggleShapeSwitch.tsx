@@ -6,7 +6,7 @@ import {
 } from "../components/ConvertElementTypePopup";
 import { editorJotaiStore } from "../editor-jotai";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

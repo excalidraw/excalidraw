@@ -36,7 +36,7 @@ import type { NullableGridSize, Zoom } from "@excalidraw/common";
 
 import { getCurvePathOps } from "./geometricShapes";
 
-import { moveArrowAboveBindable } from "./zindex";
+import { moveArrowAboveBindable } from "./arrowStacking";
 import {
   deconstructLinearOrFreeDrawElement,
   getSnapOutlineMidPoint,
@@ -59,7 +59,8 @@ import {
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { handleBindTextResize } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";

@@ -4,7 +4,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { useCallback, useState } from "react";
 
-import { useEditorInterface } from "../App";
+import { useEditorInterface } from "../App.context";
 import { Island } from "../Island";
 import Stack from "../Stack";
 

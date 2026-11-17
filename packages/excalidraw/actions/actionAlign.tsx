@@ -30,7 +30,7 @@ import { isSomeElementSelected } from "../scene";
 
 import { getShortcutKey } from "../shortcut";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

@@ -35,7 +35,10 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import "./Actions.scss";
 
-import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
+import {
+  useExcalidrawContainer,
+  useExcalidrawSetAppState,
+} from "./App.context";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { Tooltip } from "./Tooltip";
 import { PropertiesPopover } from "./PropertiesPopover";

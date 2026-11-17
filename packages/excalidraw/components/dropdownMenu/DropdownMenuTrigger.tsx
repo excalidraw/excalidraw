@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { useEditorInterface } from "../App";
+import { useEditorInterface } from "../App.context";
 
 const MenuTrigger = ({
   className = "",

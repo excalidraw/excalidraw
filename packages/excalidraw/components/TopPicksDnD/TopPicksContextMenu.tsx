@@ -1,6 +1,6 @@
 import { ContextMenu } from "radix-ui";
 
-import { useExcalidrawContainer } from "../App";
+import { useExcalidrawContainer } from "../App.context";
 
 import type { ReactElement } from "react";
 

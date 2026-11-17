@@ -2,7 +2,7 @@ import { KEYS, THEME } from "@excalidraw/common";
 
 import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
-import { useEditorInterface } from "../components/App";
+import { useEditorInterface } from "../components/App.context";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";
@@ -20,7 +20,7 @@ import { t } from "../i18n";
 
 import "../components/ToolIcon.scss";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

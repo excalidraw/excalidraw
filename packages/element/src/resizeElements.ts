@@ -33,13 +33,15 @@ import {
 } from "./bounds";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
-  getBoundTextElement,
-  getBoundTextElementId,
-  getContainerElement,
   handleBindTextResize,
   getBoundTextMaxWidth,
   computeBoundTextPosition,
 } from "./textElement";
+import {
+  getBoundTextElement,
+  getBoundTextElementId,
+  getContainerElement,
+} from "./boundText";
 import {
   getMinTextElementWidth,
   measureText,

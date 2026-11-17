@@ -10,7 +10,8 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { AppStateDelta, Delta, ElementsDelta } from "../delta";
+import { AppStateDelta, ElementsDelta } from "../delta";
+import { Delta } from "../deltaBase";
 
 import { API } from "./helpers/api";
 

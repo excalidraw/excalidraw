@@ -21,13 +21,13 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
 import { IconButton } from "../components/IconButton";
 
-import { useStylesPanelMode } from "../components/App";
+import { useStylesPanelMode } from "../components/App.context";
 
 import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { updateActiveTool } from "../appState";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

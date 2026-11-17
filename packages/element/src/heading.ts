@@ -17,14 +17,14 @@ import {
   vectorScale,
 } from "@excalidraw/math";
 
+import { getCenterForBounds } from "@excalidraw/common";
+
 import type {
   LocalPoint,
   GlobalPoint,
   Triangle,
   Vector,
 } from "@excalidraw/math";
-
-import { getCenterForBounds } from "./bounds";
 
 import type { ExcalidrawBindableElement } from "./types";
 

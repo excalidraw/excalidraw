@@ -36,13 +36,9 @@ import {
 
 import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
 
-import { getElementAbsoluteCoords } from "./bounds";
-
 import type {
-  ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
-  ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawEmbeddableElement,
   ExcalidrawFrameLikeElement,
@@ -148,36 +144,6 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
     type: "polygon",
     data,
   };
-};
-
-// return the selection box for an element, possibly rotated as well
-export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-  padding = 10,
-) => {
-  let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    elementsMap,
-    true,
-  );
-
-  x1 -= padding;
-  x2 += padding;
-  y1 -= padding;
-  y2 += padding;
-
-  //const angleInDegrees = angleToDegrees(element.angle);
-  const center = pointFrom(cx, cy);
-  const topLeft = pointRotateRads(pointFrom(x1, y1), center, element.angle);
-  const topRight = pointRotateRads(pointFrom(x2, y1), center, element.angle);
-  const bottomLeft = pointRotateRads(pointFrom(x1, y2), center, element.angle);
-  const bottomRight = pointRotateRads(pointFrom(x2, y2), center, element.angle);
-
-  return {
-    type: "polygon",
-    data: [topLeft, topRight, bottomRight, bottomLeft],
-  } as GeometricShape<Point>;
 };
 
 // ellipse

@@ -16,7 +16,10 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
 import { isGridModeEnabled } from "../../snapping";
-import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
+import {
+  useExcalidrawAppState,
+  useExcalidrawSetAppState,
+} from "../App.context";
 import { Island } from "../Island";
 import { CloseIcon } from "../icons";
 

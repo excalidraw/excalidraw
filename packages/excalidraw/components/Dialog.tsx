@@ -11,9 +11,9 @@ import {
   useExcalidrawContainer,
   useEditorInterface,
   useExcalidrawSetAppState,
-} from "./App";
+} from "./App.context";
 import { Island } from "./Island";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { isLibraryMenuOpenAtom } from "./libraryMenuAtoms";
 import { Modal } from "./Modal";
 import { CloseIcon } from "./icons";
 

@@ -12,10 +12,11 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import App, {
+import App from "./components/App";
+import {
   ExcalidrawAPIContext,
   ExcalidrawAPISetContext,
-} from "./components/App";
+} from "./components/App.context";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
@@ -475,7 +476,7 @@ export {
   bumpVersion,
 } from "@excalidraw/element";
 
-export { CaptureUpdateAction } from "./store";
+export { CaptureUpdateAction } from "./captureUpdate";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
@@ -489,7 +490,7 @@ export {
   useStylesPanelMode,
   useExcalidrawAPI,
   ExcalidrawAPIContext,
-} from "./components/App";
+} from "./components/App.context";
 
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };

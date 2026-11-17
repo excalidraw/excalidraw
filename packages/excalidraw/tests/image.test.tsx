@@ -10,7 +10,8 @@ import { createPasteEvent } from "../clipboard";
 import { API } from "./helpers/api";
 import { mockMultipleHTMLImageElements } from "./helpers/mocks";
 import { UI } from "./helpers/ui";
-import { GlobalTestState, render, waitFor } from "./test-utils";
+import { render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 import {
   DEER_IMAGE_DIMENSIONS,
   SMILEY_IMAGE_DIMENSIONS,

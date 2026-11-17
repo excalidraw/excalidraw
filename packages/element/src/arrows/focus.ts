@@ -20,7 +20,7 @@ import {
 } from "../typeChecks";
 import { LinearElementEditor } from "../linearElementEditor";
 import { getHoveredElementForBinding, hitElementItself } from "../collision";
-import { moveArrowAboveBindable } from "../zindex";
+import { moveArrowAboveBindable } from "../arrowStacking";
 
 import type {
   ElementsMap,

@@ -20,7 +20,7 @@ import {
 import { useUIAppState } from "../../context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
-import { useEditorInterface, useExcalidrawSetAppState } from "../App";
+import { useEditorInterface, useExcalidrawSetAppState } from "../App.context";
 import { Island } from "../Island";
 
 import { SidebarHeader } from "./SidebarHeader";

@@ -21,7 +21,7 @@ import type {
 
 import { getSelectedElements } from "../scene";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

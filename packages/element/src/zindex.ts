@@ -2,23 +2,13 @@ import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
 import { isFiniteNumber } from "@excalidraw/math";
 
-import type { GlobalPoint } from "@excalidraw/math";
-
-import { isFrameLikeElement, isTextElement } from "./typeChecks";
+import { isFrameLikeElement } from "./typeChecks";
 import { getElementsInGroup } from "./groups";
 import { syncMovedIndices } from "./fractionalIndex";
 import { getSelectedElements } from "./selection";
-import { getBoundTextElement, getContainerElement } from "./textElement";
 
 import type { Scene } from "./Scene";
-import type {
-  ExcalidrawArrowElement,
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
-} from "./types";
+import type { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./types";
 import type { ElementsState } from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
@@ -144,46 +134,6 @@ const getContiguousFrameRangeElements = (
     return [];
   }
   return allElements.slice(rangeStart, rangeEnd + 1);
-};
-
-/**
- * Moves the arrow element above any bindable elements it intersects with or
- * hovers over.
- */
-export const moveArrowAboveBindable = (
-  point: GlobalPoint,
-  arrow: ExcalidrawArrowElement,
-  elements: readonly OrderedExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
-  scene: Scene,
-  hoveredElement: NonDeletedExcalidrawElement,
-): readonly OrderedExcalidrawElement[] => {
-  if (!hoveredElement) {
-    return elements;
-  }
-
-  const boundTextElement = getBoundTextElement(hoveredElement, elementsMap);
-  const containerElement = isTextElement(hoveredElement)
-    ? getContainerElement(hoveredElement, elementsMap)
-    : null;
-
-  const bindableIds = [
-    hoveredElement.id,
-    boundTextElement?.id,
-    containerElement?.id,
-  ].filter((id): id is NonDeletedExcalidrawElement["id"] => !!id);
-  const bindableIdx = elements.findIndex((el) => bindableIds.includes(el.id));
-  const arrowIdx = elements.findIndex((el) => el.id === arrow.id);
-
-  if (arrowIdx !== -1 && bindableIdx !== -1 && arrowIdx < bindableIdx) {
-    const updatedElements = Array.from(elements);
-    const arrow = updatedElements.splice(arrowIdx, 1)[0];
-    updatedElements.splice(bindableIdx, 0, arrow);
-
-    scene.replaceAllElements(updatedElements);
-  }
-
-  return elements;
 };
 
 /**

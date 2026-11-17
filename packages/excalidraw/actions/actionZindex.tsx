@@ -16,7 +16,7 @@ import {
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

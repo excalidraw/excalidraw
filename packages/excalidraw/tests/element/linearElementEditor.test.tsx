@@ -40,13 +40,8 @@ import * as StaticScene from "../../renderer/staticScene";
 import { API } from "../helpers/api";
 
 import { Keyboard, Pointer, UI } from "../helpers/ui";
-import {
-  screen,
-  render,
-  fireEvent,
-  GlobalTestState,
-  unmountComponent,
-} from "../test-utils";
+import { screen, render, fireEvent, unmountComponent } from "../test-utils";
+import { GlobalTestState } from "../test-utils";
 
 import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
 

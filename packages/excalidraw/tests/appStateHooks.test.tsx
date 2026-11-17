@@ -2,7 +2,7 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
 import { getDefaultAppState } from "../appState";
-import { ExcalidrawAPIContext } from "../components/App";
+import { ExcalidrawAPIContext } from "../components/App.context";
 import { AppStateObserver } from "../components/AppStateObserver";
 import {
   useAppStateValue,

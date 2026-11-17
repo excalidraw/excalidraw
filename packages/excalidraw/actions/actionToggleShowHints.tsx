@@ -1,6 +1,6 @@
 import { messageCircleIcon } from "../components/icons";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

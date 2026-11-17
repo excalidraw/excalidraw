@@ -16,7 +16,8 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
-import { GlobalTestState, render, unmountComponent } from "./test-utils";
+import { render, unmountComponent } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 unmountComponent();
 

@@ -4,13 +4,9 @@ import type { RenderEnvironment } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
-import {
-  CaptureUpdateAction,
-  StoreChange,
-  StoreDelta,
-  type StoreSnapshot,
-  type Store,
-} from "./store";
+import { StoreChange, StoreDelta, type Store } from "./store";
+import { CaptureUpdateAction } from "./captureUpdate";
+import { type StoreSnapshot } from "./storeSnapshot";
 
 import type { AppState } from "./types";
 

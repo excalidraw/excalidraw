@@ -22,11 +22,11 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { getShortcutKey } from "../shortcut";
 
-import { useStylesPanelMode } from "../components/App";
+import { useStylesPanelMode } from "../components/App.context";
 
 import { getSelectionStateForElements } from "../components/App.selection";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

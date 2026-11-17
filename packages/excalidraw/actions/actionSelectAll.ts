@@ -14,7 +14,7 @@ import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { selectAllIcon } from "../components/icons";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

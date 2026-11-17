@@ -23,9 +23,9 @@ import type { SceneBounds } from "@excalidraw/element";
 import type { Bounds } from "@excalidraw/common";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { getNormalizedZoom } from "./scene";
+import { getNormalizedZoom } from "./scene/normalize";
 
-import { CaptureUpdateAction } from "./store";
+import { CaptureUpdateAction } from "./captureUpdate";
 
 import type {
   AppState,

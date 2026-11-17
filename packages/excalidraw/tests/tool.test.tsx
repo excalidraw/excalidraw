@@ -11,7 +11,8 @@ import { updateActiveTool } from "../appState";
 
 import { API } from "./helpers/api";
 import { Pointer } from "./helpers/ui";
-import { act, fireEvent, GlobalTestState, render } from "./test-utils";
+import { act, fireEvent, render } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { AppClassProperties, ExcalidrawImperativeAPI } from "../types";
 

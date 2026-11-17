@@ -5,6 +5,7 @@ import {
   invariant,
   rescalePoints,
   sizeOf,
+  getCenterForBounds,
 } from "@excalidraw/common";
 import {
   clamp,
@@ -30,12 +31,12 @@ import type {
 } from "@excalidraw/math";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { getCurvePathOps } from "./geometricShapes";
+import { getCurvePathOps, type GeometricShape } from "./geometricShapes";
 
 import { ELBOW_ARROW_CORNER_RADIUS, generateRoughOptions } from "./shape";
 import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
-import { getBoundTextElement, getContainerElement } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./boundText";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -76,6 +77,22 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 import type { ElementsState } from "./types";
+
+// moved to @excalidraw/common; re-exported for existing importers
+export { getCenterForBounds } from "@excalidraw/common";
+/**
+ * this file defines pure geometric shapes
+ *
+ * for instance, a cubic bezier curve is specified by its four control points and
+ * an ellipse is defined by its center, angle, semi major axis and semi minor axis
+ * (but in semi-width and semi-height so it's more relevant to Excalidraw)
+ *
+ * the idea with pure shapes is so that we can provide collision and other geoemtric methods not depending on
+ * the specifics of roughjs or elements in Excalidraw; instead, we can focus on the pure shapes themselves
+ *
+ * also included in this file are methods for converting an Excalidraw element or a Drawable from roughjs
+ * to pure shapes
+ */
 
 export type RectangleBox = {
   x: number;
@@ -1425,12 +1442,6 @@ export const getVisibleSceneBounds = ({
   ];
 };
 
-export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
-  pointFrom(
-    bounds[0] + (bounds[2] - bounds[0]) / 2,
-    bounds[1] + (bounds[3] - bounds[1]) / 2,
-  );
-
 /**
  * Get the axis-aligned bounding box for a given element
  */
@@ -1836,4 +1847,34 @@ export const elementCenterPoint = (
   const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
 
   return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
+};
+
+// return the selection box for an element, possibly rotated as well
+export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  padding = 10,
+) => {
+  let [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+    true,
+  );
+
+  x1 -= padding;
+  x2 += padding;
+  y1 -= padding;
+  y2 += padding;
+
+  //const angleInDegrees = angleToDegrees(element.angle);
+  const center = pointFrom(cx, cy);
+  const topLeft = pointRotateRads(pointFrom(x1, y1), center, element.angle);
+  const topRight = pointRotateRads(pointFrom(x2, y1), center, element.angle);
+  const bottomLeft = pointRotateRads(pointFrom(x1, y2), center, element.angle);
+  const bottomRight = pointRotateRads(pointFrom(x2, y2), center, element.angle);
+
+  return {
+    type: "polygon",
+    data: [topLeft, topRight, bottomRight, bottomLeft],
+  } as GeometricShape<Point>;
 };

@@ -1,4 +1,4 @@
-import { useEditorInterface } from "../App";
+import { useEditorInterface } from "../App.context";
 
 import { Ellipsify } from "../Ellipsify";
 

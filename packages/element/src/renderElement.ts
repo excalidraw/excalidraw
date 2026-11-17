@@ -40,12 +40,11 @@ import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
-  getBoundTextElement,
   getContainerCoords,
-  getContainerElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
 } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./boundText";
 import { getLineHeightInPx } from "./textMeasurements";
 import {
   isTextElement,
@@ -68,11 +67,12 @@ import {
   type StickyNotePathCommand,
 } from "./stickyNote";
 
+import { elementWithCanvasCache } from "./renderCache";
+
 import type { RenderEnvironment } from "./renderEnvironment";
 
 import type {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -89,6 +89,7 @@ import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
 } from "./types";
+import type { ExcalidrawElementWithCanvas } from "./renderCache";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -198,21 +199,6 @@ export const resolveElementRenderState = (
 
   return { opacity, offset: offset ?? ZERO_RENDER_OFFSET };
 };
-
-export interface ExcalidrawElementWithCanvas {
-  element: ExcalidrawElement | ExcalidrawTextElement;
-  canvas: HTMLCanvasElement;
-  theme: ElementsState["theme"];
-  scale: number;
-  /** backing-store scale the bitmap was rasterized at, see StaticCanvasRenderConfig["scale"] */
-  deviceScale: number;
-  environment: RenderEnvironment;
-  zoomValue: ElementsState["zoom"]["value"];
-  canvasOffsetX: number;
-  canvasOffsetY: number;
-  imageCrop: ExcalidrawImageElement["crop"] | null;
-  containingFrameOpacity: number;
-}
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
@@ -714,11 +700,6 @@ const drawElementOnCanvas = (
     }
   }
 };
-
-export const elementWithCanvasCache = new WeakMap<
-  ExcalidrawElement,
-  ExcalidrawElementWithCanvas
->();
 
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,

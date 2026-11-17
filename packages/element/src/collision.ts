@@ -54,10 +54,8 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import {
-  getBoundTextElement,
-  getTextElementWithAccuratePosition,
-} from "./textElement";
+import { getTextElementWithAccuratePosition } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 
 import { distanceToElement } from "./distance";
 

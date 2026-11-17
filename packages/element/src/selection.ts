@@ -1,13 +1,13 @@
 import { isShallowEqual, type Bounds } from "@excalidraw/common";
 
 import { elementsOverlappingBBox, getElementAbsoluteCoords } from "./bounds";
-import { isElementInViewport } from "./sizeHelpers";
+import { isElementInViewport } from "./viewport";
 import {
   isBoundToContainer,
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
-import { getFrameChildren } from "./frame";
+import { getFrameChildren } from "./frameChildren";
 
 import { isNonDeletedElement } from "./sceneElements";
 

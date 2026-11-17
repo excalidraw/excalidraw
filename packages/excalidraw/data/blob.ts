@@ -9,6 +9,8 @@ import {
 
 import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
+import { supported as nativeFileSystemSupported } from "browser-fs-access";
+
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
@@ -16,16 +18,18 @@ import { cleanAppStateForExport } from "../appState";
 
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { getScrollToContentState } from "../scene";
-import { decodeSvgBase64Payload } from "../scene/export";
+
+import { decodeSvgBase64Payload } from "./encode";
 
 import { base64ToString, stringToBase64, toByteString } from "./encode";
-import { nativeFileSystemSupported } from "./filesystem";
-import { isValidExcalidrawData, isValidLibrary } from "./json";
+import { isValidExcalidrawData, isValidLibrary } from "./validate";
 import {
   restoreAppState,
   restoreElements,
   restoreLibraryItems,
 } from "./restore";
+
+import { blobToArrayBuffer } from "./arrayBuffer";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
@@ -542,21 +546,4 @@ export const normalizeFile = async (file: File) => {
   (file as any)[normalizedFileSymbol] = true;
 
   return file;
-};
-
-export const blobToArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
-  if ("arrayBuffer" in blob) {
-    return blob.arrayBuffer();
-  }
-  // Safari
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (!event.target?.result) {
-        return reject(new Error("Couldn't convert blob to ArrayBuffer"));
-      }
-      resolve(event.target.result as ArrayBuffer);
-    };
-    reader.readAsArrayBuffer(blob);
-  });
 };

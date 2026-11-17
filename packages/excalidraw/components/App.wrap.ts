@@ -39,7 +39,7 @@ import {
   wrapInFrame,
 } from "../actions/actionFrame";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { getSelectionStateForElements } from "./App.selection";
 

@@ -15,9 +15,9 @@ import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 
-import { useStylesPanelMode } from "../components/App";
+import { useStylesPanelMode } from "../components/App.context";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import type { History } from "../history";
 import type { AppClassProperties, AppState } from "../types";

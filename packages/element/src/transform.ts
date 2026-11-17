@@ -71,9 +71,9 @@ import { syncInvalidIndices } from "./fractionalIndex";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
-  getBoundTextElement,
   redrawTextBoundingBox,
 } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 
 import { LinearElementEditor } from "./linearElementEditor";
 

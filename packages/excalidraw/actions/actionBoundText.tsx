@@ -55,7 +55,7 @@ import type { Radians } from "@excalidraw/math";
 import { getDefaultAppState } from "../appState";
 import { getSelectionStateForElements } from "../components/App.selection";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

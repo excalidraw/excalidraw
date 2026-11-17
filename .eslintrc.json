@@ -38,6 +38,12 @@
       {
         "allowReferrer": true
       }
+    ],
+    "import/no-cycle": [
+      "error",
+      {
+        "ignoreExternal": true
+      }
     ]
   },
   "overrides": [
@@ -59,6 +65,39 @@
           }
         ]
       }
+    },
+    {
+      "files": [
+        "packages/element/src/binding.ts",
+        "packages/element/src/bounds.ts",
+        "packages/element/src/collision.ts",
+        "packages/element/src/distance.ts",
+        "packages/element/src/elbowArrow.ts",
+        "packages/element/src/fractionalIndex.ts",
+        "packages/element/src/frame.ts",
+        "packages/element/src/linearElementEditor.ts",
+        "packages/element/src/mutateElement.ts",
+        "packages/element/src/selection.ts",
+        "packages/element/src/shape.ts",
+        "packages/element/src/stickyNote.ts",
+        "packages/element/src/textElement.ts",
+        "packages/element/src/utils.ts",
+        "packages/element/src/viewport.ts"
+      ],
+      "rules": {
+        "import/no-cycle": "off"
+      }
     }
-  ]
+  ],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/extensions": [".js", ".jsx", ".ts", ".tsx"]
+  }
 }

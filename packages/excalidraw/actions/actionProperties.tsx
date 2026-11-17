@@ -169,7 +169,10 @@ import {
 
 import { getShortcutKey } from "../shortcut";
 
-import { CaptureUpdateAction, type CaptureUpdateActionType } from "../store";
+import {
+  CaptureUpdateAction,
+  type CaptureUpdateActionType,
+} from "../captureUpdate";
 
 import {
   getColorTargetAppStateUpdates,

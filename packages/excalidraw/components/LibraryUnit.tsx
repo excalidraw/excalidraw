@@ -3,7 +3,7 @@ import { memo, useRef, useState } from "react";
 
 import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
-import { useEditorInterface } from "./App";
+import { useEditorInterface } from "./App.context";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
 import { hideTooltip, showTooltip } from "./Tooltip";

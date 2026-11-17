@@ -54,7 +54,8 @@ import { createPasteEvent } from "../clipboard";
 
 import * as blobModule from "../data/blob";
 
-import { CaptureUpdateAction, StoreDelta } from "../store";
+import { StoreDelta } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { ElementsDelta, AppStateDelta } from "../delta";
 
@@ -66,7 +67,6 @@ import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
-  GlobalTestState,
   act,
   assertSelectedElements,
   render,
@@ -75,6 +75,7 @@ import {
   checkpointHistory,
   unmountComponent,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 import { setupImageTest as _setupImageTest } from "./image.test";
 
 import type { AppState } from "../types";

@@ -5,7 +5,7 @@ import { Tooltip, hideTooltip } from "../components/Tooltip";
 import { minimapIcon } from "../components/icons";
 import { t } from "../i18n";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

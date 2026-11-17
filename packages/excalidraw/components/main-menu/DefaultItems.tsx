@@ -35,7 +35,7 @@ import {
   useExcalidrawElements,
   useAppProps,
   useApp,
-} from "../App";
+} from "../App.context";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
 import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";

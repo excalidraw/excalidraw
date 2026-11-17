@@ -16,7 +16,8 @@ import { actionFlipHorizontal, actionFlipVertical } from "../../actions/index";
 
 import { API } from "../helpers/api";
 import { Keyboard, Pointer, UI } from "../helpers/ui";
-import { act, GlobalTestState, render, unmountComponent } from "../test-utils";
+import { act, render, unmountComponent } from "../test-utils";
+import { GlobalTestState } from "../test-utils";
 
 import type { NormalizedZoomValue } from "../../types";
 

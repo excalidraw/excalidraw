@@ -4,7 +4,7 @@ import React, { type ReactNode } from "react";
 
 import { isInteractive } from "@excalidraw/common";
 
-import { useEditorInterface } from "./App";
+import { useEditorInterface } from "./App.context";
 import { Island } from "./Island";
 
 interface PropertiesPopoverProps {

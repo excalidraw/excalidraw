@@ -11,10 +11,10 @@ import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
 
-import { useApp, useExcalidrawSetAppState } from "./App";
+import { useApp, useExcalidrawSetAppState } from "./App.context";
 import ConfirmDialog from "./ConfirmDialog";
 import { Dialog } from "./Dialog";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { isLibraryMenuOpenAtom } from "./libraryMenuAtoms";
 import PublishLibrary from "./PublishLibrary";
 import { IconButton } from "./IconButton";
 import Trans from "./Trans";

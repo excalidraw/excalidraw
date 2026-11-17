@@ -3,7 +3,10 @@ import React from "react";
 import { actionSaveFileToDisk } from "../../actions";
 import { actionChangeExportEmbedScene } from "../../actions/actionExport";
 import { useI18n } from "../../i18n";
-import { useExcalidrawActionManager, useExcalidrawSetAppState } from "../App";
+import {
+  useExcalidrawActionManager,
+  useExcalidrawSetAppState,
+} from "../App.context";
 import { FilledButton } from "../FilledButton";
 
 export type ActionProps = {

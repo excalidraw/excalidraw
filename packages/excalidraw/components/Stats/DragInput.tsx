@@ -13,10 +13,10 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
-import { useApp, useExcalidrawSetAppState } from "../App";
+import { useApp, useExcalidrawSetAppState } from "../App.context";
 import { InlineIcon } from "../InlineIcon";
 
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../../captureUpdate";
 
 import { SMALLEST_DELTA } from "./utils";
 

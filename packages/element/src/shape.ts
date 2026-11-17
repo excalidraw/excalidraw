@@ -35,7 +35,7 @@ import {
   getPolygonShape,
 } from "./geometricShapes";
 
-import { elementWithCanvasCache } from "./renderElement";
+import { elementWithCanvasCache } from "./renderCache";
 
 import {
   canBecomePolygon,

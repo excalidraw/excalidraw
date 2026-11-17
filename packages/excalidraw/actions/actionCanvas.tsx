@@ -38,7 +38,7 @@ import {
 } from "../viewport";
 import { getShortcutKey } from "../shortcut";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

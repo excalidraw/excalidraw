@@ -23,13 +23,14 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
+import { getCenterForBounds } from "@excalidraw/common";
+
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
 
 import type { NullableGridSize } from "@excalidraw/common";
 
-import { getCenterForBounds } from "./bounds";
 import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
@@ -48,7 +49,8 @@ import {
 } from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { handleBindTextResize } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 import {
   isArrowElement,
   isBindableElement,

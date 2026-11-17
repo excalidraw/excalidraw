@@ -32,6 +32,8 @@ import {
   stickyNoteToolIcon,
 } from "./icons";
 
+import { isToolButtonDisabled } from "./toolButtons";
+
 import type {
   AppClassProperties,
   AppState,
@@ -221,14 +223,6 @@ export const findShapeByKey = (
   }
   return null;
 };
-
-/**
- * Whether a toolbar entry activating the given tool renders disabled — true
- * when the active tool is host-controlled (`props.activeTool`) and the entry
- * doesn't activate the forced tool (`setActiveTool` refuses it).
- */
-export const isToolButtonDisabled = (app: AppClassProperties, type: string) =>
-  app.props.activeTool != null && app.props.activeTool.type !== type;
 
 export type ToolButtonComponentProps = {
   app: AppClassProperties;

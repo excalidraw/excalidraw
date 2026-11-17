@@ -73,11 +73,8 @@ import type {
   ElementsPendingErasure,
 } from "@excalidraw/element/types";
 
-import {
-  type CaptureUpdateActionType,
-  type DurableIncrement,
-  type EphemeralIncrement,
-} from "./store";
+import { type DurableIncrement, type EphemeralIncrement } from "./store";
+import { type CaptureUpdateActionType } from "./captureUpdate";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";

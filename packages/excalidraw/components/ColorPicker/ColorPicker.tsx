@@ -19,7 +19,11 @@ import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useApp, useExcalidrawContainer, useStylesPanelMode } from "../App";
+import {
+  useApp,
+  useExcalidrawContainer,
+  useStylesPanelMode,
+} from "../App.context";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";

@@ -44,7 +44,7 @@ import { getShortcutKey } from "../shortcut";
 
 import { selectGroupsForSelectedElements } from "../components/App.selection";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

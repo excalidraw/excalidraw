@@ -6,7 +6,7 @@ import type { FractionalIndex } from "@excalidraw/element/types";
 import { reconcileElements } from "../data/reconcile";
 import { Excalidraw } from "../index";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";

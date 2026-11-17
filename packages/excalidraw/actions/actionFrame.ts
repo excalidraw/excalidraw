@@ -38,7 +38,7 @@ import type {
 import { getSelectionStateForElements } from "../components/App.selection";
 import { getSelectedElements } from "../scene";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

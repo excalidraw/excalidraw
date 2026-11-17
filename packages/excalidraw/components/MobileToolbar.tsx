@@ -16,11 +16,11 @@ import {
   getToolShortcut,
   HandToolButton,
   ImageToolButton,
-  isToolButtonDisabled,
   SelectionToolPopover,
   TextToolButton,
   TOOLS,
 } from "./Tools";
+import { isToolButtonDisabled } from "./toolButtons";
 
 import {
   TextIcon,

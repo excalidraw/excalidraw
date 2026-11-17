@@ -6,7 +6,7 @@ import {
 } from "@excalidraw/fractional-indexing";
 
 import { mutateElement, newElementWith } from "./mutateElement";
-import { getBoundTextElementId } from "./textElement";
+import { getBoundTextElementId } from "./boundText";
 import { hasBoundTextElement } from "./typeChecks";
 
 import { isNonDeletedElement } from "./sceneElements";

@@ -24,7 +24,7 @@ import {
   elementsOverlappingBBox,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
-import { getBoundTextElement, getContainerElement } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./boundText";
 import { syncMovedIndices } from "./fractionalIndex";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -35,6 +35,8 @@ import {
 } from "./typeChecks";
 
 import { getNonDeletedElements } from "./sceneElements";
+
+import { getFrameChildren } from "./frameChildren";
 
 import type { ExcalidrawElementsIncludingDeleted, Scene } from "./Scene";
 
@@ -261,19 +263,6 @@ export const groupByFrameLikes = (elements: readonly ExcalidrawElement[]) => {
   }
 
   return frameElementsMap;
-};
-
-export const getFrameChildren = (
-  allElements: ElementsMapOrArray,
-  frameId: string,
-) => {
-  const frameChildren: ExcalidrawElement[] = [];
-  for (const element of allElements.values()) {
-    if (element.frameId === frameId) {
-      frameChildren.push(element);
-    }
-  }
-  return frameChildren;
 };
 
 export const getFrameLikeElements = (

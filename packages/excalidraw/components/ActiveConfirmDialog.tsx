@@ -2,7 +2,7 @@ import { actionClearCanvas } from "../actions";
 import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 
-import { useExcalidrawActionManager } from "./App";
+import { useExcalidrawActionManager } from "./App.context";
 import ConfirmDialog from "./ConfirmDialog";
 
 export const activeConfirmDialogAtom = atom<"clearCanvas" | null>(null);

@@ -11,11 +11,8 @@ import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
-import {
-  decodeSvgBase64Payload,
-  encodeSvgBase64Payload,
-  exportScene,
-} from "../scene/export";
+import { encodeSvgBase64Payload, exportScene } from "../scene/export";
+import { decodeSvgBase64Payload } from "../data/encode";
 
 import { API } from "./helpers/api";
 import { render, waitFor } from "./test-utils";

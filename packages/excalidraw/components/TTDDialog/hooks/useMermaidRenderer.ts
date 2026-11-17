@@ -4,7 +4,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom } from "../../../editor-jotai";
 
-import { useApp } from "../../App";
+import { useApp } from "../../App.context";
 
 import { chatHistoryAtom, errorAtom, showPreviewAtom } from "../TTDContext";
 import { convertMermaidToExcalidraw } from "../common";

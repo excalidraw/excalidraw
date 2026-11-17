@@ -40,7 +40,7 @@ import { IconButton } from "../components/IconButton";
 
 import { updateActiveTool } from "../appState";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

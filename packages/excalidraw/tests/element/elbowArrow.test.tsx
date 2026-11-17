@@ -22,13 +22,8 @@ import { actionChangeArrowhead } from "../../actions/actionProperties";
 import { actionDuplicateSelection } from "../../actions/actionDuplicateSelection";
 import { API } from "../helpers/api";
 import { Pointer, UI } from "../helpers/ui";
-import {
-  act,
-  fireEvent,
-  GlobalTestState,
-  queryByTestId,
-  render,
-} from "../test-utils";
+import { act, fireEvent, queryByTestId, render } from "../test-utils";
+import { GlobalTestState } from "../test-utils";
 
 const { h } = window;
 

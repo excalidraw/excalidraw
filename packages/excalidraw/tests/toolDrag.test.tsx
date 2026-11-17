@@ -13,7 +13,8 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard, UI } from "./helpers/ui";
 import { getTextEditor } from "./queries/dom";
-import { fireEvent, GlobalTestState, render } from "./test-utils";
+import { fireEvent, render } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

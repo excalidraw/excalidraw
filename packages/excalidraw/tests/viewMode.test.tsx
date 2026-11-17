@@ -12,11 +12,11 @@ import {
   act,
   fireEvent,
   render,
-  GlobalTestState,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

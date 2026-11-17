@@ -12,14 +12,14 @@ import type {
   ExcalidrawLineElement,
 } from "@excalidraw/element/types";
 
-import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
+import { DEFAULT_CATEGORIES } from "../components/CommandPalette/categories";
 import { IconButton } from "../components/IconButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
 
 import { newElementWith } from "../../element/src/mutateElement";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

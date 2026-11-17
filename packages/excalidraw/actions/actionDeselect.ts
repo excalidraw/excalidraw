@@ -13,7 +13,7 @@ import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { updateActiveTool } from "../appState";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

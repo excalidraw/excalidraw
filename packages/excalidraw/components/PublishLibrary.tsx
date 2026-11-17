@@ -15,7 +15,7 @@ import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
 import { exportScene } from "../scene/export";
 
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App.context";
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
 import { IconButton } from "./IconButton";

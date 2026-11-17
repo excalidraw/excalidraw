@@ -25,7 +25,7 @@ import {
   useAppProps,
   useExcalidrawContainer,
   useStylesPanelMode,
-} from "../App";
+} from "../App.context";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";

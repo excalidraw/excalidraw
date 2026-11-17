@@ -7,14 +7,8 @@ import { t } from "../i18n";
 import { Excalidraw, Footer, MainMenu } from "../index";
 import { actionExportWithDarkMode } from "../actions/actionExport";
 
-import {
-  act,
-  fireEvent,
-  GlobalTestState,
-  toggleMenu,
-  render,
-  waitFor,
-} from "./test-utils";
+import { act, fireEvent, toggleMenu, render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

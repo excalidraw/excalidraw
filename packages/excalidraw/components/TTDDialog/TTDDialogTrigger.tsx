@@ -1,7 +1,7 @@
 import { trackEvent } from "../../analytics";
 import { useTunnels } from "../../context/tunnels";
 import { useI18n } from "../../i18n";
-import { useExcalidrawSetAppState } from "../App";
+import { useExcalidrawSetAppState } from "../App.context";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import { brainIcon } from "../icons";
 

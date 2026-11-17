@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react";
 
-import { useApp } from "../App";
+import { useApp } from "../App.context";
 
 import type { GenerateDiagramToCode } from "../../types";
 

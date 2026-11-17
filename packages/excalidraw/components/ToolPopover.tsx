@@ -8,11 +8,11 @@ import { Popover } from "radix-ui";
 import { trackEvent } from "../analytics";
 
 import { IconButton } from "./IconButton";
-import { isToolButtonDisabled } from "./Tools";
+import { isToolButtonDisabled } from "./toolButtons";
 
 import "./ToolPopover.scss";
 
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App.context";
 
 import type { AppClassProperties } from "../types";
 

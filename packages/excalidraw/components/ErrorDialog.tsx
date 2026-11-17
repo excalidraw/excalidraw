@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { t } from "../i18n";
 
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App.context";
 import { Dialog } from "./Dialog";
 
 export const ErrorDialog = ({

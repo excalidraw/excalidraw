@@ -13,18 +13,12 @@ import { Excalidraw } from "../index";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
 import { editorJotaiStore } from "../editor-jotai";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
-import {
-  act,
-  fireEvent,
-  GlobalTestState,
-  render,
-  togglePopover,
-  waitFor,
-} from "./test-utils";
+import { act, fireEvent, render, togglePopover, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

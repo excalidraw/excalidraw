@@ -15,7 +15,7 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
-import { CaptureUpdateAction } from "../store";
+import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
@@ -24,13 +24,13 @@ import {
   act,
   render,
   fireEvent,
-  GlobalTestState,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
   unmountComponent,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 unmountComponent();
 

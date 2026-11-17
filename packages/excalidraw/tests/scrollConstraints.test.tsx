@@ -24,12 +24,12 @@ import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
 import {
   fireEvent,
-  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { AppState, ScrollConstraints } from "../types";
 

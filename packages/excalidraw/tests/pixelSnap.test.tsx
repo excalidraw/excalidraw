@@ -4,7 +4,8 @@ import { Excalidraw } from "../index";
 import { snapScrollToDevicePixels } from "../renderer/helpers";
 
 import { API } from "./helpers/api";
-import { act, GlobalTestState, render, waitFor } from "./test-utils";
+import { act, render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { NormalizedZoomValue } from "../types";
 

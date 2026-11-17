@@ -2,7 +2,10 @@ import { useState, useLayoutEffect } from "react";
 
 import { EVENT, THEME } from "@excalidraw/common";
 
-import { useEditorInterface, useExcalidrawContainer } from "../components/App";
+import {
+  useEditorInterface,
+  useExcalidrawContainer,
+} from "../components/App.context";
 import { useUIAppState } from "../context/ui-appState";
 
 export const useCreatePortalContainer = (opts?: {

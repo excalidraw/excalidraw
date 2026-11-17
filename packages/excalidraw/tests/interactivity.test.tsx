@@ -15,12 +15,12 @@ import { getTextEditor, updateTextEditor } from "./queries/dom";
 import {
   act,
   fireEvent,
-  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { MockInstance } from "vitest";
 
