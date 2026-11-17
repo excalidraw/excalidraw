@@ -339,11 +339,6 @@ export interface AppState extends ElementsState {
    * - when set and present, the editor will handle linear element creation logic accordingly
    */
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
-  /**
-   * decoupled from newElement, dragging selection only creates selectionElement
-   * - set on pointer down, updated during pointer move
-   */
-  selectionElement: NonDeletedExcalidrawElement | null;
   /** user box selection preference; defaults to "contain" when unset */
   boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */

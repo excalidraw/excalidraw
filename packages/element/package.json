@@ -95,7 +95,6 @@
     "roughjs": "4.6.4"
   },
   "devDependencies": {
-    "@excalidraw/excalidraw": "workspace:*",
     "@excalidraw/laser-pointer": "workspace:*",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.2.0",

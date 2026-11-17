@@ -719,6 +719,11 @@ export interface ElementsState {
   gridSize: number;
   gridModeEnabled: boolean;
   shouldCacheIgnoreZoom: boolean;
+  /**
+   * decoupled from newElement, dragging selection only creates selectionElement
+   * - set on pointer down, updated during pointer move
+   */
+  selectionElement: NonDeletedExcalidrawElement | null;
   /** the open dialog, if any (`AppState` narrows this to its dialogs) */
   openDialog: { name: string } | null;
 }

@@ -337,9 +337,6 @@ importers:
         specifier: 4.6.4
         version: 4.6.4
     devDependencies:
-      '@excalidraw/excalidraw':
-        specifier: workspace:*
-        version: link:../excalidraw
       '@excalidraw/laser-pointer':
         specifier: workspace:*
         version: link:../laser-pointer

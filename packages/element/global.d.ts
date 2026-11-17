@@ -1,3 +1,7 @@
 /// <reference types="vite/client" />
-import "@excalidraw/excalidraw/global";
-import "@excalidraw/excalidraw/css";
+/// <reference path="../common/global.d.ts" />
+
+interface Window {
+  // set to debug fractional index validation in the scene
+  DEBUG_FRACTIONAL_INDICES: boolean | undefined;
+}

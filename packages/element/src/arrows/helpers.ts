@@ -1,27 +1,16 @@
-import type { NullableGridSize } from "@excalidraw/common";
-
 import { LinearElementEditor } from "../linearElementEditor";
 
 import { handleFocusPointDrag } from "./focus";
 
-import type { Scene } from "../Scene";
-import type { ElementsState } from "../types";
+import type { LinearElementEditorHost } from "../linearElementEditor";
 
 /**
- * What arrow point dragging needs from the editor. Point dragging itself
- * (`LinearElementEditor.handlePointDragging`) still takes the whole editor.
+ * What arrow point dragging needs from the editor: point dragging's own needs
+ * (`LinearElementEditorHost`) plus the last pointer position and event.
  */
-export type ArrowPointDragHost = Parameters<
-  typeof LinearElementEditor.handlePointDragging
->[1] & {
-  state: Pick<
-    ElementsState,
-    "selectedLinearElement" | "isBindingEnabled" | "zoom"
-  >;
-  scene: Scene;
+export type ArrowPointDragHost = LinearElementEditorHost & {
   lastPointerMoveCoords: { x: number; y: number } | null;
   lastPointerMoveEvent: PointerEvent | null;
-  getEffectiveGridSize(): NullableGridSize;
 };
 
 export const maybeHandleArrowPointlikeDrag = ({
