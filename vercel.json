@@ -65,5 +65,5 @@
     }
   ],
   "outputDirectory": "excalidraw-app/build",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install --frozen-lockfile --config.confirm-modules-purge=false"
 }
