@@ -6,11 +6,7 @@ import {
   segmentsIntersectAt,
 } from "@excalidraw/math";
 
-import type {
-  AppClassProperties,
-  AppState,
-  StaticCanvasAppState,
-} from "@excalidraw/excalidraw/types";
+import type { AppClassProperties } from "@excalidraw/excalidraw/types";
 
 import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
@@ -53,6 +49,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
+import type { ElementsState } from "./types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -313,7 +310,7 @@ export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
   appState: Pick<
-    AppState,
+    ElementsState,
     "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
   >,
   elementsMap: ElementsMap,
@@ -817,7 +814,7 @@ export const updateFrameMembershipOfSelectedElements = <
 >(
   allElements: T,
   appState: Pick<
-    AppState,
+    ElementsState,
     | "selectedElementIds"
     | "selectedElementsAreBeingDragged"
     | "frameToHighlight"
@@ -915,7 +912,7 @@ export const getTargetFrame = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   appState: Pick<
-    StaticCanvasAppState,
+    ElementsState,
     | "selectedElementIds"
     | "selectedElementsAreBeingDragged"
     | "frameToHighlight"
@@ -947,7 +944,7 @@ export const isElementInFrame = (
   element: ExcalidrawElement,
   allElementsMap: ElementsMap,
   appState: Pick<
-    StaticCanvasAppState,
+    ElementsState,
     | "selectedElementIds"
     | "selectedElementsAreBeingDragged"
     | "frameToHighlight"
@@ -1047,7 +1044,7 @@ export const shouldApplyFrameClip = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
   appState: Pick<
-    StaticCanvasAppState,
+    ElementsState,
     | "selectedElementIds"
     | "selectedElementsAreBeingDragged"
     | "frameToHighlight"

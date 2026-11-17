@@ -1,11 +1,5 @@
 import { isShallowEqual, type Bounds } from "@excalidraw/common";
 
-import type {
-  AppState,
-  BoxSelectionMode,
-  InteractiveCanvasAppState,
-} from "@excalidraw/excalidraw/types";
-
 import { elementsOverlappingBBox, getElementAbsoluteCoords } from "./bounds";
 import { isElementInViewport } from "./sizeHelpers";
 import {
@@ -26,6 +20,8 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
+import type { BoxSelectionMode } from "./types";
+import type { ElementsState } from "./types";
 
 export const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
   element.locked || isBoundToContainer(element);
@@ -101,7 +97,7 @@ export const getVisibleAndNonSelectedElements = <
   elements: readonly T[],
   selectedElements: readonly ExcalidrawElement[],
   appState: Pick<
-    AppState,
+    ElementsState,
     | "width"
     | "height"
     | "zoom"
@@ -131,12 +127,12 @@ export const getVisibleAndNonSelectedElements = <
 // FIXME move this into the editor instance to keep utility methods stateless
 export const isSomeElementSelected = (function () {
   let lastElements: readonly NonDeletedExcalidrawElement[] | null = null;
-  let lastSelectedElementIds: AppState["selectedElementIds"] | null = null;
+  let lastSelectedElementIds: ElementsState["selectedElementIds"] | null = null;
   let isSelected: boolean | null = null;
 
   const ret = (
     elements: readonly NonDeletedExcalidrawElement[],
-    appState: Pick<AppState, "selectedElementIds">,
+    appState: Pick<ElementsState, "selectedElementIds">,
   ): boolean => {
     if (
       isSelected != null &&
@@ -166,7 +162,7 @@ export const isSomeElementSelected = (function () {
 
 export const getSelectedElements = (
   elements: ElementsMapOrArray,
-  appState: Pick<InteractiveCanvasAppState, "selectedElementIds">,
+  appState: Pick<ElementsState, "selectedElementIds">,
   opts?: {
     includeBoundTextElement?: boolean;
     includeElementsInFrames?: boolean;
@@ -221,7 +217,7 @@ export const getSelectedElements = (
 export const getTargetElements = (
   elements: ElementsMapOrArray,
   appState: Pick<
-    AppState,
+    ElementsState,
     "selectedElementIds" | "editingTextElement" | "newElement" | "activeTool"
   >,
 ) =>
@@ -241,8 +237,8 @@ export const getTargetElements = (
  * retain reference identity for memoization
  */
 export const makeNextSelectedElementIds = (
-  nextSelectedElementIds: AppState["selectedElementIds"],
-  prevState: Pick<AppState, "selectedElementIds">,
+  nextSelectedElementIds: ElementsState["selectedElementIds"],
+  prevState: Pick<ElementsState, "selectedElementIds">,
 ) => {
   if (isShallowEqual(prevState.selectedElementIds, nextSelectedElementIds)) {
     return prevState.selectedElementIds;
@@ -256,7 +252,7 @@ export const makeNextSelectedElementIds = (
  */
 export const getActiveTextElement = (
   selectedElements: readonly NonDeleted<ExcalidrawElement>[],
-  appState: Pick<AppState, "editingTextElement">,
+  appState: Pick<ElementsState, "editingTextElement">,
   elementsMap: ElementsMap,
 ) => {
   // `editingTextElement` is the element as it was when editing started, so

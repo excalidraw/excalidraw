@@ -11,33 +11,19 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
-import * as InteractiveCanvas from "@excalidraw/excalidraw/renderer/interactiveScene";
-import * as StaticScene from "@excalidraw/excalidraw/renderer/staticScene";
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-
-import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
-  screen,
-  render,
-  fireEvent,
-  GlobalTestState,
-  unmountComponent,
-} from "@excalidraw/excalidraw/tests/test-utils";
+  hasBoundingBox,
+  wrapText,
+  getBoundTextElementPosition,
+  getBoundTextMaxWidth,
+  LinearElementEditor,
+  newArrowElement,
+  getLinearElementPathSegments,
+} from "@excalidraw/element";
+
+import * as textElementUtils from "@excalidraw/element/textElement";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
-
-import { hasBoundingBox, wrapText } from "../src";
-import * as textElementUtils from "../src/textElement";
-import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
-import { LinearElementEditor } from "../src";
-import { newArrowElement } from "../src";
-import { getLinearElementPathSegments } from "../src/utils";
-
-import {
-  getTextEditor,
-  TEXT_EDITOR_SELECTOR,
-} from "../../excalidraw/tests/queries/dom";
 
 import type {
   ExcalidrawArrowElement,
@@ -46,7 +32,23 @@ import type {
   ExcalidrawTextElementWithContainer,
   FontString,
   NonDeletedExcalidrawElement,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { Excalidraw } from "../../index";
+import * as InteractiveCanvas from "../../renderer/interactiveScene";
+import * as StaticScene from "../../renderer/staticScene";
+import { API } from "../helpers/api";
+
+import { Keyboard, Pointer, UI } from "../helpers/ui";
+import {
+  screen,
+  render,
+  fireEvent,
+  GlobalTestState,
+  unmountComponent,
+} from "../test-utils";
+
+import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

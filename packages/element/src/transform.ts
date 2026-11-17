@@ -31,7 +31,8 @@ import {
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
-import type { Zoom } from "@excalidraw/excalidraw/types";
+
+import type { Zoom } from "@excalidraw/common";
 
 import {
   bindBindingElement,

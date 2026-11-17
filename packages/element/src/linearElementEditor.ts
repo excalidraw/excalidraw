@@ -32,15 +32,14 @@ import type { Radians } from "@excalidraw/math";
 
 import type {
   AppState,
-  PointerCoords,
   InteractiveCanvasAppState,
   AppClassProperties,
-  NullableGridSize,
-  Zoom,
 } from "@excalidraw/excalidraw/types";
 import type { Bounds } from "@excalidraw/common";
 
 import type { Store } from "@excalidraw/excalidraw/store";
+
+import type { NullableGridSize, Zoom } from "@excalidraw/common";
 
 import { getCurvePathOps } from "./geometricShapes";
 
@@ -95,6 +94,8 @@ import type {
   Ordered,
   ExcalidrawBindableElement,
 } from "./types";
+import type { PointerCoords } from "./types";
+import type { ElementsState } from "./types";
 
 /**
  * Normalizes line points so that the start point is at [0,0]. This is
@@ -128,7 +129,7 @@ const getNormalizedPoints = ({
 type PointMoveOtherUpdates = {
   startBinding?: FixedPointBinding | null;
   endBinding?: FixedPointBinding | null;
-  suggestedBinding?: AppState["suggestedBinding"] | null;
+  suggestedBinding?: ElementsState["suggestedBinding"] | null;
 };
 
 const BoundTextPositionCache = new WeakMap<
@@ -314,7 +315,7 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     linearElementEditor: LinearElementEditor,
-  ): Pick<AppState, "suggestedBinding" | "selectedLinearElement"> | null {
+  ): Pick<ElementsState, "suggestedBinding" | "selectedLinearElement"> | null {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
     const { elementId } = linearElementEditor;
@@ -363,7 +364,7 @@ export class LinearElementEditor {
     }
 
     // Apply the point movement if needed
-    let suggestedBinding: AppState["suggestedBinding"] = null;
+    let suggestedBinding: ElementsState["suggestedBinding"] = null;
     const { positions, updates, hit } = pointDraggingUpdates(
       [idx],
       deltaX,
@@ -473,7 +474,7 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     linearElementEditor: LinearElementEditor,
-  ): Pick<AppState, "suggestedBinding" | "selectedLinearElement"> | null {
+  ): Pick<ElementsState, "suggestedBinding" | "selectedLinearElement"> | null {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
     const { elbowed, elementId, initialState } = linearElementEditor;
@@ -566,7 +567,7 @@ export class LinearElementEditor {
     }
 
     // Apply the point movement if needed
-    let suggestedBinding: AppState["suggestedBinding"] = null;
+    let suggestedBinding: ElementsState["suggestedBinding"] = null;
     const { positions, updates, hit } = pointDraggingUpdates(
       selectedPointsIndices,
       deltaX,
@@ -1439,7 +1440,7 @@ export class LinearElementEditor {
   static getPointIndexUnderCursor(
     element: ExcalidrawLinearElement,
     elementsMap: ElementsMap,
-    zoom: AppState["zoom"],
+    zoom: ElementsState["zoom"],
     x: number,
     y: number,
   ) {
@@ -1847,7 +1848,7 @@ export class LinearElementEditor {
     },
     options?: {
       isDragging?: boolean;
-      zoom?: AppState["zoom"];
+      zoom?: ElementsState["zoom"];
       sceneElementsMap?: NonDeletedSceneElementsMap;
       isBindingEnabled?: boolean;
       isMidpointSnappingEnabled?: boolean;

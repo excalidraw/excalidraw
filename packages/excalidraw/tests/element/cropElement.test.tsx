@@ -3,30 +3,22 @@ import { vi } from "vitest";
 
 import { KEYS, cloneJSON } from "@excalidraw/common";
 
-import { Excalidraw, exportScene } from "@excalidraw/excalidraw";
-import {
-  actionFlipHorizontal,
-  actionFlipVertical,
-} from "@excalidraw/excalidraw/actions/index";
-
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
-import {
-  act,
-  GlobalTestState,
-  render,
-  unmountComponent,
-} from "@excalidraw/excalidraw/tests/test-utils";
-
-import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
-
-import { duplicateElement } from "../src/duplicate";
+import { duplicateElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawImageElement,
   ImageCrop,
   NonDeleted,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { Excalidraw, exportScene } from "../../index";
+import { actionFlipHorizontal, actionFlipVertical } from "../../actions/index";
+
+import { API } from "../helpers/api";
+import { Keyboard, Pointer, UI } from "../helpers/ui";
+import { act, GlobalTestState, render, unmountComponent } from "../test-utils";
+
+import type { NormalizedZoomValue } from "../../types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

@@ -1,13 +1,14 @@
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { pointFrom } from "@excalidraw/math";
-
-import type { LocalPoint } from "@excalidraw/math";
 
 import {
   ELBOW_ARROW_CORNER_RADIUS,
   generateElbowArrowShape,
   ShapeCache,
-} from "../src/shape";
+} from "@excalidraw/element";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import { API } from "../helpers/api";
 
 import type { Op } from "roughjs/bin/core";
 

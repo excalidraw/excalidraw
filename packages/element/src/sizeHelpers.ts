@@ -11,7 +11,7 @@ import {
 
 import { pointsEqual } from "@excalidraw/math";
 
-import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
+import type { Zoom } from "@excalidraw/common";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
 import {
@@ -21,6 +21,8 @@ import {
 } from "./typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "./types";
+import type { Offsets } from "./types";
+import type { ElementsState } from "./types";
 
 export type VerticalResizeAnchor = "top" | "bottom" | "center";
 
@@ -156,7 +158,7 @@ export const isElementCompletelyInViewport = (
  * Makes a perfect shape or diagonal/horizontal/vertical line
  */
 export const getPerfectElementSize = (
-  elementType: AppState["activeTool"]["type"],
+  elementType: ElementsState["activeTool"]["type"],
   width: number,
   height: number,
 ): { width: number; height: number } => {

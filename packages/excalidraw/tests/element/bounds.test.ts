@@ -6,9 +6,6 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 import { arrayToMap, type Bounds, ROUNDNESS } from "@excalidraw/common";
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-
-import type { LocalPoint } from "@excalidraw/math";
 
 import {
   CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
@@ -18,14 +15,18 @@ import {
   getArrowheadSize,
   getElementAbsoluteCoords,
   getElementBounds,
-} from "../src/bounds";
-import { ShapeCache } from "../src/shape";
+  ShapeCache,
+} from "@excalidraw/element";
+
+import type { LocalPoint } from "@excalidraw/math";
 
 import type {
   Arrowhead,
   ExcalidrawElement,
   ExcalidrawLinearElement,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { API } from "../helpers/api";
 
 const _ce = ({
   x,

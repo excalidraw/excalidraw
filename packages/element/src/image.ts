@@ -4,11 +4,7 @@
 
 import { MIME_TYPES, SVG_NS } from "@excalidraw/common";
 
-import type {
-  AppClassProperties,
-  DataURL,
-  BinaryFiles,
-} from "@excalidraw/excalidraw/types";
+import type { AppClassProperties } from "@excalidraw/excalidraw/types";
 
 import { getRenderEnvironment } from "./renderEnvironment";
 import { isInitializedImageElement } from "./typeChecks";
@@ -18,6 +14,7 @@ import type {
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
+import type { DataURL, BinaryFiles } from "./types";
 
 export const loadHTMLImageElement = (
   dataURL: DataURL,

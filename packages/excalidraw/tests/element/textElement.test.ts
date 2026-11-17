@@ -1,5 +1,4 @@
 import { getLineHeight } from "@excalidraw/common";
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
 
@@ -9,10 +8,13 @@ import {
   getBoundTextMaxWidth,
   getBoundTextMaxHeight,
   computeBoundTextPosition,
-} from "../src/textElement";
-import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
+  detectLineHeight,
+  getLineHeightInPx,
+} from "@excalidraw/element";
 
-import type { ExcalidrawTextElementWithContainer } from "../src/types";
+import type { ExcalidrawTextElementWithContainer } from "@excalidraw/element/types";
+
+import { API } from "../helpers/api";
 
 describe("Test measureText", () => {
   describe("Test getContainerCoords", () => {

@@ -11,8 +11,6 @@ import {
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import {
   getElementsInGroup,
   getNewGroupIdsForDuplication,
@@ -53,6 +51,7 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
+import type { ElementsState } from "./types";
 
 /**
  * Lookups supplied to the host's `props.onDuplicate`, covering just the
@@ -101,7 +100,7 @@ export type OnDuplicateData = {
  * @param element Element to duplicate
  */
 export const duplicateElement = <TElement extends ExcalidrawElement>(
-  editingGroupId: AppState["editingGroupId"],
+  editingGroupId: ElementsState["editingGroupId"],
   groupIdMapForOperation: Map<GroupId, GroupId>,
   element: TElement,
   randomizeSeed?: boolean,
@@ -172,8 +171,8 @@ export const duplicateElements = (
           ExcalidrawElement
         >;
         appState: {
-          editingGroupId: AppState["editingGroupId"];
-          selectedGroupIds: AppState["selectedGroupIds"];
+          editingGroupId: ElementsState["editingGroupId"];
+          selectedGroupIds: ElementsState["selectedGroupIds"];
         };
       }
   ),

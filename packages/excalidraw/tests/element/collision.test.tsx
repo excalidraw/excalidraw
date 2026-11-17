@@ -11,32 +11,35 @@ import {
   pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
-import { Excalidraw } from "@excalidraw/excalidraw";
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
-import { render } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { Zoom } from "@excalidraw/excalidraw/types";
-
-import * as distance from "../src/distance";
-import { getElementBounds } from "../src/bounds";
 import {
+  getElementBounds,
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
   hitElementItself,
   intersectElementWithLineSegment,
   isPointInElement,
-} from "../src/collision";
-import { mutateElement } from "../src/mutateElement";
-import { newFreeDrawElement } from "../src/newElement";
-import { getAllMidpoints } from "../src/utils";
+  mutateElement,
+  newFreeDrawElement,
+  getAllMidpoints,
+} from "@excalidraw/element";
+// must come after the package index import: entering the element module
+// graph through a submodule first breaks circular-import initialization
+import * as distance from "@excalidraw/element/distance";
 
 import type {
   ExcalidrawDiamondElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
   Ordered,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { render } from "../test-utils";
+import { UI } from "../helpers/ui";
+import { API } from "../helpers/api";
+import { Excalidraw } from "../../index";
+
+import type { Zoom } from "../../types";
 
 describe("check rotated elements can be hit:", () => {
   beforeEach(async () => {

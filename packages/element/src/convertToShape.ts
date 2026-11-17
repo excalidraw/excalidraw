@@ -17,7 +17,7 @@ import {
   skewness,
 } from "@excalidraw/math";
 
-import type { App, AppState } from "@excalidraw/excalidraw/types";
+import type { App } from "@excalidraw/excalidraw/types";
 
 import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
@@ -47,6 +47,7 @@ import type {
   NonDeleted,
   ExcalidrawLineElement,
 } from "./types";
+import type { ElementsState } from "./types";
 
 declare global {
   interface Window {
@@ -530,7 +531,7 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
 export const convertToShape = (
   points: GlobalPoint[],
   appState: Pick<
-    AppState,
+    ElementsState,
     | "zoom"
     | "currentItemRoundness"
     | "currentItemRoughness"

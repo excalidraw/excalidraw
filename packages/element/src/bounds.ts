@@ -28,7 +28,6 @@ import type {
   LocalPoint,
   Radians,
 } from "@excalidraw/math";
-import type { AppState } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { getCurvePathOps } from "./geometricShapes";
@@ -76,6 +75,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
+import type { ElementsState } from "./types";
 
 export type RectangleBox = {
   x: number;
@@ -1414,7 +1414,7 @@ export const getVisibleSceneBounds = ({
   height,
   zoom,
 }: Pick<
-  AppState,
+  ElementsState,
   "scrollX" | "scrollY" | "width" | "height" | "zoom"
 >): SceneBounds => {
   return [

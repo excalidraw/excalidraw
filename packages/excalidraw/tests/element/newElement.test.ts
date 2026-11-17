@@ -1,9 +1,13 @@
 import * as common from "@excalidraw/common";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import {
+  newElement,
+  newLinearElement,
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element";
 
-import { newElement, newLinearElement } from "../src/newElement";
-import { mutateElement, newElementWith } from "../src/mutateElement";
+import { API } from "../helpers/api";
 
 describe("element creation time", () => {
   afterEach(() => {

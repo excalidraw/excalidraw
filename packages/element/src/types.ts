@@ -1,23 +1,32 @@
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   FillStyle,
   FontFamilyKeys,
+  IMAGE_MIME_TYPES,
+  MIME_TYPES,
   FontFamilyValues,
   FontString,
   RoundnessType,
   StrokeStyle,
+  StrokeWidthKey,
   TEXT_ALIGN,
   UnitlessLineHeight,
   THEME,
   VERTICAL_ALIGN,
+  Zoom,
 } from "@excalidraw/common";
 
 import type {
   MakeBrand,
   MarkNonNullable,
   Merge,
+  ValueOf,
 } from "@excalidraw/common/utility-types";
+
+import type { Drawable } from "roughjs/bin/core";
+
+import type { LinearElementEditor } from "./linearElementEditor";
 
 export type {
   FillStyle,
@@ -501,3 +510,207 @@ export type ExcalidrawLinearElementSubType =
 export type ConvertibleGenericTypes = "rectangle" | "diamond" | "ellipse";
 export type ConvertibleLinearTypes = ExcalidrawLinearElementSubType;
 export type ConvertibleTypes = ConvertibleGenericTypes | ConvertibleLinearTypes;
+
+// -----------------------------------------------------------------------------
+// Editor-adjacent types that element code operates on (re-exported from
+// `@excalidraw/excalidraw/types` and `@excalidraw/excalidraw/scene/types`)
+// -----------------------------------------------------------------------------
+
+export type DataURL = string & { _brand: "DataURL" };
+
+export type BinaryFileData = {
+  mimeType:
+    | ValueOf<typeof IMAGE_MIME_TYPES>
+    // future user or unknown file type
+    | typeof MIME_TYPES.binary;
+  id: FileId;
+  dataURL: DataURL;
+  /**
+   * Epoch timestamp in milliseconds
+   */
+  created: number;
+  /**
+   * Indicates when the file was last retrieved from storage to be loaded
+   * onto the scene. We use this flag to determine whether to delete unused
+   * files from storage.
+   *
+   * Epoch timestamp in milliseconds.
+   */
+  lastRetrieved?: number;
+  /**
+   * indicates the version of the file. This can be used to determine whether
+   * the file dataURL has changed e.g. as part of restore due to schema update.
+   */
+  version?: number;
+};
+
+export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
+
+export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
+
+export type ToolType =
+  | "selection"
+  | "lasso"
+  | "rectangle"
+  | "diamond"
+  | "ellipse"
+  | "arrow"
+  | "line"
+  | "freedraw"
+  | "text"
+  | "image"
+  | "eraser"
+  | "hand"
+  | "frame"
+  | "magicframe"
+  | "stickynote"
+  | "embeddable"
+  | "laser"
+  | "autoshape"
+  | "bucketfill";
+
+export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
+
+export type BoxSelectionMode = "contain" | "overlap";
+
+export type PointerCoords = Readonly<{
+  x: number;
+  y: number;
+}>;
+
+export type FrameNameBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type EmbedsValidationStatus = Map<
+  ExcalidrawIframeLikeElement["id"],
+  boolean
+>;
+
+export type PendingExcalidrawElements = NonDeletedExcalidrawElement[];
+
+export type Offsets = Partial<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>;
+
+export type SVGPathString = string & { __brand: "SVGPathString" };
+
+export type ElementShape =
+  | Drawable
+  | Drawable[]
+  | Path2D
+  | (Drawable | SVGPathString)[]
+  | null;
+
+export type ElementShapes = {
+  rectangle: Drawable;
+  ellipse: Drawable;
+  diamond: Drawable;
+  iframe: Drawable;
+  embeddable: Drawable;
+  freedraw: (Drawable | SVGPathString)[];
+  arrow: Drawable[];
+  line: Drawable[];
+  text: null;
+  stickynote: null;
+  image: null;
+  frame: null;
+  magicframe: null;
+};
+
+export type ActiveTool =
+  | {
+      type: ToolType;
+      customType: null;
+    }
+  | {
+      type: "custom";
+      customType: string;
+    };
+
+/**
+ * The part of the editor state that element code reads. The editor's
+ * `AppState` (`@excalidraw/excalidraw/types`) extends it.
+ */
+export interface ElementsState {
+  /**
+   * for a newly created element
+   * - set on pointer down, updated during pointer move, used on pointer up
+   */
+  newElement: NonDeleted<ExcalidrawNonSelectionElement> | null;
+  /**
+   * tracking current arrow binding editor state (takes into account
+   * `bindingPreference` and keyboard modifiers (ctrl/alt)
+   */
+  isBindingEnabled: boolean;
+  /**
+   * The bindable element the UI highlights for the user when an arrow is
+   * dragged or otherwise its endpoint being close to said element.
+   */
+  suggestedBinding: {
+    element: NonDeleted<ExcalidrawBindableElement>;
+    midPoint?: GlobalPoint;
+  } | null;
+  frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
+  frameRendering: {
+    enabled: boolean;
+    name: boolean;
+    outline: boolean;
+    clip: boolean;
+  };
+  /**
+   * set when a new text is created or when an existing text is being edited
+   */
+  editingTextElement: ExcalidrawTextElement | null;
+  activeTool: {
+    /**
+     * indicates a previous tool we should revert back to if we deselect the
+     * currently active tool. At the moment applies to `eraser` and `hand` tool.
+     */
+    lastActiveTool: ActiveTool | null;
+    locked: boolean;
+    // indicates if the current tool is temporarily switched on from the selection tool
+    fromSelection: boolean;
+  } & ActiveTool;
+  currentItemStrokeColor: string;
+  currentItemBackgroundColor: string;
+  currentItemFillStyle: ExcalidrawElement["fillStyle"];
+  currentItemStrokeWidthKey: StrokeWidthKey;
+  currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
+  currentItemRoughness: number;
+  currentItemOpacity: number;
+  currentItemStartArrowhead: Arrowhead | null;
+  currentItemEndArrowhead: Arrowhead | null;
+  currentItemRoundness: StrokeRoundness;
+  viewBackgroundColor: string;
+  scrollX: number;
+  scrollY: number;
+  zoom: Zoom;
+  selectedElementIds: Readonly<{ [id: string]: true }>;
+  selectedElementsAreBeingDragged: boolean;
+  theme: Theme;
+  viewModeEnabled: boolean;
+  /** top-most selected groups (i.e. does not include nested groups) */
+  selectedGroupIds: { [groupId: string]: boolean };
+  /** group being edited when you drill down to its constituent element
+    (e.g. when you double-click on a group's element) */
+  editingGroupId: GroupId | null;
+  width: number;
+  height: number;
+  offsetTop: number;
+  offsetLeft: number;
+  selectedLinearElement: LinearElementEditor | null;
+  croppingElementId: ExcalidrawElement["id"] | null;
+  // Stores the current bind mode which is detemined at various points during
+  // a drag operation (like pointer position vs bindable element) but needed
+  // globally for calculating the binding strategy
+  bindMode: BindMode;
+  /** the open dialog, if any (`AppState` narrows this to its dialogs) */
+  openDialog: { name: string } | null;
+}

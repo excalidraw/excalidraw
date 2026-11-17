@@ -1,10 +1,8 @@
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { mutateElement, normalizeElementOrder } from "@excalidraw/element";
 
-import { mutateElement } from "../src/index";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { normalizeElementOrder } from "../src/sortElements";
-
-import type { ExcalidrawElement } from "../src/types";
+import { API } from "../helpers/api";
 
 const { h } = window;
 const assertOrder = (

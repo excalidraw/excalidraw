@@ -6,14 +6,20 @@ import {
   polygonIncludesPoint,
 } from "@excalidraw/math";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import {
+  computeBucketFillPolygon,
+  isRestylableFill,
+  getFreedrawStrokeCenterPoints,
+} from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Polygon } from "@excalidraw/math";
 
-import { computeBucketFillPolygon, isRestylableFill } from "../src/bucketFill";
-import { getFreedrawStrokeCenterPoints } from "../src/shape";
+import type {
+  ElementsMap,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
-import type { ElementsMap, NonDeletedExcalidrawElement } from "../src/types";
+import { API } from "../helpers/api";
 
 const setup = (elements: NonDeletedExcalidrawElement[]) => ({
   elements,

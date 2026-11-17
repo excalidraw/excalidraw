@@ -29,11 +29,7 @@ import {
 
 import type { Curve, LineSegment, LocalPoint, Radians } from "@excalidraw/math";
 
-import type {
-  AppState,
-  NormalizedZoomValue,
-  Zoom,
-} from "@excalidraw/excalidraw/types";
+import type { NormalizedZoomValue, Zoom } from "@excalidraw/common";
 
 import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
@@ -60,6 +56,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+import type { ElementsState } from "./types";
 
 export type LinearPathSegment = LineSegment<GlobalPoint> | Curve<GlobalPoint>;
 
@@ -770,7 +767,7 @@ export const getElbowArrowSnapMidPoint = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ) => {
   const TOLERANCE = 0.05;
   const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
@@ -789,7 +786,7 @@ export const getSnapOutlineMidPoint = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   arrow: { elbowed: boolean },
 ): GlobalPoint | undefined => {
   if (arrow.elbowed) {
@@ -813,7 +810,7 @@ export const projectFixedPointOntoDiagonal = (
   element: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   isMidpointSnappingEnabled: boolean = true,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");

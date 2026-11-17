@@ -1,31 +1,34 @@
 import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
-import { Excalidraw } from "@excalidraw/excalidraw";
-import { actionSelectAll } from "@excalidraw/excalidraw/actions/index";
-import { actionChangeArrowhead } from "@excalidraw/excalidraw/actions/actionProperties";
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+
 import {
-  act,
-  fireEvent,
-  GlobalTestState,
-  queryByTestId,
-  render,
-} from "@excalidraw/excalidraw/tests/test-utils";
+  bindBindingElement,
+  validateElbowPoints,
+  Scene,
+} from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
-
-import { bindBindingElement, validateElbowPoints } from "../src/index";
-
-import { Scene } from "../src/Scene";
 
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
   NonDeleted,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { Excalidraw } from "../../index";
+import { actionSelectAll } from "../../actions/index";
+import { actionChangeArrowhead } from "../../actions/actionProperties";
+import { actionDuplicateSelection } from "../../actions/actionDuplicateSelection";
+import { API } from "../helpers/api";
+import { Pointer, UI } from "../helpers/ui";
+import {
+  act,
+  fireEvent,
+  GlobalTestState,
+  queryByTestId,
+  render,
+} from "../test-utils";
 
 const { h } = window;
 

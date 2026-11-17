@@ -1,5 +1,3 @@
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
 
@@ -11,6 +9,7 @@ import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
+import type { ElementsState } from "./types";
 
 export interface Distribution {
   space: "between";
@@ -21,7 +20,9 @@ export const distributeElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   distribution: Distribution,
-  appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
+  appState: Readonly<
+    Pick<ElementsState, "selectedGroupIds" | "editingGroupId">
+  >,
   scene: Scene,
   /** measures the labels of the bound arrows the distribution moves */
   renderEnvironment?: RenderEnvironment,

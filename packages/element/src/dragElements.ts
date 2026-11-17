@@ -6,12 +6,9 @@ import {
   DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
-import type {
-  AppState,
-  NormalizedZoomValue,
-  NullableGridSize,
-  PointerDownState,
-} from "@excalidraw/excalidraw/types";
+import type { PointerDownState } from "@excalidraw/excalidraw/types";
+
+import type { NormalizedZoomValue, NullableGridSize } from "@excalidraw/common";
 
 import {
   getFrameArrowIdsToReattach,
@@ -38,6 +35,7 @@ import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+import type { ElementsState } from "./types";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -329,7 +327,7 @@ export const dragNewElement = ({
   informMutation = true,
 }: {
   newElement: NonDeletedExcalidrawElement;
-  elementType: AppState["activeTool"]["type"];
+  elementType: ElementsState["activeTool"]["type"];
   originX: number;
   originY: number;
   x: number;

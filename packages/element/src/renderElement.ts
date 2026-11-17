@@ -33,9 +33,7 @@ import {
 } from "@excalidraw/common";
 
 import type {
-  AppState,
   StaticCanvasAppState,
-  Zoom,
   InteractiveCanvasAppState,
   ElementRenderOverrides,
 } from "@excalidraw/excalidraw/types";
@@ -45,6 +43,8 @@ import type {
   RenderableElementsMap,
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
+
+import type { Zoom } from "@excalidraw/common";
 
 import { getCreatePath, getRenderEnvironment } from "./renderEnvironment";
 
@@ -95,6 +95,7 @@ import type {
 } from "./types";
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { ElementsState } from "./types";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -208,12 +209,12 @@ export const resolveElementRenderState = (
 export interface ExcalidrawElementWithCanvas {
   element: ExcalidrawElement | ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
-  theme: AppState["theme"];
+  theme: ElementsState["theme"];
   scale: number;
   /** backing-store scale the bitmap was rasterized at, see StaticCanvasRenderConfig["scale"] */
   deviceScale: number;
   environment: RenderEnvironment;
-  zoomValue: AppState["zoom"]["value"];
+  zoomValue: ElementsState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
   imageCrop: ExcalidrawImageElement["crop"] | null;

@@ -11,6 +11,12 @@ import type { MakeBrand } from "@excalidraw/common/utility-types";
 import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type {
+  SVGPathString,
+  ElementShape,
+  ElementShapes,
+} from "@excalidraw/element/types";
+
+import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
@@ -22,7 +28,8 @@ import type {
   PendingExcalidrawElements,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-import type { Drawable } from "roughjs/bin/core";
+
+export type { SVGPathString, ElementShape, ElementShapes };
 
 export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;
@@ -174,29 +181,4 @@ export type ScrollBars = {
     height: number;
     deltaMultiplier: number;
   } | null;
-};
-
-export type SVGPathString = string & { __brand: "SVGPathString" };
-
-export type ElementShape =
-  | Drawable
-  | Drawable[]
-  | Path2D
-  | (Drawable | SVGPathString)[]
-  | null;
-
-export type ElementShapes = {
-  rectangle: Drawable;
-  ellipse: Drawable;
-  diamond: Drawable;
-  iframe: Drawable;
-  embeddable: Drawable;
-  freedraw: (Drawable | SVGPathString)[];
-  arrow: Drawable[];
-  line: Drawable[];
-  text: null;
-  stickynote: null;
-  image: null;
-  frame: null;
-  magicframe: null;
 };

@@ -1,11 +1,9 @@
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-
-import { newElementWith } from "../src/mutateElement";
 import {
+  newElementWith,
   hasBoundTextElement,
   isLinearElement,
   isTextElement,
-} from "../src/typeChecks";
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -13,7 +11,9 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { API } from "../helpers/api";
 
 describe("Test TypeChecks", () => {
   describe("Test hasBoundTextElement", () => {

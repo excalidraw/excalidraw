@@ -2,37 +2,20 @@ import { KEYS, ROUNDNESS, arrayToMap, DEFAULT_ZOOM } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
 
-import { actionWrapTextInContainer } from "@excalidraw/excalidraw/actions/actionBoundText";
-
-import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw";
-
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
-import {
-  act,
-  fireEvent,
-  render,
-} from "@excalidraw/excalidraw/tests/test-utils";
-
-import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
-
-import type { Radians } from "@excalidraw/math";
-
 import {
   bindBindingElement,
   getBindingGap,
   updateBoundElements,
-} from "../src/binding";
-import { Scene } from "../src/Scene";
-import { convertToExcalidrawElements } from "../src/transform";
-import { getAllMidpoints } from "../src/utils";
-import { getTransformHandles } from "../src/transformHandles";
-import {
-  getTextEditor,
-  TEXT_EDITOR_SELECTOR,
-} from "../../excalidraw/tests/queries/dom";
+  Scene,
+  convertToExcalidrawElements,
+  getAllMidpoints,
+  getTransformHandles,
+} from "@excalidraw/element";
 
-import type { RenderEnvironment } from "../src/renderEnvironment";
+import type { Radians } from "@excalidraw/math";
+
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
@@ -40,7 +23,19 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   NonDeleted,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { actionWrapTextInContainer } from "../../actions/actionBoundText";
+
+import { Excalidraw, isLinearElement } from "../../index";
+
+import { API } from "../helpers/api";
+import { UI, Pointer, Keyboard } from "../helpers/ui";
+import { act, fireEvent, render } from "../test-utils";
+
+import { defaultLang, setLanguage } from "../../i18n";
+
+import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
 
 const { h } = window;
 

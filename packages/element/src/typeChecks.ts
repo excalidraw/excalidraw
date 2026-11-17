@@ -2,8 +2,6 @@ import { ROUNDNESS, assertNever } from "@excalidraw/common";
 
 import { pointsEqual } from "@excalidraw/math";
 
-import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
-
 import type { MarkNonNullable } from "@excalidraw/common/utility-types";
 
 import type {
@@ -31,6 +29,7 @@ import type {
   ExcalidrawLinearElementSubType,
   ExcalidrawStickyNoteElement,
 } from "./types";
+import type { ElementOrToolType } from "./types";
 
 export const isInitializedImageElement = <T extends ExcalidrawElement>(
   element: T | null,

@@ -9,15 +9,31 @@ import {
   getUpdatedTimestamp,
 } from "@excalidraw/common";
 
-import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
+import {
+  deepCopyElement,
+  duplicateElement,
+  duplicateElements,
+  isBoundToContainer,
+  isTextElement,
+} from "@excalidraw/element";
 
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/index";
+import type { LocalPoint } from "@excalidraw/math";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import type {
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
-import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Excalidraw, mutateElement } from "../../index";
 
-import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
+import { actionDuplicateSelection } from "../../actions/index";
+
+import { API } from "../helpers/api";
+
+import { UI, Keyboard, Pointer } from "../helpers/ui";
+
+import { getTextEditor } from "../queries/dom";
 
 import {
   GlobalTestState,
@@ -27,23 +43,7 @@ import {
   getCloneByOrigId,
   render,
   waitFor,
-} from "@excalidraw/excalidraw/tests/test-utils";
-
-import type { LocalPoint } from "@excalidraw/math";
-
-import {
-  deepCopyElement,
-  duplicateElement,
-  duplicateElements,
-} from "../src/duplicate";
-
-import { isBoundToContainer, isTextElement } from "../src/typeChecks";
-
-import type {
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  NonDeletedExcalidrawElement,
-} from "../src/types";
+} from "../test-utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

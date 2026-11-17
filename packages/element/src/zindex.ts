@@ -2,7 +2,6 @@ import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
 import { isFiniteNumber } from "@excalidraw/math";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
 import type { GlobalPoint } from "@excalidraw/math";
 
 import { isFrameLikeElement, isTextElement } from "./typeChecks";
@@ -20,6 +19,7 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
 } from "./types";
+import type { ElementsState } from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
   return element.frameId === frameId || element.id === frameId;
@@ -35,7 +35,7 @@ const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
  */
 const getIndicesToMove = (
   elements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds">,
+  appState: Pick<ElementsState, "selectedElementIds">,
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   let selectedIndices: number[] = [];
@@ -191,7 +191,7 @@ export const moveArrowAboveBindable = (
  *  is a non-deleted element, and not inside a group (unless we're editing it).
  */
 const getTargetIndex = (
-  appState: Pick<AppState, "editingGroupId">,
+  appState: Pick<ElementsState, "editingGroupId">,
   elements: readonly ExcalidrawElement[],
   boundaryIndex: number,
   direction: "left" | "right",
@@ -344,7 +344,7 @@ const hasSameElementIds = (
 
 const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
   direction: "left" | "right",
   scene: Scene,
 ) => {
@@ -430,7 +430,7 @@ const shiftElementsByOne = (
 
 const shiftElementsToEnd = (
   elements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
   direction: "left" | "right",
   containingFrame: ExcalidrawFrameLikeElement["id"] | null,
   elementsToBeMoved?: readonly ExcalidrawElement[],
@@ -542,11 +542,11 @@ const shiftElementsToEnd = (
 
 function shiftElementsAccountingForFrames(
   allElements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
   direction: "left" | "right",
   shiftFunction: (
     elements: readonly ExcalidrawElement[],
-    appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+    appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
     direction: "left" | "right",
     containingFrame: ExcalidrawFrameLikeElement["id"] | null,
     elementsToBeMoved?: readonly ExcalidrawElement[],
@@ -625,7 +625,7 @@ function shiftElementsAccountingForFrames(
 
 export const moveOneLeft = (
   allElements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
   scene: Scene,
 ) => {
   return shiftElementsByOne(allElements, appState, "left", scene);
@@ -633,7 +633,7 @@ export const moveOneLeft = (
 
 export const moveOneRight = (
   allElements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
   scene: Scene,
 ) => {
   return shiftElementsByOne(allElements, appState, "right", scene);
@@ -641,7 +641,7 @@ export const moveOneRight = (
 
 export const moveAllLeft = (
   allElements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
 ) => {
   return shiftElementsAccountingForFrames(
     allElements,
@@ -653,7 +653,7 @@ export const moveAllLeft = (
 
 export const moveAllRight = (
   allElements: readonly ExcalidrawElement[],
-  appState: Pick<AppState, "selectedElementIds" | "editingGroupId">,
+  appState: Pick<ElementsState, "selectedElementIds" | "editingGroupId">,
 ) => {
   return shiftElementsAccountingForFrames(
     allElements,

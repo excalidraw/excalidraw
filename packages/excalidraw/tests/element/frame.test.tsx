@@ -1,30 +1,15 @@
-import {
-  convertToExcalidrawElements,
-  Excalidraw,
-} from "@excalidraw/excalidraw";
 import { arrayToMap, ELEMENT_TRANSLATE_AMOUNT, KEYS } from "@excalidraw/common";
+
 import { pointFrom } from "@excalidraw/math";
-
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
-import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
-import {
-  act,
-  getCloneByOrigId,
-  render,
-} from "@excalidraw/excalidraw/tests/test-utils";
-
-import { getSelectedElements } from "@excalidraw/excalidraw/scene/index";
-import { exportScene } from "@excalidraw/excalidraw/scene/export";
-
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import {
   elementOverlapsWithFrame,
   getElementsOverlappingFrame,
   shouldApplyFrameClip,
-} from "../src/frame";
-import { LinearElementEditor } from "../src/linearElementEditor";
+  LinearElementEditor,
+} from "@excalidraw/element";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawArrowElement,
@@ -33,7 +18,17 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { convertToExcalidrawElements, Excalidraw } from "../../index";
+
+import { API } from "../helpers/api";
+import { Keyboard, Pointer, UI } from "../helpers/ui";
+import { getTextEditor } from "../queries/dom";
+import { act, getCloneByOrigId, render } from "../test-utils";
+
+import { getSelectedElements } from "../../scene/index";
+import { exportScene } from "../../scene/export";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

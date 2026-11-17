@@ -1,32 +1,27 @@
 import { reseed } from "@excalidraw/common";
 
+import type {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  ExcalidrawSelectionElement,
+} from "@excalidraw/element/types";
+
 import {
   actionSendBackward,
   actionBringForward,
   actionBringToFront,
   actionSendToBack,
   actionDuplicateSelection,
-} from "@excalidraw/excalidraw/actions/index";
+} from "../../actions/index";
 
-import { Excalidraw, getNonDeletedElements } from "@excalidraw/excalidraw";
+import { Excalidraw, getNonDeletedElements } from "../../index";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import {
-  act,
-  getCloneByOrigId,
-  render,
-  unmountComponent,
-} from "@excalidraw/excalidraw/tests/test-utils";
+import { API } from "../helpers/api";
+import { act, getCloneByOrigId, render, unmountComponent } from "../test-utils";
 
-import { selectGroupsForSelectedElements } from "@excalidraw/excalidraw/components/App.selection";
+import { selectGroupsForSelectedElements } from "../../components/App.selection";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawFrameElement,
-  ExcalidrawSelectionElement,
-} from "../src/types";
+import type { AppState } from "../../types";
 
 unmountComponent();
 

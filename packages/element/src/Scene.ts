@@ -42,7 +42,7 @@ import type {
   Ordered,
 } from "./types";
 
-import type { AppState } from "../../excalidraw/types";
+import type { ElementsState } from "./types";
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
@@ -126,7 +126,7 @@ export class Scene {
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
   private elementsMap = toBrandedType<SceneElementsMap>(new Map());
   private selectedElementsCache: {
-    selectedElementIds: AppState["selectedElementIds"] | null;
+    selectedElementIds: ElementsState["selectedElementIds"] | null;
     elements: readonly NonDeletedExcalidrawElement[] | null;
     cache: Map<SelectionHash, NonDeletedExcalidrawElement[]>;
   } = {
@@ -179,7 +179,7 @@ export class Scene {
 
   getSelectedElements(opts: {
     // NOTE can be ommitted by making Scene constructor require App instance
-    selectedElementIds: AppState["selectedElementIds"];
+    selectedElementIds: ElementsState["selectedElementIds"];
     /**
      * for specific cases where you need to use elements not from current
      * scene state. This in effect will likely result in cache-miss, and

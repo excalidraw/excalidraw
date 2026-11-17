@@ -1,19 +1,25 @@
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { pointFrom } from "@excalidraw/math";
 
-import type { PointerDownState } from "@excalidraw/excalidraw/types";
+import {
+  Scene,
+  dragSelectedElements,
+  syncInvalidIndices,
+  LinearElementEditor,
+} from "@excalidraw/element";
+import { updateBoundElements } from "@excalidraw/element/binding";
+
 import type { LocalPoint } from "@excalidraw/math";
 
-import { Scene } from "../src/Scene";
-import { updateBoundElements } from "../src/binding";
-import { dragSelectedElements } from "../src/dragElements";
-import { syncInvalidIndices } from "../src/fractionalIndex";
-import { LinearElementEditor } from "../src/linearElementEditor";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import type { NonDeletedExcalidrawElement } from "../src/types";
+import { API } from "../helpers/api";
 
-vi.mock("../src/binding", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../src/binding")>();
+import type { PointerDownState } from "../../types";
+
+vi.mock("@excalidraw/element/binding", async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import("@excalidraw/element/binding")
+  >();
   return {
     ...actual,
     updateBoundElements: vi.fn(actual.updateBoundElements),

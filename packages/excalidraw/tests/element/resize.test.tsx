@@ -5,7 +5,6 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
 import {
   type Bounds,
   KEYS,
@@ -14,33 +13,31 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
-  act,
-  render,
-  unmountComponent,
-} from "@excalidraw/excalidraw/tests/test-utils";
+  isLinearElement,
+  resizeSingleElement,
+  distanceToElement,
+  getLinearElementPathSegments,
+  LinearElementEditor,
+  getElementPointsCoords,
+  computeContainerDimensionForBoundText,
+} from "@excalidraw/element";
 
 import type { GlobalPoint } from "@excalidraw/math";
-
 import type { LocalPoint } from "@excalidraw/math";
-
-import { isLinearElement } from "../src/typeChecks";
-import { resizeSingleElement } from "../src/resizeElements";
-import { distanceToElement } from "../src/distance";
-import { getLinearElementPathSegments } from "../src/utils";
-import { LinearElementEditor } from "../src/linearElementEditor";
-import { getElementPointsCoords } from "../src/bounds";
-import { computeContainerDimensionForBoundText } from "../src/textElement";
 
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
-} from "../src/types";
-import type { TransformHandleDirection } from "../src/transformHandles";
+} from "@excalidraw/element/types";
+import type { TransformHandleDirection } from "@excalidraw/element";
+
+import { act, render, unmountComponent } from "../test-utils";
+import { UI, Keyboard, Pointer } from "../helpers/ui";
+import { API } from "../helpers/api";
+import { Excalidraw } from "../../index";
 unmountComponent();
 
 const { h } = window;

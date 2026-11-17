@@ -1,7 +1,7 @@
 import { pointDistance, pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { invariant } from "@excalidraw/common";
 
-import type { AppState, NullableGridSize } from "@excalidraw/excalidraw/types";
+import type { NullableGridSize } from "@excalidraw/common";
 
 import {
   bindBindingElement,
@@ -33,6 +33,7 @@ import type {
 } from "../types";
 
 import type { Scene } from "../Scene";
+import type { ElementsState } from "../types";
 
 export const isFocusPointVisible = (
   focusPoint: GlobalPoint,
@@ -40,8 +41,8 @@ export const isFocusPointVisible = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   appState: {
-    isBindingEnabled: AppState["isBindingEnabled"];
-    zoom: AppState["zoom"];
+    isBindingEnabled: ElementsState["isBindingEnabled"];
+    zoom: ElementsState["zoom"];
   },
   startOrEnd: "start" | "end",
   ignoreOverlap = false,
@@ -106,7 +107,7 @@ const focusPointUpdate = (
   isStartBinding: boolean,
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
-  appState: Pick<AppState, "selectedLinearElement" | "isBindingEnabled">,
+  appState: Pick<ElementsState, "selectedLinearElement" | "isBindingEnabled">,
   switchToInsideBinding: boolean,
 ) => {
   const pointUpdates = new Map();
@@ -214,7 +215,7 @@ export const handleFocusPointDrag = (
   pointerCoords: { x: number; y: number },
   scene: Scene,
   appState: Pick<
-    AppState,
+    ElementsState,
     "selectedLinearElement" | "isBindingEnabled" | "zoom"
   >,
   gridSize: NullableGridSize,
@@ -346,7 +347,7 @@ export const handleFocusPointPointerDown = (
   arrow: ExcalidrawArrowElement,
   pointerDownState: { origin: { x: number; y: number } },
   elementsMap: NonDeletedSceneElementsMap,
-  appState: Pick<AppState, "isBindingEnabled" | "zoom">,
+  appState: Pick<ElementsState, "isBindingEnabled" | "zoom">,
 ): {
   hitFocusPoint: "start" | "end" | null;
   pointerOffset: { x: number; y: number };
@@ -509,7 +510,7 @@ export const handleFocusPointHover = (
   scenePointerX: number,
   scenePointerY: number,
   scene: Scene,
-  appState: Pick<AppState, "isBindingEnabled" | "zoom">,
+  appState: Pick<ElementsState, "isBindingEnabled" | "zoom">,
 ): "start" | "end" | null => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const pointerPos = pointFrom(scenePointerX, scenePointerY);

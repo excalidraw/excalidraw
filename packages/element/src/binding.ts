@@ -24,9 +24,11 @@ import {
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
-import type { AppState, NullableGridSize } from "@excalidraw/excalidraw/types";
+import type { AppState } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
+
+import type { NullableGridSize } from "@excalidraw/common";
 
 import { getCenterForBounds } from "./bounds";
 import {
@@ -90,6 +92,7 @@ import type {
   Ordered,
   PointsPositionUpdates,
 } from "./types";
+import type { ElementsState } from "./types";
 
 export type BindingStrategy =
   // Create a new binding with this mode
@@ -132,7 +135,9 @@ export const getBindingGap = (
   return BASE_BINDING_GAP + bindTarget.strokeWidth / 2;
 };
 
-export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
+export const maxBindingDistance_simple = (
+  zoom?: ElementsState["zoom"],
+): number => {
   const BASE_BINDING_DISTANCE = Math.max(BASE_BINDING_GAP, 15);
   const zoomValue = zoom?.value && zoom.value < 1 ? zoom.value : 1;
   return clamp(
@@ -145,7 +150,7 @@ export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
 };
 
 export const isBindingEnabled = (appState: {
-  isBindingEnabled: AppState["isBindingEnabled"];
+  isBindingEnabled: ElementsState["isBindingEnabled"];
 }): boolean => {
   return appState.isBindingEnabled;
 };
@@ -244,7 +249,7 @@ const bindOrUnbindBindingElementEdge = (
   { mode, element, focusPoint }: BindingStrategy,
   startOrEnd: "start" | "end",
   scene: Scene,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   shouldSnapToOutline = true,
   isMidpointSnappingEnabled = true,
 ): void => {
@@ -271,7 +276,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -328,7 +333,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   startIdx: number,
   endIdx: number,
   appState: AppState,
-  globalBindMode?: AppState["bindMode"],
+  globalBindMode?: ElementsState["bindMode"],
   shiftKey?: boolean,
 ): {
   start: BindingStrategy;
@@ -492,9 +497,9 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   oppositeBinding: FixedPointBinding | null,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  globalBindMode: AppState["bindMode"],
+  globalBindMode: ElementsState["bindMode"],
   arrow: NonDeleted<ExcalidrawArrowElement>,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   finalize?: boolean,
 ): { current: BindingStrategy; other: BindingStrategy } => {
   let current: BindingStrategy = { mode: undefined };
@@ -1146,7 +1151,7 @@ export const bindBindingElement = (
   mode: BindMode,
   startOrEnd: "start" | "end",
   scene: Scene,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   focusPoint?: GlobalPoint,
   shouldSnapToOutline = true,
   isMidpointSnappingEnabled = true,
@@ -1195,7 +1200,7 @@ export const isEndBoundBeyondBindingArea = (
   arrow: ExcalidrawArrowElement,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ): boolean => {
   const binding =
     startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
@@ -1315,7 +1320,7 @@ export const unbindBindingElement = (
 export const reanchorBindingsToOutline = (
   changedElement: NonDeleted<ExcalidrawBindableElement>,
   scene: Scene,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const center = elementCenterPoint(changedElement, elementsMap);
@@ -1833,7 +1838,7 @@ export const getHeadingForElbowArrowSnap = (
   aabb: Bounds | undefined | null,
   origPoint: GlobalPoint,
   elementsMap: ElementsMap,
-  zoom?: AppState["zoom"],
+  zoom?: ElementsState["zoom"],
 ): Heading => {
   const otherPointHeading = vectorToHeading(vectorFromPoint(otherPoint, p));
 
@@ -1861,7 +1866,7 @@ const getDistanceForBinding = (
   point: Readonly<GlobalPoint>,
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom?: AppState["zoom"],
+  zoom?: ElementsState["zoom"],
 ) => {
   const distance = distanceToElement(bindableElement, elementsMap, point);
   const bindDistance = maxBindingDistance_simple(zoom);
@@ -1874,7 +1879,7 @@ export const bindPointToSnapToElementOutline = (
   bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   customIntersector?: LineSegment<GlobalPoint>,
   isMidpointSnappingEnabled = true,
 ): GlobalPoint => {
@@ -2387,7 +2392,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   shouldSnapToOutline = true,
   isMidpointSnappingEnabled = true,
 ): { fixedPoint: FixedPoint } => {
