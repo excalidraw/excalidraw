@@ -103,19 +103,21 @@ export const Dialog = (props: DialogProps) => {
     props.onCloseRequest();
   };
 
+  const dialogTitleId = props.title ? `${id}-dialog-title` : undefined;
+
   return (
     <Modal
       className={clsx("Dialog", props.className, {
         "Dialog--fullscreen": isFullscreen,
       })}
-      labelledBy="dialog-title"
+      labelledBy={dialogTitleId}
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}
     >
       <Island ref={setIslandNode}>
         {props.title && (
-          <h2 id={`${id}-dialog-title`} className="Dialog__title">
+          <h2 id={dialogTitleId} className="Dialog__title">
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
         )}
