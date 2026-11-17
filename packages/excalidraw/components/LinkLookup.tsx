@@ -61,7 +61,10 @@ export const LinkLookup = ({
   }, []);
 
   useEffect(() => {
+    // bumping the request counter on unmount is intentional: any in-flight
+    // response must be treated as stale once the lookup is torn down
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       requestRef.current++;
       cancel();
     };

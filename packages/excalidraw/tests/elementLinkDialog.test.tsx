@@ -1,8 +1,9 @@
 import React from "react";
 
+import { Excalidraw } from "../index";
+
 import { API } from "./helpers/api";
 import { act, fireEvent, render, waitFor } from "./test-utils";
-import { Excalidraw } from "../index";
 
 const { h } = window;
 
@@ -20,10 +21,9 @@ const findLookupToggle = () =>
 const findLookupField = () =>
   document.querySelector<HTMLInputElement>(".LinkLookup__field input");
 
-const findResults = () =>
-  [
-    ...document.querySelectorAll<HTMLButtonElement>(".LinkLookup__result"),
-  ];
+const findResults = () => [
+  ...document.querySelectorAll<HTMLButtonElement>(".LinkLookup__result"),
+];
 
 const findLinkField = () =>
   document.querySelector<HTMLInputElement>(
@@ -90,9 +90,9 @@ describe("ElementLinkDialog public link lookup", () => {
       ) ?? document.body,
     );
     await waitFor(() => {
-      expect(
-        h.app.scene.getNonDeletedElementsMap().get(element.id)!.link,
-      ).toBe("https://gateway-api.sigs.k8s.io/");
+      expect(h.app.scene.getNonDeletedElementsMap().get(element.id)!.link).toBe(
+        "https://gateway-api.sigs.k8s.io/",
+      );
     });
   });
 
@@ -101,6 +101,7 @@ describe("ElementLinkDialog public link lookup", () => {
     const onLinkLookup = vi.fn(async () => [
       { title: "good", url: "https://example.com/docs" },
       { title: "relative", url: "/docs" },
+      // eslint-disable-next-line no-script-url
       { title: "js", url: "javascript:alert(1)" },
       { title: "ftp", url: "ftp://example.com/file" },
       { title: "garbage", url: "not a url" },
@@ -128,7 +129,7 @@ describe("ElementLinkDialog public link lookup", () => {
     const onLinkLookup = vi.fn(
       (_query: string, { signal }: { signal: AbortSignal }) => {
         signals.push(signal);
-        return new Promise(() => {
+        return new Promise<{ title: string; url: string }[]>(() => {
           /* never resolves */
         });
       },
@@ -177,18 +178,20 @@ describe("ElementLinkDialog public link lookup", () => {
     const popup = document.querySelector(".excalidraw-hyperlinkContainer");
     if (!popup || !popup.querySelector("input")) {
       throw new Error(
-        `popup bad; containers=${document.querySelectorAll(
-          ".excalidraw-hyperlinkContainer",
-        ).length} html=${popup?.innerHTML?.slice(0, 300) ?? "null"}`,
+        `popup bad; containers=${
+          document.querySelectorAll(".excalidraw-hyperlinkContainer").length
+        } html=${popup?.innerHTML?.slice(0, 300) ?? "null"}`,
       );
     }
     fireEvent.click(document.querySelector(".LinkLookup__toggle")!);
     await submitLookup("k8s gateway");
     fireEvent.click(
-      (await waitFor(() => {
-        expect(findResults().length).toBeGreaterThan(0);
-        return findResults();
-      }))[0],
+      (
+        await waitFor(() => {
+          expect(findResults().length).toBeGreaterThan(0);
+          return findResults();
+        })
+      )[0],
     );
 
     const popupInput = document.querySelector<HTMLInputElement>(
@@ -204,9 +207,10 @@ describe("ElementLinkDialog public link lookup", () => {
     }> = [];
     const onLinkLookup = vi.fn(
       (query: string, _opts: { signal: AbortSignal }) => {
-        const { promise, resolve } = Promise.withResolvers<
-          { title: string; url: string }[]
-        >();
+        let resolve!: (results: { title: string; url: string }[]) => void;
+        const promise = new Promise<{ title: string; url: string }[]>((res) => {
+          resolve = res;
+        });
         resolvers.push({ resolve });
         return promise;
       },
@@ -226,12 +230,16 @@ describe("ElementLinkDialog public link lookup", () => {
     await waitFor(() => expect(onLinkLookup).toHaveBeenCalledTimes(2));
 
     // resolve the first (stale) lookup first
-    resolvers[0].resolve([{ title: "stale", url: "https://stale.example.com/" }]);
+    resolvers[0].resolve([
+      { title: "stale", url: "https://stale.example.com/" },
+    ]);
     await new Promise((r) => setTimeout(r, 50));
     // stale results must not be shown
     expect(findResults().length).toBe(0);
 
-    resolvers[1].resolve([{ title: "fresh", url: "https://fresh.example.com/" }]);
+    resolvers[1].resolve([
+      { title: "fresh", url: "https://fresh.example.com/" },
+    ]);
     await waitFor(() => {
       expect(findResults().length).toBe(1);
     });
