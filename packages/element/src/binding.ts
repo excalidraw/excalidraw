@@ -24,7 +24,6 @@ import {
 } from "@excalidraw/math";
 
 import type { LineSegment, LocalPoint, Radians } from "@excalidraw/math";
-import type { AppState } from "@excalidraw/excalidraw/types";
 import type { MapEntry, Mutable } from "@excalidraw/common/utility-types";
 import type { Bounds } from "@excalidraw/common";
 
@@ -161,7 +160,16 @@ export const bindOrUnbindBindingElement = (
   scenePointerX: number,
   scenePointerY: number,
   scene: Scene,
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "bindMode"
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "selectedLinearElement"
+    | "zoom"
+  >,
   opts?: {
     newArrow?: boolean;
     altKey?: boolean;
@@ -332,7 +340,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   endDragged: boolean,
   startIdx: number,
   endIdx: number,
-  appState: AppState,
+  appState: Pick<ElementsState, "selectedLinearElement" | "zoom">,
   globalBindMode?: ElementsState["bindMode"],
   shiftKey?: boolean,
 ): {
@@ -625,7 +633,16 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   screenPointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "bindMode"
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "selectedLinearElement"
+    | "zoom"
+  >,
   opts?: {
     newArrow?: boolean;
     angleLocked?: boolean;
@@ -665,7 +682,15 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   scenePointerY: number,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "selectedLinearElement"
+    | "zoom"
+  >,
   opts?: {
     newArrow?: boolean;
     angleLocked?: boolean;
@@ -973,7 +998,10 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    "bindMode" | "isBindingEnabled" | "selectedLinearElement" | "zoom"
+  >,
   opts?: {
     newArrow?: boolean;
     shiftKey?: boolean;
@@ -1105,7 +1133,16 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
 export const bindOrUnbindBindingElements = (
   selectedArrows: NonDeleted<ExcalidrawArrowElement>[],
   scene: Scene,
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "bindMode"
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "selectedLinearElement"
+    | "zoom"
+  >,
 ): void => {
   selectedArrows.forEach((arrow) => {
     bindOrUnbindBindingElement(
@@ -1691,7 +1728,15 @@ const updateArrowBindings = (
   startOrEnd: "startBinding" | "endBinding",
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "selectedLinearElement"
+    | "zoom"
+  >,
 ) => {
   invariant(
     !isElbowArrow(latestElement),
@@ -1754,7 +1799,15 @@ const updateArrowBindings = (
 export const updateBindings = (
   latestElement: NonDeletedExcalidrawElement,
   scene: Scene,
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "selectedLinearElement"
+    | "zoom"
+  >,
   options?: {
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     newSize?: { width: number; height: number };

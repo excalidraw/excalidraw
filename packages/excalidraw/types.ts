@@ -1,5 +1,4 @@
 import type {
-  IMAGE_MIME_TYPES,
   UserIdleState,
   throttleRAF,
   EditorInterface,
@@ -21,7 +20,6 @@ import type {
   ExcalidrawElement,
   ExcalidrawArrowElement,
   FontFamilyValues,
-  FileId,
   Theme,
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
@@ -31,11 +29,7 @@ import type {
   StrokeVariability,
 } from "@excalidraw/element/types";
 
-import type {
-  Merge,
-  MaybePromise,
-  ValueOf,
-} from "@excalidraw/common/utility-types";
+import type { Merge, MaybePromise } from "@excalidraw/common/utility-types";
 
 import type { RenderEnvironment, OnDuplicateData } from "@excalidraw/element";
 
@@ -64,7 +58,20 @@ import type {
 
 import type { ActiveTool } from "@excalidraw/element/types";
 
-import type { ElementsState } from "@excalidraw/element/types";
+import type {
+  ElementsState,
+  EmbeddableValidator,
+  GenerateLinkForSelection,
+  ImageCache,
+  OriginalElementsMap,
+} from "@excalidraw/element/types";
+
+import type {
+  ElementRenderOverride,
+  ElementRenderOverrides,
+  ElementRenderOffsets,
+  ElementsPendingErasure,
+} from "@excalidraw/element/types";
 
 import {
   type CaptureUpdateActionType,
@@ -86,6 +93,13 @@ import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
+
+export type {
+  ElementRenderOverride,
+  ElementRenderOverrides,
+  ElementRenderOffsets,
+  ElementsPendingErasure,
+};
 
 export type { ElementsState };
 
@@ -334,8 +348,6 @@ export interface AppState extends ElementsState {
   boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
-  /** user preference whether arrow snap to midpoints while binding */
-  isMidpointSnappingEnabled: boolean;
   /** user preference whether to show contextual hints above the toolbar */
   showHints: boolean;
   /**
@@ -428,9 +440,7 @@ export interface AppState extends ElementsState {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
-  hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
-  shouldCacheIgnoreZoom: boolean;
   toast: {
     message: React.ReactNode;
     closable?: boolean;
@@ -438,10 +448,7 @@ export interface AppState extends ElementsState {
   } | null;
   zenModeEnabled: boolean;
   minimapEnabled: boolean;
-  /** grid cell px size */
-  gridSize: number;
   gridStep: number;
-  gridModeEnabled: boolean;
 
   fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
@@ -738,26 +745,6 @@ export type UIControl =
   | keyof Extract<UIConfig, { enabled: unknown }>["enabled"]
   | keyof Extract<UIConfig, { disabled: unknown }>["disabled"];
 
-/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
-export type ElementRenderOverride = Readonly<{
-  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
-  opacity?: number;
-  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
-  offset?: Readonly<{ x: number; y: number }>;
-}>;
-
-/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
-export type ElementRenderOverrides = ReadonlyMap<
-  ExcalidrawElement["id"],
-  ElementRenderOverride
->;
-
-/** The translation part of a snapshot: only the entries that carry an offset. */
-export type ElementRenderOffsets = ReadonlyMap<
-  ExcalidrawElement["id"],
-  NonNullable<ElementRenderOverride["offset"]>
->;
-
 export interface ExcalidrawProps {
   className?: string;
   /**
@@ -961,7 +948,7 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
-  generateLinkForSelection?: (id: string, type: "element" | "group") => string;
+  generateLinkForSelection?: GenerateLinkForSelection;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
@@ -979,12 +966,7 @@ export interface ExcalidrawProps {
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
-  validateEmbeddable?:
-    | boolean
-    | string[]
-    | RegExp
-    | RegExp[]
-    | ((link: string) => boolean | undefined);
+  validateEmbeddable?: EmbeddableValidator;
   renderEmbeddable?: (
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
@@ -1135,13 +1117,7 @@ export type AppClassProperties = {
   canvas: HTMLCanvasElement;
   focusContainer(): void;
   library: Library;
-  imageCache: Map<
-    FileId,
-    {
-      image: HTMLImageElement | Promise<HTMLImageElement>;
-      mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
-    }
-  >;
+  imageCache: ImageCache;
   files: BinaryFiles;
   editorInterface: App["editorInterface"];
   scene: App["scene"];
@@ -1214,7 +1190,7 @@ export type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   // original element frozen snapshots so we can access the original
   // element attribute values at time of pointerdown
-  originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
+  originalElements: OriginalElementsMap;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -1447,8 +1423,6 @@ export type Primitive =
   | undefined;
 
 export type JSONValue = string | number | boolean | null | object;
-
-export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 
 /** Runtime gridSize value. Null indicates disabled grid. */
 export type GenerateDiagramToCode = (props: {

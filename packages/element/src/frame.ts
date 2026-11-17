@@ -6,8 +6,6 @@ import {
   segmentsIntersectAt,
 } from "@excalidraw/math";
 
-import type { AppClassProperties } from "@excalidraw/excalidraw/types";
-
 import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
 import {
@@ -38,7 +36,7 @@ import {
 
 import { getNonDeletedElements } from ".";
 
-import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
+import type { ExcalidrawElementsIncludingDeleted, Scene } from "./Scene";
 
 import type {
   ElementsMap,
@@ -820,7 +818,7 @@ export const updateFrameMembershipOfSelectedElements = <
     | "frameToHighlight"
     | "editingGroupId"
   >,
-  app: AppClassProperties,
+  app: { scene: Pick<Scene, "getSelectedElements"> },
 ) => {
   const selectedElements = app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,

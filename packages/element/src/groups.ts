@@ -1,5 +1,3 @@
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import { getBoundTextElement } from "./textElement";
 
 import { isBoundToContainer } from "./typeChecks";
@@ -121,10 +119,15 @@ export const selectGroupsFromGivenElements = (
   return nextAppState.selectedGroupIds;
 };
 
-export const editGroupForSelectedElement = (
-  appState: AppState,
+export const editGroupForSelectedElement = <
+  T extends Pick<
+    ElementsState,
+    "editingGroupId" | "selectedGroupIds" | "selectedElementIds"
+  >,
+>(
+  appState: T,
   element: NonDeleted<ExcalidrawElement>,
-): AppState => {
+): T => {
   return {
     ...appState,
     editingGroupId: element.groupIds.length ? element.groupIds[0] : null,

@@ -4,8 +4,6 @@
 
 import { MIME_TYPES, SVG_NS } from "@excalidraw/common";
 
-import type { AppClassProperties } from "@excalidraw/excalidraw/types";
-
 import { getRenderEnvironment } from "./renderEnvironment";
 import { isInitializedImageElement } from "./typeChecks";
 
@@ -14,7 +12,7 @@ import type {
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
-import type { DataURL, BinaryFiles } from "./types";
+import type { DataURL, BinaryFiles, ImageCache } from "./types";
 
 export const loadHTMLImageElement = (
   dataURL: DataURL,
@@ -43,7 +41,7 @@ export const updateImageCache = async ({
 }: {
   fileIds: FileId[];
   files: BinaryFiles;
-  imageCache: AppClassProperties["imageCache"];
+  imageCache: ImageCache;
   /** creates images in the owner window so cross-document scenes keep
    * runtime ownership of their HTMLImageElements */
   createImage?: () => HTMLImageElement;

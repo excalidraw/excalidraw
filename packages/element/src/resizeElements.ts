@@ -17,8 +17,6 @@ import {
 
 import type { GlobalPoint } from "@excalidraw/math";
 
-import type { PointerDownState } from "@excalidraw/excalidraw/types";
-
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import {
@@ -92,10 +90,11 @@ import type {
   ExcalidrawArrowElement,
 } from "./types";
 import type { ElementUpdate } from "./mutateElement";
+import type { OriginalElementsMap } from "./types";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
-  originalElements: PointerDownState["originalElements"],
+  originalElements: OriginalElementsMap,
   transformHandleType: MaybeTransformHandleType,
   selectedElements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
@@ -429,7 +428,7 @@ export const resizeSingleTextElement = (
 };
 
 const rotateMultipleElements = (
-  originalElements: PointerDownState["originalElements"],
+  originalElements: OriginalElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
   pointerX: number,

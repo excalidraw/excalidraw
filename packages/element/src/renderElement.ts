@@ -32,18 +32,6 @@ import {
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
-import type {
-  StaticCanvasAppState,
-  InteractiveCanvasAppState,
-  ElementRenderOverrides,
-} from "@excalidraw/excalidraw/types";
-
-import type {
-  StaticCanvasRenderConfig,
-  RenderableElementsMap,
-  InteractiveCanvasRenderConfig,
-} from "@excalidraw/excalidraw/scene/types";
-
 import type { Zoom } from "@excalidraw/common";
 
 import { getCreatePath, getRenderEnvironment } from "./renderEnvironment";
@@ -96,6 +84,11 @@ import type {
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { ElementsState } from "./types";
+import type {
+  ElementRenderOverrides,
+  StaticCanvasRenderConfig,
+  RenderableElementsMap,
+} from "./types";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -283,7 +276,7 @@ const generateElementCanvas = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  appState: Pick<ElementsState, "theme">,
 ): ExcalidrawElementWithCanvas | null => {
   const environment = getRenderEnvironment(renderConfig.renderEnvironment);
   const canvas = environment.createCanvas();
@@ -731,7 +724,7 @@ const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  appState: Pick<ElementsState, "shouldCacheIgnoreZoom" | "theme" | "zoom">,
 ) => {
   const zoom: Zoom = renderConfig ? appState.zoom : DEFAULT_ZOOM;
   const renderEnvironment = getRenderEnvironment(
@@ -794,7 +787,7 @@ const generateElementWithCanvas = (
  */
 const canSnapElement = (
   element: ExcalidrawElement,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  appState: Pick<ElementsState, "shouldCacheIgnoreZoom">,
 ) =>
   !appState?.shouldCacheIgnoreZoom &&
   (!element.angle || isRightAngleRads(element.angle));
@@ -811,7 +804,10 @@ const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    "scrollX" | "scrollY" | "shouldCacheIgnoreZoom"
+  >,
   allElementsMap: NonDeletedSceneElementsMap,
   positionOffset: RenderPositionOffset,
 ) => {
@@ -999,8 +995,8 @@ const drawElementFromCanvas = (
 export const renderSelectionElement = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  appState: Pick<ElementsState, "scrollX" | "scrollY" | "theme" | "zoom">,
+  selectionColor: string,
 ) => {
   context.save();
   context.translate(element.x + appState.scrollX, element.y + appState.scrollY);
@@ -1030,7 +1026,19 @@ export const renderElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    | "croppingElementId"
+    | "frameRendering"
+    | "hoveredElementIds"
+    | "openDialog"
+    | "scrollX"
+    | "scrollY"
+    | "selectedElementIds"
+    | "shouldCacheIgnoreZoom"
+    | "theme"
+    | "zoom"
+  >,
   renderState = resolveElementRenderState(
     element,
     elementsMap,
@@ -1078,7 +1086,16 @@ const drawElement = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    | "croppingElementId"
+    | "frameRendering"
+    | "scrollX"
+    | "scrollY"
+    | "shouldCacheIgnoreZoom"
+    | "theme"
+    | "zoom"
+  >,
   renderState: ElementRenderState,
 ) => {
   switch (element.type) {

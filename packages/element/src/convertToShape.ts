@@ -17,8 +17,6 @@ import {
   skewness,
 } from "@excalidraw/math";
 
-import type { App } from "@excalidraw/excalidraw/types";
-
 import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
 
@@ -47,6 +45,7 @@ import type {
   NonDeleted,
   ExcalidrawLineElement,
 } from "./types";
+import type { Scene } from "./Scene";
 import type { ElementsState } from "./types";
 
 declare global {
@@ -773,8 +772,22 @@ const isDrawShapePreviewEqual = (
 // Append to the trail and recompute the shape preview. This runs inside
 // withBatchedUpdatesThrottled (throttleRAF), so it fires at most once per
 // animation frame regardless of raw pointermove rate.
+/** What live shape recognition needs from the editor. */
+export type ShapeRecognitionHost = {
+  state: Parameters<typeof convertToShape>[1] &
+    Pick<ElementsState, "activeTool" | "newElement">;
+  scene: Pick<Scene, "getNonDeletedElementsMap" | "getNonDeletedFramesLikes">;
+  drawShape: {
+    trail: {
+      addPointToPath(x: number, y: number): void;
+      getCurrentPoints(): GlobalPoint[];
+    };
+  };
+  setState(state: Pick<ElementsState, "newElement">): void;
+};
+
 export const convertToShapeHandlePointerMoveFromPointerDown = (
-  app: App,
+  app: ShapeRecognitionHost,
   pointerCoords: { x: number; y: number },
 ) => {
   if (app.state.activeTool.type === "autoshape") {

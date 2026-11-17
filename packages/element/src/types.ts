@@ -27,6 +27,7 @@ import type {
 import type { Drawable } from "roughjs/bin/core";
 
 import type { LinearElementEditor } from "./linearElementEditor";
+import type { RenderEnvironment } from "./renderEnvironment";
 
 export type {
   FillStyle,
@@ -711,6 +712,98 @@ export interface ElementsState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** user preference whether arrow snap to midpoints while binding */
+  isMidpointSnappingEnabled: boolean;
+  hoveredElementIds: Readonly<{ [id: string]: true }>;
+  /** grid cell px size */
+  gridSize: number;
+  gridModeEnabled: boolean;
+  shouldCacheIgnoreZoom: boolean;
   /** the open dialog, if any (`AppState` narrows this to its dialogs) */
   openDialog: { name: string } | null;
 }
+
+/** images loaded for the scene's image elements, keyed by file id */
+export type ImageCache = Map<
+  FileId,
+  {
+    image: HTMLImageElement | Promise<HTMLImageElement>;
+    mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
+  }
+>;
+
+/** host-supplied validation of embeddable URLs (the `validateEmbeddable` prop) */
+export type EmbeddableValidator =
+  | boolean
+  | string[]
+  | RegExp
+  | RegExp[]
+  | ((link: string) => boolean | undefined);
+
+/** host-supplied element link generator (the `generateLinkForSelection` prop) */
+export type GenerateLinkForSelection = (
+  id: string,
+  type: "element" | "group",
+) => string;
+
+/** elements as they were when the pointer went down, keyed by id */
+export type OriginalElementsMap = Map<string, NonDeleted<ExcalidrawElement>>;
+
+/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
+export type ElementRenderOverride = Readonly<{
+  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
+  opacity?: number;
+  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
+  offset?: Readonly<{ x: number; y: number }>;
+}>;
+
+/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
+export type ElementRenderOverrides = ReadonlyMap<
+  ExcalidrawElement["id"],
+  ElementRenderOverride
+>;
+
+/** The translation part of a snapshot: only the entries that carry an offset. */
+export type ElementRenderOffsets = ReadonlyMap<
+  ExcalidrawElement["id"],
+  NonNullable<ElementRenderOverride["offset"]>
+>;
+
+export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
+
+export type RenderableElementsMap = NonDeletedElementsMap &
+  MakeBrand<"RenderableElementsMap">;
+
+export type StaticCanvasRenderConfig = {
+  canvasBackgroundColor: ElementsState["viewBackgroundColor"];
+  /**
+   * Backing-store scale the target canvas was bootstrapped with -- the owner
+   * window's devicePixelRatio when rendering into the editor, exportScale when
+   * exporting. Element caches are built and blitted at this ratio, so it must
+   * be the same value passed as `StaticSceneRenderConfig["scale"]`.
+   */
+  scale: number;
+  /**
+   * Host environment that creates the canvases and images this render
+   * rasterizes (per-editor owner window in the app; the export's
+   * `config.environment` when exporting). Defaults to the browser's.
+   */
+  renderEnvironment?: RenderEnvironment;
+  /** export only: clips everything drawn to this frame (square corners) */
+  clipToFrame?: ExcalidrawFrameLikeElement | null;
+  // extra options passed to the renderer
+  // ---------------------------------------------------------------------------
+  imageCache: ImageCache;
+  renderGrid: boolean;
+  /** whether to render link icons on elements with links (never rendered
+   when exporting). @default true */
+  renderLinks?: boolean;
+  /** when exporting the behavior is slightly different (e.g. we can't use
+   CSS filters), and we disable render optimizations for best output */
+  isExporting: boolean;
+  embedsValidationStatus: EmbedsValidationStatus;
+  elementsPendingErasure: ElementsPendingErasure;
+  pendingFlowchartNodes: PendingExcalidrawElements | null;
+  theme: ElementsState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
+};

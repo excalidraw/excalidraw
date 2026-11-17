@@ -1,13 +1,10 @@
 import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { MakeBrand } from "@excalidraw/common/utility-types";
 import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type {
@@ -17,56 +14,23 @@ import type {
 } from "@excalidraw/element/types";
 
 import type {
+  RenderableElementsMap,
+  StaticCanvasRenderConfig,
+} from "@excalidraw/element/types";
+
+import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
-  ElementRenderOverrides,
-  ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  PendingExcalidrawElements,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
+export type { RenderableElementsMap, StaticCanvasRenderConfig };
+
 export type { SVGPathString, ElementShape, ElementShapes };
-
-export type RenderableElementsMap = NonDeletedElementsMap &
-  MakeBrand<"RenderableElementsMap">;
-
-export type StaticCanvasRenderConfig = {
-  canvasBackgroundColor: AppState["viewBackgroundColor"];
-  /**
-   * Backing-store scale the target canvas was bootstrapped with -- the owner
-   * window's devicePixelRatio when rendering into the editor, exportScale when
-   * exporting. Element caches are built and blitted at this ratio, so it must
-   * be the same value passed as `StaticSceneRenderConfig["scale"]`.
-   */
-  scale: number;
-  /**
-   * Host environment that creates the canvases and images this render
-   * rasterizes (per-editor owner window in the app; the export's
-   * `config.environment` when exporting). Defaults to the browser's.
-   */
-  renderEnvironment?: RenderEnvironment;
-  /** export only: clips everything drawn to this frame (square corners) */
-  clipToFrame?: ExcalidrawFrameLikeElement | null;
-  // extra options passed to the renderer
-  // ---------------------------------------------------------------------------
-  imageCache: AppClassProperties["imageCache"];
-  renderGrid: boolean;
-  /** whether to render link icons on elements with links (never rendered
-   when exporting). @default true */
-  renderLinks?: boolean;
-  /** when exporting the behavior is slightly different (e.g. we can't use
-   CSS filters), and we disable render optimizations for best output */
-  isExporting: boolean;
-  embedsValidationStatus: EmbedsValidationStatus;
-  elementsPendingErasure: ElementsPendingErasure;
-  pendingFlowchartNodes: PendingExcalidrawElements | null;
-  theme: AppState["theme"];
-  elementRenderOverrides?: ElementRenderOverrides;
-};
 
 export type SVGRenderConfig = {
   /**
