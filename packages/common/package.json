@@ -57,6 +57,10 @@
     "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
   },
   "dependencies": {
+    "@braintree/sanitize-url": "6.0.2",
+    "es6-promise-pool": "2.5.0",
+    "nanoid": "3.3.8",
+    "roughjs": "4.6.4",
     "tinycolor2": "1.6.0"
   },
   "devDependencies": {

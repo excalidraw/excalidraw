@@ -56,11 +56,13 @@
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
+    "points-on-curve": "0.2.0",
     "roughjs": "4.6.4"
   },
   "devDependencies": {
     "cross-env": "7.0.3",
     "fonteditor-core": "2.4.0",
+    "jest-diff": "29.7.0",
     "typescript": "5.9.3",
     "wawoff2": "2.0.1",
     "which": "4.0.0"

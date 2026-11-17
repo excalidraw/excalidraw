@@ -127,6 +127,7 @@
     "ansicolor": "2.0.3",
     "autoprefixer": "10.4.7",
     "cross-env": "7.0.3",
+    "csstype": "3.1.3",
     "dotenv": "16.0.1",
     "esbuild": "0.19.10",
     "esbuild-sass-plugin": "2.16.0",
@@ -135,6 +136,8 @@
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
     "jest-diff": "29.7.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "typescript": "5.9.3"
   }
 }

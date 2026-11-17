@@ -65,6 +65,16 @@
   "dependencies": {
     "@excalidraw/common": "0.18.0",
     "@excalidraw/math": "0.18.0",
-    "@excalidraw/fractional-indexing": "3.3.0"
+    "@excalidraw/fractional-indexing": "3.3.0",
+    "lodash.throttle": "4.1.1",
+    "perfect-freehand": "1.2.0",
+    "points-on-curve": "0.2.0",
+    "roughjs": "4.6.4"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/react": "16.2.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   }
 }
