@@ -3,8 +3,6 @@
     "signUp": "Registrer deg",
     "signIn": "Logg inn",
     "upgrade": "Oppgrader",
-    "tryExcalidrawPlus": "Prøv Excalidraw+",
-    "plusFreeTrial": "14 dagars gratis prøveperiode",
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som rein tekst",
     "pasteCharts": "Lim inn diagram",
@@ -787,5 +785,16 @@
     "spacebar": "Mellomrom",
     "delete": "Slett",
     "mmb": "Rullehjul"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
