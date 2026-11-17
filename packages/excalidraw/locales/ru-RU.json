@@ -3,8 +3,6 @@
     "signUp": "Регистрация",
     "signIn": "Вход",
     "upgrade": "Обновить",
-    "tryExcalidrawPlus": "Попробовать Excalidraw+",
-    "plusFreeTrial": "14 дней бесплатно",
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
@@ -787,5 +785,16 @@
     "spacebar": "Пробел",
     "delete": "Delete",
     "mmb": "Колёсико мыши"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
