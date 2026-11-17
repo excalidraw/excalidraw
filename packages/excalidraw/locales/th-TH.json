@@ -3,8 +3,6 @@
     "signUp": "สมัครสมาชิก",
     "signIn": "เข้าสู่ระบบ",
     "upgrade": "อัปเกรด",
-    "tryExcalidrawPlus": "ลองใช้ Excalidraw+",
-    "plusFreeTrial": "ทดลองใช้ฟรี 14 วัน",
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
@@ -787,5 +785,16 @@
     "spacebar": "อวกาศ",
     "delete": "ลบ",
     "mmb": "ล้อเมาส์"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
