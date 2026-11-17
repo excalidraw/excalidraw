@@ -15,7 +15,6 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
-  APP_NAME,
   CURSOR_TYPE,
   DEFAULT_STROKE_STREAMLINE,
   DEFAULT_STROKE_STREAMLINE_PRECISE,
@@ -3895,16 +3894,7 @@ class App extends React.Component<AppProps, AppState> {
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
 
-    const searchParams = new URLSearchParams(
-      this.ownerWindow.location.search.slice(1),
-    );
-
-    if (searchParams.has("web-share-target")) {
-      // Obtain a file that was shared via the Web Share Target API.
-      this.restoreFileFromShare();
-    } else {
-      this.updateDOMRect(this.initializeScene);
-    }
+    this.updateDOMRect(this.initializeScene);
 
     // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
@@ -4919,27 +4909,6 @@ class App extends React.Component<AppProps, AppState> {
       duration: 8000,
     });
   }
-
-  restoreFileFromShare = async () => {
-    try {
-      const webShareTargetCache = await caches.open("web-share-target");
-
-      const response = await webShareTargetCache.match("shared-file");
-      if (response) {
-        const blob = await response.blob();
-        const file = new File([blob], blob.name || "", { type: blob.type });
-        this.loadFileToCanvas(file, null);
-        await webShareTargetCache.delete("shared-file");
-        this.ownerWindow.history.replaceState(
-          null,
-          APP_NAME,
-          this.ownerWindow.location.pathname,
-        );
-      }
-    } catch (error: any) {
-      this.setState({ errorMessage: error.message });
-    }
-  };
 
   /**
    * adds supplied files to existing files in the appState.
