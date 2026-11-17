@@ -3,8 +3,6 @@
     "signUp": "Înscrie-te",
     "signIn": "Conectează-te",
     "upgrade": "Treci la un plan superior",
-    "tryExcalidrawPlus": "Încearcă Excalidraw+",
-    "plusFreeTrial": "Perioadă de încercare gratuită de 14 zile",
     "paste": "Lipire",
     "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
@@ -787,5 +785,16 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Rotiță maus"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
