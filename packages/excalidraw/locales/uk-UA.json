@@ -3,8 +3,6 @@
     "signUp": "Зареєструватися",
     "signIn": "Увійти",
     "upgrade": "Оновити план",
-    "tryExcalidrawPlus": "Спробувати Excalidraw+",
-    "plusFreeTrial": "14 днів безплатно",
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
@@ -787,5 +785,16 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Коліщатко"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
