@@ -3,8 +3,6 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
@@ -787,5 +785,16 @@
     "spacebar": "Espaci",
     "delete": "Suprimir",
     "mmb": "Clic rodeta"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
