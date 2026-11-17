@@ -5,8 +5,6 @@ import {
   MOBILE_ACTION_BUTTON_BG,
 } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import { orderByFractionalIndex } from "@excalidraw/element";
 
 import type { SceneElementsMap } from "@excalidraw/element/types";
@@ -18,6 +16,8 @@ import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 
 import { useStylesPanelMode } from "../components/App";
+
+import { CaptureUpdateAction } from "../store";
 
 import type { History } from "../history";
 import type { AppClassProperties, AppState } from "../types";

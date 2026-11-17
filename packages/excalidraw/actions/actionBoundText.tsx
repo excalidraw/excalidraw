@@ -38,8 +38,6 @@ import { syncMovedIndices } from "@excalidraw/element";
 
 import { newElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -56,6 +54,8 @@ import type { Radians } from "@excalidraw/math";
 
 import { getDefaultAppState } from "../appState";
 import { getSelectionStateForElements } from "../components/App.selection";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

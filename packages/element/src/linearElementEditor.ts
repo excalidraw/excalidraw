@@ -40,6 +40,8 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import type { Bounds } from "@excalidraw/common";
 
+import type { Store } from "@excalidraw/excalidraw/store";
+
 import { getCurvePathOps } from "./geometricShapes";
 
 import { moveArrowAboveBindable } from "./zindex";
@@ -74,7 +76,6 @@ import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
 import { isLineElement } from "./typeChecks";
 
-import type { Store } from "./store";
 import type { LinearPathSegment } from "./utils";
 
 import type { Scene } from "./Scene";

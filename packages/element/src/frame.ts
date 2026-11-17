@@ -312,7 +312,10 @@ export const getRootElements = <T extends ExcalidrawElement>(
 export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
-  appState: AppState,
+  appState: Pick<
+    AppState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  >,
   elementsMap: ElementsMap,
 ): ExcalidrawElement[] => {
   const prevElementsInFrame = getFrameChildren(allElements, frame.id);
@@ -813,7 +816,13 @@ export const updateFrameMembershipOfSelectedElements = <
   T extends ElementsMapOrArray,
 >(
   allElements: T,
-  appState: AppState,
+  appState: Pick<
+    AppState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+    | "editingGroupId"
+  >,
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements({
@@ -905,7 +914,12 @@ export const omitGroupsContainingFrameLikes = (
 export const getTargetFrame = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-  appState: StaticCanvasAppState,
+  appState: Pick<
+    StaticCanvasAppState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+  >,
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element, elementsMap) || element
@@ -932,7 +946,13 @@ export const getTargetFrame = (
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElementsMap: ElementsMap,
-  appState: StaticCanvasAppState,
+  appState: Pick<
+    StaticCanvasAppState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+    | "editingGroupId"
+  >,
   opts?: {
     targetFrame?: ExcalidrawFrameLikeElement;
     checkedGroups?: Map<string, boolean>;
@@ -1026,7 +1046,14 @@ export const isElementInFrame = (
 export const shouldApplyFrameClip = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
-  appState: StaticCanvasAppState,
+  appState: Pick<
+    StaticCanvasAppState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+    | "editingGroupId"
+    | "frameRendering"
+  >,
   elementsMap: ElementsMap,
   checkedGroups?: Map<string, boolean>,
 ) => {

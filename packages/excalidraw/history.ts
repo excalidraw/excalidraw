@@ -1,18 +1,16 @@
 import { Emitter } from "@excalidraw/common";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
+import type { SceneElementsMap } from "@excalidraw/element/types";
+
 import {
   CaptureUpdateAction,
   StoreChange,
   StoreDelta,
-} from "@excalidraw/element";
-
-import type {
-  RenderEnvironment,
-  StoreSnapshot,
-  Store,
-} from "@excalidraw/element";
-
-import type { SceneElementsMap } from "@excalidraw/element/types";
+  type StoreSnapshot,
+  type Store,
+} from "./store";
 
 import type { AppState } from "./types";
 

@@ -21,7 +21,7 @@ export const distributeElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   distribution: Distribution,
-  appState: Readonly<AppState>,
+  appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
   scene: Scene,
   /** measures the labels of the bound arrows the distribution moves */
   renderEnvironment?: RenderEnvironment,

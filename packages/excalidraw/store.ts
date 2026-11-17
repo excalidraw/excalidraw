@@ -8,32 +8,31 @@ import {
   toIterable,
 } from "@excalidraw/common";
 
-import type App from "@excalidraw/excalidraw/components/App";
-
-import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
-
-import type { AppState, ObservedAppState } from "@excalidraw/excalidraw/types";
-
-import { deepCopyElement } from "./duplicate";
-import { newElementWith } from "./mutateElement";
-
-import { ElementsDelta, AppStateDelta, Delta } from "./delta";
-
 import {
+  deepCopyElement,
+  newElementWith,
   syncInvalidIndicesImmutable,
   hashElementsVersion,
   hashString,
   isInitializedImageElement,
   isImageElement,
-} from "./index";
+} from "@excalidraw/element";
 
-import type { ApplyToOptions } from "./delta";
+import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
 
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
   SceneElementsMap,
-} from "./types";
+} from "@excalidraw/element/types";
+
+import { ElementsDelta, AppStateDelta, Delta } from "./delta";
+
+import type App from "./components/App";
+
+import type { AppState, ObservedAppState } from "./types";
+
+import type { ApplyToOptions } from "./delta";
 
 export const CaptureUpdateAction = {
   /**

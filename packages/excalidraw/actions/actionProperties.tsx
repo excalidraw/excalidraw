@@ -73,7 +73,6 @@ import {
 import {
   updateElbowArrowPoints,
   updateElbowArrowRoute,
-  CaptureUpdateAction,
   toggleLinePolygonState,
 } from "@excalidraw/element";
 
@@ -98,8 +97,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { ElementUpdate, Scene } from "@excalidraw/element";
-
-import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
@@ -171,6 +168,8 @@ import {
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
+
+import { CaptureUpdateAction, type CaptureUpdateActionType } from "../store";
 
 import {
   getColorTargetAppStateUpdates,

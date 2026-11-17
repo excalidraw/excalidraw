@@ -47,13 +47,7 @@ import type {
   ValueOf,
 } from "@excalidraw/common/utility-types";
 
-import type {
-  CaptureUpdateActionType,
-  DurableIncrement,
-  EphemeralIncrement,
-  RenderEnvironment,
-  OnDuplicateData,
-} from "@excalidraw/element";
+import type { RenderEnvironment, OnDuplicateData } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
 
 import type {
@@ -63,6 +57,12 @@ import type {
   UnsubscribeCallback,
   Zoom,
 } from "@excalidraw/common";
+
+import {
+  type CaptureUpdateActionType,
+  type DurableIncrement,
+  type EphemeralIncrement,
+} from "./store";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";

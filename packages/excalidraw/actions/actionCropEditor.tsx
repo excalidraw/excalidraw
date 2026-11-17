@@ -1,12 +1,12 @@
 import { isImageElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import type { ExcalidrawImageElement } from "@excalidraw/element/types";
 
 import { IconButton } from "../components/IconButton";
 import { cropIcon } from "../components/icons";
 import { t } from "../i18n";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

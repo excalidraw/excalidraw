@@ -3,7 +3,6 @@ import { vi } from "vitest";
 
 import { KEYS, ROUNDNESS, arrayToMap, reseed } from "@excalidraw/common";
 import {
-  CaptureUpdateAction,
   getElementBounds,
   getElementLineSegments,
   getElementsWithinSelection,
@@ -15,6 +14,8 @@ import { TOOLS } from "../components/Tools";
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
+
+import { CaptureUpdateAction } from "../store";
 
 import { API } from "./helpers/api";
 import { getTextEditor, updateTextEditor } from "./queries/dom";

@@ -26,8 +26,6 @@ import {
   getElementBounds,
 } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import type { Bounds } from "@excalidraw/common";
 
 import type {
@@ -39,6 +37,8 @@ import type {
 
 import { getSelectionStateForElements } from "../components/App.selection";
 import { getSelectedElements } from "../scene";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

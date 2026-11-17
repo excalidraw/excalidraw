@@ -1,19 +1,20 @@
-import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { arrayToMap } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
-import type { ObservedAppState } from "@excalidraw/excalidraw/types";
+import { mutateElement, newElementWith } from "@excalidraw/element";
 
-import { AppStateDelta, Delta, ElementsDelta } from "../src/delta";
-
-import { mutateElement, newElementWith } from "../src/mutateElement";
-
-import type { LinearElementEditor } from "../src/index";
+import type { LinearElementEditor } from "@excalidraw/element";
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
   SceneElementsMap,
-} from "../src/types";
+} from "@excalidraw/element/types";
+
+import { AppStateDelta, Delta, ElementsDelta } from "../delta";
+
+import { API } from "./helpers/api";
+
+import type { ObservedAppState } from "../types";
 
 describe("ElementsDelta", () => {
   describe("visible changes", () => {

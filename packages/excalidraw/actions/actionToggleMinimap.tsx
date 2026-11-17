@@ -1,11 +1,11 @@
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import { IconButton } from "../components/IconButton";
 import { MINIMAP_MIN_EDITOR_HEIGHT } from "../components/Minimap/Minimap";
 import { MinimapAnnouncementDot } from "../components/Minimap/MinimapAnnouncementDot";
 import { Tooltip, hideTooltip } from "../components/Tooltip";
 import { minimapIcon } from "../components/icons";
 import { t } from "../i18n";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

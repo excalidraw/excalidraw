@@ -1,8 +1,8 @@
 import { KEYS, matchKey } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import { coffeeIcon } from "../components/icons";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

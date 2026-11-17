@@ -15,8 +15,6 @@ import { syncMovedIndices } from "@excalidraw/element";
 
 import { duplicateElements } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import { IconButton } from "../components/IconButton";
 import { DuplicateIcon } from "../components/icons";
 
@@ -27,6 +25,8 @@ import { getShortcutKey } from "../shortcut";
 import { useStylesPanelMode } from "../components/App";
 
 import { getSelectionStateForElements } from "../components/App.selection";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

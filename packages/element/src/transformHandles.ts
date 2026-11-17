@@ -327,7 +327,7 @@ export const getTransformHandles = (
 
 export const hasBoundingBox = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: InteractiveCanvasAppState,
+  appState: Pick<InteractiveCanvasAppState, "selectedLinearElement">,
   editorInterface: EditorInterface,
 ) => {
   if (

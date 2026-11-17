@@ -1413,7 +1413,10 @@ export const getVisibleSceneBounds = ({
   width,
   height,
   zoom,
-}: AppState): SceneBounds => {
+}: Pick<
+  AppState,
+  "scrollX" | "scrollY" | "width" | "height" | "zoom"
+>): SceneBounds => {
   return [
     -scrollX,
     -scrollY,

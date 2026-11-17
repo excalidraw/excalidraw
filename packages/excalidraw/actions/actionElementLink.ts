@@ -4,12 +4,12 @@ import {
   getLinkIdAndTypeFromSelection,
 } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import { copyTextToSystemClipboard } from "../clipboard";
 import { copyIcon, elementLinkIcon } from "../components/icons";
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

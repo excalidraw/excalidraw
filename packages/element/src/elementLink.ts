@@ -30,7 +30,7 @@ export const defaultGetElementLinkFromSelection: Exclude<
 
 export const getLinkIdAndTypeFromSelection = (
   selectedElements: ExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<AppState, "selectedGroupIds">,
 ): {
   id: string;
   type: "element" | "group";

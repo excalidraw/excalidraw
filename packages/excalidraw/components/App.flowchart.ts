@@ -2,7 +2,6 @@ import { isArrowKey, KEYS } from "@excalidraw/common";
 
 import {
   makeNextSelectedElementIds,
-  CaptureUpdateAction,
   FlowChartCreator,
   FlowChartNavigator,
   getSelectedElements,
@@ -14,6 +13,8 @@ import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+
+import { CaptureUpdateAction } from "../store";
 
 import type React from "react";
 import type App from "./App";

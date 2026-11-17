@@ -100,7 +100,16 @@ export const getVisibleAndNonSelectedElements = <
 >(
   elements: readonly T[],
   selectedElements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<
+    AppState,
+    | "width"
+    | "height"
+    | "zoom"
+    | "offsetLeft"
+    | "offsetTop"
+    | "scrollX"
+    | "scrollY"
+  >,
   elementsMap: ElementsMap,
 ) => {
   const selectedElementsSet = new Set(

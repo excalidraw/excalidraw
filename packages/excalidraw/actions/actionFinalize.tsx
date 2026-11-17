@@ -25,8 +25,6 @@ import { isPathALoop } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
@@ -41,6 +39,8 @@ import { TOGGLE_TOOLS } from "../components/Tools";
 import { IconButton } from "../components/IconButton";
 
 import { updateActiveTool } from "../appState";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

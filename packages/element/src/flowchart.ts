@@ -275,7 +275,7 @@ const cloneFlowchartNode = (
 
 export const addNewNodes = (
   startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
-  appState: AppState,
+  appState: Pick<AppState, "currentItemEndArrowhead" | "zoom">,
   direction: LinkDirection,
   scene: Scene,
   numberOfNodes: number,
@@ -315,7 +315,7 @@ const createBindingArrow = (
   startBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   endBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   direction: LinkDirection,
-  appState: AppState,
+  appState: Pick<AppState, "currentItemEndArrowhead" | "zoom">,
   scene: Scene,
 ) => {
   let startX: number;
@@ -627,7 +627,7 @@ export class FlowChartCreator {
 
   createNodes(
     startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
-    appState: AppState,
+    appState: Pick<AppState, "currentItemEndArrowhead" | "zoom">,
     direction: LinkDirection,
     scene: Scene,
   ) {

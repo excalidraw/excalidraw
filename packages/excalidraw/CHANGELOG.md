@@ -13,6 +13,16 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Package exports: undo/redo store, editor helpers and shared types (2026-11-17)
+
+Breaking for direct users of `@excalidraw/element`, `@excalidraw/common` and `@excalidraw/utils`. `@excalidraw/excalidraw`'s exports are unchanged.
+
+- The undo/redo store moved from `@excalidraw/element` into `@excalidraw/excalidraw`, so `@excalidraw/element` no longer exports `Store`, `StoreChange`, `StoreDelta`, `StoreSnapshot`, `StoreIncrement`, `DurableIncrement`, `EphemeralIncrement`, `CaptureUpdateAction`, `CaptureUpdateActionType`, `getObservedAppState`, `Delta`, `ElementsDelta`, `AppStateDelta`, `ApplyToOptions` or `DeltaContainer`. Import `CaptureUpdateAction` from `@excalidraw/excalidraw` (it was already exported there). The types are available from `@excalidraw/excalidraw/store` and `@excalidraw/excalidraw/delta`.
+- `@excalidraw/common` no longer exports the editor-only `updateActiveTool`, `isSelectionLikeTool`, `DEFAULT_UI_OPTIONS` and `DEFAULT_IMAGE_OPTIONS`. They're now internal to `@excalidraw/excalidraw`.
+- `@excalidraw/common` now exports the basic types shared by all packages: `FontFamilyKeys`, `FontFamilyValues`, `FontString`, `UnitlessLineHeight`, `FillStyle`, `StrokeStyle`, `RoundnessType`, `ArrowType`, `Zoom`, `NormalizedZoomValue`, `NullableGridSize` and `UnsubscribeCallback`. `@excalidraw/element/types` and `@excalidraw/excalidraw/types` still export them under the same names. `getStrokeWidthByKey` accepts any element type string.
+- The geometric shape helpers moved from `@excalidraw/utils/shape` into `@excalidraw/element` (`geometricShapes`). `@excalidraw/utils/shape` still re-exports them. `@excalidraw/utils/test-utils` is removed.
+- `@excalidraw/common`'s type declarations no longer include copies of `@excalidraw/element`'s and `@excalidraw/excalidraw`'s types.
+
 ### Minimap, zoom menu and `ui.disabled` (2026-11-12) [#12605](https://github.com/excalidraw/excalidraw/pull/12605), [#12606](https://github.com/excalidraw/excalidraw/pull/12606)
 
 - A toggleable minimap above the bottom-left canvas actions: drag its viewport (or press outside of it) to pan, wheel over it to zoom. Toggled from the footer button next to the zoom level, the Preferences menu, the command palette and the context menu; stored as `appState.minimapEnabled` (in the browser, not in exported files). Not shown on phones or in editors shorter than 500px.

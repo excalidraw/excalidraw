@@ -1,6 +1,6 @@
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import { messageCircleIcon } from "../components/icons";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

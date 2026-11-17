@@ -27,8 +27,6 @@ import {
 
 import { syncMovedIndices } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -45,6 +43,8 @@ import { isSomeElementSelected } from "../scene";
 import { getShortcutKey } from "../shortcut";
 
 import { selectGroupsForSelectedElements } from "../components/App.selection";
+
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

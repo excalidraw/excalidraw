@@ -5,8 +5,6 @@ import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
 
 import { deepCopyElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
-
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -17,6 +15,8 @@ import type { Scene } from "@excalidraw/element";
 
 import { useApp, useExcalidrawSetAppState } from "../App";
 import { InlineIcon } from "../InlineIcon";
+
+import { CaptureUpdateAction } from "../../store";
 
 import { SMALLEST_DELTA } from "./utils";
 

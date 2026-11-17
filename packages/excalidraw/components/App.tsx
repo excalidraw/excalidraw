@@ -93,7 +93,6 @@ import {
 } from "@excalidraw/common";
 
 import {
-  getObservedAppState,
   getCommonBounds,
   bindOrUnbindBindingElements,
   getHoveredElementForBinding,
@@ -187,14 +186,10 @@ import {
   dragNewElement,
   getDragOffsetXY,
   Scene,
-  Store,
-  CaptureUpdateAction,
   type ElementUpdate,
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
-  StoreDelta,
-  type ApplyToOptions,
   positionElementsOnGrid,
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
@@ -375,6 +370,15 @@ import {
 } from "../actions/colorTargets";
 
 import { updateActiveTool, isSelectionLikeTool } from "../appState";
+
+import {
+  getObservedAppState,
+  Store,
+  CaptureUpdateAction,
+  StoreDelta,
+} from "../store";
+
+import { type ApplyToOptions } from "../delta";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,

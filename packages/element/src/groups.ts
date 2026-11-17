@@ -19,7 +19,10 @@ import type {
 
 export const selectGroup = (
   groupId: GroupId,
-  appState: InteractiveCanvasAppState,
+  appState: Pick<
+    InteractiveCanvasAppState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  >,
   elements: readonly NonDeletedExcalidrawElement[],
 ): Pick<
   InteractiveCanvasAppState,
@@ -93,9 +96,15 @@ export const getSelectedGroupIds = (
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: InteractiveCanvasAppState,
+  appState: Pick<
+    InteractiveCanvasAppState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  >,
 ) => {
-  let nextAppState: InteractiveCanvasAppState = {
+  let nextAppState: Pick<
+    InteractiveCanvasAppState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  > = {
     ...appState,
     selectedGroupIds: {},
   };

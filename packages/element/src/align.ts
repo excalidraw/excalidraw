@@ -21,7 +21,7 @@ export const alignElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   alignment: Alignment,
   scene: Scene,
-  appState: Readonly<AppState>,
+  appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
   /** measures the labels of the bound arrows the alignment moves */
   renderEnvironment?: RenderEnvironment,
 ): NonDeletedExcalidrawElement[] => {

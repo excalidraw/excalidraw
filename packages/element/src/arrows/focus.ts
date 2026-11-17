@@ -106,7 +106,7 @@ const focusPointUpdate = (
   isStartBinding: boolean,
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
-  appState: AppState,
+  appState: Pick<AppState, "selectedLinearElement" | "isBindingEnabled">,
   switchToInsideBinding: boolean,
 ) => {
   const pointUpdates = new Map();
@@ -213,7 +213,10 @@ export const handleFocusPointDrag = (
   elementsMap: NonDeletedSceneElementsMap,
   pointerCoords: { x: number; y: number },
   scene: Scene,
-  appState: AppState,
+  appState: Pick<
+    AppState,
+    "selectedLinearElement" | "isBindingEnabled" | "zoom"
+  >,
   gridSize: NullableGridSize,
   switchToInsideBinding: boolean,
 ) => {
@@ -343,7 +346,7 @@ export const handleFocusPointPointerDown = (
   arrow: ExcalidrawArrowElement,
   pointerDownState: { origin: { x: number; y: number } },
   elementsMap: NonDeletedSceneElementsMap,
-  appState: AppState,
+  appState: Pick<AppState, "isBindingEnabled" | "zoom">,
 ): {
   hitFocusPoint: "start" | "end" | null;
   pointerOffset: { x: number; y: number };
@@ -506,7 +509,7 @@ export const handleFocusPointHover = (
   scenePointerX: number,
   scenePointerY: number,
   scene: Scene,
-  appState: AppState,
+  appState: Pick<AppState, "isBindingEnabled" | "zoom">,
 ): "start" | "end" | null => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const pointerPos = pointFrom(scenePointerX, scenePointerY);

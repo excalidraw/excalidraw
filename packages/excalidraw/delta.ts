@@ -8,46 +8,33 @@ import {
   randomInteger,
 } from "@excalidraw/common";
 
+import {
+  BoundElement,
+  BindableElement,
+  bindingProperties,
+  updateBoundElements,
+  LinearElementEditor,
+  mutateElement,
+  newElementWith,
+  getBoundTextElementId,
+  redrawTextBoundingBox,
+  hasBoundTextElement,
+  isArrowElement,
+  isBindableElement,
+  isBoundToContainer,
+  isTextElement,
+  getNonDeletedGroupIds,
+  orderByFractionalIndex,
+  syncMovedIndices,
+  Scene,
+} from "@excalidraw/element";
+
 import type {
   DTO,
   Mutable,
   SubtypeOf,
   ValueOf,
 } from "@excalidraw/common/utility-types";
-
-import type {
-  AppState,
-  ObservedAppState,
-  ObservedElementsAppState,
-  ObservedStandaloneAppState,
-} from "@excalidraw/excalidraw/types";
-
-import { getObservedAppState } from "./store";
-
-import {
-  BoundElement,
-  BindableElement,
-  bindingProperties,
-  updateBoundElements,
-} from "./binding";
-import { LinearElementEditor } from "./linearElementEditor";
-import { mutateElement, newElementWith } from "./mutateElement";
-import { getBoundTextElementId, redrawTextBoundingBox } from "./textElement";
-import {
-  hasBoundTextElement,
-  isArrowElement,
-  isBindableElement,
-  isBoundToContainer,
-  isTextElement,
-} from "./typeChecks";
-
-import { getNonDeletedGroupIds } from "./groups";
-
-import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
-
-import { StoreSnapshot } from "./store";
-
-import { Scene } from "./Scene";
 
 import type {
   ExcalidrawElement,
@@ -59,12 +46,24 @@ import type {
   Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
+} from "@excalidraw/element/types";
+
+import type {
+  BindableProp,
+  BindingProp,
+  ElementUpdate,
+  RenderEnvironment,
+} from "@excalidraw/element";
+
+import { getObservedAppState } from "./store";
+import { StoreSnapshot } from "./store";
+
+import type {
+  AppState,
+  ObservedAppState,
+  ObservedElementsAppState,
+  ObservedStandaloneAppState,
 } from "./types";
-
-import type { BindableProp, BindingProp } from "./binding";
-
-import type { ElementUpdate } from "./mutateElement";
-import type { RenderEnvironment } from "./renderEnvironment";
 
 /**
  * Represents the difference between two objects of the same type.

@@ -1,10 +1,12 @@
 import { randomInteger } from "@excalidraw/common";
-import { CaptureUpdateAction, newElementWith } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
 
 import type { FractionalIndex } from "@excalidraw/element/types";
 
 import { reconcileElements } from "../data/reconcile";
 import { Excalidraw } from "../index";
+
+import { CaptureUpdateAction } from "../store";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";

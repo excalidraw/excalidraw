@@ -529,7 +529,20 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
 // `elementsMap`.
 export const convertToShape = (
   points: GlobalPoint[],
-  appState: AppState,
+  appState: Pick<
+    AppState,
+    | "zoom"
+    | "currentItemRoundness"
+    | "currentItemRoughness"
+    | "currentItemBackgroundColor"
+    | "currentItemStrokeColor"
+    | "currentItemFillStyle"
+    | "currentItemOpacity"
+    | "currentItemStrokeStyle"
+    | "currentItemStrokeWidthKey"
+    | "currentItemStartArrowhead"
+    | "currentItemEndArrowhead"
+  >,
   elementsMap: ElementsMap,
   previousElement: ExcalidrawElement | null,
   frames?: readonly ExcalidrawFrameLikeElement[],

@@ -3,7 +3,6 @@ import {
   COLOR_PALETTE,
   KEYS,
 } from "@excalidraw/common";
-import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -13,6 +12,8 @@ import type { ExcalidrawLineElement } from "@excalidraw/element/types";
 import { Excalidraw } from "../index";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
 import { editorJotaiStore } from "../editor-jotai";
+
+import { CaptureUpdateAction } from "../store";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";

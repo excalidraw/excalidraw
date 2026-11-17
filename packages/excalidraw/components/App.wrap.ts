@@ -1,5 +1,4 @@
 import {
-  CaptureUpdateAction,
   fixBindingsAfterDeletion,
   getBoundTextElement,
   getNonDeletedElements,
@@ -39,6 +38,8 @@ import {
   unwrapFrame,
   wrapInFrame,
 } from "../actions/actionFrame";
+
+import { CaptureUpdateAction } from "../store";
 
 import { getSelectionStateForElements } from "./App.selection";
 
