@@ -3,8 +3,6 @@
     "signUp": "新規登録",
     "signIn": "ログイン",
     "upgrade": "アップグレード",
-    "tryExcalidrawPlus": "Excalidraw+ を試す",
-    "plusFreeTrial": "14日間の無料トライアル",
     "paste": "貼り付け",
     "pasteAsPlaintext": "書式なしテキストとして貼り付け",
     "pasteCharts": "チャートの貼り付け",
@@ -787,5 +785,16 @@
     "spacebar": "スペース",
     "delete": "Delete",
     "mmb": "スクロールホイール"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
