@@ -1,17 +1,17 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
-    "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
+    "signUp": "साइन अप करें",
+    "signIn": "साइन इन करें",
+    "upgrade": "अपग्रेड करें",
+    "tryExcalidrawPlus": "Excalidraw+ आज़माएँ",
+    "plusFreeTrial": "14 दिन का निःशुल्क परीक्षण",
     "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "बार चार्ट",
+    "chartType_line": "लाइन चार्ट",
+    "chartType_radar": "रडार चार्ट",
+    "chartType_plaintext": "सादा पाठ",
     "selectAll": "सेलेक्ट ऑल",
     "multiSelect": "अवयव को चयन में सम्मिलित करें",
     "moveCanvas": "चित्रपटल को स्थानांतरित करें",
@@ -30,7 +30,7 @@
     "copyStyles": "अंदाज़ की प्रतिलिपि बनायें",
     "pasteStyles": "अंदाज़ चिपकाये",
     "stroke": "रेखा",
-    "textColor": "",
+    "textColor": "पाठ का रंग",
     "changeStroke": "कूँची का रंग बदले",
     "background": "पृष्ठभूमि",
     "changeBackground": "पृष्ठभूमि का रंग बदले",
@@ -41,9 +41,9 @@
     "strokeStyle_dashed": "डैश",
     "strokeStyle_dotted": "बिंदीदार",
     "sloppiness": "बेढ़ंगापन",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "दबाव",
+    "pressure_constant": "स्थिर",
+    "pressure_variable": "परिवर्तनशील",
     "opacity": "अपारदर्शिता",
     "textAlign": "पाठ्य संरेखन",
     "edges": "किनारे",
@@ -62,14 +62,14 @@
     "arrowhead_crowfoot_many": "चिड़िया पैर (अनेक)",
     "arrowhead_crowfoot_one": "चिड़िया पैर (एक)",
     "arrowhead_crowfoot_one_or_many": "चिड़िया पैर (एक या अनेक)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "कार्डिनैलिटी (एक)",
+    "arrowhead_cardinality_many": "कार्डिनैलिटी (अनेक)",
+    "arrowhead_cardinality_one_or_many": "कार्डिनैलिटी (एक या अनेक)",
+    "arrowhead_cardinality_exactly_one": "कार्डिनैलिटी (ठीक एक)",
+    "arrowhead_cardinality_zero_or_one": "कार्डिनैलिटी (शून्य या एक)",
+    "arrowhead_cardinality_zero_or_many": "कार्डिनैलिटी (शून्य या अनेक)",
     "more_options": "और विकल्प",
-    "cardinality": "",
+    "cardinality": "कार्डिनैलिटी",
     "arrowtypes": "तीर प्रकार",
     "arrowtype_sharp": "तीक्ष्ण तीर",
     "arrowtype_round": "गोलाकार तीर",
@@ -115,10 +115,10 @@
     "group": "समूह चयन",
     "ungroup": "समूह चयन असमूहीकृत करें",
     "collaborators": "सहयोगी",
-    "you": "",
+    "you": "आप",
     "toggleGrid": "जाली दिखना टॉगल करें",
-    "minimap": "",
-    "zoom": "",
+    "minimap": "मिनीमैप",
+    "zoom": "ज़ूम",
     "addToLibrary": "लाइब्रेरी में सम्मिलित करें",
     "removeFromLibrary": "समूहकोष से अलग करें",
     "libraryLoadingMessage": "समूहकोष खुल रहा है",
@@ -165,7 +165,7 @@
       "editArrow": "तीर संपादन"
     },
     "polygon": {
-      "breakPolygon": "",
+      "breakPolygon": "बहुभुज तोड़ें",
       "convertToPolygon": "बहुभुज में कनवर्ट करें"
     },
     "elementLock": {
@@ -188,27 +188,27 @@
     "zoomToFit": "सभी तत्व दिखे इतना झूम करें",
     "installPWA": "एक्सकाली ड्रॉ को स्थानीयरूप में इंस्टॉल करें (PWA)",
     "autoResize": "स्वयं आकार पुनः निर्धारण",
-    "toggleAutoResize": "",
+    "toggleAutoResize": "पाठ का स्वयं आकार पुनः निर्धारण टॉगल करें",
     "imageCropping": "प्रतिमा काटना",
     "unCroppedDimension": "कटाई पूर्व आयाम",
     "copyElementLink": "वस्तु की कड़ी कॉपी करें",
     "linkToElement": "वस्तु की कड़ी",
     "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
-    "removeFrame": "",
-    "toggleWrap": "",
-    "tab": "",
+    "removeFrame": "चौखट हटाएँ",
+    "toggleWrap": "चयन को लपेटें या लपेटन हटाएँ",
+    "tab": "Tab",
     "shapeSwitch": "आकार बदलें",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
-    "arrowBinding": "",
-    "midpointSnapping": "",
-    "showHints": "",
-    "inputDevice": "",
-    "inputDeviceTrackpad": "",
-    "inputDeviceMouse": ""
+    "preferences": "पसंद",
+    "preferences_toolLock": "उपकरण लॉक",
+    "boxSelectionMode": "चयन करें",
+    "boxSelectionContain": "घेरने पर",
+    "boxSelectionOverlap": "छूने पर",
+    "arrowBinding": "तीर बंधन",
+    "midpointSnapping": "मध्य बिंदुओं पर स्नैप करें",
+    "showHints": "टूलबार संकेत",
+    "inputDevice": "इनपुट",
+    "inputDeviceTrackpad": "ट्रैकपैड",
+    "inputDeviceMouse": "माउस"
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
@@ -223,7 +223,7 @@
       "inputPlaceholder": "लाइब्रेरी में खोजें",
       "heading": "लाइब्रेरी मैच",
       "noResults": "कोई मिलता जुलता नहीं मिला |||",
-      "clearSearch": ""
+      "clearSearch": "खोज साफ़ करें"
     }
   },
   "search": {
@@ -252,14 +252,14 @@
     "zoomIn": "बड़ा करें",
     "zoomOut": "छोटा करें",
     "resetZoom": "बड़ा छोटा करना पहले जैसा करें",
-    "zoomToFit": "",
+    "zoomToFit": "फ़िट करने के लिए ज़ूम करें",
     "menu": "चयन सूची",
     "done": "समाप्त",
     "edit": "संपादित करें",
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
     "resetLibrary": "संग्रह को पुनः स्थापित करें",
-    "reset": "",
+    "reset": "रीसेट करें",
     "createNewRoom": "एक नया कमरा बनाएं",
     "fullScreen": "पूर्ण दृश्यपटल",
     "darkMode": "कम प्रकाश प्रणाली",
@@ -269,11 +269,11 @@
     "objectsSnapMode": "वस्तुओं से पकड़े",
     "exitZenMode": "एकाग्र स्थिति से बाहर निकलें",
     "cancel": "रद्द करें",
-    "saveLibNames": "",
+    "saveLibNames": "नाम सुरक्षित करें और बाहर निकलें",
     "clear": "साफ़ करे",
     "remove": "हटाएं",
     "embed": "जड़ना पलटें",
-    "publishLibrary": "",
+    "publishLibrary": "नाम बदलें या प्रकाशित करें",
     "submit": "प्रस्तुत करे",
     "confirm": "पुष्टि करें",
     "embeddableInteractionButton": "संवाद स्थापना के लिए क्लिक करें"
@@ -300,7 +300,7 @@
     "removeItemsFromsLibrary": "{{count}} वस्तु(यें) संग्रह से हटायें?",
     "invalidEncryptionKey": "कूटलेखन कुंजी 22 अक्षरों की होनी चाहिये, इसलिये जीवंत सहयोग अक्षम हैं",
     "collabOfflineWarning": "कोई इंटरनेट कनेक्शन उपलब्ध नहीं है।\nआपके बदलाव सहेजे नहीं जाएंगे!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "ब्राउज़र संग्रहण की सीमा पार हो गई है। बदलाव सहेजे नहीं जाएँगे।"
   },
   "errors": {
     "unsupportedFileType": "असमर्थित फाइल प्रकार",
@@ -347,19 +347,19 @@
     "eraser": "रबड़",
     "frame": "चौखट उपकरण",
     "magicframe": "तारिक ढाँचें को सांकेतिक लिपि में",
-    "stickynote": "",
+    "stickynote": "स्टिकी नोट",
     "embeddable": "वेब जड़ायें",
     "laser": "लेसर टॉर्च",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "चित्रांकन से आकृति",
+    "bucketfill": "रंग भराई",
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
     "convertElementType": "आकार प्रकार टॉगल करें"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "यहाँ भरने के लिए कोई बंद क्षेत्र नहीं मिला।",
+    "tooComplex": "यह क्षेत्र भरने के लिए बहुत जटिल है।"
   },
   "element": {
     "rectangle": "आयत",
@@ -373,7 +373,7 @@
     "group": "समूह",
     "frame": "ढांचा",
     "magicframe": "तारिक ढाँचें को सांकेतिक लिपि में",
-    "stickynote": "",
+    "stickynote": "स्टिकी नोट",
     "embeddable": "वेब जडें",
     "selection": "चयन",
     "iframe": "आईफ्रेम"
@@ -384,40 +384,40 @@
     "shapes": "आकृतियाँ"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} दबाकर खोज बंद करें",
+    "canvasPanning": "चित्रपटल को स्थानांतरित करने के लिए, खींचते समय {{shortcut_1}} या {{shortcut_2}} दबाए रखें, या हाथ उपकरण का उपयोग करें",
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, एकमात्र रेखा के लिए खींचें",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, एकमात्र रेखा के लिए खींचें। तीर का प्रकार बदलने के लिए फिर से {{shortcut}} दबाएँ।",
+    "arrowBindModifiers": "बंधन अक्षम करने के लिए {{shortcut_1}} दबाए रखें, या किसी निश्चित बिंदु पर बाँधने के लिए {{shortcut_2}}",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोडे",
     "text": "आप चयन उपकरण से कहीं भी डबल-क्लिक करके पाठ्य को जोड़ सकते हों",
     "embeddable": "वेबसाइट बनाकर जड़ने के लिए क्लिक-ड़्रैग करें",
-    "stickynote": "",
-    "autoshape": "",
-    "text_selected": "",
-    "text_editing": "",
-    "toggleTextAutoResize": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "resizeStickyNote": "",
-    "rotate": "",
-    "toggleArrowhead": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "stickynote": "नोट रखने के लिए क्लिक करें, या उसका आकार तय करने के लिए खींचें",
+    "autoshape": "आयत, वृत्त, ईंट, रेखाएँ और तीर बनाएँ",
+    "text_selected": "पाठ संपादित करने के लिए डबल-क्लिक करें या {{shortcut}} दबाएँ",
+    "text_editing": "संपादन समाप्त करने के लिए {{shortcut_1}} या {{shortcut_2}} दबाएँ",
+    "toggleTextAutoResize": "{{shortcut}} दबाकर पाठ का स्वयं आकार पुनः निर्धारण टॉगल करें",
+    "linearElementMulti": "समाप्त करने के लिए अंतिम बिंदु पर क्लिक करें या {{shortcut_1}} या {{shortcut_2}} दबाएँ",
+    "lockAngle": "आप {{shortcut}} दबाए रखकर कोण सीमित कर सकते हैं",
+    "resize": "आकार बदलते समय {{shortcut_1}} दबाए रखकर आप अनुपात सीमित कर सकते हैं,\nकेंद्र से आकार बदलने के लिए {{shortcut_2}} दबाए रखें",
+    "resizeImage": "{{shortcut_1}} दबाए रखकर आप मुक्त रूप से आकार बदल सकते हैं,\nकेंद्र से आकार बदलने के लिए {{shortcut_2}} दबाए रखें",
+    "resizeStickyNote": "मुक्त रूप से आकार बदलने के लिए {{shortcut_1}} दबाए रखें, केंद्र से आकार बदलने के लिए {{shortcut_2}}",
+    "rotate": "घुमाते समय {{shortcut}} दबाए रखकर आप कोण सीमित कर सकते हैं",
+    "toggleArrowhead": "तीर शीर्ष टॉगल करने के लिए डबल-क्लिक करें",
+    "lineEditor_info": "बिंदु संपादित करने के लिए {{shortcut_1}} दबाए रखकर डबल-क्लिक करें या {{shortcut_2}} दबाएँ",
+    "lineEditor_line_info": "बिंदु संपादित करने के लिए डबल-क्लिक करें या {{shortcut}} दबाएँ",
+    "lineEditor_pointSelected": "बिंदु हटाने के लिए {{shortcut_1}} दबाएँ,\nप्रतिरूप बनाने के लिए {{shortcut_2}}, या स्थानांतरित करने के लिए खींचें",
+    "lineEditor_nothingSelected": "संपादित करने के लिए एक बिंदु चुनें (एक से अधिक चुनने के लिए {{shortcut_1}} दबाए रखें),\nया नए बिंदु जोड़ने के लिए {{shortcut_2}} दबाए रखकर क्लिक करें",
     "publishLibrary": "आपका अपना समूहकोष प्रकाशित करे",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "cycleSelection": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} दबाकर पाठ जोड़ें",
+    "createFlowchart": "{{shortcut}} दबाकर फ़्लोचार्ट बनाएँ",
+    "deepBoxSelect": "गहरे चयन के लिए, और खींचना रोकने के लिए {{shortcut}} दबाए रखें",
+    "cycleSelection": "{{shortcut}}-क्लिक करके चयन को क्रम से बदलें, या प्रतिरूप बनाने के लिए खींचें",
+    "eraserRevert": "हटाने हेतु चिह्नित अवयवों को वापस लाने के लिए {{shortcut}} दबाए रखें",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "स्नैपिंग अक्षम करने के लिए {{shortcut}} दबाए रखें",
+    "enterCropEditor": "प्रतिमा काटने के लिए उस पर डबल-क्लिक करें या {{shortcut}} दबाएँ",
+    "leaveCropEditor": "काटना समाप्त करने के लिए प्रतिमा के बाहर क्लिक करें या {{shortcut_1}} या {{shortcut_2}} दबाएँ"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -449,8 +449,8 @@
     "title": "त्रुटि"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "सुरक्षित किया जा रहा है",
+    "defaultMessage": "सुरक्षित करने की तैयारी हो रही है..."
   },
   "exportDialog": {
     "disk_title": "डिस्क पर सुरक्षित करे",
@@ -614,9 +614,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "आपके चित्र आपके ब्राउज़र के संग्रहण में सहेजे जाते हैं।",
+      "center_heading_line2": "ब्राउज़र संग्रहण अनपेक्षित रूप से साफ़ हो सकता है।",
+      "center_heading_line3": "अपना काम खोने से बचने के लिए उसे नियमित रूप से किसी फ़ाइल में सुरक्षित करें।",
       "center_heading_plus": "बजाय आपको एक्स-काली-ड्रॉ-प्लस पर जाना है?",
       "menuHint": "निर्यात, पसंद, भाषायें, ..."
     },
@@ -628,16 +628,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "रंग",
     "mostUsedCustomColors": "अधिकांश उपयोगित रंग",
     "colors": "रंग",
     "shades": "छाया",
     "hexCode": "हेक्स कोड",
     "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "मान्य रंग नहीं है",
+    "invalidHexLength": "हेक्स कोड 3, 4, 6 या 8 अक्षरों का होना चाहिए",
+    "topPicksTip": "सुझाव: किसी भी रंग को पिन करने के लिए उसे अपने शीर्ष विकल्पों पर खींचें",
+    "resetTopPicks": "शीर्ष विकल्पों को डिफ़ॉल्ट पर रीसेट करें"
   },
   "overwriteConfirm": {
     "action": {
@@ -671,72 +671,72 @@
     }
   },
   "fileDrop": {
-    "replace": "",
-    "add": "",
-    "importLibrary": "",
-    "replaceHint": "",
-    "keepHint": "",
-    "libraryHint": "",
-    "replacedToast": ""
+    "replace": "सामग्री बदलने के लिए छोड़ें",
+    "add": "चित्रपटल में जोड़ने के लिए छोड़ें",
+    "importLibrary": "समूहकोष आयात करने के लिए छोड़ें",
+    "replaceHint": "मौजूदा सामग्री रखने के लिए <shift>Shift</shift> दबाए रखें",
+    "keepHint": "आपकी मौजूदा सामग्री बनी रहेगी",
+    "libraryHint": "समूहकोष फ़ाइलें जोड़ दी जाएँगी",
+    "replacedToast": "सामग्री बदल दी गई। {{shortcut}} दबाकर पूर्ववत् करें"
   },
   "mermaid": {
     "title": "मर्मेड से एक्सकाली में",
     "button": "सन्निवेश करे",
-    "description": "",
+    "description": "<flowchartLink>फ़्लोचार्ट</flowchartLink>, <sequenceLink>सीक्वेंस</sequenceLink>, <classLink>क्लास</classLink>, <stateLink>स्टेट</stateLink> और <erdLink>एंटिटी रिलेशनशिप</erdLink> रेखाचित्र, <ganttLink>गैंट चार्ट</ganttLink>, <quadrantLink>क्वाड्रेंट चार्ट</quadrantLink> और <timelineLink>टाइमलाइन</timelineLink> Excalidraw अवयवों में बदल दिए जाते हैं। अन्य प्रकार प्रतिमा के रूप में सम्मिलित किए जाते हैं।",
     "syntax": "मर्मेड विन्यास",
     "preview": "पूर्वावलोकन",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": "",
-    "loadError": "",
-    "loadErrorReload": "",
-    "reload": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Mermaid रेखाचित्र की परिभाषा यहाँ लिखें...",
+    "autoFixAvailable": "स्वतः-सुधार उपलब्ध है",
+    "loadError": "Mermaid लोड नहीं हो सका। अपना इंटरनेट कनेक्शन जाँचें और पुनः प्रयास करें।",
+    "loadErrorReload": "Mermaid लोड नहीं हो सका। पुनः प्रयास करने के लिए पृष्ठ को पुनः लोड करें।",
+    "reload": "पुनः लोड करें"
   },
   "ttd": {
-    "error": ""
+    "error": "त्रुटि!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "अपने रेखाचित्र का विचार यहाँ लिखना शुरू करें... (नई पंक्ति के लिए {{shortcut}})",
+    "inputPlaceholderWithMessages": "अपने रेखाचित्र को और बेहतर बनाते रहें...",
+    "generating": "बनाया जा रहा है...",
+    "rateLimitRemaining": "आज {{count}} अनुरोध शेष हैं",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "आप",
+      "assistant": "AI सहायक",
+      "system": "सिस्टम"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI बीटा",
+    "label": "चैट",
+    "menu": "मेनू",
+    "newChat": "नई चैट",
+    "deleteChat": "चैट हटाएँ",
+    "deleteMessage": "संदेश हटाएँ",
+    "viewAsMermaid": "Mermaid के रूप में देखें",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "आइए, आपका रेखाचित्र डिज़ाइन करें",
+      "description": "आप जो रेखाचित्र बनाना चाहते हैं उसका वर्णन करें, और हम उसे आपके लिए बना देंगे।",
+      "hint": "फ़िलहाल हम फ़्लोचार्ट, सीक्वेंस, क्लास, स्टेट और एंटिटी रिलेशनशिप रेखाचित्र बना सकते हैं।"
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "पूर्वावलोकन",
+    "insert": "सम्मिलित करें",
+    "retry": "पुनः प्रयास करें",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "प्रॉम्प्ट बहुत छोटा है (न्यूनतम {{min}} अक्षर)",
+      "promptTooLong": "प्रॉम्प्ट बहुत लंबा है (अधिकतम {{max}} अक्षर)",
+      "generationFailed": "रेखाचित्र नहीं बनाया जा सका",
+      "invalidDiagram": "अमान्य रेखाचित्र बन गया :( आप इसे मैन्युअल रूप से संपादित कर सकते हैं, स्वतः-सुधार के साथ पुनः प्रयास कर सकते हैं, या कोई दूसरा प्रॉम्प्ट आज़मा सकते हैं।",
+      "fixInMermaid": "Mermaid को मैन्युअल रूप से संपादित करें →",
+      "aiRepair": "फिर से बनाएँ (स्वतः-सुधार) →",
+      "requestAborted": "अनुरोध रद्द किया गया",
+      "requestFailed": "अनुरोध विफल रहा",
+      "mermaidParseError": "Mermaid विन्यास त्रुटि"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "आप निःशुल्क प्लान की AI सीमा तक पहुँच गए हैं। अधिक के लिए Excalidraw+ आज़माएँ या कल फिर आएँ।",
+      "generalRateLimit": "ज़रा रुकिए, आप हमारे लिए कुछ ज़्यादा ही तेज़ हैं! कृपया दोबारा प्रयास करने से पहले थोड़ी देर प्रतीक्षा करें।",
+      "messageLimitInputPlaceholder": "आप अपनी संदेश सीमा तक पहुँच गए हैं"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Plus में अपग्रेड करें"
   },
   "quickSearch": {
     "placeholder": "त्वरित खोज"
@@ -748,8 +748,8 @@
     "sceneFonts": "इस दृश्य में",
     "availableFonts": "उपलब्ध लिपियां",
     "empty": "कोई लिपि नहीं मिली",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "सुझाव: किसी भी लिपि को पिन करने के लिए उसे अपने शीर्ष विकल्पों पर खींचें",
+    "resetTopPicks": "शीर्ष विकल्पों को डिफ़ॉल्ट पर रीसेट करें"
   },
   "userList": {
     "empty": "कोई उपयोक्ता नहीं मिला",
@@ -777,15 +777,15 @@
     "shortcutHint": "आदेश फलक के लिए, {{shortcut}} का उपयोग कीजिए"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "स्पेस",
+    "delete": "Delete",
+    "mmb": "स्क्रॉल व्हील"
   }
 }
