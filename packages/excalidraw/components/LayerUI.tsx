@@ -723,8 +723,9 @@ const LayerUI = ({
               zoom={app.state.zoom.value}
               width={app.state.width}
               height={app.state.height}
+              theme={app.state.theme}
               onNavigate={handleMiniMapNavigate}
-/>
+            />
           )}
 
           {renderSidebars()}
