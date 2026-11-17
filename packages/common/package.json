@@ -57,9 +57,6 @@
     "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
   },
   "dependencies": {
-    "tinycolor2": "1.6.0"
-  },
-  "devDependencies": {
-    "@types/tinycolor2": "1.4.6"
+    "colord": "^2.13.0"
   }
 }
