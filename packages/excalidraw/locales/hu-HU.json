@@ -3,8 +3,6 @@
     "signUp": "Regisztráció",
     "signIn": "Bejelentkezés",
     "upgrade": "Frissítés",
-    "tryExcalidrawPlus": "Próbáld ki az Excalidraw+-t",
-    "plusFreeTrial": "14 napos ingyenes próbaidőszak",
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
@@ -787,5 +785,16 @@
     "spacebar": "Szóköz",
     "delete": "Delete",
     "mmb": "Görgő"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
