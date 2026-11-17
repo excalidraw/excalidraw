@@ -3,8 +3,6 @@
     "signUp": "साइन अप करें",
     "signIn": "साइन इन करें",
     "upgrade": "अपग्रेड करें",
-    "tryExcalidrawPlus": "Excalidraw+ आज़माएँ",
-    "plusFreeTrial": "14 दिन का निःशुल्क परीक्षण",
     "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
@@ -787,5 +785,16 @@
     "spacebar": "स्पेस",
     "delete": "Delete",
     "mmb": "स्क्रॉल व्हील"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
