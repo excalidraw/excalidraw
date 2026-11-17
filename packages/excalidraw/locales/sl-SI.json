@@ -3,8 +3,6 @@
     "signUp": "Registriraj se",
     "signIn": "Prijavi se",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
@@ -787,5 +785,16 @@
     "spacebar": "Presledek",
     "delete": "Izbriši",
     "mmb": "Kolesce za pomikanje"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
