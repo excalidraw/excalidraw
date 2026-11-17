@@ -3,8 +3,6 @@
     "signUp": "Registrati",
     "signIn": "Accedi",
     "upgrade": "Aggiorna",
-    "tryExcalidrawPlus": "Prova Excalidraw+",
-    "plusFreeTrial": "14 giorni gratis",
     "paste": "Incolla",
     "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",
@@ -787,5 +785,16 @@
     "spacebar": "Spazio",
     "delete": "Elimina",
     "mmb": "Rotella di scorrimento"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
