@@ -57,6 +57,6 @@
     "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
   },
   "dependencies": {
-    "colord": "^2.13.0"
+    "colord": "^2.14.0"
   }
 }
