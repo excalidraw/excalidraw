@@ -3,8 +3,6 @@
     "signUp": "Zaregistrovat se",
     "signIn": "Přihlásit se",
     "upgrade": "Upgradovat",
-    "tryExcalidrawPlus": "Vyzkoušet Excalidraw+",
-    "plusFreeTrial": "14 dní zdarma",
     "paste": "Vložit",
     "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
@@ -787,5 +785,16 @@
     "spacebar": "Mezerník",
     "delete": "Delete",
     "mmb": "Kolečko myši"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
