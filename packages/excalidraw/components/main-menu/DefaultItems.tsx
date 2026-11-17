@@ -15,6 +15,7 @@ import {
   actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
   actionToggleShowHints,
+  actionToggleWheelToolSwitching,
   actionToggleMinimap,
   actionToggleStats,
   actionToggleTheme,
@@ -582,6 +583,23 @@ const PreferencesToggleShowHintsItem = () => {
   );
 };
 
+const PreferencesToggleWheelToolSwitchingItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.isWheelToolSwitchingEnabled}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleWheelToolSwitching);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.wheelToolSwitching")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleGridModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -706,6 +724,7 @@ export const Preferences = ({
             <PreferencesToggleArrowBindingItem />
             <PreferencesToggleMidpointSnappingItem />
             <PreferencesToggleShowHintsItem />
+            <PreferencesToggleWheelToolSwitchingItem />
           </>
         )}
         {additionalItems}
@@ -721,6 +740,7 @@ Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
 Preferences.ToggleShowHints = PreferencesToggleShowHintsItem;
+Preferences.ToggleWheelToolSwitching = PreferencesToggleWheelToolSwitchingItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;

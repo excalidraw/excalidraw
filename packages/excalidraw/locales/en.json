@@ -206,6 +206,7 @@
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
     "showHints": "Toolbar hints",
+    "wheelToolSwitching": "Scroll toolbar to switch tools",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"
