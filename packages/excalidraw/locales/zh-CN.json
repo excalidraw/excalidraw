@@ -3,8 +3,6 @@
     "signUp": "注册",
     "signIn": "登录",
     "upgrade": "升级",
-    "tryExcalidrawPlus": "试用 Excalidraw+",
-    "plusFreeTrial": "14 天免费试用",
     "paste": "粘贴",
     "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
@@ -787,5 +785,16 @@
     "spacebar": "空格",
     "delete": "Delete",
     "mmb": "鼠标滚轮"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
