@@ -1204,6 +1204,17 @@ const getElbowArrowData = (
   // those fall back to the zoom=1 binding distance
   const zoom = options?.zoom ?? DEFAULT_ZOOM;
 
+  // Inside bound ends sit where they are within the element they're bound
+  // to and the route starts right there, so the element is not routed around
+  const startInsideElement =
+    arrow.startBinding?.mode === "inside"
+      ? getBindableElementForId(arrow.startBinding.elementId, elementsMap)
+      : null;
+  const endInsideElement =
+    arrow.endBinding?.mode === "inside"
+      ? getBindableElementForId(arrow.endBinding.elementId, elementsMap)
+      : null;
+
   let hoveredStartElement = null;
   let hoveredEndElement = null;
   if (options?.isDragging && options?.isBindingEnabled !== false) {
@@ -1223,43 +1234,65 @@ const getElbowArrowData = (
       ? getBindableElementForId(arrow.endBinding.elementId, elementsMap) || null
       : null;
   }
+  if (startInsideElement) {
+    hoveredStartElement = null;
+  }
+  if (endInsideElement) {
+    hoveredEndElement = null;
+  }
 
-  const startGlobalPoint = getGlobalPoint(
-    {
-      ...arrow,
-      angle: 0,
-      type: "arrow",
-      elbowed: true,
-      points: nextPoints,
-    } as ExcalidrawElbowArrowElement,
-    "start",
-    arrow.startBinding?.fixedPoint,
-    origStartGlobalPoint,
-    zoom,
-    hoveredStartElement,
-    elementsMap,
-    options?.isDragging,
-    options?.isBindingEnabled,
-    options?.isMidpointSnappingEnabled,
-  );
-  const endGlobalPoint = getGlobalPoint(
-    {
-      ...arrow,
-      angle: 0,
-      type: "arrow",
-      elbowed: true,
-      points: nextPoints,
-    } as ExcalidrawElbowArrowElement,
-    "end",
-    arrow.endBinding?.fixedPoint,
-    origEndGlobalPoint,
-    zoom,
-    hoveredEndElement,
-    elementsMap,
-    options?.isDragging,
-    options?.isBindingEnabled,
-    options?.isMidpointSnappingEnabled,
-  );
+  const startGlobalPoint =
+    getInsideBoundGlobalPoint(
+      arrow.startBinding,
+      startInsideElement,
+      origStartGlobalPoint,
+      elementsMap,
+      options?.isDragging,
+    ) ??
+    getGlobalPoint(
+      {
+        ...arrow,
+        angle: 0,
+        type: "arrow",
+        elbowed: true,
+        points: nextPoints,
+      } as ExcalidrawElbowArrowElement,
+      "start",
+      arrow.startBinding?.fixedPoint,
+      origStartGlobalPoint,
+      zoom,
+      hoveredStartElement,
+      elementsMap,
+      options?.isDragging,
+      options?.isBindingEnabled,
+      options?.isMidpointSnappingEnabled,
+    );
+  const endGlobalPoint =
+    getInsideBoundGlobalPoint(
+      arrow.endBinding,
+      endInsideElement,
+      origEndGlobalPoint,
+      elementsMap,
+      options?.isDragging,
+    ) ??
+    getGlobalPoint(
+      {
+        ...arrow,
+        angle: 0,
+        type: "arrow",
+        elbowed: true,
+        points: nextPoints,
+      } as ExcalidrawElbowArrowElement,
+      "end",
+      arrow.endBinding?.fixedPoint,
+      origEndGlobalPoint,
+      zoom,
+      hoveredEndElement,
+      elementsMap,
+      options?.isDragging,
+      options?.isBindingEnabled,
+      options?.isMidpointSnappingEnabled,
+    );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
@@ -2366,6 +2399,30 @@ const getGlobalPoint = (
   }
 
   return initialPoint;
+};
+
+/**
+ * Where an inside bound end is: where it's dragged to while dragging, where
+ * it's bound to otherwise. Null if the end is not bound inside.
+ */
+const getInsideBoundGlobalPoint = (
+  binding: FixedPointBinding | null,
+  insideElement: ExcalidrawBindableElement | null,
+  initialPoint: GlobalPoint,
+  elementsMap: ElementsMap,
+  isDragging?: boolean,
+): GlobalPoint | null => {
+  if (!binding || !insideElement) {
+    return null;
+  }
+
+  return isDragging
+    ? initialPoint
+    : getGlobalFixedPointForBindableElement(
+        binding.fixedPoint,
+        insideElement,
+        elementsMap,
+      );
 };
 
 const getBindPointHeading = (

@@ -1,11 +1,11 @@
-import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
+import { ARROW_TYPE, DEFAULT_ZOOM, KEYS } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
 import { actionChangeArrowhead } from "@excalidraw/excalidraw/actions/actionProperties";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   act,
   fireEvent,
@@ -330,6 +330,125 @@ describe("elbow arrow ui", () => {
       [51, 164],
       [101, 164],
     ]);
+  });
+
+  it("binds to the outline without Alt held", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.downAt(0, 50);
+    mouse.moveTo(240, 40);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    // the end is snapped onto the outline, not left where it was dropped
+    const end = arrow.points[arrow.points.length - 1];
+    expect(arrow.y + end[1]).toBeLessThan(0);
+  });
+
+  it("binds inside the element with Alt held", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(0, 50);
+      mouse.moveTo(240, 40);
+      mouse.up();
+    });
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    expect(arrow.endBinding?.fixedPoint[0]).toBeCloseTo(0.4);
+    expect(arrow.endBinding?.fixedPoint[1]).toBeCloseTo(0.4);
+    expect(rect.boundElements).toContainEqual({ id: arrow.id, type: "arrow" });
+
+    const end = arrow.points[arrow.points.length - 1];
+    expect([[arrow.x + end[0], arrow.y + end[1]]]).toCloselyEqualPoints([
+      [240, 40],
+    ]);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+
+    // follows the element, staying inside it where it was bound
+    UI.clickTool("selection");
+    mouse.reset();
+    mouse.downAt(200, 80);
+    mouse.moveTo(300, 180);
+    mouse.up();
+
+    expect(rect.x).toBe(300);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    const movedEnd = arrow.points[arrow.points.length - 1];
+    expect([
+      [arrow.x + movedEnd[0], arrow.y + movedEnd[1]],
+    ]).toCloselyEqualPoints([[340, 140]]);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
+  it("switches between inside and outline binding as Alt is pressed and released without moving", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.downAt(0, 50);
+    mouse.moveTo(240, 40);
+
+    const arrow = h.state.newElement as ExcalidrawElbowArrowElement;
+    const endOf = () => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [[arrow.x + end[0], arrow.y + end[1]]];
+    };
+
+    expect(endOf()[0][1]).toBeLessThan(0);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    expect(endOf()).toCloselyEqualPoints([[240, 40]]);
+
+    Keyboard.keyUp(KEYS.ALT);
+
+    expect(arrow.endBinding?.mode).not.toBe("inside");
+    expect(endOf()[0][1]).toBeLessThan(0);
+
+    mouse.up();
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
   });
 
   it("keeps arrow shape when the whole set of arrow and bindables are duplicated", async () => {

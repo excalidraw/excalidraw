@@ -31,13 +31,18 @@ export const maybeHandleArrowPointlikeDrag = ({
       appState.selectedLinearElement.initialState.lastClickedPoint >= 0 &&
       appState.selectedLinearElement.isDragging
     ) {
-      LinearElementEditor.handlePointDragging(
-        app.lastPointerMoveEvent,
+      // NOTE: the modifiers come from `event`, as the last pointer move
+      // event's are stale when they change without the pointer moving
+      const newState = LinearElementEditor.handlePointDragging(
+        "nativeEvent" in event ? event.nativeEvent : event,
         app,
         app.lastPointerMoveCoords.x,
         app.lastPointerMoveCoords.y,
         appState.selectedLinearElement,
       );
+      if (newState) {
+        app.setState(newState);
+      }
       return true;
     }
   }
