@@ -3,8 +3,6 @@
     "signUp": "Aanmelden",
     "signIn": "Inloggen",
     "upgrade": "Upgraden",
-    "tryExcalidrawPlus": "Probeer Excalidraw+",
-    "plusFreeTrial": "14-daagse gratis proefperiode",
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Grafieken plakken",
@@ -787,5 +785,16 @@
     "spacebar": "Spatie",
     "delete": "Delete",
     "mmb": "Muiswiel"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
