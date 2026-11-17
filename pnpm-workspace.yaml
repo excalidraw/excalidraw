@@ -12,3 +12,7 @@ onlyBuiltDependencies:
   - core-js
   - esbuild
   - protobufjs
+
+# Type- and test-only edges close cycles (common/element import shared types
+# from excalidraw; element tests use its test harness). Runtime deps are acyclic.
+ignoreWorkspaceCycles: true

@@ -21,6 +21,18 @@ import type { App, AppState } from "@excalidraw/excalidraw/types";
 
 import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
+
+import { newArrowElement, newElement, newLinearElement } from "./newElement";
+import { getBoundsFromPoints, getElementAbsoluteCoords } from "./bounds";
+
+import { getFrameLikeElements } from "./frame";
+import {
+  isLinearElement,
+  isLineElement,
+  isUsingAdaptiveRadius,
+} from "./typeChecks";
+import { LinearElementEditor } from "./linearElementEditor";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
@@ -34,18 +46,7 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawLineElement,
-} from "@excalidraw/element/types";
-
-import { newArrowElement, newElement, newLinearElement } from "./newElement";
-import { getBoundsFromPoints, getElementAbsoluteCoords } from "./bounds";
-
-import { getFrameLikeElements } from "./frame";
-import {
-  isLinearElement,
-  isLineElement,
-  isUsingAdaptiveRadius,
-} from "./typeChecks";
-import { LinearElementEditor } from "./linearElementEditor";
+} from "./types";
 
 declare global {
   interface Window {

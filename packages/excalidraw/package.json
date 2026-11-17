@@ -19,6 +19,7 @@
       "types": "./dist/types/utils/src/*.d.ts"
     },
     "./*": {
+      "excalidraw-source": "./*.js",
       "types": "./dist/types/excalidraw/*.d.ts"
     },
     "./index.css": {
@@ -26,6 +27,7 @@
       "production": "./dist/prod/index.css"
     },
     ".": {
+      "excalidraw-source": "./index.tsx",
       "types": "./dist/types/excalidraw/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
@@ -36,7 +38,34 @@
     "dist/*"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      "./common/*": {
+        "types": "./dist/types/common/src/*.d.ts"
+      },
+      "./element/*": {
+        "types": "./dist/types/element/src/*.d.ts"
+      },
+      "./math/*": {
+        "types": "./dist/types/math/src/*.d.ts"
+      },
+      "./utils/*": {
+        "types": "./dist/types/utils/src/*.d.ts"
+      },
+      "./*": {
+        "types": "./dist/types/excalidraw/*.d.ts"
+      },
+      "./index.css": {
+        "development": "./dist/dev/index.css",
+        "production": "./dist/prod/index.css"
+      },
+      ".": {
+        "types": "./dist/types/excalidraw/index.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      }
+    }
   },
   "description": "Excalidraw as a React component",
   "license": "MIT",

@@ -3,15 +3,17 @@ import { arrayToMap } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
 import type { ObservedAppState } from "@excalidraw/excalidraw/types";
-import type { LinearElementEditor } from "@excalidraw/element";
+
+import { AppStateDelta, Delta, ElementsDelta } from "../src/delta";
+
+import { mutateElement, newElementWith } from "../src/mutateElement";
+
+import type { LinearElementEditor } from "../src/index";
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
   SceneElementsMap,
-} from "@excalidraw/element/types";
-
-import { AppStateDelta, Delta, ElementsDelta } from "../src/delta";
-import { mutateElement, newElementWith } from "../src/mutateElement";
+} from "../src/types";
 
 describe("ElementsDelta", () => {
   describe("visible changes", () => {

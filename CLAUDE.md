@@ -29,6 +29,7 @@ pnpm fix             # Auto-fix formatting and linting issues
 ### Package System
 
 - Uses pnpm workspaces for monorepo management
-- Internal packages use path aliases (see `vitest.config.mts`)
+- Internal packages depend on each other via `workspace:*` and resolve to their sources through the `excalidraw-source` export condition (enabled in tsconfig, Vite, Vitest and the esbuild scripts); `publishConfig.exports` holds the published dist exports
+- A package can't import itself by name: use relative imports inside a package
 - Build system uses esbuild for packages, Vite for the app
 - TypeScript throughout with strict configuration

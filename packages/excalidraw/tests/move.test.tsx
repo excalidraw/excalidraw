@@ -2,7 +2,6 @@ import React from "react";
 import { vi } from "vitest";
 import { KEYS, reseed, DEFAULT_ZOOM } from "@excalidraw/common";
 import { bindBindingElement } from "@excalidraw/element";
-import "@excalidraw/utils/test-utils";
 
 import type {
   ExcalidrawArrowElement,

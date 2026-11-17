@@ -18,8 +18,6 @@ import {
   isCurve,
 } from "@excalidraw/math";
 
-import { getCurvePathOps } from "@excalidraw/utils/shape";
-
 import {
   DRAGGING_THRESHOLD,
   KEYS,
@@ -41,6 +39,8 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 import type { Bounds } from "@excalidraw/common";
+
+import { getCurvePathOps } from "./geometricShapes";
 
 import { moveArrowAboveBindable } from "./zindex";
 import {

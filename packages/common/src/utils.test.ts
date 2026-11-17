@@ -1,3 +1,8 @@
+import { vi } from "vitest";
+
+// Import directly to avoid the @excalidraw/common throttleRAF mock from setupTests.ts.
+import { throttleRAF } from "./utils";
+
 import {
   getNearestScrollableContainer,
   isInputLike,
@@ -7,11 +12,7 @@ import {
   isWritableElement,
   mapFind,
   reduceToCommonValue,
-} from "@excalidraw/common";
-import { vi } from "vitest";
-
-// Import directly to avoid the @excalidraw/common throttleRAF mock from setupTests.ts.
-import { throttleRAF } from "./utils";
+} from "./index";
 
 type RafCallback = FrameRequestCallback;
 

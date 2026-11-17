@@ -8,6 +8,7 @@
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
+      "excalidraw-source": "./src/index.ts",
       "types": "./dist/types/laser-pointer/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
@@ -25,7 +26,15 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "license": "MIT",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/types/laser-pointer/src/index.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      }
+    }
   },
   "scripts": {
     "gen:types": "rimraf types && tsc",

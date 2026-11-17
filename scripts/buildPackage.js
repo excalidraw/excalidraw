@@ -71,9 +71,6 @@ const getConfig = (outdir) => ({
   target: "es2020",
   assetNames: "[dir]/[name]",
   chunkNames: "[dir]/[name]-[hash]",
-  alias: {
-    "@excalidraw/utils": path.resolve(__dirname, "../packages/utils/src"),
-  },
   external: [
     "@excalidraw/common",
     "@excalidraw/element",

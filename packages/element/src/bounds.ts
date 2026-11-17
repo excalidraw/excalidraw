@@ -17,7 +17,7 @@ import {
   vectorDot,
   vectorFromPoint,
 } from "@excalidraw/math";
-import { getCurvePathOps } from "@excalidraw/utils/shape";
+
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import type {
@@ -30,6 +30,8 @@ import type {
 } from "@excalidraw/math";
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
+
+import { getCurvePathOps } from "./geometricShapes";
 
 import { ELBOW_ARROW_CORNER_RADIUS, generateRoughOptions } from "./shape";
 import { ShapeCache } from "./shape";

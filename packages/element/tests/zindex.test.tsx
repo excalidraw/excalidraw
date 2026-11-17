@@ -6,7 +6,7 @@ import {
   actionBringToFront,
   actionSendToBack,
   actionDuplicateSelection,
-} from "@excalidraw/excalidraw/actions";
+} from "@excalidraw/excalidraw/actions/index";
 
 import { Excalidraw, getNonDeletedElements } from "@excalidraw/excalidraw";
 

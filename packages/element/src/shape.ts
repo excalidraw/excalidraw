@@ -3,15 +3,6 @@ import { getStroke, getStrokePoints } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
-  type GeometricShape,
-  getClosedCurveShape,
-  getCurveShape,
-  getEllipseShape,
-  getFreedrawShape,
-  getPolygonShape,
-} from "@excalidraw/utils/shape";
-
-import {
   pointFrom,
   pointDistance,
   type LocalPoint,
@@ -44,6 +35,15 @@ import type {
   ElementShapes,
   SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
+
+import {
+  type GeometricShape,
+  getClosedCurveShape,
+  getCurveShape,
+  getEllipseShape,
+  getFreedrawShape,
+  getPolygonShape,
+} from "./geometricShapes";
 
 import { elementWithCanvasCache } from "./renderElement";
 

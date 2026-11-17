@@ -9,14 +9,14 @@ import {
 } from "@excalidraw/math";
 import { type Bounds, isBounds } from "@excalidraw/common";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
-
 import type { Curve } from "@excalidraw/math";
 
 import { getElementBounds } from "./bounds";
 import { intersectElementWithLineSegment } from "./collision";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { isPathALoop } from "./utils";
+
+import type { ElementsMap, ExcalidrawElement } from "./types";
 
 // The global data holder to collect the debug operations
 declare global {

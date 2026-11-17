@@ -23,8 +23,6 @@ import {
   randomId,
 } from "@excalidraw/common";
 
-import "@excalidraw/utils/test-utils";
-
 import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
 
 import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";

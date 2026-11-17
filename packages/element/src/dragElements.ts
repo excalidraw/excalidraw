@@ -13,8 +13,6 @@ import type {
   PointerDownState,
 } from "@excalidraw/excalidraw/types";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
-
 import {
   getFrameArrowIdsToReattach,
   getSimultaneouslyUpdatedElementIds,
@@ -33,6 +31,8 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
+
+import type { NonDeletedExcalidrawElement } from "./types";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";

@@ -14,7 +14,11 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import { pointInEllipse, pointOnEllipse, type Ellipse } from "../src/shape";
+import {
+  pointInEllipse,
+  pointOnEllipse,
+  type Ellipse,
+} from "../src/geometricShapes";
 
 describe("point and line", () => {
   // const l: Line<GlobalPoint> = line(point(1, 0), point(1, 2));

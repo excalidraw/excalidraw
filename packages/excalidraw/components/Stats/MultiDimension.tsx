@@ -23,7 +23,7 @@ import { getBoundTextElement, handleBindTextResize } from "@excalidraw/element";
 
 import { isTextElement } from "@excalidraw/element";
 
-import { getCommonBounds } from "@excalidraw/utils";
+import { getCommonBounds } from "@excalidraw/element";
 
 import type {
   ElementsMap,

@@ -7,12 +7,14 @@
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
+      "excalidraw-source": "./src/index.ts",
       "types": "./dist/types/utils/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
     "./*": {
+      "excalidraw-source": "./src/*.js",
       "types": "./dist/types/utils/src/*.d.ts"
     }
   },
@@ -21,7 +23,18 @@
   ],
   "description": "Excalidraw utility functions",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/types/utils/src/index.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      },
+      "./*": {
+        "types": "./dist/types/utils/src/*.d.ts"
+      }
+    }
   },
   "license": "MIT",
   "keywords": [
@@ -56,12 +69,14 @@
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
-    "points-on-curve": "0.2.0",
     "roughjs": "4.6.4"
   },
   "devDependencies": {
+    "@excalidraw/common": "workspace:*",
+    "@excalidraw/element": "workspace:*",
+    "@excalidraw/excalidraw": "workspace:*",
+    "@excalidraw/math": "workspace:*",
     "cross-env": "7.0.3",
-    "jest-diff": "29.7.0",
     "typescript": "5.9.3",
     "wawoff2": "2.0.1",
     "which": "4.0.0"

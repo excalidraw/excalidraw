@@ -7,12 +7,14 @@
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
+      "excalidraw-source": "./src/index.ts",
       "types": "./dist/types/common/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
     "./*": {
+      "excalidraw-source": "./src/*.js",
       "types": "./dist/types/common/src/*.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
@@ -24,7 +26,21 @@
   ],
   "description": "Excalidraw common functions, constants, etc.",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/types/common/src/index.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      },
+      "./*": {
+        "types": "./dist/types/common/src/*.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      }
+    }
   },
   "license": "MIT",
   "keywords": [
@@ -65,6 +81,8 @@
     "tinycolor2": "1.6.0"
   },
   "devDependencies": {
+    "@excalidraw/element": "workspace:*",
+    "@excalidraw/excalidraw": "workspace:*",
     "@types/tinycolor2": "1.4.6"
   }
 }

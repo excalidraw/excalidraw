@@ -10,18 +10,6 @@ import {
 } from "@excalidraw/common";
 
 import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  NonDeleted,
-  ExcalidrawFrameLikeElement,
-  ElementsMapOrArray,
-  SceneElementsMap,
-  NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
-  Ordered,
-} from "@excalidraw/element/types";
-
-import type {
   Assert,
   Mutable,
   SameType,
@@ -41,6 +29,18 @@ import { getSelectedElements } from "./selection";
 import { mutateElement, type ElementUpdate } from "./mutateElement";
 
 import { isNonDeletedElement } from "./index";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  NonDeleted,
+  ExcalidrawFrameLikeElement,
+  ElementsMapOrArray,
+  SceneElementsMap,
+  NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
+  Ordered,
+} from "./types";
 
 import type { AppState } from "../../excalidraw/types";
 

@@ -14,7 +14,7 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import { getSelectedElements } from "@excalidraw/excalidraw/scene";
+import { getSelectedElements } from "@excalidraw/excalidraw/scene/index";
 import { exportScene } from "@excalidraw/excalidraw/scene/export";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";

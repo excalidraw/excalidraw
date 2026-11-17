@@ -26,6 +26,10 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@excalidraw/common": "workspace:*",
+    "@excalidraw/element": "workspace:*",
+    "@excalidraw/excalidraw": "workspace:*",
+    "@excalidraw/math": "workspace:*",
     "@excalidraw/random-username": "1.1.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",

@@ -12,7 +12,7 @@ import {
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "../src/types";
 
 unmountComponent();
 

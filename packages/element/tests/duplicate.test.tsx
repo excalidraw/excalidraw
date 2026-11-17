@@ -11,7 +11,7 @@ import {
 
 import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
 
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
+import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/index";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 

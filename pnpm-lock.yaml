@@ -14,6 +14,9 @@ importers:
       '@babel/preset-env':
         specifier: 7.26.9
         version: 7.26.9(@babel/core@7.26.9)
+      '@excalidraw/common':
+        specifier: workspace:*
+        version: link:packages/common
       '@excalidraw/eslint-config':
         specifier: 1.0.3
         version: 1.0.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@5.9.3))(eslint@7.32.0)(typescript@5.9.3))(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@5.9.3))(eslint-config-prettier@8.5.0(eslint@7.32.0))(eslint-plugin-prettier@3.3.1(eslint-config-prettier@8.5.0(eslint@7.32.0))(eslint@7.32.0)(prettier@2.6.2))(eslint@7.32.0)(prettier@2.6.2)
@@ -98,6 +101,9 @@ importers:
       husky:
         specifier: 7.0.4
         version: 7.0.4
+      jest-diff:
+        specifier: 29.7.0
+        version: 29.7.0
       jsdom:
         specifier: 22.1.0
         version: 22.1.0
@@ -155,6 +161,9 @@ importers:
 
   examples/with-nextjs:
     dependencies:
+      '@excalidraw/excalidraw':
+        specifier: workspace:*
+        version: link:../../packages/excalidraw
       next:
         specifier: '14.1'
         version: 14.1.4(@babel/core@7.26.9)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.85.1)
@@ -208,6 +217,18 @@ importers:
 
   excalidraw-app:
     dependencies:
+      '@excalidraw/common':
+        specifier: workspace:*
+        version: link:../packages/common
+      '@excalidraw/element':
+        specifier: workspace:*
+        version: link:../packages/element
+      '@excalidraw/excalidraw':
+        specifier: workspace:*
+        version: link:../packages/excalidraw
+      '@excalidraw/math':
+        specifier: workspace:*
+        version: link:../packages/math
       '@excalidraw/random-username':
         specifier: 1.1.0
         version: 1.1.0
@@ -288,6 +309,12 @@ importers:
         specifier: 1.6.0
         version: 1.6.0
     devDependencies:
+      '@excalidraw/element':
+        specifier: workspace:*
+        version: link:../element
+      '@excalidraw/excalidraw':
+        specifier: workspace:*
+        version: link:../excalidraw
       '@types/tinycolor2':
         specifier: 1.4.6
         version: 1.4.6
@@ -316,6 +343,12 @@ importers:
         specifier: 4.6.4
         version: 4.6.4
     devDependencies:
+      '@excalidraw/excalidraw':
+        specifier: workspace:*
+        version: link:../excalidraw
+      '@excalidraw/laser-pointer':
+        specifier: workspace:*
+        version: link:../laser-pointer
       '@testing-library/dom':
         specifier: 10.4.0
         version: 10.4.0
@@ -518,11 +551,7 @@ importers:
 
   packages/laser-pointer: {}
 
-  packages/math:
-    dependencies:
-      '@excalidraw/common':
-        specifier: workspace:*
-        version: link:../common
+  packages/math: {}
 
   packages/utils:
     dependencies:
@@ -550,19 +579,25 @@ importers:
       png-chunks-extract:
         specifier: 1.0.0
         version: 1.0.0
-      points-on-curve:
-        specifier: 0.2.0
-        version: 0.2.0
       roughjs:
         specifier: 4.6.4
         version: 4.6.4
     devDependencies:
+      '@excalidraw/common':
+        specifier: workspace:*
+        version: link:../common
+      '@excalidraw/element':
+        specifier: workspace:*
+        version: link:../element
+      '@excalidraw/excalidraw':
+        specifier: workspace:*
+        version: link:../excalidraw
+      '@excalidraw/math':
+        specifier: workspace:*
+        version: link:../math
       cross-env:
         specifier: 7.0.3
         version: 7.0.3
-      jest-diff:
-        specifier: 29.7.0
-        version: 29.7.0
       typescript:
         specifier: 5.9.3
         version: 5.9.3

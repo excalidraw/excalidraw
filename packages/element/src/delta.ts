@@ -9,18 +9,6 @@ import {
 } from "@excalidraw/common";
 
 import type {
-  ExcalidrawElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-  NonDeletedExcalidrawElement,
-  Ordered,
-  OrderedExcalidrawElement,
-  SceneElementsMap,
-} from "@excalidraw/element/types";
-
-import type {
   DTO,
   Mutable,
   SubtypeOf,
@@ -60,6 +48,18 @@ import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { StoreSnapshot } from "./store";
 
 import { Scene } from "./Scene";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+  Ordered,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 
 import type { BindableProp, BindingProp } from "./binding";
 
