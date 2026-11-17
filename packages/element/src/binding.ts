@@ -68,7 +68,7 @@ import {
   projectFixedPointOntoDiagonal,
 } from "./utils";
 
-import { isNonDeletedElement } from ".";
+import { isNonDeletedElement } from "./sceneElements";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";

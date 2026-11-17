@@ -3,7 +3,7 @@ import { getCommonBoundingBox } from "./bounds";
 
 import { getSelectedElementsByGroup } from "./groups";
 
-import { getNonDeletedElements } from ".";
+import { getNonDeletedElements } from "./sceneElements";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";

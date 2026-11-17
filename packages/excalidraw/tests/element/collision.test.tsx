@@ -23,8 +23,6 @@ import {
   newFreeDrawElement,
   getAllMidpoints,
 } from "@excalidraw/element";
-// must come after the package index import: entering the element module
-// graph through a submodule first breaks circular-import initialization
 import * as distance from "@excalidraw/element/distance";
 
 import type {

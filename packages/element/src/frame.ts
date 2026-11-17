@@ -34,7 +34,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { getNonDeletedElements } from ".";
+import { getNonDeletedElements } from "./sceneElements";
 
 import type { ExcalidrawElementsIncludingDeleted, Scene } from "./Scene";
 

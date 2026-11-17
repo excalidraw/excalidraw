@@ -9,7 +9,7 @@ import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElementId } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
 
-import { isNonDeletedElement } from ".";
+import { isNonDeletedElement } from "./sceneElements";
 
 import type {
   ElementsMap,

@@ -39,7 +39,7 @@ import { fixDuplicatedBindingsAfterDuplication } from "./binding";
 
 import { ShapeCache } from "./shape";
 
-import { isNonDeletedElement } from ".";
+import { isNonDeletedElement } from "./sceneElements";
 
 import type { ElementUpdate } from "./mutateElement";
 

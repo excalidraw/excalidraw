@@ -9,7 +9,7 @@ import {
 } from "./typeChecks";
 import { getFrameChildren } from "./frame";
 
-import { isNonDeletedElement } from ".";
+import { isNonDeletedElement } from "./sceneElements";
 
 import type {
   ElementsMap,

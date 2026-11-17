@@ -34,7 +34,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { isNonDeletedElement } from ".";
+import { isNonDeletedElement } from "./sceneElements";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 

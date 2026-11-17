@@ -28,7 +28,7 @@ import { getSelectedElements } from "./selection";
 
 import { mutateElement, type ElementUpdate } from "./mutateElement";
 
-import { isNonDeletedElement } from "./index";
+import { isNonDeletedElement } from "./sceneElements";
 
 import type {
   ExcalidrawElement,
