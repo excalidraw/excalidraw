@@ -3,8 +3,6 @@
     "signUp": "ثبت‌نام",
     "signIn": "ورود",
     "upgrade": "ارتقا",
-    "tryExcalidrawPlus": "Excalidraw+‎ را امتحان کنید",
-    "plusFreeTrial": "دوره آزمایشی رایگان 14 روزه",
     "paste": "جایگذاری",
     "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
@@ -787,5 +785,16 @@
     "spacebar": "فاصله",
     "delete": "حذف",
     "mmb": "چرخ ماوس"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
