@@ -1,4 +1,8 @@
 import Trans from "@excalidraw/excalidraw/components/Trans";
+import {
+  EditorJotaiProvider,
+  editorJotaiStore,
+} from "@excalidraw/excalidraw/editor-jotai";
 import { t } from "@excalidraw/excalidraw/i18n";
 import * as Sentry from "@sentry/browser";
 import React from "react";
@@ -20,7 +24,15 @@ export class TopErrorBoundary extends React.Component<
   };
 
   render() {
-    return this.state.hasError ? this.errorSplash() : this.props.children;
+    // The failed editor's provider is unmounted with it. Trans in the recovery
+    // screen still needs the editor store to render its translations.
+    return this.state.hasError ? (
+      <EditorJotaiProvider store={editorJotaiStore}>
+        {this.errorSplash()}
+      </EditorJotaiProvider>
+    ) : (
+      this.props.children
+    );
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
