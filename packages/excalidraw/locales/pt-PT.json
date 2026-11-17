@@ -3,8 +3,6 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "Colar",
     "pasteAsPlaintext": "Colar como texto simples",
     "pasteCharts": "Colar gráficos",
@@ -787,5 +785,16 @@
     "spacebar": "Espaço",
     "delete": "Delete",
     "mmb": "Rodinha do rato"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
