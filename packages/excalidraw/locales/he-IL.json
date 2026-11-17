@@ -617,7 +617,7 @@
       "center_heading": "השרטוטים שלך נשמרים באחסון הדפדפן שלך.",
       "center_heading_line2": "זיכרון הדפדפן יכול להתנקות באופן לא צפוי.",
       "center_heading_line3": "כדאי לשמור את העבודה שלך תדיר בתור קובץ בשביל שהיא לא תיאבד.",
-      "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
+      "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+‎ במקום?",
       "menuHint": "ייצוא, העדפות, שפות, ..."
     },
     "defaults": {
@@ -732,7 +732,7 @@
       "mermaidParseError": "שגיאת תחביר Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את ‎Excalidraw+‏ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
+      "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את Excalidraw+‎ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
       "generalRateLimit": "נא להאט את הקצב, אתה מהיר מדי עבורנו! אנא המתן רגע לפני שתנסה שוב.",
       "messageLimitInputPlaceholder": "הגעת למכסת ההודעות היומית"
     },
