@@ -43,7 +43,6 @@
     "prettier": "2.6.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "rewire": "6.0.0",
     "rimraf": "^5.0.0",
     "typescript": "5.9.3",
     "vite": "5.0.12",
@@ -62,7 +61,6 @@
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
-    "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
     "build:common": "yarn --cwd ./packages/common build:esm",
