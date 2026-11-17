@@ -35,20 +35,18 @@
         }
       }
 
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-      }
-
       body {
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0 1.5rem;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 1.5rem;
         box-sizing: border-box;
-        overflow: hidden;
+        /* the cursor label may stick out sideways; vertical overflow scrolls */
+        overflow-x: hidden;
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
           Arial, sans-serif;
         background: var(--background);
@@ -87,7 +85,8 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        max-width: 30rem;
+        /* shrink on short (landscape) screens so that everything fits */
+        max-width: clamp(15rem, calc((100vh - 13rem) * 1.6), 30rem);
         text-align: center;
       }
 
