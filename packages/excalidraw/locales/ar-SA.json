@@ -3,8 +3,6 @@
     "signUp": "أنشئ حسابًا",
     "signIn": "سجّل الدخول",
     "upgrade": "ترقية",
-    "tryExcalidrawPlus": "جرّب Excalidraw+‎",
-    "plusFreeTrial": "فترة تجريبية مجانية لمدة 14 يومًا",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
@@ -787,5 +785,16 @@
     "spacebar": "مسافة",
     "delete": "احذف",
     "mmb": "عجلة التمرير"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
