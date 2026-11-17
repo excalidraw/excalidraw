@@ -3,8 +3,6 @@
     "signUp": "회원가입",
     "signIn": "로그인",
     "upgrade": "업그레이드",
-    "tryExcalidrawPlus": "Excalidraw+ 체험하기",
-    "plusFreeTrial": "14일 무료 체험",
     "paste": "붙여 넣기",
     "pasteAsPlaintext": "일반 텍스트로 붙여 넣기",
     "pasteCharts": "차트 붙여 넣기",
@@ -787,5 +785,16 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "스크롤 휠"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
