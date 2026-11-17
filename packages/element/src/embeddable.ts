@@ -154,6 +154,8 @@ const ALLOWED_DOMAINS = new Set([
   "reddit.com",
   "forms.microsoft.com",
   "instagram.com",
+  "app.merginmaps.com",
+  "app.dev.merginmaps.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
