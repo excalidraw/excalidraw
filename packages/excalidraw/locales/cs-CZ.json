@@ -13,7 +13,7 @@
     "chartType_radar": "Radarový graf",
     "chartType_plaintext": "Prostý text",
     "selectAll": "Vybrat vše",
-    "multiSelect": "Přidat prvek do výběru",
+    "multiSelect": "Přidat objekt do výběru",
     "moveCanvas": "Posunout plátno",
     "cut": "Vyjmout",
     "copy": "Kopírovat",
@@ -116,7 +116,7 @@
     "ungroup": "Zrušit sloučení skupiny",
     "collaborators": "Spolupracovníci",
     "you": "Vy",
-    "toggleGrid": "Přepínač mřížky",
+    "toggleGrid": "Zobrazit mřížku",
     "minimap": "Minimapa",
     "zoom": "Přiblížení",
     "addToLibrary": "Přidat do knihovny",
@@ -136,7 +136,7 @@
     "distributeVertically": "Rozložit svisle",
     "flipHorizontal": "Převrátit vodorovně",
     "flipVertical": "Převrátit svisle",
-    "viewMode": "Náhled",
+    "viewMode": "Mód pro čtení",
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
@@ -158,7 +158,7 @@
       "labelEmbed": "Odkaz & vložit",
       "empty": "Není nastaven žádný odkaz",
       "hint": "Napište nebo vložte svůj odkaz zde",
-      "goToElement": "Přejít na cílový prvek"
+      "goToElement": "Přejít na cílový objekt"
     },
     "lineEditor": {
       "edit": "Upravit čáru",
@@ -176,8 +176,8 @@
     },
     "statusPublished": "Zveřejněno",
     "sidebarLock": "Ponechat postranní panel otevřený",
-    "selectAllElementsInFrame": "Vybrat všechny prvky v orámování",
-    "removeAllElementsFromFrame": "Odstranit všechny prvky z orámování",
+    "selectAllElementsInFrame": "Vybrat všechny objekty v orámování",
+    "removeAllElementsFromFrame": "Odstranit všechny objekty z orámování",
     "eyeDropper": "Vyberte barvu z plátna",
     "textToDiagram": "Z textu na diagram",
     "prompt": "Výzva",
@@ -185,7 +185,7 @@
     "discordChat": "Discord chat",
     "zoomToFitViewport": "Přiblížit na velikost zobrazení",
     "zoomToFitSelection": "Přiblížit na výběr",
-    "zoomToFit": "Přiblížit na zobrazení všech prvků",
+    "zoomToFit": "Přiblížit na zobrazení všech objektů",
     "installPWA": "Instalovat Excalidraw lokálně (PWA)",
     "autoResize": "Povolit automatickou změnu velikosti textu",
     "toggleAutoResize": "Přepnout automatickou změnu velikosti textu",
@@ -199,7 +199,7 @@
     "tab": "Tab",
     "shapeSwitch": "Změnit tvar",
     "preferences": "Předvolby",
-    "preferences_toolLock": "Zámek nástroje",
+    "preferences_toolLock": "Zamknout nástroj",
     "boxSelectionMode": "Vybírat při",
     "boxSelectionContain": "Obklopení",
     "boxSelectionOverlap": "Překrytí",
@@ -217,8 +217,8 @@
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
-    "hint_emptyLibrary": "Vyberte položku na plátně a přidejte ji sem nebo nainstalujte knihovnu z veřejného úložiště níže.",
-    "hint_emptyPrivateLibrary": "Vyberte položku na plátně a přidejte ji sem.",
+    "hint_emptyLibrary": "Vyberte objekt na plátně a přidejte ho sem nebo nainstalujte knihovnu z veřejného úložiště níže.",
+    "hint_emptyPrivateLibrary": "Vyberte objekt na plátně a přidejte ho sem.",
     "search": {
       "inputPlaceholder": "Hledat v knihovně",
       "heading": "Výsledky v knihovně",
@@ -316,13 +316,13 @@
     "imageToolNotSupported": "Obrázky jsou vypnuty.",
     "brave_measure_text_error": {
       "line1": "Vypadá to, že používáte Brave prohlížeč s povoleným nastavením <bold>Aggressively Block Fingerprinting</bold>.",
-      "line2": "To by mohlo vést k narušení <bold>Textových elementů</bold> ve vašich výkresech.",
+      "line2": "To by mohlo vést k narušení <bold>Textových objektů</bold> ve vašich výkresech.",
       "line3": "Důrazně doporučujeme zakázat toto nastavení. Můžete sledovat <link>tyto kroky</link> jak to udělat.",
-      "line4": "Pokud vypnutí tohoto nastavení neopravuje zobrazení textových prvků, prosím, otevřete <issueLink>problém</issueLink> na našem GitHubu, nebo nám napište na <discordLink>Discord</discordLink>"
+      "line4": "Pokud vypnutí tohoto nastavení neopravuje zobrazení textových objektů, prosím, otevřete <issueLink>problém</issueLink> na našem GitHubu, nebo nám napište na <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "Prvky typu Web Embed nelze přidat do knihovny.",
-      "iframe": "Prvky typu IFrame nelze přidat do knihovny.",
+      "embeddable": "Objekty typu Web Embed nelze přidat do knihovny.",
+      "iframe": "Objekty typu IFrame nelze přidat do knihovny.",
       "image": "Podpora přidávání obrázků do knihovny brzy přibude!"
     },
     "asyncPasteFailedOnRead": "Nepodařilo se vložit (nelze číst ze systémové schránky).",
@@ -347,7 +347,7 @@
     "eraser": "Guma",
     "frame": "Orámování",
     "magicframe": "Z wireframu na kód",
-    "stickynote": "Lepicí poznámka",
+    "stickynote": "Poznámka",
     "embeddable": "Web Embed",
     "laser": "Laserové ukazovátko",
     "autoshape": "Z kresby na tvar",
@@ -373,7 +373,7 @@
     "group": "Skupina",
     "frame": "Rám",
     "magicframe": "Z wireframu na kód",
-    "stickynote": "Lepicí poznámka",
+    "stickynote": "Poznámka",
     "embeddable": "Web Embed",
     "selection": "Výběr",
     "iframe": "IFrame"
@@ -413,7 +413,7 @@
     "createFlowchart": "{{shortcut}} pro vytvoření vývojového diagramu",
     "deepBoxSelect": "Podržte {{shortcut}} pro hluboký výběr a pro zabránění tažení",
     "cycleSelection": "{{shortcut}}+kliknutí pro přepínání výběru, nebo tažení pro duplikování",
-    "eraserRevert": "Podržte {{shortcut}} pro obnovení prvků označených ke smazání",
+    "eraserRevert": "Podržte {{shortcut}} pro obnovení objektů označených ke smazání",
     "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\".",
     "disableSnapping": "Podržte {{shortcut}} pro vypnutí přichytávání",
     "enterCropEditor": "Dvakrát klikněte na obrázek nebo stiskněte {{shortcut}} pro oříznutí obrázku",
@@ -422,7 +422,7 @@
   "canvasError": {
     "cannotShowPreview": "Náhled nelze zobrazit",
     "canvasTooBig": "Plátno je možná příliš velké.",
-    "canvasTooBigTip": "Tip: zkus posunout nejvzdálenější prvky trochu blíže k sobě."
+    "canvasTooBigTip": "Tip: zkus posunout nejvzdálenější objekty trochu blíže k sobě."
   },
   "errorSplash": {
     "headingMain": "Chyba. Zkuste <button>znovu načíst stránku</button>.",
@@ -468,7 +468,7 @@
     "click": "kliknutí",
     "deepSelect": "Hluboký výběr",
     "deepBoxSelect": "Hluboký výběr uvnitř boxu a zabránění táhnnutí",
-    "createFlowchart": "Vytvořit vývojový diagram z obecného prvku",
+    "createFlowchart": "Vytvořit vývojový diagram z obecného objektu",
     "navigateFlowchart": "Procházet vývojový diagram",
     "curvedArrow": "Zakřivená šipka",
     "curvedLine": "Zakřivená čára",
@@ -488,7 +488,7 @@
     "textNewLine": "Přidat nový řádek (textový editor)",
     "title": "Nápověda",
     "view": "Zobrazení",
-    "zoomToFit": "Přiblížit na zobrazení všech prvků",
+    "zoomToFit": "Přiblížit na zobrazení všech objektů",
     "zoomToSelection": "Přiblížit na výběr",
     "toggleElementLock": "Zamknout/odemknout výběr",
     "movePageUpDown": "Posunout stránku nahoru/dolů",
@@ -590,7 +590,7 @@
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden prvek,\nnebo vložte do existujícího textového editoru",
+    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden objekt,\nnebo vložte do existujícího textového editoru",
     "unableToEmbed": "Vložení této URL adresy momentálně není povoleno. O přidání URL adresy na seznam povolených můžete požádat na GitHubu",
     "unrecognizedLinkFormat": "Vložený odkaz neodpovídá očekávanému formátu. Zkuste prosím vložit řetězec 'embed' poskytnutý zdrojovým webem",
     "elementLinkCopied": "Odkaz zkopírován do schránky"
@@ -682,7 +682,7 @@
   "mermaid": {
     "title": "Z Mermaid do Excalidraw",
     "button": "Vložit",
-    "description": "<flowchartLink>Vývojové diagramy</flowchartLink>, <sequenceLink>sekvenční diagramy</sequenceLink>, <classLink>diagramy tříd</classLink>, <stateLink>stavové diagramy</stateLink>, <erdLink>diagramy entit a vztahů</erdLink>, <ganttLink>Ganttovy diagramy</ganttLink>, <quadrantLink>kvadrantové grafy</quadrantLink> a <timelineLink>časové osy</timelineLink> se převádějí na prvky Excalidraw. Ostatní typy se vloží jako obrázek.",
+    "description": "<flowchartLink>Vývojové diagramy</flowchartLink>, <sequenceLink>sekvenční diagramy</sequenceLink>, <classLink>diagramy tříd</classLink>, <stateLink>stavové diagramy</stateLink>, <erdLink>diagramy entit a vztahů</erdLink>, <ganttLink>Ganttovy diagramy</ganttLink>, <quadrantLink>kvadrantové grafy</quadrantLink> a <timelineLink>časové osy</timelineLink> se převádějí na objekty Excalidraw. Ostatní typy se vloží jako obrázek.",
     "syntax": "Mermaid syntaxe",
     "preview": "Náhled",
     "label": "Mermaid",
