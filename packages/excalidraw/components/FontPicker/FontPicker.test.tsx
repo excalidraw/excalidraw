@@ -1,6 +1,6 @@
 import { FONT_FAMILY, KEYS } from "@excalidraw/common";
 
-import { Excalidraw } from "../..";
+import { Excalidraw } from "../../index";
 import { API } from "../../tests/helpers/api";
 import { Keyboard } from "../../tests/helpers/ui";
 import { act, fireEvent, render, waitFor } from "../../tests/test-utils";

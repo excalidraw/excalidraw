@@ -20,7 +20,7 @@ PolyfillLocalStorage();
 // By default testing-library dumps the entire serialized DOM into the error
 // message whenever a `waitFor`/`getBy*` fails, which floods the test output
 // (often hundreds of lines of HTML per failure). Strip it out unless
-// VITE_DEBUG_DOM is enabled (see .env.test), e.g. `VITE_DEBUG_DOM=true yarn test`.
+// VITE_DEBUG_DOM is enabled (see .env.test), e.g. `VITE_DEBUG_DOM=true pnpm test`.
 const debugDom = ["true", "1"].includes(process.env.VITE_DEBUG_DOM ?? "");
 if (!debugDom) {
   configure({

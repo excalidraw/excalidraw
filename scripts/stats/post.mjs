@@ -3,7 +3,7 @@
 /**
  * Posts a performance run — a commit's build and the commit before's, measured
  * side by side (`perf.mjs --compare --base <commit> --out perf.json`) — or a
- * build's bundle stats (`yarn stats:bundle` →
+ * build's bundle stats (`pnpm stats:bundle` →
  * `excalidraw-app/build/bundle-stats.json`) to the Excalidraw+ api, which
  * stores it for the admin's Performance and Bundle size pages. Needs
  * `OSS_STATS_TOKEN`; the commit is `--commit`, `GITHUB_SHA` or HEAD, read from

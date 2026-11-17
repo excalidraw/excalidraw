@@ -1,0 +1,14 @@
+packages:
+  - excalidraw-app
+  - packages/*
+  - examples/*
+
+overrides:
+  strip-ansi: 6.0.1
+
+# dependencies allowed to run install scripts (pnpm 10 blocks them by default)
+onlyBuiltDependencies:
+  - "@parcel/watcher"
+  - core-js
+  - esbuild
+  - protobufjs
