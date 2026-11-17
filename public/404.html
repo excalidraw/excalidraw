@@ -86,7 +86,7 @@
         align-items: center;
         width: 100%;
         /* shrink on short (landscape) screens so that everything fits */
-        max-width: clamp(15rem, calc((100vh - 13rem) * 1.6), 30rem);
+        max-width: clamp(15rem, calc((100vh - 16rem) * 1.6), 30rem);
         text-align: center;
       }
 
@@ -165,7 +165,7 @@
         color: var(--text-muted);
       }
 
-      a {
+      .button {
         margin-top: 1.75rem;
         padding: 0.75rem 1.5rem;
         border-radius: 0.625rem;
@@ -176,7 +176,7 @@
         transition: background-color 0.15s, transform 0.15s;
       }
 
-      a:hover {
+      .button:hover {
         background: var(--primary-hover);
         transform: translateY(-1px);
       }
@@ -184,6 +184,33 @@
       a:focus-visible {
         outline: 2px solid var(--primary);
         outline-offset: 3px;
+        border-radius: 0.25rem;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem 0.75rem;
+        margin-top: 1.5rem;
+        font-size: 0.9375rem;
+      }
+
+      nav span {
+        color: var(--text-muted);
+        opacity: 0.6;
+      }
+
+      nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+
+      nav a:hover {
+        color: var(--primary);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
       }
 
       main > * {
@@ -200,6 +227,10 @@
 
       main > :nth-child(4) {
         animation-delay: 0.24s;
+      }
+
+      main > :nth-child(5) {
+        animation-delay: 0.32s;
       }
 
       @keyframes rise {
@@ -286,7 +317,20 @@
         </svg>
       </h1>
       <p>There is nothing at this address.</p>
-      <a href="/">Open Excalidraw</a>
+      <a class="button" href="/">Open Excalidraw</a>
+      <nav aria-label="More from Excalidraw">
+        <a
+          href="https://plus.excalidraw.com?utm_source=excalidraw&amp;utm_medium=app&amp;utm_content=404"
+          >Excalidraw+</a
+        >
+        <span aria-hidden="true">•</span>
+        <a
+          href="https://plus.excalidraw.com/docs?utm_source=excalidraw&amp;utm_medium=app&amp;utm_content=404"
+          >Documentation</a
+        >
+        <span aria-hidden="true">•</span>
+        <a href="https://github.com/excalidraw/cli">CLI</a>
+      </nav>
     </main>
   </body>
 </html>
