@@ -3,8 +3,6 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
@@ -787,5 +785,16 @@
     "spacebar": "רווח",
     "delete": "מחיקה",
     "mmb": "גלגלת העכבר"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
