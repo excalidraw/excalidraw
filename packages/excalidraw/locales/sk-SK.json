@@ -3,8 +3,6 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
@@ -787,5 +785,16 @@
     "spacebar": "Medzerník",
     "delete": "Delete",
     "mmb": "Rolovacie koliesko"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
