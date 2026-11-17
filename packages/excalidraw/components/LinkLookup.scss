@@ -1,0 +1,124 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .LinkLookup {
+    margin-top: 0.5rem;
+
+    .LinkLookup__toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      padding: 0.5rem 0.75rem;
+
+      font-size: 0.875rem;
+
+      border: 1px solid var(--input-border-color, var(--button-border, #e0e0e0));
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-primary-color);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(
+          --button-hover-bg,
+          var(--input-hover-bg, rgba(0, 0, 0, 0.04))
+        );
+      }
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    .LinkLookup__bar {
+      display: flex;
+      align-items: center;
+
+      .LinkLookup__field {
+        flex: 1;
+      }
+
+      .LinkLookup__submit {
+        margin-left: 0.75rem;
+
+        .ToolIcon__icon {
+          width: 2rem;
+          height: 2rem;
+        }
+      }
+    }
+
+    .LinkLookup__hint {
+      margin-top: 0.5rem;
+
+      font-size: 0.875rem;
+      color: var(--text-secondary-color, var(--text-primary-color));
+
+      &--error {
+        color: $color-red-6;
+      }
+    }
+
+    .LinkLookup__results {
+      list-style: none;
+
+      margin: 0.5rem 0 0;
+      padding: 0;
+
+      max-height: 14rem;
+      overflow-y: auto;
+
+      li + li {
+        margin-top: 0.25rem;
+      }
+    }
+
+    .LinkLookup__result {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.125rem;
+
+      width: 100%;
+
+      padding: 0.5rem 0.75rem;
+
+      font-size: 0.875rem;
+      text-align: left;
+
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-primary-color);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(
+          --button-hover-bg,
+          var(--input-hover-bg, rgba(0, 0, 0, 0.04))
+        );
+      }
+
+      .LinkLookup__result-title {
+        font-weight: 500;
+
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .LinkLookup__result-url {
+        font-size: 0.75rem;
+        color: var(--text-secondary-color, var(--text-primary-color));
+
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}

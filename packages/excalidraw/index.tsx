@@ -103,6 +103,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     generateIdForFile,
     onLinkOpen,
     generateLinkForSelection,
+    onLinkLookup,
     onPointerDown,
     onPointerUp,
     onScrollChange,
@@ -247,6 +248,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
           generateLinkForSelection={generateLinkForSelection}
+          onLinkLookup={onLinkLookup}
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
