@@ -210,7 +210,11 @@ const MiniMap = ({
     const elementHeight = Math.max(element.height * scale, 1);
 
     const fill = element.backgroundColor || "none";
-    const stroke = element.strokeColor || "#64748b";
+
+    const stroke =
+      theme === "dark"
+        ? "#ffffff"
+        : element.strokeColor || "#64748b";
 
     const centerX = x + elementWidth / 2;
     const centerY = y + elementHeight / 2;
@@ -374,27 +378,27 @@ const MiniMap = ({
       }}
     >
       <svg
-        width={MINIMAP_WIDTH}
-        height={MINIMAP_HEIGHT}
-        viewBox={`0 0 ${MINIMAP_WIDTH} ${MINIMAP_HEIGHT}`}
-      >
-        {/* Canvas elements */}
-        {elements
-          .filter((element) => !element.isDeleted)
-          .map(renderElement)}
+  width={MINIMAP_WIDTH}
+  height={MINIMAP_HEIGHT}
+  viewBox={`0 0 ${MINIMAP_WIDTH} ${MINIMAP_HEIGHT}`}
+>
+  {/* Current viewport indicator - render behind shapes */}
+  <rect
+    x={getX(-scrollX)}
+    y={getY(-scrollY)}
+    width={(width / Math.max(zoom, 0.01)) * scale}
+    height={(height / Math.max(zoom, 0.01)) * scale}
+    fill="rgba(99, 102, 241, 0.08)"
+    stroke="#6366f1"
+    strokeWidth={1.2}
+    pointerEvents="none"
+  />
 
-        {/* Current viewport indicator */}
-        <rect
-          x={getX(-scrollX)}
-          y={getY(-scrollY)}
-          width={(width / Math.max(zoom, 0.01)) * scale}
-          height={(height / Math.max(zoom, 0.01)) * scale}
-          fill="rgba(99, 102, 241, 0.10)"
-          stroke="#6366f1"
-          strokeWidth={1.2}
-          pointerEvents="none"
-        />
-      </svg>
+  {/* Render all canvas elements above viewport */}
+  {elements
+    .filter((element) => !element.isDeleted)
+    .map(renderElement)}
+</svg>
     </div>
   );
 };
