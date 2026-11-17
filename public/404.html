@@ -337,5 +337,15 @@
         <a href="https://github.com/excalidraw/cli">CLI</a>
       </nav>
     </main>
+    <!-- 100% privacy friendly analytics (same as the editor) -->
+    <script>
+      // only on excalidraw.com, not on previews or self-hosted builds
+      if (window.location.hostname === "excalidraw.com") {
+        var scriptEle = document.createElement("script");
+        scriptEle.src = "https://scripts.simpleanalyticscdn.com/latest.js";
+        scriptEle.async = true;
+        document.body.appendChild(scriptEle);
+      }
+    </script>
   </body>
 </html>
