@@ -3,8 +3,6 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "Įklijuoti",
     "pasteAsPlaintext": "Įklijuoti kaip paprastą tekstą",
     "pasteCharts": "Įklijuoti diagramas",
@@ -787,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
