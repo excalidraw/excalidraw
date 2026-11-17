@@ -3,8 +3,6 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
     "paste": "Yapıştır",
     "pasteAsPlaintext": "Düz metin olarak yapıştır",
     "pasteCharts": "Grafikleri yapıştır",
@@ -787,5 +785,16 @@
     "spacebar": "Boşluk",
     "delete": "Sil",
     "mmb": "Kaydırma tekerleği"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
