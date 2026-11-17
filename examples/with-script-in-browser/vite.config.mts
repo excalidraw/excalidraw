@@ -2,6 +2,14 @@ import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // use Sass's modern compiler API (the legacy JS API is deprecated)
+        api: "modern-compiler",
+      },
+    },
+  },
   server: {
     port: 3001,
     // open the browser

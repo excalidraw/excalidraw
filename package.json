@@ -43,7 +43,7 @@
     "react-dom": "19.0.0",
     "rimraf": "^5.0.0",
     "typescript": "5.9.3",
-    "vite": "5.0.12",
+    "vite": "5.4.21",
     "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.21.1",

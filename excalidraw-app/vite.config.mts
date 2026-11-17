@@ -144,6 +144,14 @@ export default defineConfig(({ mode }) => {
   const mermaidChunkFileNames = new Set<string>();
   // https://vitejs.dev/config/
   return {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // use Sass's modern compiler API (the legacy JS API is deprecated)
+          api: "modern-compiler",
+        },
+      },
+    },
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       // open the browser
