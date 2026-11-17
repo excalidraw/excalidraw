@@ -61,9 +61,30 @@ export const actionPaste = register({
     try {
       types = await readSystemClipboard();
     } catch (error: any) {
-      if (error.name === "AbortError" || error.name === "NotAllowedError") {
-        // user probably aborted the action. Though not 100% sure, it's best
-        // to not annoy them with an error message.
+      if (error.name === "AbortError") {
+        return false;
+      }
+
+      if (error.name === "NotAllowedError") {
+        try {
+          const permission = await app.ownerWindow.navigator.permissions?.query(
+            {
+              name: "clipboard-read" as PermissionName,
+            },
+          );
+          if (permission?.state === "denied") {
+            return {
+              captureUpdate: CaptureUpdateAction.EVENTUALLY,
+              appState: {
+                ...appState,
+                errorMessage: t("errors.asyncPasteFailedOnRead"),
+              },
+            };
+          }
+        } catch {
+          // Some browsers don't support querying clipboard-read permission.
+        }
+        // The user may have dismissed the prompt. Stay silent unless denied.
         return false;
       }
 
