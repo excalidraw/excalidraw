@@ -3,8 +3,6 @@
     "signUp": "Zarejestruj się",
     "signIn": "Zaloguj się",
     "upgrade": "Przejdź na wyższy plan",
-    "tryExcalidrawPlus": "Wypróbuj Excalidraw+",
-    "plusFreeTrial": "14 dni za darmo",
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
@@ -787,5 +785,16 @@
     "spacebar": "Spacja",
     "delete": "Del",
     "mmb": "Kółko myszy"
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
