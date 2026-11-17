@@ -41,7 +41,6 @@ import {
   reduceToCommonValue,
   ROUNDNESS,
   sceneCoordsToViewportCoords,
-  updateActiveTool,
 } from "@excalidraw/common";
 
 import { measureText } from "@excalidraw/element";
@@ -85,6 +84,8 @@ import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
+
+import { updateActiveTool } from "../appState";
 
 import "./ConvertElementTypePopup.scss";
 import { IconButton } from "./IconButton";

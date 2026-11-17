@@ -5,7 +5,6 @@ import {
   EVENT,
   KEYS,
   TEXT_AUTOWRAP_THRESHOLD,
-  updateActiveTool,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
@@ -22,6 +21,8 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
 } from "@excalidraw/element/types";
+
+import { updateActiveTool } from "../appState";
 
 import type React from "react";
 

@@ -1,9 +1,14 @@
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
-  FONT_FAMILY,
-  ROUNDNESS,
+  FillStyle,
+  FontFamilyKeys,
+  FontFamilyValues,
+  FontString,
+  RoundnessType,
+  StrokeStyle,
   TEXT_ALIGN,
+  UnitlessLineHeight,
   THEME,
   VERTICAL_ALIGN,
 } from "@excalidraw/common";
@@ -12,20 +17,22 @@ import type {
   MakeBrand,
   MarkNonNullable,
   Merge,
-  ValueOf,
 } from "@excalidraw/common/utility-types";
 
+export type {
+  FillStyle,
+  FontFamilyKeys,
+  FontFamilyValues,
+  FontString,
+  RoundnessType,
+  StrokeStyle,
+};
+
 export type ChartType = "bar" | "line" | "radar";
-export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
-export type FontFamilyKeys = keyof typeof FONT_FAMILY;
-export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type Theme = typeof THEME[keyof typeof THEME];
-export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeRoundness = "round" | "sharp";
-export type RoundnessType = ValueOf<typeof ROUNDNESS>;
-export type StrokeStyle = "solid" | "dashed" | "dotted";
 export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
@@ -280,7 +287,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * Unitless line height (aligned to W3C). To get line height in px, multiply
      *  with font size (using `getLineHeightInPx` helper).
      */
-    lineHeight: number & { _brand: "unitlessLineHeight" };
+    lineHeight: UnitlessLineHeight;
     /**
      * Position of text bound to a linear element (such as an arrow),
      * expressed as a normalized arc-length parameter (0–1) along the

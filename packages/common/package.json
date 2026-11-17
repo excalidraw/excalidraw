@@ -81,8 +81,6 @@
     "tinycolor2": "1.6.0"
   },
   "devDependencies": {
-    "@excalidraw/element": "workspace:*",
-    "@excalidraw/excalidraw": "workspace:*",
     "@types/tinycolor2": "1.4.6"
   }
 }

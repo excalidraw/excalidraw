@@ -8,8 +8,6 @@ import React, {
 
 import {
   applyDarkModeFilter,
-  DEFAULT_IMAGE_OPTIONS,
-  DEFAULT_UI_OPTIONS,
   getStrokeWidthByKey,
   isShallowEqual,
 } from "@excalidraw/common";
@@ -34,6 +32,8 @@ import polyfill from "./polyfill";
 import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
+
+import { DEFAULT_IMAGE_OPTIONS, DEFAULT_UI_OPTIONS } from "./appState";
 
 import type {
   AppProps,

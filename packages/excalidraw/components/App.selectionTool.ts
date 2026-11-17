@@ -2,7 +2,6 @@ import {
   CURSOR_TYPE,
   DRAGGING_THRESHOLD,
   getGridPoint,
-  isSelectionLikeTool,
   KEYS,
   shouldMaintainAspectRatio,
   shouldResizeFromCenter,
@@ -77,6 +76,8 @@ import {
 } from "../scene";
 
 import { snapDraggedElements, snapResizingElements } from "../snapping";
+
+import { isSelectionLikeTool } from "../appState";
 
 import { selectGroupsForSelectedElements } from "./App.selection";
 

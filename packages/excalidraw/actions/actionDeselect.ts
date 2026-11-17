@@ -4,13 +4,15 @@ import {
   makeNextSelectedElementIds,
 } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { KEYS, isWritableElement, updateActiveTool } from "@excalidraw/common";
+import { KEYS, isWritableElement } from "@excalidraw/common";
 
 import type { GroupId } from "@excalidraw/element/types";
 
 import { TOGGLE_TOOLS } from "../components/Tools";
 
 import { selectGroupsForSelectedElements } from "../components/App.selection";
+
+import { updateActiveTool } from "../appState";
 
 import { register } from "./register";
 

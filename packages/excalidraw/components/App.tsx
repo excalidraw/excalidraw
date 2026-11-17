@@ -59,7 +59,6 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
   updateObject,
-  updateActiveTool,
   isTransparent,
   muteFSAbortError,
   isTestEnv,
@@ -89,7 +88,6 @@ import {
   type StylesPanelMode,
   loadDesktopUIModePreference,
   setDesktopUIMode,
-  isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
 } from "@excalidraw/common";
@@ -375,6 +373,8 @@ import {
   getColorTargetAppStateUpdates,
   resolveColorTarget,
 } from "../actions/colorTargets";
+
+import { updateActiveTool, isSelectionLikeTool } from "../appState";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,

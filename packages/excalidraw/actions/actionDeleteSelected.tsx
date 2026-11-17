@@ -1,8 +1,4 @@
-import {
-  KEYS,
-  MOBILE_ACTION_BUTTON_BG,
-  updateActiveTool,
-} from "@excalidraw/common";
+import { KEYS, MOBILE_ACTION_BUTTON_BG } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element";
@@ -30,6 +26,8 @@ import { IconButton } from "../components/IconButton";
 import { useStylesPanelMode } from "../components/App";
 
 import { selectGroupsForSelectedElements } from "../components/App.selection";
+
+import { updateActiveTool } from "../appState";
 
 import { register } from "./register";
 

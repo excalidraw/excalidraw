@@ -309,12 +309,6 @@ importers:
         specifier: 1.6.0
         version: 1.6.0
     devDependencies:
-      '@excalidraw/element':
-        specifier: workspace:*
-        version: link:../element
-      '@excalidraw/excalidraw':
-        specifier: workspace:*
-        version: link:../excalidraw
       '@types/tinycolor2':
         specifier: 1.4.6
         version: 1.4.6

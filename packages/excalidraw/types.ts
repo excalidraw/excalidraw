@@ -45,7 +45,6 @@ import type {
   Merge,
   MaybePromise,
   ValueOf,
-  MakeBrand,
 } from "@excalidraw/common/utility-types";
 
 import type {
@@ -56,6 +55,14 @@ import type {
   OnDuplicateData,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
+
+import type {
+  ArrowType,
+  NormalizedZoomValue,
+  NullableGridSize,
+  UnsubscribeCallback,
+  Zoom,
+} from "@excalidraw/common";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -71,6 +78,14 @@ import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
+
+export type {
+  ArrowType,
+  NormalizedZoomValue,
+  NullableGridSize,
+  UnsubscribeCallback,
+  Zoom,
+};
 
 export type { App };
 
@@ -465,7 +480,7 @@ export interface AppState {
   currentItemEndArrowhead: Arrowhead | null;
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
-  currentItemArrowType: "sharp" | "round" | "elbow";
+  currentItemArrowType: ArrowType;
   viewBackgroundColor: string;
   scrollX: number;
   scrollY: number;
@@ -622,12 +637,6 @@ export type UIAppState = Omit<
   | "frameToHighlight"
   | "elementsToHighlight"
 >;
-
-export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
-
-export type Zoom = Readonly<{
-  value: NormalizedZoomValue;
-}>;
 
 export type PointerCoords = Readonly<{
   x: number;
@@ -1402,8 +1411,6 @@ export type PointerDownState = Readonly<{
   };
 }>;
 
-export type UnsubscribeCallback = () => void;
-
 export type ExcalidrawMountPayload = {
   excalidrawAPI: ExcalidrawImperativeAPI;
   /*
@@ -1576,10 +1583,6 @@ export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 export type PendingExcalidrawElements = NonDeletedExcalidrawElement[];
 
 /** Runtime gridSize value. Null indicates disabled grid. */
-export type NullableGridSize =
-  | (AppState["gridSize"] & MakeBrand<"NullableGridSize">)
-  | null;
-
 export type GenerateDiagramToCode = (props: {
   frame: NonDeleted<ExcalidrawMagicFrameElement>;
   children: readonly NonDeletedExcalidrawElement[];

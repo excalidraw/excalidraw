@@ -10,6 +10,7 @@ export * from "./promise-pool";
 export * from "./random";
 export * from "./url";
 export * from "./utils";
+export * from "./types";
 export * from "./emitter";
 export * from "./appEventBus";
 export * from "./editorInterface";

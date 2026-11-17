@@ -1,14 +1,14 @@
-import type {
-  ExcalidrawElement,
-  FontFamilyValues,
-} from "@excalidraw/element/types";
-import type {
-  AppProps,
-  AppState,
-  NormalizedZoomValue,
-} from "@excalidraw/excalidraw/types";
-
 import { COLOR_PALETTE } from "./colors";
+
+import type {
+  ArrowType,
+  FillStyle,
+  FontFamilyValues,
+  NormalizedZoomValue,
+  RoundnessType,
+  StrokeStyle,
+  Zoom,
+} from "./types";
 
 export { DEFAULT_STICKY_NOTE_BG } from "./colors";
 
@@ -210,13 +210,13 @@ export const THEME = {
 export const DARK_THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const FRAME_STYLE = {
-  strokeColor: "#bbb" as ExcalidrawElement["strokeColor"],
-  strokeWidth: 2 as ExcalidrawElement["strokeWidth"],
-  strokeStyle: "solid" as ExcalidrawElement["strokeStyle"],
-  fillStyle: "solid" as ExcalidrawElement["fillStyle"],
-  roughness: 0 as ExcalidrawElement["roughness"],
-  roundness: null as ExcalidrawElement["roundness"],
-  backgroundColor: "transparent" as ExcalidrawElement["backgroundColor"],
+  strokeColor: "#bbb" as string,
+  strokeWidth: 2 as number,
+  strokeStyle: "solid" as StrokeStyle,
+  fillStyle: "solid" as FillStyle,
+  roughness: 0 as number,
+  roundness: null as null | { type: RoundnessType; value?: number },
+  backgroundColor: "transparent" as string,
   radius: 8,
   nameOffsetY: 3,
   nameColorLightTheme: "#999999",
@@ -369,7 +369,7 @@ export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 30;
 /** 100% zoom, for computations that have no editor zoom to go by */
-export const DEFAULT_ZOOM: AppState["zoom"] = Object.freeze({
+export const DEFAULT_ZOOM: Zoom = Object.freeze({
   value: 1 as NormalizedZoomValue,
 });
 export const HYPERLINK_TOOLTIP_DELAY = 300;
@@ -387,30 +387,10 @@ export const URL_HASH_KEYS = {
   addLibrary: "addLibrary",
 } as const;
 
-export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
-  canvasActions: {
-    changeViewBackgroundColor: true,
-    clearCanvas: true,
-    export: { saveFileToDisk: true },
-    loadScene: true,
-    saveToActiveFile: true,
-    toggleTheme: null,
-    saveAsImage: true,
-  },
-  tools: {
-    image: true,
-  },
-};
-
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
 export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
-
-export const DEFAULT_IMAGE_OPTIONS: AppProps["imageOptions"] = {
-  maxWidthOrHeight: 1440,
-  maxFileSizeBytes: 4 * 1024 * 1024,
-};
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
 export const SVG_DOCUMENT_PREAMBLE = `<?xml version="1.0" standalone="no"?>
@@ -484,7 +464,7 @@ export const STROKE_WIDTH_KEYS: readonly StrokeWidthKey[] = [
 ];
 
 export const STROKE_WIDTH: Readonly<
-  Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
+  Record<StrokeWidthKey | "extraBold", number>
 > = {
   thin: 1,
   medium: 2,
@@ -498,7 +478,7 @@ export const STROKE_WIDTH: Readonly<
 //
 // note that in the UI, STROKE_WIDTH.thin == FREEDRAW_STROKE_WIDTH.thin still
 export const FREEDRAW_STROKE_WIDTH: Readonly<
-  Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
+  Record<StrokeWidthKey | "extraBold", number>
 > = {
   thin: 0.5,
   medium: 1,
@@ -507,9 +487,9 @@ export const FREEDRAW_STROKE_WIDTH: Readonly<
 };
 
 export const getStrokeWidthByKey = (
-  elementType: ExcalidrawElement["type"],
+  elementType: string,
   strokeWidthKey: StrokeWidthKey,
-): ExcalidrawElement["strokeWidth"] => {
+): number => {
   return elementType === "freedraw"
     ? FREEDRAW_STROKE_WIDTH[strokeWidthKey]
     : STROKE_WIDTH[strokeWidthKey];
@@ -518,14 +498,14 @@ export const getStrokeWidthByKey = (
 export const DEFAULT_ELEMENT_STROKE_WIDTH_KEY: StrokeWidthKey = "medium";
 
 export const DEFAULT_ELEMENT_PROPS: {
-  strokeColor: ExcalidrawElement["strokeColor"];
-  backgroundColor: ExcalidrawElement["backgroundColor"];
-  fillStyle: ExcalidrawElement["fillStyle"];
-  strokeWidth: ExcalidrawElement["strokeWidth"];
-  strokeStyle: ExcalidrawElement["strokeStyle"];
-  roughness: ExcalidrawElement["roughness"];
-  opacity: ExcalidrawElement["opacity"];
-  locked: ExcalidrawElement["locked"];
+  strokeColor: string;
+  backgroundColor: string;
+  fillStyle: FillStyle;
+  strokeWidth: number;
+  strokeStyle: StrokeStyle;
+  roughness: number;
+  opacity: number;
+  locked: boolean;
 } = {
   strokeColor: COLOR_PALETTE.black,
   backgroundColor: COLOR_PALETTE.transparent,
@@ -593,7 +573,7 @@ export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 
 export const MIN_WIDTH_OR_HEIGHT = 1;
 
-export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
+export const ARROW_TYPE: { [T in ArrowType]: T } = {
   sharp: "sharp",
   round: "round",
   elbow: "elbow",
