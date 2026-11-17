@@ -4,6 +4,8 @@ import { isDevEnv } from "@excalidraw/common";
 
 import { newElement, newLinearElement } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import { GRID_OPACITY, commonProps } from "./charts.constants";
@@ -26,6 +28,7 @@ export const renderLineChart = (
   x: number,
   y: number,
   colorSeed?: number,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements => {
   const series = spreadsheet.series;
   const layout = getCartesianChartLayout("line", series.length);
@@ -110,8 +113,16 @@ export const renderLineChart = (
     layout,
     max,
     isDevEnv(),
+    renderEnvironment,
   );
-  const xLabels = chartXLabels(spreadsheet, x, y, backgroundColor, layout);
+  const xLabels = chartXLabels(
+    spreadsheet,
+    x,
+    y,
+    backgroundColor,
+    layout,
+    renderEnvironment,
+  );
   const xLabelsBottomY = Math.max(
     y + layout.gap / 2,
     ...xLabels.map((label) => getRotatedTextElementBottom(label)),
@@ -124,6 +135,7 @@ export const renderLineChart = (
     xLabelsBottomY,
     y + layout.gap * 5,
     backgroundColor,
+    renderEnvironment,
   );
 
   return [...baseElements, ...lines, ...guides, ...dots, ...seriesLegend];

@@ -48,6 +48,7 @@ import {
   redrawTextBoundingBox,
 } from "../textElement";
 
+import type { RenderEnvironment } from "../renderEnvironment";
 import type {
   ExcalidrawElement,
   ExcalidrawStickyNoteElement,
@@ -710,6 +711,42 @@ describe("sticky note text layout", () => {
     );
     expect(measure.mock.calls.length).toBeLessThanOrEqual(12);
     measure.mockRestore();
+  });
+
+  it("measures the fit through the given render environment", () => {
+    // the test-env canvas provider reports 10px per character; a host whose
+    // canvas measures three times as wide is observable in the fitted label
+    const perChar = 3;
+    const env: RenderEnvironment = {
+      createCanvas: () =>
+        ({
+          getContext: () => ({
+            font: "",
+            measureText: (text: string) => ({ width: text.length * perChar }),
+          }),
+        } as unknown as HTMLCanvasElement),
+      createImage: () => ({} as HTMLImageElement),
+    };
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const defaultWidth = getStickyNoteLayout(sticky, text).text!.width;
+    expect(defaultWidth).toBe("short".length * 10);
+
+    // the pure layout
+    expect(
+      getStickyNoteLayout(sticky, text, { renderEnvironment: env }).text!.width,
+    ).toBe(defaultWidth * perChar);
+
+    // ...and both ways of applying it to a scene
+    updateStickyNoteLayout(sticky, scene, { renderEnvironment: env });
+    expect(getBoundText(scene, textId).width).toBe(defaultWidth * perChar);
+
+    redrawTextBoundingBox(getBoundText(scene, textId), sticky, scene);
+    expect(getBoundText(scene, textId).width).toBe(defaultWidth);
+
+    redrawTextBoundingBox(getBoundText(scene, textId), sticky, scene, env);
+    expect(getBoundText(scene, textId).width).toBe(defaultWidth * perChar);
   });
 
   it("honors a lowered ceiling even when the old fitted size still fits", () => {

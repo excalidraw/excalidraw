@@ -1,5 +1,4 @@
-import { useRef } from "react";
-import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+import { useEffect, useRef, useState } from "react";
 import { isFiniteNumber } from "@excalidraw/math";
 
 import { useAtom } from "../../../editor-jotai";
@@ -17,18 +16,25 @@ import {
   removeLastAssistantMessage,
   updateAssistantContent,
 } from "../utils/chat";
+import { isModuleLoadError } from "../utils/mermaidError";
 
-import type { LLMMessage, TTTDDialog } from "../types";
+import type {
+  LLMMessage,
+  MermaidToExcalidrawLibProps,
+  TTTDDialog,
+} from "../types";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 10000;
 
 export const useTextGeneration = ({
   onTextSubmit,
+  mermaidToExcalidrawLib,
 }: {
   onTextSubmit: (
     props: TTTDDialog.OnTextSubmitProps,
   ) => Promise<TTTDDialog.OnTextSubmitRetValue>;
+  mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
 }) => {
   const [, setError] = useAtom(errorAtom);
   const [rateLimits, setRateLimits] = useAtom(rateLimitsAtom);
@@ -38,6 +44,66 @@ export const useTextGeneration = ({
     useChatAgent();
 
   const streamingAbortControllerRef = useRef<AbortController | null>(null);
+
+  // the lib may get reloaded (retry) while a generation is in flight, so
+  // always validate against the latest one
+  const mermaidToExcalidrawLibRef = useRef(mermaidToExcalidrawLib);
+  mermaidToExcalidrawLibRef.current = mermaidToExcalidrawLib;
+
+  // generated mermaid that couldn't be validated because the lib failed to
+  // load (e.g. offline) -> validated once the lib loads
+  const [pendingValidation, setPendingValidation] = useState<string | null>(
+    null,
+  );
+
+  const validateMermaid = async (
+    { parseMermaidToExcalidraw }: Awaited<MermaidToExcalidrawLibProps["api"]>,
+    mermaidDefinition: string,
+  ) => {
+    try {
+      await parseMermaidToExcalidraw(mermaidDefinition);
+      trackEvent("ai", "mermaid parse success", "ttd");
+    } catch (error: any) {
+      if (isModuleLoadError(error)) {
+        // not a syntax error, but a diagram chunk failing to load
+        setPendingValidation(mermaidDefinition);
+        return;
+      }
+      trackEvent("ai", "mermaid parse failed", "ttd");
+      const _error = new Error(
+        error.message || t("chat.errors.mermaidParseError"),
+      );
+      setAssistantError(_error.message, "parse");
+      setError(_error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      pendingValidation === null ||
+      mermaidToExcalidrawLib.status !== "loaded"
+    ) {
+      return;
+    }
+    setPendingValidation(null);
+
+    // skip if the user has moved on (new generation, switched chats, ...)
+    const lastAssistantMessage = getLastAssistantMessage(chatHistory);
+    if (
+      lastAssistantMessage?.isGenerating ||
+      lastAssistantMessage?.error ||
+      (lastAssistantMessage?.content ?? "") !== pendingValidation
+    ) {
+      return;
+    }
+
+    mermaidToExcalidrawLib.api.then(
+      (api) => validateMermaid(api, pendingValidation),
+      () => {},
+    );
+    // validateMermaid only closes over stable setters
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingValidation, mermaidToExcalidrawLib, chatHistory]);
 
   const validatePrompt = (prompt: string): boolean => {
     if (
@@ -76,6 +142,7 @@ export const useTextGeneration = ({
     }
 
     setError(null);
+    setPendingValidation(null);
 
     const abortController = new AbortController();
     streamingAbortControllerRef.current = abortController;
@@ -190,17 +257,16 @@ export const useTextGeneration = ({
         return;
       }
 
+      let api;
       try {
-        await parseMermaidToExcalidraw(generatedResponse ?? "");
-        trackEvent("ai", "mermaid parse success", "ttd");
+        api = await mermaidToExcalidrawLibRef.current.api;
       } catch (error: any) {
-        trackEvent("ai", "mermaid parse failed", "ttd");
-        const _error = new Error(
-          error.message || t("chat.errors.mermaidParseError"),
-        );
-        setAssistantError(_error.message, "parse");
-        setError(_error);
+        console.error("Failed to load mermaid-to-excalidraw", error);
+        setPendingValidation(generatedResponse ?? "");
+        return;
       }
+
+      await validateMermaid(api, generatedResponse ?? "");
     } catch (error: any) {
       const _error = new Error(
         error.message || t("chat.errors.generationFailed"),

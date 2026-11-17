@@ -1,11 +1,14 @@
-import { getFontString } from "@excalidraw/common";
+import { getFontString, KEYS, matchKey } from "@excalidraw/common";
 
 import {
+  getElementBounds,
   getTextAnchorRatios,
+  isBoundToContainer,
   isExcalidrawElement,
   isNonDeletedElement,
   newElementWith,
   updateBoundElements,
+  wrapText,
 } from "@excalidraw/element";
 import { measureText } from "@excalidraw/element";
 
@@ -13,11 +16,91 @@ import { isTextElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { getSelectedElements } from "../scene";
 
 import { register } from "./register";
+
+import type { AppClassProperties, AppState } from "../types";
+
+/** the selected free texts (a container's text follows its container) */
+const getSelectedFreeTexts = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+) =>
+  getSelectedElements(elements, appState).filter(
+    (element) => isTextElement(element) && !isBoundToContainer(element),
+  );
+
+/**
+ * Room past its text for a text made to keep its width (px). One exactly as
+ * wide as its longest line is on the verge of wrapping, and Chrome lays the
+ * editor's text out in 1/64px steps, rounding each run of it up — a line
+ * being split into more runs as it's edited. The line can so come out a hair
+ * wider there than measured here, and wrap in the editor alone.
+ */
+const KEPT_TEXT_WIDTH_SLACK = 1;
+
+/**
+ * The text with auto-resizing toggled: growing with its content again,
+ * unwrapped — or keeping its width (and some: see `KEPT_TEXT_WIDTH_SLACK`),
+ * wrapping at it, which is at most the width a typed text stops growing at
+ * (see `AppText.getMaxTextWidth()`), even for a text already wider.
+ */
+const toggleTextAutoResize = (
+  text: ExcalidrawTextElement,
+  autoResize: boolean,
+  app: AppClassProperties,
+) => {
+  const font = getFontString(text);
+  const width = autoResize
+    ? null
+    : Math.min(
+        text.width + KEPT_TEXT_WIDTH_SLACK,
+        app.text.getMaxTextWidth(
+          app.text.getTextViewportOffsets(
+            getElementBounds(text, app.scene.getNonDeletedElementsMap()),
+          ),
+        ),
+      );
+  const nextText =
+    width === null
+      ? text.originalText
+      : wrapText(text.originalText, font, width, app.renderEnvironment);
+  const metrics = measureText(
+    nextText,
+    font,
+    text.lineHeight,
+    app.renderEnvironment,
+  );
+  const nextWidth = width ?? metrics.width;
+
+  // (un)wrapping resizes the box, so keep the point the text's alignment pins
+  // — otherwise a right-aligned or centred text slides sideways, and one
+  // bound to an arrow endpoint drags the arrow with it
+  const anchor = getTextAnchorRatios(text);
+
+  return newElementWith(text, {
+    autoResize,
+    width: nextWidth,
+    height: metrics.height,
+    x: text.x + (text.width - nextWidth) * anchor.x,
+    y: text.y + (text.height - metrics.height) * anchor.y,
+    text: nextText,
+  });
+};
+
+export const isTextAutoResizeShortcut = (
+  event: KeyboardEvent | React.KeyboardEvent<Element>,
+) =>
+  event.altKey &&
+  !event[KEYS.CTRL_OR_CMD] &&
+  !event.shiftKey &&
+  matchKey(event, KEYS.W);
 
 export const actionTextAutoResize = register({
   name: "autoResize",
@@ -32,57 +115,53 @@ export const actionTextAutoResize = register({
       !selectedElements[0].autoResize
     );
   },
+  /**
+   * Toggles auto-resizing of the given text (e.g. the one being edited), or
+   * else of the selected free texts: on if any of them wraps, else off.
+   */
   perform: (elements, appState, targetElement, app) => {
-    const selectedElements = getSelectedElements(elements, appState);
-
-    const targetTextElement =
-      isExcalidrawElement(targetElement) && isTextElement(targetElement)
-        ? targetElement
-        : (selectedElements[0] as ExcalidrawElement | undefined);
-
-    const target = elements.find(
-      (element) => element.id === targetTextElement?.id,
+    const targetIds = new Set(
+      (isExcalidrawElement(targetElement) &&
+      isTextElement(targetElement) &&
+      !isBoundToContainer(targetElement)
+        ? [targetElement]
+        : getSelectedFreeTexts(elements, appState)
+      ).map((element) => element.id),
     );
+    const targets = elements.filter(
+      (element) => targetIds.has(element.id) && isTextElement(element),
+    ) as ExcalidrawTextElement[];
 
-    if (!target || !isTextElement(target)) {
+    if (!targets.length) {
       return false;
     }
 
-    const metrics = measureText(
-      target.originalText,
-      getFontString(target),
-      target.lineHeight,
+    const autoResize = targets.some((text) => !text.autoResize);
+    const toggled = new Map(
+      targets
+        .filter((text) => text.autoResize !== autoResize)
+        .map((text) => [text.id, toggleTextAutoResize(text, autoResize, app)]),
     );
 
-    // unwrapping resizes the box, so keep the point the text's alignment pins
-    // — otherwise a right-aligned or centred text slides sideways, and one
-    // bound to an arrow endpoint drags the arrow with it
-    const anchor = getTextAnchorRatios(target);
-
-    const resized = newElementWith(target, {
-      autoResize: true,
-      width: metrics.width,
-      height: metrics.height,
-      x: target.x + (target.width - metrics.width) * anchor.x,
-      y: target.y + (target.height - metrics.height) * anchor.y,
-      text: target.originalText,
-    });
-
     // the anchor only pins one point of the box, so any other arrow bound to
-    // this text still has to be re-routed to its new geometry. The scene holds
-    // the pre-resize text, hence handing the new one over explicitly.
-    if (isNonDeletedElement(resized)) {
-      updateBoundElements(resized, app.scene, {
-        changedElements: new Map([[resized.id, resized]]),
-      });
+    // a text still has to be re-routed to its new geometry. The scene holds
+    // the texts as they were, hence handing the new ones over explicitly.
+    for (const text of toggled.values()) {
+      if (isNonDeletedElement(text)) {
+        updateBoundElements(text, app.scene, {
+          changedElements: new Map([[text.id, text]]),
+          renderEnvironment: app.renderEnvironment,
+        });
+      }
     }
 
     return {
       appState,
-      elements: elements.map((element) =>
-        element.id === resized.id ? resized : element,
-      ),
+      elements: elements.map((element) => toggled.get(element.id) ?? element),
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+  keyTest: (event, appState, elements) =>
+    isTextAutoResizeShortcut(event) &&
+    getSelectedFreeTexts(elements, appState).length > 0,
 });

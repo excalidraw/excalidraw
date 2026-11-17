@@ -34,6 +34,8 @@ import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -345,6 +347,7 @@ export const newTextElement = (
     autoResize?: ExcalidrawTextElement["autoResize"];
     labelPosition?: ExcalidrawTextElement["labelPosition"];
     baseFontSize?: ExcalidrawTextElement["baseFontSize"];
+    renderEnvironment?: RenderEnvironment;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -355,6 +358,7 @@ export const newTextElement = (
     text,
     getFontString({ fontFamily, fontSize }),
     lineHeight,
+    opts.renderEnvironment,
   );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
@@ -394,6 +398,9 @@ const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
   elementsMap: ElementsMap,
   nextText: string,
+  /** the width the text is to take regardless of its content */
+  nextFixedWidth?: number,
+  renderEnvironment?: RenderEnvironment,
 ): {
   x: number;
   y: number;
@@ -404,10 +411,13 @@ const getAdjustedDimensions = (
     nextText,
     getFontString(element),
     element.lineHeight,
+    renderEnvironment,
   );
 
   // wrapped text
-  if (!element.autoResize) {
+  if (nextFixedWidth !== undefined) {
+    nextWidth = nextFixedWidth;
+  } else if (!element.autoResize) {
     nextWidth = element.width;
   }
 
@@ -424,6 +434,7 @@ const getAdjustedDimensions = (
       element.text,
       getFontString(element),
       element.lineHeight,
+      renderEnvironment,
     );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
@@ -531,9 +542,42 @@ export const refreshTextDimensions = (
   container: ExcalidrawTextContainer | null,
   elementsMap: ElementsMap,
   text = textElement.text,
+  /**
+   * For a free text that grows with its content (`autoResize`): the widest
+   * it may grow to. Crossing it, the text stops growing and wraps at this
+   * width from then on (`autoResize: false`), anchored as its growth was. A
+   * text that is already wider keeps growing.
+   */
+  maxWidth?: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (textElement.isDeleted) {
     return;
+  }
+  if (
+    maxWidth !== undefined &&
+    !container &&
+    textElement.autoResize &&
+    textElement.width <= maxWidth
+  ) {
+    const font = getFontString(textElement);
+    if (
+      measureText(text, font, textElement.lineHeight, renderEnvironment).width >
+      maxWidth
+    ) {
+      const wrappedText = wrapText(text, font, maxWidth, renderEnvironment);
+      return {
+        text: wrappedText,
+        autoResize: false,
+        ...getAdjustedDimensions(
+          textElement,
+          elementsMap,
+          wrappedText,
+          maxWidth,
+          renderEnvironment,
+        ),
+      };
+    }
   }
   if (container || !textElement.autoResize) {
     text = wrapText(
@@ -542,9 +586,16 @@ export const refreshTextDimensions = (
       container
         ? getBoundTextMaxWidth(container, textElement)
         : textElement.width,
+      renderEnvironment,
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
+  const dimensions = getAdjustedDimensions(
+    textElement,
+    elementsMap,
+    text,
+    undefined,
+    renderEnvironment,
+  );
   return { text, ...dimensions };
 };
 

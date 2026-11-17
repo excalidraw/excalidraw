@@ -64,6 +64,7 @@ import { Scene } from "./Scene";
 import type { BindableProp, BindingProp } from "./binding";
 
 import type { ElementUpdate } from "./mutateElement";
+import type { RenderEnvironment } from "./renderEnvironment";
 
 /**
  * Represents the difference between two objects of the same type.
@@ -1019,6 +1020,11 @@ type ElementPartial<TElement extends ExcalidrawElement = ExcalidrawElement> =
 
 export type ApplyToOptions = {
   excludedProperties?: Set<keyof ElementPartial>;
+  /**
+   * measures the labels re-laid out after applying (bound texts, and the
+   * labels of bound arrows) -- the editor passes the host's
+   */
+  renderEnvironment?: RenderEnvironment;
 };
 
 type ApplyToFlags = {
@@ -1508,7 +1514,11 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
             )
           : undefined;
 
-      ElementsDelta.redrawElements(nextElements, changedElements);
+      ElementsDelta.redrawElements(
+        nextElements,
+        changedElements,
+        options?.renderEnvironment,
+      );
 
       if (versionsBeforeRedraw) {
         for (const [id, element] of nextElements) {
@@ -2034,6 +2044,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   public static redrawElements(
     nextElements: SceneElementsMap,
     changedElements: Map<string, OrderedExcalidrawElement>,
+    renderEnvironment?: RenderEnvironment,
   ) {
     try {
       // we don't have an up-to-date scene, as we can be just in the middle of applying history entry
@@ -2041,10 +2052,18 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       // so we are creating a temp scene just to query and mutate elements
       const tempScene = new Scene(nextElements, { skipValidation: true });
 
-      ElementsDelta.redrawTextBoundingBoxes(tempScene, changedElements);
+      ElementsDelta.redrawTextBoundingBoxes(
+        tempScene,
+        changedElements,
+        renderEnvironment,
+      );
 
       // needs ordered nextElements to avoid z-index binding issues
-      ElementsDelta.redrawBoundArrows(tempScene, changedElements);
+      ElementsDelta.redrawBoundArrows(
+        tempScene,
+        changedElements,
+        renderEnvironment,
+      );
     } catch (e) {
       console.error(`Couldn't redraw elements`, e);
 
@@ -2059,6 +2078,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   private static redrawTextBoundingBoxes(
     scene: Scene,
     changed: Map<string, OrderedExcalidrawElement>,
+    renderEnvironment?: RenderEnvironment,
   ) {
     const elements = scene.getNonDeletedElementsMap();
     const boxesToRedraw = new Map<
@@ -2100,13 +2120,14 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         continue;
       }
 
-      redrawTextBoundingBox(boundText, container, scene);
+      redrawTextBoundingBox(boundText, container, scene, renderEnvironment);
     }
   }
 
   private static redrawBoundArrows(
     scene: Scene,
     changed: Map<string, OrderedExcalidrawElement>,
+    renderEnvironment?: RenderEnvironment,
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
@@ -2116,6 +2137,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           scene,
           {
             changedElements: changed,
+            renderEnvironment,
           },
         );
       }
@@ -2145,7 +2167,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         return acc;
       },
-      new Map(),
+      new Map<string, OrderedExcalidrawElement>(),
     );
 
     if (!flags.containsVisibleDifference && moved.size) {
@@ -2153,9 +2175,37 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       flags.containsVisibleDifference = true;
     }
 
-    // synchronize all elements that were actually moved
+    // The elements keep the indices they were given, as other history entries
+    // refer to them. Of those sharing one, a single element keeps it: one that
+    // isn't changed, or else one that isn't deleted (a deleted one is given
+    // its own index again when restored). The rest get new ones.
+    const rank = (element: OrderedExcalidrawElement) =>
+      element.isDeleted ? 0 : changed.has(element.id) ? 1 : 2;
+    let conflicting = new Map<string, OrderedExcalidrawElement>();
+    let keeper = 0;
+    for (let i = 0; i < ordered.length; i++) {
+      if (!ordered[i].index) {
+        // not all are ordered by their indices: all the moved get new ones
+        conflicting = moved;
+        break;
+      }
+      if (i === keeper || ordered[i].index !== ordered[keeper].index) {
+        keeper = i;
+        continue;
+      }
+      const loser = rank(ordered[i]) > rank(ordered[keeper]) ? keeper : i;
+      keeper = loser === i ? keeper : i;
+      // (a copy of an unchanged element, as the instance is the caller's)
+      ordered[loser] = changed.has(ordered[loser].id)
+        ? ordered[loser]
+        : { ...ordered[loser] };
+      conflicting.set(ordered[loser].id, ordered[loser]);
+    }
+
     // could fallback to synchronizing all invalid indices
-    return arrayToMap(syncMovedIndices(ordered, moved)) as typeof elements;
+    return arrayToMap(
+      syncMovedIndices(ordered, conflicting),
+    ) as typeof elements;
   }
 
   /**

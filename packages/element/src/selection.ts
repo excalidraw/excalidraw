@@ -1,4 +1,4 @@
-import { arrayToMap, isShallowEqual, type Bounds } from "@excalidraw/common";
+import { isShallowEqual, type Bounds } from "@excalidraw/common";
 
 import type {
   AppState,
@@ -11,26 +11,23 @@ import { isElementInViewport } from "./sizeHelpers";
 import {
   isBoundToContainer,
   isFrameLikeElement,
-  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import { getFrameChildren } from "./frame";
-
-import { LinearElementEditor } from "./linearElementEditor";
-import { selectGroupsForSelectedElements } from "./groups";
 
 import { isNonDeletedElement } from ".";
 
 import type {
   ElementsMap,
   ElementsMapOrArray,
+  ExcalidrawTextElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
 
-const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
+export const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
   element.locked || isBoundToContainer(element);
 
 const excludeElementsFromFrames = <T extends ExcalidrawElement>(
@@ -245,61 +242,25 @@ export const makeNextSelectedElementIds = (
   return nextSelectedElementIds;
 };
 
-const _getLinearElementEditor = (
-  targetElements: readonly NonDeletedExcalidrawElement[],
-  allElements: readonly NonDeletedExcalidrawElement[],
-) => {
-  const linears = targetElements.filter(isLinearElement);
-  if (linears.length === 1) {
-    const linear = linears[0];
-    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
-    const onlySingleLinearSelected = targetElements.every(
-      (el) => el.id === linear.id || boundElements.includes(el.id),
-    );
-
-    if (onlySingleLinearSelected) {
-      return new LinearElementEditor(linear, arrayToMap(allElements));
-    }
-  }
-
-  return null;
-};
-
-export const getSelectionStateForElements = (
-  targetElements: readonly NonDeletedExcalidrawElement[],
-  allElements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-) => {
-  return {
-    selectedLinearElement: _getLinearElementEditor(targetElements, allElements),
-    ...selectGroupsForSelectedElements(
-      {
-        editingGroupId: appState.editingGroupId,
-        selectedElementIds: excludeElementsInFramesFromSelection(
-          targetElements,
-        ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
-          if (!isBoundToContainer(element)) {
-            acc[element.id] = true;
-          }
-          return acc;
-        }, {}),
-      },
-      allElements,
-      appState,
-      null,
-    ),
-  };
-};
-
 /**
  * Returns editing or single-selected text element, if any.
  */
 export const getActiveTextElement = (
   selectedElements: readonly NonDeleted<ExcalidrawElement>[],
   appState: Pick<AppState, "editingTextElement">,
+  elementsMap: ElementsMap,
 ) => {
+  // `editingTextElement` is the element as it was when editing started, so
+  // resolve the current one (typing changes its dimensions and position)
+  const editingTextElement =
+    appState.editingTextElement &&
+    ((elementsMap.get(appState.editingTextElement.id) as
+      | ExcalidrawTextElement
+      | undefined) ||
+      appState.editingTextElement);
+
   const activeTextElement =
-    appState.editingTextElement ||
+    editingTextElement ||
     (selectedElements.length === 1 &&
       isTextElement(selectedElements[0]) &&
       selectedElements[0]);

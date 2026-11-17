@@ -14,6 +14,8 @@ import {
   newTextElement,
 } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import {
@@ -43,6 +45,7 @@ export const renderRadarChart = (
   x: number,
   y: number,
   colorSeed?: number,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements | null => {
   if (!isSpreadsheetValidForChartType(spreadsheet, "radar")) {
     return null;
@@ -72,6 +75,7 @@ export const renderRadarChart = (
     centerY,
     radius,
     backgroundColor,
+    renderEnvironment,
   );
 
   const titleFontFamily = FONT_FAMILY["Lilita One"];
@@ -86,10 +90,16 @@ export const renderRadarChart = (
         spreadsheet.title,
         titleFontString,
         chartWidth + RADAR_LABEL_OFFSET * 2,
+        renderEnvironment,
       )
     : null;
   const titleTextMetrics = titleText
-    ? measureText(titleText, titleFontString, titleLineHeight)
+    ? measureText(
+        titleText,
+        titleFontString,
+        titleLineHeight,
+        renderEnvironment,
+      )
     : null;
   const title = titleText
     ? newTextElement({
@@ -103,6 +113,7 @@ export const renderRadarChart = (
         fontSize: titleFontSize,
         lineHeight: titleLineHeight,
         textAlign: "center",
+        renderEnvironment,
       })
     : null;
 
@@ -186,6 +197,7 @@ export const renderRadarChart = (
     axisLabelBottomY,
     y + BAR_GAP * 5,
     backgroundColor,
+    renderEnvironment,
   );
 
   return [

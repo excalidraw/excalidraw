@@ -1,5 +1,7 @@
 # Website
 
+> **The developer docs have moved to [plus.excalidraw.com/docs/sdk](https://plus.excalidraw.com/docs/sdk).** `vercel.json` redirects every docs.excalidraw.com page to its new location, so changes here are no longer published.
+
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
 ### Installation

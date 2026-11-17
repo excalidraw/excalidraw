@@ -74,7 +74,11 @@ export const createUndoAction: ActionCreator = (history) => ({
   viewMode: false,
   perform: (elements, appState, value, app) =>
     executeHistoryAction(app, appState, () =>
-      history.undo(arrayToMap(elements) as SceneElementsMap, appState),
+      history.undo(
+        arrayToMap(elements) as SceneElementsMap,
+        appState,
+        app.renderEnvironment,
+      ),
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
@@ -113,7 +117,11 @@ export const createRedoAction: ActionCreator = (history) => ({
   viewMode: false,
   perform: (elements, appState, __, app) =>
     executeHistoryAction(app, appState, () =>
-      history.redo(arrayToMap(elements) as SceneElementsMap, appState),
+      history.redo(
+        arrayToMap(elements) as SceneElementsMap,
+        appState,
+        app.renderEnvironment,
+      ),
     ),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||

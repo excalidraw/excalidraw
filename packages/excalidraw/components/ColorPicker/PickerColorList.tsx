@@ -19,7 +19,7 @@ import {
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
-import { useColorPickerDnD } from "./topPicksDnD";
+import { useColorPickerDnD } from "./colorTopPicksDnD";
 
 import type { TranslationKeys } from "../../i18n";
 
@@ -108,7 +108,7 @@ const PickerColorList = ({
               setActiveColorPickerSection("baseColors");
             }}
             onPointerDown={
-              dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
+              dnd ? (event) => dnd.startSourceDrag(event, color) : undefined
             }
             title={`${label}${
               color.startsWith("#") ? ` ${color}` : ""

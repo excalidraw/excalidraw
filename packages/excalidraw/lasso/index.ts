@@ -9,7 +9,6 @@ import { LinearElementEditor } from "@excalidraw/element";
 import { isFrameLikeElement, isLinearElement } from "@excalidraw/element";
 
 import { getFrameChildren } from "@excalidraw/element";
-import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
 import {
   arrayToMap,
@@ -23,6 +22,8 @@ import type {
   ExcalidrawLinearElement,
   NonDeleted,
 } from "@excalidraw/element/types";
+
+import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { AnimatedTrail } from "../animatedTrail";
 import { getSelectionColor } from "../renderer/helpers";

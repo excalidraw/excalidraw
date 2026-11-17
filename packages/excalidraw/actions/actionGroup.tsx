@@ -19,7 +19,6 @@ import { KEYS, randomId, arrayToMap } from "@excalidraw/common";
 import {
   getSelectedGroupIds,
   selectGroup,
-  selectGroupsForSelectedElements,
   getElementsInGroup,
   addToGroup,
   removeFromSelectedGroups,
@@ -44,6 +43,8 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
 import { getShortcutKey } from "../shortcut";
+
+import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { register } from "./register";
 
