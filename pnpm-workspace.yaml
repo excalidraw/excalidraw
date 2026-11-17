@@ -6,9 +6,11 @@ packages:
 overrides:
   strip-ansi: 6.0.1
 
-# dependencies allowed to run install scripts (pnpm 10 blocks them by default)
-onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - core-js
-  - esbuild
-  - protobufjs
+saveExact: true
+
+# dependencies allowed to run install scripts (pnpm blocks them by default)
+allowBuilds:
+  "@parcel/watcher": true
+  core-js: true
+  esbuild: true
+  protobufjs: true

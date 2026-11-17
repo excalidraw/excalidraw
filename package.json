@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "excalidraw-monorepo",
-  "packageManager": "pnpm@10.34.9",
+  "packageManager": "pnpm@11.28.12",
   "devDependencies": {
     "@babel/preset-env": "7.26.9",
     "@excalidraw/common": "workspace:*",
@@ -54,7 +54,8 @@
     "which": "4.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.13.0",
+    "pnpm": ">=11.0.0"
   },
   "homepage": ".",
   "prettier": "@excalidraw/prettier-config",
@@ -98,8 +99,6 @@
     "release:test": "node scripts/release.js --tag=test",
     "release:next": "node scripts/release.js --tag=next",
     "release:latest": "node scripts/release.js --tag=latest",
-    "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist",
-    "rm:node_modules": "rimraf --glob node_modules excalidraw-app/node_modules packages/*/node_modules",
-    "clean-install": "pnpm rm:node_modules && pnpm install"
+    "rm:build": "rimraf --glob excalidraw-app/build excalidraw-app/dist excalidraw-app/dev-dist packages/*/dist packages/*/build examples/*/build examples/*/dist"
   }
 }
