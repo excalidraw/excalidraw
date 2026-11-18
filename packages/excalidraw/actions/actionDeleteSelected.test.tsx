@@ -1,5 +1,14 @@
 import React from "react";
 
+import { arrayToMap } from "@excalidraw/common";
+import { LinearElementEditor } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
+
+import type {
+  ExcalidrawArrowElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { act, assertElements, render } from "../tests/test-utils";
@@ -274,5 +283,86 @@ describe("cutting a selected frame takes its children along", () => {
       { id: r2.id, isDeleted: true },
       { id: t1.id, isDeleted: true },
     ]);
+  });
+});
+
+describe("deleting points of an arrow in the line editor", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  const deletePoints = (
+    arrow: NonDeleted<ExcalidrawArrowElement>,
+    selectedPointsIndices: number[],
+  ) => {
+    API.setSelectedElements([arrow]);
+    act(() => {
+      h.setState({
+        selectedLinearElement: {
+          ...new LinearElementEditor(arrow, arrayToMap(h.elements)),
+          isEditing: true,
+          selectedPointsIndices,
+        },
+      });
+    });
+    act(() => {
+      h.app.actionManager.executeAction(actionDeleteSelected);
+    });
+  };
+
+  const setup = () => {
+    const start = API.createElement({
+      type: "rectangle",
+      id: "start",
+      x: -105,
+      y: -50,
+      boundElements: [{ type: "arrow", id: "arrow" }],
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      id: "end",
+      x: 300,
+      y: -50,
+      boundElements: [{ type: "arrow", id: "arrow" }],
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow",
+      width: 295,
+      height: 100,
+      points: [pointFrom(0, 0), pointFrom(150, 100), pointFrom(295, 0)],
+      startBinding: { elementId: "start", fixedPoint: [1, 0.5], mode: "orbit" },
+      endBinding: { elementId: "end", fixedPoint: [0, 0.5], mode: "orbit" },
+    }) as NonDeleted<ExcalidrawArrowElement>;
+    API.setElements([start, end, arrow]);
+    return arrow;
+  };
+
+  it("unbinds a deleted endpoint", async () => {
+    const arrow = setup();
+
+    deletePoints(arrow, [2]);
+
+    expect(API.getElement(arrow)).toMatchObject({
+      startBinding: { elementId: "start" },
+      endBinding: null,
+    });
+    expect(API.getElement(arrow).points).toHaveLength(2);
+    assertElements(h.elements, [
+      { id: "start", boundElements: [{ type: "arrow", id: "arrow" }] },
+      { id: "end", boundElements: [] },
+      { id: "arrow", selected: true },
+    ]);
+  });
+
+  it("keeps the bindings when deleting a midpoint", async () => {
+    const arrow = setup();
+
+    deletePoints(arrow, [1]);
+
+    expect(API.getElement(arrow)).toMatchObject({
+      startBinding: { elementId: "start" },
+      endBinding: { elementId: "end" },
+    });
   });
 });
