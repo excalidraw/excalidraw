@@ -1,6 +1,12 @@
 import React from "react";
 
-import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
+import {
+  DEFAULT_VERSION,
+  getVersion,
+  isDarwin,
+  isFirefox,
+  isWindows,
+} from "@excalidraw/common";
 
 import { KEYS } from "@excalidraw/common";
 
@@ -58,6 +64,19 @@ const Header = () => (
     </a>
   </div>
 );
+
+const Version = () => {
+  const version = getVersion();
+
+  return (
+    <div className="HelpDialog__version">
+      <span>{t("stats.version")}</span>
+      <code>
+        {version === DEFAULT_VERSION ? t("stats.versionNotAvailable") : version}
+      </code>
+    </div>
+  );
+};
 
 const Section = (props: { title: string; children: React.ReactNode }) => (
   <>
@@ -141,6 +160,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         className={"HelpDialog"}
       >
         <Header />
+        <Version />
         <Section title={t("helpDialog.shortcuts")}>
           <ShortcutIsland
             className="HelpDialog__island--tools"
