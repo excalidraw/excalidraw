@@ -1010,7 +1010,7 @@ export const renderSelectionElement = (
 
   // render from 0.5px offset  to get 1px wide line
   // https://stackoverflow.com/questions/7530593/html5-canvas-and-line-width/7531540#7531540
-  // TODO can be be improved by offseting to the negative when user selects
+  // TODO can be be improved by offsetting to the negative when user selects
   // from right to left
   const offset = 0.5 / appState.zoom.value;
 

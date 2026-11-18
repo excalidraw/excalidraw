@@ -143,7 +143,7 @@ export class Store {
       // immediately create an immutable change of the scheduled updates,
       // compared to the current state, so that they won't mutate later on during batching
       // also, we have to compare against the current state,
-      // as comparing against the snapshot might include yet uncomitted changes (i.e. async freedraw / text / image, etc.)
+      // as comparing against the snapshot might include yet uncommitted changes (i.e. async freedraw / text / image, etc.)
       const currentSnapshot = StoreSnapshot.create(
         this.app.scene.getElementsMapIncludingDeleted(),
         this.app.state,
