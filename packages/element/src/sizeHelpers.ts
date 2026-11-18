@@ -13,6 +13,8 @@ import { pointsEqual } from "@excalidraw/math";
 
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
+import type { LocalPoint } from "@excalidraw/math";
+
 import { getCommonBounds, getElementBounds } from "./bounds";
 import {
   isArrowElement,
@@ -20,7 +22,11 @@ import {
   isLinearElement,
 } from "./typeChecks";
 
-import type { ElementsMap, ExcalidrawElement } from "./types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+} from "./types";
 
 export type VerticalResizeAnchor = "top" | "bottom" | "center";
 
@@ -55,13 +61,47 @@ export const getPositionAfterHeightChange = (
 
 export const INVISIBLY_SMALL_ELEMENT_SIZE = 0.1;
 
+/**
+ * A free draw stroke whose points are all (nearly) coincident renders as a
+ * dot rather than a line.
+ */
+export const arePointsCoincident = (points: readonly LocalPoint[]): boolean => {
+  const [firstPoint] = points;
+
+  return (
+    points.length > 0 &&
+    points.every((point) =>
+      pointsEqual(point, firstPoint, INVISIBLY_SMALL_ELEMENT_SIZE),
+    )
+  );
+};
+
+/**
+ * A free draw element whose points are all coincident is a dot — it has no
+ * extent, and therefore no bounding box to resize against.
+ */
+export const isSinglePointFreeDrawElement = <T extends ExcalidrawElement>(
+  element?: T | null,
+): element is T & ExcalidrawFreeDrawElement => {
+  return (
+    isFreeDrawElement(element) &&
+    (element.points.length < 2 || arePointsCoincident(element.points))
+  );
+};
+
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
 //        - could also be part of `_clearElements`
 export const isInvisiblySmallElement = (
   element: ExcalidrawElement,
 ): boolean => {
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
+  if (isFreeDrawElement(element)) {
+    // a free draw element with a single point renders as a dot — it is
+    // visible, and must not be discarded
+    return element.points.length === 0;
+  }
+
+  if (isLinearElement(element)) {
     return (
       element.points.length < 2 ||
       (element.points.length === 2 &&
