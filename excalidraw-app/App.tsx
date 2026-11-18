@@ -93,6 +93,7 @@ import {
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
+import { APP_ROUTES } from "./app_routes";
 import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
@@ -1312,7 +1313,7 @@ const ExcalidrawWrapper = () => {
 
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
-    window.location.pathname === "/excalidraw-plus-export";
+    window.location.pathname === APP_ROUTES.excalidrawPlusExport;
   if (isCloudExportWindow) {
     return <ExcalidrawPlusIframeExport />;
   }
