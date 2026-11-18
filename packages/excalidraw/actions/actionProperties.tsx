@@ -54,6 +54,7 @@ import {
 
 import {
   isArrowElement,
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
@@ -717,15 +718,32 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeStrokeWidth: value must be defined");
 
+    const changedElements = new Map<string, ExcalidrawElement>();
+    const updatedElements = changeProperty(elements, appState, (el) => {
+      const nextElement = newElementWith(el, {
+        strokeWidth: getStrokeWidthForElement(el, value),
+      });
+      changedElements.set(nextElement.id, nextElement);
+      return nextElement;
+    });
+
+    // stroke width changes the binding gap, so re-route bound arrows (see #12472)
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    }).forEach((element) => {
+      if (isBindableElement(element) && isNonDeletedElement(element)) {
+        updateBoundElements(element, app.scene, {
+          renderEnvironment: app.renderEnvironment,
+          changedElements,
+        });
+      }
+    });
+
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          strokeWidth: getStrokeWidthForElement(el, value),
-        }),
-      ),
+      elements: updatedElements,
       appState: { ...appState, currentItemStrokeWidthKey: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -1765,14 +1783,14 @@ export const actionChangeRoundness = register<"sharp" | "round">({
   name: "changeRoundness",
   label: "Change edge roundness",
   trackEvent: false,
-  perform: (elements, appState, value) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (isElbowArrow(el)) {
-          return el;
-        }
+  perform: (elements, appState, value, app) => {
+    const changedElements = new Map<string, ExcalidrawElement>();
+    const updatedElements = changeProperty(elements, appState, (el) => {
+      if (isElbowArrow(el)) {
+        return el;
+      }
 
-        const nextElement = newElementWith(el, {
+      const nextElement = newElementWith(el, {
           roundness:
             value === "round"
               ? {
@@ -1783,8 +1801,24 @@ export const actionChangeRoundness = register<"sharp" | "round">({
               : null,
         });
 
+        changedElements.set(nextElement.id, nextElement);
         return nextElement;
-      }),
+      });
+
+    // roundness changes the outline, so re-route bound arrows (see #12472)
+    getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    }).forEach((element) => {
+      if (isBindableElement(element) && isNonDeletedElement(element)) {
+        updateBoundElements(element, app.scene, {
+          renderEnvironment: app.renderEnvironment,
+          changedElements,
+        });
+      }
+    });
+
+    return {
+      elements: updatedElements,
       appState: {
         ...appState,
         currentItemRoundness: value,
