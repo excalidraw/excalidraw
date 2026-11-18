@@ -449,6 +449,7 @@ export interface AppState {
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemFreedrawPointer: "crosshair" | "dot";
   currentItemStickynoteStrokeColor: string;
   currentItemStickynoteBackgroundColor: string;
   currentItemBackgroundColor: string;
