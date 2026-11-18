@@ -138,6 +138,7 @@ export class FileManager {
 
   getFiles = async (
     ids: FileId[],
+    pendingFileIds: ReadonlySet<FileId> = new Set(),
   ): Promise<{
     loadedFiles: BinaryFileData[];
     erroredFiles: Map<FileId, true>;
@@ -156,6 +157,10 @@ export class FileManager {
 
     try {
       const { loadedFiles, erroredFiles } = await this._getFiles(ids);
+
+      for (const id of pendingFileIds) {
+        erroredFiles.delete(id);
+      }
 
       for (const file of loadedFiles) {
         this.savedFiles.set(file.id, this.getFileVersion(file));

@@ -1,39 +1,30 @@
-import { STORAGE_KEYS } from "../app_constants";
+import type { STORAGE_KEYS } from "../app_constants";
 
-// in-memory state (this tab's current state) versions. Currently just
-// timestamps of the last time the state was saved to browser storage.
-const LOCAL_STATE_VERSIONS = {
-  [STORAGE_KEYS.VERSION_DATA_STATE]: -1,
-  [STORAGE_KEYS.VERSION_FILES]: -1,
-};
+type BrowserStateTypes =
+  | typeof STORAGE_KEYS.VERSION_DATA_STATE
+  | typeof STORAGE_KEYS.VERSION_FILES;
 
-type BrowserStateTypes = keyof typeof LOCAL_STATE_VERSIONS;
-
-export const isBrowserStorageStateNewer = (type: BrowserStateTypes) => {
-  const storageTimestamp = JSON.parse(localStorage.getItem(type) || "-1");
-  return storageTimestamp > LOCAL_STATE_VERSIONS[type];
-};
-
-export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
-  const timestamp = Date.now();
+const getBrowserStorageStateVersion = (type: BrowserStateTypes): number => {
   try {
-    localStorage.setItem(type, JSON.stringify(timestamp));
-    LOCAL_STATE_VERSIONS[type] = timestamp;
-  } catch (error) {
-    console.error("error while updating browser state verison", error);
+    const value = JSON.parse(localStorage.getItem(type) || "-1");
+    return typeof value === "number" &&
+      Number.isSafeInteger(value) &&
+      value >= -1
+      ? value
+      : -1;
+  } catch {
+    return -1;
   }
 };
 
-export const resetBrowserStateVersions = () => {
+export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
   try {
-    for (const key of Object.keys(
-      LOCAL_STATE_VERSIONS,
-    ) as BrowserStateTypes[]) {
-      const timestamp = -1;
-      localStorage.setItem(key, JSON.stringify(timestamp));
-      LOCAL_STATE_VERSIONS[key] = timestamp;
-    }
+    const timestamp = Math.max(
+      Date.now(),
+      getBrowserStorageStateVersion(type) + 1,
+    );
+    localStorage.setItem(type, JSON.stringify(timestamp));
   } catch (error) {
-    console.error("error while resetting browser state verison", error);
+    console.error("error while updating browser state verison", error);
   }
 };

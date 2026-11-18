@@ -10,12 +10,8 @@
  *   (localStorage, indexedDB).
  */
 
-import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
-import {
-  CANVAS_SEARCH_TAB,
-  DEFAULT_SIDEBAR,
-  debounce,
-} from "@excalidraw/common";
+import { debounce } from "@excalidraw/common";
+import { getNonDeletedElements } from "@excalidraw/element";
 import {
   createStore,
   entries,
@@ -26,16 +22,13 @@ import {
   get,
 } from "idb-keyval";
 
-import { getNonDeletedElements } from "@excalidraw/element";
-
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
-  AppState,
-  BinaryFileData,
-  BinaryFiles,
-} from "@excalidraw/excalidraw/types";
+  OrderedExcalidrawElement,
+  FileId,
+} from "@excalidraw/element/types";
+import type { AppState, BinaryFileData } from "@excalidraw/excalidraw/types";
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { appJotaiStore, atom } from "../app-jotai";
@@ -45,10 +38,24 @@ import { FileManager } from "./FileManager";
 import { FileStatusStore } from "./fileStatusStore";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
+import { importFromLocalStorage, withBrowserStorageLock } from "./localStorage";
+import { LocalScene } from "./LocalScene";
+
+import type { LocalSceneSnapshot } from "./LocalScene";
 
 const filesStore = createStore("files-db", "files-store");
 
 export const localStorageQuotaExceededAtom = atom(false);
+export const localStorageSaveFailedAtom = atom(false);
+
+type SaveOptions = {
+  getSnapshot: () => LocalSceneSnapshot;
+  onFilesSaved: () => void;
+  onSync: (updates: {
+    elements?: readonly OrderedExcalidrawElement[];
+    appState?: Partial<AppState>;
+  }) => void;
+};
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
@@ -70,44 +77,6 @@ class LocalFileManager extends FileManager {
   };
 }
 
-const saveDataStateToLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  const localStorageQuotaExceeded = appJotaiStore.get(
-    localStorageQuotaExceededAtom,
-  );
-  try {
-    const _appState = clearAppStateForLocalStorage(appState);
-
-    if (
-      _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
-      _appState.openSidebar.tab === CANVAS_SEARCH_TAB
-    ) {
-      _appState.openSidebar = null;
-    }
-
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(_appState),
-    );
-    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
-    if (localStorageQuotaExceeded) {
-      appJotaiStore.set(localStorageQuotaExceededAtom, false);
-    }
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-    if (isQuotaExceededError(error) && !localStorageQuotaExceeded) {
-      appJotaiStore.set(localStorageQuotaExceededAtom, true);
-    }
-  }
-};
-
 const isQuotaExceededError = (error: any) => {
   return (
     error instanceof DOMException &&
@@ -122,45 +91,154 @@ const isQuotaExceededError = (error: any) => {
 type SavingLockTypes = "collaboration";
 
 export class LocalData {
-  private static _save = debounce(
-    async (
-      elements: readonly ExcalidrawElement[],
-      appState: AppState,
-      files: BinaryFiles,
-      onFilesSaved: () => void,
-    ) => {
-      saveDataStateToLocalStorage(elements, appState);
+  private static scene = new LocalScene();
+  private static generation = 0;
+  private static replaceOnNextSave = false;
+  private static scheduled = false;
+  private static pending = new Set<Promise<void>>();
 
-      await this.fileStorage.saveFiles({
-        elements,
-        files,
+  static load = () => {
+    this.generation++;
+    this._save.cancel();
+    this.scheduled = false;
+    this.replaceOnNextSave = false;
+    return withBrowserStorageLock(() =>
+      this.scene.load(importFromLocalStorage()),
+    ).catch((error) => {
+      console.error(error);
+      appJotaiStore.set(localStorageSaveFailedAtom, true);
+      return this.scene.load(importFromLocalStorage());
+    });
+  };
+
+  static getSaveSession = () => this.generation;
+
+  static replaceScene = () => {
+    this.generation++;
+    this._save.cancel();
+    this.scheduled = false;
+    this.replaceOnNextSave = true;
+  };
+
+  private static _save = debounce((options: SaveOptions) => {
+    this.scheduled = false;
+    const generation = this.generation;
+    const isCurrent = () =>
+      generation === this.generation && !this.locker.isLocked();
+    const operation = withBrowserStorageLock(() => {
+      if (!isCurrent()) {
+        return;
+      }
+      const snapshot = options.getSnapshot();
+      if (snapshot.appState.isLoading) {
+        return;
+      }
+      const stored = importFromLocalStorage();
+      const result = this.scene.reconcile(
+        snapshot,
+        stored,
+        this.replaceOnNextSave,
+      );
+      let persistedElements: readonly OrderedExcalidrawElement[] =
+        result.persistedElements;
+      let serializedElements = JSON.stringify(persistedElements);
+      const serializedAppState = JSON.stringify(result.appState);
+      if (
+        serializedElements !==
+          localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS) ||
+        serializedAppState !==
+          localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE)
+      ) {
+        try {
+          localStorage.setItem(
+            STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+            serializedElements,
+          );
+          localStorage.setItem(
+            STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+            serializedAppState,
+          );
+        } catch (error) {
+          const compactedElements = getNonDeletedElements(persistedElements);
+          if (
+            !isQuotaExceededError(error) ||
+            compactedElements.length === persistedElements.length
+          ) {
+            throw error;
+          }
+          persistedElements = compactedElements;
+          serializedElements = JSON.stringify(persistedElements);
+          localStorage.setItem(
+            STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+            serializedElements,
+          );
+          localStorage.setItem(
+            STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+            serializedAppState,
+          );
+        }
+        updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+      }
+      this.scene.accept(persistedElements, result.appState);
+      this.replaceOnNextSave = false;
+      appJotaiStore.set(localStorageQuotaExceededAtom, false);
+      appJotaiStore.set(localStorageSaveFailedAtom, false);
+      if (Object.keys(result.updates).length) {
+        options.onSync(result.updates);
+      }
+      return snapshot;
+    })
+      .then(async (snapshot) => {
+        if (!snapshot || !isCurrent()) {
+          return;
+        }
+        await this.fileStorage.saveFiles(snapshot);
+        if (isCurrent()) {
+          options.onFilesSaved();
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        appJotaiStore.set(
+          localStorageQuotaExceededAtom,
+          isQuotaExceededError(error),
+        );
+        appJotaiStore.set(
+          localStorageSaveFailedAtom,
+          !isQuotaExceededError(error),
+        );
       });
-      onFilesSaved();
-    },
-    SAVE_TO_LOCAL_STORAGE_TIMEOUT,
-  );
+    this.pending.add(operation);
+    void operation.finally(() => this.pending.delete(operation));
+  }, SAVE_TO_LOCAL_STORAGE_TIMEOUT);
 
   /** Saves DataState, including files. Bails if saving is paused */
-  static save = (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-    onFilesSaved: () => void,
-  ) => {
+  static save = (options: SaveOptions) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
     if (!this.isSavePaused()) {
-      this._save(elements, appState, files, onFilesSaved);
+      this.scheduled = true;
+      this._save(options);
     }
   };
 
   static flushSave = () => {
     this._save.flush();
+    return Promise.all([...this.pending]);
   };
+
+  static hasUnsavedChanges = () =>
+    this.scheduled ||
+    this.pending.size > 0 ||
+    appJotaiStore.get(localStorageQuotaExceededAtom) ||
+    appJotaiStore.get(localStorageSaveFailedAtom);
 
   private static locker = new Locker<SavingLockTypes>();
 
   static pauseSave = (lockType: SavingLockTypes) => {
     this.locker.lock(lockType);
+    this.generation++;
+    this._save.cancel();
+    this.scheduled = false;
   };
 
   static resumeSave = (lockType: SavingLockTypes) => {
@@ -199,7 +277,7 @@ export class LocalData {
 
           try {
             // save loaded files back to storage with updated `lastRetrieved`
-            setMany(filesToSave, filesStore);
+            await setMany(filesToSave, filesStore);
           } catch (error) {
             console.warn(error);
           }
@@ -212,11 +290,6 @@ export class LocalData {
       const savedFiles = new Map<FileId, BinaryFileData>();
       const erroredFiles = new Map<FileId, BinaryFileData>();
 
-      // before we use `storage` event synchronization, let's update the flag
-      // optimistically. Hopefully nothing fails, and an IDB read executed
-      // before an IDB write finishes will read the latest value.
-      updateBrowserStateVersion(STORAGE_KEYS.VERSION_FILES);
-
       await Promise.all(
         [...addedFiles].map(async ([id, fileData]) => {
           try {
@@ -228,6 +301,10 @@ export class LocalData {
           }
         }),
       );
+
+      if (savedFiles.size) {
+        updateBrowserStateVersion(STORAGE_KEYS.VERSION_FILES);
+      }
 
       return { savedFiles, erroredFiles };
     },
