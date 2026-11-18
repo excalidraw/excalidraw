@@ -11,6 +11,7 @@ const PACKAGES = [
   "fractional-indexing",
   "math",
   "element",
+  "history",
   "excalidraw",
 ];
 const PACKAGES_DIR = path.resolve(__dirname, "../packages");

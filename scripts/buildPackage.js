@@ -74,6 +74,7 @@ const getConfig = (outdir) => ({
   external: [
     "@excalidraw/common",
     "@excalidraw/element",
+    "@excalidraw/history",
     "@excalidraw/math",
     "@excalidraw/fractional-indexing",
   ],

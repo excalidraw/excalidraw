@@ -5,6 +5,8 @@ import {
 } from "@excalidraw/element";
 import { KEYS, isWritableElement } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { GroupId } from "@excalidraw/element/types";
 
 import { TOGGLE_TOOLS } from "../components/Tools";
@@ -12,8 +14,6 @@ import { TOGGLE_TOOLS } from "../components/Tools";
 import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { updateActiveTool } from "../appState";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

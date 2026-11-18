@@ -7,13 +7,13 @@ import {
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { LockedIcon, UnlockedIcon } from "../components/icons";
 
 import { getSelectedElements } from "../scene";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

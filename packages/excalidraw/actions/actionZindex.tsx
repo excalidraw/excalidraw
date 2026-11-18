@@ -7,6 +7,8 @@ import {
   moveAllRight,
 } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import {
   BringForwardIcon,
   BringToFrontIcon,
@@ -15,8 +17,6 @@ import {
 } from "../components/icons";
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

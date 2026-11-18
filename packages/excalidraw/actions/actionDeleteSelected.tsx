@@ -14,6 +14,8 @@ import { getFrameChildren } from "@excalidraw/element";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
@@ -26,8 +28,6 @@ import { useStylesPanelMode } from "../components/App.context";
 import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { updateActiveTool } from "../appState";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

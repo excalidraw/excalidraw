@@ -30,6 +30,7 @@
     "@excalidraw/common": "workspace:*",
     "@excalidraw/element": "workspace:*",
     "@excalidraw/excalidraw": "workspace:*",
+    "@excalidraw/history": "workspace:*",
     "@excalidraw/math": "workspace:*",
     "@excalidraw/random-username": "1.1.0",
     "@sentry/browser": "9.0.1",

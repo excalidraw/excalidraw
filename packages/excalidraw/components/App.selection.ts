@@ -16,6 +16,8 @@ import {
   makeNextSelectedElementIds,
 } from "@excalidraw/element";
 
+import { type CaptureUpdateActionType } from "@excalidraw/history";
+
 import type {
   ExcalidrawElement,
   GroupId,
@@ -23,8 +25,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
-
-import { type CaptureUpdateActionType } from "../captureUpdate";
 
 import type {
   AppClassProperties,

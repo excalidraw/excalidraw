@@ -4,8 +4,6 @@ import type {
   EditorInterface,
 } from "@excalidraw/common";
 
-import type { LinearElementEditor } from "@excalidraw/element";
-
 import type {
   ListMarkerAdvance,
   MaybeTransformHandleType,
@@ -73,8 +71,11 @@ import type {
   ElementsPendingErasure,
 } from "@excalidraw/element/types";
 
-import { type DurableIncrement, type EphemeralIncrement } from "./store";
-import { type CaptureUpdateActionType } from "./captureUpdate";
+import type {
+  CaptureUpdateActionType,
+  DurableIncrement,
+  EphemeralIncrement,
+} from "@excalidraw/history";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -250,26 +251,11 @@ export type InteractiveCanvasAppState = Readonly<
   }
 >;
 
-export type ObservedAppState = ObservedStandaloneAppState &
-  ObservedElementsAppState;
-
-export type ObservedStandaloneAppState = {
-  name: AppState["name"];
-  viewBackgroundColor: AppState["viewBackgroundColor"];
-};
-
-export type ObservedElementsAppState = {
-  editingGroupId: AppState["editingGroupId"];
-  selectedElementIds: AppState["selectedElementIds"];
-  selectedGroupIds: AppState["selectedGroupIds"];
-  selectedLinearElement: {
-    elementId: LinearElementEditor["elementId"];
-    isEditing: boolean;
-  } | null;
-  croppingElementId: AppState["croppingElementId"];
-  lockedMultiSelections: AppState["lockedMultiSelections"];
-  activeLockedId: AppState["activeLockedId"];
-};
+export type {
+  ObservedAppState,
+  ObservedStandaloneAppState,
+  ObservedElementsAppState,
+} from "@excalidraw/history";
 
 /**
  * The pointing device the wheel mappings are tuned for. `auto` is reserved

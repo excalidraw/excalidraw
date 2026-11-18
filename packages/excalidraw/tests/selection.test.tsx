@@ -9,13 +9,13 @@ import {
 } from "@excalidraw/element";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import { TOOLS } from "../components/Tools";
 
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { getTextEditor, updateTextEditor } from "./queries/dom";

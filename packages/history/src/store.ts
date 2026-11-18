@@ -24,9 +24,7 @@ import { CaptureUpdateAction } from "./captureUpdate";
 
 import type { CaptureUpdateActionType } from "./captureUpdate";
 
-import type App from "./components/App";
-
-import type { AppState, ObservedAppState } from "./types";
+import type { HistoryAppState, ObservedAppState, StoreHost } from "./types";
 
 import type { ApplyToOptions } from "./delta";
 
@@ -56,7 +54,7 @@ export class Store {
     this._snapshot = snapshot;
   }
 
-  constructor(private readonly app: App) {}
+  constructor(private readonly app: StoreHost) {}
 
   public scheduleAction(action: CaptureUpdateActionType) {
     this.scheduledMacroActions.add(action);
@@ -79,7 +77,7 @@ export class Store {
       | {
           action: CaptureUpdateActionType;
           elements: readonly ExcalidrawElement[] | undefined;
-          appState: AppState | ObservedAppState | undefined;
+          appState: HistoryAppState | ObservedAppState | undefined;
         }
       | {
           action: typeof CaptureUpdateAction.IMMEDIATELY;
@@ -142,7 +140,7 @@ export class Store {
    */
   public commit(
     elements: SceneElementsMap | undefined,
-    appState: AppState | ObservedAppState | undefined,
+    appState: HistoryAppState | ObservedAppState | undefined,
   ): void {
     // execute all scheduled micro actions first
     // similar to microTasks, there can be many
@@ -246,7 +244,7 @@ export class Store {
   private maybeCloneSnapshot(
     action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
-    appState: AppState | ObservedAppState | undefined,
+    appState: HistoryAppState | ObservedAppState | undefined,
   ) {
     if (!elements && !appState) {
       return null;
@@ -279,7 +277,7 @@ export class Store {
       | {
           action: CaptureUpdateActionType;
           elements: SceneElementsMap | undefined;
-          appState: AppState | ObservedAppState | undefined;
+          appState: HistoryAppState | ObservedAppState | undefined;
         }
       | {
           action: CaptureUpdateActionType;
@@ -544,12 +542,12 @@ export class StoreDelta {
   /**
    * Apply the delta to the passed elements and appState, does not modify the snapshot.
    */
-  public static applyTo(
+  public static applyTo<TAppState extends HistoryAppState>(
     delta: StoreDelta,
     elements: SceneElementsMap,
-    appState: AppState,
+    appState: TAppState,
     options?: ApplyToOptions,
-  ): [SceneElementsMap, AppState, boolean] {
+  ): [SceneElementsMap, TAppState, boolean] {
     const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
       elements,
       StoreSnapshot.empty().elements,

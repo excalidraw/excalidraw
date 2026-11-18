@@ -12,7 +12,7 @@ import {
   StoreIncrement,
   type DurableIncrement,
   type EphemeralIncrement,
-} from "@excalidraw/excalidraw/store";
+} from "@excalidraw/history";
 
 import ExcalidrawApp from "../App";
 

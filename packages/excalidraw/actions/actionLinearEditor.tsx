@@ -7,6 +7,8 @@ import { arrayToMap, invariant } from "@excalidraw/common";
 
 import { toggleLinePolygonState } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type {
   ExcalidrawLinearElement,
   ExcalidrawLineElement,
@@ -18,8 +20,6 @@ import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
 
 import { newElementWith } from "../../element/src/mutateElement";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

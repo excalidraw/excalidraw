@@ -23,6 +23,12 @@ import {
   randomId,
 } from "@excalidraw/common";
 
+import { StoreDelta } from "@excalidraw/history";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
+
+import { ElementsDelta, AppStateDelta } from "@excalidraw/history";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -53,11 +59,6 @@ import { Excalidraw } from "../index";
 import { createPasteEvent } from "../clipboard";
 
 import * as blobModule from "../data/blob";
-
-import { StoreDelta } from "../store";
-import { CaptureUpdateAction } from "../captureUpdate";
-
-import { ElementsDelta, AppStateDelta } from "../delta";
 
 import {
   DEER_IMAGE_DIMENSIONS,

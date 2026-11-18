@@ -12,6 +12,9 @@
     "./element/*": {
       "types": "./dist/types/element/src/*.d.ts"
     },
+    "./history/*": {
+      "types": "./dist/types/history/src/*.d.ts"
+    },
     "./math/*": {
       "types": "./dist/types/math/src/*.d.ts"
     },
@@ -45,6 +48,9 @@
       },
       "./element/*": {
         "types": "./dist/types/element/src/*.d.ts"
+      },
+      "./history/*": {
+        "types": "./dist/types/history/src/*.d.ts"
       },
       "./math/*": {
         "types": "./dist/types/math/src/*.d.ts"
@@ -115,6 +121,7 @@
     "@excalidraw/common": "workspace:*",
     "@excalidraw/element": "workspace:*",
     "@excalidraw/fractional-indexing": "workspace:*",
+    "@excalidraw/history": "workspace:*",
     "@excalidraw/laser-pointer": "workspace:*",
     "@excalidraw/math": "workspace:*",
     "@excalidraw/mermaid-to-excalidraw": "3.6.0",

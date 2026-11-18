@@ -17,6 +17,8 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
 
+import type { History } from "@excalidraw/history";
+
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 
 import "./matchers";
@@ -25,8 +27,6 @@ import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
 
 import { GlobalTestState, trimErrorStack } from "./testState";
-
-import type { History } from "../history";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 

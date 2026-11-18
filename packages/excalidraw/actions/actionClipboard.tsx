@@ -3,6 +3,8 @@ import { getTextFromElements } from "@excalidraw/element";
 
 import { CODES, KEYS, isFirefox } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import {
   copyTextToSystemClipboard,
   copyToClipboard,
@@ -14,8 +16,6 @@ import {
 import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { t } from "../i18n";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { register } from "./register";

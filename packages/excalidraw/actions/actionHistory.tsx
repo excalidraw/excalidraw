@@ -7,19 +7,21 @@ import {
 
 import { orderByFractionalIndex } from "@excalidraw/element";
 
+import { HistoryChangedEvent } from "@excalidraw/history";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { SceneElementsMap } from "@excalidraw/element/types";
+
+import type { History } from "@excalidraw/history";
 
 import { IconButton } from "../components/IconButton";
 import { UndoIcon, RedoIcon } from "../components/icons";
-import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 
 import { useStylesPanelMode } from "../components/App.context";
 
-import { CaptureUpdateAction } from "../captureUpdate";
-
-import type { History } from "../history";
 import type { AppClassProperties, AppState } from "../types";
 import type { Action, ActionResult } from "./types";
 

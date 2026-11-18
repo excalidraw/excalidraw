@@ -18,14 +18,14 @@ import {
   getVisibleElements,
 } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { SceneBounds } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getNormalizedZoom } from "./scene/normalize";
-
-import { CaptureUpdateAction } from "./captureUpdate";
 
 import type {
   AppState,

@@ -14,6 +14,8 @@ import {
   updateOriginalContainerCache,
 } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
@@ -38,8 +40,6 @@ import {
   unwrapFrame,
   wrapInFrame,
 } from "../actions/actionFrame";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { getSelectionStateForElements } from "./App.selection";
 

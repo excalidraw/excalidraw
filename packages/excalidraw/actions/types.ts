@@ -1,9 +1,9 @@
+import { type CaptureUpdateActionType } from "@excalidraw/history";
+
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
-
-import { type CaptureUpdateActionType } from "../captureUpdate";
 
 import type {
   AppClassProperties,

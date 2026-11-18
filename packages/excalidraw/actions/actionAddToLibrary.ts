@@ -1,9 +1,9 @@
 import { LIBRARY_DISABLED_TYPES, randomId } from "@excalidraw/common";
 import { deepCopyElement } from "@excalidraw/element";
 
-import { t } from "../i18n";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
-import { CaptureUpdateAction } from "../captureUpdate";
+import { t } from "../i18n";
 
 import { register } from "./register";
 

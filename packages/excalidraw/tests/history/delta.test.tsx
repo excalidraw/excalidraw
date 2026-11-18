@@ -3,6 +3,10 @@ import { pointFrom } from "@excalidraw/math";
 
 import { mutateElement, newElementWith } from "@excalidraw/element";
 
+import { AppStateDelta, ElementsDelta } from "@excalidraw/history";
+
+import { Delta } from "@excalidraw/history";
+
 import type { LinearElementEditor } from "@excalidraw/element";
 import type {
   ExcalidrawTextElement,
@@ -10,12 +14,9 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { AppStateDelta, ElementsDelta } from "../delta";
-import { Delta } from "../deltaBase";
+import type { ObservedAppState } from "@excalidraw/history";
 
-import { API } from "./helpers/api";
-
-import type { ObservedAppState } from "../types";
+import { API } from "../helpers/api";
 
 describe("ElementsDelta", () => {
   describe("visible changes", () => {

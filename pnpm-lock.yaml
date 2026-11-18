@@ -226,6 +226,9 @@ importers:
       '@excalidraw/excalidraw':
         specifier: workspace:*
         version: link:../packages/excalidraw
+      '@excalidraw/history':
+        specifier: workspace:*
+        version: link:../packages/history
       '@excalidraw/math':
         specifier: workspace:*
         version: link:../packages/math
@@ -379,6 +382,9 @@ importers:
       '@excalidraw/fractional-indexing':
         specifier: workspace:*
         version: link:../fractional-indexing
+      '@excalidraw/history':
+        specifier: workspace:*
+        version: link:../history
       '@excalidraw/laser-pointer':
         specifier: workspace:*
         version: link:../laser-pointer
@@ -539,6 +545,15 @@ importers:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
+
+  packages/history:
+    dependencies:
+      '@excalidraw/common':
+        specifier: workspace:*
+        version: link:../common
+      '@excalidraw/element':
+        specifier: workspace:*
+        version: link:../element
 
   packages/laser-pointer: {}
 

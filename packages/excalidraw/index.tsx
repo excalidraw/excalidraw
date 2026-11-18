@@ -476,7 +476,7 @@ export {
   bumpVersion,
 } from "@excalidraw/element";
 
-export { CaptureUpdateAction } from "./captureUpdate";
+export { CaptureUpdateAction } from "@excalidraw/history";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 

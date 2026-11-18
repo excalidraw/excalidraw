@@ -12,6 +12,8 @@ import { getNonDeletedElements } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { getCommonBounds } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { Bounds } from "@excalidraw/common";
 
 import { getDefaultAppState } from "../appState";
@@ -37,8 +39,6 @@ import {
   zoomToFitBounds,
 } from "../viewport";
 import { getShortcutKey } from "../shortcut";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

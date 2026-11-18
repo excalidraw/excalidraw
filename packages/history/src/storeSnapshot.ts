@@ -24,7 +24,7 @@ import { CaptureUpdateAction } from "./captureUpdate";
 import type { CaptureUpdateActionType } from "./captureUpdate";
 import type { StoreChange } from "./store";
 
-import type { AppState, ObservedAppState } from "./types";
+import type { HistoryAppState, ObservedAppState } from "./types";
 
 /**
  * Represents a snapshot of the captured or updated changes in the store,
@@ -50,7 +50,7 @@ export class StoreSnapshot {
 
   public static create(
     elements: SceneElementsMap,
-    appState: AppState | ObservedAppState,
+    appState: HistoryAppState | ObservedAppState,
     metadata: {
       didElementsChange: boolean;
       didAppStateChange: boolean;
@@ -151,7 +151,7 @@ export class StoreSnapshot {
   public maybeClone(
     action: CaptureUpdateActionType,
     elements: SceneElementsMap | undefined,
-    appState: AppState | ObservedAppState | undefined,
+    appState: HistoryAppState | ObservedAppState | undefined,
   ) {
     const options = {
       shouldCompareHashes: false,
@@ -201,7 +201,7 @@ export class StoreSnapshot {
   }
 
   private maybeCreateAppStateSnapshot(
-    appState: AppState | ObservedAppState | undefined,
+    appState: HistoryAppState | ObservedAppState | undefined,
     options: {
       shouldCompareHashes: boolean;
     } = {
@@ -377,7 +377,7 @@ export class StoreSnapshot {
 }
 
 export const getObservedAppState = (
-  appState: AppState | ObservedAppState,
+  appState: HistoryAppState | ObservedAppState,
 ): ObservedAppState => {
   const observedAppState = {
     name: appState.name,
@@ -422,6 +422,6 @@ const getDefaultObservedAppState = (): ObservedAppState => {
 };
 
 const isObservedAppState = (
-  appState: AppState | ObservedAppState,
+  appState: HistoryAppState | ObservedAppState,
 ): appState is ObservedAppState =>
   !!Reflect.get(appState, hiddenObservedAppStateProp);

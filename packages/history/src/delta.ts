@@ -60,7 +60,7 @@ import { StoreSnapshot } from "./storeSnapshot";
 import { Delta } from "./deltaBase";
 
 import type {
-  AppState,
+  HistoryAppState,
   ObservedAppState,
   ObservedElementsAppState,
   ObservedStandaloneAppState,
@@ -93,7 +93,7 @@ export interface DeltaContainer<T> {
   isEmpty(): boolean;
 }
 
-export class AppStateDelta implements DeltaContainer<AppState> {
+export class AppStateDelta implements DeltaContainer<HistoryAppState> {
   private constructor(public delta: Delta<ObservedAppState>) {}
 
   public static create(delta: Delta<ObservedAppState>): AppStateDelta {
@@ -201,10 +201,10 @@ export class AppStateDelta implements DeltaContainer<AppState> {
     return this;
   }
 
-  public applyTo(
-    appState: AppState,
+  public applyTo<TAppState extends HistoryAppState>(
+    appState: TAppState,
     nextElements: SceneElementsMap,
-  ): [AppState, boolean] {
+  ): [TAppState, boolean] {
     try {
       const {
         selectedElementIds: deletedSelectedElementIds = {},
@@ -250,7 +250,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
             )
           : null;
 
-      const nextAppState = {
+      const nextAppState: TAppState = {
         ...appState,
         ...directlyApplicablePartial,
         selectedElementIds: mergedSelectedElementIds,
@@ -291,8 +291,8 @@ export class AppStateDelta implements DeltaContainer<AppState> {
    * @returns `true` if a visible change is found, `false` otherwise.
    */
   private filterInvisibleChanges(
-    prevAppState: AppState,
-    nextAppState: AppState,
+    prevAppState: HistoryAppState,
+    nextAppState: HistoryAppState,
     nextElements: SceneElementsMap,
   ): boolean {
     // TODO: #7348 we could still get an empty undo/redo, as we assume that previous appstate does not contain references to deleted elements
@@ -443,7 +443,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 
   private static filterSelectedElements(
-    selectedElementIds: AppState["selectedElementIds"],
+    selectedElementIds: HistoryAppState["selectedElementIds"],
     elements: SceneElementsMap,
     visibleDifferenceFlag: { value: boolean },
   ) {
@@ -472,7 +472,7 @@ export class AppStateDelta implements DeltaContainer<AppState> {
   }
 
   private static filterSelectedGroups(
-    selectedGroupIds: AppState["selectedGroupIds"],
+    selectedGroupIds: HistoryAppState["selectedGroupIds"],
     nonDeletedGroupIds: Set<string>,
     visibleDifferenceFlag: { value: boolean },
   ) {

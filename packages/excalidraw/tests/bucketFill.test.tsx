@@ -5,6 +5,8 @@ import {
 } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type { ExcalidrawLineElement } from "@excalidraw/element/types";
@@ -12,8 +14,6 @@ import type { ExcalidrawLineElement } from "@excalidraw/element/types";
 import { Excalidraw } from "../index";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
 import { editorJotaiStore } from "../editor-jotai";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";

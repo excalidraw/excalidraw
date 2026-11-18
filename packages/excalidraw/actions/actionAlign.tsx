@@ -10,6 +10,8 @@ import { alignElements } from "@excalidraw/element";
 
 import { getSelectedElementsByGroup } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Alignment } from "@excalidraw/element";
@@ -29,8 +31,6 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
 import { getShortcutKey } from "../shortcut";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

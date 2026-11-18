@@ -14,14 +14,14 @@ import { measureText } from "@excalidraw/element";
 
 import { isTextElement } from "@excalidraw/element";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
 import { getSelectedElements } from "../scene";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

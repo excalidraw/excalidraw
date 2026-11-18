@@ -1,5 +1,7 @@
 import { KEYS, THEME } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import { useEditorInterface } from "../components/App.context";
@@ -19,8 +21,6 @@ import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
 
 import "../components/ToolIcon.scss";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { register } from "./register";
 

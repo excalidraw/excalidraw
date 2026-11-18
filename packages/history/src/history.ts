@@ -8,19 +8,19 @@ import { StoreChange, StoreDelta, type Store } from "./store";
 import { CaptureUpdateAction } from "./captureUpdate";
 import { type StoreSnapshot } from "./storeSnapshot";
 
-import type { AppState } from "./types";
+import type { HistoryAppState } from "./types";
 
 export class HistoryDelta extends StoreDelta {
   /**
    * Apply the delta to the passed elements and appState, does not modify the snapshot.
    */
-  public applyTo(
+  public applyTo<TAppState extends HistoryAppState>(
     elements: SceneElementsMap,
-    appState: AppState,
+    appState: TAppState,
     snapshot: StoreSnapshot,
     /** measures the labels re-laid out after applying */
     renderEnvironment?: RenderEnvironment,
-  ): [SceneElementsMap, AppState, boolean] {
+  ): [SceneElementsMap, TAppState, boolean] {
     const [nextElements, elementsContainVisibleChange] = this.elements.applyTo(
       elements,
       // used to fallback into local snapshot in case we couldn't apply the delta
@@ -137,9 +137,9 @@ export class History {
     );
   }
 
-  public undo(
+  public undo<TAppState extends HistoryAppState>(
     elements: SceneElementsMap,
-    appState: AppState,
+    appState: TAppState,
     /** measures the labels re-laid out after undoing (the host's, in the editor) */
     renderEnvironment?: RenderEnvironment,
   ) {
@@ -152,9 +152,9 @@ export class History {
     );
   }
 
-  public redo(
+  public redo<TAppState extends HistoryAppState>(
     elements: SceneElementsMap,
-    appState: AppState,
+    appState: TAppState,
     /** measures the labels re-laid out after redoing (the host's, in the editor) */
     renderEnvironment?: RenderEnvironment,
   ) {
@@ -167,13 +167,13 @@ export class History {
     );
   }
 
-  private perform(
+  private perform<TAppState extends HistoryAppState>(
     elements: SceneElementsMap,
-    appState: AppState,
+    appState: TAppState,
     pop: () => HistoryDelta | null,
     push: (entry: HistoryDelta) => void,
     renderEnvironment: RenderEnvironment | undefined,
-  ): [SceneElementsMap, AppState] | void {
+  ): [SceneElementsMap, TAppState] | void {
     try {
       let historyDelta = pop();
 

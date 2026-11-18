@@ -78,6 +78,11 @@ import {
 
 import { deriveStylesPanelMode } from "@excalidraw/common";
 
+import {
+  CaptureUpdateAction,
+  type CaptureUpdateActionType,
+} from "@excalidraw/history";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -168,11 +173,6 @@ import {
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
-
-import {
-  CaptureUpdateAction,
-  type CaptureUpdateActionType,
-} from "../captureUpdate";
 
 import {
   getColorTargetAppStateUpdates,

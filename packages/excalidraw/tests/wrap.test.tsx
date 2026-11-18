@@ -4,6 +4,8 @@ import { COLOR_PALETTE, KEYS, arrayToMap } from "@excalidraw/common";
 import { LinearElementEditor, newElementWith } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
+import { CaptureUpdateAction } from "@excalidraw/history";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
@@ -17,8 +19,6 @@ import {
   actionChangeStrokeColor,
 } from "../actions/actionProperties";
 import { Excalidraw } from "../index";
-
-import { CaptureUpdateAction } from "../captureUpdate";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";

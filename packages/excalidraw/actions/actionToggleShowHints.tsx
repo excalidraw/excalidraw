@@ -1,6 +1,6 @@
-import { messageCircleIcon } from "../components/icons";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
-import { CaptureUpdateAction } from "../captureUpdate";
+import { messageCircleIcon } from "../components/icons";
 
 import { register } from "./register";
 

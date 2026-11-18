@@ -1,4 +1,4 @@
-import { CaptureUpdateAction } from "../captureUpdate";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import { register } from "./register";
 

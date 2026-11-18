@@ -207,6 +207,16 @@ import {
   isNonDeletedElement,
 } from "@excalidraw/element";
 
+import { History } from "@excalidraw/history";
+
+import { Store, StoreDelta } from "@excalidraw/history";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
+
+import { getObservedAppState } from "@excalidraw/history";
+
+import { type ApplyToOptions } from "@excalidraw/history";
+
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import type {
@@ -307,7 +317,6 @@ import {
   copyElementRenderOverrides,
   getElementRenderOffsets,
 } from "../renderOverrides";
-import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
@@ -370,12 +379,6 @@ import {
 } from "../actions/colorTargets";
 
 import { updateActiveTool, isSelectionLikeTool } from "../appState";
-
-import { Store, StoreDelta } from "../store";
-import { CaptureUpdateAction } from "../captureUpdate";
-import { getObservedAppState } from "../storeSnapshot";
-
-import { type ApplyToOptions } from "../delta";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
