@@ -27,9 +27,11 @@ export const shouldDiscardRemoteElement = (
 ): boolean => {
   if (
     local &&
-    // local element is being edited
-    (local.id === localAppState.editingTextElement?.id ||
-      local.id === localAppState.resizingElement?.id ||
+    // local element is being edited. (Not a text in its editor: the editor
+    // holds the draft, and writes it on top of whatever the scene has by
+    // then, so the newest write wins on every client. Discarded, a remote
+    // copy isn't sent again, and the clients end up on different texts.)
+    (local.id === localAppState.resizingElement?.id ||
       local.id === localAppState.newElement?.id ||
       // local element is newer
       local.version > remote.version ||

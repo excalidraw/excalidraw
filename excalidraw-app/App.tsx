@@ -610,6 +610,13 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
+            // a text edit goes on through the sync: its editor takes the
+            // synced text, or closes if the text is gone
+            appState: localDataState.appState && {
+              ...localDataState.appState,
+              editingTextElement:
+                excalidrawAPI.getAppState().editingTextElement,
+            },
             captureUpdate: CaptureUpdateAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {

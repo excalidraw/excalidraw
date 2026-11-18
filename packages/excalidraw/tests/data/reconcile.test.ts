@@ -304,6 +304,20 @@ describe("elements reconciliation", () => {
     test(["C", "A", "B"], ["C", "B", "D"], ["C:R", "A:L", "B:R", "D:R"]);
   });
 
+  it("takes a newer remote copy of the text being edited", () => {
+    // the editor holds the draft and writes it on top (see textWysiwyg):
+    // discarded here, the copy isn't sent again and the clients diverge
+    const [local] = idsToElements(["A:1"]);
+    const [remote] = idsToElements(["A:2"]);
+    const reconciled = reconcileElements(
+      [local] as OrderedExcalidrawElement[],
+      [remote] as RemoteExcalidrawElement[],
+      { editingTextElement: local } as unknown as AppState,
+    );
+    expect(reconciled).toEqual([remote]);
+    expect(reconciled[0]).not.toBe(local);
+  });
+
   it("test identical elements reconciliation", () => {
     const testIdentical = (
       local: ElementLike[],
