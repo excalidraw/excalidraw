@@ -544,6 +544,7 @@
       "padding": "Padding"
     },
     "tooltip": {
+      "onlySelected": "Select elements on the canvas before opening this dialog to export only those elements. Select a frame to crop the export to its dimensions.",
       "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
     },
     "title": {

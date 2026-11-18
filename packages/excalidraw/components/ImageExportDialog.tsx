@@ -222,20 +222,20 @@ const ImageExportModal = ({
       </div>
       <div className="ImageExportModal__settings">
         <h3>{t("imageExportDialog.header")}</h3>
-        {hasSelection && (
-          <ExportSetting
-            label={t("imageExportDialog.label.onlySelected")}
+        <ExportSetting
+          label={t("imageExportDialog.label.onlySelected")}
+          tooltip={t("imageExportDialog.tooltip.onlySelected")}
+          name="exportOnlySelected"
+        >
+          <Switch
             name="exportOnlySelected"
-          >
-            <Switch
-              name="exportOnlySelected"
-              checked={exportSelectionOnly}
-              onChange={(checked) => {
-                setExportSelectionOnly(checked);
-              }}
-            />
-          </ExportSetting>
-        )}
+            checked={exportSelectionOnly}
+            disabled={!hasSelection}
+            onChange={(checked) => {
+              setExportSelectionOnly(checked);
+            }}
+          />
+        </ExportSetting>
         <ExportSetting
           label={t("imageExportDialog.label.withBackground")}
           name="exportBackgroundSwitch"
