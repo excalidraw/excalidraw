@@ -161,6 +161,50 @@ describe("search", () => {
     });
   });
 
+  it("should highlight a match on a line that repeats an earlier line", async () => {
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
+    API.setElements([
+      API.createElement({
+        type: "text",
+        text: "",
+      }),
+    ]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+    const searchInput = await querySearchInput();
+
+    for (const [text, originalText, query] of [
+      // a line break typed by the user
+      ["Item\nItem", "Item\nItem", "Item"],
+      // a line wrapped at a space
+      ["Hello world\nHello world", "Hello world Hello world", "world"],
+    ]) {
+      API.updateElement(h.elements[0] as ExcalidrawTextElement, {
+        text,
+        originalText,
+      });
+      updateTextEditor(searchInput, query);
+
+      await waitFor(() => {
+        expect(h.app.state.searchMatches?.matches.length).toBe(2);
+      });
+      const [first, second] = h.app.state.searchMatches!.matches;
+
+      // the second match sits on the second line, at the same column as the first
+      expect(second.matchedLines).toHaveLength(1);
+      expect(second.matchedLines[0].offsetX).toBe(
+        first.matchedLines[0].offsetX,
+      );
+      expect(second.matchedLines[0].width).toBe(first.matchedLines[0].width);
+      expect(second.matchedLines[0].offsetY).toBeGreaterThan(
+        first.matchedLines[0].offsetY,
+      );
+    }
+  });
+
   it("should match frame names", async () => {
     const scrollIntoViewMock = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
