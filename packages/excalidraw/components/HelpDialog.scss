@@ -78,6 +78,23 @@
       &__island--editor {
         grid-area: 1 / 2 / 3 / 3;
       }
+
+      // when searching, islands may be hidden, so let them flow naturally
+      .HelpDialog__islands-container--filtered .HelpDialog__island {
+        grid-area: auto;
+      }
+    }
+
+    &__search {
+      margin-top: 1.5rem;
+      border: 1px solid var(--dialog-border-color);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+    }
+
+    &__no-results {
+      color: var(--color-gray-40);
+      font-size: 0.875rem;
     }
 
     &__island {
