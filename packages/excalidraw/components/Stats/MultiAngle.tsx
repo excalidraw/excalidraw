@@ -5,6 +5,8 @@ import { isArrowElement } from "@excalidraw/element";
 
 import { isInGroup } from "@excalidraw/element";
 
+import { updateBindings } from "@excalidraw/element";
+
 import type { Degrees } from "@excalidraw/math";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
@@ -37,6 +39,7 @@ const handleDegreeChange: DragInputCallbackType<
   nextValue,
   property,
   scene,
+  app,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const editableLatestIndividualElements = originalElements
@@ -56,6 +59,7 @@ const handleDegreeChange: DragInputCallbackType<
       scene.mutateElement(element, {
         angle: nextAngle,
       });
+      updateBindings(element, scene, app.state);
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {
@@ -90,6 +94,7 @@ const handleDegreeChange: DragInputCallbackType<
     scene.mutateElement(latestElement, {
       angle: nextAngle,
     });
+    updateBindings(latestElement, scene, app.state);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
