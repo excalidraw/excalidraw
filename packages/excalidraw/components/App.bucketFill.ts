@@ -11,6 +11,7 @@ import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 
 import {
   computeBucketFillPolygon,
+  getElementsInGroup,
   isBucketFillCompatible,
   isFrameLikeElement,
   isRestylableFill,
@@ -212,6 +213,21 @@ export class AppBucketFill {
       this.restyle(hitElement);
       return;
     }
+    // nor on a locked fill (see `locked` below), which the hit test above
+    // skips — being locked, it isn't restyled either
+    const hitLockedElement = this.app.getElementAtPosition(point[0], point[1], {
+      includeLockedElements: true,
+    });
+    if (
+      hitLockedElement?.locked &&
+      isRestylableFill({
+        hitElement: hitLockedElement,
+        scenePoints: result.scenePoints,
+        elementsMap,
+      })
+    ) {
+      return;
+    }
 
     const { width, height } = getSizeFromPoints(result.scenePoints);
     // linear elements are normalized so points[0] must be [0, 0]; use the
@@ -241,6 +257,13 @@ export class AppBucketFill {
                 : common.filter((groupId) => groupIds.includes(groupId)),
             null as string[] | null,
           ) ?? [];
+    // a fill joining a locked group is locked with it, or the whole group
+    // could be selected, moved and deleted through the fill
+    const locked =
+      groupIds.length > 0 &&
+      getElementsInGroup(elements, groupIds[0]).every(
+        (element) => element.locked,
+      );
 
     const fill = newLinearElement({
       type: "line",
@@ -260,6 +283,7 @@ export class AppBucketFill {
       opacity: this.app.state.currentItemOpacity,
       frameId,
       groupIds,
+      locked,
       // no marker: fills are recognized by shape (`isBucketFillCompatible`),
       // since metadata would go stale the moment the user restyles the fill
     });
