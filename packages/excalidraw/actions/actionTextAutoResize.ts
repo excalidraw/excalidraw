@@ -49,7 +49,8 @@ const KEPT_TEXT_WIDTH_SLACK = 1;
  * The text with auto-resizing toggled: growing with its content again,
  * unwrapped — or keeping its width (and some: see `KEPT_TEXT_WIDTH_SLACK`),
  * wrapping at it, which is at most the width a typed text stops growing at
- * (see `AppText.getMaxTextWidth()`), even for a text already wider.
+ * (see `AppText.getMaxTextWidth()`), even for a text already wider. A text
+ * with nothing typed yet has no width to keep, and wraps at that width.
  */
 const toggleTextAutoResize = (
   text: ExcalidrawTextElement,
@@ -57,16 +58,17 @@ const toggleTextAutoResize = (
   app: AppClassProperties,
 ) => {
   const font = getFontString(text);
+  const maxWidth = () =>
+    app.text.getMaxTextWidth(
+      app.text.getTextViewportOffsets(
+        getElementBounds(text, app.scene.getNonDeletedElementsMap()),
+      ),
+    );
   const width = autoResize
     ? null
-    : Math.min(
-        text.width + KEPT_TEXT_WIDTH_SLACK,
-        app.text.getMaxTextWidth(
-          app.text.getTextViewportOffsets(
-            getElementBounds(text, app.scene.getNonDeletedElementsMap()),
-          ),
-        ),
-      );
+    : text.originalText
+    ? Math.min(text.width + KEPT_TEXT_WIDTH_SLACK, maxWidth())
+    : maxWidth();
   const nextText =
     width === null
       ? text.originalText

@@ -3727,6 +3727,22 @@ describe("textWysiwyg", () => {
       expect(editor.style.whiteSpace).toBe("pre-wrap");
     });
 
+    // there's no width to keep before anything's typed: it'd wrap after
+    // every character
+    it("wraps a text toggled with Alt+W before anything's typed at the max width", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+
+      fireEvent.keyDown(editor, { key: "w", altKey: true });
+      updateTextEditor(editor, "hello world");
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.text).toBe("hello world");
+      expect(text.width).toBe(TEXT_MAX_WRAP_WIDTH);
+    });
+
     it("leaves the canvas no cursor of the text's own while it's edited", async () => {
       API.setElements([wrappedText()]);
       const canvas = GlobalTestState.interactiveCanvas;
