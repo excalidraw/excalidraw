@@ -9,6 +9,7 @@ import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "./newElement";
+import { parseMusicLink } from "./musicEmbeddable";
 import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 
@@ -188,6 +189,18 @@ export const getEmbedLink = (
   }
 
   const originalLink = link;
+
+  const musicLink = parseMusicLink(link);
+  if (musicLink) {
+    const embed =
+      musicLink.type === "youtube"
+        ? getEmbedLink(musicLink.link)
+        : { ...musicLink, sandbox: { allowSameOrigin: true } };
+    if (embed) {
+      embeddedLinkCache.set(originalLink, embed);
+    }
+    return embed;
+  }
 
   const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
     matchHostname(link, ALLOW_SAME_ORIGIN) || "",
@@ -565,5 +578,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return !!matchHostname(url, ALLOWED_DOMAINS);
+  return !!parseMusicLink(url) || !!matchHostname(url, ALLOWED_DOMAINS);
 };
