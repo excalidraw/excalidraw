@@ -1,0 +1,57 @@
+# Excalidraw Codebase Architecture
+
+## Overview
+
+Excalidraw is an open-source virtual whiteboard for creating hand-drawn-style diagrams, sketches, and flowcharts. Its codebase contains reusable drawing functionality, the web application, documentation, examples, and development tools.
+
+## Repository Structure
+
+The following directories provide a starting point for exploring the repository:
+
+- `packages/` — Reusable packages and shared functionality.
+- `excalidraw-app/` — The Excalidraw web application.
+- `dev-docs/` — Developer documentation.
+- `examples/` — Example implementations and integrations.
+- `scripts/` — Development and automation scripts.
+
+## Main Components
+
+### 1. Excalidraw Package
+
+The reusable package provides drawing-related functionality that can be integrated into other applications.
+
+### 2. Excalidraw Application
+
+The application provides the user interface for creating, editing, and managing drawings.
+
+### 3. Developer Documentation
+
+Developer documentation helps contributors understand the project, set up their environment, and follow contribution guidelines.
+
+## How to Explore the Codebase
+
+New contributors can follow these steps:
+
+1. Read the project README and contribution guidelines.
+2. Explore the `packages/` directory to understand reusable functionality.
+3. Explore `excalidraw-app/` to understand the application.
+4. Trace a simple user action, such as creating or moving an element, through the relevant components and functions.
+5. Review related tests before changing existing behavior.
+
+## Understanding a Feature
+
+When investigating a feature, identify:
+
+1. The component or module responsible for the feature.
+2. The functions that implement its behavior.
+3. The data passed between the relevant components.
+4. The tests that verify the behavior.
+5. The documentation that explains the feature.
+
+## Contributing to Excalidraw
+
+Before implementing a change, check existing issues and pull requests to avoid duplicate work. Follow the repository's contribution guidelines, make a focused change, run the relevant checks, and submit a pull request describing the changes.
+
+## Note
+
+This guide is an introductory overview. Verify directory names, implementation details, and relevant file paths against the current repository before expanding the guide with specific code examples.
