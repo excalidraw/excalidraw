@@ -11,7 +11,20 @@ export const normalizeLink = (link: string) => {
 };
 
 export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
+  if (!link) {
+    return false;
+  }
+  if (link.startsWith("/")) {
+    return !link.startsWith("//");
+  }
+  try {
+    return (
+      typeof location !== "undefined" &&
+      new URL(link).origin === location.origin
+    );
+  } catch {
+    return false;
+  }
 };
 
 /**
