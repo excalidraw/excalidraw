@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 import type { NonDeletedSceneElementsMap } from "@excalidraw/element/types";
 
@@ -26,7 +26,9 @@ interface NewElementCanvasProps {
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  useEffect(() => {
+  // a layout effect draws the element before the browser paints, so it keeps
+  // up with the pointer (Preact runs `useEffect` only after the next paint)
+  useLayoutEffect(() => {
     if (!canvasRef.current) {
       return;
     }
