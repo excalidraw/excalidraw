@@ -394,6 +394,7 @@ import { AppDuplicate } from "./App.duplicate";
 import { AppFlowchart } from "./App.flowchart";
 import { AppModifiers } from "./App.modifiers";
 import { AppPan } from "./App.pan";
+import { AppKeyboardPan } from "./App.keyboardPan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
 import {
@@ -693,6 +694,7 @@ class App extends React.Component<AppProps, AppState> {
     getPointerCount: () => gesture.pointers.size,
     isDraggingScrollBar: () => isDraggingScrollBar,
   });
+  public keyboardPan: AppKeyboardPan = new AppKeyboardPan(this);
   public textTool: AppTextTool = new AppTextTool(this);
   public clipboard: AppClipboard = new AppClipboard(this, {
     getContainer: () => this.excalidrawContainerRef.current,
@@ -3234,6 +3236,7 @@ class App extends React.Component<AppProps, AppState> {
   // Lifecycle
 
   private onBlur = withBatchedUpdates(() => {
+    this.keyboardPan.stop();
     this.pan.setSpaceHeld(false);
     this.modifiers.reset();
     this.setState({
@@ -3268,6 +3271,10 @@ class App extends React.Component<AppProps, AppState> {
   private handleNavigationModeKeyDown = (event: KeyboardEvent) => {
     if (this.maybeHandlePageScrollKeyDown(event)) {
       // the editor consumes the input — the page must not scroll along
+      event.preventDefault();
+      return;
+    }
+    if (this.keyboardPan.handleKeyDown(event)) {
       event.preventDefault();
       return;
     }
@@ -3324,6 +3331,7 @@ class App extends React.Component<AppProps, AppState> {
     // relies on. Among other things this tears down window-level listeners.
     this.maybeCleanupAfterMissingPointerUp(null);
 
+    this.keyboardPan.stop();
     this.pan.setSpaceHeld(false);
     this.modifiers.reset();
     isDraggingScrollBar = false;
@@ -3931,6 +3939,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.ownerWindow.clearTimeout(this.zenModeTransitionTimer);
+    this.keyboardPan.stop();
     this.unmarkZenModeTransition();
     this.editorLifecycleEvents.emit("editor:unmount");
     this.props.onUnmount?.();
@@ -4081,6 +4090,9 @@ class App extends React.Component<AppProps, AppState> {
             this.handleNavigationModeKeyDown as EventListener,
             false,
           ),
+          addEventListener(this.ownerDocument, EVENT.KEYUP, this.onKeyUp, {
+            passive: true,
+          }),
           // wheel zoom is anchored on `viewport.lastPosition`
           addEventListener(
             this.ownerDocument,
@@ -4345,6 +4357,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
+    }
+
+    if (
+      (prevProps.viewModeEnabled && !this.props.viewModeEnabled) ||
+      (prevState.viewModeEnabled && !this.state.viewModeEnabled)
+    ) {
+      this.keyboardPan.stop();
     }
 
     // neither the text tool's hover affordance nor a pending center click
@@ -5284,6 +5303,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (this.keyboardPan.handleKeyDown(event)) {
+        event.preventDefault();
+        return;
+      }
+
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
@@ -5617,6 +5641,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     this.modifiers.sync(event);
+    this.keyboardPan.handleKeyUp(event);
     if (!this.isInteractionEnabled()) {
       return;
     }

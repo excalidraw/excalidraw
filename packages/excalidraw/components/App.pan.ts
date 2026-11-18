@@ -120,6 +120,7 @@ export class AppPan {
       return false;
     }
     this.active = true;
+    app.keyboardPan.stop();
     this.secondary = isSecondary
       ? { engaged: false, nativeMenuSeen: false }
       : null;
