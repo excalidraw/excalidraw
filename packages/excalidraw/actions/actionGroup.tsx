@@ -90,6 +90,21 @@ export const actionGroup = register({
   icon: (appState) => <GroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    // Toggle behavior: if all selected elements are already in the same group,
+    // ungroup them instead (Ctrl+G acts as toggle)
+    {
+      const selected = app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        includeBoundTextElement: false,
+      });
+      if (
+        selected.length >= 2 &&
+        allElementsInSameGroup(selected, appState.editingGroupId)
+      ) {
+        return actionUngroup.perform(elements, appState, undefined, app);
+      }
+    }
+
     if (!enableActionGroup(appState, app)) {
       return false;
     }
@@ -199,7 +214,20 @@ export const actionGroup = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  predicate: (elements, appState, _, app) => enableActionGroup(appState, app),
+  predicate: (elements, appState, _, app) => {
+    if (enableActionGroup(appState, app)) {
+      return true;
+    }
+    // Also enable when elements can be ungrouped (toggle behavior)
+    const selectedElements = app.scene.getSelectedElements({
+      selectedElementIds: appState.selectedElementIds,
+      includeBoundTextElement: false,
+    });
+    return (
+      selectedElements.length >= 2 &&
+      allElementsInSameGroup(selectedElements, appState.editingGroupId)
+    );
+  },
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData, app }) => (
