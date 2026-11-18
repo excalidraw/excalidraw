@@ -138,6 +138,7 @@ export const exportCanvas = async (
         ...config,
         embedScene: appState.exportEmbedScene && type === "svg",
         environment: renderEnvironment,
+        title: name,
       },
     });
 
