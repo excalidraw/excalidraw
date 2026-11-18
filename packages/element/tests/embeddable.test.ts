@@ -271,3 +271,24 @@ describe("Instagram embedding", () => {
     }
   });
 });
+
+describe("Share Note embedding", () => {
+  it("should preserve Share Note URLs with the default sandbox", () => {
+    const url = "https://share.note.sx/example#test-key";
+
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    expect(getEmbedLink(url)).toMatchObject({
+      type: "generic",
+      link: url,
+      sandbox: { allowSameOrigin: false },
+    });
+  });
+
+  it.each([
+    "https://share.note.sx.example.com/example",
+    "https://other.share.note.sx/example",
+    "https://example.com/example",
+  ])("should reject %s by default", (url) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(false);
+  });
+});
