@@ -1063,7 +1063,7 @@ export const textWysiwyg = ({
   const outdent = () => {
     const { selectionStart, selectionEnd } = editable;
     const linesStartIndices = getSelectedLinesStartIndices();
-    const removedTabs: number[] = [];
+    const removedTabs: { startIndex: number; length: number }[] = [];
 
     let value = editable.value;
     linesStartIndices.forEach((startIndex) => {
@@ -1077,17 +1077,18 @@ export const textWysiwyg = ({
 
         // Delete a tab from the line
         value = `${startValue}${endValue}`;
-        removedTabs.push(startIndex);
+        removedTabs.push({ startIndex, length: tabMatch[0].length });
       }
     });
 
     editable.value = value;
 
     if (removedTabs.length) {
-      if (selectionStart > removedTabs[removedTabs.length - 1]) {
+      const lastRemovedTab = removedTabs[removedTabs.length - 1];
+      if (selectionStart > lastRemovedTab.startIndex) {
         editable.selectionStart = Math.max(
-          selectionStart - TAB_SIZE,
-          removedTabs[removedTabs.length - 1],
+          selectionStart - lastRemovedTab.length,
+          lastRemovedTab.startIndex,
         );
       } else {
         // If the cursor is before the first tab removed, ex:
@@ -1099,7 +1100,8 @@ export const textWysiwyg = ({
       }
       editable.selectionEnd = Math.max(
         editable.selectionStart,
-        selectionEnd - TAB_SIZE * removedTabs.length,
+        selectionEnd -
+  removedTabs.reduce((total, tab) => total + tab.length, 0),
       );
     }
   };
