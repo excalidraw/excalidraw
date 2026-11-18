@@ -194,4 +194,37 @@ describe("search", () => {
       expect(h.app.state.searchMatches?.matches.length).toBe(3);
     });
   });
+
+  it("should maintain stable search results order when elements are moved", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    const elem1 = API.createElement({ type: "text", text: "test 1", y: 100 });
+    const elem2 = API.createElement({ type: "text", text: "test 2", y: 0 });
+    API.setElements([elem1, elem2]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    const initialMatchElementIds = h.app.state.searchMatches?.matches.map(
+      (m) => m.id,
+    );
+
+    API.updateElement(elem1, { y: -100 });
+
+    await waitFor(() => {
+      const updatedMatchElementIds = h.app.state.searchMatches?.matches.map(
+        (m) => m.id,
+      );
+      expect(updatedMatchElementIds).toEqual(initialMatchElementIds);
+    });
+  });
 });
