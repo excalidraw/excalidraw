@@ -11,9 +11,15 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
-import { parseLibraryJSON } from "../data/blob";
+import { loadLibraryFromBlob, parseLibraryJSON } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
-import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import { fileOpen } from "../data/filesystem";
+import {
+  distributeLibraryItemsOnSquareGrid,
+  loadLibraryFromBlobs,
+  mergeLibraryItems,
+} from "../data/library";
+import { t } from "../i18n";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -45,9 +51,34 @@ vi.mock("../data/filesystem.ts", async (importOriginal) => {
     __esmodule: true,
     //@ts-ignore
     ...module,
-    fileOpen: vi.fn(() => mockLibraryFilePromise),
+    // the library file picker allows selecting multiple files
+    fileOpen: vi.fn(async () => [await mockLibraryFilePromise]),
   };
 });
+
+const createLibraryItem = (
+  id: string,
+  status?: LibraryItem["status"],
+): LibraryItem => ({
+  id,
+  status: status!,
+  created: 1,
+  elements: [
+    {
+      ...API.createElement({ id: `${id}-element`, type: "rectangle" }),
+      // like in saved library files (restore regenerates a missing one)
+      versionNonce: 1,
+    },
+  ],
+});
+
+const createLibraryFile = (name: string, libraryItems: LibraryItem[]) =>
+  new File([serializeLibraryAsJSON(libraryItems)], `${name}.excalidrawlib`, {
+    type: MIME_TYPES.excalidrawlib,
+  });
+
+const getLibraryItemIds = async () =>
+  (await h.app.library.getLatestLibrary()).map((item) => item.id);
 
 describe("library items inserting", () => {
   beforeEach(async () => {
@@ -170,6 +201,58 @@ describe("library", () => {
     });
   });
 
+  it("import multiple libraries via drag&drop", async () => {
+    await API.drop([
+      {
+        kind: "file",
+        file: createLibraryFile("arrows", [createLibraryItem("arrow")]),
+      },
+      {
+        kind: "file",
+        file: createLibraryFile("icons", [
+          createLibraryItem("icon1"),
+          createLibraryItem("icon2"),
+        ]),
+      },
+    ]);
+
+    await waitFor(async () => {
+      expect(await getLibraryItemIds()).toEqual(["icon1", "icon2", "arrow"]);
+    });
+    expect(h.state.openSidebar?.name).toBe("default");
+    expect(h.elements).toEqual([]);
+  });
+
+  it("import multiple libraries via drag&drop keeps the existing items", async () => {
+    await h.app.library.setLibrary([createLibraryItem("existing")]);
+
+    await API.drop([
+      { kind: "file", file: createLibraryFile("a", [createLibraryItem("a")]) },
+      { kind: "file", file: createLibraryFile("b", [createLibraryItem("b")]) },
+    ]);
+
+    await waitFor(async () => {
+      expect(await getLibraryItemIds()).toEqual(["b", "a", "existing"]);
+    });
+  });
+
+  it("shows an error and imports nothing if one of the dropped libraries is invalid", async () => {
+    await API.drop([
+      { kind: "file", file: createLibraryFile("a", [createLibraryItem("a")]) },
+      {
+        kind: "file",
+        file: new File(["not a library"], "broken.excalidrawlib", {
+          type: MIME_TYPES.excalidrawlib,
+        }),
+      },
+    ]);
+
+    await waitFor(() => {
+      expect(h.state.errorMessage).toBe(t("errors.importLibraryError"));
+    });
+    expect(await getLibraryItemIds()).toEqual([]);
+  });
+
   // NOTE: mocked to test logic, not actual drag&drop via UI
   it("drop library item onto canvas", async () => {
     expect(h.elements).toEqual([]);
@@ -270,6 +353,44 @@ describe("library menu", () => {
       expect(latestLibrary[0].elements).toEqual([
         expect.objectContaining(strippedElement),
       ]);
+    });
+  });
+});
+
+describe("library menu: importing multiple files", () => {
+  const openLibraryFilePicker = async () => {
+    const { container } = await render(<Excalidraw />);
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    fireEvent.click(
+      queryByTestId(
+        container.querySelector(".layer-ui__library")!,
+        "dropdown-menu-button",
+      )!,
+    );
+    fireEvent.click(queryByTestId(container, "lib-dropdown--load")!);
+  };
+
+  it("should let the user select multiple library files", async () => {
+    await openLibraryFilePicker();
+
+    expect(fileOpen).toHaveBeenLastCalledWith(
+      expect.objectContaining({ multiple: true }),
+    );
+  });
+
+  it("should load all library files selected in the file picker", async () => {
+    vi.mocked(fileOpen).mockResolvedValueOnce([
+      createLibraryFile("arrows", [createLibraryItem("arrow")]),
+      createLibraryFile("icons", [
+        createLibraryItem("icon1"),
+        createLibraryItem("icon2"),
+      ]),
+    ]);
+
+    await openLibraryFilePicker();
+
+    await waitFor(async () => {
+      expect(await getLibraryItemIds()).toEqual(["icon1", "icon2", "arrow"]);
     });
   });
 });
@@ -439,5 +560,69 @@ describe("distributeLibraryItemsOnSquareGrid()", () => {
         }),
       ]),
     );
+  });
+});
+
+describe("loadLibraryFromBlobs()", () => {
+  it("should load the items of all files, later files first", async () => {
+    const libraryItems = await loadLibraryFromBlobs([
+      createLibraryFile("a", [
+        createLibraryItem("a1"),
+        createLibraryItem("a2"),
+      ]),
+      createLibraryFile("b", [createLibraryItem("b1")]),
+    ]);
+
+    expect(libraryItems.map((item) => item.id)).toEqual(["b1", "a1", "a2"]);
+  });
+
+  it("should merge files like importing them one after another", async () => {
+    const files = [
+      createLibraryFile("a", [createLibraryItem("a")]),
+      createLibraryFile("b", [createLibraryItem("b")]),
+    ];
+
+    const loadedAtOnce = await loadLibraryFromBlobs(files);
+
+    let loadedOneByOne: LibraryItems = [];
+    for (const file of files) {
+      loadedOneByOne = mergeLibraryItems(
+        loadedOneByOne,
+        await loadLibraryFromBlob(file),
+      );
+    }
+
+    const ids = (items: LibraryItems) => items.map((item) => item.id);
+    expect(ids(loadedAtOnce)).toEqual(ids(loadedOneByOne));
+  });
+
+  it("should return no items for no files", async () => {
+    expect(await loadLibraryFromBlobs([])).toEqual([]);
+  });
+
+  it("should apply the default status to items without one", async () => {
+    const libraryItems = await loadLibraryFromBlobs(
+      [
+        createLibraryFile("a", [
+          createLibraryItem("a"),
+          createLibraryItem("b", "unpublished"),
+        ]),
+      ],
+      "published",
+    );
+
+    expect(libraryItems.map((item) => item.status)).toEqual([
+      "published",
+      "unpublished",
+    ]);
+  });
+
+  it("should reject when one of the files is not a library", async () => {
+    await expect(
+      loadLibraryFromBlobs([
+        createLibraryFile("a", [createLibraryItem("a")]),
+        new Blob(["not a library"], { type: MIME_TYPES.excalidrawlib }),
+      ]),
+    ).rejects.toThrow();
   });
 });
