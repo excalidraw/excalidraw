@@ -66,6 +66,39 @@ describe("convertMermaidToExcalidraw", () => {
     }
   });
 
+  it("normalizes <br> tag variants to newlines before parsing", async () => {
+    const parseMermaidToExcalidraw = vi
+      .fn<ParseMermaidToExcalidraw>()
+      .mockResolvedValue({ elements: [], files: {} });
+
+    const cases: [string, string][] = [
+      [
+        'graph TD\nA["Line1<br>Line2"]',
+        'graph TD\nA["Line1\nLine2"]',
+      ],
+      [
+        'graph TD\nA["Line1<br/>Line2"]',
+        'graph TD\nA["Line1\nLine2"]',
+      ],
+      [
+        'graph TD\nA["Line1<br />Line2"]',
+        'graph TD\nA["Line1\nLine2"]',
+      ],
+      [
+        'graph TD\nA["Line1<BR>Line2"]',
+        'graph TD\nA["Line1\nLine2"]',
+      ],
+    ];
+
+    for (const [input, expected] of cases) {
+      parseMermaidToExcalidraw.mockClear();
+      await convertMermaidToExcalidraw(
+        createConvertArgs(input, parseMermaidToExcalidraw),
+      );
+      expect(parseMermaidToExcalidraw).toHaveBeenCalledWith(expected);
+    }
+  });
+
   it("does not retry quote normalization when the input has no double quotes", async () => {
     const originalError = new Error("Parse error on line 9: ...");
     const parseMermaidToExcalidraw = vi
