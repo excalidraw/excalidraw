@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 import { copyTextToSystemClipboard } from "../clipboard";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
@@ -24,29 +24,18 @@ export const ShareableLinkDialog = ({
   setErrorMessage,
 }: ShareableLinkDialogProps) => {
   const { t } = useI18n();
-  const [, setJustCopied] = useState(false);
-  const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
+  const { onCopy, copyStatus } = useCopyStatus();
 
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(link);
+      onCopy();
     } catch (e) {
       setErrorMessage(t("errors.copyToSystemClipboardFailed"));
     }
-    setJustCopied(true);
-
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = window.setTimeout(() => {
-      setJustCopied(false);
-    }, 3000);
-
     ref.current?.select();
   };
-  const { onCopy, copyStatus } = useCopyStatus();
   return (
     <Dialog onCloseRequest={onCloseRequest} title={false} size="small">
       <div className="ShareableLinkDialog">
@@ -65,10 +54,7 @@ export const ShareableLinkDialog = ({
             label={t("buttons.copyLink")}
             icon={copyIcon}
             status={copyStatus}
-            onClick={() => {
-              onCopy();
-              copyRoomLink();
-            }}
+            onClick={copyRoomLink}
           />
         </div>
         <div className="ShareableLinkDialog__description">
