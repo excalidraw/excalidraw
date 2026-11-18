@@ -214,4 +214,29 @@ describe("duplicate element on move when ALT is clicked", () => {
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
+
+  it("keeps the duplicate aligned with the original when shift locks the axis", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    fireEvent.click(getByToolName("rectangle"));
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 70 });
+    fireEvent.pointerUp(canvas);
+
+    fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
+    // duplicate after a small diagonal move
+    fireEvent.pointerMove(canvas, { clientX: 60, clientY: 23, altKey: true });
+    // then lock the drag to the horizontal axis
+    fireEvent.pointerMove(canvas, {
+      clientX: 100,
+      clientY: 24,
+      shiftKey: true,
+    });
+    fireEvent.pointerUp(canvas);
+
+    expect(h.elements.length).toEqual(2);
+    expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
+    expect([h.elements[1].x, h.elements[1].y]).toEqual([80, 20]);
+  });
 });
