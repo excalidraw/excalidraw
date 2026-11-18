@@ -1000,12 +1000,19 @@ export class AppSelectionTool {
           );
         }
 
-        this.app.setState({
+        this.app.setState((prevState) => ({
           selectedElementsAreBeingDragged: true,
           // element is being dragged and selectionElement that was created on pointer down
           // should be removed
           selectionElement: null,
-        });
+          selectedLinearElement: prevState.selectedLinearElement
+            ? {
+                ...prevState.selectedLinearElement,
+                hoverPointIndex: -1,
+                segmentMidPointHoveredCoords: null,
+              }
+            : null,
+        }));
 
         // We duplicate the selected element if alt is pressed on pointer move
         if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
