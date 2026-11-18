@@ -110,7 +110,9 @@ export const getFileHandleType = (handle: FileSystemFileHandle | null) => {
     return null;
   }
 
-  return handle.name.match(/\.(json|excalidraw|png|svg)$/)?.[1] || null;
+  return (
+    handle.name.toLowerCase().match(/\.(json|excalidraw|png|svg)$/)?.[1] || null
+  );
 };
 
 export const isImageFileHandleType = (
