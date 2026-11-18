@@ -1206,13 +1206,11 @@ export const textWysiwyg = ({
   };
 
   const cleanup = () => {
-    app.text.setEditedTextHoveredSide(null);
     // (the canvas takes the editor's place under the pointer, with the
     // cursor given to it for around the editor: see the pointermove below)
     app.cursor.reset();
     // remove events to ensure they don't late-fire
     editable.onblur = null;
-    editable.onpointerenter = null;
     editable.oninput = null;
     editable.onkeydown = null;
 
@@ -1455,8 +1453,6 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
-  // (the pointer left the canvas, and with it the text's side handles)
-  editable.onpointerenter = () => app.text.setEditedTextHoveredSide(null);
   // (the cursor the canvas will have once the pointer leaves the editor)
   editable.addEventListener("pointermove", (event) =>
     app.text.primeCursorAroundEditedText(
