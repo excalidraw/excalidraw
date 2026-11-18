@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { pointFrom } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import {
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
@@ -23,6 +23,8 @@ import {
   TEXT_MAX_WRAP_WIDTH,
   TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT,
 } from "@excalidraw/common";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawTextElement,
@@ -3590,6 +3592,42 @@ describe("textWysiwyg", () => {
 
         const text = h.elements[0] as ExcalidrawTextElement;
         expect(edge(text)).toBeCloseTo(before, 4);
+      },
+    );
+
+    // a rotated text turns about the center of its box, which (un)wrapping
+    // moves: the anchor has to stay put where it's drawn
+    it.each(["left", "center", "right"] as const)(
+      "keeps the anchor of a rotated %s text where it's drawn when (un)wrapping",
+      (textAlign) => {
+        API.setElements([
+          wrappedText({ textAlign, angle: (Math.PI / 3) as Radians }),
+        ]);
+        API.setAppState({ selectedElementIds: { text: true } });
+        const getDrawnAnchor = () => {
+          const text = h.elements[0] as ExcalidrawTextElement;
+          const ratio =
+            textAlign === "left" ? 0 : textAlign === "right" ? 1 : 0.5;
+          return pointRotateRads(
+            pointFrom<GlobalPoint>(text.x + text.width * ratio, text.y),
+            pointFrom<GlobalPoint>(
+              text.x + text.width / 2,
+              text.y + text.height / 2,
+            ),
+            text.angle,
+          );
+        };
+        const [x, y] = getDrawnAnchor();
+
+        API.executeAction(actionTextAutoResize);
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(true);
+        expect(getDrawnAnchor()[0]).toBeCloseTo(x, 4);
+        expect(getDrawnAnchor()[1]).toBeCloseTo(y, 4);
+
+        API.executeAction(actionTextAutoResize);
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
+        expect(getDrawnAnchor()[0]).toBeCloseTo(x, 4);
+        expect(getDrawnAnchor()[1]).toBeCloseTo(y, 4);
       },
     );
 
