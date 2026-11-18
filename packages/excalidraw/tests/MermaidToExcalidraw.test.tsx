@@ -1,6 +1,5 @@
 import { expect, vi } from "vitest";
 
-import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
 import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -131,12 +130,6 @@ describe("Test <MermaidToExcalidraw/>", () => {
     const dialog = document.querySelector(".ttd-dialog")!;
     await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
     expect(normalizeDialogSnapshot(dialog)).toMatchSnapshot();
-    // flowchart edges as elbow arrows
-    expect(
-      MermaidToExcalidrawLib.parseMermaidToExcalidraw,
-    ).toHaveBeenCalledWith(expect.any(String), {
-      elbow: { flowchart: true },
-    });
   });
 
   it("should show error in preview when mermaid library throws error", async () => {

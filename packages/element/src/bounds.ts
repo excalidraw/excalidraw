@@ -52,11 +52,7 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 import { intersectElementWithLineSegment } from "./collision";
-import {
-  elementOverlapsWithFrame,
-  getContainingFrame,
-  isFrameClippable,
-} from "./frame";
+import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -1631,7 +1627,6 @@ export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
     const associatedFrame = getContainingFrame(element, elementsMap);
     if (
       associatedFrame &&
-      isFrameClippable(element, elementsMap) &&
       elementOverlapsWithFrame(element, associatedFrame, elementsMap)
     ) {
       const frameAABB = getElementBounds(associatedFrame, elementsMap);

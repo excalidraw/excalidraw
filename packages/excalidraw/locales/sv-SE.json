@@ -168,6 +168,12 @@
       "lockAll": "Lås alla",
       "unlockAll": "Lås upp alla"
     },
+    "elementBookmark": {
+      "bookmark": "Lägg till bokmärke",
+      "removeBookmark": "Ta bort bokmärke",
+      "next": "Nästa bokmärke",
+      "previous": "Föregående bokmärke"
+    },
     "statusPublished": "Publicerad",
     "sidebarLock": "Håll sidofältet öppet",
     "selectAllElementsInFrame": "Markera alla element i rutan",
@@ -221,6 +227,11 @@
     "placeholder": "Hitta text på canvas...",
     "frames": "Ramar",
     "texts": "Texter"
+  },
+  "bookmarks": {
+    "title": "Bokmärken",
+    "empty": "Inga bokmärken än...",
+    "emptyHint": "Högerklicka på ett element för att bokmärka det."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",

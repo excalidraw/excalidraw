@@ -168,6 +168,12 @@
       "lockAll": "Alle sperren",
       "unlockAll": "Alle entsperren"
     },
+    "elementBookmark": {
+      "bookmark": "Lesezeichen hinzufügen",
+      "removeBookmark": "Lesezeichen entfernen",
+      "next": "Nächstes Lesezeichen",
+      "previous": "Vorheriges Lesezeichen"
+    },
     "statusPublished": "Veröffentlicht",
     "sidebarLock": "Seitenleiste offen lassen",
     "selectAllElementsInFrame": "Alle Elemente im Rahmen auswählen",
@@ -221,6 +227,11 @@
     "placeholder": "Text auf Zeichenfläche suchen...",
     "frames": "Rahmen",
     "texts": "Texte"
+  },
+  "bookmarks": {
+    "title": "Lesezeichen",
+    "empty": "Noch keine Lesezeichen...",
+    "emptyHint": "Rechtsklick auf ein Element, um es als Lesezeichen zu speichern."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",

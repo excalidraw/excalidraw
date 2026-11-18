@@ -4,7 +4,6 @@ import { addEventListener } from "@excalidraw/common";
 
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
-import { MERMAID_TO_EXCALIDRAW_CONFIG } from "../../mermaid";
 import { useApp } from "../App";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
@@ -56,10 +55,7 @@ const loadMermaidToExcalidrawLib = (
   ).then((lib) => ({
     // Pele lazy-loads a chunk per diagram type, which can fail to load
     // (e.g. offline) even though the lib itself loaded fine
-    parseMermaidToExcalidraw: async (
-      definition,
-      config = MERMAID_TO_EXCALIDRAW_CONFIG,
-    ) => {
+    parseMermaidToExcalidraw: async (definition, config) => {
       try {
         return await lib.parseMermaidToExcalidraw(definition, config);
       } catch (error) {

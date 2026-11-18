@@ -126,22 +126,6 @@ export const actionClearCanvas = register({
   },
 });
 
-/**
- * The viewport point (client coords, see `ZoomOptions`) a zoom keeps in place.
- * Defaults to the canvas center.
- */
-type ZoomAnchor = { viewportX: number; viewportY: number };
-
-const getZoomAnchor = (
-  /** the action's formData */
-  anchor: unknown,
-  appState: AppState,
-): ZoomAnchor =>
-  (anchor as ZoomAnchor | null | undefined) ?? {
-    viewportX: appState.width / 2 + appState.offsetLeft,
-    viewportY: appState.height / 2 + appState.offsetTop,
-  };
-
 export const actionZoomIn = register({
   name: "zoomIn",
   label: "buttons.zoomIn",
@@ -150,13 +134,14 @@ export const actionZoomIn = register({
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
-  perform: (_elements, appState, anchor, app) => {
+  perform: (_elements, appState, _, app) => {
     app.requestUnfollow();
     const nextState = {
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
         {
-          ...getZoomAnchor(anchor, appState),
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
           nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
         },
         appState,
@@ -203,13 +188,14 @@ export const actionZoomOut = register({
   navigation: true,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
-  perform: (_elements, appState, anchor, app) => {
+  perform: (_elements, appState, _, app) => {
     app.requestUnfollow();
     const nextState = {
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
         {
-          ...getZoomAnchor(anchor, appState),
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
           nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
         },
         appState,
@@ -256,7 +242,7 @@ export const actionResetZoom = register({
   navigation: true,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
-  perform: (_elements, appState, anchor, app) => {
+  perform: (_elements, appState, _, app) => {
     app.requestUnfollow();
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
@@ -267,7 +253,8 @@ export const actionResetZoom = register({
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
         {
-          ...getZoomAnchor(anchor, appState),
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
           nextZoom: getNormalizedZoom(nextZoom),
         },
         appState,

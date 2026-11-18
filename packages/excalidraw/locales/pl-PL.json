@@ -168,6 +168,12 @@
       "lockAll": "Zablokuj wszystko",
       "unlockAll": "Odblokuj wszystko"
     },
+    "elementBookmark": {
+      "bookmark": "Dodaj zakładkę",
+      "removeBookmark": "Usuń zakładkę",
+      "next": "Następna zakładka",
+      "previous": "Poprzednia zakładka"
+    },
     "statusPublished": "Opublikowano",
     "sidebarLock": "Panel boczny zawsze otwarty",
     "selectAllElementsInFrame": "Zaznacz wszystkie elementy w ramce",
@@ -221,6 +227,11 @@
     "placeholder": "Znajdź tekst na płótnie...",
     "frames": "Ramki",
     "texts": "Teksty"
+  },
+  "bookmarks": {
+    "title": "Zakładki",
+    "empty": "Brak zakładek...",
+    "emptyHint": "Kliknij prawym przyciskiem myszy element, aby dodać go do zakładek."
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",

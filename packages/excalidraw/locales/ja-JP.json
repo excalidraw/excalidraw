@@ -168,6 +168,12 @@
       "lockAll": "すべてロック",
       "unlockAll": "すべてのロックを解除"
     },
+    "elementBookmark": {
+      "bookmark": "ブックマークを追加",
+      "removeBookmark": "ブックマークを削除",
+      "next": "次のブックマーク",
+      "previous": "前のブックマーク"
+    },
     "statusPublished": "公開済み",
     "sidebarLock": "サイドバーを開いたままにする",
     "selectAllElementsInFrame": "フレーム内のすべての要素を選択",
@@ -221,6 +227,11 @@
     "placeholder": "キャンバス内のテキストを検索…",
     "frames": "フレーム",
     "texts": "テキスト"
+  },
+  "bookmarks": {
+    "title": "ブックマーク",
+    "empty": "ブックマークはまだありません...",
+    "emptyHint": "要素を右クリックしてブックマークします。"
   },
   "buttons": {
     "clearReset": "キャンバスのリセット",

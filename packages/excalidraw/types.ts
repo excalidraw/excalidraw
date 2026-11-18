@@ -218,6 +218,7 @@ export type StaticCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
+    bookmarkedElementIds: AppState["bookmarkedElementIds"];
     suggestedBinding: AppState["suggestedBinding"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
@@ -268,6 +269,7 @@ export type ObservedAppState = ObservedStandaloneAppState &
 export type ObservedStandaloneAppState = {
   name: AppState["name"];
   viewBackgroundColor: AppState["viewBackgroundColor"];
+  bookmarkedElementIds: AppState["bookmarkedElementIds"];
 };
 
 export type ObservedElementsAppState = {
@@ -507,6 +509,7 @@ export interface AppState {
 
   lastPointerDownWith: PointerType;
   selectedElementIds: Readonly<{ [id: string]: true }>;
+  bookmarkedElementIds: readonly ExcalidrawElement["id"][];
   hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
@@ -517,7 +520,6 @@ export interface AppState {
     duration?: number;
   } | null;
   zenModeEnabled: boolean;
-  minimapEnabled: boolean;
   theme: Theme;
   /** grid cell px size */
   gridSize: number;
@@ -800,52 +802,26 @@ export type InteractionConfig = {
   };
 };
 
-export type UIConfig =
-  | {
-      /**
-       * Default UI controls that stay enabled while the rest of Excalidraw's
-       * default UI is hidden. Opt-in: anything omitted or `false` is
-       * disabled.
-       */
-      enabled: {
-        /**
-         * The zoom controls (zoom out, the zoom level resetting it, zoom in).
-         *
-         * @default false
-         */
-        zoom?: boolean;
-        /**
-         * The button shown when the viewport is scrolled away from all
-         * content.
-         *
-         * @default false
-         */
-        scrollBackToContent?: boolean;
-      };
-    }
-  | {
-      /**
-       * Default UI controls that are removed while the rest of Excalidraw's
-       * default UI is rendered. Opt-out: anything omitted or `false` stays.
-       */
-      disabled: {
-        /**
-         * The minimap, and every way to toggle it (its footer button, the
-         * Preferences menu item, and the command palette and context menu
-         * entries). Without the minimap toggle next to them, the zoom
-         * controls are the zoom out / zoom level / zoom in buttons instead of
-         * the zoom menu.
-         *
-         * @default false
-         */
-        minimap?: boolean;
-      };
-    };
-
-/** A default UI control that `UIConfig` can keep or remove. */
-export type UIControl =
-  | keyof Extract<UIConfig, { enabled: unknown }>["enabled"]
-  | keyof Extract<UIConfig, { disabled: unknown }>["disabled"];
+export type UIConfig = {
+  /**
+   * Default UI controls that stay enabled while the rest of Excalidraw's
+   * default UI is hidden. Opt-in: anything omitted or `false` is disabled.
+   */
+  enabled: {
+    /**
+     * The zoom-out, reset-zoom, and zoom-in controls.
+     *
+     * @default false
+     */
+    zoom?: boolean;
+    /**
+     * The button shown when the viewport is scrolled away from all content.
+     *
+     * @default false
+     */
+    scrollBackToContent?: boolean;
+  };
+};
 
 /** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
 export type ElementRenderOverride = Readonly<{
@@ -1014,12 +990,10 @@ export interface ExcalidrawProps {
    * `false`.
    *
    * Pass a config object to keep specific default controls rendered while the
-   * rest of the default UI is hidden, or to remove specific controls from the
-   * otherwise full default UI (see `UIConfig`):
+   * rest of the default UI is hidden (see `UIConfig`):
    *
    * ```tsx
    * <Excalidraw ui={{ enabled: { zoom: true } }} />
-   * <Excalidraw ui={{ disabled: { minimap: true } }} />
    * ```
    *
    * NOTE: this is WIP and what default UI is/is not rendered when ui=false
@@ -1261,7 +1235,6 @@ export type AppClassProperties = {
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
   viewport: App["viewport"];
-  wheel: App["wheel"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
@@ -1275,7 +1248,6 @@ export type AppClassProperties = {
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
   arrowText: App["arrowText"];
-  text: App["text"];
   textTool: App["textTool"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
@@ -1309,7 +1281,6 @@ export type AppClassProperties = {
 
   isInteractionEnabled: App["isInteractionEnabled"];
   isNavigationEnabled: App["isNavigationEnabled"];
-  isUIControlEnabled: App["isUIControlEnabled"];
 };
 
 export type PointerDownState = Readonly<{

@@ -168,6 +168,12 @@
       "lockAll": "Blocare toate",
       "unlockAll": "Deblocare toate"
     },
+    "elementBookmark": {
+      "bookmark": "Adaugă un marcaj",
+      "removeBookmark": "Elimină marcajul",
+      "next": "Marcajul următor",
+      "previous": "Marcajul anterior"
+    },
     "statusPublished": "Publicat",
     "sidebarLock": "Păstrează deschisă bara laterală",
     "selectAllElementsInFrame": "Selectează toate elementele din cadru",
@@ -221,6 +227,11 @@
     "placeholder": "Găsire text pe pânză...",
     "frames": "Cadre",
     "texts": "Texte"
+  },
+  "bookmarks": {
+    "title": "Semne de carte",
+    "empty": "Niciun semn de carte încă...",
+    "emptyHint": "Faceți clic dreapta pe un element pentru a-l adăuga la semne de carte."
   },
   "buttons": {
     "clearReset": "Resetare pânză",

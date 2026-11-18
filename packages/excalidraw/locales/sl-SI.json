@@ -168,6 +168,12 @@
       "lockAll": "Zakleni vse",
       "unlockAll": "Odkleni vse"
     },
+    "elementBookmark": {
+      "bookmark": "Dodaj zaznamek",
+      "removeBookmark": "Odstrani zaznamek",
+      "next": "Naslednji zaznamek",
+      "previous": "Prejšnji zaznamek"
+    },
     "statusPublished": "Objavljeno",
     "sidebarLock": "Obdrži stransko vrstico odprto",
     "selectAllElementsInFrame": "Izberi vse elemente v okvirju",
@@ -221,6 +227,11 @@
     "placeholder": "Poišči besedilo na platnu ...",
     "frames": "Okvirji",
     "texts": "Besedila"
+  },
+  "bookmarks": {
+    "title": "Zaznamki",
+    "empty": "Ni še nobenih zaznamkov...",
+    "emptyHint": "Z desno miškino tipko kliknite element, da ga dodate med zaznamke."
   },
   "buttons": {
     "clearReset": "Ponastavi platno",

@@ -460,9 +460,6 @@ export class AppViewport {
     { side: "left" | "right"; offset: number }
   >();
 
-  /** @see beginGesture */
-  private activeExternalGestures = 0;
-
   /** Unique per instance (see `ViewportAnimationKeys`); exposed for tests
    * observing the animations. */
   readonly scrollToContentAnimationKey = Symbol("scrollToContentAnimation");
@@ -911,26 +908,6 @@ export class AppViewport {
     );
   };
 
-  /**
-   * Marks a viewport gesture driven from outside of the canvas (e.g. dragging
-   * the minimap) as active, so that a rubberband overscroll is held for as
-   * long as it lasts, same as during a pan — including one that's snapping
-   * back already. Returns the function ending it, which releases the
-   * overscroll.
-   */
-  beginGesture = () => {
-    let isActive = true;
-    this.activeExternalGestures++;
-    AnimationController.cancel(this.snapBackAnimationKey);
-    return () => {
-      if (isActive) {
-        isActive = false;
-        this.activeExternalGestures--;
-        this.releaseOverscroll();
-      }
-    };
-  };
-
   /** Releases a held rubberband overscroll. */
   releaseOverscroll = () => {
     if (!this.app.state.scrollConstraints) {
@@ -941,11 +918,7 @@ export class AppViewport {
   };
 
   private snapBack = () => {
-    if (
-      this.app.unmounted ||
-      this.dependencies.isGestureActive() ||
-      this.activeExternalGestures > 0
-    ) {
+    if (this.app.unmounted || this.dependencies.isGestureActive()) {
       return;
     }
     snapBackToConstraints(

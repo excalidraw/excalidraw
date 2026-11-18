@@ -38,6 +38,8 @@ export type ShortcutName =
       | "flipVertical"
       | "hyperlink"
       | "toggleElementLock"
+      | "nextBookmark"
+      | "previousBookmark"
       | "resetZoom"
       | "zoomOut"
       | "zoomIn"
@@ -49,7 +51,6 @@ export type ShortcutName =
       | "toggleShortcuts"
       | "wrapSelectionInFrame"
       | "toggleWrap"
-      | "autoResize"
     >
   | "saveScene"
   | "imageExport"
@@ -103,6 +104,8 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
   toggleElementLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
+  nextBookmark: [getShortcutKey("CtrlOrCmd+Alt+Shift+]")],
+  previousBookmark: [getShortcutKey("CtrlOrCmd+Alt+Shift+[")],
   resetZoom: [getShortcutKey("CtrlOrCmd+0")],
   zoomOut: [getShortcutKey("CtrlOrCmd+-")],
   zoomIn: [getShortcutKey("CtrlOrCmd++")],
@@ -115,7 +118,6 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
   wrapSelectionInFrame: [],
   toggleWrap: [getShortcutKey("W")],
-  autoResize: [getShortcutKey("Alt+W")],
   toolLock: [getShortcutKey("Q")],
 };
 

@@ -168,6 +168,12 @@
       "lockAll": "قفل همه",
       "unlockAll": "باز کردن قفل همه"
     },
+    "elementBookmark": {
+      "bookmark": "افزودن نشانک",
+      "removeBookmark": "حذف نشانک",
+      "next": "نشانک بعدی",
+      "previous": "نشانک قبلی"
+    },
     "statusPublished": "منتشر شده",
     "sidebarLock": "باز نگه داشتن سایدبار",
     "selectAllElementsInFrame": "همه آیتم های در فریم را انتخاب کنید",
@@ -221,6 +227,11 @@
     "placeholder": "جستجوی متن در بوم...",
     "frames": "فریم‌ها",
     "texts": "متن"
+  },
+  "bookmarks": {
+    "title": "نشانک‌ها",
+    "empty": "هنوز نشانکی وجود ندارد...",
+    "emptyHint": "برای نشانک‌گذاری روی یک عنصر کلیک راست کنید."
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",

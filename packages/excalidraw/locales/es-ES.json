@@ -168,6 +168,12 @@
       "lockAll": "Bloquear todo",
       "unlockAll": "Desbloquear todo"
     },
+    "elementBookmark": {
+      "bookmark": "Añadir marcador",
+      "removeBookmark": "Quitar marcador",
+      "next": "Marcador siguiente",
+      "previous": "Marcador anterior"
+    },
     "statusPublished": "Publicado",
     "sidebarLock": "Mantener barra lateral abierta",
     "selectAllElementsInFrame": "Seleccionar todos los elementos en el marco",
@@ -221,6 +227,11 @@
     "placeholder": "Encontrar texto en lienzo...",
     "frames": "",
     "texts": "Textos"
+  },
+  "bookmarks": {
+    "title": "Marcadores",
+    "empty": "Aún no hay marcadores...",
+    "emptyHint": "Haz clic derecho en un elemento para marcarlo."
   },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",

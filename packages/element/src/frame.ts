@@ -32,9 +32,7 @@ import {
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { syncMovedIndices } from "./fractionalIndex";
-import { LinearElementEditor } from "./linearElementEditor";
 import {
-  isArrowElement,
   isFrameElement,
   isFrameLikeElement,
   isTextElement,
@@ -47,7 +45,6 @@ import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 import type {
   ElementsMap,
   ElementsMapOrArray,
-  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -473,24 +470,6 @@ export const getContainingFrame = (
     null) as null | ExcalidrawFrameLikeElement;
 };
 
-/**
- * Whether frames clip the element to their bounds (as their child, or when
- * dragged into them). Arrows (with their labels) aren't, so that they can
- * connect elements across and out of frames.
- */
-export const isFrameClippable = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-) => {
-  if (isArrowElement(element)) {
-    return false;
-  }
-  if (isTextElement(element) && element.containerId) {
-    return !isArrowElement(elementsMap.get(element.containerId));
-  }
-  return true;
-};
-
 // --------------------------- Frame Operations -------------------------------
 
 /** */
@@ -721,70 +700,6 @@ export const removeElementsFromFrame = (
   }
 };
 
-/**
- * Whether one of the arrow's ends is in the frame: bound to an element in it,
- * or, unbound, inside it. An arrow belongs to a frame only while one is.
- */
-export const isArrowEndInFrame = (
-  arrow: ExcalidrawArrowElement,
-  frame: ExcalidrawFrameLikeElement,
-  elementsMap: ElementsMap,
-) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame, elementsMap);
-  return [arrow.startBinding, arrow.endBinding].some((binding, index) =>
-    binding
-      ? elementsMap.get(binding.elementId)?.frameId === frame.id
-      : isPointWithinBounds(
-          pointFrom(x1, y1),
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            arrow,
-            index ? -1 : 0,
-            elementsMap,
-          ),
-          pointFrom(x2, y2),
-        ),
-  );
-};
-
-/**
- * Takes the arrows among `elements`, and those bound to them, that have no end
- * in their frame (see `isArrowEndInFrame()`) out of it. Call it once their ends
- * (and the elements they're bound to) may have left it. Arrows in groups are
- * left to their group.
- */
-export const removeArrowsWithoutEndInFrame = (
-  elements: Iterable<ExcalidrawElement>,
-  elementsMap: ElementsMap,
-) => {
-  const arrows = new Set<ExcalidrawArrowElement>();
-  for (const element of elements) {
-    if (isArrowElement(element)) {
-      arrows.add(element);
-    }
-    for (const { id, type } of element.boundElements ?? []) {
-      const arrow = type === "arrow" ? elementsMap.get(id) : undefined;
-      if (isArrowElement(arrow)) {
-        arrows.add(arrow);
-      }
-    }
-  }
-
-  const arrowsToRemove = [];
-  for (const arrow of arrows) {
-    const frame = arrow.frameId ? elementsMap.get(arrow.frameId) : undefined;
-    if (
-      !arrow.isDeleted &&
-      !arrow.groupIds.length &&
-      frame &&
-      isFrameLikeElement(frame) &&
-      !isArrowEndInFrame(arrow, frame, elementsMap)
-    ) {
-      arrowsToRemove.push(arrow);
-    }
-  }
-  removeElementsFromFrame(arrowsToRemove, elementsMap);
-};
-
 export const removeAllElementsFromFrame = <T extends ExcalidrawElement>(
   allElements: readonly T[],
   frame: ExcalidrawFrameLikeElement,
@@ -799,13 +714,11 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
   nextElementsInFrame: ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
 ): T[] => {
-  const nextElements = addElementsToFrame(
+  return addElementsToFrame(
     removeAllElementsFromFrame(allElements, frame),
     nextElementsInFrame,
     frame,
   ).slice();
-  removeArrowsWithoutEndInFrame(nextElementsInFrame, arrayToMap(nextElements));
-  return nextElements;
 };
 
 /** does not mutate elements, but returns new ones */
@@ -1030,11 +943,7 @@ export const shouldApplyFrameClip = (
   elementsMap: ElementsMap,
   checkedGroups?: Map<string, boolean>,
 ) => {
-  if (
-    !appState.frameRendering ||
-    !appState.frameRendering.clip ||
-    !isFrameClippable(element, elementsMap)
-  ) {
+  if (!appState.frameRendering || !appState.frameRendering.clip) {
     return false;
   }
 
@@ -1108,25 +1017,16 @@ export const getElementsOverlappingFrame = <T extends ExcalidrawElement>(
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  const frameBounds = getElementBounds(frame, elementsMap);
-
-  return elements.filter((el) => {
-    const container =
-      isTextElement(el) && el.containerId
-        ? elementsMap.get(el.containerId)
-        : null;
-    // an arrow's label is placed, and thus shown, with its arrow
-    const target = isArrowElement(container) ? container : el;
-
-    return (
+  return elements.filter(
+    (el) =>
       // exclude elements which are overlapping, but are in a different frame,
-      // and thus invisible in target frame (unless not clipped by theirs)
-      (!target.frameId ||
-        target.frameId === frame.id ||
-        !isFrameClippable(target, elementsMap)) &&
-      doBoundsIntersect(getElementBounds(target, elementsMap), frameBounds)
-    );
-  });
+      // and thus invisible in target frame
+      (!el.frameId || el.frameId === frame.id) &&
+      doBoundsIntersect(
+        getElementBounds(el, elementsMap),
+        getElementBounds(frame, elementsMap),
+      ),
+  );
 };
 
 export const frameAndChildrenSelectedTogether = (

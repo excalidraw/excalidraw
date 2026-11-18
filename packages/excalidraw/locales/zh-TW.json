@@ -168,6 +168,12 @@
       "lockAll": "全部鎖定",
       "unlockAll": "全部解鎖"
     },
+    "elementBookmark": {
+      "bookmark": "新增書籤",
+      "removeBookmark": "移除書籤",
+      "next": "下一個書籤",
+      "previous": "上一個書籤"
+    },
     "statusPublished": "已發布",
     "sidebarLock": "側欄維持開啟",
     "selectAllElementsInFrame": "選取框架內的所有元素",
@@ -221,6 +227,11 @@
     "placeholder": "在畫布上尋找文字…",
     "frames": "框架",
     "texts": "文字"
+  },
+  "bookmarks": {
+    "title": "書籤",
+    "empty": "尚無書籤...",
+    "emptyHint": "在元素上按按右鍵以加入書籤。"
   },
   "buttons": {
     "clearReset": "重設畫布",

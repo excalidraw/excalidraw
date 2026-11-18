@@ -16,12 +16,7 @@ import {
 
 import { getFrameChildren } from "@excalidraw/element";
 
-import {
-  getFrameArrowIdsToReattach,
-  moveFrameArrows,
-  removeArrowsWithoutEndInFrame,
-  updateBindings,
-} from "@excalidraw/element";
+import { updateBindings } from "@excalidraw/element";
 import { DRAGGING_THRESHOLD } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
@@ -198,15 +193,10 @@ export const moveElement = (
       originalElementsMap,
       originalElement.id,
     );
-    const frameArrowIds = getFrameArrowIdsToReattach([
-      originalElement,
-      ...originalChildren,
-    ]);
     originalChildren.forEach((child) => {
       const latestChildElement = elementsMap.get(child.id);
 
-      // moved with their frame once the rest has (below)
-      if (!latestChildElement || frameArrowIds.has(child.id)) {
+      if (!latestChildElement) {
         return;
       }
 
@@ -242,17 +232,7 @@ export const moveElement = (
         renderEnvironment,
       });
     });
-    moveFrameArrows(frameArrowIds, { x: changeInX, y: changeInY }, scene, {
-      originalElements: originalElementsMap,
-      renderEnvironment,
-    });
   }
-
-  // a moved arrow's ends may have left its frame
-  removeArrowsWithoutEndInFrame(
-    [latestElement],
-    scene.getNonDeletedElementsMap(),
-  );
 };
 
 export const getAtomicUnits = (

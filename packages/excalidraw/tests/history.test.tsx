@@ -33,7 +33,6 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawElbowArrowElement,
-  ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
@@ -1523,54 +1522,6 @@ describe("history", () => {
         expect.objectContaining({ id: rect1.id }),
         expect.objectContaining({ id: rect3.id }),
       ]);
-    });
-
-    it("should restore elements' order when a deleted element holds a restored index", async () => {
-      await render(<Excalidraw handleKeyboardGlobally={true} />);
-
-      const rectangle = (id: string, index: string) =>
-        API.createElement({
-          type: "rectangle",
-          id,
-          index: index as FractionalIndex,
-        });
-      const reindexed = (element: ExcalidrawElement, index: string) =>
-        newElementWith(element, { index: index as FractionalIndex });
-
-      const z = rectangle("z", "a1V");
-      const y = rectangle("y", "a2");
-      const a = rectangle("a", "a1G");
-      // takes the index `z` leaves, to keep once undone (deleted)
-      const b = rectangle("b", "a1V");
-      const c = rectangle("c", "a4");
-      const yBack = reindexed(y, "a0V");
-      const zForward = reindexed(z, "a2");
-
-      API.updateScene({
-        elements: [z, y],
-        captureUpdate: CaptureUpdateAction.NEVER,
-      });
-      for (const elements of [
-        [yBack, z],
-        [yBack, a, b, zForward, c],
-        [yBack, reindexed(b, "a0Z"), a, reindexed(c, "a1l"), zForward],
-      ]) {
-        API.updateScene({
-          elements,
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-      expect(API.getUndoStack().length).toBe(3);
-
-      Keyboard.undo();
-      Keyboard.undo();
-      Keyboard.undo();
-
-      expect(
-        h.elements
-          .filter((element) => !element.isDeleted)
-          .map((element) => element.id),
-      ).toEqual(["z", "y"]);
     });
 
     describe("should support bidirectional bindings", async () => {

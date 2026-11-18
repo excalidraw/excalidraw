@@ -85,11 +85,15 @@ export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
 export { actionToggleShowHints } from "./actionToggleShowHints";
 
 export { actionToggleStats } from "./actionToggleStats";
-export { actionToggleMinimap } from "./actionToggleMinimap";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
 export { actionToggleWrap } from "./actionToggleWrap";
 export { actionLink } from "./actionLink";
 export { actionToggleElementLock } from "./actionElementLock";
+export { actionToggleElementBookmark } from "./actionElementBookmark";
+export {
+  actionNextBookmark,
+  actionPreviousBookmark,
+} from "./actionBookmarkNavigation";
 export { actionToggleLinearEditor } from "./actionLinearEditor";
 
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";

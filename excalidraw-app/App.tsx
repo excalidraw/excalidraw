@@ -232,6 +232,10 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
+  const elements = restoreElements(localDataState?.elements, null, {
+    repairBindings: true,
+    deleteInvisibleElements: true,
+  });
 
   let scene: Omit<
     RestoredDataState,
@@ -241,11 +245,8 @@ const initializeScene = async (opts: {
   > & {
     scrollToContent?: boolean;
   } = {
-    elements: restoreElements(localDataState?.elements, null, {
-      repairBindings: true,
-      deleteInvisibleElements: true,
-    }),
-    appState: restoreAppState(localDataState?.appState, null),
+    elements,
+    appState: restoreAppState(localDataState?.appState, null, elements),
   };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
@@ -265,19 +266,22 @@ const initializeScene = async (opts: {
           jsonBackendMatch[2],
         );
 
+        const elements = bumpElementVersions(
+          restoreElements(imported.elements, null, {
+            repairBindings: true,
+            deleteInvisibleElements: true,
+          }),
+          localDataState?.elements,
+        );
+
         scene = {
-          elements: bumpElementVersions(
-            restoreElements(imported.elements, null, {
-              repairBindings: true,
-              deleteInvisibleElements: true,
-            }),
-            localDataState?.elements,
-          ),
+          elements,
           appState: restoreAppState(
             imported.appState,
             // local appState when importing from backend to ensure we restore
             // localStorage user settings which we do not persist on server.
             localDataState?.appState,
+            elements,
           ),
         };
       }
@@ -331,6 +335,11 @@ const initializeScene = async (opts: {
     const { excalidrawAPI } = opts;
 
     const scene = await opts.collabAPI.startCollaboration(roomLinkData);
+    const reconciledElements = reconcileElements(
+      scene?.elements || [],
+      excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
+      excalidrawAPI.getAppState(),
+    );
 
     return {
       // when collaborating, the state may have already been updated at this
@@ -345,16 +354,13 @@ const initializeScene = async (opts: {
               theme: localDataState?.appState?.theme || scene?.appState?.theme,
             },
             excalidrawAPI.getAppState(),
+            reconciledElements,
           ),
           // necessary if we're invoking from a hashchange handler which doesn't
           // go through App.initializeScene() that resets this flag
           isLoading: false,
         },
-        elements: reconcileElements(
-          scene?.elements || [],
-          excalidrawAPI.getSceneElementsIncludingDeleted() as RemoteExcalidrawElement[],
-          excalidrawAPI.getAppState(),
-        ),
+        elements: reconciledElements,
       },
       isExternalScene: true,
       id: roomLinkData.roomId,
@@ -583,11 +589,20 @@ const ExcalidrawWrapper = () => {
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
           if (data.scene) {
-            excalidrawAPI.updateScene({
-              elements: restoreElements(data.scene.elements, null, {
+            const restoredElements = restoreElements(
+              data.scene.elements,
+              null,
+              {
                 repairBindings: true,
-              }),
-              appState: restoreAppState(data.scene.appState, null),
+              },
+            );
+            excalidrawAPI.updateScene({
+              elements: restoredElements,
+              appState: restoreAppState(
+                data.scene.appState,
+                null,
+                restoredElements,
+              ),
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           }

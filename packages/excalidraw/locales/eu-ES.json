@@ -168,6 +168,12 @@
       "lockAll": "Blokeatu guztiak",
       "unlockAll": "Desblokeatu guztiak"
     },
+    "elementBookmark": {
+      "bookmark": "Gehitu laster-marka",
+      "removeBookmark": "Kendu laster-marka",
+      "next": "Hurrengo laster-marka",
+      "previous": "Aurreko laster-marka"
+    },
     "statusPublished": "Argitaratua",
     "sidebarLock": "Mantendu alboko barra irekita",
     "selectAllElementsInFrame": "Hautatu markoko elementu guztiak",
@@ -221,6 +227,11 @@
     "placeholder": "Bilatu testua oihalean...",
     "frames": "Markoak",
     "texts": "Testuak"
+  },
+  "bookmarks": {
+    "title": "Laster-markak",
+    "empty": "Ez dago laster-markarik oraindik...",
+    "emptyHint": "Egin klik eskuineko botoiaz elementu batean laster-marka gehitzeko."
   },
   "buttons": {
     "clearReset": "Garbitu oihala",

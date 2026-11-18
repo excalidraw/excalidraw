@@ -26,8 +26,8 @@ import {
   checkpointHistory,
 } from "./test-utils";
 
-import type { ShortcutName } from "../actions/shortcuts";
 import type { ActionName } from "../actions/types";
+import type { ShortcutName } from "../actions/shortcuts";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
@@ -47,11 +47,6 @@ const mouse = new Pointer("mouse");
 unmountComponent();
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
-beforeEach(() => {
-  localStorage.clear();
-  renderStaticScene.mockClear();
-  reseed(7);
-});
 
 const { h } = window;
 
@@ -74,10 +69,12 @@ describe("contextMenu element", () => {
   });
 
   afterEach(() => {
-    checkpoint("end of test");
-
-    mouse.reset();
-    mouse.down(0, 0);
+    try {
+      checkpoint("end of test");
+    } finally {
+      unmountComponent();
+      mouse.reset();
+    }
   });
 
   it("shows context menu for canvas", () => {
@@ -137,6 +134,7 @@ describe("contextMenu element", () => {
       "hyperlink",
       "copyElementLink",
       "toggleElementLock",
+      "toggleElementBookmark",
     ];
 
     expect(contextMenu).not.toBeNull();
@@ -188,6 +186,32 @@ describe("contextMenu element", () => {
     expect(API.getSelectedElement().id).toBe(rect2.id);
   });
 
+  it("shows and activates the bookmark action for a selected element", () => {
+    const element = API.createElement({
+      type: "rectangle",
+      id: "context-menu-bookmark",
+    });
+    API.setElements([element]);
+    API.setSelectedElements([element]);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+    });
+
+    const contextMenu = UI.queryContextMenu();
+    const bookmarkAction = contextMenu?.querySelector(
+      'li[data-testid="toggleElementBookmark"]',
+    );
+
+    expect(bookmarkAction).not.toBeNull();
+    expect(bookmarkAction?.textContent).toContain("Bookmark");
+    fireEvent.click(bookmarkAction!);
+
+    expect(h.state.bookmarkedElementIds).toEqual([element.id]);
+  });
+
   it("shows 'Group selection' in context menu for multiple selected elements", () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -212,7 +236,7 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
-    const expectedShortcutNames: ShortcutName[] = [
+    const expectedShortcutNames: ActionName[] = [
       "cut",
       "copy",
       "paste",
@@ -230,6 +254,7 @@ describe("contextMenu element", () => {
       "bringToFront",
       "duplicateSelection",
       "toggleElementLock",
+      "toggleElementBookmark",
     ];
 
     expect(contextMenu).not.toBeNull();
@@ -288,6 +313,7 @@ describe("contextMenu element", () => {
       "bringToFront",
       "duplicateSelection",
       "toggleElementLock",
+      "toggleElementBookmark",
     ];
 
     expect(contextMenu).not.toBeNull();

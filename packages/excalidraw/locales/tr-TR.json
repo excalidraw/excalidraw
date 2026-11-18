@@ -168,6 +168,12 @@
       "lockAll": "Hepsini kilitle",
       "unlockAll": "Hepsinin kilidini kaldır"
     },
+    "elementBookmark": {
+      "bookmark": "Yer işareti ekle",
+      "removeBookmark": "Yer işaretini kaldır",
+      "next": "Sonraki yer işareti",
+      "previous": "Önceki yer işareti"
+    },
     "statusPublished": "Yayınlandı",
     "sidebarLock": "Kenar çubuğu açık kalsın",
     "selectAllElementsInFrame": "Çerçevedeki tüm bileşenleri seç",
@@ -221,6 +227,11 @@
     "placeholder": "Tuvalde metin bul...",
     "frames": "Çerçeveler",
     "texts": "Metinler"
+  },
+  "bookmarks": {
+    "title": "Yer İmleri",
+    "empty": "Henüz yer imi yok...",
+    "emptyHint": "Yer imlerine eklemek için bir öğeye sağ tıklayın."
   },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
