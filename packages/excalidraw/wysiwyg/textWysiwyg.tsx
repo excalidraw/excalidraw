@@ -1323,6 +1323,23 @@ export const textWysiwyg = ({
       return;
     }
 
+    // the auto-resize toggle on the box of the text being edited unwraps it
+    // without leaving the editor
+    if (
+      event.button === POINTER_BUTTON.MAIN &&
+      target instanceof ownerWindow.HTMLCanvasElement &&
+      app.text.handleTextAutoResizeHandlePointerDown(
+        app.scene.getSelectedElements(app.state),
+        viewportCoordsToSceneCoords(event, app.state),
+      )
+    ) {
+      // the press is the editor's: the canvas would otherwise act on it
+      event.preventDefault();
+      event.stopPropagation();
+      temporarilyDisableSubmit();
+      return;
+    }
+
     // dragging a side of the text being edited resizes it (changing where it
     // wraps) without leaving the editor; a mere click there still submits
     if (

@@ -3621,6 +3621,36 @@ describe("textWysiwyg", () => {
       expect(text.text).toBe(text.originalText);
     });
 
+    it("unwraps the text being edited clicked on its handle, still editing it", async () => {
+      unmountComponent();
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      API.setElements([wrappedText()]);
+      mouse.doubleClickAt(110, 110);
+      const editor = await getTextEditor();
+      // the editor listens for presses outside it from the next frame on
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const [x, y] = getTextAutoResizeHandle(
+        h.elements[0] as ExcalidrawTextElement,
+        h.state.zoom.value,
+        "desktop",
+      )!.center;
+
+      mouse.downAt(x, y);
+      // (as the browser does, the press on the canvas taking the focus)
+      fireEvent.blur(editor);
+      mouse.upAt(x, y);
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      expect(editor.style.whiteSpace).toBe("pre");
+    });
+
     it("toggles auto-resizing of the selected texts with Alt+W, wrapping at the max width at most", () => {
       const line = "Excalidraw is an opensource virtual collaborative ";
       // (10px a character in tests)
