@@ -386,3 +386,28 @@ describe("toolbar", () => {
     expect(badge("eraser")).toBe("E");
   });
 });
+
+describe("mouse wheel tool selection", () => {
+  it("cycles through tools on Alt + wheel", async () => {
+    const { container } = await render(<Excalidraw />);
+    const canvas = container.querySelector("canvas")!;
+
+    expect(window.h.state.activeTool.type).toBe("selection");
+
+    // Alt + scroll down moves to next tool (rectangle)
+    fireEvent.wheel(canvas, { deltaY: 100, altKey: true });
+    expect(window.h.state.activeTool.type).toBe("rectangle");
+
+    // Alt + scroll down moves to diamond
+    fireEvent.wheel(canvas, { deltaY: 100, altKey: true });
+    expect(window.h.state.activeTool.type).toBe("diamond");
+
+    // Alt + scroll up moves back to rectangle
+    fireEvent.wheel(canvas, { deltaY: -100, altKey: true });
+    expect(window.h.state.activeTool.type).toBe("rectangle");
+
+    // Normal scroll without Alt does not change tool
+    fireEvent.wheel(canvas, { deltaY: 100, altKey: false });
+    expect(window.h.state.activeTool.type).toBe("rectangle");
+  });
+});
