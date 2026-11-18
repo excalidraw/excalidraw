@@ -12,6 +12,8 @@ import {
   updateBoundPoint,
 } from "@excalidraw/element";
 
+import type { GlobalPoint } from "@excalidraw/math";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawLineElement,
@@ -69,7 +71,7 @@ export class AppDrawShape {
   };
 
   /** returns true when the pointermove was consumed by the shape preview */
-  handlePointerMove = (pointerCoords: { x: number; y: number }): boolean => {
+  handlePointerMove = (pointerCoords: GlobalPoint): boolean => {
     return convertToShapeHandlePointerMoveFromPointerDown(
       this.app,
       pointerCoords,

@@ -4,10 +4,13 @@ import {
   EVENT,
   KEYS,
   getGridPoint,
+  tupleToCoors,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
 import { isStickyNoteElement, newStickyNoteElement } from "@excalidraw/element";
+
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawNonSelectionElement,
@@ -19,8 +22,6 @@ import { trackEvent } from "../analytics";
 import type App from "./App";
 import type { ToolType } from "../types";
 
-type ScenePoint = { x: number; y: number };
-
 /** what a drag places: any element the new-element canvas can preview */
 type DraggedElement = NonDeleted<ExcalidrawNonSelectionElement>;
 
@@ -30,14 +31,14 @@ type DraggedElement = NonDeleted<ExcalidrawNonSelectionElement>;
  */
 type DraggableTool = {
   /** the element the drop creates, centered on the pointer */
-  createElement: (app: App, center: ScenePoint) => DraggedElement;
+  createElement: (app: App, center: GlobalPoint) => DraggedElement;
   /** what the tool does once its element is on the canvas (e.g. start editing) */
   onDrop?: (app: App, element: DraggedElement) => void;
 };
 
-const centered = (center: ScenePoint, width: number, height: number) => ({
-  x: center.x - width / 2,
-  y: center.y - height / 2,
+const centered = (center: GlobalPoint, width: number, height: number) => ({
+  x: center[0] - width / 2,
+  y: center[1] - height / 2,
   width,
   height,
 });
@@ -64,7 +65,8 @@ export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
         opacity: state.currentItemOpacity,
         roundness: app.getCurrentItemRoundness("stickynote"),
         locked: false,
-        frameId: app.getTopLayerFrameAtSceneCoords(center)?.id ?? null,
+        frameId:
+          app.getTopLayerFrameAtSceneCoords(tupleToCoors(center))?.id ?? null,
       });
     },
     onDrop: (app, element) => {
@@ -152,7 +154,9 @@ export class AppToolDrag {
     }
     const preview = this.tool!.createElement(
       this.app,
-      viewportCoordsToSceneCoords(event, this.app.state),
+      pointFrom<GlobalPoint>(
+        viewportCoordsToSceneCoords(event, this.app.state),
+      ),
     );
     // Snap after the tool centers its element, just like click-to-place.
     const [x, y] = getGridPoint(

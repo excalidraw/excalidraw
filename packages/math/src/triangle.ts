@@ -1,4 +1,4 @@
-import type { GlobalPoint, LocalPoint, Triangle } from "./types";
+import type { GenericPoint, Triangle } from "./types";
 
 // Types
 
@@ -11,7 +11,7 @@ import type { GlobalPoint, LocalPoint, Triangle } from "./types";
  * @param p The point to test whether is in the triangle
  * @returns TRUE if the point is inside of the triangle
  */
-export function triangleIncludesPoint<P extends GlobalPoint | LocalPoint>(
+export function triangleIncludesPoint<P extends GenericPoint>(
   [a, b, c]: Triangle<P>,
   p: P,
 ): boolean {
