@@ -15,6 +15,7 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
+import { actionUnbindText } from "../actions/actionBoundText";
 import { actionWrapSelectionInFrame } from "../actions/actionFrame";
 import {
   actionChangeFontSize,
@@ -24,6 +25,7 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { act, render } from "./test-utils";
 
 const { h } = window;
@@ -322,6 +324,61 @@ describe("wrap (w)", () => {
     );
     expect(selectedIds().sort()).toEqual([rectangle.id, arrow.id].sort());
   });
+
+  // a typed label grows its container, which goes back to its height once
+  // the label's unbound — the arrows bound to it following
+  it.each([
+    ["`w`", pressW],
+    ["the unbind text action", () => API.executeAction(actionUnbindText)],
+  ])(
+    "re-routes the arrows bound to a container it shrinks back (%s)",
+    async (_, unbind) => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        // an id of its own: the heights containers go back to are cached by
+        // id, for the whole module
+        id: "grown",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 50,
+        boundElements: [{ type: "arrow", id: "arrow" }],
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: 100,
+        y: 400,
+        width: 0,
+        height: -340,
+        points: [pointFrom(0, 0), pointFrom(0, -340)],
+        endBinding: { elementId: "grown", fixedPoint: [0.5, 1], mode: "orbit" },
+      });
+      API.setElements([rectangle, arrow]);
+      API.setSelectedElements([rectangle]);
+
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "a\nb\nc\nd\ne\nf");
+      Keyboard.exitTextEditor(editor);
+
+      // how far the arrow's end is from the rectangle's bottom edge
+      const gap = () => {
+        const { y, points } = getElement<ExcalidrawArrowElement>("arrow");
+        const { y: top, height } = getElement("grown");
+        return y + points[points.length - 1][1] - (top + height);
+      };
+      const grownHeight = getElement("grown").height;
+      expect(grownHeight).toBeGreaterThan(50);
+      const gapBefore = gap();
+
+      API.setSelectedElements([getElement("grown")]);
+      unbind();
+
+      expect(getElement("grown").height).toBe(50);
+      expect(gap()).toBeCloseTo(gapBefore, 0);
+    },
+  );
 
   it("drops the point editor of an unwrapped arrow", () => {
     const [arrow, label] = API.createLabeledArrow();
