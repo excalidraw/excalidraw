@@ -326,7 +326,11 @@ export class AppClipboard {
       const isPlainPaste = !!IS_PLAIN_PASTE;
 
       // #686
-      const target = this.app.ownerDocument.activeElement;
+      const root = this.dependencies.getContainer()?.getRootNode();
+      const shadowRoot =
+        root instanceof this.app.ownerWindow.ShadowRoot ? root : null;
+      const target =
+        shadowRoot?.activeElement ?? this.app.ownerDocument.activeElement;
       const isExcalidrawActive = this.dependencies
         .getContainer()
         ?.contains(target);
@@ -334,10 +338,15 @@ export class AppClipboard {
         return;
       }
 
-      const elementUnderCursor = this.app.ownerDocument.elementFromPoint(
-        this.app.viewport.lastPosition.x,
-        this.app.viewport.lastPosition.y,
-      );
+      const elementUnderCursor =
+        shadowRoot?.elementFromPoint?.(
+          this.app.viewport.lastPosition.x,
+          this.app.viewport.lastPosition.y,
+        ) ??
+        this.app.ownerDocument.elementFromPoint(
+          this.app.viewport.lastPosition.x,
+          this.app.viewport.lastPosition.y,
+        );
       if (
         event &&
         (!(
