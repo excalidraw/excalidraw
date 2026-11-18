@@ -1,5 +1,8 @@
 import React from "react";
 
+import { elementWithCanvasCache } from "@excalidraw/element";
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
+
 import { Excalidraw } from "../index";
 import { snapScrollToDevicePixels } from "../renderer/helpers";
 
@@ -54,6 +57,37 @@ describe("element pixel snap", () => {
     await render(<Excalidraw />);
     // jsdom gives the editor no size, which culls every element
     API.setAppState({ width: 800, height: 600 });
+  });
+
+  it("allocates the same bitmap padding for a start-only arrowhead", async () => {
+    const props = {
+      type: "arrow" as const,
+      x: 100,
+      y: 100,
+      width: 120,
+      height: 80,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(120, 80)],
+    };
+    const startArrow = API.createElement({
+      ...props,
+      startArrowhead: "triangle",
+    });
+    const endArrow = API.createElement({
+      ...props,
+      endArrowhead: "triangle",
+    });
+
+    API.setElements([startArrow, endArrow]);
+    const [startCanvas, endCanvas] = await waitFor(() => {
+      const start = elementWithCanvasCache.get(startArrow)?.canvas;
+      const end = elementWithCanvasCache.get(endArrow)?.canvas;
+      expect(start).toBeDefined();
+      expect(end).toBeDefined();
+      return [start!, end!];
+    });
+
+    expect(startCanvas.width).toBe(endCanvas.width);
+    expect(startCanvas.height).toBe(endCanvas.height);
   });
 
   it.each([
