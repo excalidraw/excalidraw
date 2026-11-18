@@ -1431,8 +1431,14 @@ export const textWysiwyg = ({
     const latestElement = app.scene.getElement(element.id);
     if (!latestElement || latestElement.isDeleted) {
       // the element went away under the edit (another tab's sync, a host's
-      // update): so does the editor. After the update that's under way.
-      queueMicrotask(handleSubmit);
+      // update): so does the editor. After the update that's under way, and
+      // unless that brought it back (a reset followed by a load).
+      queueMicrotask(() => {
+        const currentElement = app.scene.getElement(element.id);
+        if (!currentElement || currentElement.isDeleted) {
+          handleSubmit();
+        }
+      });
       return;
     }
     // Until the user types, the editor shows the scene's text: a change

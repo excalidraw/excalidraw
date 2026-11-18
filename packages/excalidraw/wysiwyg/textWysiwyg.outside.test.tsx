@@ -204,6 +204,29 @@ describe("text editor & the world outside it", () => {
     expect(h.elements).toEqual([]);
   });
 
+  it("stays open when the update that removed the element brings it back", async () => {
+    updateTextEditor(editor, "draft");
+    const restored = newElementWith(getText(text.id), {
+      originalText: "restored",
+      text: "restored",
+    });
+    // a host's reset followed by a load of the same scene
+    act(() => {
+      h.app.updateScene({
+        elements: [],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+      h.app.updateScene({
+        elements: [restored],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    });
+    await act(async () => {});
+    // not closed, so nothing wrote the draft over the restored text
+    expect(document.querySelector("textarea")).toBe(editor);
+    expect(getText(text.id).originalText).toBe("restored");
+  });
+
   it("keeps a label's container in step with a change from outside", async () => {
     Keyboard.exitTextEditor(editor);
     const container = UI.createElement("rectangle", {
