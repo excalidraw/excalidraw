@@ -1,4 +1,5 @@
 import { getFontString, KEYS, matchKey } from "@excalidraw/common";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
   getElementBounds,
@@ -15,6 +16,8 @@ import { measureText } from "@excalidraw/element";
 import { isTextElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawElement,
@@ -81,15 +84,29 @@ const toggleTextAutoResize = (
 
   // (un)wrapping resizes the box, so keep the point the text's alignment pins
   // — otherwise a right-aligned or centred text slides sideways, and one
-  // bound to an arrow endpoint drags the arrow with it
+  // bound to an arrow endpoint drags the arrow with it. Keep it where it is
+  // on the canvas, that is: a rotated text turns about the center of its
+  // box, which the resize moves.
   const anchor = getTextAnchorRatios(text);
+  /** the anchor from the center of a box of the given size, rotated */
+  const getAnchorOffset = (width: number, height: number) =>
+    pointRotateRads(
+      pointFrom<GlobalPoint>(
+        width * (anchor.x - 0.5),
+        height * (anchor.y - 0.5),
+      ),
+      pointFrom<GlobalPoint>(0, 0),
+      text.angle,
+    );
+  const [offsetX, offsetY] = getAnchorOffset(text.width, text.height);
+  const [nextOffsetX, nextOffsetY] = getAnchorOffset(nextWidth, metrics.height);
 
   return newElementWith(text, {
     autoResize,
     width: nextWidth,
     height: metrics.height,
-    x: text.x + (text.width - nextWidth) * anchor.x,
-    y: text.y + (text.height - metrics.height) * anchor.y,
+    x: text.x + (text.width - nextWidth) / 2 + offsetX - nextOffsetX,
+    y: text.y + (text.height - metrics.height) / 2 + offsetY - nextOffsetY,
     text: nextText,
   });
 };

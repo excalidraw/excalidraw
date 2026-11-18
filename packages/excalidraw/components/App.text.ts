@@ -562,21 +562,6 @@ export class AppText {
   };
 
   /**
-   * The side handle of the text being edited under the pointer (see
-   * `getEditedTextResizeHandleAt()`), drawn as the affordance for dragging
-   * it: a text that doesn't wrap yet has no box showing its sides. Not app
-   * state — the interactive canvas takes it as a prop.
-   */
-  public editedTextHoveredSide: "e" | "w" | null = null;
-
-  public setEditedTextHoveredSide = (side: "e" | "w" | null) => {
-    if (this.editedTextHoveredSide !== side) {
-      this.editedTextHoveredSide = side;
-      this.app.triggerRender();
-    }
-  };
-
-  /**
    * The side handle, at a scene point, of the free text being edited: dragging
    * it sets the width the text wraps at, as it does for a selected text.
    *
