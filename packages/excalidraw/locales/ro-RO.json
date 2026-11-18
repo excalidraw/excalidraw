@@ -787,14 +787,14 @@
     "mmb": "Rotiță maus"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Prezentări",
+    "mcp": "Desenează cu IA",
+    "comments": "Scrie comentarii",
+    "teams": "Lucrează în echipă",
+    "voiceChat": "Conversație vocală",
+    "withExcalidrawPlus": "cu Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pentru oameni și IA"
   }
 }
