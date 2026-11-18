@@ -342,6 +342,82 @@ const hasSameElementIds = (
   return true;
 };
 
+/**
+ * Gathers each selected frame's elements into one contiguous block at the
+ * leading edge of the frame's z-range (its topmost element when moving right,
+ * bottommost when moving left), pushing the unselected elements interleaved
+ * in that range (denormalized frame order) behind it.
+ *
+ * Without this, shifting a denormalized frame by one moves each of its
+ * contiguous runs independently, so the frame stays interleaved with
+ * unrelated elements, and doesn't reach the front/back even once its leading
+ * run gets there.
+ *
+ * Selected elements only ever move in `direction` relative to the
+ * unselected ones, and keep their relative order.
+ *
+ * @returns the same array if nothing was gathered
+ */
+const gatherSelectedFrames = (
+  elements: readonly ExcalidrawElement[],
+  indicesToMove: number[],
+  direction: "left" | "right",
+) => {
+  const idsToMove = new Set(indicesToMove.map((index) => elements[index].id));
+  const selectedFrameIds = new Set(
+    indicesToMove
+      .map((index) => elements[index])
+      .filter((element) => isFrameLikeElement(element))
+      .map((frame) => frame.id),
+  );
+
+  // children of unselected frames stay in place (in their own frame's range)
+  const shouldGather = (element: ExcalidrawElement) =>
+    idsToMove.has(element.id) &&
+    (!element.frameId || selectedFrameIds.has(element.frameId));
+
+  let nextElements = elements;
+
+  for (const frameId of selectedFrameIds) {
+    // ignore deleted children so that stale ones don't stretch the range
+    const isFrameElement = (element: ExcalidrawElement) =>
+      !element.isDeleted && isOfTargetFrame(element, frameId);
+
+    const rangeStart = findIndex(nextElements, isFrameElement);
+    const rangeEnd = findLastIndex(nextElements, isFrameElement);
+
+    if (rangeStart === -1) {
+      continue;
+    }
+
+    const rangeElements = nextElements.slice(rangeStart, rangeEnd + 1);
+    const elementsToGather = rangeElements.filter(shouldGather);
+    const displacedElements = rangeElements.filter(
+      (element) => !shouldGather(element),
+    );
+    const gatheredRangeElements =
+      direction === "left"
+        ? [...elementsToGather, ...displacedElements]
+        : [...displacedElements, ...elementsToGather];
+
+    if (
+      gatheredRangeElements.every(
+        (element, index) => element === rangeElements[index],
+      )
+    ) {
+      continue;
+    }
+
+    nextElements = [
+      ...nextElements.slice(0, rangeStart),
+      ...gatheredRangeElements,
+      ...nextElements.slice(rangeEnd + 1),
+    ];
+  }
+
+  return nextElements;
+};
+
 const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -349,7 +425,18 @@ const shiftElementsByOne = (
   scene: Scene,
 ) => {
   const originalElements = elements;
-  const indicesToMove = getIndicesToMove(elements, appState);
+  let indicesToMove = getIndicesToMove(elements, appState);
+
+  const gatheredElements = gatherSelectedFrames(
+    elements,
+    indicesToMove,
+    direction,
+  );
+  if (gatheredElements !== elements) {
+    elements = gatheredElements;
+    indicesToMove = getIndicesToMove(elements, appState);
+  }
+
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
 
   let groupedIndices = toContiguousGroups(indicesToMove);

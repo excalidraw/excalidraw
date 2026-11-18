@@ -1296,9 +1296,7 @@ describe("z-indexing with frames", () => {
         { id: "R2" },
       ],
       operations: [
-        // +1
-        [actionBringForward, ["R1", "F1_1", "F1", "R2", "F1_2"]],
-        // +1
+        // +1 (gathered above R1, then moved past R2)
         [actionBringForward, ["R1", "R2", "F1_1", "F1", "F1_2"]],
         // noop
         [actionBringForward, ["R1", "R2", "F1_1", "F1", "F1_2"]],
@@ -1316,13 +1314,46 @@ describe("z-indexing with frames", () => {
         { id: "R3" },
       ],
       operations: [
+        // +1 (gathered above R1 & R2, then moved past R3)
+        [actionBringForward, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
+        // noop
+        [actionBringForward, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R3" },
+        { id: "R4" },
+      ],
+      operations: [
+        // +1 (moves past R3 only)
+        [actionBringForward, ["R1", "R2", "R3", "F1_1", "F1", "F1_2", "R4"]],
         // +1
-        [actionBringForward, ["R1", "F1_1", "R2", "F1", "R3", "F1_2"]],
-        // +1
-        // FIXME incorrect, should put F1_1 after R3
-        [actionBringForward, ["R1", "R2", "F1_1", "R3", "F1", "F1_2"]],
-        // +1
-        // FIXME should be noop from previous step after it's fixed
+        [actionBringForward, ["R1", "R2", "R3", "R4", "F1_1", "F1", "F1_2"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER, already at the front
+    assertZindex({
+      elements: [
+        { id: "R1" },
+        { id: "F1_1", frameId: "F1" },
+        { id: "R2" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R3" },
+        { id: "F1_2", frameId: "F1" },
+      ],
+      operations: [
+        // +1 (nothing left to move past, only gathered)
+        [actionBringForward, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
+        // noop
         [actionBringForward, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
       ],
     });
@@ -1338,10 +1369,107 @@ describe("z-indexing with frames", () => {
         { id: "R3" },
       ],
       operations: [
-        // -1
-        [actionSendBackward, ["F1_1", "F1", "R1", "F1_2", "R2", "R3"]],
-        // -1
+        // -1 (nothing left to move past, only gathered)
         [actionSendBackward, ["F1_1", "F1", "F1_2", "R1", "R2", "R3"]],
+        // noop
+        [actionSendBackward, ["F1_1", "F1", "F1_2", "R1", "R2", "R3"]],
+      ],
+    });
+
+    // DENORMALIZED FRAME ORDER
+    assertZindex({
+      elements: [
+        { id: "R0" },
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+      ],
+      operations: [
+        // -1 (gathered below R1 & R2, then moved past R0)
+        [actionSendBackward, ["F1_1", "F1", "F1_2", "R0", "R1", "R2"]],
+        // noop
+        [actionSendBackward, ["F1_1", "F1", "F1_2", "R0", "R1", "R2"]],
+      ],
+    });
+  });
+
+  it("moving whole frame by one (DENORMALIZED) along with other elements", () => {
+    // selected element interleaved in the frame's z-range
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1", isSelected: true },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R3" },
+      ],
+      operations: [
+        [actionBringForward, ["R2", "R3", "F1_1", "R1", "F1", "F1_2"]],
+      ],
+    });
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1", isSelected: true },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1" },
+        { id: "R3" },
+      ],
+      operations: [
+        [actionSendBackward, ["F1_1", "R1", "F1", "F1_2", "R2", "R3"]],
+      ],
+    });
+
+    // selected element outside the frame's z-range moves on its own
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "R2", isSelected: true },
+        { id: "R3" },
+        { id: "R4" },
+      ],
+      operations: [
+        [actionBringForward, ["R1", "R3", "F1_1", "F1", "R2", "R4"]],
+      ],
+    });
+
+    // deleted frame child doesn't stretch the frame's z-range
+    assertZindex({
+      elements: [
+        { id: "R0" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "R2" },
+        { id: "F1_2", frameId: "F1", isDeleted: true },
+      ],
+      operations: [
+        [actionBringForward, ["R0", "R1", "F1", "F1_1", "R2", "F1_2"]],
+      ],
+    });
+
+    // multiple denormalized frames
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1" },
+        { id: "R1" },
+        { id: "F1", type: "frame", isSelected: true },
+        { id: "F2_1", frameId: "F2" },
+        { id: "R2" },
+        { id: "F2", type: "frame", isSelected: true },
+        { id: "R3" },
+      ],
+      operations: [
+        // +1 (each frame gathered, then moved past one element)
+        [actionBringForward, ["R1", "R2", "F1_1", "F1", "R3", "F2_1", "F2"]],
+        // -1
+        [actionSendBackward, ["R1", "F1_1", "F1", "R2", "F2_1", "F2", "R3"]],
       ],
     });
   });
@@ -1612,6 +1740,22 @@ describe("z-index reordering with broken contiguity (invariant-violating input)"
       [actionSendBackward, ["F1_1", "F2_1", "F1_2", "F1", "F2"]],
       [actionBringToFront, ["F2_1", "F1_2", "F1", "F1_1", "F2"]],
       [actionSendToBack, ["F1_1", "F2_1", "F1_2", "F1", "F2"]],
+    ]);
+  });
+
+  it("selected frame's z-range interleaved with another frame", () => {
+    // F2 (unselected, with selected child F2_1) sits INSIDE the selected
+    // frame F1's z-range. Gathering F1 must not drag F2_1 out of F2.
+    const elements: Parameters<typeof populateElements>[0] = [
+      { id: "F1_1", frameId: "F1" },
+      { id: "F2_1", frameId: "F2", isSelected: true },
+      { id: "F2", type: "frame" },
+      { id: "F1", type: "frame", isSelected: true },
+      { id: "R1" },
+    ];
+    assertReorderPreservesElements(elements, undefined, [
+      [actionBringForward, ["F2_1", "F2", "R1", "F1_1", "F1"]],
+      [actionSendBackward, ["F1_1", "F1", "F2_1", "F2", "R1"]],
     ]);
   });
 
