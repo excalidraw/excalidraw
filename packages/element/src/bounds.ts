@@ -1743,12 +1743,7 @@ export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
             center,
             element.angle,
           ),
-        ].some((point) => {
-          return pointInsideBounds(
-            pointRotateRads(point, center, element.angle),
-            selectionBounds,
-          );
-        });
+        ].some((point) => pointInsideBounds(point, selectionBounds));
       }
 
       if (!hasIntersection) {
