@@ -229,6 +229,26 @@ describe("charts", () => {
       ]);
     });
 
+    it("treats a numeric first row with empty top-left as series headers (#12401)", () => {
+      const spreadsheet = [
+        ["", "2023", "2024"],
+        ["North", "10", "20"],
+        ["South", "5", "6"],
+      ];
+
+      const result = tryParseCells(spreadsheet);
+      expect(result.ok).toBe(true);
+
+      const parsed = (result as { ok: true; data: Spreadsheet }).data;
+
+      expect(parsed.title).toBeNull();
+      expect(parsed.labels).toEqual(["North", "South"]);
+      expect(parsed.series).toEqual([
+        { title: "2023", values: [10, 5] },
+        { title: "2024", values: [20, 6] },
+      ]);
+    });
+
     it("parses 2-row multi-series data with header row", () => {
       const spreadsheet = [
         ["trait", "Dunk", "Egg"],
