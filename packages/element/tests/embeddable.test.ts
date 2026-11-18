@@ -271,3 +271,12 @@ describe("Instagram embedding", () => {
     }
   });
 });
+
+describe("fckswg.de embedding", () => {
+  it.each(["https://fckswg.de", "https://www.fckswg.de/"])(
+    "should validate fckswg.de domain by default: %s",
+    (url) => {
+      expect(embeddableURLValidator(url, undefined)).toBe(true);
+    },
+  );
+});
