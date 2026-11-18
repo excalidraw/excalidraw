@@ -63,7 +63,7 @@ export const CustomColorList = ({
               dnd ? (event) => dnd.startSourceDrag(event, c) : undefined
             }
             title={c}
-            aria-label={label}
+            aria-label={`${label}: ${c}`}
             style={{ "--swatch-color": displayColor }}
             key={i}
           >

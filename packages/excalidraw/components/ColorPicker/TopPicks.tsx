@@ -113,6 +113,7 @@ export const TopPicks = ({
               key={color}
               type="button"
               title={color}
+              aria-label={color || "transparent"}
               onClick={() => onChange(color)}
               onPointerDown={
                 dnd
