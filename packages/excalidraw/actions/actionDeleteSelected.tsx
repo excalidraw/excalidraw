@@ -87,10 +87,12 @@ const deleteSelectedElements = (
         ? getContainerElement(el, elementsMap)
         : null;
 
+      // a selected child of a deleted frame is kept, leaving the frame as
+      // the unselected ones do (see below)
       if (!withFrameChildren && isChildOfDeletedFrame(el)) {
         shouldSelectEditingGroup = false;
         selectedElementIds[el.id] = true;
-        return el;
+        return newElementWith(el, { frameId: null });
       }
 
       if (
