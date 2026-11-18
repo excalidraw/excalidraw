@@ -3,8 +3,13 @@ import {
   getBaseFontSize,
   getBaseFontSizeUpdate,
   redrawTextBoundingBox,
+  updateBoundElements,
 } from "@excalidraw/element";
-import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
+import {
+  hasBoundTextElement,
+  isNonDeletedElement,
+  isTextElement,
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -80,6 +85,12 @@ const handleFontSizeChange: DragInputCallbackType<
         scene,
         app.renderEnvironment,
       );
+      // re-route arrows bound to the resized text (see #12475)
+      if (isNonDeletedElement(latestElement)) {
+        updateBoundElements(latestElement, scene, {
+          renderEnvironment: app.renderEnvironment,
+        });
+      }
     }
   }
 };
