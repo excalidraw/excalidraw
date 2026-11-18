@@ -1,4 +1,8 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  embeddableURLValidator,
+  getEmbedLink,
+  maybeParseEmbedSrc,
+} from "../src/embeddable";
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
@@ -269,5 +273,40 @@ describe("Instagram embedding", () => {
     if (result?.type === "generic") {
       expect(result.link).toBe(expectedLink);
     }
+  });
+});
+
+describe("YouTube privacy-enhanced (youtube-nocookie.com) links", () => {
+  it.each([
+    {
+      url: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+      expectedLink:
+        "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1",
+    },
+    {
+      url: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=90",
+      expectedLink:
+        "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1&start=90",
+    },
+    {
+      url: '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allowfullscreen></iframe>',
+      expectedLink:
+        "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?enablejsapi=1",
+    },
+  ])("should embed $url", ({ url, expectedLink }) => {
+    const src = maybeParseEmbedSrc(url);
+    expect(embeddableURLValidator(src, undefined)).toBe(true);
+    const result = getEmbedLink(src);
+    expect(result?.type).toBe("video");
+    if (result?.type === "video") {
+      expect(result.link).toBe(expectedLink);
+    }
+  });
+
+  it("should keep regular YouTube links on youtube.com", () => {
+    const result = getEmbedLink("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    expect(result?.type === "video" && result.link).toBe(
+      "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1",
+    );
   });
 });
