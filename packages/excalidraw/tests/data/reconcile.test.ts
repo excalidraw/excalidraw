@@ -1,9 +1,14 @@
-import { syncInvalidIndices } from "@excalidraw/element";
+import {
+  syncInvalidIndices,
+  ShapeCache,
+  newElement,
+} from "@excalidraw/element";
 
 import { randomInteger, cloneJSON } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawRectangleElement,
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -382,5 +387,81 @@ describe("elements reconciliation", () => {
       index: "a0",
     };
     testIdentical([el1, el2], [el2, el1], ["A", "B"]);
+  });
+});
+
+describe("elements reconciliation: shape cache reuse", () => {
+  afterEach(() => {
+    ShapeCache.destroy();
+  });
+
+  const asLocal = (element: OrderedExcalidrawElement) =>
+    cloneJSON([element]) as unknown as OrderedExcalidrawElement[];
+
+  it("carries the cached shape over when a remote update only moves the element", () => {
+    const source = newElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+      index: "a0" as OrderedExcalidrawElement["index"],
+    }) as OrderedExcalidrawElement;
+
+    // Cache the shape on the exact instance that will be passed as the
+    // local element below — ShapeCache is keyed by object identity, so a
+    // separately-cloned copy would never hit.
+    const localElements = asLocal(source);
+    const localElement = localElements[0] as ExcalidrawRectangleElement;
+    const cachedShape = ShapeCache.generateElementShape(localElement, null);
+
+    // Simulates a remote peer re-broadcasting the same element (a fresh
+    // instance, per the collab wire format) with only its position and
+    // version bookkeeping changed — e.g. one frame of a live drag.
+    const remote = {
+      ...cloneJSON(localElement),
+      x: 42,
+      y: 17,
+      version: localElement.version + 1,
+      versionNonce: localElement.versionNonce + 1,
+    } as unknown as RemoteExcalidrawElement;
+
+    const [reconciled] = reconcileElements(
+      localElements,
+      [remote],
+      {} as AppState,
+    );
+
+    expect(ShapeCache.get(reconciled, null)).toBe(cachedShape);
+  });
+
+  it("does not reuse the cached shape when a shape-relevant property changed", () => {
+    const source = newElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+      index: "a0" as OrderedExcalidrawElement["index"],
+    }) as OrderedExcalidrawElement;
+
+    const localElements = asLocal(source);
+    const localElement = localElements[0] as ExcalidrawRectangleElement;
+    ShapeCache.generateElementShape(localElement, null);
+
+    const remote = {
+      ...cloneJSON(localElement),
+      width: 200, // shape-relevant change
+      version: localElement.version + 1,
+      versionNonce: localElement.versionNonce + 1,
+    } as unknown as RemoteExcalidrawElement;
+
+    const [reconciled] = reconcileElements(
+      localElements,
+      [remote],
+      {} as AppState,
+    );
+
+    expect(ShapeCache.get(reconciled, null)).toBeUndefined();
   });
 });
