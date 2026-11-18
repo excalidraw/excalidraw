@@ -31,7 +31,7 @@
   <a href="https://discord.gg/UexuTaE">
     <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widget=false"/></a>
   <a href="https://deepwiki.com/excalidraw/excalidraw">
-    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg" /></a>
+    <img alt="Ask DeepWiki" src="https://img.shields.io/badge/Ask-DeepWiki-0969DA" /></a>
   <a href="https://twitter.com/excalidraw">
     <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/></a>
 </p>
