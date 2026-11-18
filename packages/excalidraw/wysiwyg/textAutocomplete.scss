@@ -1,0 +1,67 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .excalidraw-textAutocomplete {
+    position: absolute;
+    // sits in the same layer as the wysiwyg textarea; appended after it in the
+    // DOM, so it paints on top
+    z-index: var(--zIndex-wysiwyg);
+    box-sizing: border-box;
+    min-width: 7.5rem;
+    max-width: 15rem;
+    padding: 0.25rem;
+    margin: 0;
+
+    background-color: var(--popup-bg-color);
+    color: var(--popup-text-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-island);
+
+    // the editor box swallows pointer events; the popup takes them back
+    pointer-events: auto;
+    user-select: none;
+    overflow: hidden;
+
+    font-family: var(--ui-font);
+    font-size: 0.875rem;
+    line-height: 1.25;
+    text-align: start;
+
+    .excalidraw-textAutocomplete__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      height: 1.75rem;
+      padding: 0 0.5rem;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+
+      &--selected {
+        background-color: var(--color-surface-mid);
+      }
+    }
+
+    .excalidraw-textAutocomplete__label {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    // the part the user already typed
+    .excalidraw-textAutocomplete__match {
+      font-weight: 600;
+    }
+
+    // the "Tab" affordance on the highlighted row
+    .excalidraw-textAutocomplete__hint {
+      flex: 0 0 auto;
+      padding: 0 0.25rem;
+      border-radius: var(--border-radius-md);
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+      font-size: 0.625rem;
+      line-height: 1rem;
+    }
+  }
+}
