@@ -27,6 +27,7 @@
     "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
+    "textColor": "文本颜色",
     "changeStroke": "更改描边颜色",
     "background": "背景",
     "changeBackground": "更改背景颜色",

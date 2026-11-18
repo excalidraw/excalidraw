@@ -27,6 +27,7 @@
     "copyStyles": "Copia els estils",
     "pasteStyles": "Enganxa els estils",
     "stroke": "Color del traç",
+    "textColor": "Color del text",
     "changeStroke": "Canvia el color del traç",
     "background": "Color del fons",
     "changeBackground": "Canvia el color de fons",
