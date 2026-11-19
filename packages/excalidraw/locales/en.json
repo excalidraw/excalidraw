@@ -541,10 +541,12 @@
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",
       "scale": "Scale",
+      "svgDescription": "SVG description",
       "padding": "Padding"
     },
     "tooltip": {
-      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
+      "svgDescription": "Adds a description for accessibility tools to the SVG file. It will not appear in the image."
     },
     "title": {
       "exportToPng": "Export to PNG",

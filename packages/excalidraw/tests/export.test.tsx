@@ -113,6 +113,33 @@ describe("export", () => {
     copySpy.mockRestore();
   });
 
+  it("includes the description supplied to SVG export", async () => {
+    const copySpy = vi
+      .spyOn(clipboardModule, "copyTextToSystemClipboard")
+      .mockResolvedValue();
+    const { exportedElements } = prepareElementsForExport(
+      testElements,
+      h.state,
+      false,
+    );
+
+    await exportCanvas(
+      "clipboard-svg",
+      exportedElements,
+      h.state,
+      {},
+      {
+        exportingFrame: null,
+        description: "Review & approval",
+      },
+    );
+
+    expect(copySpy).toHaveBeenCalledWith(
+      expect.stringContaining("<desc>Review &amp; approval</desc>"),
+    );
+    copySpy.mockRestore();
+  });
+
   it("export svg-embedded scene", async () => {
     const svg = await exportScene({
       type: "svg",
