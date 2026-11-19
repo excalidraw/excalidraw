@@ -272,6 +272,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom: AppState["zoom"],
+  altKey?: boolean,
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -298,20 +299,28 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     zoom,
   );
 
-  const current = hit
-    ? {
-        element: hit,
-        mode: "orbit" as const,
-        focusPoint: LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          arrow,
-          pointIdx,
-          elementsMap,
-        ),
-      }
+  // Elbow arrows bind inside (the endpoint stays where it's dropped within
+  // the element, the route starting from there) only while Alt is held
+  const current: BindingStrategy = hit
+    ? altKey && isPointInElement(globalPoint, hit, elementsMap)
+      ? {
+          element: hit,
+          mode: "inside",
+          focusPoint: globalPoint,
+        }
+      : {
+          element: hit,
+          mode: "orbit",
+          focusPoint: LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            pointIdx,
+            elementsMap,
+          ),
+        }
     : {
         mode: null,
       };
-  const other = { mode: undefined };
+  const other: BindingStrategy = { mode: undefined };
 
   return pointIdx === 0
     ? { start: current, end: other }
@@ -714,6 +723,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       elementsMap,
       elements,
       appState.zoom,
+      opts?.altKey,
     );
   }
 
@@ -972,6 +982,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
   opts?: {
     newArrow?: boolean;
     shiftKey?: boolean;
+    altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
   },
@@ -1021,6 +1032,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
       elementsMap,
       elements,
       appState.zoom,
+      opts?.altKey,
     );
   }
 
@@ -1155,7 +1167,21 @@ export const bindBindingElement = (
 
   let binding: FixedPointBinding;
 
-  if (isElbowArrow(arrow)) {
+  if (isElbowArrow(arrow) && mode === "inside") {
+    // Inside bound elbow arrow endpoints stay where they are within the
+    // element, no outline snapping
+    binding = {
+      elementId: hoveredElement.id,
+      mode: "inside",
+      ...calculateFixedPointForNonElbowArrowBinding(
+        arrow,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+        focusPoint,
+      ),
+    };
+  } else if (isElbowArrow(arrow)) {
     binding = {
       elementId: hoveredElement.id,
       mode: "orbit",
@@ -1339,7 +1365,7 @@ export const reanchorBindingsToOutline = (
 
       const startOrEndName = startOrEnd === "startBinding" ? "start" : "end";
 
-      if (isElbowArrow(element)) {
+      if (isElbowArrow(element) && binding.mode !== "inside") {
         updates[startOrEnd] = {
           ...binding,
           ...calculateFixedPointForElbowArrowBinding(
