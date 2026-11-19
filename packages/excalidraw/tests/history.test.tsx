@@ -2156,6 +2156,27 @@ describe("history", () => {
       expect(queryByTestId(container, "button-undo")).toBeDisabled();
       expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
     });
+
+    it("should allow undoing the first element added after resetScene", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      API.updateScene({
+        elements: [API.createElement({ type: "rectangle" })],
+      });
+      expect(h.elements.length).toBe(1);
+
+      API.resetScene();
+      expect(h.elements.length).toBe(0);
+      expect(API.getUndoStack().length).toBe(0);
+
+      UI.clickTool("rectangle");
+      mouse.down(10, 10);
+      mouse.up(20, 20);
+      expect(h.elements.filter((el) => !el.isDeleted).length).toBe(1);
+
+      Keyboard.undo();
+      expect(h.elements.filter((el) => !el.isDeleted).length).toBe(0);
+    });
   });
 
   describe("multiplayer undo/redo", () => {
