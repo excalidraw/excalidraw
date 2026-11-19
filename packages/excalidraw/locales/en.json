@@ -744,8 +744,18 @@
       "old": "old"
     },
     "sceneFonts": "In this scene",
+    "favoriteFonts": "Favorites",
     "availableFonts": "Available fonts",
+    "loadMore": "Browse more fonts",
+    "loadingMore": "Loading…",
+    "searchForMore": "Use search for more",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites",
+    "searchResults": "Search results",
+    "moreResults": "+{{count}} more, keep typing to narrow",
+    "didYouMean": "Did you mean…",
     "empty": "No fonts found",
+    "searching": "Searching…",
     "topPicksTip": "Tip: drag any font onto your top picks to pin it",
     "resetTopPicks": "Reset to default top picks"
   },

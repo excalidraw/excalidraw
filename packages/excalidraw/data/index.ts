@@ -30,12 +30,17 @@ import {
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportScene, getExportConfigFromAppState } from "../scene/export";
+import {
+  exportScene,
+  getExportConfigFromAppState,
+  serializeSvg,
+} from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
+import type { FontResolvers } from "../fonts";
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 
@@ -107,6 +112,7 @@ export const exportCanvas = async (
     fileHandle = null,
     exportingFrame = null,
     renderEnvironment,
+    fontResolvers,
   }: {
     exportPadding?: number;
     /** filename, if applicable */
@@ -114,6 +120,7 @@ export const exportCanvas = async (
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
     renderEnvironment?: RenderEnvironment;
+    fontResolvers?: FontResolvers;
   },
 ) => {
   if (elements.length === 0) {
@@ -124,6 +131,7 @@ export const exportCanvas = async (
     ...getExportConfigFromAppState(appState),
     padding: exportPadding,
     exportingFrame,
+    fontResolvers,
   };
 
   if (type === "svg" || type === "clipboard-svg") {
@@ -146,7 +154,7 @@ export const exportCanvas = async (
         svgPromise.then((svg) => {
           // adding SVG preamble so that older software parse the SVG file
           // properly
-          return new Blob([SVG_DOCUMENT_PREAMBLE + svg.outerHTML], {
+          return new Blob([SVG_DOCUMENT_PREAMBLE + serializeSvg(svg)], {
             type: MIME_TYPES.svg,
           });
         }),
@@ -159,7 +167,7 @@ export const exportCanvas = async (
         },
       );
     } else if (type === "clipboard-svg") {
-      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      const svg = await svgPromise.then(serializeSvg);
       try {
         await copyTextToSystemClipboard(svg);
       } catch (e) {

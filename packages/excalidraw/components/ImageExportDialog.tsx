@@ -38,6 +38,7 @@ import "./ImageExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 
+import type { FontResolvers } from "../fonts";
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
 export const ErrorCanvasPreview = () => {
@@ -60,6 +61,7 @@ type ImageExportModalProps = {
   onExportImage: AppClassProperties["onExportImage"];
   name: string;
   exportWithDarkMode: boolean;
+  fontResolvers: FontResolvers;
 };
 
 const ImageExportModal = ({
@@ -70,6 +72,7 @@ const ImageExportModal = ({
   onExportImage,
   name,
   exportWithDarkMode,
+  fontResolvers,
 }: ImageExportModalProps) => {
   const hasSelection = isSomeElementSelected(
     elementsSnapshot,
@@ -145,6 +148,7 @@ const ImageExportModal = ({
         padding: DEFAULT_EXPORT_PADDING,
         maxWidthOrHeight: Math.max(maxWidth, maxHeight),
         exportingFrame,
+        fontResolvers,
       },
     })
       .then(async (canvas) => {
@@ -192,6 +196,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    fontResolvers,
   ]);
 
   return (
@@ -397,6 +402,7 @@ export const ImageExportDialog = ({
   onExportImage,
   onCloseRequest,
   name,
+  fontResolvers,
 }: {
   appState: UIAppState;
   elements: readonly NonDeletedExcalidrawElement[];
@@ -405,6 +411,7 @@ export const ImageExportDialog = ({
   onExportImage: AppClassProperties["onExportImage"];
   onCloseRequest: () => void;
   name: string;
+  fontResolvers: FontResolvers;
 }) => {
   // we need to take a snapshot so that the exported state can't be modified
   // while the dialog is open
@@ -425,6 +432,7 @@ export const ImageExportDialog = ({
         onExportImage={onExportImage}
         name={name}
         exportWithDarkMode={appState.exportWithDarkMode}
+        fontResolvers={fontResolvers}
       />
     </Dialog>
   );

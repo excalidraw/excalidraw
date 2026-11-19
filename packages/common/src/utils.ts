@@ -2,7 +2,7 @@ import { average } from "@excalidraw/math";
 
 import type { GlobalCoord } from "@excalidraw/math";
 
-import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
+import type { FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -17,12 +17,14 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
+  getCustomFontCSSFamily,
+  isCustomFontFamily,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
 import type { MaybePromise, ResolutionType } from "./utility-types";
 
-import type { EVENT } from "./constants";
+import type { EVENT, FontFamily } from "./constants";
 
 let mockDateTime: string | null = null;
 
@@ -137,8 +139,20 @@ export const isWritableElement = (
 export const getFontFamilyString = ({
   fontFamily,
 }: {
-  fontFamily: FontFamilyValues;
+  fontFamily: FontFamily;
 }) => {
+  // Custom font - referred to by its generated CSS name, never by the id
+  // itself (see `getCustomFontCSSFamily`), plus the generic fallbacks. Also
+  // covers a string we can't resolve (i.e. a bare "Comic Sans MS" kept by
+  // `restore`): its generated name matches no font, so it renders in the
+  // fallbacks on every machine rather than in whatever happens to be installed
+  if (isCustomFontFamily(fontFamily)) {
+    const fallbacks = getFontFamilyFallbacks(fontFamily);
+    return `${getCustomFontCSSFamily(fontFamily)}${fallbacks
+      .map((x) => `, ${x}`)
+      .join("")}`;
+  }
+
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
       return `${fontFamilyString}${getFontFamilyFallbacks(id)
@@ -155,7 +169,7 @@ export const getFontString = ({
   fontFamily,
 }: {
   fontSize: number;
-  fontFamily: FontFamilyValues;
+  fontFamily: FontFamily;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
 };

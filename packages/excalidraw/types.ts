@@ -5,6 +5,7 @@ import type {
   MIME_TYPES,
   EditorInterface,
   StrokeWidthKey,
+  FontFamily,
 } from "@excalidraw/common";
 
 import type { LinearElementEditor } from "@excalidraw/element";
@@ -25,7 +26,6 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawArrowElement,
   Arrowhead,
-  FontFamilyValues,
   FileId,
   Theme,
   StrokeRoundness,
@@ -68,6 +68,9 @@ import type { ImportedDataState } from "./data/types";
 import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
+
+import type { FontResolver } from "./fonts";
+
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
@@ -458,12 +461,12 @@ export interface AppState {
   currentItemRoughness: number;
   currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
-  currentItemFontFamily: FontFamilyValues;
+  currentItemFontFamily: FontFamily;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
-  currentHoveredFontFamily: FontFamilyValues | null;
+  currentHoveredFontFamily: FontFamily | null;
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
   viewBackgroundColor: string;
@@ -588,7 +591,7 @@ export interface AppState {
   };
   /** user-customized font-picker top picks (pinned via drag & drop from the
    * font picker popup). `null` means no customization (defaults are used) */
-  fontTopPicks: readonly FontFamilyValues[] | null;
+  fontTopPicks: readonly FontFamily[] | null;
 }
 
 export type SearchMatch = {
@@ -713,6 +716,133 @@ export type OnExportProgress = {
   /** 0-1 range */
   progress?: number;
 };
+
+export interface FontProvider {
+  icon: React.JSX.Element;
+  /**
+   * Resolve a bare font family name (i.e. "Roboto") into a loadable font
+   * definition.
+   *
+   * WARN: family names are treated as *exact* - reject a name you don't
+   * recognise verbatim rather than normalising it. The name is persisted into
+   * `fontFamily`, so it has to mean one thing: resolving both "Roboto" and
+   * "roboto" puts two ids for one font into documents.
+   */
+  resolve: FontResolver;
+  /**
+   * The fonts to offer up front in the font picker - see {@link ProvidedFont}.
+   *
+   * Taken as-is: keep them unique, and mind that a name shadowing a built-in
+   * font (i.e. "Nunito") shows up as a separate entry next to it.
+   */
+  availableFonts: readonly ProvidedFont[];
+  /**
+   * Text previewing a family when pinned to the font picker's top picks,
+   * written in that family - "Aa" when omitted, empty or failed, and while a
+   * returned promise is pending. Return a sample in the family's script, i.e.
+   * "あ" for a Japanese font, as "Aa" falls back to another font where the
+   * family has no Latin glyphs.
+   *
+   * Asked once per family, the answer is kept for the session.
+   *
+   * @param fontFamily the family's id, i.e. "Roboto" - see {@link ProvidedFont}
+   */
+  getPreviewText?(fontFamily: string): string | Promise<string>;
+  /**
+   * Find families beyond `availableFonts` as the user types into the font
+   * picker's search (debounced, and aborted via `signal` once superseded).
+   *
+   * Return every hit, most relevant first - the picker lists only the first
+   * few, so the user narrows down by typing more. Ids follow `resolve`'s
+   * exactness rule: return the canonical spelling.
+   *
+   * Only what this returns is offered: a typed name is never tried as a font
+   * of its own, as ids aren't necessarily something a user could type.
+   *
+   * @param query trimmed search text, i.e. "rob"
+   */
+  search?(
+    query: string,
+    opts: { signal: AbortSignal },
+  ): Promise<FontSearchResult>;
+  /**
+   * More of the provider's fonts than `availableFonts`, a page at a time -
+   * turns "Browse more fonts" on at the end of the font picker's list. The
+   * picker asks for the next page when the user clicks it, and from then on
+   * whenever they reach the end of the list.
+   *
+   * Return the fonts in an order which stays the same between calls (i.e.
+   * most popular first), `limit` of them at most - fewer mean there are no
+   * more. Fonts the picker lists already are skipped, and what gets loaded is
+   * appended as it comes, not sorted. It stays listed when the picker closes
+   * and reopens, until `fontProviders` changes.
+   *
+   * @param opts.offset how many fonts the earlier calls returned
+   */
+  loadMore?(opts: {
+    offset: number;
+    limit: number;
+    signal: AbortSignal;
+  }): Promise<readonly ProvidedFont[]>;
+}
+
+/**
+ * A font a provider offers. `id` is the family part of its font id
+ * (`"<provider>:<id>"`) - what gets saved into `fontFamily` and handed to
+ * `resolve` - and `label` the name the font picker shows and searches by. A
+ * plain string is shorthand for the two being the same, i.e. "Roboto" for a
+ * Google font.
+ *
+ * Tell them apart wherever the id isn't a name - an uploaded font's id
+ * should be something stable (i.e. a hash or a uuid), so that renaming the
+ * font or another organization uploading one under the same name doesn't
+ * change what a document refers to.
+ */
+export type ProvidedFont = string | { id: string; label: string };
+
+export type FontSearchResult = {
+  /**
+   * "match" when every label contains the query (case-insensitive substring),
+   * "suggestion" when none does and the labels are merely similar, i.e.
+   * "Roboto" for "rovoto" - listed only while nothing matches
+   */
+  kind: "match" | "suggestion";
+  fonts: readonly ProvidedFont[];
+};
+
+/**
+ * Font providers, by provider key. The key is persisted as part of every font
+ * family id it resolves (`<provider>:<family>`, i.e. "com.acme.fonts:Brand
+ * Sans") and travels with the document, so it can never change. It must be:
+ *
+ * - `"google"` ({@link GOOGLE_FONT_PROVIDER_KEY}) for Google Fonts, or
+ * - a lowercase reverse-DNS key under a domain you own, containing at least
+ *   one dot, i.e. "com.acme.fonts". Keys without a dot are reserved.
+ *
+ * The key names the catalog, not whoever serves the files: a mirror of Google
+ * Fonts still registers as `"google"`.
+ *
+ * The contract every provider signs up to, as ids end up in files, libraries
+ * and the clipboard, and are read by other hosts:
+ *
+ * - One id means one rendering. A family is resolved once, then cached and
+ *   shared across every editor on the page until reload, so resolvers must
+ *   return equivalent faces and metadata for the same family.
+ * - Ids are exact. Resolve only the names you publish, verbatim, and reject
+ *   the rest rather than normalizing them.
+ * - Never stop resolving a family you once offered - documents using it are
+ *   out there for good.
+ * - A family is a family: don't publish its weights or styles as separate
+ *   families (i.e. "Roboto Light").
+ *
+ * A rejection is not retried automatically - the family is shown as failed in
+ * the picker until a deliberate user action, which keeps host code off the
+ * path of every scene update. Resolvers are expected to cache their
+ * definitions and to retry internally before rejecting. The verdict is
+ * page-scoped and clears as soon as the family resolves anywhere; image
+ * exports never record one, so a blip while rendering cannot disable a font.
+ */
+export type FontProviders = Record<string, FontProvider>;
 
 export type InteractionConfig = {
   /**
@@ -968,6 +1098,10 @@ export interface ExcalidrawProps {
    * prevent the duplication as a whole, return `false`. If no duplicate
    * remains, the duplication is cancelled and the returned elements are
    * ignored (alt-drag then moves the original elements instead).
+   *
+   * NOTE: replacing a text element's `fontFamily` here leaves its measured
+   * geometry (width, wrapping, container size) to you - the editor does not
+   * re-measure host-swapped duplicates.
    */
   onDuplicate?: (
     nextElements: readonly ExcalidrawElement[],
@@ -1100,6 +1234,41 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  /**
+   * Font providers for custom font support, keyed by provider key. Custom
+   * fonts are identified by that key as a prefix in `fontFamily`, i.e.
+   * `"google:Roboto"`; built-in fonts are unaffected. See
+   * {@link FontProviders} for which keys are allowed.
+   *
+   * Providers are scoped to this editor; resolved font faces are shared
+   * page-wide, so a family any editor resolved renders in all of them.
+   */
+  fontProviders?: FontProviders;
+  /**
+   * The user's favorite fonts, and what to do when they change - turns
+   * favorites on in the font picker. A font is added by dragging it from the
+   * picker's list onto the drop zone which takes the search's place for the
+   * drag, and removed the same way. Favorites are listed in a section of
+   * their own, below the fonts the scene uses.
+   *
+   * Controlled: the editor keeps nothing, so that the host can store the
+   * list where it stores the user's other preferences.
+   */
+  fontFavorites?: {
+    /** font ids as in `fontFamily`, i.e. `5` or `"google:Roboto"` */
+    fonts: readonly FontFamily[];
+    onChange: (fonts: FontFamily[]) => void;
+  };
+  /**
+   * Replaces the tip at the bottom of the font picker ("drag any font onto
+   * your top picks to pin it"), i.e. to say where the fonts offered there
+   * come from and where to change them. `null` shows none.
+   *
+   * Replaces the whole text rather than adding to it, so that the tip never
+   * mixes the host's translations with the editor's - localize it yourself.
+   * The editor's reset link for customized top picks stays next to it.
+   */
+  fontPickerTip?: React.ReactNode;
   renderScrollbars?: boolean;
   viewportStatusFrame?: ViewportStatusFrame | null;
   /**

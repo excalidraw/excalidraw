@@ -2,6 +2,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   FONT_FAMILY,
+  FontFamily,
   ROUNDNESS,
   TEXT_ALIGN,
   THEME,
@@ -18,7 +19,6 @@ import type {
 export type ChartType = "bar" | "line" | "radar";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
-export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
@@ -139,15 +139,14 @@ export type ExcalidrawIframeLikeElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
-export type IframeData =
-  | {
-      intrinsicSize: { w: number; h: number };
-      error?: Error;
-      sandbox?: { allowSameOrigin?: boolean };
-    } & (
-      | { type: "video" | "generic"; link: string }
-      | { type: "document"; srcdoc: (theme: Theme) => string }
-    );
+export type IframeData = {
+  intrinsicSize: { w: number; h: number };
+  error?: Error;
+  sandbox?: { allowSameOrigin?: boolean };
+} & (
+  | { type: "video" | "generic"; link: string }
+  | { type: "document"; srcdoc: (theme: Theme) => string }
+);
 
 export type ImageCrop = {
   x: number;
@@ -254,7 +253,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
     fontSize: number;
-    fontFamily: FontFamilyValues;
+    fontFamily: FontFamily;
     /**
      * The font size the user picked, from which the layout derives `fontSize`.
      * Today only sticky note labels have one: the auto-fit shrinks below it

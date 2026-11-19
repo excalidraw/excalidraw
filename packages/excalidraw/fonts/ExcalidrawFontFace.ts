@@ -8,20 +8,45 @@ export class ExcalidrawFontFace {
   public readonly urls: URL[] | DataURL[];
   public readonly fontFace: FontFace;
 
+  /**
+   * The family as we know it, i.e. "Excalifont" or "google:Roboto" - our
+   * source of truth, for lookups and messages.
+   */
+  public readonly family: string;
+
+  /**
+   * The name the browser knows the family by: the same as `family` for the
+   * built-ins, a generated one for custom fonts (`getCustomFontCSSFamily`),
+   * whose id must never reach CSS. What `getFontFamilyString` refers to.
+   */
+  public readonly cssFamily: string;
+
+  private readonly descriptors?: FontFaceDescriptors;
+
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
     import.meta.env.PKG_NAME
       ? `${import.meta.env.PKG_NAME}@${import.meta.env.PKG_VERSION}` // is provided during package build
       : "@excalidraw/excalidraw" // fallback to the latest package version (i.e. for app)
   }/dist/prod/`;
 
-  constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
+  constructor(
+    family: string,
+    uri: string,
+    descriptors?: FontFaceDescriptors,
+    cssFamily: string = family,
+  ) {
     this.urls = ExcalidrawFontFace.createUrls(uri);
+    this.family = family;
+    this.cssFamily = cssFamily;
+    this.descriptors = descriptors;
 
     const sources = this.urls
       .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
       .join(", ");
 
-    this.fontFace = new FontFace(family, sources, {
+    // WARN: the bare name, unquoted - it takes the name itself, so a
+    // pre-quoted value double-quotes and matches nothing
+    this.fontFace = new FontFace(this.cssFamily, sources, {
       display: "swap",
       style: "normal",
       weight: "400",
@@ -44,9 +69,31 @@ export class ExcalidrawFontFace {
       (char) => char.codePointAt(0)!,
     );
 
+    // carry the face's distinguishing descriptors into the declaration, or a
+    // multi-weight / italic / unicode-ranged family collapses into one bucket
+    // and viewers match the wrong face. From our own descriptors, as browser
+    // `FontFace` serialization differs per engine; defaults are omitted
+    const cssDescriptors = [
+      this.descriptors?.style &&
+        this.descriptors.style !== "normal" &&
+        `font-style: ${this.descriptors.style};`,
+      this.descriptors?.weight &&
+        this.descriptors.weight !== "400" &&
+        `font-weight: ${this.descriptors.weight};`,
+      this.descriptors?.unicodeRange &&
+        `unicode-range: ${this.descriptors.unicodeRange};`,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     return this.getContent(codepoints).then(
       (content) =>
-        `@font-face { font-family: ${this.fontFace.family}; src: url(${content}); }`,
+        // quoted, as not every built-in name is a valid ident sequence
+        `@font-face { font-family: ${JSON.stringify(
+          this.cssFamily,
+        )}; src: url(${content});${
+          cssDescriptors ? ` ${cssDescriptors}` : ""
+        } }`,
     );
   }
 
@@ -78,7 +125,7 @@ export class ExcalidrawFontFace {
     }
 
     console.error(
-      `Failed to fetch font family "${this.fontFace.family}"`,
+      `Failed to fetch font family "${this.family}"`,
       JSON.stringify(errorMessages, undefined, 2),
     );
 
@@ -112,10 +159,16 @@ export class ExcalidrawFontFace {
   }
 
   private getUnicodeRangeRegex() {
+    // prefer our own descriptor - `fontFace.unicodeRange` is the browser's
+    // serialization of it (and a hardcoded stub in tests). A real gate here
+    // also keeps non-intersecting faces out of exports entirely
+    const unicodeRange =
+      this.descriptors?.unicodeRange ?? this.fontFace.unicodeRange;
+
     // using \u{h} or \u{hhhhh} to match any number of hex digits,
     // otherwise we would get an "Invalid Unicode escape" error
     // e.g. U+0-1007F -> \u{0}-\u{1007F}
-    const unicodeRangeRegex = this.fontFace.unicodeRange
+    const unicodeRangeRegex = unicodeRange
       .split(/,\s*/)
       .map((range) => {
         const [start, end] = range.replace("U+", "").split("-");

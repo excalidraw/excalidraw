@@ -145,6 +145,65 @@ describe("history", () => {
   });
 
   describe("singleplayer undo/redo", () => {
+    it("keeps a font repair deferred during a drag out of the drag's undo entry", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      // created before its family is in - bakes in the fallback metrics
+      const text = API.createElement({
+        type: "text",
+        text: "drag me",
+        x: 10,
+        y: 10,
+        fontFamily: "test.historyrepair:Font",
+      });
+      API.updateScene({
+        elements: [text],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      API.setSelectedElements([text]);
+
+      const originalLineHeight = text.lineHeight;
+      expect(originalLineHeight).not.toBe(2);
+
+      // drag the element...
+      mouse.downAt(text.x + text.width / 2, text.y + text.height / 2);
+      mouse.moveTo(text.x + text.width / 2 + 30, text.y + text.height / 2);
+
+      // ...and let its font settle mid-drag - the repair of text measured
+      // before that (see `AppFonts.repairTextOnFontLoad`) must defer, as
+      // mutating mid-gesture would corrupt the gesture's undo entry
+      // (`CaptureUpdateAction.NEVER` outranks the gesture's `EVENTUALLY`)
+      act(() => {
+        h.app.fonts.instance.runSceneRepair(() => {
+          h.app.scene.mutateElement(
+            h.app.scene.getElement(text.id) as ExcalidrawTextElement,
+            { lineHeight: 2 as ExcalidrawTextElement["lineHeight"] },
+          );
+        });
+      });
+      expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(
+        originalLineHeight,
+      );
+
+      mouse.up();
+
+      // the gesture got captured, then the repair ran in its own
+      // non-capturable pass
+      await waitFor(() =>
+        expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2),
+      );
+      expect(h.elements[0].x).not.toBe(10);
+
+      // creation baseline + the drag
+      expect(API.getUndoStack().length).toBe(2);
+      Keyboard.undo();
+
+      // undo reverts the drag - and only the drag; the repair is not part
+      // of its entry
+      expect(h.elements[0].x).toBe(10);
+      expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2);
+    });
+
     it("should not collapse when applying corrupted history entry", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       const rect = API.createElement({ type: "rectangle" });

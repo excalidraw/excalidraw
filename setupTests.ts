@@ -87,9 +87,13 @@ Object.defineProperty(window, "FontFace", {
 
 Object.defineProperty(document, "fonts", {
   value: {
-    load: vi.fn().mockResolvedValue([]),
-    check: vi.fn().mockResolvedValue(true),
-    has: vi.fn().mockResolvedValue(true),
+    // an implementation (unlike `mockResolvedValue`) survives a test's
+    // `mockRestore()` - `load` always returns a promise in the browser
+    load: vi.fn(() => Promise.resolve([])),
+    // `check` and `has` are synchronous booleans in the browser - a promise
+    // here would be always-truthy and silently skip loading branches
+    check: vi.fn().mockReturnValue(true),
+    has: vi.fn().mockReturnValue(true),
     add: vi.fn(),
   },
 });

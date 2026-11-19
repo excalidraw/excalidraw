@@ -19,7 +19,8 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import { getDefaultAppState } from "../../appState";
 import * as staticSceneModule from "../../renderer/staticScene";
-import { exportScene } from "../../scene/export";
+import { registerFontResolvers } from "../../fonts";
+import { exportScene, serializeSvg } from "../../scene/export";
 
 import { prepareElementsForExport } from "../../data";
 import {
@@ -418,6 +419,122 @@ describe("exportToCanvas", () => {
       { willReadFrequently: true },
     ]);
     getContextSpy.mockRestore();
+  });
+});
+
+describe("registerFontResolvers", () => {
+  const METADATA = {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 800,
+      descender: -200,
+      lineHeight: 1.2,
+    },
+  };
+  const createResolver = () =>
+    vi.fn(async () => ({
+      fontFaces: [{ uri: "https://example.com/font.woff2" }] as const,
+      metadata: METADATA,
+    }));
+
+  const exportText = (
+    fontFamily: string,
+    fontResolvers?: Parameters<typeof registerFontResolvers>[0],
+  ) =>
+    exportScene({
+      type: "svg",
+      data: {
+        elements: [
+          API.createElement({
+            type: "text",
+            text: "a",
+            fontFamily: fontFamily as `${string}:${string}`,
+          }),
+        ],
+        appState: {},
+        files: null,
+      },
+      config: { skipInliningFonts: true, fontResolvers },
+    });
+
+  it("resolves custom fonts in every export, until taken back", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const resolver = createResolver();
+    const unregister = registerFontResolvers({ "test.registered": resolver });
+
+    await exportText("test.registered:First");
+    expect(resolver).toHaveBeenCalledWith("First");
+    expect(warn).not.toHaveBeenCalled();
+
+    unregister();
+    await exportText("test.registered:Second");
+    expect(resolver).toHaveBeenCalledTimes(1);
+    // nothing supplies the font any more - that isn't silent
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it("lets a resolver passed to the export win", async () => {
+    const registered = createResolver();
+    const passed = createResolver();
+    const unregister = registerFontResolvers({ "test.override": registered });
+
+    await exportText("test.override:Font", { "test.override": passed });
+
+    expect(passed).toHaveBeenCalledWith("Font");
+    expect(registered).not.toHaveBeenCalled();
+    unregister();
+  });
+
+  it("is shared with another copy of the package in the realm", async () => {
+    const resolver = createResolver();
+    const unregister = registerFontResolvers({ "test.shared": resolver });
+
+    // i.e. `@excalidraw/utils`, or a second bundle - loaded later, at that
+    vi.resetModules();
+    const otherCopy = await import("../../fonts/resolvers");
+
+    expect(otherCopy.registerFontResolvers).not.toBe(registerFontResolvers);
+    expect(otherCopy.getExportFontResolvers()).toMatchObject({
+      "test.shared": resolver,
+    });
+    unregister();
+    expect(otherCopy.getExportFontResolvers()).not.toHaveProperty(
+      "test.shared",
+    );
+  });
+
+  it("rejects a provider key the editor wouldn't accept", () => {
+    expect(() => registerFontResolvers({ acme: createResolver() })).toThrow(
+      "Invalid font provider key",
+    );
+  });
+});
+
+describe("serializeSvg", () => {
+  it("serializes a non-breaking space as XML can parse it", async () => {
+    const svg = await exportScene({
+      type: "svg",
+      data: {
+        // the entity typed out must survive as text
+        elements: [
+          API.createElement({ type: "text", text: "a\u00a0b &nbsp; c" }),
+        ],
+        appState: {},
+        files: null,
+      },
+      config: { skipInliningFonts: true },
+    });
+
+    // HTML serialization writes `&nbsp;`, an entity XML doesn't define
+    expect(svg.outerHTML).toContain("&nbsp;");
+
+    const markup = serializeSvg(svg);
+    expect(markup).toContain("a&#160;b &amp;nbsp; c");
+
+    const parsed = new DOMParser().parseFromString(markup, "image/svg+xml");
+    expect(parsed.querySelector("parsererror")).toBe(null);
+    expect(parsed.querySelector("text")?.textContent).toBe("a\u00a0b &nbsp; c");
   });
 });
 

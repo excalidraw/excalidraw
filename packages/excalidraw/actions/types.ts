@@ -29,6 +29,7 @@ export type ActionResult =
       files?: BinaryFiles | null;
       captureUpdate: CaptureUpdateActionType;
       replaceFiles?: boolean;
+      loadFonts?: boolean;
     }
   | false;
 
