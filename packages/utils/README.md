@@ -16,7 +16,7 @@ yarn add @excalidraw/utils
 
 ### `serializeAsJSON`
 
-See [`serializeAsJSON`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#serializeAsJSON) for API and description.
+See `serializeAsJSON` for API and description.
 
 ### `exportToBlob` (async)
 
@@ -37,7 +37,7 @@ import { exportToSvg, exportToBlob } from "@excalidraw/utils";
 To use it in a browser directly:
 
 ```html
-<script src="https://unpkg.com/@excalidraw/utils@0.1.0/dist/excalidraw-utils.min.js"></script>
+<script src=""></script>
 <script>
   // ExcalidrawUtils is a global variable defined by excalidraw.min.js
   const { exportToSvg, exportToBlob } = ExcalidrawUtils;
