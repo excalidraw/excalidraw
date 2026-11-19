@@ -272,16 +272,6 @@ const assertValidUpdate = (
     "Updates to fixed segments must be either horizontal or vertical",
   );
 
-  // FIXME: an array is always truthy, so this never fails
-  invariant(
-    arrow.points
-      .slice(1)
-      .map(
-        (p, i) => p[0] === arrow.points[i][0] || p[1] === arrow.points[i][1],
-      ),
-    "Elbow arrow segments must be either horizontal or vertical",
-  );
-
   const points = updates.points ?? arrow.points;
   invariant(
     !updates.fixedSegments?.some(
