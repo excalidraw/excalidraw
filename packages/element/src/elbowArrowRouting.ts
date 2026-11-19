@@ -646,7 +646,7 @@ export const getElbowArrowRoute = (
   getCornerPoints(
     removeShortSegments(
       getSimpleRoute(arrow, elbowArrowData, elementsMap) ??
-        getGridRoute(arrow, elbowArrowData) ??
+        getGridRoute(elbowArrowData) ??
         [],
     ),
   );
@@ -777,20 +777,18 @@ const getSimpleRoute = (
  * The elbow arrow's route on the grid, keeping a padding around the elements
  * it connects, or null if there's none
  */
-const getGridRoute = (
-  arrow: ElbowArrowState,
-  {
-    dynamicAABBs,
-    startDonglePosition,
-    startGlobalPoint,
-    startHeading,
-    endDonglePosition,
-    endGlobalPoint,
-    endHeading,
-    commonBounds,
-    hoveredEndElement,
-  }: ElbowArrowData,
-): GlobalPoint[] | null => {
+const getGridRoute = ({
+  dynamicAABBs,
+  startDonglePosition,
+  startGlobalPoint,
+  startHeading,
+  endDonglePosition,
+  endGlobalPoint,
+  endHeading,
+  commonBounds,
+  hoveredStartElement,
+  hoveredEndElement,
+}: ElbowArrowData): GlobalPoint[] | null => {
   const grid = calculateGrid(
     dynamicAABBs,
     startDonglePosition,
@@ -803,13 +801,15 @@ const getGridRoute = (
   const startDongle = pointToGridNode(startDonglePosition, grid);
   const endDongle = pointToGridNode(endDonglePosition, grid);
 
-  // Do not allow stepping on the true end or true start points
+  // Do not allow stepping on the true end or true start points of bound
+  // endpoints (if they're on the grid at all, as usually only their dongles
+  // are)
   const endNode = pointToGridNode(endGlobalPoint, grid);
   if (endNode && hoveredEndElement) {
     endNode.closed = true;
   }
   const startNode = pointToGridNode(startGlobalPoint, grid);
-  if (startNode && arrow.startBinding) {
+  if (startNode && hoveredStartElement) {
     startNode.closed = true;
   }
 
