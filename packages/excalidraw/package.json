@@ -106,7 +106,8 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && pnpm gen:types"
+    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && pnpm gen:types",
+    "prepublishOnly": "node ../../scripts/ensure-pnpm-publish.js"
   },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.2.0 || ^19.0.0",

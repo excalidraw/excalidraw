@@ -70,7 +70,8 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && pnpm gen:types"
+    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && pnpm gen:types",
+    "prepublishOnly": "node ../../scripts/ensure-pnpm-publish.js"
   },
   "dependencies": {
     "@braintree/sanitize-url": "6.0.2",
