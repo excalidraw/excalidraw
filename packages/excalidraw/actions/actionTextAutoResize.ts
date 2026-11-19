@@ -162,11 +162,13 @@ export const actionTextAutoResize = register({
 
     // the anchor only pins one point of the box, so any other arrow bound to
     // a text still has to be re-routed to its new geometry. The scene holds
-    // the texts as they were, hence handing the new ones over explicitly.
+    // the texts as they were, hence handing the new ones over explicitly —
+    // all of them, as an arrow's re-routing re-places both of its ends,
+    // which may be bound to two of the toggled texts.
     for (const text of toggled.values()) {
       if (isNonDeletedElement(text)) {
         updateBoundElements(text, app.scene, {
-          changedElements: new Map([[text.id, text]]),
+          changedElements: toggled,
           renderEnvironment: app.renderEnvironment,
         });
       }
