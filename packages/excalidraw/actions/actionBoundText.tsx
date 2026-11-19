@@ -20,12 +20,14 @@ import {
   getBoundTextElement,
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
+  updateBoundElements,
   updateStickyNoteLayout,
 } from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
   isArrowElement,
+  isNonDeletedElement,
   isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
@@ -103,6 +105,12 @@ export const unbindTextFromContainer = (
     });
   } else if (originalContainerHeight) {
     scene.mutateElement(container, { height: originalContainerHeight });
+    // the arrows bound to its edges follow it as it shrinks back
+    if (isNonDeletedElement(container)) {
+      updateBoundElements(container, scene, {
+        renderEnvironment: app.renderEnvironment,
+      });
+    }
   }
 };
 
