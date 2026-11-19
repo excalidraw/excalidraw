@@ -23,7 +23,10 @@ yarn-debug.log*
 yarn-error.log*
 packages/excalidraw/types
 coverage
+test-results
+playwright-report
 dev-dist
 html
 meta*.json
 .claude
+todo.md
