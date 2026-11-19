@@ -221,7 +221,12 @@ export class AppText {
       const latestTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
 
-      if (!latestTextElement || !isTextElement(latestTextElement)) {
+      if (
+        !latestTextElement ||
+        !isTextElement(latestTextElement) ||
+        // deleted from under the edit: the submit doesn't bring it back
+        latestTextElement.isDeleted
+      ) {
         return;
       }
 
