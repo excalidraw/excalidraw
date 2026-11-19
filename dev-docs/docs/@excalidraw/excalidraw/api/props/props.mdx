@@ -5,33 +5,56 @@ All `props` are _optional_.
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) | `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
+| [`initialState`](#initialstate) | `object` | \_ | Initial editor state that isn't part of the scene data. Currently supports the initial `viewport`. |
 | [`excalidrawAPI`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) | `function` | \_ | Callback triggered with the excalidraw api once rendered |
+| [`onMount`](#onmount) | `function` | \_ | Callback triggered once the editor root is mounted. |
+| [`onInitialize`](#oninitialize) | `function` | \_ | Callback triggered once the initial scene is loaded. |
+| [`onUnmount`](#onunmount) | `function` | \_ | Callback triggered when the editor root is unmounted. |
 | [`isCollaborating`](#iscollaborating) | `boolean` | \_ | This indicates if the app is in `collaboration` mode |
+| [`userToFollow`](#usertofollow) | `object` &#124; `null` | \_ | The collaborator being followed on the canvas, controlled by the host app. |
+| [`onUserFollow`](#onuserfollow) | `function` | \_ | Callback triggered when the user asks to follow or stop following a collaborator. |
+| [`currentUserControls`](#currentusercontrols) | `ReactNode` &#124; `function` | \_ | Custom UI rendered in the collaborators list. |
 | [`onChange`](#onchange) | `function` | \_ | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw `elements` and the current `app state`. |
+| [`onIncrement`](#onincrement) | `function` | \_ | Callback triggered with each change captured by the editor's store. |
 | [`onPointerUpdate`](#onpointerupdate) | `function` | \_ | Callback triggered when mouse pointer is updated. |
 | [`onPointerDown`](#onpointerdown) | `function` | \_ | This prop if passed gets triggered on pointer down events |
 | [`onScrollChange`](#onscrollchange) | `function` | \_ | This prop if passed gets triggered when scrolling the canvas. |
 | [`onPaste`](#onpaste) | `function` | \_ | Callback to be triggered if passed when something is pasted into the scene |
+| [`onDuplicate`](#onduplicate) | `function` | \_ | Callback triggered when elements are duplicated, which can modify or cancel the duplicates. |
+| [`onExport`](#onexport) | `function` | \_ | Callback triggered before the scene is saved to a file, which can delay the save. |
 | [`onLibraryChange`](#onlibrarychange) | `function` | \_ | The callback if supplied is triggered when the library is updated and receives the library items. |
 | [`generateLinkForSelection`](#generatelinkforselection) | `function` | \_ | Allows you to override `url` generation when linking to Excalidraw elements. |
 | [`onLinkOpen`](#onlinkopen) | `function` | \_ | The callback if supplied is triggered when any link is opened. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string to be used in Excalidraw |
+| [`renderTopLeftUI`](#rendertopleftui) | `function` | \_ | Render function that renders custom UI in top left corner |
 | [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | \_ | Render function that renders custom UI in top right corner |
 | [`renderCustomStats`](/docs/@excalidraw/excalidraw/api/props/render-props#rendercustomstats) | `function` | \_ | Render function that can be used to render custom stats on the stats dialog. |
 | [`viewModeEnabled`](#viewmodeenabled) | `boolean` | \_ | This indicates if the app is in `view` mode. |
+| [`interaction`](#interaction) | `boolean` &#124; `object` | `true` | Whether the editor accepts user input, or which interactions stay enabled when it doesn't. |
+| [`ui`](#ui) | `boolean` &#124; `object` | `true` | Whether Excalidraw's default UI is rendered, or which default controls are kept or removed. |
+| [`activeTool`](#activetool) | `object` | \_ | Forces the active tool, taking tool control away from the user. |
 | [`zenModeEnabled`](#zenmodeenabled) | `boolean` | \_ | This indicates if the `zen` mode is enabled |
 | [`gridModeEnabled`](#gridmodeenabled) | `boolean` | \_ | This indicates if the `grid` mode is enabled |
+| [`objectsSnapModeEnabled`](#objectssnapmodeenabled) | `boolean` | \_ | Intended to indicate if snapping to objects is enabled. Currently not forwarded by `<Excalidraw>`, so it has no effect. |
 | [`libraryReturnUrl`](#libraryreturnurl) | `string` | \_ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
+| [`onThemeChange`](#onthemechange) | `function` | \_ | Callback triggered when the user changes the theme. When supplied, the host app applies the theme. |
 | [`name`](#name) | `string` |  | Name of the drawing |
 | [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](/docs/@excalidraw/excalidraw/api/props/ui-options#canvasactions) |
+| [`imageOptions`](#imageoptions) | `object` | `{ maxWidthOrHeight: 1440, maxFileSizeBytes: 4194304 }` | Size constraints for images inserted on the canvas. |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
 | [`autoFocus`](#autofocus) | `boolean` | `false` | Indicates whether to focus the Excalidraw component on page load |
+| [`className`](#classname) | `string` | \_ | CSS class name(s) added to the root Excalidraw container. |
+| [`ownerDocument`](#ownerdocument) | `Document` | `document` | Document that owns the editor's DOM, when it differs from the global `document`. |
+| [`renderEnvironment`](#renderenvironment) | `object` | Built from `ownerDocument` | Host environment used to create canvases and images for rendering and export. |
 | [`generateIdForFile`](#generateidforfile) | `function` | \_ | Allows you to override `id` generation for files added on canvas |
 | [`validateEmbeddable`](#validateembeddable) | `string[]` \| `boolean` \| `RegExp` \| `RegExp[]` \| <code>((link: string) => boolean &#124; undefined)</code> | \_ | use for custom src url validation |
 | [`renderEmbeddable`](/docs/@excalidraw/excalidraw/api/props/render-props#renderEmbeddable) | `function` | \_ | Render function that can override the built-in `<iframe>` |
-| [`renderScrollbars`] | `boolean`| | `false` | Indicates whether scrollbars will be shown
+| [`aiEnabled`](#aienabled) | `boolean` | `true` | Indicates whether the AI features are shown in the UI. |
+| [`showDeprecatedFonts`](#showdeprecatedfonts) | `boolean` | \_ | Indicates whether deprecated fonts are listed in the font picker. |
+| [`viewportStatusFrame`](#viewportstatusframe) | `object` &#124; `null` | \_ | A colored border around the viewport and/or a status badge at its bottom. |
+| `renderScrollbars` | `boolean` | `false` | Indicates whether scrollbars will be shown |
 
 ### Storing custom data on Excalidraw elements
 
@@ -49,9 +72,75 @@ You can add `customData` to elements when passing them as [`initialData`](/docs/
 }
 ```
 
+### initialState
+
+Initial editor state that isn't part of the scene data. It is read once, when the initial scene is loaded, so later changes have no effect.
+
+```ts
+{
+  viewport?: Omit<SetViewportOptions, "animation">;
+}
+```
+
+`viewport` sets the initial viewport with the same options as the `setViewport` API method, except `animation`. Its `target` can be a scene-coordinate box, element(s), or an element id or element-link URL. When `viewport` is supplied, it takes precedence over `initialData.scrollToContent`. If the target can't be resolved (e.g. the element doesn't exist), the viewport is left as restored from `initialData`.
+
+```tsx
+<Excalidraw
+  initialState={{ viewport: { target: "element-id", fit: "contain" } }}
+/>
+```
+
+### onMount
+
+```ts
+(payload: { excalidrawAPI: ExcalidrawImperativeAPI; container: HTMLDivElement | null }) => void
+```
+
+Triggered when the editor root is mounted. It receives the [excalidraw api](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) and the editor container element. The initial scene may not be loaded yet: use [`onInitialize`](#oninitialize) to wait for it.
+
+### onInitialize
+
+```ts
+(api: ExcalidrawImperativeAPI) => void
+```
+
+Triggered once, when the initial scene has been loaded (after [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) is resolved and applied). It receives the [excalidraw api](/docs/@excalidraw/excalidraw/api/props/excalidraw-api).
+
+### onUnmount
+
+```ts
+() => void
+```
+
+Triggered when the editor root is unmounted. After this point, the excalidraw api is marked as destroyed (`isDestroyed`) and should no longer be used.
+
 ### isCollaborating
 
 This prop indicates if the app is in `collaboration` mode.
+
+### userToFollow
+
+```ts
+{ socketId: SocketId; username: string } | null
+```
+
+The collaborator currently being followed on the canvas. This value is controlled by the host app: the editor never sets it. The editor uses it to highlight the followed user's avatar in the collaborators list, and it emits follow and unfollow requests through [`onUserFollow`](#onuserfollow). Following the collaborator's viewport is up to the host app.
+
+### onUserFollow
+
+```ts
+(payload: { userToFollow: { socketId: SocketId; username: string }; action: "FOLLOW" | "UNFOLLOW" }) => void
+```
+
+Triggered when the user asks to follow or stop following a collaborator, e.g. by clicking an avatar in the collaborators list. An `UNFOLLOW` request is also emitted for the current [`userToFollow`](#usertofollow) when the user takes over the viewport (panning, zooming, or pointer down with any tool except the laser) or when the `setViewport` API method navigates. Update `userToFollow` in response. The same requests are available through the `onUserFollow` subscription of the [excalidraw api](/docs/@excalidraw/excalidraw/api/props/excalidraw-api).
+
+### currentUserControls
+
+```ts
+React.ReactNode | ((isMobile: boolean) => React.ReactNode);
+```
+
+Custom UI rendered in the collaborators list, below a divider: in the "who's here" dropdown on desktop and in the collaborators section of the main menu on phones. The list is only shown while there are collaborators. If you pass a function, it is called with `isMobile` so you can render different UI for each.
 
 ### onChange
 
@@ -68,6 +157,16 @@ Every time component updates, this callback if passed will get triggered and has
 3. `files`: The [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L64) which are added to the scene.
 
 Here you can try saving the data to your backend or local storage for example.
+
+### onIncrement
+
+```ts
+(increment: DurableIncrement | EphemeralIncrement) => void
+```
+
+Triggered with each change captured by the editor's store. A `DurableIncrement` (`increment.type === "durable"`) is a change recorded to the undo history, and also carries the `delta` of the change. An `EphemeralIncrement` (`increment.type === "ephemeral"`) is a change that isn't recorded. Both carry the changed elements and app state in `increment.change`.
+
+The editor only subscribes to the store if this prop is defined on the initial render. Adding it later has no effect.
 
 ### onPointerUpdate
 
@@ -129,6 +228,37 @@ This callback is triggered if passed when something is pasted into the scene. Yo
 This callback must return a `boolean` value or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to a boolean value.
 
 In case you want to prevent the excalidraw paste action you must return `false`, it will stop the native excalidraw clipboard management flow (nothing will be pasted into the scene).
+
+### onDuplicate
+
+```ts
+(
+  nextElements: readonly ExcalidrawElement[],
+  prevElements: readonly ExcalidrawElement[],
+  data: OnDuplicateData,
+) => ExcalidrawElement[] | void | false
+```
+
+Triggered when elements are duplicated: by the duplicate action, alt-drag, paste, library insert and similar. `prevElements` excludes the duplicated elements. `data` contains the duplicates and their originals, mapped by id, and lookups from original id to duplicate id and back.
+
+- Return nothing to keep the duplication as is.
+- Return all elements (including deleted ones) to replace `nextElements`. To change a duplicate, return a new object with the same `id`, which is shallow-merged into the duplicate. Don't mutate the elements. Your changes are part of the duplication (same undo entry).
+- Omit a duplicate from the returned array to prevent it from being created.
+- Return `false` to cancel the duplication. If no duplicate remains, it is cancelled as well, and alt-drag moves the original elements instead.
+
+### onExport
+
+```ts
+(
+  type: "json",
+  data: { elements: readonly ExcalidrawElement[]; appState: AppState; files: BinaryFiles },
+  options: { signal: AbortSignal },
+) => void | Promise<void> | AsyncGenerator<{ type: "progress"; message?: React.ReactNode; progress?: number }, void>
+```
+
+Triggered before the scene is saved to a file (when saving to the active file or to disk). It lets the host app delay the save until async work completes, e.g. until images finish loading. If it returns a promise, a progress toast is shown until it resolves. If it returns an async generator, the save waits until the generator completes, and each yielded progress update (`progress` in the 0-1 range) is shown in a toast.
+
+`options.signal` is aborted if the user cancels the save (e.g. closes the file picker). In that case, return early or throw an `AbortError`. The callback can't cancel the save: errors are logged and the scene is saved anyway, with the latest `files`.
 
 ### onLibraryChange
 
@@ -202,9 +332,69 @@ import { defaultLang, languages } from "@excalidraw/excalidraw";
 | `defaultLang` | `string` |
 | `languages` | [`Language[]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/i18n.ts#L15) |
 
+### renderTopLeftUI
+
+```ts
+(isMobile: boolean, appState: UIAppState) => JSX.Element | null;
+```
+
+A function returning `JSX` to render custom UI in the top left corner of the app, before the main menu. It is called on every render of the UI, with `isMobile` set to `true` in the phone layout. See [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) for an example.
+
 ### viewModeEnabled
 
 This prop indicates whether the app is in `view mode`. When supplied, the value takes precedence over _intialData.appState.viewModeEnabled_, the `view mode` will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+### interaction
+
+```ts
+boolean | { enabled?: { links?: boolean; embeds?: boolean; interactiveContent?: boolean; navigation?: boolean; browserZoom?: boolean; tools?: { laser?: boolean; custom?: boolean } } }
+```
+
+Whether the editor accepts user input (pointer, keyboard, wheel, touch, clipboard and drag & drop). Defaults to `true`. When `false`, the scene still renders and can be updated through the [excalidraw api](/docs/@excalidraw/excalidraw/api/props/excalidraw-api), but the user can't affect it, and view mode is implied.
+
+Pass an object to keep specific interactions enabled while the editor is otherwise non-interactive. Anything omitted is disabled:
+
+- `links`: link icons render and links open on click.
+- `embeds`: embeddable and iframe elements can be activated and used.
+- `interactiveContent`: shorthand for `links` and `embeds`.
+- `navigation`: panning and zooming, as in view mode.
+- `browserZoom`: the browser's own zoom stays available over the editor.
+- `tools.laser`, `tools.custom`: pointer input keeps driving the laser or a custom tool when it is the active tool. Tool switching stays with the host app.
+
+```tsx
+<Excalidraw interaction={{ enabled: { links: true, navigation: true } }} />
+```
+
+### ui
+
+```ts
+boolean | { enabled: { zoom?: boolean; scrollBackToContent?: boolean } } | { disabled: { minimap?: boolean } }
+```
+
+Whether Excalidraw's default UI is rendered (toolbar, default menus, footer controls, sidebars and canvas popups). Defaults to `true`. When `false`, UI passed through children (such as `MainMenu` and `Footer`) and render props still renders, as does the canvas content. The editor stays interactive unless [`interaction`](#interaction) is `false`.
+
+Pass `{ enabled }` to keep specific default controls while the rest of the default UI is hidden, or `{ disabled }` to remove specific controls from the full default UI.
+
+```tsx
+<Excalidraw ui={{ enabled: { zoom: true } }} />
+<Excalidraw ui={{ disabled: { minimap: true } }} />
+```
+
+This prop is a work in progress: what is rendered when `ui` is `false` may still change.
+
+### activeTool
+
+```ts
+{ type: Exclude<ToolType, "image"> } | { type: "custom"; customType: string }
+```
+
+Forces the active tool (controlled). While set, tool switching by the user or by `setActiveTool` is ignored, and the editor switches back to this tool if it changes internally. The forced tool behaves as if locked, without changing the user's tool lock setting. Unset it to give tool control back to the editor (the current tool stays active).
+
+The tool must be activatable: not disabled in [`UIOptions.tools`](/docs/@excalidraw/excalidraw/api/props/ui-options), and allowed by `interaction.enabled.tools` while the editor is non-interactive. Otherwise the editor stays on the `selection` tool until it is. The `image` tool can't be forced.
+
+```tsx
+<Excalidraw activeTool={{ type: "laser" }} />
+```
 
 ### zenModeEnabled
 
@@ -213,6 +403,12 @@ This prop indicates whether the app is in `zen mode`. When supplied, the value t
 ### gridModeEnabled
 
 This prop indicates whether the shows the grid. When supplied, the value takes precedence over _intialData.appState.gridModeEnabled_, the grid will be fully controlled by the host app, and users won't be able to toggle it from within the app.
+
+### objectsSnapModeEnabled
+
+Intended to indicate whether snapping to objects is enabled, like [`gridModeEnabled`](#gridmodeenabled) for the grid. The editor reads it once, as the initial value of `appState.objectsSnapModeEnabled`, and makes the action that toggles snapping to objects unavailable when it is defined.
+
+However, the `<Excalidraw>` component doesn't currently forward this prop to the editor, so it has no effect.
 
 ### libraryReturnUrl
 
@@ -224,9 +420,28 @@ This prop controls Excalidraw's theme. When supplied, the value takes precedence
 
 You can use [`THEME`](/docs/@excalidraw/excalidraw/api/utils#theme) to specify the theme.
 
+### onThemeChange
+
+```ts
+(theme: "light" | "dark" | "system") => void
+```
+
+Triggered when the user changes the theme from within Excalidraw. When supplied, the editor doesn't change its theme itself: update the [`theme`](#theme) prop in this callback. Supplying it also enables the theme toggle unless `UIOptions.canvasActions.toggleTheme` is set. `"system"` is only passed by the `MainMenu.DefaultItems.ToggleTheme` component with `allowSystemTheme`, which requires this prop.
+
 ### name
 
 This prop sets the `name` of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over _intialData.appState.name_, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
+
+### imageOptions
+
+```ts
+{ maxWidthOrHeight?: number; maxFileSizeBytes?: number }
+```
+
+Size constraints for images inserted on the canvas, applied when an image file is inserted:
+
+- `maxWidthOrHeight`: larger images are resized so that their longer side fits. SVG images aren't resized. Defaults to `1440`.
+- `maxFileSizeBytes`: images larger than this after resizing are rejected with an error. Defaults to `4194304` (4 MB).
 
 ### detectScroll
 
@@ -241,6 +456,30 @@ Enable this if you want Excalidraw to handle keyboard even if the component isn'
 ### autoFocus
 
 This prop indicates whether to `focus` the Excalidraw component on page load. Defaults to false.
+
+### className
+
+CSS class name(s) added to the root Excalidraw container element, next to the built-in `excalidraw` and `excalidraw-container` classes.
+
+### ownerDocument
+
+The document that owns Excalidraw's DOM. Defaults to the global `document`. Set it only when the editor mounts into another document, e.g. when code running in a parent window mounts Excalidraw into an iframe. The value must stay the same for the editor's lifetime.
+
+### renderEnvironment
+
+```ts
+{
+  createCanvas: () => HTMLCanvasElement;
+  createImage: () => HTMLImageElement;
+  createPath?: (svgPath: string) => Path2D;
+  document?: Document;
+  textMetrics?: TextMetricsProvider;
+}
+```
+
+Host environment used by the renderer and the export pipeline to create canvases and images. Supply it to redirect canvas creation and image decoding, e.g. to a host canvas pool or a non-DOM image decoder. By default, canvases and images are created from [`ownerDocument`](#ownerdocument) and its window. `createPath` (used to fill freedraw strokes) falls back to the global `Path2D`, so a non-browser host without one must supply it. Pass `document` to build SVG exports in that document, and `textMetrics` to measure the editor's text with your own provider.
+
+The value must be referentially stable, because the render caches are keyed by it. An inline object creates a new value on every render and re-renders all elements, so define it at module level or memoize it.
 
 ### generateIdForFile
 
@@ -259,3 +498,35 @@ validateEmbeddable?: boolean | string[] | RegExp | RegExp[] | ((link: string) =>
 This is an optional property. By default we support a handful of well-known sites. You may allow additional sites or disallow the default ones by supplying a custom validator. If you pass `true`, all URLs will be allowed. You can also supply a list of hostnames, RegExp (or list of RegExp objects), or a function. If the function returns `undefined`, the built-in validator will be used.
 
 Supplying a list of hostnames (with or without `www.`) is the preferred way to allow a specific list of domains.
+
+### aiEnabled
+
+Indicates whether the AI features are shown. Defaults to `true`. When `false`, the `TTDDialogTrigger` (text to diagram) rendered by the host app and the wireframe-to-code (magic frame) tool are hidden from the toolbar, the "convert to code" button isn't shown on magic frames, and the "Text to diagram" and "Mermaid to Excalidraw" entries are removed from the command palette.
+
+### showDeprecatedFonts
+
+Indicates whether deprecated fonts (Virgil, Helvetica and Cascadia) are listed in the font picker. When not set, they are hidden, except for fonts already used in the scene, which are always listed.
+
+### viewportStatusFrame
+
+```ts
+{
+  label?: {
+    label: React.ReactNode;
+    icon?: React.ReactNode;
+    background?: string;
+    color?: string;
+    onClick?: () => void;
+    onClose?: () => void;
+  };
+  border: false | string;
+} | null
+```
+
+Shows a status around the viewport, e.g. to indicate a special mode. `border` draws a border along the viewport edges with the given CSS color (`false` for none). `label` shows a badge at the bottom center of the viewport, with optional `icon`, `background` and text `color`. The badge is clickable when `onClick` is set, and shows a close button when `onClose` is set. The badge background falls back to the `border` color.
+
+```tsx
+<Excalidraw
+  viewportStatusFrame={{ border: "#e03131", label: { label: "Presenting" } }}
+/>
+```
