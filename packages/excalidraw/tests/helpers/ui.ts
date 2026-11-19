@@ -23,6 +23,8 @@ import {
 } from "@excalidraw/element";
 import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
 
+import { act, fireEvent, screen } from "@testing-library/react";
+
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
 import type { TransformHandleType } from "@excalidraw/element";
@@ -40,9 +42,11 @@ import type {
   ElementsMap,
 } from "@excalidraw/element/types";
 
+import "../matchers";
+
 import { createTestHook } from "../../components/App";
 import { getTextEditor, TEXT_EDITOR_SELECTOR } from "../queries/dom";
-import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
+import { GlobalTestState } from "../testState";
 
 import { API } from "./api";
 

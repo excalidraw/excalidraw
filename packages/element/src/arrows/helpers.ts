@@ -1,14 +1,23 @@
-import type { App } from "@excalidraw/excalidraw/types";
-
 import { LinearElementEditor } from "../linearElementEditor";
 
 import { handleFocusPointDrag } from "./focus";
+
+import type { LinearElementEditorHost } from "../linearElementEditor";
+
+/**
+ * What arrow point dragging needs from the editor: point dragging's own needs
+ * (`LinearElementEditorHost`) plus the last pointer position and event.
+ */
+export type ArrowPointDragHost = LinearElementEditorHost & {
+  lastPointerMoveCoords: { x: number; y: number } | null;
+  lastPointerMoveEvent: PointerEvent | null;
+};
 
 export const maybeHandleArrowPointlikeDrag = ({
   app,
   event,
 }: {
-  app: App;
+  app: ArrowPointDragHost;
   event: KeyboardEvent | React.KeyboardEvent<Element> | PointerEvent;
 }): boolean => {
   const appState = app.state;

@@ -2,7 +2,7 @@ import React from "react";
 
 import { t } from "../i18n";
 
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App.context";
 
 export const Section: React.FC<{
   heading: "canvasActions" | "selectedShapeActions" | "shapes";

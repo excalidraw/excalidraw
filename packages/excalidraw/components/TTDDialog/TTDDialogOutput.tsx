@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { useApp } from "../App";
+import { useApp } from "../App.context";
 import { Button } from "../Button";
 import Spinner from "../Spinner";
 import { t } from "../../i18n";

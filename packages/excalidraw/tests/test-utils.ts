@@ -17,20 +17,32 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
 
+import type { History } from "@excalidraw/history";
+
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
+
+import "./matchers";
 
 import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
 
-import type { History } from "../history";
+import { GlobalTestState, trimErrorStack } from "./testState";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
 import type { ImportedDataState } from "../data/types";
 
+// moved to ./testState (a leaf, so the helpers it imports can use them);
+// re-exported here for tests
+export {
+  GlobalTestState,
+  stripIgnoredNodesFromErrorMessage,
+  trimErrorStack,
+} from "./testState";
+
 export { cleanup as unmountComponent };
 
-const customQueries = {
+export const customQueries = {
   ...queries,
   ...toolQueries,
 };
@@ -105,31 +117,6 @@ export * from "@testing-library/react";
 
 // override render method
 export { renderApp as render };
-
-/**
- * For state-sharing across test helpers.
- * NOTE: there shouldn't be concurrency issues as each test is running in its
- *  own process and thus gets its own instance of this module when running
- *  tests in parallel.
- */
-export class GlobalTestState {
-  /**
-   * automatically updated on each call to render()
-   */
-  static renderResult: RenderResult<typeof customQueries> = null!;
-  /**
-   * retrieves static canvas for currently rendered app instance
-   */
-  static get canvas(): HTMLCanvasElement {
-    return null!;
-  }
-  /**
-   * retrieves interactive canvas for currently rendered app instance
-   */
-  static get interactiveCanvas(): HTMLCanvasElement {
-    return null!;
-  }
-}
 
 const initLocalStorage = (data: ImportedDataState) => {
   if (data.elements) {
@@ -250,39 +237,6 @@ export const togglePopover = (label: string) => {
 
   UI.clickLabeledElement(label);
 };
-
-expect.extend({
-  toBeNonNaNNumber(received) {
-    const pass = typeof received === "number" && !isNaN(received);
-    if (pass) {
-      return {
-        message: () => `expected ${received} not to be a non-NaN number`,
-        pass: true,
-      };
-    }
-    return {
-      message: () => `expected ${received} to be a non-NaN number`,
-      pass: false,
-    };
-  },
-});
-
-/**
- * Serializer for IEE754 float pointing numbers to avoid random failures due to tiny precision differences
- */
-expect.addSnapshotSerializer({
-  serialize(val, config, indentation, depth, refs, printer) {
-    return printer(val.toFixed(5), config, indentation, depth, refs);
-  },
-  test(val) {
-    return (
-      typeof val === "number" &&
-      Number.isFinite(val) &&
-      !Number.isNaN(val) &&
-      !Number.isInteger(val)
-    );
-  },
-});
 
 export const getCloneByOrigId = <T extends boolean = false>(
   origId: ExcalidrawElement["id"],
@@ -472,22 +426,4 @@ export const checkpointHistory = (history: History, name: string) => {
       },
     })),
   ).toMatchSnapshot(`[${name}] redo stack`);
-};
-
-/**
- * removes one or more leading stack trace lines (leading to files) from the
- * error stack trace
- */
-export const trimErrorStack = (error: Error, range = 1) => {
-  const stack = error.stack?.split("\n");
-  if (stack) {
-    stack.splice(1, range);
-    error.stack = stack.join("\n");
-  }
-  return error;
-};
-
-export const stripIgnoredNodesFromErrorMessage = (error: Error) => {
-  error.message = error.message.replace(/\s+Ignored nodes:[\s\S]+/, "");
-  return error;
 };

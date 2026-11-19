@@ -12,7 +12,7 @@ import { getNonDeletedElements } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { getCommonBounds } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { Bounds } from "@excalidraw/common";
 

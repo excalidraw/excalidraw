@@ -1,9 +1,4 @@
-import type {
-  AppState,
-  InteractiveCanvasAppState,
-} from "@excalidraw/excalidraw/types";
-
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 
 import { isBoundToContainer } from "./typeChecks";
 
@@ -16,13 +11,17 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedElementsMapOrArray,
 } from "./types";
+import type { ElementsState } from "./types";
 
 export const selectGroup = (
   groupId: GroupId,
-  appState: InteractiveCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  >,
   elements: readonly NonDeletedExcalidrawElement[],
 ): Pick<
-  InteractiveCanvasAppState,
+  ElementsState,
   "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
 > => {
   const elementsInGroup = elements.reduce(
@@ -64,18 +63,12 @@ export const selectGroup = (
  * selection border around it.
  */
 export const isSelectedViaGroup = (
-  appState: Pick<
-    InteractiveCanvasAppState,
-    "editingGroupId" | "selectedGroupIds"
-  >,
+  appState: Pick<ElementsState, "editingGroupId" | "selectedGroupIds">,
   element: ExcalidrawElement,
 ) => getSelectedGroupForElement(appState, element) != null;
 
 export const getSelectedGroupForElement = (
-  appState: Pick<
-    InteractiveCanvasAppState,
-    "editingGroupId" | "selectedGroupIds"
-  >,
+  appState: Pick<ElementsState, "editingGroupId" | "selectedGroupIds">,
   element: ExcalidrawElement,
 ) =>
   element.groupIds
@@ -83,7 +76,7 @@ export const getSelectedGroupForElement = (
     .find((groupId) => appState.selectedGroupIds[groupId]);
 
 export const getSelectedGroupIds = (
-  appState: Pick<InteractiveCanvasAppState, "selectedGroupIds">,
+  appState: Pick<ElementsState, "selectedGroupIds">,
 ): GroupId[] =>
   Object.entries(appState.selectedGroupIds)
     .filter(([groupId, isSelected]) => isSelected)
@@ -93,9 +86,15 @@ export const getSelectedGroupIds = (
 // or used to update the elements
 export const selectGroupsFromGivenElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: InteractiveCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  >,
 ) => {
-  let nextAppState: InteractiveCanvasAppState = {
+  let nextAppState: Pick<
+    ElementsState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  > = {
     ...appState,
     selectedGroupIds: {},
   };
@@ -120,10 +119,15 @@ export const selectGroupsFromGivenElements = (
   return nextAppState.selectedGroupIds;
 };
 
-export const editGroupForSelectedElement = (
-  appState: AppState,
+export const editGroupForSelectedElement = <
+  T extends Pick<
+    ElementsState,
+    "editingGroupId" | "selectedGroupIds" | "selectedElementIds"
+  >,
+>(
+  appState: T,
   element: NonDeleted<ExcalidrawElement>,
-): AppState => {
+): T => {
   return {
     ...appState,
     editingGroupId: element.groupIds.length ? element.groupIds[0] : null,
@@ -162,7 +166,7 @@ export const getSelectedGroupIdForElement = (
 export const addToGroup = (
   prevGroupIds: ExcalidrawElement["groupIds"],
   newGroupId: GroupId,
-  editingGroupId: AppState["editingGroupId"],
+  editingGroupId: ElementsState["editingGroupId"],
 ) => {
   // insert before the editingGroupId, or push to the end.
   const groupIds = [...prevGroupIds];
@@ -247,7 +251,7 @@ export const isInGroup = (element: ExcalidrawElement) => {
 
 export const getNewGroupIdsForDuplication = (
   groupIds: ExcalidrawElement["groupIds"],
-  editingGroupId: AppState["editingGroupId"],
+  editingGroupId: ElementsState["editingGroupId"],
   mapper: (groupId: GroupId) => GroupId,
 ) => {
   const copy = [...groupIds];
@@ -268,7 +272,9 @@ export const getNewGroupIdsForDuplication = (
 export const getSelectedElementsByGroup = (
   selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
-  appState: Readonly<Pick<AppState, "selectedGroupIds" | "editingGroupId">>,
+  appState: Readonly<
+    Pick<ElementsState, "selectedGroupIds" | "editingGroupId">
+  >,
 ): NonDeletedExcalidrawElement[][] => {
   const buckets: Map<string, NonDeletedExcalidrawElement[]> = new Map();
   const selectedGroupIds = getSelectedGroupIds(appState);

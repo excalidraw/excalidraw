@@ -1,13 +1,8 @@
 import type {
-  IMAGE_MIME_TYPES,
   UserIdleState,
   throttleRAF,
-  MIME_TYPES,
   EditorInterface,
-  StrokeWidthKey,
 } from "@excalidraw/common";
-
-import type { LinearElementEditor } from "@excalidraw/element";
 
 import type {
   ListMarkerAdvance,
@@ -21,41 +16,66 @@ import type {
   NonDeleted,
   TextAlign,
   ExcalidrawElement,
-  GroupId,
-  ExcalidrawBindableElement,
   ExcalidrawArrowElement,
-  Arrowhead,
   FontFamilyValues,
-  FileId,
   Theme,
-  StrokeRoundness,
   ExcalidrawEmbeddableElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawFrameLikeElement,
-  ExcalidrawElementType,
-  ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
-  ExcalidrawNonSelectionElement,
-  BindMode,
   ExcalidrawTextElement,
   StrokeVariability,
 } from "@excalidraw/element/types";
 
+import type { Merge, MaybePromise } from "@excalidraw/common/utility-types";
+
+import type { RenderEnvironment, OnDuplicateData } from "@excalidraw/element";
+
 import type {
-  Merge,
-  MaybePromise,
-  ValueOf,
-  MakeBrand,
-} from "@excalidraw/common/utility-types";
+  ArrowType,
+  NormalizedZoomValue,
+  NullableGridSize,
+  UnsubscribeCallback,
+  Zoom,
+} from "@excalidraw/common";
+
+import type {
+  DataURL,
+  BinaryFileData,
+  BinaryFileMetadata,
+  BinaryFiles,
+  ToolType,
+  ElementOrToolType,
+  BoxSelectionMode,
+  PointerCoords,
+  FrameNameBounds,
+  EmbedsValidationStatus,
+  PendingExcalidrawElements,
+  Offsets,
+} from "@excalidraw/element/types";
+
+import type { ActiveTool } from "@excalidraw/element/types";
+
+import type {
+  ElementsState,
+  EmbeddableValidator,
+  GenerateLinkForSelection,
+  ImageCache,
+  OriginalElementsMap,
+} from "@excalidraw/element/types";
+
+import type {
+  ElementRenderOverride,
+  ElementRenderOverrides,
+  ElementRenderOffsets,
+  ElementsPendingErasure,
+} from "@excalidraw/element/types";
 
 import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
-  RenderEnvironment,
-  OnDuplicateData,
-} from "@excalidraw/element";
-import type { GlobalPoint } from "@excalidraw/math";
+} from "@excalidraw/history";
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
@@ -71,6 +91,40 @@ import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
+
+export type {
+  ElementRenderOverride,
+  ElementRenderOverrides,
+  ElementRenderOffsets,
+  ElementsPendingErasure,
+};
+
+export type { ElementsState };
+
+export type { ActiveTool };
+
+export type {
+  DataURL,
+  BinaryFileData,
+  BinaryFileMetadata,
+  BinaryFiles,
+  ToolType,
+  ElementOrToolType,
+  BoxSelectionMode,
+  PointerCoords,
+  FrameNameBounds,
+  EmbedsValidationStatus,
+  PendingExcalidrawElements,
+  Offsets,
+};
+
+export type {
+  ArrowType,
+  NormalizedZoomValue,
+  NullableGridSize,
+  UnsubscribeCallback,
+  Zoom,
+};
 
 export type { App };
 
@@ -116,71 +170,6 @@ export type CollaboratorPointer = {
    */
   laserColor?: string;
 };
-
-export type DataURL = string & { _brand: "DataURL" };
-
-export type BinaryFileData = {
-  mimeType:
-    | ValueOf<typeof IMAGE_MIME_TYPES>
-    // future user or unknown file type
-    | typeof MIME_TYPES.binary;
-  id: FileId;
-  dataURL: DataURL;
-  /**
-   * Epoch timestamp in milliseconds
-   */
-  created: number;
-  /**
-   * Indicates when the file was last retrieved from storage to be loaded
-   * onto the scene. We use this flag to determine whether to delete unused
-   * files from storage.
-   *
-   * Epoch timestamp in milliseconds.
-   */
-  lastRetrieved?: number;
-  /**
-   * indicates the version of the file. This can be used to determine whether
-   * the file dataURL has changed e.g. as part of restore due to schema update.
-   */
-  version?: number;
-};
-
-export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
-
-export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
-
-export type ToolType =
-  | "selection"
-  | "lasso"
-  | "rectangle"
-  | "diamond"
-  | "ellipse"
-  | "arrow"
-  | "line"
-  | "freedraw"
-  | "text"
-  | "image"
-  | "eraser"
-  | "hand"
-  | "frame"
-  | "magicframe"
-  | "stickynote"
-  | "embeddable"
-  | "laser"
-  | "autoshape"
-  | "bucketfill";
-
-export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
-
-export type ActiveTool =
-  | {
-      type: ToolType;
-      customType: null;
-    }
-  | {
-      type: "custom";
-      customType: string;
-    };
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -262,28 +251,11 @@ export type InteractiveCanvasAppState = Readonly<
   }
 >;
 
-export type ObservedAppState = ObservedStandaloneAppState &
-  ObservedElementsAppState;
-
-export type ObservedStandaloneAppState = {
-  name: AppState["name"];
-  viewBackgroundColor: AppState["viewBackgroundColor"];
-};
-
-export type ObservedElementsAppState = {
-  editingGroupId: AppState["editingGroupId"];
-  selectedElementIds: AppState["selectedElementIds"];
-  selectedGroupIds: AppState["selectedGroupIds"];
-  selectedLinearElement: {
-    elementId: LinearElementEditor["elementId"];
-    isEditing: boolean;
-  } | null;
-  croppingElementId: AppState["croppingElementId"];
-  lockedMultiSelections: AppState["lockedMultiSelections"];
-  activeLockedId: AppState["activeLockedId"];
-};
-
-export type BoxSelectionMode = "contain" | "overlap";
+export type {
+  ObservedAppState,
+  ObservedStandaloneAppState,
+  ObservedElementsAppState,
+} from "@excalidraw/history";
 
 /**
  * The pointing device the wheel mappings are tuned for. `auto` is reserved
@@ -327,7 +299,7 @@ export type ScrollConstraints = {
   offsets?: Offsets;
 };
 
-export interface AppState {
+export interface AppState extends ElementsState {
   contextMenu: {
     items: ContextMenuItems;
     top: number;
@@ -341,11 +313,6 @@ export interface AppState {
     state: "hover" | "active";
   } | null;
   /**
-   * for a newly created element
-   * - set on pointer down, updated during pointer move, used on pointer up
-   */
-  newElement: NonDeleted<ExcalidrawNonSelectionElement> | null;
-  /**
    * for a single element that's being resized
    * - set on pointer down when it's selected and the active tool is selection
    */
@@ -355,22 +322,10 @@ export interface AppState {
    * - when set and present, the editor will handle linear element creation logic accordingly
    */
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
-  /**
-   * decoupled from newElement, dragging selection only creates selectionElement
-   * - set on pointer down, updated during pointer move
-   */
-  selectionElement: NonDeletedExcalidrawElement | null;
-  /**
-   * tracking current arrow binding editor state (takes into account
-   * `bindingPreference` and keyboard modifiers (ctrl/alt)
-   */
-  isBindingEnabled: boolean;
   /** user box selection preference; defaults to "contain" when unset */
   boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
-  /** user preference whether arrow snap to midpoints while binding */
-  isMidpointSnappingEnabled: boolean;
   /** user preference whether to show contextual hints above the toolbar */
   showHints: boolean;
   /**
@@ -381,14 +336,6 @@ export interface AppState {
    * device detection exists — see `resolveInputDevice`
    */
   inputDevice: InputDevice;
-  /**
-   * The bindable element the UI highlights for the user when an arrow is
-   * dragged or otherwise its endpoint being close to said element.
-   */
-  suggestedBinding: {
-    element: NonDeleted<ExcalidrawBindableElement>;
-    midPoint?: GlobalPoint;
-  } | null;
   /**
    * What a text-tool click at the hovered position would act on — the text
    * it would edit, the empty container it would label, or the arrow anchor
@@ -405,13 +352,6 @@ export interface AppState {
         anchor: "start" | "end" | "label";
       }
     | null;
-  frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
-  frameRendering: {
-    enabled: boolean;
-    name: boolean;
-    outline: boolean;
-    clip: boolean;
-  };
   /**
    * frame-like element whose name is currently being edited
    */
@@ -421,20 +361,6 @@ export interface AppState {
    * would get added to a frame being dragged/resized.
    */
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
-  /**
-   * set when a new text is created or when an existing text is being edited
-   */
-  editingTextElement: ExcalidrawTextElement | null;
-  activeTool: {
-    /**
-     * indicates a previous tool we should revert back to if we deselect the
-     * currently active tool. At the moment applies to `eraser` and `hand` tool.
-     */
-    lastActiveTool: ActiveTool | null;
-    locked: boolean;
-    // indicates if the current tool is temporarily switched on from the selection tool
-    fromSelection: boolean;
-  } & ActiveTool;
   preferredSelectionTool: {
     type: "selection" | "lasso";
     initialized: boolean;
@@ -448,34 +374,20 @@ export interface AppState {
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
   exportScale: number;
-  currentItemStrokeColor: string;
   currentItemStickynoteStrokeColor: string;
   currentItemStickynoteBackgroundColor: string;
-  currentItemBackgroundColor: string;
-  currentItemFillStyle: ExcalidrawElement["fillStyle"];
-  currentItemStrokeWidthKey: StrokeWidthKey;
-  currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
-  currentItemRoughness: number;
   currentItemStrokeVariability: StrokeVariability;
-  currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
-  currentItemStartArrowhead: Arrowhead | null;
-  currentItemEndArrowhead: Arrowhead | null;
   currentHoveredFontFamily: FontFamilyValues | null;
-  currentItemRoundness: StrokeRoundness;
-  currentItemArrowType: "sharp" | "round" | "elbow";
-  viewBackgroundColor: string;
-  scrollX: number;
-  scrollY: number;
+  currentItemArrowType: ArrowType;
   scrollConstraints: ScrollConstraints | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
   isResizing: boolean;
   isRotating: boolean;
-  zoom: Zoom;
   openMenu: "canvas" | null;
   openPopup:
     | "canvasBackground"
@@ -506,11 +418,7 @@ export interface AppState {
   defaultSidebarDockedPreference: boolean;
 
   lastPointerDownWith: PointerType;
-  selectedElementIds: Readonly<{ [id: string]: true }>;
-  hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
-  selectedElementsAreBeingDragged: boolean;
-  shouldCacheIgnoreZoom: boolean;
   toast: {
     message: React.ReactNode;
     closable?: boolean;
@@ -518,22 +426,7 @@ export interface AppState {
   } | null;
   zenModeEnabled: boolean;
   minimapEnabled: boolean;
-  theme: Theme;
-  /** grid cell px size */
-  gridSize: number;
   gridStep: number;
-  gridModeEnabled: boolean;
-  viewModeEnabled: boolean;
-
-  /** top-most selected groups (i.e. does not include nested groups) */
-  selectedGroupIds: { [groupId: string]: boolean };
-  /** group being edited when you drill down to its constituent element
-    (e.g. when you double-click on a group's element) */
-  editingGroupId: GroupId | null;
-  width: number;
-  height: number;
-  offsetTop: number;
-  offsetLeft: number;
 
   fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
@@ -543,7 +436,6 @@ export interface AppState {
     panels: number;
   };
   showHyperlinkPopup: false | "info" | "editor";
-  selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
   originSnapOffset: {
     x: number;
@@ -553,7 +445,6 @@ export interface AppState {
 
   /** image cropping */
   isCropping: boolean;
-  croppingElementId: ExcalidrawElement["id"] | null;
 
   /** null if no search matches found / search closed */
   searchMatches: Readonly<{
@@ -568,10 +459,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-  // Stores the current bind mode which is detemined at various points during
-  // a drag operation (like pointer position vs bindable element) but needed
-  // globally for calculating the binding strategy
-  bindMode: BindMode;
   /** user-customized color-picker top picks (pinned via drag & drop from the
    * color picker popup). `null` means no customization (defaults, or
    * host-supplied `topPicks`, are used). Kept per picker. */
@@ -622,17 +509,6 @@ export type UIAppState = Omit<
   | "frameToHighlight"
   | "elementsToHighlight"
 >;
-
-export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };
-
-export type Zoom = Readonly<{
-  value: NormalizedZoomValue;
-}>;
-
-export type PointerCoords = Readonly<{
-  x: number;
-  y: number;
-}>;
 
 export type Gesture = {
   pointers: Map<number, PointerCoords>;
@@ -847,26 +723,6 @@ export type UIControl =
   | keyof Extract<UIConfig, { enabled: unknown }>["enabled"]
   | keyof Extract<UIConfig, { disabled: unknown }>["disabled"];
 
-/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
-export type ElementRenderOverride = Readonly<{
-  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
-  opacity?: number;
-  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
-  offset?: Readonly<{ x: number; y: number }>;
-}>;
-
-/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
-export type ElementRenderOverrides = ReadonlyMap<
-  ExcalidrawElement["id"],
-  ElementRenderOverride
->;
-
-/** The translation part of a snapshot: only the entries that carry an offset. */
-export type ElementRenderOffsets = ReadonlyMap<
-  ExcalidrawElement["id"],
-  NonNullable<ElementRenderOverride["offset"]>
->;
-
 export interface ExcalidrawProps {
   className?: string;
   /**
@@ -1070,7 +926,7 @@ export interface ExcalidrawProps {
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
-  generateLinkForSelection?: (id: string, type: "element" | "group") => string;
+  generateLinkForSelection?: GenerateLinkForSelection;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
@@ -1088,12 +944,7 @@ export interface ExcalidrawProps {
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
-  validateEmbeddable?:
-    | boolean
-    | string[]
-    | RegExp
-    | RegExp[]
-    | ((link: string) => boolean | undefined);
+  validateEmbeddable?: EmbeddableValidator;
   renderEmbeddable?: (
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
@@ -1244,13 +1095,7 @@ export type AppClassProperties = {
   canvas: HTMLCanvasElement;
   focusContainer(): void;
   library: Library;
-  imageCache: Map<
-    FileId,
-    {
-      image: HTMLImageElement | Promise<HTMLImageElement>;
-      mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
-    }
-  >;
+  imageCache: ImageCache;
   files: BinaryFiles;
   editorInterface: App["editorInterface"];
   scene: App["scene"];
@@ -1323,7 +1168,7 @@ export type PointerDownState = Readonly<{
   lastCoords: { x: number; y: number };
   // original element frozen snapshots so we can access the original
   // element attribute values at time of pointerdown
-  originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
+  originalElements: OriginalElementsMap;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -1401,8 +1246,6 @@ export type PointerDownState = Readonly<{
     hasOccurred: boolean;
   };
 }>;
-
-export type UnsubscribeCallback = () => void;
 
 export type ExcalidrawMountPayload = {
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -1528,13 +1371,6 @@ export interface ExcalidrawImperativeAPI {
   onEvent: InstanceType<typeof App>["onEvent"];
 }
 
-export type FrameNameBounds = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
 export type FrameNameBoundsCache = {
   get: (
     frameElement: ExcalidrawFrameLikeElement | ExcalidrawMagicFrameElement,
@@ -1566,20 +1402,7 @@ export type Primitive =
 
 export type JSONValue = string | number | boolean | null | object;
 
-export type EmbedsValidationStatus = Map<
-  ExcalidrawIframeLikeElement["id"],
-  boolean
->;
-
-export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
-
-export type PendingExcalidrawElements = NonDeletedExcalidrawElement[];
-
 /** Runtime gridSize value. Null indicates disabled grid. */
-export type NullableGridSize =
-  | (AppState["gridSize"] & MakeBrand<"NullableGridSize">)
-  | null;
-
 export type GenerateDiagramToCode = (props: {
   frame: NonDeleted<ExcalidrawMagicFrameElement>;
   children: readonly NonDeletedExcalidrawElement[];
@@ -1590,13 +1413,6 @@ export type GenerateDiagramToCode = (props: {
    */
   onPartial?: (html: string) => void;
 }) => MaybePromise<{ html: string }>;
-
-export type Offsets = Partial<{
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}>;
 
 /**
  * Value of the `data-viewport-ui` attribute, marking a DOM node as a UI

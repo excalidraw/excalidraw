@@ -6,7 +6,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
-import { useExcalidrawAppState } from "../App";
+import { useExcalidrawAppState } from "../App.context";
 
 import {
   getDropdownMenuItemClassName,

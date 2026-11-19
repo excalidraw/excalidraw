@@ -6,12 +6,6 @@ import {
   segmentsIntersectAt,
 } from "@excalidraw/math";
 
-import type {
-  AppClassProperties,
-  AppState,
-  StaticCanvasAppState,
-} from "@excalidraw/excalidraw/types";
-
 import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
 import {
@@ -30,7 +24,7 @@ import {
   elementsOverlappingBBox,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
-import { getBoundTextElement, getContainerElement } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./boundText";
 import { syncMovedIndices } from "./fractionalIndex";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -40,9 +34,11 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import { getNonDeletedElements } from ".";
+import { getNonDeletedElements } from "./sceneElements";
 
-import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
+import { getFrameChildren } from "./frameChildren";
+
+import type { ExcalidrawElementsIncludingDeleted, Scene } from "./Scene";
 
 import type {
   ElementsMap,
@@ -53,6 +49,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./types";
+import type { ElementsState } from "./types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -268,19 +265,6 @@ export const groupByFrameLikes = (elements: readonly ExcalidrawElement[]) => {
   return frameElementsMap;
 };
 
-export const getFrameChildren = (
-  allElements: ElementsMapOrArray,
-  frameId: string,
-) => {
-  const frameChildren: ExcalidrawElement[] = [];
-  for (const element of allElements.values()) {
-    if (element.frameId === frameId) {
-      frameChildren.push(element);
-    }
-  }
-  return frameChildren;
-};
-
 export const getFrameLikeElements = (
   allElements: ExcalidrawElementsIncludingDeleted,
 ): ExcalidrawFrameLikeElement[] => {
@@ -312,7 +296,10 @@ export const getRootElements = <T extends ExcalidrawElement>(
 export const getElementsInResizingFrame = (
   allElements: ExcalidrawElementsIncludingDeleted,
   frame: ExcalidrawFrameLikeElement,
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    "selectedGroupIds" | "selectedElementIds" | "editingGroupId"
+  >,
   elementsMap: ElementsMap,
 ): ExcalidrawElement[] => {
   const prevElementsInFrame = getFrameChildren(allElements, frame.id);
@@ -813,8 +800,14 @@ export const updateFrameMembershipOfSelectedElements = <
   T extends ElementsMapOrArray,
 >(
   allElements: T,
-  appState: AppState,
-  app: AppClassProperties,
+  appState: Pick<
+    ElementsState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+    | "editingGroupId"
+  >,
+  app: { scene: Pick<Scene, "getSelectedElements"> },
 ) => {
   const selectedElements = app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
@@ -905,7 +898,12 @@ export const omitGroupsContainingFrameLikes = (
 export const getTargetFrame = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-  appState: StaticCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+  >,
 ) => {
   const _element = isTextElement(element)
     ? getContainerElement(element, elementsMap) || element
@@ -932,7 +930,13 @@ export const getTargetFrame = (
 export const isElementInFrame = (
   element: ExcalidrawElement,
   allElementsMap: ElementsMap,
-  appState: StaticCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+    | "editingGroupId"
+  >,
   opts?: {
     targetFrame?: ExcalidrawFrameLikeElement;
     checkedGroups?: Map<string, boolean>;
@@ -1026,7 +1030,14 @@ export const isElementInFrame = (
 export const shouldApplyFrameClip = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
-  appState: StaticCanvasAppState,
+  appState: Pick<
+    ElementsState,
+    | "selectedElementIds"
+    | "selectedElementsAreBeingDragged"
+    | "frameToHighlight"
+    | "editingGroupId"
+    | "frameRendering"
+  >,
   elementsMap: ElementsMap,
   checkedGroups?: Map<string, boolean>,
 ) => {

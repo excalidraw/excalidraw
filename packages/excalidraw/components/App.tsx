@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import throttle from "lodash.throttle";
-import React, { useContext } from "react";
+import React from "react";
 import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
 import { nanoid } from "nanoid";
@@ -58,7 +58,6 @@ import {
   viewportCoordsToSceneCoords,
   wrapEvent,
   updateObject,
-  updateActiveTool,
   isTransparent,
   muteFSAbortError,
   isTestEnv,
@@ -88,13 +87,11 @@ import {
   type StylesPanelMode,
   loadDesktopUIModePreference,
   setDesktopUIMode,
-  isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
 } from "@excalidraw/common";
 
 import {
-  getObservedAppState,
   getCommonBounds,
   bindOrUnbindBindingElements,
   getHoveredElementForBinding,
@@ -188,14 +185,10 @@ import {
   dragNewElement,
   getDragOffsetXY,
   Scene,
-  Store,
-  CaptureUpdateAction,
   type ElementUpdate,
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
-  StoreDelta,
-  type ApplyToOptions,
   positionElementsOnGrid,
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
@@ -212,6 +205,16 @@ import {
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
 } from "@excalidraw/element";
+
+import { History } from "@excalidraw/history";
+
+import { Store, StoreDelta } from "@excalidraw/history";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
+
+import { getObservedAppState } from "@excalidraw/history";
+
+import { type ApplyToOptions } from "@excalidraw/history";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
@@ -313,7 +316,6 @@ import {
   copyElementRenderOverrides,
   getElementRenderOffsets,
 } from "../renderOverrides";
-import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
@@ -375,6 +377,8 @@ import {
   resolveColorTarget,
 } from "../actions/colorTargets";
 
+import { updateActiveTool, isSelectionLikeTool } from "../appState";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -427,6 +431,19 @@ import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
+import {
+  AppContext,
+  AppPropsContext,
+  editorInterfaceContextInitialValue,
+  EditorInterfaceContext,
+  ExcalidrawContainerContext,
+  ExcalidrawElementsContext,
+  ExcalidrawAppStateContext,
+  ExcalidrawSetAppStateContext,
+  ExcalidrawActionManagerContext,
+  ExcalidrawAPIContext,
+} from "./App.context";
+
 import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
@@ -473,91 +490,11 @@ import type { Action, ActionResult } from "../actions/types";
 const isUIConfig = (ui: AppProps["ui"]): ui is UIConfig =>
   typeof ui === "object" && ui !== null;
 
-const AppContext = React.createContext<AppClassProperties>(null!);
-const AppPropsContext = React.createContext<AppProps>(null!);
-
-const editorInterfaceContextInitialValue: EditorInterface = {
-  formFactor: "desktop",
-  desktopUIMode: "full",
-  userAgent: createUserAgentDescriptor(
-    typeof navigator !== "undefined" ? navigator.userAgent : "",
-  ),
-  isTouchScreen: false,
-  canFitSidebar: false,
-  isLandscape: true,
-};
-const EditorInterfaceContext = React.createContext<EditorInterface>(
-  editorInterfaceContextInitialValue,
-);
-EditorInterfaceContext.displayName = "EditorInterfaceContext";
-
 const editorLifecycleEventBehavior = {
   "editor:mount": { cardinality: "once", replay: "last" },
   "editor:initialize": { cardinality: "once", replay: "last" },
   "editor:unmount": { cardinality: "once", replay: "last" },
 } as const;
-
-export const ExcalidrawContainerContext = React.createContext<{
-  container: HTMLDivElement | null;
-  id: string | null;
-}>({ container: null, id: null });
-ExcalidrawContainerContext.displayName = "ExcalidrawContainerContext";
-
-const ExcalidrawElementsContext = React.createContext<
-  readonly NonDeletedExcalidrawElement[]
->([]);
-ExcalidrawElementsContext.displayName = "ExcalidrawElementsContext";
-
-const ExcalidrawAppStateContext = React.createContext<AppState>({
-  ...getDefaultAppState(),
-  width: 0,
-  height: 0,
-  offsetLeft: 0,
-  offsetTop: 0,
-});
-ExcalidrawAppStateContext.displayName = "ExcalidrawAppStateContext";
-
-const ExcalidrawSetAppStateContext = React.createContext<
-  React.Component<any, AppState>["setState"]
->(() => {
-  console.warn("Uninitialized ExcalidrawSetAppStateContext context!");
-});
-ExcalidrawSetAppStateContext.displayName = "ExcalidrawSetAppStateContext";
-
-const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
-  null!,
-);
-ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
-
-export const ExcalidrawAPIContext =
-  React.createContext<ExcalidrawImperativeAPI | null>(null);
-ExcalidrawAPIContext.displayName = "ExcalidrawAPIContext";
-
-export const ExcalidrawAPISetContext = React.createContext<
-  ((api: ExcalidrawImperativeAPI | null) => void) | null
->(null);
-ExcalidrawAPISetContext.displayName = "ExcalidrawAPISetContext";
-
-export const useApp = () => useContext(AppContext);
-export const useAppProps = () => useContext(AppPropsContext);
-export const useEditorInterface = () =>
-  useContext<EditorInterface>(EditorInterfaceContext);
-export const useStylesPanelMode = () =>
-  deriveStylesPanelMode(useEditorInterface());
-export const useExcalidrawContainer = () =>
-  useContext(ExcalidrawContainerContext);
-export const useExcalidrawElements = () =>
-  useContext(ExcalidrawElementsContext);
-export const useExcalidrawAppState = () =>
-  useContext(ExcalidrawAppStateContext);
-export const useExcalidrawSetAppState = () =>
-  useContext(ExcalidrawSetAppStateContext);
-export const useExcalidrawActionManager = () =>
-  useContext(ExcalidrawActionManagerContext);
-/**
- * Requires wrapping your component in <ExcalidrawAPIContext.Provider>
- */
-export const useExcalidrawAPI = () => useContext(ExcalidrawAPIContext);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;

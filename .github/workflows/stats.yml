@@ -22,14 +22,17 @@ jobs:
     environment: stats
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 20.x
+          node-version: 22.x
+          cache: pnpm
       - name: Install
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Build with bundle stats
-        run: yarn stats:bundle
+        run: pnpm stats:bundle
         env:
           VITE_APP_GIT_SHA: ${{ github.sha }}
           VITE_APP_ENABLE_ESLINT: "false"
@@ -55,16 +58,19 @@ jobs:
       - name: Fetch the commit before the push
         if: env.BEFORE
         run: git fetch --no-tags --depth=1 origin "$BEFORE"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 20.x
+          node-version: 22.x
+          cache: pnpm
       - name: Install
         run: |
-          yarn install --frozen-lockfile
-          npx playwright install --with-deps chromium
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
       - name: Measure this commit and the one before it
-        run: yarn stats:compare --base "${BEFORE:-HEAD^}" --iterations 6 --out perf.json
+        run: pnpm stats:compare --base "${BEFORE:-HEAD^}" --iterations 6 --out perf.json
       - name: Post to the Excalidraw+ admin
         run: node scripts/stats/post.mjs perf perf.json
         env:

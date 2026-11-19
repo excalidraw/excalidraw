@@ -7,7 +7,7 @@ import {
   moveAllRight,
 } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import {
   BringForwardIcon,

@@ -31,6 +31,9 @@ import { isUsingAdaptiveRadius, getSelectedElements } from "@excalidraw/element"
 
 import { FONT_SIZES } from "@excalidraw/common";
 
+import { createEvent, fireEvent, act } from "@testing-library/react";
+
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -52,16 +55,19 @@ import type {
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
+import "../matchers";
+
 import { selectGroupsForSelectedElements } from "../../components/App.selection";
 
 import { getMimeType } from "../../data/blob";
 import { createTestHook } from "../../components/App";
 import { getDefaultAppState } from "../../appState";
-import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+import { GlobalTestState } from "../testState";
 
 import type { Action } from "../../actions/types";
 import type App from "../../components/App";
 import type { AppState } from "../../types";
+
 
 
 const readFile = util.promisify(fs.readFile);

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useExcalidrawAPI } from "../components/App";
+import { useExcalidrawAPI } from "../components/App.context";
 
 import { getDefaultAppState } from "../appState";
 

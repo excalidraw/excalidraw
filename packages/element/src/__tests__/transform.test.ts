@@ -21,7 +21,7 @@ import {
 import { getBindingGap } from "../binding";
 import { getArrowheadSize, getCommonBounds } from "../bounds";
 import { LinearElementEditor } from "../linearElementEditor";
-import { getBoundTextElement } from "../textElement";
+import { getBoundTextElement } from "../boundText";
 import * as textMeasurements from "../textMeasurements";
 import * as textWrapping from "../textWrapping";
 import {

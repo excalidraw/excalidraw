@@ -3,7 +3,7 @@ import {
   COLOR_PALETTE,
   removeDarkModeFilter,
   rgbToHex,
-} from "@excalidraw/common";
+} from "./index";
 
 describe("COLOR_PALETTE", () => {
   it("color palette doesn't regress", () => {

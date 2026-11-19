@@ -32,9 +32,9 @@ import {
   getCloneByOrigId,
   render,
   waitFor,
-  GlobalTestState,
   unmountComponent,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { ExcalidrawProps, NormalizedZoomValue } from "../types";
 

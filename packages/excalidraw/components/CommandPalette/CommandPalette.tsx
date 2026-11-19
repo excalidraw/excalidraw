@@ -36,7 +36,7 @@ import {
   useAppProps,
   useExcalidrawActionManager,
   useExcalidrawSetAppState,
-} from "../App";
+} from "../App.context";
 import { Dialog } from "../Dialog";
 import { InlineIcon } from "../InlineIcon";
 import { TextField } from "../TextField";
@@ -75,6 +75,8 @@ import {
 import * as defaultItems from "./defaultCommandPaletteItems";
 import "./CommandPalette.scss";
 
+import { DEFAULT_CATEGORIES } from "./categories";
+
 import type { CommandPaletteItem } from "./types";
 import type { ToolbarToolType } from "../Tools";
 import type { AppProps, AppState, LibraryItem, UIAppState } from "../../types";
@@ -83,16 +85,6 @@ import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
-
-export const DEFAULT_CATEGORIES = {
-  app: "App",
-  export: "Export",
-  tools: "Tools",
-  editor: "Editor",
-  elements: "Elements",
-  links: "Links",
-  library: "Library",
-};
 
 const getCategoryOrder = (category: string) => {
   switch (category) {

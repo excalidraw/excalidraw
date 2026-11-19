@@ -36,7 +36,7 @@ import {
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 

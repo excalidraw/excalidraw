@@ -22,15 +22,6 @@
     }
 
     &__popover {
-      @keyframes ShareableLinkDialog__popover__scaleIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
       box-sizing: border-box;
       z-index: 100;
 
@@ -55,13 +46,22 @@
       background: var(--color-success);
       color: var(--color-success-text);
 
+      transform-origin: var(--radix-popover-content-transform-origin);
+      animation: ShareableLinkDialog__popover__scaleIn 150ms ease-out;
+
       & > svg {
         width: 0.875rem;
         height: 0.875rem;
       }
 
-      transform-origin: var(--radix-popover-content-transform-origin);
-      animation: ShareableLinkDialog__popover__scaleIn 150ms ease-out;
+      @keyframes ShareableLinkDialog__popover__scaleIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     }
 
     &__linkRow {

@@ -8,7 +8,7 @@ import { t } from "../../i18n";
 import { IconButton } from "../IconButton";
 import { TextIcon } from "../icons";
 
-import { useExcalidrawSetAppState } from "../App";
+import { useExcalidrawSetAppState } from "../App.context";
 
 interface FontPickerTriggerProps {
   selectedFontFamily: FontFamilyValues | null;

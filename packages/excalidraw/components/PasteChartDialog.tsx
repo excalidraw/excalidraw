@@ -11,7 +11,7 @@ import { exportScene } from "../scene/export";
 
 import { useUIAppState } from "../context/ui-appState";
 
-import { useApp } from "./App";
+import { useApp } from "./App.context";
 import { Dialog } from "./Dialog";
 
 import "./PasteChartDialog.scss";

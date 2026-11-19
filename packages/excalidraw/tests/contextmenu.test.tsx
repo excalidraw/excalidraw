@@ -16,7 +16,6 @@ import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
-  GlobalTestState,
   screen,
   queryByText,
   queryAllByText,
@@ -25,6 +24,7 @@ import {
   unmountComponent,
   checkpointHistory,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { ShortcutName } from "../actions/shortcuts";
 import type { ActionName } from "../actions/types";

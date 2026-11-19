@@ -18,7 +18,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, getCommonBounds } from "../..";
+import { Excalidraw, getCommonBounds } from "../../index";
 import { actionGroup } from "../../actions";
 import { t } from "../../i18n";
 import * as StaticScene from "../../renderer/staticScene";
@@ -26,11 +26,11 @@ import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
 import {
-  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
+import { GlobalTestState } from "../../tests/testState";
 
 import { getStepSizedValue } from "./utils";
 

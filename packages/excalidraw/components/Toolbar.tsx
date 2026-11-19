@@ -6,7 +6,7 @@ import { KEYS } from "@excalidraw/common";
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
 
-import { useEditorInterface, useStylesPanelMode } from "./App";
+import { useEditorInterface, useStylesPanelMode } from "./App.context";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
 import { LockButton } from "./LockButton";
@@ -34,7 +34,6 @@ import {
   FreedrawToolButton,
   getToolShortcut,
   HandToolButton,
-  isToolButtonDisabled,
   LassoToolButton,
   LineToolButton,
   RectangleToolButton,
@@ -43,6 +42,7 @@ import {
   StickyNoteToolButton,
   TextToolButton,
 } from "./Tools";
+import { isToolButtonDisabled } from "./toolButtons";
 
 import type {
   AppClassProperties,

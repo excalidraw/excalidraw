@@ -6,7 +6,6 @@ import {
   SVG_NS,
   THEME,
   MIME_TYPES,
-  EXPORT_DATA_TYPES,
   COLOR_WHITE,
   DEFAULT_EXPORT_PADDING,
   arrayToMap,
@@ -56,7 +55,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { cleanAppStateForExport } from "../appState";
-import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
+import { encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { encodePngMetadata } from "../data/image";
@@ -1216,40 +1215,6 @@ export const encodeSvgBase64Payload = ({
   );
   metadataElement.appendChild(ownerDocument.createTextNode(base64));
   metadataElement.appendChild(createHTMLComment(ownerDocument, "payload-end"));
-};
-
-export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
-  if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
-    const match = svg.match(
-      /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
-    );
-    if (!match) {
-      throw new Error("INVALID");
-    }
-    const versionMatch = svg.match(/<!-- payload-version:(\d+) -->/);
-    const version = versionMatch?.[1] || "1";
-    const isByteString = version !== "1";
-
-    try {
-      const json = base64ToString(match[1], isByteString);
-      const encodedData = JSON.parse(json);
-      if (!("encoded" in encodedData)) {
-        // legacy, un-encoded scene JSON
-        if (
-          "type" in encodedData &&
-          encodedData.type === EXPORT_DATA_TYPES.excalidraw
-        ) {
-          return json;
-        }
-        throw new Error("FAILED");
-      }
-      return decode(encodedData);
-    } catch (error: any) {
-      console.error(error);
-      throw new Error("FAILED");
-    }
-  }
-  throw new Error("INVALID");
 };
 
 // ---------------------------------------------------------------------------

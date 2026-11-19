@@ -1,8 +1,4 @@
-import {
-  CANVAS_SEARCH_TAB,
-  DEFAULT_SIDEBAR,
-  isSelectionLikeTool,
-} from "@excalidraw/common";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
 
 import {
   isArrowElement,
@@ -23,6 +19,8 @@ import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
+
+import { isSelectionLikeTool } from "../appState";
 
 import "./HintViewer.scss";
 

@@ -5,17 +5,16 @@ import {
 } from "@excalidraw/element";
 import { arrayToMap, invariant } from "@excalidraw/common";
 
-import {
-  toggleLinePolygonState,
-  CaptureUpdateAction,
-} from "@excalidraw/element";
+import { toggleLinePolygonState } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type {
   ExcalidrawLinearElement,
   ExcalidrawLineElement,
 } from "@excalidraw/element/types";
 
-import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
+import { DEFAULT_CATEGORIES } from "../components/CommandPalette/categories";
 import { IconButton } from "../components/IconButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";

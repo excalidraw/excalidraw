@@ -23,13 +23,13 @@ import type {
 
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 
-import { getSyncableElements } from ".";
+import { getSyncableElements } from "./syncable";
 
-import type { SyncableExcalidrawElement } from ".";
 import type Portal from "../collab/Portal";
 import type { Socket } from "socket.io-client";
 import type { Bytes } from "firebase/firestore";
 import type { UploadMetadata } from "firebase/storage";
+import type { SyncableExcalidrawElement } from "./syncable";
 
 // private
 // -----------------------------------------------------------------------------

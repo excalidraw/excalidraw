@@ -37,7 +37,7 @@ import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
 
-import { useEditorInterface } from "./App";
+import { useEditorInterface } from "./App.context";
 
 import { Button } from "./Button";
 

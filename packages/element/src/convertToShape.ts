@@ -1,13 +1,4 @@
 import {
-  getBoundsFromPoints,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
-import {
-  newArrowElement,
-  newElement,
-  newLinearElement,
-} from "@excalidraw/element/newElement";
-import {
   ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
   getStrokeWidthByKey,
   ROUNDNESS,
@@ -26,10 +17,20 @@ import {
   skewness,
 } from "@excalidraw/math";
 
-import type { App, AppState } from "@excalidraw/excalidraw/types";
-
 import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
+
+import { newArrowElement, newElement, newLinearElement } from "./newElement";
+import { getBoundsFromPoints, getElementAbsoluteCoords } from "./bounds";
+
+import { getFrameLikeElements } from "./frame";
+import {
+  isLinearElement,
+  isLineElement,
+  isUsingAdaptiveRadius,
+} from "./typeChecks";
+import { LinearElementEditor } from "./linearElementEditor";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
@@ -43,15 +44,9 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawLineElement,
-} from "@excalidraw/element/types";
-
-import { getFrameLikeElements } from "./frame";
-import {
-  isLinearElement,
-  isLineElement,
-  isUsingAdaptiveRadius,
-} from "./typeChecks";
-import { LinearElementEditor } from "./linearElementEditor";
+} from "./types";
+import type { Scene } from "./Scene";
+import type { ElementsState } from "./types";
 
 declare global {
   interface Window {
@@ -534,7 +529,20 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
 // `elementsMap`.
 export const convertToShape = (
   points: GlobalPoint[],
-  appState: AppState,
+  appState: Pick<
+    ElementsState,
+    | "zoom"
+    | "currentItemRoundness"
+    | "currentItemRoughness"
+    | "currentItemBackgroundColor"
+    | "currentItemStrokeColor"
+    | "currentItemFillStyle"
+    | "currentItemOpacity"
+    | "currentItemStrokeStyle"
+    | "currentItemStrokeWidthKey"
+    | "currentItemStartArrowhead"
+    | "currentItemEndArrowhead"
+  >,
   elementsMap: ElementsMap,
   previousElement: ExcalidrawElement | null,
   frames?: readonly ExcalidrawFrameLikeElement[],
@@ -764,8 +772,22 @@ const isDrawShapePreviewEqual = (
 // Append to the trail and recompute the shape preview. This runs inside
 // withBatchedUpdatesThrottled (throttleRAF), so it fires at most once per
 // animation frame regardless of raw pointermove rate.
+/** What live shape recognition needs from the editor. */
+export type ShapeRecognitionHost = {
+  state: Parameters<typeof convertToShape>[1] &
+    Pick<ElementsState, "activeTool" | "newElement">;
+  scene: Pick<Scene, "getNonDeletedElementsMap" | "getNonDeletedFramesLikes">;
+  drawShape: {
+    trail: {
+      addPointToPath(x: number, y: number): void;
+      getCurrentPoints(): GlobalPoint[];
+    };
+  };
+  setState(state: Pick<ElementsState, "newElement">): void;
+};
+
 export const convertToShapeHandlePointerMoveFromPointerDown = (
-  app: App,
+  app: ShapeRecognitionHost,
   pointerCoords: { x: number; y: number },
 ) => {
   if (app.state.activeTool.type === "autoshape") {

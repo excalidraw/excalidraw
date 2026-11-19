@@ -24,7 +24,6 @@ import {
   DEFAULT_GRID_STEP,
   randomId,
   getUpdatedTimestamp,
-  updateActiveTool,
   arrayToMap,
   getSizeFromPoints,
   normalizeLink,
@@ -114,6 +113,8 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
+
+import { updateActiveTool } from "../appState";
 
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";

@@ -24,12 +24,8 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { Pointer, Keyboard } from "./helpers/ui";
-import {
-  render,
-  waitFor,
-  GlobalTestState,
-  unmountComponent,
-} from "./test-utils";
+import { render, waitFor, unmountComponent } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import type { NormalizedZoomValue } from "../types";
 

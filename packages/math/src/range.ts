@@ -1,5 +1,3 @@
-import { toBrandedType } from "@excalidraw/common";
-
 import type { InclusiveRange } from "./types";
 
 /**
@@ -10,7 +8,7 @@ import type { InclusiveRange } from "./types";
  * @returns
  */
 export function rangeInclusive(start: number, end: number): InclusiveRange {
-  return toBrandedType<InclusiveRange>([start, end]);
+  return [start, end] as InclusiveRange;
 }
 
 /**
@@ -20,7 +18,7 @@ export function rangeInclusive(start: number, end: number): InclusiveRange {
  * @returns The new inclusive range
  */
 export function rangeInclusiveFromPair(pair: [start: number, end: number]) {
-  return toBrandedType<InclusiveRange>(pair);
+  return pair as InclusiveRange;
 }
 
 /**
@@ -62,7 +60,7 @@ export const rangeIntersection = (
   const rangeEnd = Math.min(a1, b1);
 
   if (rangeStart <= rangeEnd) {
-    return toBrandedType<InclusiveRange>([rangeStart, rangeEnd]);
+    return [rangeStart, rangeEnd] as InclusiveRange;
   }
 
   return null;

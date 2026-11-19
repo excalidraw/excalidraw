@@ -10,6 +10,8 @@ Install the package together with its React peer dependencies.
 npm install react react-dom @excalidraw/excalidraw
 # or
 yarn add react react-dom @excalidraw/excalidraw
+# or
+pnpm add react react-dom @excalidraw/excalidraw
 ```
 
 > **Note**: If you want to try unreleased changes, use `@excalidraw/excalidraw@next`.

@@ -7,14 +7,6 @@ import {
 } from "@excalidraw/common";
 
 import type {
-  InteractiveCanvasRenderConfig,
-  InteractiveSceneRenderAnimationState,
-  InteractiveSceneRenderConfig,
-  RenderableElementsMap,
-  RenderInteractiveSceneCallback,
-} from "@excalidraw/excalidraw/scene/types";
-
-import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -24,6 +16,14 @@ import { getSelectionColor } from "../../renderer/helpers";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import { AnimationController } from "../../renderer/animation";
+
+import type {
+  InteractiveCanvasRenderConfig,
+  InteractiveSceneRenderAnimationState,
+  InteractiveSceneRenderConfig,
+  RenderableElementsMap,
+  RenderInteractiveSceneCallback,
+} from "../../scene/types";
 
 import type {
   AppClassProperties,

@@ -30,12 +30,12 @@ import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
   fireEvent,
-  GlobalTestState,
   render,
   screen,
   unmountComponent,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 import { getTextEditor } from "./queries/dom";
 

@@ -8,7 +8,7 @@ import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
-import { useExcalidrawContainer } from "./App";
+import { useExcalidrawContainer } from "./App.context";
 
 import "./IconPicker.scss";
 

@@ -20,7 +20,11 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 import { useStable } from "../hooks/useStable";
 import { getSelectedElements } from "../scene";
 
-import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+import {
+  useApp,
+  useExcalidrawContainer,
+  useExcalidrawElements,
+} from "./App.context";
 import { eyeDropperIconSvgPaths } from "./icons";
 import { positionElementBesideCursor } from "./positionElementBesideCursor";
 

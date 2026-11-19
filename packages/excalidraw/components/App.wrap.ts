@@ -1,5 +1,4 @@
 import {
-  CaptureUpdateAction,
   fixBindingsAfterDeletion,
   getBoundTextElement,
   getNonDeletedElements,
@@ -14,6 +13,8 @@ import {
   updateBoundElements,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type {
   ExcalidrawArrowElement,

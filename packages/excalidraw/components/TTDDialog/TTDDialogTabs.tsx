@@ -3,7 +3,7 @@ import { useRef } from "react";
 
 import { isMemberOf } from "@excalidraw/common";
 
-import { useExcalidrawSetAppState } from "../App";
+import { useExcalidrawSetAppState } from "../App.context";
 
 import type { ReactNode } from "react";
 

@@ -6,7 +6,7 @@ import { isShallowEqual } from "@excalidraw/common";
 
 import { t } from "../i18n";
 
-import { useExcalidrawActionManager } from "./App";
+import { useExcalidrawActionManager } from "./App.context";
 import { chevronDownIcon } from "./icons";
 import { Island } from "./Island";
 import { QuickSearch } from "./QuickSearch";

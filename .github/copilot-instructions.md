@@ -38,7 +38,7 @@
 ## Testing
 
 - Always attempt to fix #problems
-- Always offer to run `yarn test:app` in the project root after modifications are complete and attempt fixing the issues reported
+- Always offer to run `pnpm test:app` in the project root after modifications are complete and attempt fixing the issues reported
 
 ## Types
 

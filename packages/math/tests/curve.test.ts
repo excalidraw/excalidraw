@@ -1,5 +1,3 @@
-import "@excalidraw/utils/test-utils";
-
 import {
   bezierEquation,
   curve,

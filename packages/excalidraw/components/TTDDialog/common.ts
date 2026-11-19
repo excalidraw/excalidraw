@@ -2,13 +2,13 @@ import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
-import { exportScene } from "@excalidraw/utils";
-
 import type { RenderEnvironment } from "@excalidraw/element";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
 } from "@excalidraw/element/types";
+
+import { exportScene } from "../../scene/export";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 

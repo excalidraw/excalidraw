@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
 import { t } from "../../i18n";
-import { useApp } from "../App";
+import { useApp } from "../App.context";
 
 import "./Minimap.scss";
 

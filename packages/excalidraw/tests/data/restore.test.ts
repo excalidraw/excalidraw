@@ -29,12 +29,13 @@ import type {
   ExcalidrawTextElement,
   FractionalIndex,
 } from "@excalidraw/element/types";
-import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
 import { getDefaultAppState } from "../../appState";
 import { serializeAsJSON } from "../../data/json";
+
+import type { NormalizedZoomValue } from "../../types";
 
 import type { ImportedDataState } from "../../data/types";
 import type { LibraryItem, LibraryItem_v1, LibraryItems } from "../../types";

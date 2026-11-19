@@ -1,7 +1,7 @@
-import type { UnsubscribeCallback } from "@excalidraw/excalidraw/types";
-
 import { Emitter } from "./emitter";
 import { isProdEnv } from "./utils";
+
+import type { UnsubscribeCallback } from "./types";
 
 export type AppEventPayloadMap = Record<string, unknown[]>;
 

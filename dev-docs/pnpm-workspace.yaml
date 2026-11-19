@@ -1,0 +1,9 @@
+# standalone project: keeps pnpm from treating dev-docs as part of the
+# repo-root workspace (it is not listed there)
+packages:
+  - "."
+
+# core-js postinstall only prints a funding banner
+ignoredBuiltDependencies:
+  - core-js
+  - core-js-pure

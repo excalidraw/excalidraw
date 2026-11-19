@@ -12,8 +12,9 @@ import {
 
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import type { AppState, Zoom } from "@excalidraw/excalidraw/types";
 import type { Bounds } from "@excalidraw/common";
+
+import type { Zoom } from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
@@ -35,6 +36,7 @@ import type {
   NonDeletedExcalidrawElement,
   ElementsMap,
 } from "./types";
+import type { ElementsState } from "./types";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -49,7 +51,7 @@ const isInsideTransformHandle = (
 export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
-  appState: AppState,
+  appState: Pick<ElementsState, "selectedElementIds" | "croppingElementId">,
   x: number,
   y: number,
   zoom: Zoom,
@@ -131,7 +133,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
 
 export const getElementWithTransformHandleType = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<ElementsState, "selectedElementIds" | "croppingElementId">,
   scenePointerX: number,
   scenePointerY: number,
   zoom: Zoom,

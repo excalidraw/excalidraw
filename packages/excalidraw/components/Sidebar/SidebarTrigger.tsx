@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 import { useUIAppState } from "../../context/ui-appState";
-import { useExcalidrawSetAppState } from "../App";
+import { useExcalidrawSetAppState } from "../App.context";
 
 import "./SidebarTrigger.scss";
 

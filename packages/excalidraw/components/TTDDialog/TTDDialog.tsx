@@ -5,7 +5,7 @@ import { addEventListener } from "@excalidraw/common";
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
 import { MERMAID_TO_EXCALIDRAW_CONFIG } from "../../mermaid";
-import { useApp } from "../App";
+import { useApp } from "../App.context";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 

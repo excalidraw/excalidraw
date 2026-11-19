@@ -23,11 +23,11 @@ import {
   randomId,
 } from "@excalidraw/common";
 
-import "@excalidraw/utils/test-utils";
+import { StoreDelta } from "@excalidraw/history";
 
-import { ElementsDelta, AppStateDelta } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
-import { CaptureUpdateAction, StoreDelta } from "@excalidraw/element";
+import { ElementsDelta, AppStateDelta } from "@excalidraw/history";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -68,7 +68,6 @@ import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
-  GlobalTestState,
   act,
   assertSelectedElements,
   render,
@@ -77,6 +76,7 @@ import {
   checkpointHistory,
   unmountComponent,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 import { setupImageTest as _setupImageTest } from "./image.test";
 
 import type { AppState } from "../types";

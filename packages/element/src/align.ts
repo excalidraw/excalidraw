@@ -1,16 +1,15 @@
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
 import { getSelectedElementsByGroup } from "./groups";
 
-import { getNonDeletedElements } from ".";
+import { getNonDeletedElements } from "./sceneElements";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
 import type { BoundingBox } from "./bounds";
 import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
+import type { ElementsState } from "./types";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -21,7 +20,9 @@ export const alignElements = (
   selectedElements: NonDeletedExcalidrawElement[],
   alignment: Alignment,
   scene: Scene,
-  appState: Readonly<AppState>,
+  appState: Readonly<
+    Pick<ElementsState, "selectedGroupIds" | "editingGroupId">
+  >,
   /** measures the labels of the bound arrows the alignment moves */
   renderEnvironment?: RenderEnvironment,
 ): NonDeletedExcalidrawElement[] => {

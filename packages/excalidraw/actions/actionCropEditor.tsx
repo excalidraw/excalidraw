@@ -1,6 +1,6 @@
 import { isImageElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { ExcalidrawImageElement } from "@excalidraw/element/types";
 

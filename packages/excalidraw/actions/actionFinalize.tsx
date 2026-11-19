@@ -20,13 +20,12 @@ import {
   arrayToMap,
   invariant,
   shouldRotateWithDiscreteAngle,
-  updateActiveTool,
 } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { LocalPoint } from "@excalidraw/math";
 import type {
@@ -40,6 +39,8 @@ import { t } from "../i18n";
 import { done } from "../components/icons";
 import { TOGGLE_TOOLS } from "../components/Tools";
 import { IconButton } from "../components/IconButton";
+
+import { updateActiveTool } from "../appState";
 
 import { register } from "./register";
 

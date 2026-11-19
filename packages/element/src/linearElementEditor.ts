@@ -18,8 +18,6 @@ import {
   isCurve,
 } from "@excalidraw/math";
 
-import { getCurvePathOps } from "@excalidraw/utils/shape";
-
 import {
   DRAGGING_THRESHOLD,
   KEYS,
@@ -30,29 +28,22 @@ import {
   getFeatureFlag,
 } from "@excalidraw/common";
 
+import type { Radians } from "@excalidraw/math";
+
+import type { Bounds } from "@excalidraw/common";
+
+import type { NullableGridSize, Zoom } from "@excalidraw/common";
+
+import { getCurvePathOps } from "./geometricShapes";
+
+import { moveArrowAboveBindable } from "./arrowStacking";
 import {
   deconstructLinearOrFreeDrawElement,
   getSnapOutlineMidPoint,
   isPathALoop,
-  moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
-  type Store,
   getLinearElementPathSegments,
-} from "@excalidraw/element";
-
-import type { LinearPathSegment } from "@excalidraw/element";
-
-import type { Radians } from "@excalidraw/math";
-
-import type {
-  AppState,
-  PointerCoords,
-  InteractiveCanvasAppState,
-  AppClassProperties,
-  NullableGridSize,
-  Zoom,
-} from "@excalidraw/excalidraw/types";
-import type { Bounds } from "@excalidraw/common";
+} from "./utils";
 
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -68,7 +59,8 @@ import {
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { handleBindTextResize } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";
@@ -76,6 +68,8 @@ import { ShapeCache, toggleLinePolygonState } from "./shape";
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
 import { isLineElement } from "./typeChecks";
+
+import type { LinearPathSegment } from "./utils";
 
 import type { Scene } from "./Scene";
 
@@ -94,6 +88,9 @@ import type {
   Ordered,
   ExcalidrawBindableElement,
 } from "./types";
+import type { PointerCoords } from "./types";
+import type { ElementsState } from "./types";
+import type { RenderEnvironment } from "./renderEnvironment";
 
 /**
  * Normalizes line points so that the start point is at [0,0]. This is
@@ -127,7 +124,7 @@ const getNormalizedPoints = ({
 type PointMoveOtherUpdates = {
   startBinding?: FixedPointBinding | null;
   endBinding?: FixedPointBinding | null;
-  suggestedBinding?: AppState["suggestedBinding"] | null;
+  suggestedBinding?: ElementsState["suggestedBinding"] | null;
 };
 
 const BoundTextPositionCache = new WeakMap<
@@ -138,6 +135,40 @@ const BoundTextPositionCache = new WeakMap<
     position: { x: number; y: number };
   }
 >();
+
+/**
+ * What the linear element pointer handlers need from the editor. The editor
+ * (`App`) satisfies it.
+ */
+export type LinearElementEditorHost = {
+  state: Pick<
+    ElementsState,
+    | "bindMode"
+    | "gridModeEnabled"
+    | "gridSize"
+    | "isBindingEnabled"
+    | "isMidpointSnappingEnabled"
+    | "newElement"
+    | "selectedLinearElement"
+    | "suggestedBinding"
+    | "zoom"
+  >;
+  scene: Scene;
+  renderEnvironment: RenderEnvironment;
+  getEffectiveGridSize(): NullableGridSize;
+  arrowText: {
+    isBoundTextGrabbable(
+      element: NonDeletedExcalidrawElement,
+      x: number,
+      y: number,
+    ): boolean;
+  };
+};
+
+/** The history store, as far as point editing is concerned. */
+export type LinearElementEditorStore = {
+  scheduleCapture(): void;
+};
 
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
@@ -246,8 +277,8 @@ export class LinearElementEditor {
 
   static handleBoxSelection(
     event: PointerEvent,
-    appState: AppState,
-    setState: React.Component<any, AppState>["setState"],
+    appState: Pick<ElementsState, "selectedLinearElement" | "selectionElement">,
+    setState: (state: Pick<ElementsState, "selectedLinearElement">) => void,
     elementsMap: NonDeletedSceneElementsMap,
   ) {
     if (
@@ -309,11 +340,11 @@ export class LinearElementEditor {
 
   static handlePointerMove(
     event: PointerEvent,
-    app: AppClassProperties,
+    app: LinearElementEditorHost,
     scenePointerX: number,
     scenePointerY: number,
     linearElementEditor: LinearElementEditor,
-  ): Pick<AppState, "suggestedBinding" | "selectedLinearElement"> | null {
+  ): Pick<ElementsState, "suggestedBinding" | "selectedLinearElement"> | null {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
     const { elementId } = linearElementEditor;
@@ -362,7 +393,7 @@ export class LinearElementEditor {
     }
 
     // Apply the point movement if needed
-    let suggestedBinding: AppState["suggestedBinding"] = null;
+    let suggestedBinding: ElementsState["suggestedBinding"] = null;
     const { positions, updates, hit } = pointDraggingUpdates(
       [idx],
       deltaX,
@@ -468,11 +499,11 @@ export class LinearElementEditor {
 
   static handlePointDragging(
     event: PointerEvent,
-    app: AppClassProperties,
+    app: LinearElementEditorHost,
     scenePointerX: number,
     scenePointerY: number,
     linearElementEditor: LinearElementEditor,
-  ): Pick<AppState, "suggestedBinding" | "selectedLinearElement"> | null {
+  ): Pick<ElementsState, "suggestedBinding" | "selectedLinearElement"> | null {
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
     const { elbowed, elementId, initialState } = linearElementEditor;
@@ -565,7 +596,7 @@ export class LinearElementEditor {
     }
 
     // Apply the point movement if needed
-    let suggestedBinding: AppState["suggestedBinding"] = null;
+    let suggestedBinding: ElementsState["suggestedBinding"] = null;
     const { positions, updates, hit } = pointDraggingUpdates(
       selectedPointsIndices,
       deltaX,
@@ -724,7 +755,7 @@ export class LinearElementEditor {
   static handlePointerUp(
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
-    appState: AppState,
+    appState: Pick<ElementsState, "zoom">,
     scene: Scene,
   ): LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
@@ -816,7 +847,7 @@ export class LinearElementEditor {
   static getEditorMidPoints = (
     element: ExcalidrawLinearElement,
     elementsMap: ElementsMap,
-    appState: InteractiveCanvasAppState,
+    appState: Pick<ElementsState, "selectedLinearElement" | "zoom">,
   ): (GlobalPoint | null)[] => {
     const boundText = getBoundTextElement(element, elementsMap);
 
@@ -867,7 +898,7 @@ export class LinearElementEditor {
   static getSegmentMidpointHitCoords = (
     linearElementEditor: LinearElementEditor,
     scenePointer: { x: number; y: number },
-    appState: AppState,
+    appState: Pick<ElementsState, "selectedLinearElement" | "zoom">,
     elementsMap: ElementsMap,
   ): GlobalPoint | null => {
     const { elementId } = linearElementEditor;
@@ -1024,7 +1055,7 @@ export class LinearElementEditor {
 
   static getSegmentMidPointIndex(
     linearElementEditor: LinearElementEditor,
-    appState: AppState,
+    appState: Pick<ElementsState, "selectedLinearElement" | "zoom">,
     midPoint: GlobalPoint,
     elementsMap: ElementsMap,
   ) {
@@ -1052,8 +1083,8 @@ export class LinearElementEditor {
 
   static handlePointerDown(
     event: React.PointerEvent<HTMLElement>,
-    app: AppClassProperties,
-    store: Store,
+    app: LinearElementEditorHost,
+    store: LinearElementEditorStore,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
     scene: Scene,
@@ -1264,7 +1295,7 @@ export class LinearElementEditor {
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,
     scenePointerY: number,
-    app: AppClassProperties,
+    app: LinearElementEditorHost,
   ): LinearElementEditor | null {
     const appState = app.state;
     if (!appState.selectedLinearElement?.isEditing) {
@@ -1438,7 +1469,7 @@ export class LinearElementEditor {
   static getPointIndexUnderCursor(
     element: ExcalidrawLinearElement,
     elementsMap: ElementsMap,
-    zoom: AppState["zoom"],
+    zoom: ElementsState["zoom"],
     x: number,
     y: number,
   ) {
@@ -1502,7 +1533,9 @@ export class LinearElementEditor {
 
   // element-mutating methods
   // ---------------------------------------------------------------------------
-  static duplicateSelectedPoints(appState: AppState, scene: Scene): AppState {
+  static duplicateSelectedPoints<
+    T extends Pick<ElementsState, "selectedLinearElement">,
+  >(appState: T, scene: Scene): T {
     invariant(
       appState.selectedLinearElement?.isEditing,
       "Not currently editing a linear element",
@@ -1580,7 +1613,7 @@ export class LinearElementEditor {
 
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    app: AppClassProperties,
+    app: LinearElementEditorHost,
     pointIndices: readonly number[],
   ) {
     const isUncommittedPoint =
@@ -1741,7 +1774,7 @@ export class LinearElementEditor {
   static shouldAddMidpoint(
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
-    appState: AppState,
+    appState: Pick<ElementsState, "selectedLinearElement" | "zoom">,
     elementsMap: ElementsMap,
   ) {
     const element = LinearElementEditor.getElement(
@@ -1786,7 +1819,7 @@ export class LinearElementEditor {
   static addMidpoint(
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
-    app: AppClassProperties,
+    app: LinearElementEditorHost,
     snapToGrid: boolean,
     scene: Scene,
   ) {
@@ -1846,7 +1879,7 @@ export class LinearElementEditor {
     },
     options?: {
       isDragging?: boolean;
-      zoom?: AppState["zoom"];
+      zoom?: ElementsState["zoom"];
       sceneElementsMap?: NonDeletedSceneElementsMap;
       isBindingEnabled?: boolean;
       isMidpointSnappingEnabled?: boolean;
@@ -2408,7 +2441,7 @@ const pointDraggingUpdates = (
   elementsMap: NonDeletedSceneElementsMap,
   element: NonDeleted<ExcalidrawLinearElement>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  app: AppClassProperties,
+  app: LinearElementEditorHost,
   angleLocked: boolean,
   altKey: boolean,
   linearElementEditor: LinearElementEditor,

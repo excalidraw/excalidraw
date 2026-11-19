@@ -26,7 +26,7 @@ import {
   getElementBounds,
 } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { Bounds } from "@excalidraw/common";
 

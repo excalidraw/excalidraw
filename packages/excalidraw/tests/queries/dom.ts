@@ -4,7 +4,8 @@ import { fireEvent } from "@testing-library/react";
 import {
   stripIgnoredNodesFromErrorMessage,
   trimErrorStack,
-} from "../test-utils";
+} from "../testState";
+import "../matchers";
 
 export const TEXT_EDITOR_SELECTOR =
   ".excalidraw-textEditorContainer > textarea";

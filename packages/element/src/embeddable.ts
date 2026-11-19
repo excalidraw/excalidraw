@@ -5,7 +5,6 @@ import {
   getFontString,
 } from "@excalidraw/common";
 
-import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "./newElement";
@@ -18,6 +17,7 @@ import type {
   IframeData,
   NonDeletedExcalidrawElement,
 } from "./types";
+import type { EmbeddableValidator } from "./types";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 
@@ -535,7 +535,7 @@ export const maybeParseEmbedSrc = (str: string): string => {
 
 export const embeddableURLValidator = (
   url: string | null | undefined,
-  validateEmbeddable: ExcalidrawProps["validateEmbeddable"],
+  validateEmbeddable: EmbeddableValidator | undefined,
 ): boolean => {
   if (!url) {
     return false;

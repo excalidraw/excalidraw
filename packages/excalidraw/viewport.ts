@@ -13,18 +13,19 @@ import {
 import { clamp, pointDistance, pointFrom, roundToStep } from "@excalidraw/math";
 
 import {
-  CaptureUpdateAction,
   getCommonBounds,
   getElementBounds,
   getVisibleElements,
 } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { SceneBounds } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { getNormalizedZoom } from "./scene";
+import { getNormalizedZoom } from "./scene/normalize";
 
 import type {
   AppState,

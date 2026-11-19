@@ -1,5 +1,3 @@
-const path = require("path");
-
 const { build } = require("esbuild");
 
 // contains all dependencies bundled inside
@@ -10,12 +8,13 @@ const getConfig = (outdir) => ({
   entryPoints: ["src/index.ts"],
   entryNames: "[name]",
   assetNames: "[dir]/[name]",
-  alias: {
-    "@excalidraw/utils": path.resolve(__dirname, "../packages/utils/src"),
-  },
+  // resolve workspace packages (linked through node_modules) to their
+  // sources: see the "excalidraw-source" condition in their `exports`
+  conditions: ["excalidraw-source"],
   external: [
     "@excalidraw/common",
     "@excalidraw/element",
+    "@excalidraw/history",
     "@excalidraw/math",
     "@excalidraw/fractional-indexing",
   ],

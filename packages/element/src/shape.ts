@@ -3,15 +3,6 @@ import { getStroke, getStrokePoints } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
-  type GeometricShape,
-  getClosedCurveShape,
-  getCurveShape,
-  getEllipseShape,
-  getFreedrawShape,
-  getPolygonShape,
-} from "@excalidraw/utils/shape";
-
-import {
   pointFrom,
   pointDistance,
   type LocalPoint,
@@ -35,17 +26,16 @@ import type { GlobalPoint, Polygon } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import type {
-  AppState,
-  EmbedsValidationStatus,
-} from "@excalidraw/excalidraw/types";
-import type {
-  ElementShape,
-  ElementShapes,
-  SVGPathString,
-} from "@excalidraw/excalidraw/scene/types";
+import {
+  type GeometricShape,
+  getClosedCurveShape,
+  getCurveShape,
+  getEllipseShape,
+  getFreedrawShape,
+  getPolygonShape,
+} from "./geometricShapes";
 
-import { elementWithCanvasCache } from "./renderElement";
+import { elementWithCanvasCache } from "./renderCache";
 
 import {
   canBecomePolygon,
@@ -83,12 +73,19 @@ import type {
 
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import type {
+  EmbedsValidationStatus,
+  ElementShape,
+  ElementShapes,
+  SVGPathString,
+} from "./types";
+import type { ElementsState } from "./types";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
   private static cache = new WeakMap<
     ExcalidrawElement,
-    { shape: ElementShape; theme: AppState["theme"] }
+    { shape: ElementShape; theme: ElementsState["theme"] }
   >();
 
   /**
@@ -97,7 +94,7 @@ export class ShapeCache {
    */
   public static get = <T extends ExcalidrawElement>(
     element: T,
-    theme: AppState["theme"] | null,
+    theme: ElementsState["theme"] | null,
   ) => {
     const cached = ShapeCache.cache.get(element);
     if (cached && (theme === null || cached.theme === theme)) {
@@ -127,9 +124,9 @@ export class ShapeCache {
     element: T,
     renderConfig: {
       isExporting: boolean;
-      canvasBackgroundColor: AppState["viewBackgroundColor"];
+      canvasBackgroundColor: ElementsState["viewBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
-      theme: AppState["theme"];
+      theme: ElementsState["theme"];
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
@@ -838,7 +835,7 @@ const _generateElementShape = (
     isExporting: boolean;
     canvasBackgroundColor: string;
     embedsValidationStatus: EmbedsValidationStatus | null;
-    theme?: AppState["theme"];
+    theme?: ElementsState["theme"];
   },
 ): ElementShape => {
   const isDarkMode = theme === THEME.DARK;

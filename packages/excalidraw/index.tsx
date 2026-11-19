@@ -8,16 +8,15 @@ import React, {
 
 import {
   applyDarkModeFilter,
-  DEFAULT_IMAGE_OPTIONS,
-  DEFAULT_UI_OPTIONS,
   getStrokeWidthByKey,
   isShallowEqual,
 } from "@excalidraw/common";
 
-import App, {
+import App from "./components/App";
+import {
   ExcalidrawAPIContext,
   ExcalidrawAPISetContext,
-} from "./components/App";
+} from "./components/App.context";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
@@ -34,6 +33,8 @@ import polyfill from "./polyfill";
 import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
+
+import { DEFAULT_IMAGE_OPTIONS, DEFAULT_UI_OPTIONS } from "./appState";
 
 import type {
   AppProps,
@@ -475,7 +476,7 @@ export {
   bumpVersion,
 } from "@excalidraw/element";
 
-export { CaptureUpdateAction } from "@excalidraw/element";
+export { CaptureUpdateAction } from "@excalidraw/history";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
@@ -489,7 +490,7 @@ export {
   useStylesPanelMode,
   useExcalidrawAPI,
   ExcalidrawAPIContext,
-} from "./components/App";
+} from "./components/App.context";
 
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };

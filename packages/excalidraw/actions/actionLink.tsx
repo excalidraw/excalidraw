@@ -5,7 +5,7 @@ import {
 
 import { KEYS } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import { IconButton } from "../components/IconButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";

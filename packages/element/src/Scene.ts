@@ -8,19 +8,27 @@ import {
   isTestEnv,
   toArray,
 } from "@excalidraw/common";
-import { isNonDeletedElement } from "@excalidraw/element";
-import { isFrameLikeElement } from "@excalidraw/element";
-import { getElementsInGroup } from "@excalidraw/element";
+
+import type {
+  Assert,
+  Mutable,
+  SameType,
+} from "@excalidraw/common/utility-types";
+
+import { isFrameLikeElement } from "./typeChecks";
+import { getElementsInGroup } from "./groups";
 
 import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "@excalidraw/element";
+} from "./fractionalIndex";
 
-import { getSelectedElements } from "@excalidraw/element";
+import { getSelectedElements } from "./selection";
 
-import { mutateElement, type ElementUpdate } from "@excalidraw/element";
+import { mutateElement, type ElementUpdate } from "./mutateElement";
+
+import { isNonDeletedElement } from "./sceneElements";
 
 import type {
   ExcalidrawElement,
@@ -32,15 +40,9 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
-} from "@excalidraw/element/types";
+} from "./types";
 
-import type {
-  Assert,
-  Mutable,
-  SameType,
-} from "@excalidraw/common/utility-types";
-
-import type { AppState } from "../../excalidraw/types";
+import type { ElementsState } from "./types";
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
@@ -124,7 +126,7 @@ export class Scene {
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
   private elementsMap = toBrandedType<SceneElementsMap>(new Map());
   private selectedElementsCache: {
-    selectedElementIds: AppState["selectedElementIds"] | null;
+    selectedElementIds: ElementsState["selectedElementIds"] | null;
     elements: readonly NonDeletedExcalidrawElement[] | null;
     cache: Map<SelectionHash, NonDeletedExcalidrawElement[]>;
   } = {
@@ -177,7 +179,7 @@ export class Scene {
 
   getSelectedElements(opts: {
     // NOTE can be ommitted by making Scene constructor require App instance
-    selectedElementIds: AppState["selectedElementIds"];
+    selectedElementIds: ElementsState["selectedElementIds"];
     /**
      * for specific cases where you need to use elements not from current
      * scene state. This in effect will likely result in cache-miss, and

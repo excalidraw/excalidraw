@@ -29,7 +29,7 @@ import {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
-import { atom, useAtom } from "../editor-jotai";
+import { useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 
 import { getSelectedElements } from "../scene";
@@ -39,7 +39,7 @@ import {
   useAppProps,
   useExcalidrawElements,
   useExcalidrawSetAppState,
-} from "./App";
+} from "./App.context";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import LibraryMenuItems from "./LibraryMenuItems";
 import Spinner from "./Spinner";
@@ -54,8 +54,6 @@ import type {
   AppClassProperties,
 } from "../types";
 import type Library from "../data/library";
-
-export const isLibraryMenuOpenAtom = atom(false);
 
 const LibraryMenuWrapper = ({ children }: { children: React.ReactNode }) => {
   return <div className="layer-ui__library">{children}</div>;

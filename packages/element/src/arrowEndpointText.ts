@@ -22,8 +22,6 @@ import {
 
 import type { GlobalPoint } from "@excalidraw/math";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import { getBindingGap, normalizeFixedPoint } from "./binding";
 import {
   HEADING_DOWN,
@@ -47,6 +45,7 @@ import type {
   TextAlign,
   VerticalAlign,
 } from "./types";
+import type { ElementsState } from "./types";
 
 export type ArrowEndpoint = {
   arrow: NonDeleted<ExcalidrawArrowElement>;
@@ -62,7 +61,7 @@ export const getUnboundArrowEndpointAtPoint = (
   scenePointer: GlobalPoint,
   elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ): ArrowEndpoint | null => {
   // front to back, so the top-most arrow wins when endpoints overlap
   for (let index = elements.length - 1; index >= 0; index--) {

@@ -6,7 +6,7 @@ import { KEYS, normalizeInputColor } from "@excalidraw/common";
 import { getShortcutKey } from "../..//shortcut";
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useEditorInterface } from "../App";
+import { useEditorInterface } from "../App.context";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { eyeDropperIcon } from "../icons";
 

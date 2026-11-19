@@ -27,7 +27,7 @@ import {
 
 import { syncMovedIndices } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type {
   ExcalidrawElement,

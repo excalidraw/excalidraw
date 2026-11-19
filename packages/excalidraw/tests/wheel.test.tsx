@@ -13,7 +13,8 @@ import { Excalidraw } from "../index";
 import { getNormalizedZoom } from "../scene";
 
 import { API } from "./helpers/api";
-import { GlobalTestState, mockBoundingClientRect, render } from "./test-utils";
+import { mockBoundingClientRect, render } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

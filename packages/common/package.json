@@ -7,12 +7,14 @@
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
+      "excalidraw-source": "./src/index.ts",
       "types": "./dist/types/common/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
     "./*": {
+      "excalidraw-source": "./src/*.js",
       "types": "./dist/types/common/src/*.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
@@ -24,7 +26,21 @@
   ],
   "description": "Excalidraw common functions, constants, etc.",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/types/common/src/index.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      },
+      "./*": {
+        "types": "./dist/types/common/src/*.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      }
+    }
   },
   "license": "MIT",
   "keywords": [
@@ -54,9 +70,14 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
+    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && pnpm gen:types"
   },
   "dependencies": {
+    "@braintree/sanitize-url": "6.0.2",
+    "@excalidraw/math": "workspace:*",
+    "es6-promise-pool": "2.5.0",
+    "nanoid": "3.3.8",
+    "roughjs": "4.6.4",
     "tinycolor2": "1.6.0"
   },
   "devDependencies": {

@@ -4,7 +4,7 @@ import decodePng from "png-chunks-extract";
 
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
 
-import { blobToArrayBuffer } from "./blob";
+import { blobToArrayBuffer } from "./arrayBuffer";
 import { encode, decode } from "./encode";
 
 // -----------------------------------------------------------------------------

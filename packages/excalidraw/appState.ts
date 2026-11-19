@@ -15,7 +15,14 @@ import {
   DEFAULT_STICKY_NOTE_BG,
 } from "@excalidraw/common";
 
-import type { AppState, InputDevice, NormalizedZoomValue } from "./types";
+import type {
+  ActiveTool,
+  AppProps,
+  AppState,
+  InputDevice,
+  NormalizedZoomValue,
+  ToolType,
+} from "./types";
 
 /**
  * Resolved lazily rather than at module scope: this module is pulled in by the
@@ -361,3 +368,60 @@ export const resolveInputDevice = (
   inputDevice: InputDevice,
 ): Exclude<InputDevice, "auto"> =>
   inputDevice === "auto" ? "trackpad" : inputDevice;
+
+export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
+  canvasActions: {
+    changeViewBackgroundColor: true,
+    clearCanvas: true,
+    export: { saveFileToDisk: true },
+    loadScene: true,
+    saveToActiveFile: true,
+    toggleTheme: null,
+    saveAsImage: true,
+  },
+  tools: {
+    image: true,
+  },
+};
+
+export const DEFAULT_IMAGE_OPTIONS: AppProps["imageOptions"] = {
+  maxWidthOrHeight: 1440,
+  maxFileSizeBytes: 4 * 1024 * 1024,
+};
+
+export const isSelectionLikeTool = (type: ToolType | "custom") => {
+  return type === "selection" || type === "lasso";
+};
+
+export const updateActiveTool = (
+  appState: Pick<AppState, "activeTool">,
+  data: ((
+    | {
+        type: ToolType;
+      }
+    | { type: "custom"; customType: string }
+  ) & { locked?: boolean; fromSelection?: boolean }) & {
+    lastActiveTool?: ActiveTool | null;
+  },
+): AppState["activeTool"] => {
+  if (data.type === "custom") {
+    return {
+      ...appState.activeTool,
+      type: "custom",
+      customType: data.customType,
+      locked: data.locked ?? appState.activeTool.locked,
+    };
+  }
+
+  return {
+    ...appState.activeTool,
+    lastActiveTool:
+      data.lastActiveTool === undefined
+        ? appState.activeTool.lastActiveTool
+        : data.lastActiveTool,
+    type: data.type,
+    customType: null,
+    locked: data.locked ?? appState.activeTool.locked,
+    fromSelection: data.fromSelection ?? false,
+  };
+};

@@ -1,10 +1,10 @@
 import { KEYS, THEME } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
-import { useEditorInterface } from "../components/App";
+import { useEditorInterface } from "../components/App.context";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";

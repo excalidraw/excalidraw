@@ -5,7 +5,7 @@ import {
   DEFAULT_SIDEBAR,
 } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import { searchIcon } from "../components/icons";
 

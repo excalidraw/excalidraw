@@ -27,8 +27,6 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import type { AppState, FrameNameBounds } from "@excalidraw/excalidraw/types";
-
 import { isPathALoop } from "./utils";
 import {
   doBoundsIntersect,
@@ -56,10 +54,8 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import {
-  getBoundTextElement,
-  getTextElementWithAccuratePosition,
-} from "./textElement";
+import { getTextElementWithAccuratePosition } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 
 import { distanceToElement } from "./distance";
 
@@ -83,6 +79,8 @@ import type {
   NonDeletedSceneElementsMap,
   Ordered,
 } from "./types";
+import type { FrameNameBounds } from "./types";
+import type { ElementsState } from "./types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -345,7 +343,7 @@ export const isPointInBindingArea = (
   point: GlobalPoint,
   element: NonDeleted<ExcalidrawBindableElement>,
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ) => {
   const maxDistance = maxBindingDistance_simple(zoom);
   return (
@@ -383,7 +381,7 @@ const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ): BindingCandidate[] => {
   const maxDistance = maxBindingDistance_simple(zoom);
   const candidates: BindingCandidate[] = [];
@@ -451,7 +449,7 @@ export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement>[] =>
   getBindingCandidates(point, elements, elementsMap, zoom).map(
     ({ element }) => element,
@@ -461,7 +459,7 @@ export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidates = getBindingCandidates(point, elements, elementsMap, zoom);
 

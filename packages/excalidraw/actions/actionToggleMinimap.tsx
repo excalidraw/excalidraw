@@ -1,4 +1,4 @@
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import { IconButton } from "../components/IconButton";
 import { MINIMAP_MIN_EDITOR_HEIGHT } from "../components/Minimap/Minimap";

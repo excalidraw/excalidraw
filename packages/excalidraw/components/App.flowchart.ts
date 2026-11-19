@@ -2,13 +2,14 @@ import { isArrowKey, KEYS } from "@excalidraw/common";
 
 import {
   makeNextSelectedElementIds,
-  CaptureUpdateAction,
   FlowChartCreator,
   FlowChartNavigator,
   getSelectedElements,
   isFlowchartNodeElement,
   type LinkDirection,
 } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type {
   ExcalidrawElement,

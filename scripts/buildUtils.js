@@ -1,5 +1,3 @@
-const path = require("path");
-
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 
@@ -13,17 +11,9 @@ const getConfig = (outdir) => ({
   entryPoints: ["src/index.ts"],
   entryNames: "[name]",
   assetNames: "[dir]/[name]",
-  alias: {
-    "@excalidraw/common": path.resolve(__dirname, "../packages/common/src"),
-    "@excalidraw/element": path.resolve(__dirname, "../packages/element/src"),
-    "@excalidraw/excalidraw": path.resolve(__dirname, "../packages/excalidraw"),
-    "@excalidraw/math": path.resolve(__dirname, "../packages/math/src"),
-    "@excalidraw/fractional-indexing": path.resolve(
-      __dirname,
-      "../packages/fractional-indexing/src",
-    ),
-    "@excalidraw/utils": path.resolve(__dirname, "../packages/utils/src"),
-  },
+  // resolve workspace packages (linked through node_modules) to their
+  // sources: see the "excalidraw-source" condition in their `exports`
+  conditions: ["excalidraw-source"],
 });
 
 function buildDev(config) {

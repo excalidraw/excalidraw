@@ -1,3 +1,6 @@
 /// <reference types="vite/client" />
-import "@excalidraw/excalidraw/global";
-import "@excalidraw/excalidraw/css";
+
+interface Window {
+  // set by the host app to override the source recorded in exported data
+  EXCALIDRAW_EXPORT_SOURCE: string;
+}

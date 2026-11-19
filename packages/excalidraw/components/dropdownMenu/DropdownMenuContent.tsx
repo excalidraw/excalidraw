@@ -8,7 +8,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import { useCallbackRefState } from "../../hooks/useCallbackRefState";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
-import { useEditorInterface } from "../App";
+import { useEditorInterface } from "../App.context";
 import { Island } from "../Island";
 import Stack from "../Stack";
 

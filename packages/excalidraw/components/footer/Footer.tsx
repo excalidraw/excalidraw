@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
-import { useApp } from "../App";
+import { useApp } from "../App.context";
 import { HelpButton } from "../HelpButton";
 import { Minimap } from "../Minimap/Minimap";
 import { Section } from "../Section";

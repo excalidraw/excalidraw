@@ -9,7 +9,7 @@ import {
   useAppProps,
   useEditorInterface,
   useExcalidrawSetAppState,
-} from "../App";
+} from "../App.context";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";

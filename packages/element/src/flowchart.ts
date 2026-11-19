@@ -2,11 +2,6 @@ import { invariant, toBrandedType, type Bounds } from "@excalidraw/common";
 
 import { clamp, pointFrom, PRECISION } from "@excalidraw/math";
 
-import type {
-  AppState,
-  PendingExcalidrawElements,
-} from "@excalidraw/excalidraw/types";
-
 import { bindBindingElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -37,6 +32,8 @@ import {
 } from "./types";
 
 import type { Scene } from "./Scene";
+import type { PendingExcalidrawElements } from "./types";
+import type { ElementsState } from "./types";
 
 export type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -275,7 +272,7 @@ const cloneFlowchartNode = (
 
 export const addNewNodes = (
   startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
-  appState: AppState,
+  appState: Pick<ElementsState, "currentItemEndArrowhead" | "zoom">,
   direction: LinkDirection,
   scene: Scene,
   numberOfNodes: number,
@@ -315,7 +312,7 @@ const createBindingArrow = (
   startBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   endBindingElement: NonDeleted<ExcalidrawFlowchartNodeElement>,
   direction: LinkDirection,
-  appState: AppState,
+  appState: Pick<ElementsState, "currentItemEndArrowhead" | "zoom">,
   scene: Scene,
 ) => {
   let startX: number;
@@ -627,7 +624,7 @@ export class FlowChartCreator {
 
   createNodes(
     startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
-    appState: AppState,
+    appState: Pick<ElementsState, "currentItemEndArrowhead" | "zoom">,
     direction: LinkDirection,
     scene: Scene,
   ) {

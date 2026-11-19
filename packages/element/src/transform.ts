@@ -31,7 +31,8 @@ import {
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
-import type { Zoom } from "@excalidraw/excalidraw/types";
+
+import type { Zoom } from "@excalidraw/common";
 
 import {
   bindBindingElement,
@@ -70,9 +71,9 @@ import { syncInvalidIndices } from "./fractionalIndex";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
-  getBoundTextElement,
   redrawTextBoundingBox,
 } from "./textElement";
+import { getBoundTextElement } from "./boundText";
 
 import { LinearElementEditor } from "./linearElementEditor";
 

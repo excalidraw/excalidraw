@@ -23,16 +23,25 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.13.0",
+    "pnpm": ">=11.0.0"
   },
   "dependencies": {
-    "@excalidraw/random-username": "1.0.0",
+    "@excalidraw/common": "workspace:*",
+    "@excalidraw/element": "workspace:*",
+    "@excalidraw/excalidraw": "workspace:*",
+    "@excalidraw/history": "workspace:*",
+    "@excalidraw/math": "workspace:*",
+    "@excalidraw/random-username": "1.1.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",
+    "clsx": "1.1.1",
     "firebase": "11.3.1",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "2.11.0",
+    "lodash.throttle": "4.1.1",
+    "nanoid": "3.3.8",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "socket.io-client": "4.7.2",
@@ -41,17 +50,19 @@
   },
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
-    "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "cross-env VITE_APP_DISABLE_SENTRY=true vite build",
     "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA cross-env VITE_APP_ENABLE_TRACKING=true vite build",
     "build:version": "node ../scripts/build-version.js",
-    "build": "yarn build:app && yarn build:version",
-    "start": "yarn && vite",
-    "start:production": "yarn build && yarn serve",
-    "serve": "npx http-server build -a localhost -p 5001 -o",
-    "build:preview": "yarn build && vite preview --port 5000"
+    "build": "pnpm build:app && pnpm build:version",
+    "start": "pnpm install && vite",
+    "start:production": "pnpm build && pnpm serve",
+    "serve": "pnpm exec http-server build -a localhost -p 5001 -o",
+    "build:preview": "pnpm build && vite preview --port 5000"
   },
   "devDependencies": {
-    "vite-plugin-sitemap": "0.7.1"
+    "cross-env": "7.0.3",
+    "vite": "5.4.21",
+    "vite-plugin-sitemap": "0.7.1",
+    "workbox-window": "7.3.0"
   }
 }

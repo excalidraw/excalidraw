@@ -3,8 +3,9 @@ import {
   COLOR_PALETTE,
   KEYS,
 } from "@excalidraw/common";
-import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { LocalPoint } from "@excalidraw/math";
 
@@ -16,14 +17,8 @@ import { editorJotaiStore } from "../editor-jotai";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
-import {
-  act,
-  fireEvent,
-  GlobalTestState,
-  render,
-  togglePopover,
-  waitFor,
-} from "./test-utils";
+import { act, fireEvent, render, togglePopover, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

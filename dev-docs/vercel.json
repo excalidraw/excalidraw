@@ -6,7 +6,7 @@
     }
   },
   "outputDirectory": "build",
-  "installCommand": "yarn install",
+  "installCommand": "pnpm install",
   "redirects": [
     {
       "source": "/docs/introduction/development",

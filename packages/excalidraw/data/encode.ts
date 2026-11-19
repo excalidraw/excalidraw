@@ -1,5 +1,7 @@
 import { deflate, inflate } from "pako";
 
+import { MIME_TYPES, EXPORT_DATA_TYPES } from "@excalidraw/common";
+
 import { encryptData, decryptData } from "./encryption";
 
 // -----------------------------------------------------------------------------
@@ -412,3 +414,60 @@ export const decompressData = async <T extends Record<string, any>>(
 };
 
 // -----------------------------------------------------------------------------
+
+const SVG_PAYLOAD_START = "<!-- payload-start -->";
+const SVG_PAYLOAD_END = "<!-- payload-end -->";
+
+/**
+ * Returns the whitespace-trimmed text between the first payload start marker
+ * and the end marker following it, or `null` if there is none.
+ *
+ * Deliberately not a regex such as
+ * `/<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/`, which is
+ * quadratic on long whitespace runs in (untrusted) SVG input.
+ */
+const getSvgBase64Payload = (svg: string): string | null => {
+  const startIndex = svg.indexOf(SVG_PAYLOAD_START);
+  if (startIndex === -1) {
+    return null;
+  }
+  const payloadStartIndex = startIndex + SVG_PAYLOAD_START.length;
+  const endIndex = svg.indexOf(SVG_PAYLOAD_END, payloadStartIndex);
+  if (endIndex === -1) {
+    return null;
+  }
+  // `trim` strips the same characters as `\s`
+  return svg.slice(payloadStartIndex, endIndex).trim() || null;
+};
+
+export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
+  if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
+    const payload = getSvgBase64Payload(svg);
+    if (!payload) {
+      throw new Error("INVALID");
+    }
+    const versionMatch = svg.match(/<!-- payload-version:(\d+) -->/);
+    const version = versionMatch?.[1] || "1";
+    const isByteString = version !== "1";
+
+    try {
+      const json = base64ToString(payload, isByteString);
+      const encodedData = JSON.parse(json);
+      if (!("encoded" in encodedData)) {
+        // legacy, un-encoded scene JSON
+        if (
+          "type" in encodedData &&
+          encodedData.type === EXPORT_DATA_TYPES.excalidraw
+        ) {
+          return json;
+        }
+        throw new Error("FAILED");
+      }
+      return decode(encodedData);
+    } catch (error: any) {
+      console.error(error);
+      throw new Error("FAILED");
+    }
+  }
+  throw new Error("INVALID");
+};

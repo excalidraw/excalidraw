@@ -5,7 +5,7 @@ import { ARROW_TYPE, EVENT } from "@excalidraw/common";
 
 import { atom, useAtom } from "../editor-jotai";
 
-import { useApp, useExcalidrawContainer } from "./App";
+import { useApp, useExcalidrawContainer } from "./App.context";
 import { positionElementBesideCursor } from "./positionElementBesideCursor";
 import {
   LineIcon,

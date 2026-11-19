@@ -3,12 +3,13 @@ import { vi } from "vitest";
 
 import { KEYS, ROUNDNESS, arrayToMap, reseed } from "@excalidraw/common";
 import {
-  CaptureUpdateAction,
   getElementBounds,
   getElementLineSegments,
   getElementsWithinSelection,
 } from "@excalidraw/element";
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import { TOOLS } from "../components/Tools";
 
@@ -23,13 +24,13 @@ import {
   act,
   render,
   fireEvent,
-  GlobalTestState,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
   unmountComponent,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 unmountComponent();
 

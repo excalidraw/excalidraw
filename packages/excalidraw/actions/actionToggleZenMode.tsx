@@ -1,6 +1,6 @@
 import { KEYS, matchKey } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import { coffeeIcon } from "../components/icons";
 

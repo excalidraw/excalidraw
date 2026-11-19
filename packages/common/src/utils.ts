@@ -2,16 +2,6 @@ import { average } from "@excalidraw/math";
 
 import type { GlobalCoord } from "@excalidraw/math";
 
-import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
-
-import type {
-  ActiveTool,
-  AppState,
-  ToolType,
-  UnsubscribeCallback,
-  Zoom,
-} from "@excalidraw/excalidraw/types";
-
 import {
   DEFAULT_VERSION,
   ENV,
@@ -21,6 +11,12 @@ import {
 } from "./constants";
 
 import type { MaybePromise, ResolutionType } from "./utility-types";
+import type {
+  FontFamilyValues,
+  FontString,
+  UnsubscribeCallback,
+  Zoom,
+} from "./types";
 
 import type { EVENT } from "./constants";
 
@@ -289,43 +285,6 @@ export const removeSelection = () => {
 };
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
-
-export const isSelectionLikeTool = (type: ToolType | "custom") => {
-  return type === "selection" || type === "lasso";
-};
-
-export const updateActiveTool = (
-  appState: Pick<AppState, "activeTool">,
-  data: ((
-    | {
-        type: ToolType;
-      }
-    | { type: "custom"; customType: string }
-  ) & { locked?: boolean; fromSelection?: boolean }) & {
-    lastActiveTool?: ActiveTool | null;
-  },
-): AppState["activeTool"] => {
-  if (data.type === "custom") {
-    return {
-      ...appState.activeTool,
-      type: "custom",
-      customType: data.customType,
-      locked: data.locked ?? appState.activeTool.locked,
-    };
-  }
-
-  return {
-    ...appState.activeTool,
-    lastActiveTool:
-      data.lastActiveTool === undefined
-        ? appState.activeTool.lastActiveTool
-        : data.lastActiveTool,
-    type: data.type,
-    customType: null,
-    locked: data.locked ?? appState.activeTool.locked,
-    fromSelection: data.fromSelection ?? false,
-  };
-};
 
 export const isFullScreen = () =>
   document.fullscreenElement?.nodeName === "HTML";

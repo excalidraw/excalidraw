@@ -12,15 +12,13 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
-import { isSyncableElement } from "../data";
 
-import type {
-  SocketUpdateData,
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
-} from "../data";
+import { isSyncableElement } from "../data/syncable";
+
+import type { SocketUpdateData, SocketUpdateDataSource } from "../data";
 import type { TCollabClass } from "./Collab";
 import type { Socket } from "socket.io-client";
+import type { SyncableExcalidrawElement } from "../data/syncable";
 
 class Portal {
   collab: TCollabClass;

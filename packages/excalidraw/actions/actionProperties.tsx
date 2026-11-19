@@ -73,11 +73,15 @@ import {
 import {
   updateElbowArrowPoints,
   updateElbowArrowRoute,
-  CaptureUpdateAction,
   toggleLinePolygonState,
 } from "@excalidraw/element";
 
 import { deriveStylesPanelMode } from "@excalidraw/common";
+
+import {
+  CaptureUpdateAction,
+  type CaptureUpdateActionType,
+} from "@excalidraw/history";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -98,8 +102,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { ElementUpdate, Scene } from "@excalidraw/element";
-
-import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";

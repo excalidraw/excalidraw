@@ -46,11 +46,11 @@ import { getTextEditor, updateTextEditor } from "./queries/dom";
 import {
   act,
   fireEvent,
-  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

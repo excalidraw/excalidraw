@@ -1,11 +1,17 @@
-import type { UIAppState } from "@excalidraw/excalidraw/types";
-
 import { getSelectedElements } from "./selection";
 
 import type { NonDeletedExcalidrawElement } from "./types";
+import type { ElementsState } from "./types";
 
 export const showSelectedShapeActions = (
-  appState: UIAppState,
+  appState: Pick<
+    ElementsState,
+    | "viewModeEnabled"
+    | "openDialog"
+    | "activeTool"
+    | "editingTextElement"
+    | "selectedElementIds"
+  >,
   elements: readonly NonDeletedExcalidrawElement[],
 ) =>
   Boolean(

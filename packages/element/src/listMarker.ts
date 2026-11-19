@@ -1,11 +1,8 @@
 import { arrayToMap } from "@excalidraw/common";
 
 import { refreshTextDimensions } from "./newElement";
-import {
-  getBoundTextElement,
-  getContainerElement,
-  redrawTextBoundingBox,
-} from "./textElement";
+import { redrawTextBoundingBox } from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./boundText";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
 
 import type { RenderEnvironment } from "./renderEnvironment";

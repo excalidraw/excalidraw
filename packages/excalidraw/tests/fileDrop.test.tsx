@@ -7,7 +7,8 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
-import { act, fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
+import { act, fireEvent, render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

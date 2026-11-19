@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SVG_NS } from "@excalidraw/common";
+import { MIME_TYPES, SVG_NS } from "@excalidraw/common";
 
 import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
@@ -11,11 +11,8 @@ import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
-import {
-  decodeSvgBase64Payload,
-  encodeSvgBase64Payload,
-  exportScene,
-} from "../scene/export";
+import { encodeSvgBase64Payload, exportScene } from "../scene/export";
+import { decodeSvgBase64Payload } from "../data/encode";
 
 import { API } from "./helpers/api";
 import { render, waitFor } from "./test-utils";
@@ -85,6 +82,38 @@ describe("export", () => {
     expect(decoded.elements).toEqual([
       expect.objectContaining({ type: "text", text: "😀" }),
     ]);
+  });
+
+  it("decodes an SVG payload padded with whitespace", async () => {
+    const metadataElement = document.createElementNS(SVG_NS, "metadata");
+
+    encodeSvgBase64Payload({
+      metadataElement,
+      payload: serializeAsJSON(testElements, h.state, {}, "local"),
+    });
+
+    const svg = metadataElement.innerHTML
+      .replace("<!-- payload-start -->", "<!-- payload-start -->\n  ")
+      .replace("<!-- payload-end -->", " \n<!-- payload-end -->");
+
+    expect(JSON.parse(decodeSvgBase64Payload({ svg })).elements).toEqual([
+      expect.objectContaining({ type: "text", text: "😀" }),
+    ]);
+  });
+
+  it("rejects malformed SVG payloads in linear time", () => {
+    const whitespace = " ".repeat(200_000);
+    const prefix = `<!-- payload-type:${MIME_TYPES.excalidraw} --><!-- payload-start -->`;
+
+    const start = performance.now();
+    for (const svg of [
+      `${prefix}${whitespace}`,
+      `${prefix}a${whitespace}`,
+      `${prefix}${whitespace}<!-- payload-end -->`,
+    ]) {
+      expect(() => decodeSvgBase64Payload({ svg })).toThrow("INVALID");
+    }
+    expect(performance.now() - start).toBeLessThan(1000);
   });
 
   it("exports SVG at the export scale", async () => {

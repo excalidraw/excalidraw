@@ -1,12 +1,10 @@
 import React from "react";
 
 import { COLOR_PALETTE, KEYS, arrayToMap } from "@excalidraw/common";
-import {
-  CaptureUpdateAction,
-  LinearElementEditor,
-  newElementWith,
-} from "@excalidraw/element";
+import { LinearElementEditor, newElementWith } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type {
   ExcalidrawArrowElement,

@@ -24,8 +24,6 @@ import {
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import {
   bindPointToSnapToElementOutline,
   getHeadingForElbowArrowSnap,
@@ -71,6 +69,7 @@ import type {
   NonDeletedExcalidrawElement,
   Ordered,
 } from "./types";
+import type { ElementsState } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
@@ -1186,7 +1185,7 @@ const getElbowArrowData = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    zoom?: AppState["zoom"];
+    zoom?: ElementsState["zoom"];
     isBindingEnabled?: boolean;
     isMidpointSnappingEnabled?: boolean;
   },
@@ -2334,7 +2333,7 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
   element?: ExcalidrawBindableElement | null,
   elementsMap?: ElementsMap,
   isDragging?: boolean,
@@ -2374,7 +2373,7 @@ const getBindPointHeading = (
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
   elementsMap: ElementsMap,
-  zoom?: AppState["zoom"],
+  zoom?: ElementsState["zoom"],
 ): Heading =>
   getHeadingForElbowArrowSnap(
     p,
@@ -2400,7 +2399,7 @@ const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom: AppState["zoom"],
+  zoom: ElementsState["zoom"],
 ) => {
   return getHoveredElementForBinding(origPoint, elements, elementsMap, zoom);
 };

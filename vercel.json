@@ -73,5 +73,5 @@
   "framework": null,
   "buildCommand": "yarn build",
   "outputDirectory": "excalidraw-app/build",
-  "installCommand": "yarn install"
+  "installCommand": "pnpm install --frozen-lockfile --config.confirm-modules-purge=false"
 }

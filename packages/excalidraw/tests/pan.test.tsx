@@ -11,7 +11,8 @@ import {
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
-import { GlobalTestState, render } from "./test-utils";
+import { render } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

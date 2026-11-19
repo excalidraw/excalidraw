@@ -9,7 +9,6 @@
 .idea
 .vercel
 .vscode
-.yarn
 *.log
 *.tgz
 build
@@ -19,8 +18,7 @@ logs
 node_modules
 npm-debug.log*
 package-lock.json
-yarn-debug.log*
-yarn-error.log*
+pnpm-debug.log*
 packages/excalidraw/types
 coverage
 dev-dist

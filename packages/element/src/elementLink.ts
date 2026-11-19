@@ -4,16 +4,15 @@
 
 import { ELEMENT_LINK_KEY, normalizeLink } from "@excalidraw/common";
 
-import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
-
 import { elementsAreInSameGroup } from "./groups";
 
-import type { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement, GenerateLinkForSelection } from "./types";
+import type { ElementsState } from "./types";
 
-export const defaultGetElementLinkFromSelection: Exclude<
-  AppProps["generateLinkForSelection"],
-  undefined
-> = (id, type) => {
+export const defaultGetElementLinkFromSelection: GenerateLinkForSelection = (
+  id,
+  type,
+) => {
   const url = window.location.href;
 
   try {
@@ -30,7 +29,7 @@ export const defaultGetElementLinkFromSelection: Exclude<
 
 export const getLinkIdAndTypeFromSelection = (
   selectedElements: ExcalidrawElement[],
-  appState: AppState,
+  appState: Pick<ElementsState, "selectedGroupIds">,
 ): {
   id: string;
   type: "element" | "group";

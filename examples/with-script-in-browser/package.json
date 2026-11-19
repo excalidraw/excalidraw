@@ -3,20 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@excalidraw/excalidraw": "*",
+    "@excalidraw/excalidraw": "workspace:*",
     "browser-fs-access": "0.38.0",
+    "nanoid": "3.3.8",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
   "devDependencies": {
     "typescript": "^5",
-    "vite": "5.0.12"
+    "vite": "5.4.21"
   },
   "scripts": {
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5002",
-    "build:preview": "yarn build && yarn preview",
-    "build:packages": "yarn --cwd ../../ build:packages"
+    "build:preview": "pnpm build && pnpm preview",
+    "build:packages": "pnpm --dir ../../ build:packages"
   }
 }

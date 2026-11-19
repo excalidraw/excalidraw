@@ -676,12 +676,12 @@ const trimLine = (
     };
   }
 
-  // defensively default to `trimeEnd` in case the regex does not match
-  let [, trimmedLine, whitespaces] = line.match(/^(.+?)(\s+)$/) ?? [
-    line,
-    line.trimEnd(),
-    "",
-  ];
+  // split off the trailing whitespace, keeping at least one character on the
+  // line (`trimEnd` strips the same characters as `\s`); deliberately not a
+  // regex such as `/^(.+?)(\s+)$/`, which is quadratic on long whitespace runs
+  const splitIndex = Math.max(1, line.trimEnd().length);
+  let trimmedLine = line.slice(0, splitIndex);
+  const whitespaces = line.slice(splitIndex);
 
   let trimmedLineWidth = getLineWidth(trimmedLine, font, env);
 

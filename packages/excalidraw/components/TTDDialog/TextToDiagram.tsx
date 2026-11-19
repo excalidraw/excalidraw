@@ -5,7 +5,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 import { useAtom, useAtomValue } from "../../editor-jotai";
 import { t } from "../../i18n";
 
-import { useApp, useExcalidrawSetAppState } from "../App";
+import { useApp, useExcalidrawSetAppState } from "../App.context";
 
 import { useChatAgent } from "./Chat";
 

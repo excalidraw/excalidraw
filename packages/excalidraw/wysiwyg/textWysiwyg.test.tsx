@@ -36,13 +36,8 @@ import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import {
-  GlobalTestState,
-  act,
-  render,
-  screen,
-  unmountComponent,
-} from "../tests/test-utils";
+import { act, render, screen, unmountComponent } from "../tests/test-utils";
+import { GlobalTestState } from "../tests/testState";
 import {
   fireEvent,
   waitFor,

@@ -1,8 +1,4 @@
-import {
-  KEYS,
-  MOBILE_ACTION_BUTTON_BG,
-  updateActiveTool,
-} from "@excalidraw/common";
+import { KEYS, MOBILE_ACTION_BUTTON_BG } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
 import { fixBindingsAfterDeletion } from "@excalidraw/element";
@@ -18,7 +14,7 @@ import { getFrameChildren } from "@excalidraw/element";
 
 import { getElementsInGroup } from "@excalidraw/element";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -27,9 +23,11 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
 import { IconButton } from "../components/IconButton";
 
-import { useStylesPanelMode } from "../components/App";
+import { useStylesPanelMode } from "../components/App.context";
 
 import { selectGroupsForSelectedElements } from "../components/App.selection";
+
+import { updateActiveTool } from "../appState";
 
 import { register } from "./register";
 

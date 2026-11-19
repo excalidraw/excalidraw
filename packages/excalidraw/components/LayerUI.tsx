@@ -45,7 +45,11 @@ import { MINIMAP_RESERVED_HEIGHT } from "./Minimap/Minimap";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
-import { useAppProps, useEditorInterface, useStylesPanelMode } from "./App";
+import {
+  useAppProps,
+  useEditorInterface,
+  useStylesPanelMode,
+} from "./App.context";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { sidebarRightIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";

@@ -7,13 +7,13 @@ import { Excalidraw } from "../index";
 
 import { Keyboard, UI } from "./helpers/ui";
 import {
-  GlobalTestState,
   fireEvent,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 

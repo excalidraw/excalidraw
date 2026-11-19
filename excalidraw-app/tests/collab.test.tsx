@@ -8,9 +8,11 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import { vi } from "vitest";
 
-import { StoreIncrement } from "@excalidraw/element";
-
-import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
+import {
+  StoreIncrement,
+  type DurableIncrement,
+  type EphemeralIncrement,
+} from "@excalidraw/history";
 
 import ExcalidrawApp from "../App";
 

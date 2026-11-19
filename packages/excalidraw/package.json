@@ -12,6 +12,9 @@
     "./element/*": {
       "types": "./dist/types/element/src/*.d.ts"
     },
+    "./history/*": {
+      "types": "./dist/types/history/src/*.d.ts"
+    },
     "./math/*": {
       "types": "./dist/types/math/src/*.d.ts"
     },
@@ -19,6 +22,7 @@
       "types": "./dist/types/utils/src/*.d.ts"
     },
     "./*": {
+      "excalidraw-source": "./*.js",
       "types": "./dist/types/excalidraw/*.d.ts"
     },
     "./index.css": {
@@ -26,6 +30,7 @@
       "production": "./dist/prod/index.css"
     },
     ".": {
+      "excalidraw-source": "./index.tsx",
       "types": "./dist/types/excalidraw/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
@@ -36,7 +41,37 @@
     "dist/*"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      "./common/*": {
+        "types": "./dist/types/common/src/*.d.ts"
+      },
+      "./element/*": {
+        "types": "./dist/types/element/src/*.d.ts"
+      },
+      "./history/*": {
+        "types": "./dist/types/history/src/*.d.ts"
+      },
+      "./math/*": {
+        "types": "./dist/types/math/src/*.d.ts"
+      },
+      "./utils/*": {
+        "types": "./dist/types/utils/src/*.d.ts"
+      },
+      "./*": {
+        "types": "./dist/types/excalidraw/*.d.ts"
+      },
+      "./index.css": {
+        "development": "./dist/dev/index.css",
+        "production": "./dist/prod/index.css"
+      },
+      ".": {
+        "types": "./dist/types/excalidraw/index.d.ts",
+        "development": "./dist/dev/index.js",
+        "production": "./dist/prod/index.js",
+        "default": "./dist/prod/index.js"
+      }
+    }
   },
   "description": "Excalidraw as a React component",
   "license": "MIT",
@@ -71,7 +106,7 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rimraf types && tsc",
-    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"
+    "build:esm": "rimraf dist && node ../../scripts/buildPackage.js && pnpm gen:types"
   },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.2.0 || ^19.0.0",
@@ -83,13 +118,14 @@
     "@codemirror/language": "^6.0.0",
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
-    "@lezer/highlight": "^1.0.0",
-    "@excalidraw/common": "0.18.0",
-    "@excalidraw/element": "0.18.0",
-    "@excalidraw/laser-pointer": "1.3.1",
-    "@excalidraw/math": "0.18.0",
+    "@excalidraw/common": "workspace:*",
+    "@excalidraw/element": "workspace:*",
+    "@excalidraw/fractional-indexing": "workspace:*",
+    "@excalidraw/history": "workspace:*",
+    "@excalidraw/laser-pointer": "workspace:*",
+    "@excalidraw/math": "workspace:*",
     "@excalidraw/mermaid-to-excalidraw": "3.6.0",
-    "@excalidraw/random-username": "1.1.0",
+    "@lezer/highlight": "^1.0.0",
     "browser-fs-access": "0.38.0",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
@@ -101,14 +137,14 @@
     "jotai-scope": "0.7.2",
     "lodash.debounce": "4.0.8",
     "lodash.throttle": "4.1.1",
-    "nanoid": "3.3.3",
+    "nanoid": "3.3.8",
     "pako": "2.0.3",
     "perfect-freehand": "1.2.0",
     "pica": "7.1.1",
     "png-chunk-text": "1.0.0",
     "png-chunks-encode": "1.0.0",
     "png-chunks-extract": "1.0.0",
-    "points-on-curve": "1.0.1",
+    "points-on-curve": "0.2.0",
     "pwacompat": "2.0.17",
     "radix-ui": "1.4.3",
     "roughjs": "4.6.4",
@@ -127,14 +163,17 @@
     "ansicolor": "2.0.3",
     "autoprefixer": "10.4.7",
     "cross-env": "7.0.3",
+    "csstype": "3.1.3",
     "dotenv": "16.0.1",
     "esbuild": "0.19.10",
     "esbuild-sass-plugin": "2.16.0",
     "eslint-plugin-react": "7.32.2",
     "fake-indexeddb": "3.1.7",
-    "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
     "jest-diff": "29.7.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "size-limit": "9.0.0",
     "typescript": "5.9.3"
   }
 }

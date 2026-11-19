@@ -7,11 +7,9 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import type { Radians } from "@excalidraw/math";
 
-import type {
-  InteractiveCanvasAppState,
-  Zoom,
-} from "@excalidraw/excalidraw/types";
 import type { Bounds } from "@excalidraw/common";
+
+import type { Zoom } from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
@@ -27,6 +25,7 @@ import type {
   NonDeletedExcalidrawElement,
   PointerType,
 } from "./types";
+import type { ElementsState } from "./types";
 
 export type TransformHandleDirection =
   | "n"
@@ -327,7 +326,7 @@ export const getTransformHandles = (
 
 export const hasBoundingBox = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: InteractiveCanvasAppState,
+  appState: Pick<ElementsState, "selectedLinearElement">,
   editorInterface: EditorInterface,
 ) => {
   if (

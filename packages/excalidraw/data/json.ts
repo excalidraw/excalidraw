@@ -15,12 +15,7 @@ import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
-import type {
-  ExportedDataState,
-  ImportedDataState,
-  ExportedLibraryData,
-  ImportedLibraryData,
-} from "./types";
+import type { ExportedDataState, ExportedLibraryData } from "./types";
 
 export type JSONExportData = {
   elements: readonly ExcalidrawElement[];
@@ -110,28 +105,6 @@ export const loadFromJSON = async (
     // extensions: ["json", "excalidraw", "png", "svg"],
   });
   return loadFromBlob(file, localAppState, localElements, file.handle);
-};
-
-export const isValidExcalidrawData = (data?: {
-  type?: any;
-  elements?: any;
-  appState?: any;
-}): data is ImportedDataState => {
-  return (
-    data?.type === EXPORT_DATA_TYPES.excalidraw &&
-    (!data.elements ||
-      (Array.isArray(data.elements) &&
-        (!data.appState || typeof data.appState === "object")))
-  );
-};
-
-export const isValidLibrary = (json: any): json is ImportedLibraryData => {
-  return (
-    typeof json === "object" &&
-    json &&
-    json.type === EXPORT_DATA_TYPES.excalidrawLibrary &&
-    (json.version === 1 || json.version === 2)
-  );
 };
 
 export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {

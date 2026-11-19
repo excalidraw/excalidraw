@@ -1,5 +1,7 @@
 import { randomInteger } from "@excalidraw/common";
-import { CaptureUpdateAction, newElementWith } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/history";
 
 import type { FractionalIndex } from "@excalidraw/element/types";
 

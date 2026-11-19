@@ -10,7 +10,7 @@ import {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { useApp } from "../App";
+import { useApp } from "../App.context";
 import { ArrowRightIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";

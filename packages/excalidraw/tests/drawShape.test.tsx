@@ -12,7 +12,8 @@ import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
-import { GlobalTestState, act, fireEvent, render, waitFor } from "./test-utils";
+import { act, fireEvent, render, waitFor } from "./test-utils";
+import { GlobalTestState } from "./test-utils";
 
 const { h } = window;
 
