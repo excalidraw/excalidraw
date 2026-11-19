@@ -367,12 +367,12 @@ export class AppClipboard {
         }
       }
 
-      await this.insertClipboardContent(data, filesList, isPlainPaste);
-
       this.app.setActiveTool(
         { type: this.app.state.preferredSelectionTool.type },
         { keepSelection: true },
       );
+
+      await this.insertClipboardContent(data, filesList, isPlainPaste);
       event?.preventDefault();
     },
   );

@@ -274,6 +274,7 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
       UI.clickTool("arrow");
       API.setAppState({ currentItemArrowType: "elbow" });
       mouse.downAt(700, 400);
+      mouse.moveTo(760, 460);
       mouse.upAt(760, 460);
 
       let arrow: ExcalidrawArrowElement;
