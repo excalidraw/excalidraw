@@ -32,6 +32,8 @@ import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportScene, getExportConfigFromAppState } from "../scene/export";
 
+import { getExportSizeForAspectRatio } from "../scene/exportSize";
+
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
@@ -103,12 +105,14 @@ export const exportCanvas = async (
   files: BinaryFiles,
   {
     exportPadding = DEFAULT_EXPORT_PADDING,
+    exportAspectRatio = null,
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
     renderEnvironment,
   }: {
     exportPadding?: number;
+    exportAspectRatio?: number | null;
     /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
@@ -123,6 +127,11 @@ export const exportCanvas = async (
   const config = {
     ...getExportConfigFromAppState(appState),
     padding: exportPadding,
+    ...getExportSizeForAspectRatio(
+      elements,
+      exportingFrame ? null : exportAspectRatio,
+      exportPadding,
+    ),
     exportingFrame,
   };
 
