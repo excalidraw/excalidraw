@@ -26,4 +26,7 @@ coverage
 dev-dist
 html
 meta*.json
-.claude
+.claude/*
+!.claude/agents/
+!.claude/skills/
+!.claude/prompts/
