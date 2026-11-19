@@ -21,8 +21,10 @@ Object.defineProperty(window, "crypto", {
     getRandomValues: (arr: number[]) =>
       arr.forEach((v, i) => (arr[i] = Math.floor(Math.random() * 256))),
     subtle: {
-      generateKey: () => {},
-      exportKey: () => ({ k: "sTdLvMC_M3V8_vGa3UVRDg" }),
+      generateKey: async () => ({}),
+      exportKey: async () => ({ k: "sTdLvMC_M3V8_vGa3UVRDg" }),
+      importKey: async () => ({}),
+      encrypt: async () => new ArrayBuffer(0),
     },
   },
 });
@@ -69,6 +71,26 @@ vi.mock("socket.io-client", () => {
  * i.e. multiplayer history tests could be a good first candidate, as we could test both history stacks simultaneously.
  */
 describe("collaboration", () => {
+  it("keeps the collab socket when the page enters the back/forward cache", async () => {
+    await render(<ExcalidrawApp />);
+    await act(() => window.collab.startCollaboration(null));
+    await waitFor(() => expect(window.collab.portal.socket).not.toBeNull());
+
+    act(() => {
+      window.dispatchEvent(
+        new PageTransitionEvent("pagehide", { persisted: true }),
+      );
+    });
+    expect(window.collab.portal.socket).not.toBeNull();
+
+    act(() => {
+      window.dispatchEvent(
+        new PageTransitionEvent("pagehide", { persisted: false }),
+      );
+    });
+    expect(window.collab.portal.socket).toBeNull();
+  });
+
   it("should emit two ephemeral increments even though updates get batched", async () => {
     const durableIncrements: DurableIncrement[] = [];
     const ephemeralIncrements: EphemeralIncrement[] = [];
