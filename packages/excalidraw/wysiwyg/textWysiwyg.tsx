@@ -228,6 +228,8 @@ const measureNativeLineCaretPositions = ({
     pointerEvents: "none",
     whiteSpace: "pre",
     font,
+    // as the editor's, and likewise after `font`
+    fontKerning: TEXT_KERNING,
     lineHeight: `${lineHeightPx}px`,
   });
   mirror.append(textNode);
