@@ -7,6 +7,7 @@ import { t } from "../i18n";
 import { useExcalidrawAppState, useExcalidrawElements } from "./App";
 
 import { Popover } from "./Popover";
+import { LibraryIcon, clipboard, frameToolIcon } from "./icons";
 
 import "./ContextMenu.scss";
 
@@ -29,6 +30,12 @@ type ContextMenuProps = {
 };
 
 export const CONTEXT_MENU_SEPARATOR = "separator";
+
+const CONTEXT_MENU_ICONS: Partial<Record<Action["name"], React.ReactNode>> = {
+  paste: clipboard,
+  wrapSelectionInFrame: frameToolIcon,
+  addToLibrary: LibraryIcon,
+};
 
 export const ContextMenu = React.memo(
   ({ actionManager, items, top, left, onClose }: ContextMenuProps) => {
@@ -95,6 +102,11 @@ export const ContextMenu = React.memo(
               }
             }
 
+            const icon =
+              (typeof item.icon === "function"
+                ? item.icon(appState, elements)
+                : item.icon) ?? CONTEXT_MENU_ICONS[item.name];
+
             return (
               <li
                 key={idx}
@@ -115,6 +127,9 @@ export const ContextMenu = React.memo(
                     checkmark: item.checked?.(appState),
                   })}
                 >
+                  <span className="context-menu-item__icon" aria-hidden="true">
+                    {icon}
+                  </span>
                   <div className="context-menu-item__label">{label}</div>
                   <kbd className="context-menu-item__shortcut">
                     {actionName
