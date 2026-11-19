@@ -906,3 +906,50 @@ describe("elbow arrow routing between close diagonal elements", () => {
     expect(bottomLeft).toCloselyEqualPoints(topLeft as [number, number][]);
   });
 });
+
+describe("elbow arrow endpoints exactly on the bound element's outline", () => {
+  it("leaves the side the endpoint is on", () => {
+    const start = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 40,
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      x: -300,
+      y: -300,
+      width: 100,
+      height: 100,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      // exactly on the top edge, 10% along it (where the element's center
+      // is further to the side than below)
+      x: 20,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(-270, -194)],
+      startBinding: {
+        elementId: start.id,
+        fixedPoint: [0.1, -6 / 40],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: end.id,
+        fixedPoint: [0.5001, 1 + 6 / 100],
+        mode: "orbit",
+      },
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([start, end]) as NonDeletedSceneElementsMap,
+    );
+
+    // up out of the top edge, not along it
+    expect(points![1][0]).toBeCloseTo(points![0][0]);
+    expect(points![1][1]).toBeLessThan(points![0][1]);
+  });
+});
