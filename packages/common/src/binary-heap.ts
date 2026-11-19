@@ -82,11 +82,11 @@ export class BinaryHeap<T> {
   }
 
   remove(node: T) {
-    if (this.content.length === 0) {
+    const i = this.content.indexOf(node);
+    if (i === -1) {
       return;
     }
 
-    const i = this.content.indexOf(node);
     const end = this.content.pop()!;
 
     if (i < this.content.length) {
