@@ -43,4 +43,23 @@ describe("Test <App/>", () => {
       ),
     ).toMatchSnapshot();
   });
+
+  it("should listen for pagehide instead of unload", async () => {
+    const addEventListener = vi.spyOn(window, "addEventListener");
+
+    await render(<Excalidraw />);
+
+    expect(addEventListener).toHaveBeenCalledWith(
+      "pagehide",
+      expect.any(Function),
+      false,
+    );
+    expect(addEventListener).not.toHaveBeenCalledWith(
+      "unload",
+      expect.any(Function),
+      false,
+    );
+
+    addEventListener.mockRestore();
+  });
 });
