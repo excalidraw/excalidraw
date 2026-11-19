@@ -2,19 +2,38 @@ import React from "react";
 
 import { useTunnels } from "../../context/tunnels";
 import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
 import { Dialog } from "../Dialog";
 import { FilledButton } from "../FilledButton";
+import Trans from "../Trans";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { alertTriangleIcon } from "../icons";
 
 import { Actions, Action } from "./OverwriteConfirmActions";
-import { overwriteConfirmStateAtom } from "./OverwriteConfirmState";
+import {
+  openConfirmModal,
+  overwriteConfirmStateAtom,
+} from "./OverwriteConfirmState";
 
 import "./OverwriteConfirm.scss";
 
 export type OverwriteConfirmDialogProps = {
   children: React.ReactNode;
 };
+
+export const confirmLoadScene = () =>
+  openConfirmModal({
+    title: t("overwriteConfirm.modal.loadFromFile.title"),
+    actionLabel: t("overwriteConfirm.modal.loadFromFile.button"),
+    color: "warning",
+    description: (
+      <Trans
+        i18nKey="overwriteConfirm.modal.loadFromFile.description"
+        bold={(text) => <strong>{text}</strong>}
+        br={() => <br />}
+      />
+    ),
+  });
 
 const OverwriteConfirmDialog = Object.assign(
   withInternalFallback(
