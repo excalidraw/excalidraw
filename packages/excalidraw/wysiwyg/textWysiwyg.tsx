@@ -13,6 +13,7 @@ import {
   isRTL,
   hasRTLChars,
   viewportCoordsToSceneCoords,
+  TEXT_KERNING,
 } from "@excalidraw/common";
 import {
   clamp,
@@ -559,8 +560,9 @@ export const textWysiwyg = ({
 
       Object.assign(editable.style, {
         font,
-        // must be defined *after* font ¯\_(ツ)_/¯
+        // must be defined *after* font ¯\_(ツ)_/¯ (the shorthand resets them)
         lineHeight: updatedTextElement.lineHeight,
+        fontKerning: TEXT_KERNING,
         width: `${editorWidth}px`,
         height: `${height}px`,
         transformOrigin: "0 0",

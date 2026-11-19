@@ -1,7 +1,12 @@
 import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  TEXT_ALIGN,
+  TEXT_KERNING,
+  VERTICAL_ALIGN,
+} from "@excalidraw/common";
 
 import {
   computeContainerDimensionForBoundText,
@@ -10,11 +15,46 @@ import {
   getBoundTextMaxHeight,
   computeBoundTextPosition,
 } from "../src/textElement";
-import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
+import {
+  detectLineHeight,
+  getLineHeightInPx,
+  getLineWidth,
+} from "../src/textMeasurements";
 
-import type { ExcalidrawTextElementWithContainer } from "../src/types";
+import type { RenderEnvironment } from "../src/renderEnvironment";
+import type {
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../src/types";
 
 describe("Test measureText", () => {
+  it("should measure text with the font's full kerning", () => {
+    // left on `auto`, Chrome's canvas skips the kerning next to a space while
+    // its text editor applies it, so the two would wrap at different words
+    const kerningWhenMeasured: string[] = [];
+    const env: RenderEnvironment = {
+      createCanvas: () =>
+        ({
+          getContext: () => {
+            const context = {
+              font: "",
+              fontKerning: "auto",
+              measureText: (text: string) => {
+                kerningWhenMeasured.push(context.fontKerning);
+                return { width: text.length };
+              },
+            };
+            return context;
+          },
+        } as unknown as HTMLCanvasElement),
+      createImage: () => ({} as HTMLImageElement),
+    };
+
+    getLineWidth("A V A T A R", "20px Helvetica" as FontString, env);
+
+    expect(kerningWhenMeasured).toEqual([TEXT_KERNING]);
+  });
+
   describe("Test getContainerCoords", () => {
     const params = { width: 200, height: 100, x: 10, y: 20 };
 

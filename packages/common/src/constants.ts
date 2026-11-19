@@ -278,6 +278,21 @@ export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
  * `fontTopPicks.test.ts`) */
 export const FONT_TOP_PICKS_SLOTS = 3;
 export const DEFAULT_TEXT_ALIGN = "left";
+
+/**
+ * How text is kerned wherever we measure or draw it: the canvas, the text
+ * editor and exported SVG.
+ *
+ * Left on the default (`auto`), browsers skip the kerning between a letter
+ * and a space in places: Chrome on canvas (but not in the DOM), Firefox
+ * everywhere. A line such as "A V A T A R" is then several px wider on canvas
+ * than in Chrome's text editor, and wider in Firefox than in Chrome, so the
+ * same text wraps at different words. `normal` asks for the font's kerning
+ * in full, which is also what skia-canvas does on a server.
+ *
+ * Must be set on all of them, or none.
+ */
+export const TEXT_KERNING = "normal";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
