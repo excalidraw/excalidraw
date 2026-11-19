@@ -146,14 +146,14 @@ export const updateElbowArrowPoints = (
     return handleSegmentRenormalization(arrow, elementsMap);
   }
 
-  // Short circuit on no-op to avoid huge performance hit
+  // Short circuit on setting the same bindings again (and nothing else, as
+  // that might need re-routing even if unchanged: e.g. the same endpoints
+  // after the bound elements moved) to avoid huge performance hit
   if (
+    !updates.points &&
+    !updates.fixedSegments &&
     updates.startBinding === arrow.startBinding &&
     updates.endBinding === arrow.endBinding &&
-    (updates.points ?? []).every(
-      (p, i) =>
-        arrow.points[i] !== undefined && pointsEqual(p, arrow.points[i]),
-    ) &&
     areUpdatedPointsValid
   ) {
     return {};

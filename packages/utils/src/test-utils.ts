@@ -1,17 +1,23 @@
 import { diffStringsUnified } from "jest-diff";
 
 expect.extend({
-  toCloselyEqualPoints(received, expected, precision) {
+  /**
+   * Whether the points are the same, with each coordinate within
+   * `10^-precision` (i.e. matching to `precision` decimal places, 2 by default)
+   */
+  toCloselyEqualPoints(received, expected, precision = 2) {
     if (!Array.isArray(received) || !Array.isArray(expected)) {
       throw new Error("expected and received are not point arrays");
     }
 
-    const COMPARE = 1 / precision === 0 ? 1 : Math.pow(10, precision ?? 2);
-    const pass = expected.every(
-      (point, idx) =>
-        Math.abs(received[idx][0] - point[0]) < COMPARE &&
-        Math.abs(received[idx][1] - point[1]) < COMPARE,
-    );
+    const tolerance = Math.pow(10, -precision);
+    const pass =
+      received.length === expected.length &&
+      expected.every(
+        (point, idx) =>
+          Math.abs(received[idx][0] - point[0]) < tolerance &&
+          Math.abs(received[idx][1] - point[1]) < tolerance,
+      );
 
     if (!pass) {
       return {
