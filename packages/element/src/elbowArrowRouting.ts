@@ -536,7 +536,9 @@ const generateDynamicAABBs = (
     ? first[3] + (second[1] - first[3]) / 2
     : second[3] + (first[1] - second[3]) / 2;
 
-  // Which side of the diagonal of `a` the end's center is on
+  // Split at x when the end is further off to the side of `a` than above or
+  // below it (relative to the shape of `a`), i.e. depending on which side of
+  // the diagonal of `a` pointing towards the end the end's center is on
   const endCenterX = (second[0] + second[2]) / 2;
   const endCenterY = (second[1] + second[3]) / 2;
   const diagonalCross = (x1: number, y1: number, x2: number, y2: number) =>
@@ -544,14 +546,13 @@ const generateDynamicAABBs = (
       vector(x1 - endCenterX, y1 - endCenterY),
       vector(x2 - endCenterX, y2 - endCenterY),
     );
-  const splitAtX =
-    aIsLeft && aIsBelow
-      ? diagonalCross(a[2], a[1], a[0], a[3]) > 0
-      : aIsLeft && aIsAbove
-      ? !(diagonalCross(a[0], a[1], a[2], a[3]) > 0)
-      : aIsRight && aIsAbove
-      ? diagonalCross(a[2], a[1], a[0], a[3]) > 0
-      : diagonalCross(a[0], a[1], a[2], a[3]) > 0;
+  const cross =
+    aIsLeft === aIsBelow
+      ? // bottom-left or top-right: the diagonal from top-right to bottom-left
+        diagonalCross(a[2], a[1], a[0], a[3])
+      : // top-left or bottom-right: the diagonal from top-left to bottom-right
+        diagonalCross(a[0], a[1], a[2], a[3]);
+  const splitAtX = aIsLeft ? !(cross > 0) : cross > 0;
 
   if (splitAtX) {
     return aIsLeft

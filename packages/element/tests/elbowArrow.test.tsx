@@ -839,3 +839,70 @@ describe("elbow arrow updates with unchanged bindings", () => {
     expect(update.points![1][0]).toBeCloseTo(a[0] + 20);
   });
 });
+
+describe("elbow arrow routing between close diagonal elements", () => {
+  // the binding gap: BASE_BINDING_GAP + strokeWidth / 2
+  const GAP = 6;
+
+  /**
+   * Routes an arrow from the bottom of `start` to the top of `end`, with the
+   * scene mirrored vertically if `mirrored`, and returns its global points
+   * mirrored back
+   */
+  const route = (mirrored: boolean) => {
+    const flipY = (y: number, height: number) => (mirrored ? -(y + height) : y);
+    const start = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: flipY(0, 109),
+      width: 156,
+      height: 109,
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      x: 173,
+      y: flipY(158, 150),
+      width: 119,
+      height: 150,
+    });
+    const startFixedPoint: FixedPoint = [0.8, 1 + GAP / 109];
+    const endFixedPoint: FixedPoint = [0.2, -GAP / 150];
+    const flip = ([x, y]: FixedPoint): FixedPoint =>
+      mirrored ? [x, 1 - y] : [x, y];
+    const elementsMap = arrayToMap([start, end]) as NonDeletedSceneElementsMap;
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+      startBinding: {
+        elementId: start.id,
+        fixedPoint: flip(startFixedPoint),
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: end.id,
+        fixedPoint: flip(endFixedPoint),
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const update = updateElbowArrowRoute(arrow, elementsMap);
+
+    return update.points!.map(([x, y]) => [
+      update.x! + x,
+      mirrored ? -(update.y! + y) : update.y! + y,
+    ]);
+  };
+
+  it("routes the same way when the start is to the bottom-left of the end as when it is to the top-left", () => {
+    const topLeft = route(false);
+    const bottomLeft = route(true);
+
+    // between the elements across the wider (vertical) gap, with two corners
+    expect(topLeft).toHaveLength(4);
+    expect(bottomLeft).toCloselyEqualPoints(topLeft as [number, number][]);
+  });
+});
