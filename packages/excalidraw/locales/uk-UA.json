@@ -787,14 +787,14 @@
     "mmb": "Коліщатко"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Презентації",
+    "mcp": "Малюйте з ШІ",
+    "comments": "Коментарі",
+    "teams": "Співпраця",
+    "voiceChat": "Аудіочат",
+    "withExcalidrawPlus": "в Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "для людей і ШІ"
   }
 }

@@ -787,14 +787,14 @@
     "mmb": "Görgő"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Prezentációk",
+    "mcp": "Rajzolj AI-jal",
+    "comments": "Megjegyzések",
+    "teams": "Csapatmunka",
+    "voiceChat": "Hangcsevegés",
+    "withExcalidrawPlus": "Excalidraw+-szal",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "embernek & AI-nak"
   }
 }

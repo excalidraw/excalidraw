@@ -787,14 +787,14 @@
     "mmb": "عجلة التمرير"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "عروض تقديمية",
+    "mcp": "ارسم بـ AI",
+    "comments": "أضف تعليقات",
+    "teams": "العمل الجماعي",
+    "voiceChat": "محادثة صوتية",
+    "withExcalidrawPlus": "مع Excalidraw+‎",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "للبشر و AI"
   }
 }

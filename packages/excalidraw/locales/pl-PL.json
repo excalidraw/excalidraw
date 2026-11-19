@@ -787,14 +787,14 @@
     "mmb": "Kółko myszy"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Prezentacje",
+    "mcp": "Rysuj z AI",
+    "comments": "Komentarze",
+    "teams": "Współpraca",
+    "voiceChat": "Czat głosowy",
+    "withExcalidrawPlus": "w Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "dla ludzi i AI"
   }
 }

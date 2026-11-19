@@ -787,14 +787,14 @@
     "mmb": "Scroll-hjul"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentera",
+    "mcp": "Rita med AI",
+    "comments": "Kommentera",
+    "teams": "Arbeta i team",
+    "voiceChat": "Röstsamtal",
+    "withExcalidrawPlus": "med Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "för människa & AI"
   }
 }

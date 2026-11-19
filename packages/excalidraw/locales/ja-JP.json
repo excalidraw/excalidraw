@@ -787,14 +787,14 @@
     "mmb": "スクロールホイール"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "プレゼン",
+    "mcp": "AIで作図",
+    "comments": "コメント",
+    "teams": "チーム作業",
+    "voiceChat": "音声通話",
+    "withExcalidrawPlus": "Excalidraw+で",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "人間とAI向け"
   }
 }

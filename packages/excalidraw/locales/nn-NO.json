@@ -787,14 +787,14 @@
     "mmb": "Rullehjul"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presenter",
+    "mcp": "Teikn med KI",
+    "comments": "Kommenter",
+    "teams": "Arbeid i team",
+    "voiceChat": "Taleanrop",
+    "withExcalidrawPlus": "med Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "for folk & KI"
   }
 }

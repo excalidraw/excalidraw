@@ -135,7 +135,7 @@
     "flipHorizontal": "आडवं फ्लिप करा",
     "flipVertical": "उभं फ्लिप करा",
     "viewMode": "पहायची पद्धत",
-    "share": "सामायिक करा",
+    "share": "शेअर करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
     "showFonts": "लिपि निवड़क दाखवा",
@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "सादरीकरणे",
+    "mcp": "AI ने चित्र काढा",
+    "comments": "टिप्पणी करा",
+    "teams": "एकत्र काम करा",
+    "voiceChat": "व्हॉइस चॅट",
+    "withExcalidrawPlus": "Excalidraw+ सह",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "मानव व AI साठी"
   }
 }

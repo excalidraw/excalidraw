@@ -787,14 +787,14 @@
     "mmb": "Roda gulir"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentasi",
+    "mcp": "Gambar via AI",
+    "comments": "Beri komentar",
+    "teams": "Kerja tim",
+    "voiceChat": "Obrolan suara",
+    "withExcalidrawPlus": "di Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "bagi manusia & AI"
   }
 }

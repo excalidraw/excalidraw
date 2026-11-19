@@ -787,14 +787,14 @@
     "mmb": "Kolesce za pomikanje"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Predstavitve",
+    "mcp": "Rišite z UI",
+    "comments": "Komentarji",
+    "teams": "Timsko delo",
+    "voiceChat": "Glasovni klici",
+    "withExcalidrawPlus": "v Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "za ljudi in UI"
   }
 }

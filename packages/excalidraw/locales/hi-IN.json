@@ -787,14 +787,14 @@
     "mmb": "स्क्रॉल व्हील"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "प्रस्तुतियाँ",
+    "mcp": "AI से चित्र बनाएँ",
+    "comments": "टिप्पणी करें",
+    "teams": "टीम में काम करें",
+    "voiceChat": "वॉइस चैट",
+    "withExcalidrawPlus": "Excalidraw+ में",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "इंसानों व AI के लिए"
   }
 }

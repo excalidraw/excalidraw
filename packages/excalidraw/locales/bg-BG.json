@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Презентации",
+    "mcp": "Рисувай с ИИ",
+    "comments": "Коментари",
+    "teams": "Работа в екип",
+    "voiceChat": "Гласов чат",
+    "withExcalidrawPlus": "в Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "за хора и ИИ"
   }
 }

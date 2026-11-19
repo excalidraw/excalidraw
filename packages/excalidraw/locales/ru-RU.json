@@ -787,14 +787,14 @@
     "mmb": "Колёсико мыши"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Презентации",
+    "mcp": "Рисуйте с ИИ",
+    "comments": "Комментарии",
+    "teams": "Команды",
+    "voiceChat": "Аудиочат",
+    "withExcalidrawPlus": "в Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "для людей и ИИ"
   }
 }

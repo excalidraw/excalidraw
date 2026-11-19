@@ -787,14 +787,14 @@
     "mmb": "鼠标滚轮"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "演示文稿",
+    "mcp": "用 AI 绘图",
+    "comments": "添加评论",
+    "teams": "团队协作",
+    "voiceChat": "语音聊天",
+    "withExcalidrawPlus": "使用 Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "为人类与 AI 打造"
   }
 }

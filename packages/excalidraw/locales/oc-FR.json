@@ -787,14 +787,14 @@
     "mmb": "Clic rodeta"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentacions",
+    "mcp": "L’IA dessenha",
+    "comments": "Comentaris",
+    "teams": "En equipa",
+    "voiceChat": "Apèls vocals",
+    "withExcalidrawPlus": "amb Excalidraw+",
+    "excalidrawPlusMcp": "MCP Excalidraw+",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pels umans e l’IA"
   }
 }

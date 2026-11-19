@@ -135,7 +135,7 @@
     "flipHorizontal": "هەڵگەڕانەوەی ئاسۆیی",
     "flipVertical": "هەڵگەڕانەوەی ستونی",
     "viewMode": "دۆخی بینین",
-    "share": "هاوبەشی پێکردن",
+    "share": "هاوبەشکردن",
     "showStroke": "ڕەنگهەڵگری هێڵکار نیشانبدە",
     "showBackground": "ڕەنگهەڵگری باکگراوند نیشانبدە",
     "showFonts": "",
@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "پێشکەشکردن",
+    "mcp": "کێشان بە AI",
+    "comments": "نووسینی لێدوان",
+    "teams": "کاری تیمی",
+    "voiceChat": "چاتی دەنگی",
+    "withExcalidrawPlus": "بە Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "بۆ مرۆڤ و AI"
   }
 }

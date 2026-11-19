@@ -787,14 +787,14 @@
     "mmb": "چرخ ماوس"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "ارائه‌ها",
+    "mcp": "رسم با AI",
+    "comments": "افزودن نظر",
+    "teams": "کار تیمی",
+    "voiceChat": "چت صوتی",
+    "withExcalidrawPlus": "با Excalidraw+‎",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "برای انسان و AI"
   }
 }

@@ -787,14 +787,14 @@
     "mmb": "Clic molette"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Présentations",
+    "mcp": "Dessin par IA",
+    "comments": "Commentaires",
+    "teams": "Travail d'équipe",
+    "voiceChat": "Chat vocal",
+    "withExcalidrawPlus": "avec Excalidraw+",
+    "excalidrawPlusMcp": "MCP Excalidraw+",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pour vous et l'IA"
   }
 }

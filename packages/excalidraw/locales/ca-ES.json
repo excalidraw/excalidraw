@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentacions",
+    "mcp": "Dibuixa amb IA",
+    "comments": "Comentaris",
+    "teams": "En equip",
+    "voiceChat": "Xat de veu",
+    "withExcalidrawPlus": "amb Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "per a humans i IA"
   }
 }

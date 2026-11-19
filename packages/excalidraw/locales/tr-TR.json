@@ -787,14 +787,14 @@
     "mmb": "Kaydırma tekerleği"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Sunumlar",
+    "mcp": "YZ ile çiz",
+    "comments": "Yorum yap",
+    "teams": "Ekip çalışması",
+    "voiceChat": "Sesli sohbet",
+    "withExcalidrawPlus": "Excalidraw+ ile",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "insan ve YZ için"
   }
 }

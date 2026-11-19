@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Thuyết trình",
+    "mcp": "Vẽ bằng AI",
+    "comments": "Viết bình luận",
+    "teams": "Làm việc nhóm",
+    "voiceChat": "Gọi thoại",
+    "withExcalidrawPlus": "trên Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "cho người và AI"
   }
 }

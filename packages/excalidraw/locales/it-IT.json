@@ -787,14 +787,14 @@
     "mmb": "Rotella di scorrimento"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentazioni",
+    "mcp": "Disegna con l'IA",
+    "comments": "Commenti",
+    "teams": "Lavora in team",
+    "voiceChat": "Chat vocale",
+    "withExcalidrawPlus": "con Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "per persone e IA"
   }
 }

@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Prezentācijas",
+    "mcp": "Zīmē ar MI",
+    "comments": "Komentē",
+    "teams": "Darbs komandā",
+    "voiceChat": "Balss zvani",
+    "withExcalidrawPlus": "ar Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "cilvēkiem un MI"
   }
 }

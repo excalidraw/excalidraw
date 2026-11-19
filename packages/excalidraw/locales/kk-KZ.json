@@ -135,7 +135,7 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "",
-    "share": "",
+    "share": "Бөлісу",
     "showStroke": "",
     "showBackground": "",
     "showFonts": "",
@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Презентация",
+    "mcp": "AI-мен сызу",
+    "comments": "Пікір қалдыру",
+    "teams": "Топтық жұмыс",
+    "voiceChat": "Дауыстық чат",
+    "withExcalidrawPlus": "Excalidraw+-пен",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "адам мен AI үшін"
   }
 }

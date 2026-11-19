@@ -787,14 +787,14 @@
     "mmb": "Rolovacie koliesko"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Prezentácie",
+    "mcp": "Kreslite s AI",
+    "comments": "Komentáre",
+    "teams": "Tímová práca",
+    "voiceChat": "Hlasový chat",
+    "withExcalidrawPlus": "v Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pre ľudí aj AI"
   }
 }

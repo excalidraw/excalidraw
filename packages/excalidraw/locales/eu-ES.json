@@ -787,14 +787,14 @@
     "mmb": "Korritzeko gurpila"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Aurkezpenak",
+    "mcp": "Marraztu AAz",
+    "comments": "Iruzkinak egin",
+    "teams": "Talde-lana",
+    "voiceChat": "Ahots-txata",
+    "withExcalidrawPlus": "Excalidraw+-ekin",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "gizaki & AArentzat"
   }
 }

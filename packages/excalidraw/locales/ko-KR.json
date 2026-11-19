@@ -787,14 +787,14 @@
     "mmb": "스크롤 휠"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "프레젠테이션",
+    "mcp": "AI로 그리기",
+    "comments": "댓글 달기",
+    "teams": "팀과 협업하기",
+    "voiceChat": "음성 채팅",
+    "withExcalidrawPlus": "Excalidraw+에서",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "사람과 AI를 위한"
   }
 }

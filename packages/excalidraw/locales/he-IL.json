@@ -787,14 +787,14 @@
     "mmb": "גלגלת העכבר"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "מצגות",
+    "mcp": "ציור בעזרת AI",
+    "comments": "הוספת הערות",
+    "teams": "עבודת צוות",
+    "voiceChat": "שיחה קולית",
+    "withExcalidrawPlus": "ב־Excalidraw+‎",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "לבני אדם ול־AI"
   }
 }

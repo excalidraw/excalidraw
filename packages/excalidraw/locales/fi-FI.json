@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Esitykset",
+    "mcp": "Piirrä AI:lla",
+    "comments": "Kommentoi",
+    "teams": "Tiimityö",
+    "voiceChat": "Äänipuhelut",
+    "withExcalidrawPlus": "Excalidraw+:lla",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "ihmisille ja AI:lle"
   }
 }

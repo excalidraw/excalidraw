@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Pristatymai",
+    "mcp": "Pieškite su DI",
+    "comments": "Komentuokite",
+    "teams": "Dirbkite kartu",
+    "voiceChat": "Balso pokalbis",
+    "withExcalidrawPlus": "su Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "žmonėms ir DI"
   }
 }

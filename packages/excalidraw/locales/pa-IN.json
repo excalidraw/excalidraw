@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "ਪੇਸ਼ਕਾਰੀਆਂ",
+    "mcp": "AI ਨਾਲ ਵਾਹੋ",
+    "comments": "ਟਿੱਪਣੀਆਂ ਕਰੋ",
+    "teams": "ਮਿਲ ਕੇ ਕੰਮ ਕਰੋ",
+    "voiceChat": "ਵੌਇਸ ਚੈਟ",
+    "withExcalidrawPlus": "Excalidraw+ ਨਾਲ",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "ਮਨੁੱਖਾਂ ਅਤੇ AI ਲਈ"
   }
 }

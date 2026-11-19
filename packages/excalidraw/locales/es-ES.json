@@ -787,14 +787,14 @@
     "mmb": "Rueda del ratón"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentaciones",
+    "mcp": "Dibuja con IA",
+    "comments": "Comentarios",
+    "teams": "En equipo",
+    "voiceChat": "Chat de voz",
+    "withExcalidrawPlus": "con Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "para personas e IA"
   }
 }

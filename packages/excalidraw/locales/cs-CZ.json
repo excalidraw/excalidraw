@@ -787,14 +787,14 @@
     "mmb": "Kolečko myši"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Prezentace",
+    "mcp": "Kreslete s AI",
+    "comments": "Komentáře",
+    "teams": "Týmová práce",
+    "voiceChat": "Hlasový chat",
+    "withExcalidrawPlus": "v Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pro lidi i AI"
   }
 }

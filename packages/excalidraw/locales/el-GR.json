@@ -787,14 +787,14 @@
     "mmb": ""
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Παρουσίαση",
+    "mcp": "Σχέδια με ΤΝ",
+    "comments": "Σχόλια",
+    "teams": "Ομάδες",
+    "voiceChat": "Κλήσεις ήχου",
+    "withExcalidrawPlus": "στο Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "για άτομα & ΤΝ"
   }
 }

@@ -787,14 +787,14 @@
     "mmb": "Mausrad"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Präsentieren",
+    "mcp": "Zeichne mit KI",
+    "comments": "Kommentieren",
+    "teams": "Teamarbeit",
+    "voiceChat": "Sprachchat",
+    "withExcalidrawPlus": "mit Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "für Mensch & KI"
   }
 }

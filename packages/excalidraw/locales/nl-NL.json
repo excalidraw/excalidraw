@@ -787,14 +787,14 @@
     "mmb": "Muiswiel"
   },
   "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
+    "presentations": "Presentaties",
+    "mcp": "Teken met AI",
+    "comments": "Opmerkingen",
+    "teams": "Samenwerken",
+    "voiceChat": "Spraakchat",
+    "withExcalidrawPlus": "met Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "voor mens & AI"
   }
 }
