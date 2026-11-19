@@ -6590,7 +6590,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `35`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
 
 exports[`regression tests > draw every type of shape > [end of test] redo stack 1`] = `[]`;
 
@@ -9175,7 +9175,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9423,7 +9423,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
 
 exports[`regression tests > key 6 selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 6 selects line tool > [end of test] redo stack 1`] = `[]`;
 
@@ -9880,7 +9880,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
 
 exports[`regression tests > key a selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key a selects arrow tool > [end of test] redo stack 1`] = `[]`;
 
@@ -10323,7 +10323,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
 
 exports[`regression tests > key l selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key l selects line tool > [end of test] redo stack 1`] = `[]`;
 
@@ -15340,7 +15340,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > undo/redo drawing an element > [end of test] redo stack 1`] = `
 [
