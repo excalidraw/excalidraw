@@ -303,7 +303,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     appJotaiStore.set(isCollaboratingAtom, isCollaborating);
   };
 
-  private onPageHide = () => {
+  private onPageHide = (event: PageTransitionEvent) => {
+    if (event.persisted) {
+      return;
+    }
     this.destroySocketClient({ isUnload: true });
   };
 

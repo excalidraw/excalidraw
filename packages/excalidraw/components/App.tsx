@@ -4240,7 +4240,12 @@ class App extends React.Component<AppProps, AppState> {
         passive: false,
       }),
       addEventListener(this.ownerWindow, EVENT.RESIZE, this.onResize, false),
-      addEventListener(this.ownerWindow, EVENT.PAGE_HIDE, this.onPageHide, false),
+      addEventListener(
+        this.ownerWindow,
+        EVENT.PAGE_HIDE,
+        this.onPageHide,
+        false,
+      ),
       addEventListener(this.ownerWindow, EVENT.BLUR, this.onBlur, false),
       addEventListener(
         this.excalidrawContainerRef.current,
