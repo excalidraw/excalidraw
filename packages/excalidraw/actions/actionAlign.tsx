@@ -4,7 +4,7 @@ import { isFrameLikeElement } from "@excalidraw/element";
 
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
 import { alignElements } from "@excalidraw/element";
 
@@ -230,13 +230,21 @@ export const actionAlignVerticallyCentered = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+  keyTest: (event, appState, elements, app) =>
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    event.shiftKey &&
+    event.code === CODES.V &&
+    alignActionsPredicate(appState, app),
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={CenterVerticallyIcon}
       onClick={() => updateData(null)}
-      title={t("labels.centerVertically")}
+      title={`${t("labels.centerVertically")} — ${getShortcutKey(
+        "Alt+Shift+V",
+      )}`}
       aria-label={t("labels.centerVertically")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
@@ -260,13 +268,21 @@ export const actionAlignHorizontallyCentered = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
+  keyTest: (event, appState, elements, app) =>
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    event.shiftKey &&
+    event.code === CODES.H &&
+    alignActionsPredicate(appState, app),
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={CenterHorizontallyIcon}
       onClick={() => updateData(null)}
-      title={t("labels.centerHorizontally")}
+      title={`${t("labels.centerHorizontally")} — ${getShortcutKey(
+        "Alt+Shift+H",
+      )}`}
       aria-label={t("labels.centerHorizontally")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
     />
