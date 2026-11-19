@@ -1067,11 +1067,13 @@ const astar = (
       const beenVisited = neighbor.visited;
 
       if (!beenVisited || gScore < neighbor.g) {
-        const estBendCount = estimateSegmentCount(
+        // (the end node is the end dongle, which is arrived at heading
+        // towards the end element, i.e. against the end heading)
+        const estBendCount = estimateBendCount(
           neighbor,
           end,
           neighborHeading,
-          endHeading,
+          flipHeading(endHeading),
         );
         // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
         neighbor.visited = true;
@@ -1108,63 +1110,34 @@ const pathTo = (start: Node, node: Node) => {
 };
 
 /**
- * The A* heuristic's estimate of the bends left between moving along
- * `startHeading` at `start` and arriving at `end` (with `endHeading`)
+ * The A* heuristic's estimate of the bends left for a path at `start`, moving
+ * along `heading`, to arrive at `end` moving along `arrivalHeading`
  */
-const estimateSegmentCount = (
+const estimateBendCount = (
   start: Node,
   end: Node,
-  startHeading: Heading,
-  endHeading: Heading,
+  heading: Heading,
+  arrivalHeading: Heading,
 ) => {
-  const [startX, startY] = start.pos;
-  const [endX, endY] = end.pos;
+  const dx = end.pos[0] - start.pos[0];
+  const dy = end.pos[1] - start.pos[1];
+  // How far `end` is ahead along the arrival heading, and whether it's on
+  // the line through `start` along it
+  const ahead = dx * arrivalHeading[0] + dy * arrivalHeading[1];
+  const inLine = dx * arrivalHeading[1] - dy * arrivalHeading[0] === 0;
 
-  if (endHeading === HEADING_RIGHT) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        return startX >= endX ? 4 : startY === endY ? 0 : 2;
-      case HEADING_UP:
-        return startY > endY && startX < endX ? 1 : 3;
-      case HEADING_DOWN:
-        return startY < endY && startX < endX ? 1 : 3;
-      case HEADING_LEFT:
-        return startY === endY ? 4 : 2;
-    }
-  } else if (endHeading === HEADING_LEFT) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        return startY === endY ? 4 : 2;
-      case HEADING_UP:
-        return startY > endY && startX > endX ? 1 : 3;
-      case HEADING_DOWN:
-        return startY < endY && startX > endX ? 1 : 3;
-      case HEADING_LEFT:
-        return startX <= endX ? 4 : startY === endY ? 0 : 2;
-    }
-  } else if (endHeading === HEADING_UP) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        return startY > endY && startX < endX ? 1 : 3;
-      case HEADING_UP:
-        return startY >= endY ? 4 : startX === endX ? 0 : 2;
-      case HEADING_DOWN:
-        return startX === endX ? 4 : 2;
-      case HEADING_LEFT:
-        return startY > endY && startX > endX ? 1 : 3;
-    }
-  } else if (endHeading === HEADING_DOWN) {
-    switch (startHeading) {
-      case HEADING_RIGHT:
-        return startY < endY && startX < endX ? 1 : 3;
-      case HEADING_UP:
-        return startX === endX ? 4 : 2;
-      case HEADING_DOWN:
-        return startY <= endY ? 4 : startX === endX ? 0 : 2;
-      case HEADING_LEFT:
-        return startY < endY && startX > endX ? 1 : 3;
-    }
+  if (compareHeading(heading, arrivalHeading)) {
+    // straight on, or a step to the side, or turning around if past `end`
+    return ahead <= 0 ? 4 : inLine ? 0 : 2;
   }
 
-  return 0;
+  if (compareHeading(heading, flipHeading(arrivalHeading))) {
+    // turning around (and stepping aside first if in line)
+    return inLine ? 4 : 2;
+  }
+
+  // heading across: one turn if heading towards the line `end` is arrived
+  // along, and still before `end` on it
+  const towards = dx * heading[0] + dy * heading[1];
+  return towards > 0 && ahead > 0 ? 1 : 3;
 };
