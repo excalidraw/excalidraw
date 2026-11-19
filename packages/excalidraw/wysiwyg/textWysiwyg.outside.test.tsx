@@ -227,6 +227,24 @@ describe("text editor & the world outside it", () => {
     expect(getText(text.id).originalText).toBe("restored");
   });
 
+  it("is torn down with the app", async () => {
+    Keyboard.exitTextEditor(editor);
+    // a listener the editor opened next puts on the window
+    const addEventListener = vi.spyOn(window, "addEventListener");
+    mouse.doubleClickAt(text.x + 5, text.y + 5);
+    await getTextEditor();
+    const [, onBeforeUnload] = addEventListener.mock.calls.find(
+      ([type]) => type === "beforeunload",
+    )!;
+
+    const removeEventListener = vi.spyOn(window, "removeEventListener");
+    unmountComponent();
+    expect(removeEventListener).toHaveBeenCalledWith(
+      "beforeunload",
+      onBeforeUnload,
+    );
+  });
+
   it("keeps a label's container in step with a change from outside", async () => {
     Keyboard.exitTextEditor(editor);
     const container = UI.createElement("rectangle", {

@@ -3951,6 +3951,7 @@ class App extends React.Component<AppProps, AppState> {
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
+    this.text.destroy();
     this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();
