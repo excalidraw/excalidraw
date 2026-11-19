@@ -4,6 +4,6 @@
     "rootDir": "../",
     "outDir": "./dist/types"
   },
-  "include": ["**/*"],
-  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
+  "include": ["**/*", "../common/src", "../element/src", "../history/src", "../math/src", "../utils/src"],
+  "exclude": ["**/*.test.*", "../*/src/**/*.test.*", "tests", "types", "examples", "dist"]
 }

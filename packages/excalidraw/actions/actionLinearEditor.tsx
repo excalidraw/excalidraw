@@ -2,6 +2,7 @@ import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
+  newElementWith,
 } from "@excalidraw/element";
 import { arrayToMap, invariant } from "@excalidraw/common";
 
@@ -18,8 +19,6 @@ import { DEFAULT_CATEGORIES } from "../components/CommandPalette/categories";
 import { IconButton } from "../components/IconButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
-
-import { newElementWith } from "../../element/src/mutateElement";
 
 import { register } from "./register";
 
