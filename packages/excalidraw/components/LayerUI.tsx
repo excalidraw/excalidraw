@@ -130,6 +130,7 @@ const DefaultMainMenu: React.FC<{
       )}
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
+      <MainMenu.DefaultItems.ResetToolStyles />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
       <MainMenu.Group title="Excalidraw links">

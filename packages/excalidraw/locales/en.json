@@ -100,6 +100,7 @@
     "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
+    "resetToolStyles": "Reset tool styles",
     "clearCanvas": "Clear canvas",
     "layers": "Layers",
     "actions": "Actions",

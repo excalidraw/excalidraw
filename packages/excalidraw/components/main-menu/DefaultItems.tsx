@@ -6,6 +6,7 @@ import type { Theme } from "@excalidraw/element/types";
 
 import {
   actionClearCanvas,
+  actionResetToolStyles,
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
@@ -48,6 +49,7 @@ import {
   DiscordIcon,
   XBrandIcon,
   settingsIcon,
+  paintIcon,
   emptyIcon,
 } from "../icons";
 import {
@@ -728,3 +730,24 @@ Preferences.ToggleMinimap = PreferencesToggleMinimapItem;
 Preferences.ToggleElementProperties = PreferencesToggleElementPropertiesItem;
 
 Preferences.displayName = "Preferences";
+
+export const ResetToolStyles = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const actionManager = useExcalidrawActionManager();
+
+  if (appState.viewModeEnabled) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      icon={paintIcon}
+      onSelect={() => actionManager.executeAction(actionResetToolStyles)}
+      data-testid="reset-tool-styles"
+    >
+      {t("labels.resetToolStyles")}
+    </DropdownMenuItem>
+  );
+};
+ResetToolStyles.displayName = "ResetToolStyles";
