@@ -476,7 +476,16 @@ export {
   bumpVersion,
 } from "@excalidraw/element";
 
-export { CaptureUpdateAction } from "@excalidraw/history";
+// the history classes the editor's props and API take or hand out
+// (`onIncrement`, `applyDeltas`), so hosts don't need their own dependency on
+// `@excalidraw/history`
+export {
+  CaptureUpdateAction,
+  StoreIncrement,
+  DurableIncrement,
+  EphemeralIncrement,
+  StoreDelta,
+} from "@excalidraw/history";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
