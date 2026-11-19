@@ -118,10 +118,8 @@ import {
 
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { FileStatusStore } from "./data/fileStatusStore";
-import {
-  importFromLocalStorage,
-  importUsernameFromLocalStorage,
-} from "./data/localStorage";
+import { importUsernameFromLocalStorage } from "./data/localStorage";
+import { loadActiveSheetScene, getAllSheetsFileIds } from "./data/sheetStorage";
 
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
@@ -231,7 +229,7 @@ const initializeScene = async (opts: {
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
-  const localDataState = importFromLocalStorage();
+  const localDataState = await loadActiveSheetScene();
 
   let scene: Omit<
     RestoredDataState,
@@ -548,9 +546,14 @@ const ExcalidrawWrapper = () => {
               });
           }
           // on fresh load, clear unused files from IDB (from previous
-          // session)
-          LocalData.fileStorage.clearObsoleteFiles({
-            currentFileIds: fileIds,
+          // session, preserving all sheets' files)
+          getAllSheetsFileIds().then((allSheetsFileIds) => {
+            const combinedFileIds = Array.from(
+              new Set([...fileIds, ...allSheetsFileIds]),
+            );
+            LocalData.fileStorage.clearObsoleteFiles({
+              currentFileIds: combinedFileIds,
+            });
           });
         }
       }
@@ -605,21 +608,22 @@ const ExcalidrawWrapper = () => {
       ) {
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
-          const localDataState = importFromLocalStorage();
-          const username = importUsernameFromLocalStorage();
-          setLangCode(getPreferredLanguage());
-          excalidrawAPI.updateScene({
-            ...localDataState,
-            captureUpdate: CaptureUpdateAction.NEVER,
+          loadActiveSheetScene().then((localDataState) => {
+            const username = importUsernameFromLocalStorage();
+            setLangCode(getPreferredLanguage());
+            excalidrawAPI.updateScene({
+              ...localDataState,
+              captureUpdate: CaptureUpdateAction.NEVER,
+            });
+            LibraryIndexedDBAdapter.load().then((data) => {
+              if (data) {
+                excalidrawAPI.updateLibrary({
+                  libraryItems: data.libraryItems,
+                });
+              }
+            });
+            collabAPI?.setUsername(username || "");
           });
-          LibraryIndexedDBAdapter.load().then((data) => {
-            if (data) {
-              excalidrawAPI.updateLibrary({
-                libraryItems: data.libraryItems,
-              });
-            }
-          });
-          collabAPI?.setUsername(username || "");
         }
 
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_FILES)) {
@@ -1067,7 +1071,10 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
+        <AppFooter
+          onChange={() => excalidrawAPI?.refresh()}
+          excalidrawAPI={excalidrawAPI}
+        />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
 
         <TTDDialogTrigger />

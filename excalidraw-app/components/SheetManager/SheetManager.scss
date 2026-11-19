@@ -1,0 +1,424 @@
+.sheet-manager {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(560px, calc(100vw - 360px));
+  min-width: 0;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity var(--zen-mode-transition-duration) ease-in-out,
+    visibility var(--zen-mode-transition-duration);
+
+  @media screen and (max-width: 900px) {
+    max-width: calc(100vw - 280px);
+  }
+
+  @media screen and (max-width: 640px) {
+    max-width: calc(100vw - 90px);
+  }
+
+  &--zen-mode {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  &__island {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    background-color: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--default-border-color);
+    padding: 3px;
+    height: 38px;
+    font-family: var(--ui-font);
+    box-sizing: border-box;
+    max-width: 100%;
+    gap: 2px;
+    position: relative;
+
+    @at-root .excalidraw.theme--dark#{&} {
+      box-shadow: var(--shadow-island), 0 0 0 1px rgba(0, 0, 0, 0.18);
+    }
+  }
+
+  &__tabs-wrapper {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__tabs {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0 1px;
+    width: max-content;
+  }
+
+  &__divider {
+    width: 1px;
+    height: 18px;
+    background-color: var(--default-border-color);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+
+  &__add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: var(--border-radius-md);
+    background: transparent;
+    border: none;
+    color: var(--color-on-surface);
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.12s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    &:active {
+      background-color: var(--button-active-bg);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.sheet-tab {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 6px 0 10px;
+  border-radius: var(--border-radius-md);
+  background: transparent;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  font-weight: 500;
+  position: relative;
+  transition: background-color 0.12s ease, color 0.12s ease;
+  gap: 4px;
+  flex-shrink: 0;
+  outline: none;
+
+  &:hover {
+    background-color: var(--button-hover-bg);
+
+    .sheet-tab__menu-btn {
+      opacity: 0.6;
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--focus-highlight-color);
+  }
+
+  &--active {
+    background: var(--color-surface-primary-container);
+    color: var(--color-on-primary-container, var(--color-primary));
+    font-weight: 600;
+
+    &:hover {
+      background: var(--color-surface-primary-container);
+    }
+
+    .sheet-tab__menu-btn {
+      opacity: 0.75;
+      color: var(--color-on-primary-container, var(--color-primary));
+
+      &:hover {
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.08);
+      }
+    }
+  }
+
+  &--editing {
+    background-color: var(--button-hover-bg);
+  }
+
+  &__title {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  &__input {
+    background: var(--island-bg-color);
+    color: var(--color-on-surface);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--border-radius-md);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-surface-primary-container);
+    font-size: 0.8125rem;
+    font-family: inherit;
+    font-weight: 600;
+    padding: 1px 6px;
+    height: 24px;
+    width: 100px;
+    box-sizing: border-box;
+  }
+
+  &__menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border-radius: var(--border-radius-md);
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.12s ease, background-color 0.12s ease;
+
+    &:hover {
+      opacity: 1 !important;
+      background-color: var(--button-hover-bg);
+    }
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
+
+.sheet-menu {
+  position: fixed;
+  z-index: 999999;
+  background-color: var(--island-bg-color);
+  box-shadow: var(--shadow-island);
+  border: 1px solid var(--default-border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 4px;
+  min-width: 152px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: var(--ui-font);
+  font-size: 0.8125rem;
+  box-sizing: border-box;
+  animation: sheet-menu-in 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom center;
+
+  @at-root .excalidraw.theme--dark#{&} {
+    box-shadow: var(--shadow-island), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border: none;
+    background: transparent;
+    border-radius: var(--border-radius-md);
+    color: var(--color-on-surface);
+    font-size: 0.8125rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.1s ease, color 0.1s ease;
+    box-sizing: border-box;
+
+    &:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 1px var(--color-brand-hover);
+    }
+
+    &--danger {
+      color: var(--color-danger);
+
+      &:hover {
+        color: var(--color-danger);
+        background-color: var(--color-danger-background);
+      }
+
+      @at-root .excalidraw.theme--dark#{&}:hover {
+        background-color: rgba(255, 120, 120, 0.15);
+      }
+    }
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    opacity: 0.8;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__label {
+    flex: 1 1 auto;
+  }
+
+  &__separator {
+    height: 1px;
+    background-color: var(--default-border-color);
+    margin: 3px 0;
+  }
+}
+
+.sheet-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay-bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  padding: 1rem;
+  animation: sheet-overlay-fade 0.15s ease-out;
+}
+
+.sheet-dialog {
+  background-color: var(--island-bg-color);
+  box-shadow: var(--modal-shadow);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--default-border-color);
+  padding: 1.5rem;
+  max-width: 400px;
+  width: 100%;
+  color: var(--color-on-surface);
+  font-family: var(--ui-font);
+  box-sizing: border-box;
+  animation: sheet-dialog-scale 0.15s ease-out;
+
+  @at-root .excalidraw.theme--dark#{&} {
+    box-shadow: var(--modal-shadow), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-on-surface);
+  }
+
+  &__description {
+    margin: 0 0 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--color-on-surface);
+    opacity: 0.85;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    padding: 0 16px;
+    border-radius: var(--border-radius-md);
+    font-size: 0.8125rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.1s ease, border-color 0.1s ease;
+
+    &--cancel {
+      background: transparent;
+      color: var(--color-on-surface);
+      border: 1px solid var(--default-border-color);
+
+      &:hover {
+        background-color: var(--button-hover-bg);
+      }
+    }
+
+    &--danger {
+      background-color: var(--color-danger);
+      color: #ffffff;
+      border: 1px solid transparent;
+
+      &:hover {
+        background-color: var(--color-danger-darker);
+      }
+    }
+  }
+}
+
+@keyframes sheet-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sheet-overlay-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-dialog-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

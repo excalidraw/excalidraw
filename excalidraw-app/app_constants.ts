@@ -48,6 +48,9 @@ export const STORAGE_KEYS = {
   IDB_LIBRARY: "excalidraw-library",
   IDB_TTD_CHATS: "excalidraw-ttd-chats",
 
+  LOCAL_STORAGE_SHEETS_INDEX: "excalidraw-sheets-index",
+  IDB_SHEET_DATA_PREFIX: "excalidraw-sheet-data-",
+
   // do not use apart from migrations
   __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
