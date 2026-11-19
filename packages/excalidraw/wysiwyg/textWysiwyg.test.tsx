@@ -16,6 +16,7 @@ import {
   KEYS,
   FONT_FAMILY,
   TEXT_ALIGN,
+  TEXT_KERNING,
   THEME,
   VERTICAL_ALIGN,
   applyDarkModeFilter,
@@ -260,6 +261,40 @@ describe("textWysiwyg", () => {
       expect(editor).not.toBe(null);
       expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
+    });
+
+    it("should place the caret by the kerning the editor lays its text out with", async () => {
+      // the caret's found in a hidden copy of the clicked line: kerned
+      // otherwise than the editor (as it is in Firefox, left on `auto`), its
+      // letters are elsewhere, and the caret lands a character off
+      const kerningWhenMeasured = new Set<string | undefined>();
+      const { getBoundingClientRect } = Range.prototype;
+      Range.prototype.getBoundingClientRect = function (this: Range) {
+        kerningWhenMeasured.add(
+          this.startContainer.parentElement?.style.fontKerning,
+        );
+        return { left: 0 } as DOMRect;
+      };
+      try {
+        const text = API.createElement({
+          type: "text",
+          text: "A V A T A R",
+          x: 60,
+          y: 0,
+          width: 100,
+          height: 100,
+        });
+        API.setElements([text]);
+        UI.clickTool("text");
+        mouse.clickAt(text.x + 50, text.y + 50);
+
+        const editor = await getTextEditor();
+
+        expect(kerningWhenMeasured).toEqual(new Set([TEXT_KERNING]));
+        expect(editor.style.fontKerning).toBe(TEXT_KERNING);
+      } finally {
+        Range.prototype.getBoundingClientRect = getBoundingClientRect;
+      }
     });
 
     it("should vertically center newly created text on the cursor when clicked with text tool", async () => {
