@@ -1848,7 +1848,7 @@ export const getHeadingForElbowArrowSnap = (
     zoom,
   );
 
-  if (!distance) {
+  if (distance === null) {
     return vectorToHeading(
       vectorFromPoint(p, elementCenterPoint(bindableElement, elementsMap)),
     );
