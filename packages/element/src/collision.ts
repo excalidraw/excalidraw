@@ -35,12 +35,14 @@ import {
   elementCenterPoint,
   getCenterForBounds,
   getCubicBezierCurveBound,
+  getArrowheadsMaxExtent,
   getDiamondPoints,
   getElementBounds,
   pointInsideBounds,
 } from "./bounds";
 import {
   hasBoundTextElement,
+  isArrowElement,
   isBindableElement,
   isBoundToContainer,
   isFrameLikeElement,
@@ -185,9 +187,12 @@ export const hitElementItself = ({
     point,
     bounds,
     element.angle,
-    // Freedraw bounds follow the centerline points, but the ink extends past them
+    // Freedraw bounds follow the centerline points, but the ink extends past
+    // them, and arrow bounds don't include the arrowheads
     isFreeDrawElement(element)
       ? threshold + getFreedrawMaxStrokeRadius(element)
+      : isArrowElement(element)
+      ? threshold + getArrowheadsMaxExtent(element)
       : threshold,
   );
 

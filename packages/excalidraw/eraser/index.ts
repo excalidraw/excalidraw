@@ -3,6 +3,8 @@ import { arrayToMap, easeOut, THEME } from "@excalidraw/common";
 import {
   computeBoundTextPosition,
   doBoundsIntersect,
+  getArrowheadsCollisionParts,
+  getArrowheadsMaxExtent,
   getBoundTextElement,
   getElementBounds,
   getElementLineSegments,
@@ -15,6 +17,7 @@ import {
   isPointInElement,
 } from "@excalidraw/element";
 import {
+  distanceToLineSegment,
   lineSegment,
   lineSegmentsDistance,
   pointFrom,
@@ -31,7 +34,11 @@ import { getBoundTextElementId } from "@excalidraw/element";
 import type { Bounds } from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  ExcalidrawArrowElement,
+  ExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animatedTrail";
 
@@ -202,7 +209,12 @@ const eraserTest = (
   const lastPoint = pathSegment[1];
 
   // PERF: Do a quick bounds intersection test first because it's cheap
-  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
+  const threshold = isFreeDrawElement(element)
+    ? 15
+    : // arrow bounds don't include the arrowheads
+    isArrowElement(element)
+    ? element.strokeWidth / 2 + getArrowheadsMaxExtent(element)
+    : element.strokeWidth / 2;
   const segmentBounds = [
     Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
     Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
@@ -283,7 +295,10 @@ const eraserTest = (
       }
     }
 
-    return false;
+    return (
+      isArrowElement(element) &&
+      eraserHitsArrowheads(pathSegment, element, elementsMap, tolerance)
+    );
   }
 
   return (
@@ -302,3 +317,41 @@ const eraserTest = (
       ).length > 0)
   );
 };
+
+const eraserHitsArrowheads = (
+  pathSegment: LineSegment<GlobalPoint>,
+  element: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+  tolerance: number,
+) =>
+  getArrowheadsCollisionParts(element, elementsMap).some((part) => {
+    switch (part.type) {
+      case "circle":
+        return (
+          distanceToLineSegment(part.center, pathSegment) <=
+          part.diameter / 2 + tolerance
+        );
+      case "polygon":
+        return (
+          polygonIncludesPointNonZero(pathSegment[1], part.points) ||
+          part.points.some(
+            (point, index) =>
+              lineSegmentsDistance(
+                lineSegment(
+                  point,
+                  part.points[(index + 1) % part.points.length],
+                ),
+                pathSegment,
+              ) <= tolerance,
+          )
+        );
+      case "line":
+      default:
+        return (
+          lineSegmentsDistance(
+            lineSegment(part.start, part.end),
+            pathSegment,
+          ) <= tolerance
+        );
+    }
+  });

@@ -59,11 +59,8 @@ import { getCornerRadius, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
+import { getArrowheadParts } from "./arrowheads";
 import {
-  CARDINALITY_INNER_BAR_OFFSET,
-  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
-  CARDINALITY_ZERO_CIRCLE_OFFSET,
-  CARDINALITY_ZERO_CIRCLE_SCALE,
   elementCenterPoint,
   getArrowheadPoints,
   getDiamondPoints,
@@ -296,37 +293,6 @@ const modifyIframeLikeForRoughOptions = (
   return element;
 };
 
-const generateArrowheadCardinalityOne = (
-  generator: RoughGenerator,
-  arrowheadPoints: number[] | null,
-  lineOptions: Options,
-) => {
-  if (arrowheadPoints === null) {
-    return [];
-  }
-
-  const [, , x3, y3, x4, y4] = arrowheadPoints;
-
-  return [generator.line(x3, y3, x4, y4, lineOptions)];
-};
-
-const generateArrowheadLinesToTip = (
-  generator: RoughGenerator,
-  arrowheadPoints: number[] | null,
-  lineOptions: Options,
-) => {
-  if (arrowheadPoints === null) {
-    return [];
-  }
-
-  const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
-
-  return [
-    generator.line(x3, y3, x2, y2, lineOptions),
-    generator.line(x4, y4, x2, y2, lineOptions),
-  ];
-};
-
 const getArrowheadLineOptions = (
   element: ExcalidrawLinearElement,
   options: Options,
@@ -344,37 +310,6 @@ const getArrowheadLineOptions = (
   lineOptions.roughness = Math.min(1, lineOptions.roughness || 0);
 
   return lineOptions;
-};
-
-const generateArrowheadOutlineCircle = (
-  generator: RoughGenerator,
-  options: Options,
-  strokeColor: string,
-  arrowheadPoints: number[] | null,
-  fill: string,
-  diameterScale = 1,
-) => {
-  if (arrowheadPoints === null) {
-    return [];
-  }
-
-  const [x, y, diameter] = arrowheadPoints;
-  const circleOptions = {
-    ...options,
-    stroke: strokeColor,
-    roughness: Math.min(0.5, options.roughness || 0),
-    // a second stroke would stray from the fill
-    disableMultiStroke: true,
-  };
-
-  delete circleOptions.strokeLineDash;
-
-  return [
-    fillArrowheadOutline(
-      generator.circle(x, y, diameter * diameterScale, circleOptions),
-      fill,
-    ),
-  ];
 };
 
 /**
@@ -417,220 +352,61 @@ const getArrowheadShapes = (
     canvasBackgroundColor,
     isDarkMode,
   );
-  switch (arrowhead) {
-    case "circle":
-    case "circle_outline": {
-      return generateArrowheadOutlineCircle(
-        generator,
-        options,
-        strokeColor,
-        getArrowheadPoints(element, shape, position, arrowhead),
-        arrowhead === "circle_outline" ? backgroundFillColor : strokeColor,
-      );
-    }
-    case "triangle":
-    case "triangle_outline": {
-      const arrowheadPoints = getArrowheadPoints(
-        element,
-        shape,
-        position,
-        arrowhead,
-      );
 
-      if (arrowheadPoints === null) {
-        return [];
+  return getArrowheadParts<LocalPoint>(arrowhead, (part, offsetMultiplier) =>
+    getArrowheadPoints(element, shape, position, part, offsetMultiplier),
+  ).map((part) => {
+    switch (part.type) {
+      case "circle": {
+        const circleOptions = {
+          ...options,
+          stroke: strokeColor,
+          roughness: Math.min(0.5, options.roughness || 0),
+          // a second stroke would stray from the fill
+          disableMultiStroke: true,
+        };
+
+        delete circleOptions.strokeLineDash;
+
+        return fillArrowheadOutline(
+          generator.circle(
+            part.center[0],
+            part.center[1],
+            part.diameter,
+            circleOptions,
+          ),
+          part.fill === "background" ? backgroundFillColor : strokeColor,
+        );
       }
+      case "polygon": {
+        const polygonOptions = {
+          ...options,
+          roughness: Math.min(1, options.roughness || 0),
+          // a second stroke would stray from the fill
+          disableMultiStroke: true,
+          // keep the corners of the small polygon in place, only bow the edges
+          preserveVertices: true,
+        };
 
-      const [x, y, x2, y2, x3, y3] = arrowheadPoints;
-      const triangleOptions = {
-        ...options,
-        roughness: Math.min(1, options.roughness || 0),
-        // a second stroke would stray from the fill
-        disableMultiStroke: true,
-        // keep the corners of the small polygon in place, only bow the edges
-        preserveVertices: true,
-      };
+        // always use solid stroke for arrowhead
+        delete polygonOptions.strokeLineDash;
 
-      // always use solid stroke for arrowhead
-      delete triangleOptions.strokeLineDash;
-
-      return [
-        fillArrowheadOutline(
-          generator.polygon(
-            [
-              [x, y],
-              [x2, y2],
-              [x3, y3],
-            ],
-            triangleOptions,
-          ),
-          arrowhead === "triangle_outline" ? backgroundFillColor : strokeColor,
-        ),
-      ];
-    }
-    case "diamond":
-    case "diamond_outline": {
-      const arrowheadPoints = getArrowheadPoints(
-        element,
-        shape,
-        position,
-        arrowhead,
-      );
-
-      if (arrowheadPoints === null) {
-        return [];
+        return fillArrowheadOutline(
+          generator.polygon(part.points, polygonOptions),
+          part.fill === "background" ? backgroundFillColor : strokeColor,
+        );
       }
-
-      const [x, y, x2, y2, x3, y3, x4, y4] = arrowheadPoints;
-      const diamondOptions = {
-        ...options,
-        roughness: Math.min(1, options.roughness || 0),
-        // a second stroke would stray from the fill
-        disableMultiStroke: true,
-        // keep the corners of the small polygon in place, only bow the edges
-        preserveVertices: true,
-      };
-
-      // always use solid stroke for arrowhead
-      delete diamondOptions.strokeLineDash;
-
-      return [
-        fillArrowheadOutline(
-          generator.polygon(
-            [
-              [x, y],
-              [x2, y2],
-              [x3, y3],
-              [x4, y4],
-            ],
-            diamondOptions,
-          ),
-          arrowhead === "diamond_outline" ? backgroundFillColor : strokeColor,
-        ),
-      ];
+      case "line":
+      default:
+        return generator.line(
+          part.start[0],
+          part.start[1],
+          part.end[0],
+          part.end[1],
+          getArrowheadLineOptions(element, options),
+        );
     }
-    case "cardinality_one":
-      return generateArrowheadCardinalityOne(
-        generator,
-        getArrowheadPoints(element, shape, position, arrowhead),
-        getArrowheadLineOptions(element, options),
-      );
-    case "cardinality_many":
-      return generateArrowheadLinesToTip(
-        generator,
-        getArrowheadPoints(element, shape, position, arrowhead),
-        getArrowheadLineOptions(element, options),
-      );
-    case "cardinality_one_or_many": {
-      const lineOptions = getArrowheadLineOptions(element, options);
-
-      return [
-        ...generateArrowheadLinesToTip(
-          generator,
-          getArrowheadPoints(element, shape, position, "cardinality_many"),
-          lineOptions,
-        ),
-        ...generateArrowheadCardinalityOne(
-          generator,
-          getArrowheadPoints(
-            element,
-            shape,
-            position,
-            "cardinality_one",
-            CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
-          ),
-          lineOptions,
-        ),
-      ];
-    }
-    case "cardinality_exactly_one": {
-      const lineOptions = getArrowheadLineOptions(element, options);
-
-      return [
-        ...generateArrowheadCardinalityOne(
-          generator,
-          getArrowheadPoints(
-            element,
-            shape,
-            position,
-            "cardinality_one",
-            CARDINALITY_INNER_BAR_OFFSET,
-          ),
-          lineOptions,
-        ),
-        ...generateArrowheadCardinalityOne(
-          generator,
-          getArrowheadPoints(element, shape, position, "cardinality_one"),
-          lineOptions,
-        ),
-      ];
-    }
-    case "cardinality_zero_or_one": {
-      const lineOptions = getArrowheadLineOptions(element, options);
-
-      return [
-        ...generateArrowheadOutlineCircle(
-          generator,
-          options,
-          strokeColor,
-          getArrowheadPoints(
-            element,
-            shape,
-            position,
-            "circle_outline",
-            CARDINALITY_ZERO_CIRCLE_OFFSET,
-          ),
-          backgroundFillColor,
-          CARDINALITY_ZERO_CIRCLE_SCALE,
-        ),
-        ...generateArrowheadCardinalityOne(
-          generator,
-          getArrowheadPoints(
-            element,
-            shape,
-            position,
-            "cardinality_one",
-            CARDINALITY_INNER_BAR_OFFSET,
-          ),
-          lineOptions,
-        ),
-      ];
-    }
-    case "cardinality_zero_or_many": {
-      const lineOptions = getArrowheadLineOptions(element, options);
-
-      return [
-        ...generateArrowheadLinesToTip(
-          generator,
-          getArrowheadPoints(element, shape, position, "cardinality_many"),
-          lineOptions,
-        ),
-        ...generateArrowheadOutlineCircle(
-          generator,
-          options,
-          strokeColor,
-          getArrowheadPoints(
-            element,
-            shape,
-            position,
-            "circle_outline",
-            CARDINALITY_ZERO_CIRCLE_OFFSET,
-          ),
-          backgroundFillColor,
-          CARDINALITY_ZERO_CIRCLE_SCALE,
-        ),
-      ];
-    }
-    case "bar":
-    case "arrow":
-    default: {
-      return generateArrowheadLinesToTip(
-        generator,
-        getArrowheadPoints(element, shape, position, arrowhead),
-        getArrowheadLineOptions(element, options),
-      );
-    }
-  }
+  });
 };
 
 /** The simplified centerline the freedraw fill is drawn along. */
