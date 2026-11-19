@@ -3,7 +3,7 @@
  */
 
 import { version as ReactVersion } from "react";
-import { unstable_batchedUpdates } from "react-dom";
+import { flushSync, unstable_batchedUpdates } from "react-dom";
 
 import { throttleRAF } from "@excalidraw/common";
 
@@ -17,8 +17,14 @@ export const withBatchedUpdates = <
   }) as TFunction;
 
 /**
- * barches React state updates and throttles the calls to a single call per
+ * batches React state updates and throttles the calls to a single call per
  * animation frame
+ *
+ * The animation frame runs the call in flushSync, so that the frame being
+ * prepared paints its result. Outside an event, React 18+ gives an update the
+ * default priority and renders it in a task that runs after the paint, which
+ * would show the result one frame behind the pointer. `flush()` runs the call
+ * inside another event handler, which renders the updates itself.
  */
 export const withBatchedUpdatesThrottled = <
   TFunction extends ((event: any) => void) | (() => void),
@@ -31,7 +37,13 @@ export const withBatchedUpdatesThrottled = <
     ((event) => {
       unstable_batchedUpdates(func, event);
     }) as TFunction,
-    ownerWindow,
+    {
+      requestAnimationFrame: (callback) =>
+        ownerWindow.requestAnimationFrame((time) => {
+          flushSync(() => callback(time));
+        }),
+      cancelAnimationFrame: (id) => ownerWindow.cancelAnimationFrame(id),
+    },
   );
 };
 
