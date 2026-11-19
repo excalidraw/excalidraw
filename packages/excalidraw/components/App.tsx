@@ -8867,7 +8867,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     } else {
       element = newElement({
-        type: elementType,
+        type: elementType === "diamond" ? "ellipse" : elementType,
         ...baseElementAttributes,
       });
     }
@@ -10747,11 +10747,12 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       gridPadding,
     );
-    const positionedMap = arrayToMap(positioned);
 
     const nextElements = this.scene
       .getElementsIncludingDeleted()
-      .map((el) => positionedMap.get(el.id) ?? initializedMap.get(el.id) ?? el);
+      .map((el) =>
+        initializedMap.has(el.id) ? newElementWith(el, { isDeleted: true }) : el,
+      );
 
     this.updateScene({
       appState: {
