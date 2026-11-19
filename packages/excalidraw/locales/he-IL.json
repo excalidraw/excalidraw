@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
@@ -27,6 +28,7 @@
     "copyStyles": "העתקת סגנון",
     "pasteStyles": "הדבקת סגנונות",
     "stroke": "קו מתאר",
+    "textColor": "צבע טקסט",
     "changeStroke": "החלפת צבע קו מתאר",
     "background": "רקע",
     "changeBackground": "החלפת צבע הרקע",
@@ -113,6 +115,8 @@
     "collaborators": "שותפים",
     "you": "אני",
     "toggleGrid": "הצגת/הסתרת רשת",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "הוספה לספרייה",
     "removeFromLibrary": "הסרה מהספרייה",
     "libraryLoadingMessage": "הספרייה נטענת…",
@@ -182,11 +186,14 @@
     "zoomToFit": "שינוי מרחק התצוגה כך שיוצגו כל הרכיבים",
     "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
     "autoResize": "לאפשר התאמה אוטומטית של גודל הכתב",
+    "toggleAutoResize": "",
     "imageCropping": "חיתוך תמונה",
     "unCroppedDimension": "ממדים ללא חיתוך",
     "copyElementLink": "העתקת קישור לפריט",
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "לשונית",
     "shapeSwitch": "החלפת צורה",
     "preferences": "העדפות",
@@ -195,7 +202,11 @@
     "boxSelectionContain": "עטיפה",
     "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
-    "midpointSnapping": "הצמדה לנקודות ביניים"
+    "midpointSnapping": "הצמדה לנקודות ביניים",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "קישור לפריט",
@@ -239,12 +250,14 @@
     "zoomIn": "התקרבות",
     "zoomOut": "התרחקות",
     "resetZoom": "איפוס מרחק התצוגה",
+    "zoomToFit": "",
     "menu": "תפריט",
     "done": "בוצע",
     "edit": "עריכה",
     "undo": "ביטול",
     "redo": "ביצוע מחדש",
     "resetLibrary": "איפוס ספרייה",
+    "reset": "",
     "createNewRoom": "יצירת חדר חדש",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -332,6 +345,7 @@
     "eraser": "מחק",
     "frame": "כלי מסגרת",
     "magicframe": "תרשים קווי מתאר לקוד",
+    "stickynote": "",
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
     "autoshape": "ציור אל צורה",
@@ -357,6 +371,7 @@
     "group": "קבוצה",
     "frame": "מסגרת",
     "magicframe": "מתרשים קווי מתאר לקוד",
+    "stickynote": "",
     "embeddable": "הטמעה באתר",
     "selection": "בחירה",
     "iframe": "IFrame"
@@ -375,13 +390,16 @@
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "embeddable": "לחצו וגררו כדי ליצור הטמעת אתר",
+    "stickynote": "",
     "autoshape": "צייר מלבנים, עיגולים, יהלומים, קווים וחצים",
     "text_selected": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך את הטקסט",
     "text_editing": "יש ללחוץ על {{shortcut_1}} או {{shortcut_2}} לסיום העריכה",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "לחץ על הנקודה האחרונה או הקש על {{shortcut_1}} או {{shortcut_2}} כדי לסיים",
     "lockAngle": "ניתן להגביל את הזווית על ידי החזקת {{shortcut}}",
     "resize": "ניתן להגביל פרופורציות על ידי החזקת {{shortcut_1}} בזמן שינוי הגודל, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
     "resizeImage": "ניתן לשנות גודל חופשי על ידי החזקת {{shortcut_1}}, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
+    "resizeStickyNote": "",
     "rotate": "ניתן להגביל זוויות על ידי החזקת {{shortcut}} בזמן סיבוב",
     "toggleArrowhead": "לחץ לחיצה כפולה כדי להחליף בין צורות ראש החץ",
     "lineEditor_info": "החזק את {{shortcut_1}} ולחץ לחיצה כפולה או לחץ על {{shortcut_2}} כדי לערוך נקודות",
@@ -392,6 +410,7 @@
     "bindTextToElement": "‏{{shortcut}} להוספת טקסט",
     "createFlowchart": "‏{{shortcut}} ליצירת תרשים זרימה",
     "deepBoxSelect": "החזק את {{shortcut}} לבחירה עמוקה ולמניעת גרירה",
+    "cycleSelection": "",
     "eraserRevert": "החזק את {{shortcut}} כדי לשחזר את הרכיבים המסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
     "disableSnapping": "החזק את {{shortcut}} כדי לבטל את ההצמדה",
@@ -596,7 +615,7 @@
       "center_heading": "השרטוטים שלך נשמרים באחסון הדפדפן שלך.",
       "center_heading_line2": "זיכרון הדפדפן יכול להתנקות באופן לא צפוי.",
       "center_heading_line3": "כדאי לשמור את העבודה שלך תדיר בתור קובץ בשביל שהיא לא תיאבד.",
-      "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
+      "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+‎ במקום?",
       "menuHint": "ייצוא, העדפות, שפות, ..."
     },
     "defaults": {
@@ -649,15 +668,27 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
-    "description": "נכון לעכשיו, רק דיאגרמות <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> ו-<erdLink>Entity Relationship</erdLink> נתמכות. שאר הסוגים יוצגו כתמונה ב-Excalidraw.",
+    "description": "",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "Mermaid",
-    "inputPlaceholder": "נא לכתוב כאן הגדרת תרשים ל־Mermaid...",
-    "autoFixAvailable": "התיקון האוטומטי זמין"
+    "inputPlaceholder": "",
+    "autoFixAvailable": "התיקון האוטומטי זמין",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "שגיאה!"
@@ -699,7 +730,7 @@
       "mermaidParseError": "שגיאת תחביר Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את ‎Excalidraw+‏ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
+      "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את Excalidraw+‎ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
       "generalRateLimit": "נא להאט את הקצב, אתה מהיר מדי עבורנו! אנא המתן רגע לפני שתנסה שוב.",
       "messageLimitInputPlaceholder": "הגעת למכסת ההודעות היומית"
     },
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "בסצינה הנוכחית",
     "availableFonts": "הפונטים הקיימים",
-    "empty": "לא נמצאו פונטים"
+    "empty": "לא נמצאו פונטים",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "לא נמצאו משתמשים",
@@ -752,5 +785,16 @@
     "spacebar": "רווח",
     "delete": "מחיקה",
     "mmb": "גלגלת העכבר"
+  },
+  "promoBanner": {
+    "presentations": "מצגות",
+    "mcp": "ציור בעזרת AI",
+    "comments": "הוספת הערות",
+    "teams": "עבודת צוות",
+    "voiceChat": "שיחה קולית",
+    "withExcalidrawPlus": "ב־Excalidraw+‎",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "לבני אדם ול־AI"
   }
 }

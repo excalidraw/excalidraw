@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "Қою",
     "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
@@ -27,6 +28,7 @@
     "copyStyles": "Стильдерді көшіру",
     "pasteStyles": "Стильдерді қою",
     "stroke": "",
+    "textColor": "",
     "changeStroke": "",
     "background": "",
     "changeBackground": "",
@@ -113,6 +115,8 @@
     "collaborators": "",
     "you": "",
     "toggleGrid": "",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "",
     "removeFromLibrary": "",
     "libraryLoadingMessage": "",
@@ -131,7 +135,7 @@
     "flipHorizontal": "",
     "flipVertical": "",
     "viewMode": "",
-    "share": "",
+    "share": "Бөлісу",
     "showStroke": "",
     "showBackground": "",
     "showFonts": "",
@@ -182,11 +186,14 @@
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
+    "toggleAutoResize": "",
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
@@ -195,7 +202,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -239,12 +250,14 @@
     "zoomIn": "",
     "zoomOut": "",
     "resetZoom": "",
+    "zoomToFit": "",
     "menu": "Mәзір",
     "done": "Дайын",
     "edit": "",
     "undo": "",
     "redo": "",
     "resetLibrary": "",
+    "reset": "",
     "createNewRoom": "",
     "fullScreen": "",
     "darkMode": "",
@@ -332,6 +345,7 @@
     "eraser": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "laser": "",
     "autoshape": "",
@@ -357,6 +371,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,13 +390,16 @@
     "freeDraw": "",
     "text": "",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -392,6 +410,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
@@ -649,6 +668,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -657,7 +685,10 @@
     "preview": "",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": ""
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
@@ -752,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "Презентация",
+    "mcp": "AI-мен сызу",
+    "comments": "Пікір қалдыру",
+    "teams": "Топтық жұмыс",
+    "voiceChat": "Дауыстық чат",
+    "withExcalidrawPlus": "Excalidraw+-пен",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "адам мен AI үшін"
   }
 }
