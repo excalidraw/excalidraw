@@ -1156,6 +1156,11 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
+    // torn down with the app (see AppText.destroy): its scene is gone, and
+    // what was typed is in the last change it reported
+    if (app.unmounted) {
+      return;
+    }
     const updateElement = app.scene.getElement<ExcalidrawTextElement>(
       element.id,
     );
