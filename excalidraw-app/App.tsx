@@ -373,13 +373,18 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const ExcalidrawWrapper = () => {
+const ExcalidrawWrapper = ({
+  initialTheme,
+}: {
+  initialTheme?: "light" | "dark";
+}) => {
   const excalidrawAPI = useExcalidrawAPI();
 
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
-  const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
+  const { editorTheme, appTheme, setAppTheme } =
+    useHandleAppTheme(initialTheme);
 
   const [langCode, setLangCode] = useAppLangCode();
 
@@ -1311,7 +1316,11 @@ const ExcalidrawWrapper = () => {
   );
 };
 
-const ExcalidrawApp = () => {
+const ExcalidrawApp = ({
+  initialTheme,
+}: {
+  initialTheme?: "light" | "dark";
+}) => {
   const isCloudExportWindow =
     window.location.pathname === APP_ROUTES.excalidrawPlusExport;
   if (isCloudExportWindow) {
@@ -1322,7 +1331,7 @@ const ExcalidrawApp = () => {
     <TopErrorBoundary>
       <Provider store={appJotaiStore}>
         <ExcalidrawAPIProvider>
-          <ExcalidrawWrapper />
+          <ExcalidrawWrapper initialTheme={initialTheme} />
         </ExcalidrawAPIProvider>
       </Provider>
     </TopErrorBoundary>

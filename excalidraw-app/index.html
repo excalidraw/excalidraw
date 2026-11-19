@@ -69,6 +69,13 @@
         }
 
         function getTheme() {
+          const urlTheme = new URLSearchParams(
+            document.documentElement.ownerDocument.defaultView.location.search,
+          ).get("theme");
+          if (urlTheme === "dark" || urlTheme === "light") {
+            return urlTheme;
+          }
+
           const theme = window.localStorage.getItem("excalidraw-theme");
 
           if (theme && theme === "system") {
