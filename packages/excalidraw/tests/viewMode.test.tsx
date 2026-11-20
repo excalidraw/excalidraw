@@ -1,7 +1,7 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
+import { CURSOR_TYPE, KEYS, POINTER_BUTTON } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 
@@ -101,6 +101,42 @@ describe("view mode", () => {
       customType: "comment",
     });
     expect([h.state.scrollX, h.state.scrollY]).toEqual([scrollX, scrollY]);
+  });
+
+  it("pen eraser button does not switch to the eraser tool or erase elements", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rect]);
+    API.setAppState({ viewModeEnabled: true });
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      pointerType: "pen",
+      button: POINTER_BUTTON.ERASER,
+      clientX: 50,
+      clientY: 50,
+    });
+    expect(h.state.activeTool.type).toBe("laser");
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      pointerType: "pen",
+      button: POINTER_BUTTON.ERASER,
+      clientX: 50,
+      clientY: 50,
+    });
+
+    expect(h.state.activeTool.type).toBe("laser");
+    expect(h.elements.filter((el) => el.isDeleted)).toEqual([]);
+    expect(h.elements.length).toBe(1);
   });
 
   it("cursor should stay as grabbing type when hovering over canvas elements", async () => {
