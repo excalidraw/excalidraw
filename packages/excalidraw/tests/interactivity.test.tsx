@@ -1,12 +1,17 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { CODES, CURSOR_TYPE, POINTER_BUTTON } from "@excalidraw/common";
+import { CODES, CURSOR_TYPE, KEYS, POINTER_BUTTON } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { actionZoomIn } from "../actions/actionCanvas";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+import { convertElementTypePopupAtom } from "../components/ConvertElementTypePopup";
+import { editorJotaiStore } from "../editor-jotai";
 import { DefaultSidebar, Excalidraw, Footer, MainMenu } from "../index";
 
 import { API } from "./helpers/api";
@@ -446,7 +451,7 @@ describe("toggling `interaction` at runtime", () => {
 
     const rectangle = API.createElement({ type: "rectangle" });
     API.setElements([rectangle]);
-    API.setSelectedElements([rectangle]);
+    API.setSelectedElements([rectangle as NonDeletedExcalidrawElement]);
     expect(h.state.selectedElementIds[rectangle.id]).toBe(true);
 
     GlobalTestState.renderResult.rerender(
@@ -673,6 +678,44 @@ describe("ui={false}", () => {
     rightClickCanvas();
     expect(h.state.contextMenu).not.toBe(null);
     expect(UI.queryContextMenu()).toBe(null);
+  });
+
+  // #12678
+  it("Tab does not open the hidden shape switch popup nor convert shapes", () => {
+    const rectangle = h.elements[0];
+    API.setSelectedElements([rectangle as NonDeletedExcalidrawElement]);
+    h.app.focusContainer();
+
+    Keyboard.keyPress(KEYS.TAB);
+
+    expect(editorJotaiStore.get(convertElementTypePopupAtom)).toBe(null);
+
+    Keyboard.keyPress(KEYS.TAB);
+
+    // no silent shape conversion without the popup
+    expect(h.elements[0].type).toBe("rectangle");
+  });
+
+  // #12678
+  it("Esc and Enter are not swallowed after Tab", async () => {
+    const rectangle = h.elements[0];
+    API.setSelectedElements([rectangle as NonDeletedExcalidrawElement]);
+    h.app.focusContainer();
+
+    Keyboard.keyPress(KEYS.TAB);
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    // Esc must deselect — the invisible popup must not swallow it
+    expect(h.state.selectedElementIds).toEqual({});
+
+    API.setSelectedElements([rectangle as NonDeletedExcalidrawElement]);
+    Keyboard.keyPress(KEYS.TAB);
+    Keyboard.keyPress(KEYS.ENTER);
+
+    // Enter must start label editing
+    await waitFor(() => {
+      expect(h.state.editingTextElement).not.toBe(null);
+    });
   });
 });
 
