@@ -8,6 +8,7 @@ import {
   isTestEnv,
   toArray,
 } from "@excalidraw/common";
+
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element";
 import { getElementsInGroup } from "@excalidraw/element";
@@ -21,6 +22,9 @@ import {
 import { getSelectedElements } from "@excalidraw/element";
 
 import { mutateElement, type ElementUpdate } from "@excalidraw/element";
+import { getElementBounds } from "@excalidraw/element";
+
+import type { Bounds } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -39,6 +43,8 @@ import type {
   Mutable,
   SameType,
 } from "@excalidraw/common/utility-types";
+
+import { SpatialIndex } from "./spatialIndex";
 
 import type { AppState } from "../../excalidraw/types";
 
@@ -142,6 +148,30 @@ export class Scene {
 
   getSceneNonce() {
     return this.sceneNonce;
+  }
+
+  /** built on first query so throwaway scenes don't pay for it */
+  private spatialIndex: SpatialIndex | null = null;
+
+  /**
+   * Returns the non-deleted elements whose bounds intersect `bounds` (scene
+   * coordinates, edges inclusive), in z-order.
+   *
+   * Backed by a spatial index, so the cost scales with the queried area and
+   * the result size instead of the scene size. The index stays in sync with
+   * in-place mutations, including uninformed ones (see `SpatialIndex`).
+   */
+  getNonDeletedElementsInBounds(
+    bounds: Bounds,
+  ): readonly NonDeletedExcalidrawElement[] {
+    if (!this.spatialIndex) {
+      this.spatialIndex = new SpatialIndex(getElementBounds);
+    }
+    return this.spatialIndex.query(
+      bounds,
+      this.nonDeletedElements,
+      this.nonDeletedElementsMap,
+    );
   }
 
   getNonDeletedElementsMap() {
@@ -323,6 +353,8 @@ export class Scene {
   }
 
   destroy() {
+    this.spatialIndex?.destroy();
+    this.spatialIndex = null;
     this.elements = [];
     this.nonDeletedElements = [];
     this.nonDeletedFramesLikes = [];
