@@ -10,6 +10,7 @@ import {
   DEFAULT_ELEMENT_STROKE_PICKS,
   isColorDark,
   isWritableElement,
+  KEYS,
   THEME,
 } from "@excalidraw/common";
 
@@ -301,6 +302,16 @@ const ColorPickerTrigger = ({
 
     onToggle();
   };
+  const shortcut =
+    type === "elementStroke"
+      ? KEYS.S.toUpperCase()
+      : type === "elementBackground"
+      ? KEYS.G.toUpperCase()
+      : undefined;
+  const tooltipLabel =
+    type === "elementStroke"
+      ? t("labels.showStroke")
+      : t("labels.showBackground");
 
   return (
     <Popover.Trigger
@@ -314,11 +325,7 @@ const ColorPickerTrigger = ({
       })}
       aria-label={label}
       style={displayColor ? { "--swatch-color": displayColor } : undefined}
-      title={
-        type === "elementStroke"
-          ? t("labels.showStroke")
-          : t("labels.showBackground")
-      }
+      title={shortcut ? `${tooltipLabel} — ${shortcut}` : tooltipLabel}
       data-openpopup={type}
       onClick={handleClick}
       // the active-color swatch can be dragged onto the top-picks strip to
