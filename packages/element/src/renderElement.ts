@@ -28,6 +28,8 @@ import {
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
+  TEXT_KERNING,
+  TEXT_RENDERING,
   STICKY_NOTE_SHADOW_OPACITY,
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
@@ -676,6 +678,8 @@ const drawElementOnCanvas = (
         }
         withSavedContext(context, () => {
           context.font = getFontString(element);
+          context.fontKerning = TEXT_KERNING;
+          context.textRendering = TEXT_RENDERING;
           context.fillStyle = applyDarkModeFilter(
             element.strokeColor,
             renderConfig.theme === THEME.DARK,

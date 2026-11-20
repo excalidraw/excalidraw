@@ -1,7 +1,13 @@
 import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  TEXT_ALIGN,
+  TEXT_KERNING,
+  TEXT_RENDERING,
+  VERTICAL_ALIGN,
+} from "@excalidraw/common";
 
 import {
   computeContainerDimensionForBoundText,
@@ -10,11 +16,51 @@ import {
   getBoundTextMaxHeight,
   computeBoundTextPosition,
 } from "../src/textElement";
-import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
+import {
+  detectLineHeight,
+  getLineHeightInPx,
+  getLineWidth,
+} from "../src/textMeasurements";
 
-import type { ExcalidrawTextElementWithContainer } from "../src/types";
+import type { RenderEnvironment } from "../src/renderEnvironment";
+import type {
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../src/types";
 
 describe("Test measureText", () => {
+  it("should measure text as the text editor lays it out", () => {
+    // left on their defaults, Chrome's canvas skips the kerning next to a
+    // space and shapes a line word by word, while its text editor does
+    // neither, so the two would wrap at different words
+    const settingsWhenMeasured: string[][] = [];
+    const env: RenderEnvironment = {
+      createCanvas: () =>
+        ({
+          getContext: () => {
+            const context = {
+              font: "",
+              fontKerning: "auto",
+              textRendering: "auto",
+              measureText: (text: string) => {
+                settingsWhenMeasured.push([
+                  context.fontKerning,
+                  context.textRendering,
+                ]);
+                return { width: text.length };
+              },
+            };
+            return context;
+          },
+        } as unknown as HTMLCanvasElement),
+      createImage: () => ({} as HTMLImageElement),
+    };
+
+    getLineWidth("A V A T A R", "20px Helvetica" as FontString, env);
+
+    expect(settingsWhenMeasured).toEqual([[TEXT_KERNING, TEXT_RENDERING]]);
+  });
+
   describe("Test getContainerCoords", () => {
     const params = { width: 200, height: 100, x: 10, y: 20 };
 

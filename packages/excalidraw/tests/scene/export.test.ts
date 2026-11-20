@@ -3,6 +3,8 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  TEXT_KERNING,
+  TEXT_RENDERING,
   THEME,
 } from "@excalidraw/common";
 
@@ -418,6 +420,26 @@ describe("exportToCanvas", () => {
       { willReadFrequently: true },
     ]);
     getContextSpy.mockRestore();
+  });
+
+  it("draws text with the settings it's measured with", async () => {
+    const settingsWhenDrawn: string[][] = [];
+    const fillTextSpy = vi
+      .spyOn(CanvasRenderingContext2D.prototype, "fillText")
+      .mockImplementation(function (this: CanvasRenderingContext2D) {
+        settingsWhenDrawn.push([this.fontKerning, this.textRendering]);
+      });
+
+    await exportScene({
+      type: "canvas",
+      data: {
+        elements: [API.createElement({ type: "text", text: "A V A T A R" })],
+        files: null,
+      },
+    });
+
+    expect(settingsWhenDrawn).toEqual([[TEXT_KERNING, TEXT_RENDERING]]);
+    fillTextSpy.mockRestore();
   });
 });
 

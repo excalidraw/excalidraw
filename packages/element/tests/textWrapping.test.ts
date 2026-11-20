@@ -1,4 +1,8 @@
 import {
+  charWidth,
+  setCustomTextMetricsProvider,
+} from "../src/textMeasurements";
+import {
   getWrappedTextLines,
   parseTokens,
   wrapText,
@@ -454,6 +458,50 @@ describe("Test wrapText", () => {
         const res = wrapText(text, font, data.width);
         expect(res).toEqual(data.res);
       });
+    });
+  });
+
+  describe("When letters kern", () => {
+    // a font which pulls a letter and a space 3px together, and "A" and "V"
+    // 2px: a line is narrower than its characters measured one by one
+    const kerningFont = "10px Kerning" as FontString;
+    const kerning = (a: string, b: string) =>
+      (a === " ") !== (b === " ")
+        ? 3
+        : a + b === "AV" || a + b === "VA"
+        ? 2
+        : 0;
+
+    beforeEach(() => {
+      charWidth.clearCache(kerningFont);
+      setCustomTextMetricsProvider({
+        getLineWidth: (text) =>
+          Array.from(text).reduce(
+            (width, char, index, chars) =>
+              width + 10 - (index ? kerning(chars[index - 1], char) : 0),
+            0,
+          ),
+      });
+    });
+
+    afterEach(() => {
+      setCustomTextMetricsProvider(undefined);
+      charWidth.clearCache(kerningFont);
+    });
+
+    it("should break a line of single letters where the line as a whole stops fitting", () => {
+      // "A V A T A R A" is 13 characters and 94px wide: adding the letters'
+      // own widths up would break it after "A V A T A"
+      expect(wrapText("A V A T A R A V A T A R", kerningFont, 100)).toEqual(
+        "A V A T A R A\nV A T A R",
+      );
+    });
+
+    it("should break a long word where the line as a whole stops fitting", () => {
+      // "AVAVAVAVAVAV" is 12 characters and 98px wide
+      expect(wrapText("AVAVAVAVAVAVAVAVAV", kerningFont, 100)).toEqual(
+        "AVAVAVAVAVAV\nAVAVAV",
+      );
     });
   });
 
