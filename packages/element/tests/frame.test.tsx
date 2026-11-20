@@ -10,6 +10,7 @@ import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
 import {
   act,
+  fireEvent,
   getCloneByOrigId,
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
@@ -1744,5 +1745,44 @@ describe("arrows in frames", () => {
       pointFrom(midPoint[0] + ELEMENT_TRANSLATE_AMOUNT, midPoint[1]),
     );
     expect(nextEndPoint).toEqual(endPoint);
+  });
+});
+
+describe("frame name editing", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("should not commit the name on Enter while composing with an IME", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 200,
+    });
+    API.setElements([frame]);
+
+    // jsdom canvases have no size, so the frame would be culled as off-screen
+    Object.defineProperty(h.app.canvas, "width", { value: 1000 });
+    Object.defineProperty(h.app.canvas, "height", { value: 1000 });
+    act(() => h.setState({}));
+
+    const nameElement = document.getElementById(
+      `${h.app.id}-frame-name-${frame.id}`,
+    )!;
+    fireEvent.doubleClick(nameElement);
+    expect(h.state.editingFrame).toBe(frame.id);
+
+    const input = nameElement.querySelector("input")!;
+
+    fireEvent.keyDown(input, { key: KEYS.ENTER, keyCode: 229 });
+    expect(h.state.editingFrame).toBe(frame.id);
+
+    fireEvent.keyDown(input, { key: KEYS.ENTER, isComposing: true });
+    expect(h.state.editingFrame).toBe(frame.id);
+
+    fireEvent.keyDown(input, { key: KEYS.ENTER });
+    expect(h.state.editingFrame).toBe(null);
   });
 });
