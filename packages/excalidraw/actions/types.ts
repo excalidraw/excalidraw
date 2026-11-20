@@ -28,7 +28,6 @@ export type ActionResult =
       appState?: Partial<AppState> | null;
       files?: BinaryFiles | null;
       captureUpdate: CaptureUpdateActionType;
-      replaceFiles?: boolean;
     }
   | false;
 
