@@ -2238,6 +2238,10 @@ class App extends React.Component<AppProps, AppState> {
             onFocus={(e) => e.target.select()}
             onBlur={() => this.resetEditingFrame(f)}
             onKeyDown={(event) => {
+              // Enter that confirms an IME conversion must not commit the name
+              if (event.nativeEvent.isComposing || event.keyCode === 229) {
+                return;
+              }
               // for some inexplicable reason, `onBlur` triggered on ESC
               // does not reset `state.editingFrame` despite being called,
               // and we need to reset it here as well
