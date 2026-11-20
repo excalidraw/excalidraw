@@ -5,6 +5,7 @@ import {
   FONT_FAMILY,
   TEXT_ALIGN,
   TEXT_KERNING,
+  TEXT_RENDERING,
   VERTICAL_ALIGN,
 } from "@excalidraw/common";
 
@@ -28,10 +29,11 @@ import type {
 } from "../src/types";
 
 describe("Test measureText", () => {
-  it("should measure text with the font's full kerning", () => {
-    // left on `auto`, Chrome's canvas skips the kerning next to a space while
-    // its text editor applies it, so the two would wrap at different words
-    const kerningWhenMeasured: string[] = [];
+  it("should measure text as the text editor lays it out", () => {
+    // left on their defaults, Chrome's canvas skips the kerning next to a
+    // space and shapes a line word by word, while its text editor does
+    // neither, so the two would wrap at different words
+    const settingsWhenMeasured: string[][] = [];
     const env: RenderEnvironment = {
       createCanvas: () =>
         ({
@@ -39,8 +41,12 @@ describe("Test measureText", () => {
             const context = {
               font: "",
               fontKerning: "auto",
+              textRendering: "auto",
               measureText: (text: string) => {
-                kerningWhenMeasured.push(context.fontKerning);
+                settingsWhenMeasured.push([
+                  context.fontKerning,
+                  context.textRendering,
+                ]);
                 return { width: text.length };
               },
             };
@@ -52,7 +58,7 @@ describe("Test measureText", () => {
 
     getLineWidth("A V A T A R", "20px Helvetica" as FontString, env);
 
-    expect(kerningWhenMeasured).toEqual([TEXT_KERNING]);
+    expect(settingsWhenMeasured).toEqual([[TEXT_KERNING, TEXT_RENDERING]]);
   });
 
   describe("Test getContainerCoords", () => {
