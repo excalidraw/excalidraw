@@ -4,6 +4,7 @@ import { vi } from "vitest";
 
 import {
   CURSOR_TYPE,
+  KEYS,
   POINTER_BUTTON,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
@@ -36,6 +37,32 @@ const getViewport = () => ({
 });
 
 const canvas = () => GlobalTestState.interactiveCanvas;
+
+describe("space pan", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("enters pan mode on a plain space press", () => {
+    fireEvent.keyDown(document, { key: KEYS.SPACE });
+    expect(h.app.pan.isSpaceHeld()).toBe(true);
+    expect(canvas().style.cursor).toBe(CURSOR_TYPE.GRAB);
+    fireEvent.keyUp(document, { key: KEYS.SPACE });
+    expect(h.app.pan.isSpaceHeld()).toBe(false);
+  });
+
+  it.each([
+    ["ctrlKey", { ctrlKey: true }],
+    ["metaKey", { metaKey: true }],
+    // Ctrl+Cmd+Space opens the macOS emoji picker
+    ["ctrlKey+metaKey", { ctrlKey: true, metaKey: true }],
+  ])("does not enter pan mode on space with %s", (_, modifiers) => {
+    // the OS shortcut swallows the space keyup, so none is fired here
+    fireEvent.keyDown(document, { key: KEYS.SPACE, ...modifiers });
+    expect(h.app.pan.isSpaceHeld()).toBe(false);
+    expect(canvas().style.cursor).not.toBe(CURSOR_TYPE.GRAB);
+  });
+});
 
 describe("secondary-button pan", () => {
   beforeEach(async () => {
