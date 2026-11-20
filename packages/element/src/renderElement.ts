@@ -726,6 +726,37 @@ export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
+export const otherThemeElementWithCanvasCache = new WeakMap<
+  ExcalidrawElement,
+  ExcalidrawElementWithCanvas
+>();
+
+const isElementWithCanvasValid = (
+  elementWithCanvas: ExcalidrawElementWithCanvas | undefined,
+  theme: AppState["theme"],
+  zoom: Zoom,
+  renderConfig: StaticCanvasRenderConfig,
+  renderEnvironment: RenderEnvironment,
+  imageCrop: ExcalidrawImageElement["crop"] | null,
+  containingFrameOpacity: number,
+  shouldCacheIgnoreZoom?: boolean,
+): boolean => {
+  if (!elementWithCanvas) {
+    return false;
+  }
+  const shouldRegenerateBecauseZoom =
+    elementWithCanvas.zoomValue !== zoom.value && !shouldCacheIgnoreZoom;
+
+  return (
+    !shouldRegenerateBecauseZoom &&
+    elementWithCanvas.theme === theme &&
+    elementWithCanvas.deviceScale === renderConfig.scale &&
+    elementWithCanvas.environment === renderEnvironment &&
+    elementWithCanvas.imageCrop === imageCrop &&
+    elementWithCanvas.containingFrameOpacity === containingFrameOpacity
+  );
+};
+
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
@@ -736,42 +767,98 @@ const generateElementWithCanvas = (
   const renderEnvironment = getRenderEnvironment(
     renderConfig.renderEnvironment,
   );
-  const prevElementWithCanvas = elementWithCanvasCache.get(element);
-  const shouldRegenerateBecauseZoom =
-    prevElementWithCanvas &&
-    prevElementWithCanvas.zoomValue !== zoom.value &&
-    !appState?.shouldCacheIgnoreZoom;
   const imageCrop = isImageElement(element) ? element.crop : null;
-
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
 
+  const prevElementWithCanvas = elementWithCanvasCache.get(element);
+
   if (
-    !prevElementWithCanvas ||
-    shouldRegenerateBecauseZoom ||
-    prevElementWithCanvas.theme !== appState.theme ||
-    prevElementWithCanvas.deviceScale !== renderConfig.scale ||
-    prevElementWithCanvas.environment !== renderEnvironment ||
-    prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
-  ) {
-    const elementWithCanvas = generateElementCanvas(
-      element,
-      elementsMap,
+    isElementWithCanvasValid(
+      prevElementWithCanvas,
+      appState.theme,
       zoom,
       renderConfig,
-      appState,
-    );
+      renderEnvironment,
+      imageCrop,
+      containingFrameOpacity,
+      appState?.shouldCacheIgnoreZoom,
+    )
+  ) {
+    return prevElementWithCanvas!;
+  }
 
-    if (!elementWithCanvas) {
-      return null;
+  const otherElementWithCanvas = otherThemeElementWithCanvasCache.get(element);
+
+  if (
+    isElementWithCanvasValid(
+      otherElementWithCanvas,
+      appState.theme,
+      zoom,
+      renderConfig,
+      renderEnvironment,
+      imageCrop,
+      containingFrameOpacity,
+      appState?.shouldCacheIgnoreZoom,
+    )
+  ) {
+    if (
+      prevElementWithCanvas &&
+      prevElementWithCanvas.theme !== appState.theme &&
+      isElementWithCanvasValid(
+        prevElementWithCanvas,
+        prevElementWithCanvas.theme,
+        zoom,
+        renderConfig,
+        renderEnvironment,
+        imageCrop,
+        containingFrameOpacity,
+        appState?.shouldCacheIgnoreZoom,
+      )
+    ) {
+      otherThemeElementWithCanvasCache.set(element, prevElementWithCanvas);
+    } else {
+      otherThemeElementWithCanvasCache.delete(element);
     }
 
-    elementWithCanvasCache.set(element, elementWithCanvas);
-
-    return elementWithCanvas;
+    elementWithCanvasCache.set(element, otherElementWithCanvas!);
+    return otherElementWithCanvas!;
   }
-  return prevElementWithCanvas;
+
+  const elementWithCanvas = generateElementCanvas(
+    element,
+    elementsMap,
+    zoom,
+    renderConfig,
+    appState,
+  );
+
+  if (!elementWithCanvas) {
+    return null;
+  }
+
+  if (
+    prevElementWithCanvas &&
+    prevElementWithCanvas.theme !== appState.theme &&
+    isElementWithCanvasValid(
+      prevElementWithCanvas,
+      prevElementWithCanvas.theme,
+      zoom,
+      renderConfig,
+      renderEnvironment,
+      imageCrop,
+      containingFrameOpacity,
+      appState?.shouldCacheIgnoreZoom,
+    )
+  ) {
+    otherThemeElementWithCanvasCache.set(element, prevElementWithCanvas);
+  } else {
+    otherThemeElementWithCanvasCache.delete(element);
+  }
+
+  elementWithCanvasCache.set(element, elementWithCanvas);
+
+  return elementWithCanvas;
 };
 
 /**

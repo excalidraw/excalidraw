@@ -45,7 +45,10 @@ import type {
   SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { elementWithCanvasCache } from "./renderElement";
+import {
+  elementWithCanvasCache,
+  otherThemeElementWithCanvasCache,
+} from "./renderElement";
 
 import {
   canBecomePolygon,
@@ -88,7 +91,10 @@ export class ShapeCache {
   private static rg = new RoughGenerator();
   private static cache = new WeakMap<
     ExcalidrawElement,
-    { shape: ElementShape; theme: AppState["theme"] }
+    {
+      shapes: Partial<Record<AppState["theme"], ElementShape>>;
+      last: ElementShape;
+    }
   >();
 
   /**
@@ -100,10 +106,13 @@ export class ShapeCache {
     theme: AppState["theme"] | null,
   ) => {
     const cached = ShapeCache.cache.get(element);
-    if (cached && (theme === null || cached.theme === theme)) {
-      return cached.shape as T["type"] extends keyof ElementShapes
-        ? ElementShapes[T["type"]] | undefined
-        : ElementShape | undefined;
+    if (cached) {
+      const shape = theme === null ? cached.last : cached.shapes[theme];
+      if (shape !== undefined) {
+        return shape as T["type"] extends keyof ElementShapes
+          ? ElementShapes[T["type"]] | undefined
+          : ElementShape | undefined;
+      }
     }
     return undefined;
   };
@@ -111,6 +120,7 @@ export class ShapeCache {
   public static delete = (element: ExcalidrawElement) => {
     ShapeCache.cache.delete(element);
     elementWithCanvasCache.delete(element);
+    otherThemeElementWithCanvasCache.delete(element);
   };
 
   public static destroy = () => {
@@ -144,6 +154,7 @@ export class ShapeCache {
     }
 
     elementWithCanvasCache.delete(element);
+    otherThemeElementWithCanvasCache.delete(element);
 
     const shape = _generateElementShape(
       element,
@@ -159,10 +170,17 @@ export class ShapeCache {
       : Drawable | null;
 
     if (!renderConfig?.isExporting) {
-      ShapeCache.cache.set(element, {
-        shape,
-        theme: renderConfig?.theme || THEME.LIGHT,
-      });
+      const theme = renderConfig?.theme || THEME.LIGHT;
+      const cached = ShapeCache.cache.get(element);
+      if (cached) {
+        cached.shapes[theme] = shape;
+        cached.last = shape;
+      } else {
+        ShapeCache.cache.set(element, {
+          shapes: { [theme]: shape },
+          last: shape,
+        });
+      }
     }
 
     return shape;
