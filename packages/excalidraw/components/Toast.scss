@@ -3,23 +3,29 @@
     $closeButtonSize: 1.2rem;
     $closeButtonPadding: 0.4rem;
 
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 1000;
+
     animation: Toast-fade-in 0.5s;
-    min-width: 220px;
-    max-width: min(360px, calc(100vw - 32px));
+    min-width: 240px;
+    max-width: min(400px, calc(100vw - 32px));
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--default-border-color);
     background-color: var(--island-bg-color);
     color: var(--text-primary-color);
-    padding: 0.5rem 0.75rem;
-    box-shadow: 0 0 0 1px var(--color-surface-lowest);
+    padding: 0.75rem 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--color-surface-lowest);
     box-sizing: border-box;
     cursor: default;
     pointer-events: none;
 
     .Toast__message {
       font-family: var(--ui-font);
-      font-size: 0.75rem;
-      line-height: 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      line-height: 1.4rem;
       text-align: center;
       padding: 0 $closeButtonSize + ($closeButtonPadding);
       white-space: pre-wrap;

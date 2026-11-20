@@ -60,6 +60,7 @@ type ImageExportModalProps = {
   onExportImage: AppClassProperties["onExportImage"];
   name: string;
   exportWithDarkMode: boolean;
+  onCloseRequest?: () => void;
 };
 
 const ImageExportModal = ({
@@ -70,6 +71,7 @@ const ImageExportModal = ({
   onExportImage,
   name,
   exportWithDarkMode,
+  onCloseRequest,
 }: ImageExportModalProps) => {
   const hasSelection = isSomeElementSelected(
     elementsSnapshot,
@@ -309,11 +311,19 @@ const ImageExportModal = ({
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
             label={t("imageExportDialog.title.exportToPng")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
-                exportingFrame,
-              })
-            }
+            onClick={async () => {
+              try {
+                await onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
+                  exportingFrame,
+                  onFilePickerShown: () => {
+                    onCloseRequest?.();
+                  },
+                });
+                onCloseRequest?.();
+              } catch (error) {
+                console.error(error);
+              }
+            }}
             icon={downloadIcon}
           >
             {t("imageExportDialog.button.exportToPng")}
@@ -321,11 +331,19 @@ const ImageExportModal = ({
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
             label={t("imageExportDialog.title.exportToSvg")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
-                exportingFrame,
-              })
-            }
+            onClick={async () => {
+              try {
+                await onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
+                  exportingFrame,
+                  onFilePickerShown: () => {
+                    onCloseRequest?.();
+                  },
+                });
+                onCloseRequest?.();
+              } catch (error) {
+                console.error(error);
+              }
+            }}
             icon={downloadIcon}
           >
             {t("imageExportDialog.button.exportToSvg")}
@@ -425,6 +443,7 @@ export const ImageExportDialog = ({
         onExportImage={onExportImage}
         name={name}
         exportWithDarkMode={appState.exportWithDarkMode}
+        onCloseRequest={onCloseRequest}
       />
     </Dialog>
   );
