@@ -11,11 +11,13 @@ import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
 import {
+  act,
   render,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
+  waitFor,
 } from "./test-utils";
 
 unmountComponent();
@@ -223,5 +225,67 @@ describe("multi point mode in linear elements", () => {
     );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
+  });
+});
+
+describe("multi point mode hint", () => {
+  beforeAll(() => {
+    mockBoundingClientRect({ width: 1000, height: 1000 });
+  });
+
+  afterAll(() => {
+    restoreOriginalGetBoundingClientRect();
+  });
+
+  const enterMultiPointMode = (container: HTMLElement) => {
+    const canvas = container.querySelector("canvas.interactive")!;
+    // first point is added on pointer down
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+    // second point, enable multi point
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+  };
+
+  const hint = () =>
+    document.querySelector(".HintViewer")?.textContent ?? "";
+
+  it("shows the keyboard hint on desktop", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    fireEvent.click(getByToolName("line"));
+
+    enterMultiPointMode(container);
+
+    await waitFor(() => {
+      expect(hint()).toContain("Click on last point");
+    });
+  });
+
+  it("shows a touch hint instead of keyboard shortcuts on mobile", async () => {
+    const { container } = await render(
+      <Excalidraw UIOptions={{ getFormFactor: () => "phone" }} />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() =>
+      expect(window.h.app.editorInterface.formFactor).toBe("phone"),
+    );
+    // the compact phone toolbar groups the line tool away from the top
+    // level, so select it programmatically
+    act(() => {
+      window.h.app.setActiveTool({ type: "line" });
+    });
+
+    expect(window.h.state.activeTool.type).toBe("line");
+    const canvas = container.querySelector("canvas.interactive")!;
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+    expect(window.h.state.newElement?.type).toBe("line");
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+
+    expect(window.h.state.multiElement).not.toBe(null);
+    expect(document.querySelector(".App-bottom-bar")).not.toBe(null);
+
+    await waitFor(() => {
+      expect(hint()).toBe("Tap the last point to finish");
+    });
   });
 });

@@ -8,8 +8,10 @@ import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
+import { useEditorInterface } from "./App";
 import { MobileToolbar } from "./MobileToolbar";
 import { FixedSideContainer } from "./FixedSideContainer";
+import { HintViewer } from "./HintViewer";
 
 import { Island } from "./Island";
 
@@ -63,6 +65,7 @@ export const MobileMenu = ({
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
+  const editorInterface = useEditorInterface();
   const renderAppTopBar = () => {
     if (appState.openDialog?.name === "elementLinkSelector") {
       return null;
@@ -169,6 +172,15 @@ export const MobileMenu = ({
             <div className="floating-status-stack">
               {scrollBackToContentButton}
             </div>
+          )}
+
+          {appState.multiElement && (
+            <HintViewer
+              appState={appState}
+              isMobile={true}
+              editorInterface={editorInterface}
+              app={app}
+            />
           )}
 
           <MobileShapeActions
