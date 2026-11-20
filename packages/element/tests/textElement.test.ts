@@ -9,6 +9,7 @@ import {
   getBoundTextMaxWidth,
   getBoundTextMaxHeight,
   computeBoundTextPosition,
+  getContainerUpdatesToFitBoundText,
 } from "../src/textElement";
 import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
 
@@ -375,5 +376,47 @@ describe("Test computeBoundTextPosition", () => {
       expect(result.x).toBeCloseTo(135, 1);
       expect(result.y).toBeCloseTo(185, 1);
     });
+  });
+});
+
+describe("Test getContainerUpdatesToFitBoundText", () => {
+  it("should grow only the dimensions the label outgrows", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+    });
+    const boundTextElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+    }) as ExcalidrawTextElementWithContainer;
+
+    expect(
+      getContainerUpdatesToFitBoundText(container, boundTextElement, {
+        width: 50,
+        height: 200,
+      }),
+    ).toEqual({
+      height: computeContainerDimensionForBoundText(200, container.type),
+    });
+  });
+
+  it("should not resize arrows, whose size derives from their points", () => {
+    const container = API.createElement({
+      type: "arrow",
+      width: 100,
+      height: 0,
+    });
+    const boundTextElement = API.createElement({
+      type: "text",
+      containerId: container.id,
+    }) as ExcalidrawTextElementWithContainer;
+
+    expect(
+      getContainerUpdatesToFitBoundText(container, boundTextElement, {
+        width: 1000,
+        height: 1000,
+      }),
+    ).toEqual({});
   });
 });
