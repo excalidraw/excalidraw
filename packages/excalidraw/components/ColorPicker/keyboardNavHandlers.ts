@@ -93,8 +93,9 @@ const hotkeyHandler = ({
     }
   }
 
-  if (colorPickerHotkeyBindings.includes(e.key)) {
-    const index = colorPickerHotkeyBindings.indexOf(e.key);
+  const key = e.key.toLowerCase();
+  if (colorPickerHotkeyBindings.includes(key)) {
+    const index = colorPickerHotkeyBindings.indexOf(key);
     const paletteKey = Object.keys(palette)[index] as keyof ColorPalette;
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue)

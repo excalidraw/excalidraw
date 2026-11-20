@@ -32,23 +32,26 @@ const handlerArgs = (
 });
 
 describe("color picker hotkeys", () => {
-  it("reports an excluded (hidden) entry's hotkey as handled without selecting it", () => {
-    // regression: returning "unhandled" let the key escape the modal and hit
-    // global shortcuts (`q` toggles the tool lock; see the integration
-    // regression in bucketFill.test.tsx)
-    const onChange = vi.fn();
-    const palette = {
-      transparent: COLOR_PALETTE.transparent,
-      red: "#ff0000",
-    } as ColorPaletteCustom;
+  it.each(["q", "Q"])(
+    "handles excluded entry hotkey %s without selecting it",
+    (key) => {
+      // regression: returning "unhandled" let the key escape the modal and hit
+      // global shortcuts (`q` toggles the tool lock; see the integration
+      // regression in bucketFill.test.tsx)
+      const onChange = vi.fn();
+      const palette = {
+        transparent: COLOR_PALETTE.transparent,
+        red: "#ff0000",
+      } as ColorPaletteCustom;
 
-    const handled = colorPickerKeyNavHandler(
-      handlerArgs("q", palette, onChange, [COLOR_PALETTE.transparent]),
-    );
+      const handled = colorPickerKeyNavHandler(
+        handlerArgs(key, palette, onChange, [COLOR_PALETTE.transparent]),
+      );
 
-    expect(handled).toBe(true);
-    expect(onChange).not.toHaveBeenCalled();
-  });
+      expect(handled).toBe(true);
+      expect(onChange).not.toHaveBeenCalled();
+    },
+  );
 
   it("reports a hotkey past the end of a short custom palette as handled", () => {
     // a host-provided palette with fewer entries than hotkey bindings must
