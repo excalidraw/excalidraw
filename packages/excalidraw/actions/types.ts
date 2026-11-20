@@ -141,6 +141,8 @@ export type ActionName =
   | "copyElementLink"
   | "linkToElement"
   | "cropEditor"
+  | "downloadImage"
+  | "downloadOriginalImage"
   | "wrapSelectionInFrame"
   | "toggleWrap"
   | "toggleShapeSwitch"
