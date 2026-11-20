@@ -10,7 +10,6 @@ import type {
   AppState,
   NormalizedZoomValue,
   NullableGridSize,
-  PointerDownState,
 } from "@excalidraw/excalidraw/types";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
@@ -37,10 +36,14 @@ import {
 import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 
-import type { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "./types";
 
 export const dragSelectedElements = (
-  pointerDownState: PointerDownState,
+  pointerDownState: { originalElements: ElementsMap },
   _selectedElements: NonDeletedExcalidrawElement[],
   offset: { x: number; y: number },
   scene: Scene,
@@ -215,7 +218,7 @@ const calculateOffset = (
 };
 
 const updateElementCoords = (
-  pointerDownState: PointerDownState,
+  pointerDownState: { originalElements: ElementsMap },
   element: ExcalidrawElement,
   scene: Scene,
   dragOffset: { x: number; y: number },
