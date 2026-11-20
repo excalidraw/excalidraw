@@ -13,6 +13,7 @@ import { StoreIncrement } from "@excalidraw/element";
 import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
 
 import ExcalidrawApp from "../App";
+import { WS_SUBTYPES } from "../app_constants";
 
 const { h } = window;
 
@@ -23,6 +24,8 @@ Object.defineProperty(window, "crypto", {
     subtle: {
       generateKey: () => {},
       exportKey: () => ({ k: "sTdLvMC_M3V8_vGa3UVRDg" }),
+      importKey: () => {},
+      decrypt: (_algorithm: unknown, _key: unknown, data: ArrayBuffer) => data,
     },
   },
 });
@@ -54,7 +57,7 @@ vi.mock("socket.io-client", () => {
     default: () => {
       return {
         close: () => {},
-        on: () => {},
+        on: vi.fn(),
         once: () => {},
         off: () => {},
         emit: () => {},
@@ -69,6 +72,51 @@ vi.mock("socket.io-client", () => {
  * i.e. multiplayer history tests could be a good first candidate, as we could test both history stacks simultaneously.
  */
 describe("collaboration", () => {
+  it("keeps remote laser updates when collaborator cursors are hidden", async () => {
+    await render(<ExcalidrawApp />);
+
+    act(() => {
+      window.collab.startCollaboration({
+        roomId: "test-room",
+        roomKey: "test-key",
+      });
+    });
+
+    await waitFor(() => {
+      expect(window.collab.portal.socket?.on).toHaveBeenCalledWith(
+        "client-broadcast",
+        expect.any(Function),
+      );
+    });
+
+    API.updateScene({ appState: { collaboratorsCursorsHidden: true } });
+
+    const collaborator = {
+      pointer: { x: 100, y: 200, tool: "laser" },
+      button: "down",
+      username: "Ada",
+      selectedElementIds: {},
+    };
+    const message = new TextEncoder().encode(
+      JSON.stringify({
+        type: WS_SUBTYPES.MOUSE_LOCATION,
+        payload: { ...collaborator, socketId: "remote-user" },
+      }),
+    );
+    const receiveBroadcast = vi
+      .mocked(window.collab.portal.socket!.on)
+      .mock.calls.find(([event]) => event === "client-broadcast")![1];
+
+    await act(async () => {
+      await receiveBroadcast(message.buffer, new Uint8Array(12));
+    });
+
+    expect(h.state.collaboratorsCursorsHidden).toBe(true);
+    expect([...h.state.collaborators.values()]).toEqual([
+      expect.objectContaining(collaborator),
+    ]);
+  });
+
   it("should emit two ephemeral increments even though updates get batched", async () => {
     const durableIncrements: DurableIncrement[] = [];
     const ephemeralIncrements: EphemeralIncrement[] = [];
