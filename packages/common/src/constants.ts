@@ -415,6 +415,21 @@ export const DEFAULT_TEXT_ALIGN = "left";
  * Must be set on all of them, or none.
  */
 export const TEXT_KERNING = "normal";
+
+/**
+ * How a canvas shapes the text it measures or draws.
+ *
+ * Left on the default (`auto`), Chrome's canvas shapes a line word by word.
+ * A font which picks a letter's shape by what's around it, across spaces too
+ * (i.e. Caveat), then comes out several px a line wider or narrower than in
+ * the text editor, which the DOM lays out as a whole. `optimizeLegibility`
+ * has the canvas shape the line as a whole as well. It changes nothing for a
+ * font without such rules, ours included.
+ *
+ * For the canvas only: the DOM, Firefox's canvas and skia-canvas shape whole
+ * lines as it is.
+ */
+export const TEXT_RENDERING = "optimizeLegibility";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
