@@ -6,13 +6,16 @@ import {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
-import type { ExcalidrawStickyNoteElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawStickyNoteElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard, UI } from "./helpers/ui";
-import { getTextEditor } from "./queries/dom";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { fireEvent, GlobalTestState, render } from "./test-utils";
 
 const { h } = window;
@@ -32,6 +35,27 @@ const dragOut = (x: number, y: number) => {
   });
   fireEvent.pointerMove(window, { ...POINTER, clientX: x, clientY: y });
 };
+
+/** drag a note out of the toolbar and drop it at (x, y) on the canvas */
+const dropAt = (x: number, y: number) => {
+  dragOut(x, y);
+  fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+    ...POINTER,
+    button: 0,
+    clientX: x,
+    clientY: y,
+  });
+};
+
+const labelOf = (note: ExcalidrawStickyNoteElement) =>
+  (
+    h.elements.find(
+      (element) =>
+        element.type === "text" &&
+        element.containerId === note.id &&
+        !element.isDeleted,
+    ) as ExcalidrawTextElement | undefined
+  )?.originalText ?? null;
 
 const liveNotes = () =>
   h.elements.filter(
@@ -159,5 +183,35 @@ describe("dragging a tool out of the toolbar", () => {
     expect(h.state.activeTool.type).toBe("stickynote");
     expect(h.app.toolDrag.preview).toBeNull();
     expect(h.elements).toHaveLength(0);
+  });
+
+  it("labels the dropped note, not the previously selected one", async () => {
+    dropAt(300, 300);
+    let editor = await getTextEditor();
+    updateTextEditor(editor, "first");
+    // Escape keeps the labeled note selected
+    Keyboard.exitTextEditor(editor);
+    expect(h.state.selectedElementIds).toEqual({ [liveNotes()[0].id]: true });
+
+    dropAt(700, 500);
+    editor = await getTextEditor();
+    updateTextEditor(editor, "second");
+    Keyboard.exitTextEditor(editor);
+
+    expect(liveNotes().map(labelOf)).toEqual(["first", "second"]);
+  });
+
+  it("leaves a selected text alone when dropping a note", async () => {
+    const text = API.createElement({ type: "text", text: "text", x: 50 });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    dropAt(400, 350);
+    const editor = await getTextEditor();
+    updateTextEditor(editor, "note");
+    Keyboard.exitTextEditor(editor);
+
+    expect(API.getElement(text).originalText).toBe("text");
+    expect(labelOf(liveNotes()[0])).toBe("note");
   });
 });

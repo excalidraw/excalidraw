@@ -73,6 +73,10 @@ export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
           sceneX: element.x + element.width / 2,
           sceneY: element.y + element.height / 2,
           container: element,
+          // the note was just dropped, so it has no label yet. Resolving one
+          // would read the selection from before the drop (its update is
+          // still pending) and edit the previously selected text instead
+          textElement: null,
         });
       }
     },
