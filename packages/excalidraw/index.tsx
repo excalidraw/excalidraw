@@ -69,6 +69,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onExport,
     className,
+    maxVisibleElementsForDirectDraw,
     ownerDocument = document,
     renderEnvironment,
     onChange,
@@ -212,6 +213,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
         <App
           onExport={onExport}
           className={className}
+          maxVisibleElementsForDirectDraw={maxVisibleElementsForDirectDraw}
           ownerDocument={ownerDocument}
           renderEnvironment={renderEnvironment}
           onChange={onChange}

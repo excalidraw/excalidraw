@@ -1060,6 +1060,74 @@ describe("render override geometry", () => {
     expect(visibleWith(overrides)).toContain(label);
   });
 
+  it.each(["arrow", "rectangle"] as const)(
+    "directly draws a %s label at its container's offset and opacity",
+    (type) => {
+      const frame = API.createElement({
+        type: "frame",
+        id: "frame",
+        width: 500,
+        height: 500,
+        opacity: 50,
+      });
+      const container = API.createElement({
+        type,
+        id: "container",
+        x: 50,
+        y: 100,
+        width: 200,
+        height: 100,
+        frameId: frame.id,
+        points:
+          type === "arrow"
+            ? [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)]
+            : undefined,
+        boundElements: [{ id: "label", type: "text" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        text: "Label",
+        x: 100,
+        y: 140,
+        width: 50,
+        height: 25,
+        opacity: 70,
+        containerId: container.id,
+        frameId: frame.id,
+      });
+      const { context, draw, renderConfig } = setup([container, label, frame]);
+      renderConfig.maxVisibleElementsForDirectDraw = 3;
+      const paints: { x: number; y: number; alpha: number }[] = [];
+      const fillText = vi.mocked(context.fillText).getMockImplementation()!;
+      vi.spyOn(context, "fillText").mockImplementation(
+        (text, x, y, ...rest) => {
+          if (text === "Label") {
+            const t = context.getTransform();
+            paints.push({
+              x: t.a * x + t.c * y + t.e,
+              y: t.b * x + t.d * y + t.f,
+              alpha: context.globalAlpha,
+            });
+          }
+          fillText.call(context, text, x, y, ...rest);
+        },
+      );
+      draw(new Map());
+      draw(
+        new Map([
+          [container.id, { offset: { x: 20, y: 10 } }],
+          [label.id, { offset: { x: 1000, y: 1000 } }],
+        ]),
+      );
+      expect(paints).toHaveLength(2);
+      expect(paints[0].alpha).toBe(0.35);
+      expect(paints[1].x - paints[0].x).toBeCloseTo(20);
+      expect(paints[1].y - paints[0].y).toBeCloseTo(10);
+      expect(Element.elementWithCanvasCache.get(label)).toBeUndefined();
+    },
+  );
+
   it("clips a translated child against the translated frame boundary", () => {
     const frame = API.createElement({
       type: "frame",
@@ -1135,14 +1203,18 @@ describe("render override geometry", () => {
     expect(label).toMatchObject({ id: embed.id, frameId: frame.id });
   });
 
-  it.each([
-    [0, 80],
-    [80, 0],
-    [30, 80],
-    [80, 80],
-  ])(
-    "keeps the label gap with its arrow (arrow %s, ignored label %s)",
-    (arrowX, labelX) => {
+  it.each(
+    [false, true].flatMap((direct) =>
+      [
+        [0, 80],
+        [80, 0],
+        [30, 80],
+        [80, 80],
+      ].map(([arrowX, labelX]) => [direct, arrowX, labelX] as const),
+    ),
+  )(
+    "keeps the label gap with its arrow (direct %s, arrow %s, ignored label %s)",
+    (direct, arrowX, labelX) => {
       const arrow = API.createElement({
         type: "arrow",
         id: "arrow",
@@ -1159,7 +1231,8 @@ describe("render override geometry", () => {
         width: 50,
         height: 25,
       });
-      const { context, draw } = setup([arrow, label]);
+      const { context, draw, renderConfig } = setup([arrow, label]);
+      renderConfig.maxVisibleElementsForDirectDraw = direct ? 2 : 0;
       const holes: number[] = [];
       const rect = vi.mocked(context.rect).getMockImplementation()!;
       vi.spyOn(context, "rect").mockImplementation((x, y, width, height) => {
