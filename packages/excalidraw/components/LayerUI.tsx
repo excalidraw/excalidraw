@@ -106,6 +106,7 @@ interface LayerUIProps {
   scrollBackToContentUIEnabled: boolean;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
+  onLinkLookup?: AppProps["onLinkLookup"];
   currentUserControls?: ExcalidrawProps["currentUserControls"];
 }
 
@@ -174,6 +175,7 @@ const LayerUI = ({
   scrollBackToContentUIEnabled,
   isCollaborating,
   generateLinkForSelection,
+  onLinkLookup,
   currentUserControls,
 }: LayerUIProps) => {
   const editorInterface = useEditorInterface();
@@ -614,6 +616,7 @@ const LayerUI = ({
           scene={app.scene}
           appState={appState}
           generateLinkForSelection={generateLinkForSelection}
+          onLinkLookup={onLinkLookup}
         />
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />

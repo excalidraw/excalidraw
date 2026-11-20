@@ -14,6 +14,7 @@ import type { Scene } from "@excalidraw/element";
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
 
+import { LinkLookup } from "./LinkLookup";
 import DialogActionButton from "./DialogActionButton";
 import { TextField } from "./TextField";
 import { IconButton } from "./IconButton";
@@ -22,24 +23,32 @@ import { TrashIcon } from "./icons";
 import "./ElementLinkDialog.scss";
 
 import type { AppProps, AppState, UIAppState } from "../types";
+
 const ElementLinkDialog = ({
   sourceElementId,
   onClose,
   appState,
   scene,
   generateLinkForSelection = defaultGetElementLinkFromSelection,
+  onLinkLookup,
 }: {
   sourceElementId: ExcalidrawElement["id"];
   appState: UIAppState;
   scene: Scene;
   onClose?: () => void;
   generateLinkForSelection: AppProps["generateLinkForSelection"];
+  onLinkLookup?: AppProps["onLinkLookup"];
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const originalLink = elementsMap.get(sourceElementId)?.link ?? null;
 
   const [nextLink, setNextLink] = useState<string | null>(originalLink);
   const [linkEdited, setLinkEdited] = useState(false);
+
+  // resetting the lookup when the selection changes while the editor is open
+  const selectionKey = Object.keys(appState.selectedElementIds)
+    .sort()
+    .join(",");
 
   useEffect(() => {
     const selectedElements = getSelectedElements(elementsMap, appState);
@@ -155,6 +164,17 @@ const ElementLinkDialog = ({
           />
         )}
       </div>
+
+      {onLinkLookup && (
+        <LinkLookup
+          lookup={onLinkLookup}
+          cancelKey={`${sourceElementId}:${selectionKey}`}
+          onPick={(url) => {
+            setNextLink(url);
+            setLinkEdited(true);
+          }}
+        />
+      )}
 
       <div className="ElementLinkDialog__actions">
         <DialogActionButton

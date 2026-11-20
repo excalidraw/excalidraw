@@ -58,6 +58,7 @@ import {
   useExcalidrawAppState,
 } from "../App";
 import { IconButton } from "../IconButton";
+import { LinkLookup } from "../LinkLookup";
 import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
 
@@ -318,25 +319,36 @@ export const Hyperlink = ({
       }}
     >
       {isEditing ? (
-        <input
-          className={clsx("excalidraw-hyperlinkContainer-input")}
-          placeholder={t("labels.link.hint")}
-          ref={inputRef}
-          value={inputVal}
-          onChange={(event) => setInputVal(event.target.value)}
-          autoFocus
-          onKeyDown={(event) => {
-            event.stopPropagation();
-            // prevent cmd/ctrl+k shortcut when editing link
-            if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
-              event.preventDefault();
-            }
-            if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
-              handleSubmit();
-              setAppState({ showHyperlinkPopup: "info" });
-            }
-          }}
-        />
+        <>
+          <input
+            className={clsx("excalidraw-hyperlinkContainer-input")}
+            placeholder={t("labels.link.hint")}
+            ref={inputRef}
+            value={inputVal}
+            onChange={(event) => setInputVal(event.target.value)}
+            autoFocus
+            onKeyDown={(event) => {
+              event.stopPropagation();
+              // prevent cmd/ctrl+k shortcut when editing link
+              if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K) {
+                event.preventDefault();
+              }
+              if (event.key === KEYS.ENTER || event.key === KEYS.ESCAPE) {
+                handleSubmit();
+                setAppState({ showHyperlinkPopup: "info" });
+              }
+            }}
+          />
+          {appProps.onLinkLookup && (
+            <LinkLookup
+              lookup={appProps.onLinkLookup}
+              onPick={(url) => {
+                setInputVal(url);
+                inputRef.current?.focus();
+              }}
+            />
+          )}
+        </>
       ) : element.link ? (
         <a
           href={normalizeLink(element.link || "")}
