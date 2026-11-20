@@ -251,6 +251,24 @@ const maybeParseHTMLDataItem = (
 };
 
 /**
+ * Whether clipboard *read* access is blocked for the site (the permission
+ * state is "denied"). Unlike a dismissed prompt, a blocked permission throws
+ * `NotAllowedError` on every read, so it's worth telling the user about.
+ * Returns false on browsers without the Permissions API.
+ */
+export const isClipboardReadDenied = async (): Promise<boolean> => {
+  try {
+    const status = await navigator.permissions?.query({
+      name: "clipboard-read" as PermissionName,
+    });
+    return status?.state === "denied";
+  } catch {
+    // unsupported permission name or query failure — assume not denied
+    return false;
+  }
+};
+
+/**
  * Reads OS clipboard programmatically. May not work on all browsers.
  * Will prompt user for permission if not granted.
  */
