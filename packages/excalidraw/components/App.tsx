@@ -582,8 +582,9 @@ const GOOGLE_DRIVE_AUTOPLAYED = new WeakSet<HTMLIFrameElement>();
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
 
-const gesture: Gesture = {
+const gesture: Gesture & { pointerTypes: Map<number, string> } = {
   pointers: new Map(),
+  pointerTypes: new Map(),
   lastCenter: null,
   initialDistance: null,
   initialScale: null,
@@ -3330,6 +3331,7 @@ class App extends React.Component<AppProps, AppState> {
     this.host.setPointerUp(null);
 
     gesture.pointers.clear();
+    gesture.pointerTypes.clear();
     gesture.lastCenter = null;
     gesture.initialDistance = null;
     gesture.initialScale = null;
@@ -4036,6 +4038,11 @@ class App extends React.Component<AppProps, AppState> {
           passive: false,
         },
       ), // #3553
+      // A cancellation can be delivered outside the canvas after capture
+      // changes. The canvas handler still handles its own tool teardown.
+      addEventListener(this.ownerDocument, EVENT.POINTER_CANCEL, (event) => {
+        this.removeGesturePointer(event.pointerId);
+      }),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         this.ownerDocument.fonts,
@@ -4623,6 +4630,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     } else {
       gesture.pointers.clear();
+      gesture.pointerTypes.clear();
     }
   };
 
@@ -4764,8 +4772,13 @@ class App extends React.Component<AppProps, AppState> {
       this.textTool.cancel();
     }
 
+    this.removeGesturePointer(event.pointerId);
+  };
+
+  private removeGesturePointer(pointerId: number) {
     const wasMultiTouchGesture = gesture.pointers.size >= 2;
-    gesture.pointers.delete(event.pointerId);
+    gesture.pointers.delete(pointerId);
+    gesture.pointerTypes.delete(pointerId);
 
     // the multi-touch viewport gesture just disengaged: release the
     // rubberband that was withheld while it was active
@@ -4777,7 +4790,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.viewport.releaseOverscroll();
     }
-  };
+  }
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
     if (this.props.activeTool) {
@@ -8066,6 +8079,20 @@ class App extends React.Component<AppProps, AppState> {
   private updateGestureOnPointerDown(
     event: React.PointerEvent<HTMLElement>,
   ): void {
+    // A new primary press starts an input sequence for its pointer type.
+    // Forget any contacts of that type whose release the editor missed.
+    if (event.isPrimary && event.pointerType) {
+      for (const [pointerId, pointerType] of gesture.pointerTypes) {
+        if (
+          pointerId !== event.pointerId &&
+          pointerType === event.pointerType
+        ) {
+          this.removeGesturePointer(pointerId);
+        }
+      }
+    }
+
+    gesture.pointerTypes.set(event.pointerId, event.pointerType);
     gesture.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
