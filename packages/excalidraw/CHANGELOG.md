@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Scroll the toolbar to switch tools (2026-11-18) [#12663](https://github.com/excalidraw/excalidraw/pull/12663)
+
+- New opt-in preference, "Scroll toolbar to switch tools": scrolling the wheel over the toolbar moves to the next tool (down or right) or the previous one (up or left), stopping at either end. Each notch of a mouse wheel is one step; trackpads and free-spinning wheels step once per ~100px. The tools of the extra tools menu are skipped, and nothing switches while typing text or in the middle of drawing.
+- Stored as `appState.isWheelToolSwitchingEnabled` (off by default; in the browser, not in exported files), and available to custom Preferences menus as `Preferences.ToggleWheelToolSwitching`.
+
 ### Minimap, zoom menu and `ui.disabled` (2026-11-12) [#12605](https://github.com/excalidraw/excalidraw/pull/12605), [#12606](https://github.com/excalidraw/excalidraw/pull/12606)
 
 - A toggleable minimap above the bottom-left canvas actions: drag its viewport (or press outside of it) to pan, wheel over it to zoom. Toggled from the footer button next to the zoom level, the Preferences menu, the command palette and the context menu; stored as `appState.minimapEnabled` (in the browser, not in exported files). Not shown on phones or in editors shorter than 500px.

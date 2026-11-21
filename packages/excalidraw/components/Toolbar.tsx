@@ -1,8 +1,9 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { KEYS } from "@excalidraw/common";
+import { EVENT, KEYS, addEventListener } from "@excalidraw/common";
 
+import { trackEvent } from "../analytics";
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
 
@@ -44,6 +45,7 @@ import {
   TextToolButton,
 } from "./Tools";
 
+import type { ToolbarToolType } from "./Tools";
 import type {
   AppClassProperties,
   AppProps,
@@ -219,6 +221,183 @@ const ExtraToolsDropdown = ({
   );
 };
 
+/**
+ * The toolbar's tool buttons in the order `Toolbar` renders them — what
+ * scrolling the wheel over the toolbar steps through. `selection` stands for
+ * the preferred selection tool (selection or lasso), which its button
+ * activates. The extra tools dropdown is left out: its tools aren't on
+ * display, and some of them open a dialog when activated (image).
+ */
+const WHEEL_TOOLS: readonly ToolbarToolType[] = [
+  "hand",
+  "selection",
+  "rectangle",
+  "diamond",
+  "ellipse",
+  "arrow",
+  "line",
+  "freedraw",
+  "text",
+  "stickynote",
+  "eraser",
+];
+
+/** wheel delta (px) worth one tool step — about one notch of a mouse wheel */
+const WHEEL_STEP_DELTA = 100;
+/** px per line, for wheel deltas delivered in lines (`DOM_DELTA_LINE`) */
+const WHEEL_LINE_HEIGHT = 40;
+/** wheel events further apart than this (ms) are separate flicks */
+const WHEEL_GESTURE_TIMEOUT = 80;
+
+/**
+ * Position of the active tool in `WHEEL_TOOLS`, i.e. the button it's
+ * highlighted on. Tools without a button of their own (the extra tools,
+ * custom tools) are highlighted on the extra tools trigger, past the last
+ * button.
+ */
+const getWheelToolIndex = (
+  { activeTool, preferredSelectionTool }: AppState,
+  isCompact: boolean,
+) => {
+  let type: string = activeTool.type;
+  if (
+    type === "lasso" &&
+    (isCompact || preferredSelectionTool.type === "lasso")
+  ) {
+    // shown on the selection button (or the compact selection popover)
+    type = "selection";
+  } else if (type === "autoshape" && isCompact) {
+    // the compact toolbar groups the draw-shape tool with freedraw
+    type = "freedraw";
+  }
+  const index = (WHEEL_TOOLS as readonly string[]).indexOf(type);
+  return index === -1 ? WHEEL_TOOLS.length : index;
+};
+
+/**
+ * Whether the wheel may switch the tool right now. Mirrors the tool
+ * shortcuts: not while an element is being created, dragged or box-selected,
+ * nor while editing text.
+ */
+const canWheelSwitchTool = (app: AppClassProperties) =>
+  app.isInteractionEnabled() &&
+  // the active tool is host-controlled
+  app.props.activeTool == null &&
+  !app.state.viewModeEnabled &&
+  !app.state.editingTextElement &&
+  !app.state.newElement &&
+  !app.state.selectionElement &&
+  !app.state.selectedElementsAreBeingDragged;
+
+/**
+ * Scrolling the wheel over the toolbar steps through its tools (opt-in via
+ * `appState.isWheelToolSwitchingEnabled`): down (or right) activates the
+ * next tool, up (or left) the previous one, stopping at either end. Each
+ * notch of a mouse wheel is a step; continuous input (trackpads,
+ * free-spinning or high-resolution wheels) steps once per
+ * `WHEEL_STEP_DELTA` scrolled.
+ */
+const useWheelToolSwitching = (
+  toolbarRef: React.RefObject<HTMLDivElement | null>,
+  app: AppClassProperties,
+  enabled: boolean,
+  isCompact: boolean,
+) => {
+  useEffect(() => {
+    const toolbar = toolbarRef.current;
+    if (!enabled || !toolbar) {
+      return;
+    }
+
+    // scroll accumulated in the current direction since the last step
+    let accumulatedDelta = 0;
+    let lastDirection = 0;
+    let lastTimeStamp = -Infinity;
+
+    return addEventListener(
+      toolbar,
+      EVENT.WHEEL,
+      (event: WheelEvent) => {
+        // ctrl/cmd+wheel (also how a trackpad pinch arrives) is a zoom
+        // gesture, left to the editor's wheel handling; a pressed button
+        // means a drag is in progress (e.g. of a tool button out onto the
+        // canvas)
+        if (event.ctrlKey || event.metaKey || event.buttons) {
+          return;
+        }
+        // the popups rendered inside the toolbar (the extra tools dropdown,
+        // the compact toolbar's tool popovers) scroll as usual
+        if (
+          event.target instanceof app.ownerWindow.Element &&
+          event.target.closest(".dropdown-menu, .tool-popover-content")
+        ) {
+          return;
+        }
+        // the wheel belongs to the toolbar even where it can't step (at
+        // either end, mid-drawing), so that it doesn't scroll the page
+        event.preventDefault();
+
+        if (!canWheelSwitchTool(app)) {
+          return;
+        }
+
+        let delta = event.deltaY;
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+          // sideways input (trackpad swipe, tilt wheel) follows the
+          // toolbar's layout, which is mirrored in right-to-left languages
+          delta =
+            app.ownerWindow.getComputedStyle(toolbar).direction === "rtl"
+              ? -event.deltaX
+              : event.deltaX;
+        }
+        delta *=
+          event.deltaMode === event.DOM_DELTA_LINE
+            ? WHEEL_LINE_HEIGHT
+            : event.deltaMode === event.DOM_DELTA_PAGE
+            ? WHEEL_STEP_DELTA
+            : 1;
+        if (!delta) {
+          return;
+        }
+        const direction = Math.sign(delta);
+
+        if (
+          event.timeStamp - lastTimeStamp > WHEEL_GESTURE_TIMEOUT ||
+          direction !== lastDirection
+        ) {
+          // a fresh flick of the wheel (or a reversal) steps right away,
+          // however small its delta: depending on the platform and how fast
+          // the wheel turns, a notch can be anything from a few px to
+          // a few hundred
+          accumulatedDelta = direction * WHEEL_STEP_DELTA;
+        } else {
+          accumulatedDelta += delta;
+        }
+        lastTimeStamp = event.timeStamp;
+        lastDirection = direction;
+
+        if (Math.abs(accumulatedDelta) < WHEEL_STEP_DELTA) {
+          return;
+        }
+        // one step per event at most
+        accumulatedDelta %= WHEEL_STEP_DELTA;
+
+        const index = getWheelToolIndex(app.state, isCompact) + direction;
+        // no wrapping around past either end
+        if (index < 0 || index >= WHEEL_TOOLS.length) {
+          return;
+        }
+        const tool = WHEEL_TOOLS[index];
+        const type =
+          tool === "selection" ? app.state.preferredSelectionTool.type : tool;
+        trackEvent("toolbar", type, "wheel");
+        app.setActiveTool({ type });
+      },
+      { passive: false },
+    );
+  }, [toolbarRef, app, enabled, isCompact]);
+};
+
 /** the main (desktop/tablet) toolbar island */
 export const Toolbar = ({
   app,
@@ -243,8 +422,17 @@ export const Toolbar = ({
   const activeTool = appState.activeTool;
   const toolProps = { app, activeTool };
 
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  useWheelToolSwitching(
+    toolbarRef,
+    app,
+    appState.isWheelToolSwitchingEnabled,
+    isCompactStylesPanel,
+  );
+
   return (
     <Island
+      ref={toolbarRef}
       padding={1}
       className={clsx("App-toolbar", {
         "zen-mode": appState.zenModeEnabled,
