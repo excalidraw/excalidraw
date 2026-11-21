@@ -1,6 +1,7 @@
 import { KEYS } from "@excalidraw/common";
 
 import { actionSelectAll } from "../actions";
+import { actionSelectAllElementsInFrame } from "../actions/actionFrame";
 import { t } from "../i18n";
 import { Excalidraw } from "../index";
 
@@ -386,5 +387,48 @@ describe("element locking", () => {
     expect(h.state.editingTextElement?.id).not.toBe(text.id);
     expect(h.elements.length).toBe(3);
     expect(h.state.editingTextElement?.id).toBe(h.elements[2].id);
+  });
+
+  it("doesn't select locked elements when selecting all in a frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 500,
+      height: 500,
+    });
+    const unlockedChild = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      frameId: frame.id,
+    });
+    const lockedChild = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 50,
+      width: 100,
+      height: 100,
+      frameId: frame.id,
+      locked: true,
+    });
+    API.setElements([unlockedChild, lockedChild, frame]);
+    API.setSelectedElements([frame]);
+
+    API.executeAction(actionSelectAllElementsInFrame);
+
+    // selecting all excludes locked elements, as Ctrl+A does
+    expect(API.getSelectedElements().map((element) => element.id)).toEqual([
+      unlockedChild.id,
+    ]);
+
+    Keyboard.keyPress(KEYS.DELETE);
+
+    const elementsMap = h.app.scene.getElementsMapIncludingDeleted();
+    expect(elementsMap.get(unlockedChild.id)!.isDeleted).toBe(true);
+    expect(elementsMap.get(lockedChild.id)!.isDeleted).toBe(false);
+    expect(elementsMap.get(frame.id)!.isDeleted).toBe(false);
   });
 });
