@@ -1,6 +1,11 @@
 import React from "react";
 
-import { KEYS, STICKY_NOTE_PADDING } from "@excalidraw/common";
+import {
+  getLineHeight,
+  KEYS,
+  STICKY_NOTE_PADDING,
+  STICKY_NOTE_MIN_SIZE,
+} from "@excalidraw/common";
 import {
   CaptureUpdateAction,
   convertToExcalidrawElements,
@@ -62,6 +67,30 @@ describe("host-controlled sticky note footers", () => {
     );
     expect(h.state.currentItemStickynoteFooterOptions).toBeNull();
     unmount();
+  });
+
+  it("reclaims footer space in the drag-creation minimum size", async () => {
+    API.updateScene({
+      appState: {
+        currentItemStickynoteFooterOptions: null,
+        currentItemFontSize: 60,
+      },
+    });
+    UI.clickTool("stickynote");
+    mouse.downAt(300, 300);
+    mouse.moveTo(320, 320);
+    mouse.up();
+    const note = h.elements.find(
+      (element) => element.type === "stickynote",
+    ) as ExcalidrawStickyNoteElement;
+    const minimum = Math.max(
+      STICKY_NOTE_MIN_SIZE,
+      Math.ceil(60 * getLineHeight(h.state.currentItemFontFamily)) +
+        STICKY_NOTE_PADDING * 2,
+    );
+    expect(note.width).toBe(minimum);
+    expect(note.height).toBe(minimum);
+    Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
   });
 
   it.each(footers)(

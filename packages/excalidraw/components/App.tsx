@@ -9899,6 +9899,7 @@ class App extends React.Component<AppProps, AppState> {
           const minSize = getStickyNoteMinSize({
             fontSize: this.state.currentItemFontSize,
             fontFamily: this.state.currentItemFontFamily,
+            footerOptions: newElement.footerOptions,
           });
           let width = Math.max(newElement.width, minSize.width);
           let height = Math.max(newElement.height, minSize.height);
