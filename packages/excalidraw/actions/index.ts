@@ -1,4 +1,5 @@
 export { actionDeleteSelected } from "./actionDeleteSelected";
+export { actionChangeStickyNoteFooter } from "./actionStickyNoteFooter";
 export {
   actionBringForward,
   actionBringToFront,

@@ -566,6 +566,12 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .sticky-note-footer .dropdown-select {
+    width: 100%;
+    min-width: 0;
+    height: 2rem;
+  }
+
   .scroll-back-to-content {
     border-radius: var(--border-radius-lg);
     background-color: var(--island-bg-color);

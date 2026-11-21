@@ -238,6 +238,10 @@ Indicates whether to bind keyboard events to `document`. Disabled by default, me
 
 Enable this if you want Excalidraw to handle keyboard even if the component isn't focused (e.g. a user is interacting with the navbar, sidebar, or similar).
 
+### Sticky note footer controls
+
+Set `ui={{ disabled: { stickyNoteFooter: true } }}` to hide the built-in footer picker when your app supplies its own controls. The setting affects full, compact and phone layouts. It leaves saved footer data, host-controlled defaults and exports unchanged. The picker is available by default on new or selected sticky notes, including empty notes.
+
 ### autoFocus
 
 This prop indicates whether to `focus` the Excalidraw component on page load. Defaults to false.

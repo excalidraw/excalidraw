@@ -259,6 +259,7 @@ const cloneFlowchartNode = (
           type: "stickynote",
           ...commonNodeProps,
           baseHeight: template.baseHeight,
+          footerOptions: template.footerOptions,
         })
       : newElement({
           type: template.type,

@@ -15,6 +15,8 @@ import {
   DEFAULT_STICKY_NOTE_BG,
 } from "@excalidraw/common";
 
+import { DEFAULT_STICKY_NOTE_FOOTER_OPTIONS } from "@excalidraw/element";
+
 import type { AppState, InputDevice, NormalizedZoomValue } from "./types";
 
 /**
@@ -47,6 +49,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemStickynoteStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemStickynoteBackgroundColor: DEFAULT_STICKY_NOTE_BG,
+    currentItemStickynoteFooterOptions: DEFAULT_STICKY_NOTE_FOOTER_OPTIONS,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
@@ -202,6 +205,11 @@ const APP_STATE_STORAGE_CONF = (<
     server: false,
   },
   currentItemStickynoteBackgroundColor: {
+    browser: true,
+    export: false,
+    server: false,
+  },
+  currentItemStickynoteFooterOptions: {
     browser: true,
     export: false,
     server: false,

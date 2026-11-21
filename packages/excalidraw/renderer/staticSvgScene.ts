@@ -238,7 +238,11 @@ const renderElementToSvg = (
       group.appendChild(rect);
       group.appendChild(edgeShadow);
 
-      const footer = getStickyNoteFooter(element);
+      const footer = getStickyNoteFooter(
+        element,
+        undefined,
+        renderConfig.renderEnvironment,
+      );
       if (footer) {
         const dateText = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
         dateText.setAttribute("x", `${footer.x}`);
