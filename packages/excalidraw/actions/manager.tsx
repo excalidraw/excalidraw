@@ -2,10 +2,7 @@ import React from "react";
 
 import { isPromiseLike } from "@excalidraw/common";
 
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { trackEvent } from "../analytics";
 
@@ -55,13 +52,13 @@ export class ActionManager {
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
   getAppState: () => Readonly<AppState>;
-  getElementsIncludingDeleted: () => readonly OrderedExcalidrawElement[];
+  getElementsIncludingDeleted: () => readonly ExcalidrawElement[];
   app: AppClassProperties;
 
   constructor(
     updater: UpdaterFn,
     getAppState: () => AppState,
-    getElementsIncludingDeleted: () => readonly OrderedExcalidrawElement[],
+    getElementsIncludingDeleted: () => readonly ExcalidrawElement[],
     app: AppClassProperties,
   ) {
     this.updater = (actionResult) => {

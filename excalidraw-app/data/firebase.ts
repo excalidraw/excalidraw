@@ -9,11 +9,7 @@ import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 import { getSceneVersion } from "@excalidraw/element";
 
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
-import type {
-  ExcalidrawElement,
-  FileId,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -224,7 +220,7 @@ export const saveToFirebase = async (
     const reconciledElements = getSyncableElements(
       reconcileElements(
         elements,
-        prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
+        prevStoredElements as ExcalidrawElement[] as RemoteExcalidrawElement[],
         appState,
       ),
     );

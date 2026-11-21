@@ -18,7 +18,6 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
 } from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
@@ -153,11 +152,11 @@ const getContiguousFrameRangeElements = (
 export const moveArrowAboveBindable = (
   point: GlobalPoint,
   arrow: ExcalidrawArrowElement,
-  elements: readonly OrderedExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
   hoveredElement: NonDeletedExcalidrawElement,
-): readonly OrderedExcalidrawElement[] => {
+): readonly ExcalidrawElement[] => {
   if (!hoveredElement) {
     return elements;
   }

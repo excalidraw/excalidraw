@@ -2,10 +2,7 @@ import { base64urlToString } from "@excalidraw/excalidraw/data/encode";
 import { ExcalidrawError } from "@excalidraw/excalidraw/errors";
 import { useLayoutEffect, useRef } from "react";
 
-import type {
-  FileId,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { FileId, ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState, BinaryFileData } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "./app_constants";
@@ -31,7 +28,7 @@ type MESSAGE_READY = { type: "READY" };
 type MESSAGE_ERROR = { type: "ERROR"; message: string };
 type MESSAGE_SCENE_DATA = {
   type: "SCENE_DATA";
-  elements: OrderedExcalidrawElement[];
+  elements: ExcalidrawElement[];
   appState: Pick<AppState, "viewBackgroundColor">;
   files: { loadedFiles: BinaryFileData[]; erroredFiles: Map<FileId, true> };
 };
@@ -51,9 +48,7 @@ const parseSceneData = async ({
   }
 
   try {
-    const elements = JSON.parse(
-      rawElementsString,
-    ) as OrderedExcalidrawElement[];
+    const elements = JSON.parse(rawElementsString) as ExcalidrawElement[];
 
     if (!elements.length) {
       throw new ExcalidrawError("Scene is empty, nothing to export.");
