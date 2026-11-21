@@ -140,6 +140,8 @@ export type NewElementSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas;
   newElement: NonDeletedExcalidrawElement | null;
+  /** elements above a framed new element, drawn on top of it (in order) */
+  elementsAboveNewElement?: readonly NonDeletedExcalidrawElement[];
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
