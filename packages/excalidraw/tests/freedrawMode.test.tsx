@@ -81,6 +81,9 @@ describe("freedraw pointer recovery", () => {
       ...firstButton,
     };
     fireEvent.pointerDown(canvas, first);
+    if (firstButton.button === POINTER_BUTTON.MAIN) {
+      fireEvent.pointerMove(canvas, { ...first, clientX: 40, clientY: 40 });
+    }
 
     // A new primary pen contact arrives with a different ID. The original
     // pointerup never reached the editor.
@@ -104,6 +107,16 @@ describe("freedraw pointer recovery", () => {
         buttons: 0,
       });
 
+      if (firstButton.button === POINTER_BUTTON.MAIN) {
+        expect(h.elements).toHaveLength(2);
+        expect(h.elements[0]).toMatchObject({
+          type: "freedraw",
+          x: 30,
+          y: 30,
+          width: 10,
+          height: 10,
+        });
+      }
       expect(h.elements.at(-1)).toMatchObject({
         type: "freedraw",
         x: 60,
@@ -167,7 +180,11 @@ describe("freedraw pointer recovery", () => {
       clientY: 60,
     };
     const zoom = h.state.zoom;
+    const scroll = [h.state.scrollX, h.state.scrollY];
     try {
+      fireEvent.pointerMove(canvas, { ...mouse, button: -1, buttons: 0 });
+      expect([h.state.scrollX, h.state.scrollY]).toEqual(scroll);
+
       fireEvent.pointerDown(canvas, mouse);
       fireEvent.pointerMove(canvas, { ...mouse, clientX: 110, clientY: 110 });
       fireEvent.pointerUp(canvas, {

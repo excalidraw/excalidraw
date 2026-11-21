@@ -582,9 +582,14 @@ const GOOGLE_DRIVE_AUTOPLAYED = new WeakSet<HTMLIFrameElement>();
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
 
-const gesture: Gesture & { pointerTypes: Map<number, string> } = {
+const gesture: Gesture & {
+  pointerDetails: Map<
+    number,
+    { pointerType: string; isPrimary: boolean; editorId: string }
+  >;
+} = {
   pointers: new Map(),
-  pointerTypes: new Map(),
+  pointerDetails: new Map(),
   lastCenter: null,
   initialDistance: null,
   initialScale: null,
@@ -2736,7 +2741,9 @@ class App extends React.Component<AppProps, AppState> {
                             onClick={this.handleCanvasClick}
                             onPointerMove={this.handleCanvasPointerMove}
                             onPointerUp={this.handleCanvasPointerUp}
-                            onPointerCancel={this.handleCanvasPointerCancel}
+                            onPointerCancel={(event) =>
+                              this.handlePointerCancel(event.nativeEvent)
+                            }
                             onTouchMove={this.handleTouchMove}
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
@@ -3331,7 +3338,7 @@ class App extends React.Component<AppProps, AppState> {
     this.host.setPointerUp(null);
 
     gesture.pointers.clear();
-    gesture.pointerTypes.clear();
+    gesture.pointerDetails.clear();
     gesture.lastCenter = null;
     gesture.initialDistance = null;
     gesture.initialScale = null;
@@ -4039,10 +4046,12 @@ class App extends React.Component<AppProps, AppState> {
         },
       ), // #3553
       // A cancellation can be delivered outside the canvas after capture
-      // changes. The canvas handler still handles its own tool teardown.
-      addEventListener(this.ownerDocument, EVENT.POINTER_CANCEL, (event) => {
-        this.removeGesturePointer(event.pointerId);
-      }),
+      // changes. If the canvas handled it already, the contact is gone.
+      addEventListener(
+        this.ownerDocument,
+        EVENT.POINTER_CANCEL,
+        this.handlePointerCancel,
+      ),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         this.ownerDocument.fonts,
@@ -4630,7 +4639,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     } else {
       gesture.pointers.clear();
-      gesture.pointerTypes.clear();
+      gesture.pointerDetails.clear();
     }
   };
 
@@ -4765,7 +4774,7 @@ class App extends React.Component<AppProps, AppState> {
       // pointerup will follow, so the armed bucket fill must not commit and
       // the text tool's pending center click must not resolve either. Both
       // are canceled right here, ahead of the gesture teardown that follows
-      // (handleCanvasPointerCancel): that teardown first flushes a pointermove
+      // (handlePointerCancel): that teardown first flushes a pointermove
       // the gesture has queued, and with the click still pending that move
       // would resolve it as a drag.
       this.bucketFill.cancel();
@@ -4778,7 +4787,7 @@ class App extends React.Component<AppProps, AppState> {
   private removeGesturePointer(pointerId: number) {
     const wasMultiTouchGesture = gesture.pointers.size >= 2;
     gesture.pointers.delete(pointerId);
-    gesture.pointerTypes.delete(pointerId);
+    gesture.pointerDetails.delete(pointerId);
 
     // the multi-touch viewport gesture just disengaged: release the
     // rubberband that was withheld while it was active
@@ -7947,8 +7956,10 @@ class App extends React.Component<AppProps, AppState> {
     const onPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
 
-    const onPointerUp =
-      this.onPointerUpFromPointerDownHandler(pointerDownState);
+    const onPointerUp = this.onPointerUpFromPointerDownHandler(
+      pointerDownState,
+      event.pointerId,
+    );
 
     const onKeyDown = this.onKeyDownFromPointerDownHandler(pointerDownState);
     const onKeyUp = this.onKeyUpFromPointerDownHandler(pointerDownState);
@@ -7975,11 +7986,12 @@ class App extends React.Component<AppProps, AppState> {
    * same cleanup a lost pointerup gets at the next press, only not left
    * lying in wait for it, where its replay would tangle with that press.
    */
-  private handleCanvasPointerCancel = (
-    event: React.PointerEvent<HTMLCanvasElement>,
-  ) => {
+  private handlePointerCancel = (event: PointerEvent) => {
+    if (gesture.pointerDetails.get(event.pointerId)?.editorId !== this.id) {
+      return;
+    }
     this.removePointer(event);
-    this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
+    this.maybeCleanupAfterMissingPointerUp(event);
   };
 
   private handleCanvasPointerUp = (
@@ -8079,20 +8091,25 @@ class App extends React.Component<AppProps, AppState> {
   private updateGestureOnPointerDown(
     event: React.PointerEvent<HTMLElement>,
   ): void {
-    // A new primary press starts an input sequence for its pointer type.
-    // Forget any contacts of that type whose release the editor missed.
+    // There can only be one primary pointer per type. If its ID changes,
+    // drop the previous primary contact even if we never saw its release.
     if (event.isPrimary && event.pointerType) {
-      for (const [pointerId, pointerType] of gesture.pointerTypes) {
+      for (const [pointerId, details] of gesture.pointerDetails) {
         if (
           pointerId !== event.pointerId &&
-          pointerType === event.pointerType
+          details.isPrimary &&
+          details.pointerType === event.pointerType
         ) {
           this.removeGesturePointer(pointerId);
         }
       }
     }
 
-    gesture.pointerTypes.set(event.pointerId, event.pointerType);
+    gesture.pointerDetails.set(event.pointerId, {
+      pointerType: event.pointerType,
+      isPrimary: event.isPrimary,
+      editorId: this.id,
+    });
     gesture.pointers.set(event.pointerId, {
       x: event.clientX,
       y: event.clientY,
@@ -9480,6 +9497,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
+    pointerId: number,
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -9753,29 +9771,39 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       if (newElement?.type === "freedraw") {
-        const pointerCoords = viewportCoordsToSceneCoords(
-          childEvent,
-          this.state,
-        );
-
         const points = newElement.points;
-        let dx = pointerCoords.x - newElement.x;
-        let dy = pointerCoords.y - newElement.y;
+        const isRelease =
+          childEvent.type === EVENT.POINTER_UP &&
+          childEvent.pointerId === pointerId;
 
-        // Allows dots to avoid being flagged as infinitely small
-        if (dx === points[0][0] && dy === points[0][1]) {
-          dy += 0.0001;
-          dx += 0.0001;
+        // A cleanup replay can carry the next press's coordinates. Finish
+        // the old stroke at its last sample. Single-point dots still need a
+        // tiny second point so that they are not discarded as empty.
+        if (isRelease || points.length === 1) {
+          let dx = points[0][0];
+          let dy = points[0][1];
+          if (isRelease) {
+            const coords = viewportCoordsToSceneCoords(childEvent, this.state);
+            dx = coords.x - newElement.x;
+            dy = coords.y - newElement.y;
+          }
+          if (dx === points[0][0] && dy === points[0][1]) {
+            dx += 0.0001;
+            dy += 0.0001;
+          }
+
+          const pressures = newElement.simulatePressure
+            ? []
+            : [
+                ...newElement.pressures,
+                isRelease ? childEvent.pressure : newElement.pressures[0],
+              ];
+
+          this.scene.mutateElement(newElement, {
+            points: [...points, pointFrom<LocalPoint>(dx, dy)],
+            pressures,
+          });
         }
-
-        const pressures = newElement.simulatePressure
-          ? []
-          : [...newElement.pressures, childEvent.pressure];
-
-        this.scene.mutateElement(newElement, {
-          points: [...points, pointFrom<LocalPoint>(dx, dy)],
-          pressures,
-        });
 
         this.actionManager.executeAction(actionFinalize);
 
