@@ -58,12 +58,17 @@ import {
   normalizeStickyNoteGeometry,
 } from "./newElement";
 import { normalizeStickyNoteStrokeColor } from "./stickyNote";
-import { measureText, normalizeText } from "./textMeasurements";
+import {
+  markTextElementForRemeasure,
+  measureText,
+  normalizeText,
+} from "./textMeasurements";
 import {
   isArrowElement,
   isBindableElement,
   isElbowArrow,
   isStickyNoteElement,
+  isTextElement,
 } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
@@ -1216,5 +1221,16 @@ export const convertToExcalidrawElements = (
     }
   }
 
-  return elementStore.getElements();
+  const convertedElements = elementStore.getElements();
+
+  // text (including container labels) was measured with whatever font was
+  // available at this point, which may be a fallback if the actual font hasn't
+  // loaded yet. Mark it, so the editor re-measures it once the font loads.
+  for (const element of convertedElements) {
+    if (isTextElement(element)) {
+      markTextElementForRemeasure(element.id);
+    }
+  }
+
+  return convertedElements;
 };

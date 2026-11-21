@@ -289,3 +289,30 @@ export const getMaxCharWidth = (font: FontString, env?: RenderEnvironment) => {
   const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
   return Math.max(...cacheWithOutEmpty);
 };
+
+/**
+ * Ids of text elements created by `convertToExcalidrawElements`. They're
+ * measured as soon as they're created, which can happen before their font has
+ * loaded, so their dimensions may come from a fallback font. The editor
+ * re-measures them once their font loads (see `Fonts.onLoaded`) and then
+ * removes them from here.
+ *
+ * Tracked by id rather than by element, as elements get cloned on restore.
+ */
+const textElementsToRemeasure = new Set<ExcalidrawTextElement["id"]>();
+
+export const markTextElementForRemeasure = (
+  id: ExcalidrawTextElement["id"],
+) => {
+  textElementsToRemeasure.add(id);
+};
+
+export const isTextElementMarkedForRemeasure = (
+  id: ExcalidrawTextElement["id"],
+) => textElementsToRemeasure.has(id);
+
+export const unmarkTextElementForRemeasure = (
+  id: ExcalidrawTextElement["id"],
+) => {
+  textElementsToRemeasure.delete(id);
+};

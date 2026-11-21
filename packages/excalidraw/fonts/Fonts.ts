@@ -21,7 +21,13 @@ import {
 
 import { ShapeCache } from "@excalidraw/element";
 
-import { isTextElement } from "@excalidraw/element";
+import {
+  isTextElement,
+  isTextElementMarkedForRemeasure,
+  measureText,
+  redrawTextBoundingBox,
+  unmarkTextElementForRemeasure,
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -150,6 +156,8 @@ export class Fonts {
         if (container) {
           ShapeCache.delete(container);
         }
+
+        this.remeasureConvertedText(element, container);
       }
     }
 
@@ -157,6 +165,43 @@ export class Fonts {
       this.scene.triggerUpdate();
     }
   };
+
+  /**
+   * Text created by `convertToExcalidrawElements` may have been measured with
+   * a fallback font (before its font loaded). Once the font is available,
+   * re-measure it (and resize its container if needed). Other text keeps its
+   * dimensions, so that we don't change existing diagrams.
+   */
+  private remeasureConvertedText(
+    element: ExcalidrawTextElement,
+    container: ExcalidrawElement | null,
+  ) {
+    if (!isTextElementMarkedForRemeasure(element.id)) {
+      return;
+    }
+
+    const font = getFontString(element);
+
+    // the font faces for this text may not have loaded yet, keep it marked
+    // until a later `onLoaded` call
+    if (
+      this.ownerDocument.fonts &&
+      !this.ownerDocument.fonts.check(font, element.text)
+    ) {
+      return;
+    }
+
+    unmarkTextElementForRemeasure(element.id);
+
+    const metrics = measureText(element.text, font, element.lineHeight);
+
+    if (
+      metrics.height !== element.height ||
+      (element.autoResize && metrics.width !== element.width)
+    ) {
+      redrawTextBoundingBox(element, container, this.scene);
+    }
+  }
 
   /**
    * Load font faces for a given scene and trigger scene update.
