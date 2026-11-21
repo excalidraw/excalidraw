@@ -22,6 +22,8 @@ import { t } from "../i18n";
 
 import "../components/ToolIcon.scss";
 
+import { FileSystemPermissionError } from "../components/FileSystemPermissionError";
+
 import { register } from "./register";
 
 import type { JSONExportData } from "../data/json";
@@ -33,6 +35,16 @@ import type {
   ExcalidrawProps,
   OnExportProgress,
 } from "../types";
+
+const isFileSystemPermissionError = (error: any): boolean =>
+  error?.name === "NotAllowedError";
+
+const getErrorMessage = (error: any) =>
+  isFileSystemPermissionError(error) ? (
+    <FileSystemPermissionError />
+  ) : (
+    error?.message
+  );
 
 export const actionChangeProjectName = register<AppState["name"]>({
   name: "changeProjectName",
@@ -311,6 +323,17 @@ export const actionSaveToActiveFile = register({
       } else {
         console.warn(error);
       }
+
+      if (isFileSystemPermissionError(error)) {
+        return {
+          captureUpdate: CaptureUpdateAction.NEVER,
+          appState: {
+            toast: null,
+            errorMessage: getErrorMessage(error),
+          },
+        };
+      }
+
       return {
         captureUpdate: CaptureUpdateAction.NEVER,
         appState: {
@@ -362,6 +385,17 @@ export const actionSaveFileToDisk = register({
       } else {
         console.warn(error);
       }
+
+      if (isFileSystemPermissionError(error)) {
+        return {
+          captureUpdate: CaptureUpdateAction.NEVER,
+          appState: {
+            toast: null,
+            errorMessage: getErrorMessage(error),
+          },
+        };
+      }
+
       return {
         captureUpdate: CaptureUpdateAction.NEVER,
         appState: {
@@ -419,7 +453,7 @@ export const actionLoadScene = register({
       }
       return {
         elements,
-        appState: { ...appState, errorMessage: error.message },
+        appState: { ...appState, errorMessage: getErrorMessage(error) },
         files: app.files,
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
