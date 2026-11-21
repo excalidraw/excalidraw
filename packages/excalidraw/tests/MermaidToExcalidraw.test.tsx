@@ -160,6 +160,32 @@ describe("Test <MermaidToExcalidraw/>", () => {
     ).toMatchInlineSnapshot("null");
   });
 
+  it("should update the preview when the Mermaid input changes", async () => {
+    const dialog = document.querySelector(".ttd-dialog")!;
+    const selector = ".ttd-dialog-input";
+    const editor = await getTextEditor({
+      selector,
+      waitForEditor: true,
+    });
+
+    const definition = "flowchart TD\n A --> B";
+
+    updateTextEditor(editor, definition);
+
+    await waitFor(() => {
+      expect(
+        MermaidToExcalidrawLib.parseMermaidToExcalidraw,
+      ).toHaveBeenCalledWith(definition, {
+        elbow: { flowchart: true },
+      });
+    });
+
+    await waitFor(() => {
+      expect(dialog.querySelector("canvas")).not.toBeNull();
+      expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
+    });
+  });
+
   it("should show a load error when a diagram chunk fails to load", async () => {
     const dialog = document.querySelector(".ttd-dialog")!;
     const selector = ".ttd-dialog-input";
