@@ -26,6 +26,7 @@ import {
   getTransformHandleTypeFromCoords,
   getUncroppedWidthAndHeight,
   handleFocusPointPointerDown,
+  hasBoundingBox,
   hitElementBoundingBoxOnly,
   isBindingElement,
   isElbowArrow,
@@ -1230,7 +1231,7 @@ export class AppSelectionTool {
    *
    * A lone selected element has none while the line editor is open or one of
    * its line points is hovered, nor does an elbow arrow, a two-point line or
-   * arrow, (on mobile devices) any line or arrow, or the text being edited
+   * arrow, an arrow on mobile, or the text being edited
    * (none are drawn for it; see `AppText.getEditedTextResizeHandleAt()` for
    * its sides). The selection has none in the element link selector.
    */
@@ -1251,16 +1252,25 @@ export class AppSelectionTool {
     if (selectedElements.length === 1) {
       const [element] = selectedElements;
       if (
-        state.selectedLinearElement?.isEditing ||
+        !hasBoundingBox(selectedElements, state, editorInterface) ||
         (state.selectedLinearElement &&
           state.selectedLinearElement.hoverPointIndex !== -1) ||
-        isElbowArrow(element) ||
-        element.id === state.editingTextElement?.id ||
-        // HACK: Disable transform handles for linear elements on mobile until a
-        // better way of showing them is found
-        (isLinearElement(element) &&
-          (editorInterface.userAgent.isMobileDevice ||
-            element.points.length === 2))
+        element.id === state.editingTextElement?.id
+      ) {
+        return null;
+      }
+      const elementsMap = this.app.scene.getNonDeletedElementsMap();
+      // Touch can start on a line point without a preceding hover event.
+      if (
+        element.type === "line" &&
+        editorInterface.userAgent.isMobileDevice &&
+        LinearElementEditor.getPointIndexUnderCursor(
+          element,
+          elementsMap,
+          state.zoom,
+          sceneX,
+          sceneY,
+        ) !== -1
       ) {
         return null;
       }
@@ -1271,7 +1281,7 @@ export class AppSelectionTool {
         sceneY,
         state.zoom,
         pointerType,
-        this.app.scene.getNonDeletedElementsMap(),
+        elementsMap,
         editorInterface,
       );
       return elementWithTransformHandleType?.transformHandleType

@@ -27,7 +27,7 @@ import {
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
-import { hasBoundingBox, wrapText } from "../src";
+import { getTransformHandles, hasBoundingBox, wrapText } from "../src";
 import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
@@ -242,6 +242,34 @@ describe("Test Linear Elements", () => {
         ],
       ]
     `);
+  });
+
+  it("shows and detects the corner resize handle for a selected polyline on mobile", () => {
+    h.app.editorInterface = {
+      ...h.app.editorInterface,
+      userAgent: { ...h.app.editorInterface.userAgent, isMobileDevice: true },
+    };
+    const line = createThreePointerLinearElement("line");
+    mouse.moveTo(500, 500);
+    const [x, y, width, height] = getTransformHandles(
+      line,
+      h.state.zoom,
+      h.scene.getNonDeletedElementsMap(),
+      "mouse",
+    ).se!;
+
+    expect(hasBoundingBox([line], h.state, h.app.editorInterface)).toBe(true);
+    expect(
+      h.app.selectionTool.getTransformHandleAt(
+        [line],
+        x + width / 2,
+        y + height / 2,
+        "touch",
+      )?.transformHandleType,
+    ).toBe("se");
+    expect(
+      h.app.selectionTool.getTransformHandleAt([line], p1[0], p1[1], "touch"),
+    ).toBeNull();
   });
 
   it("should hide the bounding box while creating or dragging a point", () => {
