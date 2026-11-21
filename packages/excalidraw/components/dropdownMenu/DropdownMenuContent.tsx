@@ -104,7 +104,7 @@ const MenuContent = ({
         {editorInterface.formFactor === "phone" ? (
           <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
         ) : (
-          <Island className="dropdown-menu-container" padding={2}>
+          <Island className="dropdown-menu-container" padding={0}>
             {children}
           </Island>
         )}
