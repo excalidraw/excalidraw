@@ -7,7 +7,6 @@ import {
 
 import {
   colorToHex,
-  COLOR_TOP_PICKS_SLOTS,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -115,7 +114,13 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
+import type {
+  AppState,
+  BinaryFiles,
+  ColorTopPick,
+  LibraryItem,
+  SavedPenPreset,
+} from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -1217,7 +1222,37 @@ const LegacyAppStateMigrations: {
   },
 };
 
-const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
+const isSavedPenPreset = (value: unknown): value is SavedPenPreset => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const preset = value as Partial<SavedPenPreset>;
+  return (
+    typeof preset.color === "string" &&
+    STROKE_WIDTH_KEYS.includes(preset.strokeWidthKey as StrokeWidthKey) &&
+    (preset.strokeStyle === "solid" ||
+      preset.strokeStyle === "dashed" ||
+      preset.strokeStyle === "dotted") &&
+    typeof preset.roughness === "number" &&
+    Number.isFinite(preset.roughness) &&
+    preset.roughness >= 0 &&
+    preset.roughness <= 2 &&
+    typeof preset.opacity === "number" &&
+    Number.isFinite(preset.opacity) &&
+    preset.opacity >= 0 &&
+    preset.opacity <= 100 &&
+    (preset.fillStyle === "hachure" ||
+      preset.fillStyle === "cross-hatch" ||
+      preset.fillStyle === "solid" ||
+      preset.fillStyle === "zigzag") &&
+    (preset.strokeVariability === "constant" ||
+      preset.strokeVariability === "variable")
+  );
+};
+
+const restoreColorTopPicksList = (
+  value: unknown,
+): readonly ColorTopPick[] | null => {
   if (!Array.isArray(value)) {
     return null;
   }
@@ -1225,19 +1260,19 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
   // `#ffffff` vs `white`) dedupe, while the value keeps the original
   // notation — normalizing the output would break e.g. `transparent`
   // (→ `#00000000`), which the picker matches by literal value
-  const colors = new Map<string, string>();
-  for (const color of value) {
-    if (typeof color !== "string") {
+  const colors = new Map<string, ColorTopPick>();
+  for (const pick of value) {
+    if (typeof pick !== "string" && !isSavedPenPreset(pick)) {
       continue;
     }
+    const color = typeof pick === "string" ? pick : pick.color;
     const normalized = colorToHex(color) ?? color.toLowerCase();
-    if (!colors.has(normalized)) {
-      colors.set(normalized, color);
-    }
-    // the strip layout fits exactly this many slots — longer lists (hostile
-    // or hand-edited storage) would overflow the properties island
-    if (colors.size >= COLOR_TOP_PICKS_SLOTS) {
-      break;
+    const key =
+      typeof pick === "string"
+        ? `color:${normalized}`
+        : `preset:${normalized}:${pick.strokeWidthKey}:${pick.strokeStyle}:${pick.roughness}:${pick.opacity}:${pick.fillStyle}:${pick.strokeVariability}`;
+    if (!colors.has(key)) {
+      colors.set(key, pick);
     }
   }
   return colors.size ? [...colors.values()] : null;

@@ -44,9 +44,59 @@
 
   .color-picker__top-picks {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     align-items: center;
     gap: 5px;
+  }
+
+  .top-picks-dnd__pick-wrapper {
+    position: relative;
+    display: flex;
+  }
+
+  .top-picks-dnd__preset-mark {
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: 4px;
+    pointer-events: none;
+  }
+
+  .top-picks-dnd__pick-remove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #fa5252;
+    color: #ffffff;
+    font-size: 10px;
+    line-height: 14px;
+    opacity: 0;
+    pointer-events: none;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .top-picks-dnd__pick-wrapper:hover .top-picks-dnd__pick-remove,
+  .top-picks-dnd__pick-wrapper:focus-within .top-picks-dnd__pick-remove {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .top-picks-dnd__pick--add {
+    background-color: transparent;
+    border: 1px dashed var(--color-border, #ced4da);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--color-muted, #868e96);
   }
 
   .color-picker__button {
