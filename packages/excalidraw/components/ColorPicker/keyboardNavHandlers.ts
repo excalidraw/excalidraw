@@ -244,10 +244,22 @@ export const colorPickerKeyNavHandler = ({
     return true;
   }
 
+  let arrowKey = event.key;
+  if (arrowKey === KEYS.ARROW_LEFT || arrowKey === KEYS.ARROW_RIGHT) {
+    const { ownerDocument } = event.currentTarget;
+    const direction = ownerDocument.defaultView?.getComputedStyle(
+      event.currentTarget,
+    ).direction;
+    if (direction === "rtl") {
+      arrowKey =
+        arrowKey === KEYS.ARROW_LEFT ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT;
+    }
+  }
+
   if (activeColorPickerSection === "shades") {
     if (colorObj) {
       const { shade } = colorObj;
-      const newShade = arrowHandler(event.key, shade, COLORS_PER_ROW);
+      const newShade = arrowHandler(arrowKey, shade, COLORS_PER_ROW);
 
       if (newShade !== undefined) {
         onChange(palette[colorObj.colorName][newShade]);
@@ -263,7 +275,7 @@ export const colorPickerKeyNavHandler = ({
       const indexOfColorName = colorNames.indexOf(colorName);
 
       let newColorIndex = arrowHandler(
-        event.key,
+        arrowKey,
         indexOfColorName,
         colorNames.length,
       );
@@ -278,7 +290,7 @@ export const colorPickerKeyNavHandler = ({
           break;
         }
         newColorIndex = arrowHandler(
-          event.key,
+          arrowKey,
           newColorIndex,
           colorNames.length,
         );
@@ -302,7 +314,7 @@ export const colorPickerKeyNavHandler = ({
     const indexOfColor = color != null ? customColors.indexOf(color) : 0;
 
     const newColorIndex = arrowHandler(
-      event.key,
+      arrowKey,
       indexOfColor,
       customColors.length,
     );
