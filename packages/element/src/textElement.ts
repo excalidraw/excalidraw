@@ -25,6 +25,7 @@ import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { getStickyNoteBodyInsetY, updateStickyNoteLayout } from "./stickyNote";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+
 import {
   isBoundToContainer,
   isArrowElement,
@@ -33,6 +34,8 @@ import {
 } from "./typeChecks";
 
 import { isNonDeletedElement } from ".";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type { Scene } from "./Scene";
 
@@ -51,6 +54,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -58,7 +62,10 @@ export const redrawTextBoundingBox = (
     // the sticky fit owns both halves (label + note geometry). `textElement`
     // may be an uncommitted clone (font actions clone before install), so it
     // is passed explicitly instead of looked up in the scene
-    updateStickyNoteLayout(container, scene, { text: textElement });
+    updateStickyNoteLayout(container, scene, {
+      text: textElement,
+      renderEnvironment,
+    });
     return;
   }
 
@@ -94,6 +101,7 @@ export const redrawTextBoundingBox = (
       textElement.originalText,
       getFontString(textElement),
       maxWidth,
+      renderEnvironment,
     );
   }
 
@@ -101,6 +109,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
+    renderEnvironment,
   );
 
   // Note: only update width for unwrapped text and bound texts (which always have autoResize set to true)
@@ -158,11 +167,15 @@ export const handleBindTextResize = (
   shouldMaintainAspectRatio = false,
   shouldResizeFromCenter = false,
   flipByY = false,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (isStickyNoteElement(container)) {
     // resize callers pass their intents to `updateStickyNoteLayout` directly
     // and own the bound-arrow pass; this is the fallback for generic callers
-    updateStickyNoteLayout(container, scene, { bindings: false });
+    updateStickyNoteLayout(container, scene, {
+      bindings: false,
+      renderEnvironment,
+    });
     return;
   }
   const elementsMap = scene.getNonDeletedElementsMap();
@@ -192,18 +205,21 @@ export const handleBindTextResize = (
           textElement.originalText,
           getFontString(textElement),
           maxWidth,
+          renderEnvironment,
         );
       }
       const metrics = measureText(
         text,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;
     }
-    // increase height in case text element height exceeds
-    if (nextHeight > maxHeight) {
+    // increase height in case text element height exceeds (but not an
+    // arrow's, which its points determine, and its label doesn't grow)
+    if (!isArrowElement(container) && nextHeight > maxHeight) {
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
@@ -217,16 +233,15 @@ export const handleBindTextResize = (
 
       scene.mutateElement(container, {
         height: containerHeight,
-        ...(!isArrowElement(container) &&
-          getPositionAfterHeightChange(
-            container,
-            containerHeight,
-            shouldResizeFromCenter
-              ? "center"
-              : shouldResizeFromTop
-              ? "bottom"
-              : "top",
-          )),
+        ...getPositionAfterHeightChange(
+          container,
+          containerHeight,
+          shouldResizeFromCenter
+            ? "center"
+            : shouldResizeFromTop
+            ? "bottom"
+            : "top",
+        ),
       });
     }
 
@@ -440,6 +455,35 @@ export const getBoundTextElementPosition = (
       elementsMap,
     );
   }
+};
+
+/**
+ * Returns the text element with its accurate coords. An arrow label's
+ * position is derived from the arrow at render time rather than kept in
+ * sync on the element itself (see getBoundTextElementPosition), so
+ * consumers reading a label's coords directly must go through this helper.
+ */
+export const getTextElementWithAccuratePosition = <
+  T extends ExcalidrawTextElement,
+>(
+  textElement: T,
+  elementsMap: ElementsMap,
+): T => {
+  if (!textElement.containerId) {
+    return textElement;
+  }
+  const container = elementsMap.get(textElement.containerId);
+  if (!container || !isArrowElement(container)) {
+    return textElement;
+  }
+  return {
+    ...textElement,
+    ...LinearElementEditor.getBoundTextElementPosition(
+      container,
+      textElement as ExcalidrawTextElementWithContainer,
+      elementsMap,
+    ),
+  };
 };
 
 export const shouldAllowVerticalAlign = (

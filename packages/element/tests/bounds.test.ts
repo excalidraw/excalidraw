@@ -1,16 +1,31 @@
-import { pointFrom } from "@excalidraw/math";
+import {
+  degreesToRadians,
+  distanceToLineSegment,
+  lineSegment,
+  pointDistance,
+  pointFrom,
+} from "@excalidraw/math";
 import { arrayToMap, type Bounds, ROUNDNESS } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { LocalPoint } from "@excalidraw/math";
 
 import {
+  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
   elementsOverlappingBBox,
+  getArrowheadAngle,
+  getArrowheadPoints,
+  getArrowheadSize,
   getElementAbsoluteCoords,
   getElementBounds,
 } from "../src/bounds";
+import { ShapeCache } from "../src/shape";
 
-import type { ExcalidrawElement, ExcalidrawLinearElement } from "../src/types";
+import type {
+  Arrowhead,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+} from "../src/types";
 
 const _ce = ({
   x,
@@ -205,5 +220,159 @@ describe("elementsOverlappingBBox()", () => {
         ],
       }),
     ).toEqual([rectInside]);
+  });
+});
+
+describe("getArrowheadPoints()", () => {
+  // the last segment is 7px long, the previous one turns into it by ~67°
+  const prevSegment = lineSegment(
+    pointFrom<LocalPoint>(0, 0),
+    pointFrom<LocalPoint>(24, 10),
+  );
+  const lastSegmentLength = 7;
+
+  const tip = pointFrom<LocalPoint>(24, 10 + lastSegmentLength);
+
+  const getEndArrowheadPoints = (
+    endArrowhead: Arrowhead,
+    {
+      roundness = null,
+      part = endArrowhead,
+      offsetMultiplier,
+    }: {
+      roundness?: ExcalidrawLinearElement["roundness"];
+      /** the part of a composite marker to get */
+      part?: Arrowhead;
+      offsetMultiplier?: number;
+    } = {},
+  ) => {
+    const arrow = API.createElement({
+      type: "arrow",
+      points: [prevSegment[0], prevSegment[1], tip],
+      endArrowhead,
+      roundness,
+      roughness: 0,
+      strokeWidth: 2,
+    });
+
+    return getArrowheadPoints(
+      arrow,
+      ShapeCache.generateElementShape(arrow, null),
+      "end",
+      part,
+      offsetMultiplier,
+    )!;
+  };
+
+  it("lets triangle arrowheads cover a short last segment", () => {
+    const [, tipY, , y1, , y2] = getEndArrowheadPoints("triangle");
+
+    // the last segment points down
+    expect(tipY - (y1 + y2) / 2).toBeGreaterThan(lastSegmentLength);
+  });
+
+  it("grows arrow arrowheads on a short last segment clear of the previous one", () => {
+    const [, tipY, x1, y1, x2, y2] = getEndArrowheadPoints("arrow");
+
+    expect(tipY - (y1 + y2) / 2).toBeGreaterThan(lastSegmentLength * 0.75);
+    for (const sideEnd of [pointFrom(x1, y1), pointFrom(x2, y2)]) {
+      // stroke width
+      expect(distanceToLineSegment(sideEnd, prevSegment)).toBeGreaterThan(2);
+    }
+  });
+
+  it("doesn't grow arrowheads of curved arrows past the last segment", () => {
+    const [, tipY, , y1, , y2] = getEndArrowheadPoints("triangle", {
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    });
+
+    expect(tipY - (y1 + y2) / 2).toBeLessThanOrEqual(lastSegmentLength / 2);
+  });
+
+  it("grows circle arrowheads past a short last segment, also on curved arrows", () => {
+    for (const roundness of [null, { type: ROUNDNESS.PROPORTIONAL_RADIUS }]) {
+      const [, , diameter] = getEndArrowheadPoints("circle", { roundness });
+
+      expect(diameter).toBeGreaterThan(lastSegmentLength);
+    }
+  });
+
+  it("fits cardinality markers to a short last segment, scaling their parts together", () => {
+    const [apexX, apexY] = getEndArrowheadPoints("cardinality_one_or_many", {
+      part: "cardinality_many",
+    });
+    const [, , x1, y1, x2, y2] = getEndArrowheadPoints(
+      "cardinality_one_or_many",
+      {
+        part: "cardinality_one",
+        offsetMultiplier: CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
+      },
+    );
+    const crowsFootLength = pointDistance(pointFrom(apexX, apexY), tip);
+    const barLength = pointDistance(pointFrom(x1, y1), pointFrom(x2, y2));
+
+    expect(crowsFootLength).toBeGreaterThan(lastSegmentLength / 2);
+    expect(crowsFootLength).toBeLessThanOrEqual(lastSegmentLength);
+    // same proportions as at full size
+    expect(barLength / crowsFootLength).toBeCloseTo(
+      (2 *
+        getArrowheadSize("cardinality_one") *
+        Math.sin(degreesToRadians(getArrowheadAngle("cardinality_one")))) /
+        getArrowheadSize("cardinality_many"),
+    );
+  });
+
+  it("fits cardinality markers before the rounded corner of elbow arrows", () => {
+    const lastSegmentLength = 19;
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(40, 0),
+        pointFrom<LocalPoint>(40, 30),
+        pointFrom<LocalPoint>(70, 30),
+        pointFrom<LocalPoint>(70, 30 + lastSegmentLength),
+      ],
+      endArrowhead: "cardinality_many",
+      roughness: 0,
+    });
+    const [, apexY] = getArrowheadPoints(
+      arrow,
+      ShapeCache.generateElementShape(arrow, null),
+      "end",
+      "cardinality_many",
+    )!;
+    const crowsFootLength = 30 + lastSegmentLength - apexY;
+    const cornerRadius = lastSegmentLength / 2;
+
+    expect(crowsFootLength).toBeGreaterThan(lastSegmentLength / 2);
+    // at most halfway into the corner's rounding
+    expect(crowsFootLength).toBeCloseTo(lastSegmentLength - cornerRadius / 2);
+  });
+
+  it("grows bar arrowheads with their ends closer to the tip than to the previous segment", () => {
+    const [tipX, tipY, x1, y1, x2, y2] = getEndArrowheadPoints("bar");
+    const arrowTip = pointFrom<LocalPoint>(tipX, tipY);
+
+    for (const barEnd of [
+      pointFrom<LocalPoint>(x1, y1),
+      pointFrom<LocalPoint>(x2, y2),
+    ]) {
+      const length = pointDistance(barEnd, arrowTip);
+
+      expect(length).toBeGreaterThan(lastSegmentLength);
+      expect(distanceToLineSegment(barEnd, prevSegment)).toBeGreaterThan(
+        length - 0.01,
+      );
+    }
+  });
+
+  it("lets diamond arrowheads reach back to the last segment's start", () => {
+    const [tipX, tipY, , , backX, backY] = getEndArrowheadPoints("diamond");
+
+    expect(
+      pointDistance(pointFrom(tipX, tipY), pointFrom(backX, backY)),
+    ).toBeCloseTo(lastSegmentLength);
   });
 });

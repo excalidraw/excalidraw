@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "Sign up",
     "signIn": "Sign in",
+    "upgrade": "Upgrade",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
@@ -114,6 +115,8 @@
     "collaborators": "Collaborators",
     "you": "You",
     "toggleGrid": "Toggle grid",
+    "minimap": "Minimap",
+    "zoom": "Zoom",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
     "libraryLoadingMessage": "Loading library…",
@@ -163,13 +166,6 @@
       "breakPolygon": "Break polygon",
       "convertToPolygon": "Convert to polygon"
     },
-    "stickyNote": {
-      "footer": "Sticky note footer",
-      "footerNone": "No footer",
-      "footerShortDate": "Short date",
-      "footerTime": "Time only",
-      "footerFullDate": "Full date"
-    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
@@ -190,11 +186,14 @@
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
     "autoResize": "Enable text auto-resizing",
+    "toggleAutoResize": "Toggle text auto-resizing",
     "imageCropping": "Image cropping",
     "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
+    "removeFrame": "Remove frame",
+    "toggleWrap": "Wrap or unwrap selection",
     "tab": "Tab",
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
@@ -203,7 +202,11 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "showHints": "Toolbar hints",
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Link to object",
@@ -247,12 +250,14 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
+    "zoomToFit": "Zoom to fit",
     "menu": "Menu",
     "done": "Done",
     "edit": "Edit",
     "undo": "Undo",
     "redo": "Redo",
     "resetLibrary": "Reset library",
+    "reset": "Reset",
     "createNewRoom": "Create new room",
     "fullScreen": "Full screen",
     "darkMode": "Dark mode",
@@ -389,6 +394,7 @@
     "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
+    "toggleTextAutoResize": "{{shortcut}} to toggle text auto-resize",
     "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
     "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
@@ -404,6 +410,7 @@
     "bindTextToElement": "{{shortcut}} to add text",
     "createFlowchart": "{{shortcut}} to create a flowchart",
     "deepBoxSelect": "Hold {{shortcut}} to deep select, and to prevent dragging",
+    "cycleSelection": "{{shortcut}}-click to cycle selection, or drag to duplicate",
     "eraserRevert": "Hold {{shortcut}} to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
     "disableSnapping": "Hold {{shortcut}} to disable snapping",
@@ -661,15 +668,27 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Drop to replace content",
+    "add": "Drop to add to canvas",
+    "importLibrary": "Drop to import library",
+    "replaceHint": "Hold <shift>Shift</shift> to keep existing content",
+    "keepHint": "Your existing content will be kept",
+    "libraryHint": "Library files will append",
+    "replacedToast": "Content replaced. {{shortcut}} to undo"
+  },
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "<flowchartLink>Flowcharts</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, <stateLink>State</stateLink> and <erdLink>Entity Relationship</erdLink> diagrams, <ganttLink>Gantt charts</ganttLink>, <quadrantLink>Quadrant charts</quadrantLink> and <timelineLink>Timelines</timelineLink> are converted to Excalidraw elements. Other types are inserted as an image.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
-    "inputPlaceholder": "Write Mermaid diagram defintion here...",
-    "autoFixAvailable": "Auto-fix is available"
+    "inputPlaceholder": "Write Mermaid diagram definition here...",
+    "autoFixAvailable": "Auto-fix is available",
+    "loadError": "Couldn't load Mermaid. Check your internet connection and try again.",
+    "loadErrorReload": "Couldn't load Mermaid. Reload the page to try again.",
+    "reload": "Reload"
   },
   "ttd": {
     "error": "Error!"
@@ -726,7 +745,9 @@
     },
     "sceneFonts": "In this scene",
     "availableFonts": "Available fonts",
-    "empty": "No fonts found"
+    "empty": "No fonts found",
+    "topPicksTip": "Tip: drag any font onto your top picks to pin it",
+    "resetTopPicks": "Reset to default top picks"
   },
   "userList": {
     "empty": "No users found",
@@ -764,5 +785,16 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "promoBanner": {
+    "presentations": "Presentations",
+    "mcp": "Draw with AI",
+    "comments": "Make comments",
+    "teams": "Work in a team",
+    "voiceChat": "Voice chat",
+    "withExcalidrawPlus": "with Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "for humans & AI"
   }
 }

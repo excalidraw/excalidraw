@@ -61,7 +61,9 @@ export type ActionName =
   | "objectsSnapMode"
   | "arrowBinding"
   | "midpointSnapping"
+  | "showHints"
   | "stats"
+  | "minimap"
   | "changeStrokeColor"
   | "changeBackgroundColor"
   | "changeBucketFillBackgroundColor"
@@ -140,9 +142,9 @@ export type ActionName =
   | "linkToElement"
   | "cropEditor"
   | "wrapSelectionInFrame"
+  | "toggleWrap"
   | "toggleShapeSwitch"
-  | "togglePolygon"
-  | "changeStickyNoteFooter";
+  | "togglePolygon";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

@@ -26,6 +26,9 @@ export const useChatAgent = () => {
           type: "assistant",
           content: "",
           isGenerating: true,
+          // saved with the chat, to tell its diagrams from those of chats
+          // saved before
+          renderer: "pele",
         },
       ]),
     );

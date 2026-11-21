@@ -1,12 +1,15 @@
 import {
+  arrayToMap,
   DEFAULT_STICKY_NOTE_BG,
   DEFAULT_STICKY_NOTE_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_MIN_SIZE,
   getUpdatedTimestamp,
 } from "@excalidraw/common";
-import { pointFrom } from "@excalidraw/math";
+import { pointDistance, pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
+
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import {
   newElement,
@@ -15,15 +18,24 @@ import {
   newIframeElement,
 } from "../newElement";
 
+import { getBindingGap } from "../binding";
+import { getArrowheadSize, getCommonBounds } from "../bounds";
+import { LinearElementEditor } from "../linearElementEditor";
+import { getBoundTextElement } from "../textElement";
+import * as textMeasurements from "../textMeasurements";
+import * as textWrapping from "../textWrapping";
 import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
 } from "../transform";
 
+import type { RenderEnvironment } from "../renderEnvironment";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
 } from "../types";
 
 const opts = { regenerateIds: false };
@@ -444,10 +456,11 @@ describe("Test Transform", () => {
 
       expect(excalidrawElements.length).toBe(4);
       const [arrow, text, rectangle, ellipse] = excalidrawElements;
+      // placed where binding puts bound arrows: off the shape by the gap
+      expect(arrow.y).toBeCloseTo(239, 1);
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255.5,
-        y: 239,
+        x: 261,
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
           elementId: rectangle.id,
@@ -457,9 +470,10 @@ describe("Test Transform", () => {
         },
       });
 
+      // centered on the arrow as placed
+      expect(text.x).toBeCloseTo(240, 1);
+      expect(text.y).toBeCloseTo(226.5, 1);
       expect(text).toMatchObject({
-        x: 240,
-        y: 226.5,
         type: "text",
         text: "HELLO WORLD!!",
         containerId: arrow.id,
@@ -526,10 +540,11 @@ describe("Test Transform", () => {
       expect(excalidrawElements.length).toBe(4);
       const [arrow, text1, text2, text3] = excalidrawElements;
 
+      // placed where binding puts bound arrows: off the text by the gap
+      expect(arrow.y).toBeCloseTo(239, 1);
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255.5,
-        y: 239,
+        x: 261,
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
           elementId: text2.id,
@@ -539,9 +554,10 @@ describe("Test Transform", () => {
         },
       });
 
+      // centered on the arrow as placed
+      expect(text1.x).toBeCloseTo(240, 1);
+      expect(text1.y).toBeCloseTo(226.5, 1);
       expect(text1).toMatchObject({
-        x: 240,
-        y: 226.5,
         type: "text",
         text: "HELLO WORLD!!",
         containerId: arrow.id,
@@ -668,6 +684,8 @@ describe("Test Transform", () => {
           type: "arrow",
           x: 255,
           y: 239,
+          // reaching text-2, within its binding area
+          width: 305,
           label: {
             text: "HELLO WORLD!!",
           },
@@ -743,7 +761,7 @@ describe("Test Transform", () => {
       const [, , arrow, text] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255.5,
+        x: 255,
         y: 239,
         boundElements: [
           {
@@ -769,7 +787,8 @@ describe("Test Transform", () => {
       const elements = [
         {
           type: "arrow",
-          x: 255,
+          // reaching rect-1, within its binding area
+          x: 460,
           y: 239,
           end: {
             id: "rect-1",
@@ -793,7 +812,7 @@ describe("Test Transform", () => {
       const [arrow, rect] = excalidrawElements;
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
-        fixedPoint: [-2.05, 0.5001],
+        fixedPoint: [0, 0.5001],
         mode: "orbit",
       });
       expect(rect.boundElements).toStrictEqual([
@@ -1186,5 +1205,900 @@ describe("Test Transform", () => {
       expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
       expect(note.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
     });
+  });
+
+  it("should position arrow labels along the arrow when labelPosition provided", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        {
+          type: "arrow",
+          x: 100,
+          y: 100,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+          label: { text: "QUARTER", labelPosition: 0.25 },
+        },
+        {
+          type: "arrow",
+          x: 100,
+          y: 200,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+          label: { text: "HALF" },
+        },
+      ],
+      opts,
+    );
+    const [arrow, defaultArrow] = elements.filter(
+      (element) => element.type === "arrow",
+    );
+    const getLabel = (containerId: string) =>
+      elements.find(
+        (element) =>
+          element.type === "text" && element.containerId === containerId,
+      ) as ExcalidrawTextElement;
+
+    expect(getLabel(arrow.id).labelPosition).toBe(0.25);
+    expect(getLabel(defaultArrow.id).labelPosition).toBe(0.5);
+    // centered a quarter of the way along the arrow
+    const label = getLabel(arrow.id);
+    expect(label.x + label.width / 2).toBeCloseTo(150);
+  });
+
+  it("should clamp out-of-range arrow label positions as restore does", () => {
+    const elements = convertToExcalidrawElements(
+      [-1, 5].map((labelPosition, i) => ({
+        type: "arrow" as const,
+        x: 100,
+        y: 100 * i,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+        label: { text: "LABEL", labelPosition },
+      })),
+      opts,
+    );
+    const labels = elements.filter(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement[];
+
+    expect(labels.map((label) => label.labelPosition)).toEqual([0, 1]);
+  });
+
+  it("should measure bound arrow labels with the given render environment", () => {
+    const renderEnvironment: RenderEnvironment = {
+      createCanvas: () => document.createElement("canvas"),
+      createImage: () => ({} as HTMLImageElement),
+      textMetrics: { getLineWidth: () => 42 },
+    };
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+        { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          x: 100,
+          y: 50,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          label: { text: "LABEL" },
+        },
+      ],
+      { ...opts, renderEnvironment },
+    );
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(label.width).toBe(42);
+  });
+
+  it("should size frames around bound arrows as placed by their bindings", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "arrow",
+          x: 100,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          // fits on one line along the arrow as given (280px), but wraps
+          // along the arrow shortened by its binding gaps
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+        { type: "frame", children: ["A", "B", "arrow"] },
+      ],
+      opts,
+    );
+    const frame = elements.find((element) => element.type === "frame")!;
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(label.text).toContain("\n");
+    const [, minY, , maxY] = getCommonBounds(
+      elements.filter((element) => element.frameId === frame.id),
+    );
+    expect(frame.y).toBeLessThanOrEqual(minY);
+    expect(frame.y + frame.height).toBeGreaterThanOrEqual(maxY);
+  });
+
+  it("should keep bound arrows sized by their points when labels rewrap", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          x: 100,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          // wraps to a taller label along the arrow shortened by its binding
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+      ],
+      opts,
+    );
+    const arrow = elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+
+    expect(label.text).toContain("\n");
+    expect(arrow.points.every(([, y]) => y === 0)).toBe(true);
+    expect(arrow.height).toBe(0);
+  });
+
+  it("should place bound arrows listed by elements they aren't bound to", () => {
+    const convert = (stale: boolean) =>
+      convertToExcalidrawElements(
+        [
+          // lists the arrow without it being bound to it
+          ...(stale
+            ? [
+                {
+                  type: "rectangle" as const,
+                  id: "X",
+                  x: 0,
+                  y: 300,
+                  boundElements: [{ id: "arrow", type: "arrow" as const }],
+                },
+              ]
+            : []),
+          { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+          { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+          {
+            type: "arrow",
+            id: "arrow",
+            x: 100,
+            y: 50,
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(300, 0),
+            ],
+            start: { id: "A" },
+            end: { id: "B" },
+          },
+        ],
+        opts,
+      ).find((element) => element.id === "arrow")!;
+
+    const arrow = convert(true);
+    expect(arrow).toMatchObject({
+      x: convert(false).x,
+      width: convert(false).width,
+    });
+    // placed off A by the binding gap
+    expect(arrow.x).toBeGreaterThan(100);
+  });
+
+  it("should keep arrow labels where labelPosition puts them on the arrow as given", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+        { type: "rectangle", id: "B", x: 400, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          x: 80,
+          y: 50,
+          // starts inside A and ends short of B, so placing it shortens its
+          // start end only
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(250, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          // a quarter of the way along the arrow as given: x = 142.5
+          label: { text: "LABEL", labelPosition: 0.25 },
+        },
+      ],
+      opts,
+    );
+    const arrow = elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    const label = elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElementWithContainer;
+
+    // placed off A by the binding gap
+    expect(arrow.x).toBeGreaterThan(100);
+    const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+      arrow,
+      label,
+      arrayToMap(elements),
+    );
+    expect(x + label.width / 2).toBeCloseTo(142.5);
+    expect(y + label.height / 2).toBeCloseTo(50, 1);
+  });
+
+  it("should place arrow labels with no labelPosition as with the default one given", () => {
+    const elements = convertToExcalidrawElements(
+      [undefined, 0.5].flatMap((labelPosition, i) => [
+        {
+          type: "rectangle" as const,
+          id: `A${i}`,
+          x: 0,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "rectangle" as const,
+          id: `B${i}`,
+          x: 400,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "arrow" as const,
+          id: `arrow${i}`,
+          // starts inside A and ends short of B, so placing it shortens its
+          // start end only
+          x: 80,
+          y: 200 * i + 50,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(250, 0)],
+          start: { id: `A${i}` },
+          end: { id: `B${i}` },
+          // halfway along the arrow as given: x = 205
+          label: { text: "LABEL", labelPosition },
+        },
+      ]),
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const [defaultLabel, givenLabel] = ["arrow0", "arrow1"].map((id) => {
+      const arrow = elementsMap.get(id) as ExcalidrawArrowElement;
+      const label = getBoundTextElement(
+        arrow,
+        elementsMap,
+      ) as ExcalidrawTextElementWithContainer;
+      const { x } = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      return { label, centerX: x + label.width / 2 };
+    });
+
+    expect(defaultLabel.label.labelPosition).toBeCloseTo(
+      givenLabel.label.labelPosition!,
+    );
+    expect(defaultLabel.centerX).toBeCloseTo(205);
+    expect(givenLabel.centerX).toBeCloseTo(205);
+  });
+
+  it("should keep arrow labels clear of the arrow's ends when labelPosition puts them on a stretch placing trimmed off", () => {
+    const elements = convertToExcalidrawElements(
+      [0.05, 0.95].flatMap((labelPosition, i) => [
+        {
+          type: "rectangle" as const,
+          id: `A${i}`,
+          x: 0,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "rectangle" as const,
+          id: `B${i}`,
+          x: 400,
+          y: 200 * i,
+          width: 100,
+          height: 100,
+        },
+        {
+          type: "arrow" as const,
+          id: `arrow${i}`,
+          // from A's center to B's center, as a layout engine might route it
+          x: 50,
+          y: 200 * i + 50,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: `A${i}` },
+          end: { id: `B${i}` },
+          // inside A, and inside B
+          label: { text: "LABEL", labelPosition },
+        },
+      ]),
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const [startLabel, endLabel] = ["arrow0", "arrow1"].map((id) => {
+      const arrow = elementsMap.get(id) as ExcalidrawArrowElement;
+      const label = getBoundTextElement(
+        arrow,
+        elementsMap,
+      ) as ExcalidrawTextElementWithContainer;
+      const { x } = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      const [, [endX]] = LinearElementEditor.getPointsGlobalCoordinates(
+        arrow,
+        elementsMap,
+      );
+      return { arrow, label, x, endX };
+    });
+
+    // as close to the start as it can be without covering it
+    expect(startLabel.label.labelPosition).toBeGreaterThan(0);
+    expect(startLabel.x).toBeCloseTo(startLabel.arrow.x);
+    // ...and to the end without covering its arrowhead
+    expect(endLabel.label.labelPosition).toBeLessThan(1);
+    expect(endLabel.x + endLabel.label.width).toBeCloseTo(
+      endLabel.endX - getArrowheadSize("arrow"),
+    );
+  });
+
+  it("should store bound arrow labels' x/y where the placed arrows put them", () => {
+    const elements = convertToExcalidrawElements(
+      [undefined, 0.25].flatMap((labelPosition, i) => [
+        {
+          type: "rectangle" as const,
+          id: `A${i}`,
+          x: 0,
+          y: 100 * i,
+          width: 100,
+          height: 20,
+        },
+        {
+          type: "rectangle" as const,
+          id: `B${i}`,
+          x: 500,
+          y: 100 * i,
+          width: 100,
+          height: 20,
+        },
+        {
+          type: "arrow" as const,
+          x: 100,
+          y: 100 * i + 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: `A${i}` },
+          end: { id: `B${i}` },
+          // wraps along the arrow shortened by its binding gaps
+          label: { text: "aaaa bbbb cccc dddd eeee fff", labelPosition },
+        },
+      ]),
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const labels = elements.filter(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElementWithContainer[];
+
+    expect(labels).toHaveLength(2);
+    for (const label of labels) {
+      const arrow = elementsMap.get(
+        label.containerId,
+      ) as ExcalidrawArrowElement;
+      expect(label.text).toContain("\n");
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      expect(label.x).toBeCloseTo(x);
+      expect(label.y).toBeCloseTo(y);
+    }
+  });
+
+  it("should keep arrows' unbound ends where they're given", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 100 },
+        {
+          type: "arrow",
+          id: "half-bound",
+          x: 100,
+          y: 50,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(300, 100),
+          ],
+          start: { id: "A" },
+        },
+        {
+          type: "arrow",
+          id: "unbound",
+          x: 100,
+          y: 300,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+        },
+      ],
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const halfBound = elementsMap.get("half-bound") as ExcalidrawArrowElement;
+    const unbound = elementsMap.get("unbound") as ExcalidrawArrowElement;
+
+    // placed off A by the binding gap
+    expect(halfBound.x).toBeGreaterThan(100);
+    const [endX, endY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      halfBound,
+      -1,
+      elementsMap,
+    );
+    expect(endX).toBeCloseTo(400);
+    expect(endY).toBeCloseTo(150);
+    expect(unbound).toMatchObject({
+      x: 100,
+      y: 300,
+      width: 300,
+      points: [
+        [0, 0],
+        [300, 0],
+      ],
+    });
+  });
+
+  it("should unbind arrow ends given beyond the binding areas of the elements they're bound to", () => {
+    // e.g. a sequence diagram's messages, bound to their participants' headers
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "beyond",
+          x: 50,
+          // further below them than binding distance
+          y: 40,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(500, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          label: { text: "message" },
+        },
+        {
+          type: "arrow",
+          id: "half-far",
+          x: 100,
+          y: 10,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(450, 490),
+          ],
+          start: { id: "A" },
+          end: { id: "B" },
+        },
+        {
+          type: "arrow",
+          id: "near",
+          x: 50,
+          // within binding distance below them
+          y: 30,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(500, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+        },
+      ],
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const near = elementsMap.get("near") as ExcalidrawArrowElement;
+    const beyond = elementsMap.get("beyond") as ExcalidrawArrowElement;
+    const halfFar = elementsMap.get("half-far") as ExcalidrawArrowElement;
+
+    expect(beyond).toMatchObject({
+      startBinding: null,
+      endBinding: null,
+      x: 50,
+      y: 40,
+      width: 500,
+      height: 0,
+      points: [
+        [0, 0],
+        [500, 0],
+      ],
+    });
+    expect(near.startBinding?.elementId).toBe("A");
+    expect(near.endBinding?.elementId).toBe("B");
+    expect(halfFar.startBinding?.elementId).toBe("A");
+    expect(halfFar.endBinding).toBeNull();
+    expect(elementsMap.get("A")?.boundElements).toEqual([
+      { id: "half-far", type: "arrow" },
+      { id: "near", type: "arrow" },
+    ]);
+    expect(elementsMap.get("B")?.boundElements).toEqual([
+      { id: "near", type: "arrow" },
+    ]);
+
+    // placed off A by the binding gap, its unbound end left where given
+    expect(halfFar.x).toBeGreaterThan(100);
+    const [endX, endY] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      halfFar,
+      -1,
+      elementsMap,
+    );
+    expect(endX).toBeCloseTo(550);
+    expect(endY).toBeCloseTo(500);
+  });
+
+  it("should frame arrows unbound from a frame's children with them", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "arrow",
+          x: 50,
+          // further below them than binding distance
+          y: 60,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(500, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+        },
+        { type: "frame", children: ["A", "B"] },
+      ],
+      opts,
+    );
+    const frame = elements.find((element) => element.type === "frame")!;
+    const arrow = elements.find(
+      (element) => element.id === "arrow",
+    ) as ExcalidrawArrowElement;
+
+    expect(arrow.startBinding).toBeNull();
+    expect(arrow.endBinding).toBeNull();
+    expect(arrow.frameId).toBe(frame.id);
+    const [, , , maxY] = getCommonBounds([arrow]);
+    expect(frame.y + frame.height).toBeGreaterThanOrEqual(maxY);
+  });
+
+  it("should extend arrow ends falling short of the elements they're bound to onto them", () => {
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "short",
+          // ends 100px short of B: within its end segment's length
+          x: 150,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(250, 0)],
+          end: { id: "B" },
+        },
+        {
+          type: "arrow",
+          id: "stub",
+          // starts 80px short of A: within the minimum extension
+          x: 180,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(20, 0)],
+          start: { id: "A" },
+        },
+        {
+          type: "arrow",
+          id: "too-short",
+          // ends 200px short of B: beyond its end segment's length
+          x: 200,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+          end: { id: "B" },
+        },
+      ],
+      opts,
+    );
+    const elementsMap = arrayToMap(elements);
+    const short = elementsMap.get("short") as ExcalidrawArrowElement;
+    const stub = elementsMap.get("stub") as ExcalidrawArrowElement;
+    const tooShort = elementsMap.get("too-short") as ExcalidrawArrowElement;
+
+    expect(short.endBinding?.elementId).toBe("B");
+    const [shortEndX, shortEndY] =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        short,
+        -1,
+        elementsMap,
+      );
+    expect(shortEndX).toBeCloseTo(500 - getBindingGap(elementsMap.get("B")!));
+    expect(shortEndY).toBeCloseTo(10);
+
+    expect(stub.startBinding?.elementId).toBe("A");
+    const [stubStartX, stubStartY] =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        stub,
+        0,
+        elementsMap,
+      );
+    expect(stubStartX).toBeCloseTo(100 + getBindingGap(elementsMap.get("A")!));
+    expect(stubStartY).toBeCloseTo(10);
+
+    expect(tooShort).toMatchObject({
+      endBinding: null,
+      x: 200,
+      y: 10,
+      points: [
+        [0, 0],
+        [100, 0],
+      ],
+    });
+    expect(elementsMap.get("A")?.boundElements).toEqual([
+      { id: "stub", type: "arrow" },
+    ]);
+    expect(elementsMap.get("B")?.boundElements).toEqual([
+      { id: "short", type: "arrow" },
+    ]);
+  });
+
+  it("should keep arrow ends bound to frame children where given, whether frameId or children is given", () => {
+    for (const byFrameId of [true, false]) {
+      const elements = convertToExcalidrawElements(
+        [
+          // not sized yet when arrow ends are checked
+          {
+            type: "frame",
+            id: "frame",
+            x: 0,
+            y: 0,
+            children: byFrameId ? [] : ["A", "B"],
+          },
+          {
+            type: "rectangle",
+            id: "A",
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 20,
+            ...(byFrameId && { frameId: "frame" }),
+          },
+          {
+            type: "rectangle",
+            id: "B",
+            x: 300,
+            y: 0,
+            width: 100,
+            height: 20,
+            ...(byFrameId && { frameId: "frame" }),
+          },
+          {
+            type: "arrow",
+            id: "arrow",
+            x: 100,
+            y: 10,
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(200, 0),
+            ],
+            start: { id: "A" },
+            end: { id: "B" },
+          },
+        ],
+        opts,
+      );
+      const elementsMap = arrayToMap(elements);
+      const arrow = elementsMap.get("arrow") as ExcalidrawArrowElement;
+
+      expect(elementsMap.get("A")?.frameId).toBe("frame");
+      expect(elementsMap.get("B")?.frameId).toBe("frame");
+      // on the edges they're given on, facing each other
+      expect(arrow.startBinding).toStrictEqual({
+        elementId: "A",
+        fixedPoint: [1, 0.5001],
+        mode: "orbit",
+      });
+      expect(arrow.endBinding).toStrictEqual({
+        elementId: "B",
+        fixedPoint: [0, 0.5001],
+        mode: "orbit",
+      });
+    }
+  });
+
+  it("should bind arrows to elements sized to fit their labels after them as to those before them", () => {
+    const convert = (rectangleFirst: boolean) => {
+      // sized to fit its label, after the arrows listed before it are bound
+      const rectangle = {
+        type: "rectangle",
+        id: "B",
+        x: 400,
+        y: 25,
+        label: { text: "B" },
+      } as const;
+      const arrow = {
+        type: "arrow",
+        id: "arrow",
+        x: 100,
+        y: 50,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+        end: { id: "B" },
+      } as const;
+      const elements = convertToExcalidrawElements(
+        rectangleFirst ? [rectangle, arrow] : [arrow, rectangle],
+        opts,
+      );
+      return elements.find(
+        (element) => element.id === "arrow",
+      ) as ExcalidrawArrowElement;
+    };
+    const arrowFirst = convert(false);
+    const rectangleFirst = convert(true);
+
+    // not bound to the center of B as it was before being sized, but where
+    // the end was given: B's left edge
+    expect(arrowFirst.endBinding?.fixedPoint[0]).toBeCloseTo(0);
+    expect(arrowFirst.endBinding).toEqual(rectangleFirst.endBinding);
+    expect(arrowFirst.points).toEqual(rectangleFirst.points);
+    expect(arrowFirst.height).toBe(0);
+  });
+
+  it("should route elbow arrows extended onto elements as to elements sized to fit their labels after them as to those before them", () => {
+    // starting short of A, or ending short of B
+    for (const [startX, endX] of [
+      [150, 400],
+      [106, 330],
+    ]) {
+      const convert = (rectangleFirst: boolean) => {
+        const rectangleA = {
+          type: "rectangle",
+          id: "A",
+          x: 0,
+          y: 25,
+          width: 100,
+          height: 50,
+        } as const;
+        // sized to fit its label, after the arrows listed before it are bound
+        const rectangleB = {
+          type: "rectangle",
+          id: "B",
+          x: 400,
+          y: 25,
+          label: { text: "B" },
+        } as const;
+        const arrow = {
+          type: "arrow",
+          id: "arrow",
+          elbowed: true,
+          x: startX,
+          y: 50,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(endX - startX, 0),
+          ],
+          start: { id: "A" },
+          end: { id: "B" },
+        } as const;
+        const elements = convertToExcalidrawElements(
+          rectangleFirst
+            ? [rectangleA, rectangleB, arrow]
+            : [rectangleA, arrow, rectangleB],
+          opts,
+        );
+        return elements.find(
+          (element) => element.id === "arrow",
+        ) as ExcalidrawArrowElement;
+      };
+      const arrowFirst = convert(false);
+      const rectangleFirst = convert(true);
+
+      // into B's left side, not routed around it from its center as it was
+      // before being sized
+      expect(arrowFirst.endBinding?.fixedPoint[0]).toBeLessThan(0);
+      expect(arrowFirst.endBinding).toEqual(rectangleFirst.endBinding);
+      expect(arrowFirst.points).toEqual(rectangleFirst.points);
+      expect(arrowFirst.points).toHaveLength(2);
+    }
+  });
+
+  it("should create shapes for start / end without ids where arrows in any direction start / end", () => {
+    const arrows = {
+      diagonal: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+      vertical: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 200)],
+      "right-to-left": [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(-200, 0),
+      ],
+      "multi-point": [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(0, 150),
+        pointFrom<LocalPoint>(200, 150),
+      ],
+    };
+    for (const [id, points] of Object.entries(arrows)) {
+      for (const [start, end] of [
+        [{ type: "rectangle" }, { type: "ellipse" }],
+        [{ type: "diamond" }, { type: "text", text: "end" }],
+      ] as const) {
+        const elements = convertToExcalidrawElements(
+          [{ type: "arrow", id, x: 0, y: 0, points, start, end }],
+          opts,
+        );
+        const elementsMap = arrayToMap(elements);
+        const arrow = elementsMap.get(id) as ExcalidrawArrowElement;
+        const [, startElement, endElement] = elements;
+
+        expect(arrow.startBinding?.elementId).toBe(startElement.id);
+        expect(arrow.endBinding?.elementId).toBe(endElement.id);
+        expect(startElement.boundElements).toEqual([{ id, type: "arrow" }]);
+        expect(endElement.boundElements).toEqual([{ id, type: "arrow" }]);
+
+        // placed off the shapes by about the gap, not routed around them
+        for (const [index, element, [x, y]] of [
+          [0, startElement, points[0]],
+          [-1, endElement, points[points.length - 1]],
+        ] as const) {
+          const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            index,
+            elementsMap,
+          );
+          // the arrows are at 0,0
+          expect(
+            pointDistance(point, pointFrom<GlobalPoint>(x, y)),
+          ).toBeLessThan(2 * getBindingGap(element));
+        }
+      }
+    }
+  });
+
+  it("should wrap and measure arrow labels once, along the arrows as placed", () => {
+    const wrapTextSpy = vi.spyOn(textWrapping, "wrapText");
+    const measureTextSpy = vi.spyOn(textMeasurements, "measureText");
+    const elements = convertToExcalidrawElements(
+      [
+        { type: "rectangle", id: "A", x: 0, y: 0, width: 100, height: 20 },
+        { type: "rectangle", id: "B", x: 500, y: 0, width: 100, height: 20 },
+        {
+          type: "arrow",
+          id: "bound",
+          x: 100,
+          y: 10,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          start: { id: "A" },
+          end: { id: "B" },
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+        {
+          type: "arrow",
+          id: "unbound",
+          x: 100,
+          y: 300,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(400, 0)],
+          label: { text: "aaaa bbbb cccc dddd eeee fff" },
+        },
+      ],
+      opts,
+    );
+    const labelOf = (arrowId: string) =>
+      elements.find(
+        (element) => element.type === "text" && element.containerId === arrowId,
+      ) as ExcalidrawTextElement;
+
+    // wrapped along the bound arrow shortened by its binding gaps, and along
+    // the unbound one as given
+    expect(labelOf("bound").text).toContain("\n");
+    expect(labelOf("unbound").text).not.toContain("\n");
+    // once each (plus each unwrapped label's measurement as created)
+    expect(wrapTextSpy).toHaveBeenCalledTimes(2);
+    expect(measureTextSpy).toHaveBeenCalledTimes(4);
+
+    wrapTextSpy.mockRestore();
+    measureTextSpy.mockRestore();
   });
 });

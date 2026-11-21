@@ -8,8 +8,6 @@ import {
   isElbowArrow,
   isImageElement,
   isLinearElement,
-  isStickyNoteBoundText,
-  isStickyNoteElement,
   isTextElement,
   hasStrokeColor,
   toolIsArrow,
@@ -155,14 +153,6 @@ export const getShapeActionPredicates = (
       activeToolType === "text" ||
       suppportsHorizontalAlign(targetElements, elementsMap),
     verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
-    stickyNoteFooter:
-      activeToolType === "stickynote" ||
-      targetElements.some(
-        (element) =>
-          isStickyNoteElement(element) ||
-          (isTextElement(element) &&
-            isStickyNoteBoundText(element, elementsMap)),
-      ),
 
     opacity: activeToolType !== "autoshape" || hasSelection,
 

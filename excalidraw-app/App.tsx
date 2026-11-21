@@ -93,6 +93,7 @@ import {
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
+import { APP_ROUTES } from "./app_routes";
 import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
@@ -609,6 +610,13 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
+            // a text edit goes on through the sync: its editor takes the
+            // synced text, or closes if the text is gone
+            appState: localDataState.appState && {
+              ...localDataState.appState,
+              editingTextElement:
+                excalidrawAPI.getAppState().editingTextElement,
+            },
             captureUpdate: CaptureUpdateAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
@@ -822,6 +830,14 @@ const ExcalidrawWrapper = () => {
   };
 
   const isOffline = useAtomValue(isOfflineAtom);
+  const isCollabAvailable =
+    !isCollabDisabled && (!isOffline || isCollaborating);
+
+  useEffect(() => {
+    if (!isCollabAvailable) {
+      setShareDialogState({ isOpen: false });
+    }
+  }, [isCollabAvailable, setShareDialogState]);
 
   const localStorageQuotaExceeded = useAtomValue(localStorageQuotaExceededAtom);
 
@@ -993,7 +1009,7 @@ const ExcalidrawWrapper = () => {
         theme={editorTheme}
         onThemeChange={setAppTheme}
         renderTopRightUI={(isMobile) => {
-          if (isMobile || !collabAPI || isCollabDisabled) {
+          if (isMobile || !collabAPI || !isCollabAvailable) {
             return null;
           }
 
@@ -1030,13 +1046,13 @@ const ExcalidrawWrapper = () => {
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
-          isCollabEnabled={!isCollabDisabled}
+          isCollabEnabled={isCollabAvailable}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
-          isCollabEnabled={!isCollabDisabled}
+          isCollabEnabled={isCollabAvailable}
         />
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
@@ -1113,6 +1129,7 @@ const ExcalidrawWrapper = () => {
             {
               label: t("labels.liveCollaboration"),
               category: DEFAULT_CATEGORIES.app,
+              predicate: isCollabAvailable,
               keywords: [
                 "team",
                 "multiplayer",
@@ -1154,7 +1171,7 @@ const ExcalidrawWrapper = () => {
             {
               label: t("labels.share"),
               category: DEFAULT_CATEGORIES.app,
-              predicate: true,
+              predicate: isCollabAvailable,
               icon: share,
               keywords: [
                 "link",
@@ -1303,7 +1320,7 @@ const ExcalidrawWrapper = () => {
 
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
-    window.location.pathname === "/excalidraw-plus-export";
+    window.location.pathname === APP_ROUTES.excalidrawPlusExport;
   if (isCloudExportWindow) {
     return <ExcalidrawPlusIframeExport />;
   }

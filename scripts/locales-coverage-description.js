@@ -1,3 +1,4 @@
+const { execSync } = require("child_process");
 const fs = require("fs");
 
 const THRESSHOLD = 85;
@@ -164,10 +165,27 @@ const languages = {
   "th-TH": "ภาษาไทย",
 };
 
-const percentages = fs.readFileSync(
-  `${__dirname}/../packages/excalidraw/locales/percentages.json`,
-);
+const PERCENTAGES_PATH = "packages/excalidraw/locales/percentages.json";
+// production = what's on master (the editor filters languages by
+// master's percentages.json)
+const PRODUCTION_REF = process.env.PRODUCTION_REF || "origin/master";
+
+const percentages = fs.readFileSync(`${__dirname}/../${PERCENTAGES_PATH}`);
 const rowData = JSON.parse(percentages);
+
+const getProductionCoverages = () => {
+  try {
+    return JSON.parse(
+      execSync(`git show ${PRODUCTION_REF}:${PERCENTAGES_PATH}`, {
+        cwd: `${__dirname}/..`,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }),
+    );
+  } catch {
+    return null;
+  }
+};
 
 const coverages = Object.entries(rowData)
   .sort(([, a], [, b]) => b - a)
@@ -198,10 +216,51 @@ const printRow = (id, locale, coverage) => {
   return result;
 };
 
+const printLanguage = (locale) => {
+  const language = locale in languages ? languages[locale] : locale;
+  return locale in flags ? `${flags[locale]} ${language}` : language;
+};
+
+// languages that crossed the threshold (either way) compared to production
+const printProductionDiff = () => {
+  const production = getProductionCoverages();
+  if (!production) {
+    return;
+  }
+  const added = [];
+  const removed = [];
+  for (const locale in coverages) {
+    if (locale === "en") {
+      continue;
+    }
+    const before = production[locale] ?? 0;
+    const after = coverages[locale];
+    const line = `${printLanguage(locale)} (${before}% → ${after}%)`;
+    if (before < THRESSHOLD && after >= THRESSHOLD) {
+      added.push(line);
+    } else if (before >= THRESSHOLD && after < THRESSHOLD) {
+      removed.push(line);
+    }
+  }
+  console.info("### Changes compared to production");
+  console.info("\r");
+  if (!added.length && !removed.length) {
+    console.info(`No language crossed the ${THRESSHOLD}% threshold.`);
+  }
+  for (const line of added) {
+    console.info(`- 🟢 **Added**: ${line}`);
+  }
+  for (const line of removed) {
+    console.info(`- 🔴 **Removed**: ${line}`);
+  }
+  console.info("\n\r");
+};
+
 console.info(
   `Each language must be at least **${THRESSHOLD}%** translated in order to appear on Excalidraw. Join us on [Crowdin](https://crowdin.com/project/excalidraw) and help us translate your own language. **Can't find yours yet?** Open an [issue](https://github.com/excalidraw/excalidraw/issues/new) and we'll add it to the list.`,
 );
 console.info("\n\r");
+printProductionDiff();
 console.info(printHeader());
 let index = 1;
 for (const coverage in coverages) {

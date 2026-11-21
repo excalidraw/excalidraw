@@ -2,20 +2,37 @@ import { MIME_TYPES } from "@excalidraw/common";
 import * as clipboardModule from "@excalidraw/excalidraw/clipboard";
 import * as imageModule from "@excalidraw/excalidraw/data/image";
 import * as jsonModule from "@excalidraw/excalidraw/data/json";
-import * as mockedSceneExportUtils from "@excalidraw/excalidraw/scene/export";
+import * as staticSceneModule from "@excalidraw/excalidraw/renderer/staticScene";
+import * as staticSvgSceneModule from "@excalidraw/excalidraw/renderer/staticSvgScene";
 import { diagramFactory } from "@excalidraw/excalidraw/tests/fixtures/diagramFixture";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
 import * as utils from "../src";
 
-const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
+import type { ExportSceneConfig } from "../src";
 
-describe("exportToCanvas", async () => {
+describe("exportScene: canvas", async () => {
   const EXPORT_PADDING = 10;
 
-  it("with default arguments", async () => {
-    const canvas = await utils.exportToCanvas({
-      ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+  it("with default arguments (padding 10)", async () => {
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+    });
+
+    expect(canvas.width).toBe(100 + 2 * EXPORT_PADDING);
+    expect(canvas.height).toBe(100 + 2 * EXPORT_PADDING);
+  });
+
+  it("with padding", async () => {
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: {
+        padding: EXPORT_PADDING,
+      },
     });
 
     expect(canvas.width).toBe(100 + 2 * EXPORT_PADDING);
@@ -23,116 +40,222 @@ describe("exportToCanvas", async () => {
   });
 
   it("when custom width and height", async () => {
-    const canvas = await utils.exportToCanvas({
-      ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-      getDimensions: () => ({ width: 200, height: 200, scale: 1 }),
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: { width: 200, height: 200 },
     });
 
     expect(canvas.width).toBe(200);
     expect(canvas.height).toBe(200);
   });
-});
 
-describe("exportToBlob", async () => {
-  describe("mime type", () => {
-    it("should change image/jpg to image/jpeg", async () => {
-      const blob = await utils.exportToBlob({
-        ...diagramFactory(),
-        getDimensions: (width, height) => ({ width, height, scale: 1 }),
-        // testing typo in MIME type (jpg → jpeg)
-        mimeType: "image/jpg",
-        appState: {
-          exportBackground: true,
+  it("derives a missing width/height from the aspect ratio", async () => {
+    const elements = [
+      API.createElement({ type: "rectangle", width: 200, height: 100 }),
+    ];
+
+    const fromHeight = await utils.exportScene({
+      type: "canvas",
+      data: { elements, files: null },
+      config: { padding: EXPORT_PADDING, height: 50 },
+    });
+    // 30px of content height → 60px of content width, plus padding
+    expect([fromHeight.width, fromHeight.height]).toEqual([80, 50]);
+
+    const fromWidth = await utils.exportScene({
+      type: "canvas",
+      data: { elements, files: null },
+      config: { padding: EXPORT_PADDING, width: 100 },
+    });
+    expect([fromWidth.width, fromWidth.height]).toEqual([100, 60]);
+  });
+
+  it("crops (doesn't scale) an x/y region by default", async () => {
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: 200, height: 100 }),
+        ],
+        files: null,
+      },
+      config: { padding: EXPORT_PADDING, x: 50, y: 0, width: 100, height: 100 },
+    });
+
+    // `fit: "none"` adds the padding around the region
+    expect([canvas.width, canvas.height]).toEqual([120, 120]);
+  });
+
+  it("pads an x/y region on all sides", async () => {
+    const renderSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: 200, height: 100 }),
+        ],
+        files: null,
+      },
+      config: { padding: EXPORT_PADDING, x: 0, y: 0, width: 100, height: 100 },
+    });
+
+    // the canvas covers the scene from -10 to 110 on both axes
+    expect([canvas.width, canvas.height]).toEqual([120, 120]);
+    const { scrollX, scrollY } = renderSpy.mock.calls[0][0].appState;
+    expect([scrollX, scrollY]).toEqual([EXPORT_PADDING, EXPORT_PADDING]);
+    renderSpy.mockRestore();
+  });
+
+  it("ignores x/y when the content is scaled to fit", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const renderSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+    const exportWith = (config: ExportSceneConfig) =>
+      utils.exportScene({
+        type: "canvas",
+        data: {
+          elements: [
+            API.createElement({ type: "rectangle", width: 200, height: 100 }),
+          ],
+          files: null,
         },
+        config: { padding: EXPORT_PADDING, ...config },
       });
-      expect(blob?.type).toBe(MIME_TYPES.jpg);
+    const renderedScroll = (call: number) => {
+      const { scrollX, scrollY } = renderSpy.mock.calls[call][0].appState;
+      return [scrollX, scrollY];
+    };
+
+    await exportWith({ width: 100, height: 100, fit: "contain" });
+    await exportWith({ width: 100, height: 100, fit: "contain", x: 30, y: 20 });
+    await exportWith({ maxWidthOrHeight: 100 });
+    // the types forbid x/y with maxWidthOrHeight, JS callers still can
+    // @ts-expect-error
+    await exportWith({ maxWidthOrHeight: 100, x: 30, y: 20 });
+
+    expect(renderedScroll(1)).toEqual(renderedScroll(0));
+    expect(renderedScroll(3)).toEqual(renderedScroll(2));
+    expect(warn).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+    renderSpy.mockRestore();
+  });
+
+  it("keeps the padding of flat content", async () => {
+    const line = API.createElement({
+      type: "line",
+      width: 200,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(200, 0)],
     });
-    it("should default to image/png", async () => {
-      const blob = await utils.exportToBlob({
-        ...diagramFactory(),
-      });
-      expect(blob?.type).toBe(MIME_TYPES.png);
+    const exportLine = (config: ExportSceneConfig) =>
+      utils.exportScene({ type: "canvas", data: { elements: [line] }, config });
+
+    // the padding used to be clamped against the content's (zero) height
+    const fitted = await exportLine({ padding: 10, maxWidthOrHeight: 400 });
+    expect([fitted.width, fitted.height]).toEqual([220, 20]);
+
+    // never a zero-sized canvas, which can't be encoded
+    const unpadded = await exportLine({ padding: 0 });
+    expect([unpadded.width, unpadded.height]).toEqual([200, 1]);
+  });
+
+  it("derives a missing width/height after clamping the padding", async () => {
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: 200, height: 100 }),
+        ],
+      },
+      // a 10px height leaves no room for the padding, so it's dropped
+      config: { height: 10, padding: 10 },
     });
 
-    it("should warn when using quality with image/png", async () => {
-      const consoleSpy = vi
-        .spyOn(console, "warn")
-        .mockImplementationOnce(() => void 0);
-      await utils.exportToBlob({
-        ...diagramFactory(),
-        mimeType: MIME_TYPES.png,
-        quality: 1,
-      });
-      expect(consoleSpy).toHaveBeenCalledWith(
-        `"quality" will be ignored for "${MIME_TYPES.png}" mimeType`,
-      );
+    expect([canvas.width, canvas.height]).toEqual([20, 10]);
+  });
+
+  it("with a scale function", async () => {
+    const scale = vi.fn((width: number, height: number) => 60 / width);
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: { padding: EXPORT_PADDING, scale },
     });
+
+    // receives the export dimensions at scale 1, padding included
+    expect(scale).toHaveBeenCalledWith(120, 120);
+    expect(canvas.width).toBe(60);
+    expect(canvas.height).toBe(60);
+  });
+
+  it("rounds the canvas dimensions", async () => {
+    const size = 29 / 1.1;
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: size, height: size }),
+        ],
+        files: null,
+      },
+      // size * 1.1 === 28.999999999999996
+      config: { scale: 1.1, padding: 0 },
+    });
+
+    expect(canvas.width).toBe(29);
+    expect(canvas.height).toBe(29);
   });
 });
 
-describe("exportToSvg", () => {
-  const passedElements = () => exportToSvgSpy.mock.calls[0][0];
-  const passedOptions = () => exportToSvgSpy.mock.calls[0][1];
+describe("exportScene: png & jpeg", () => {
+  it("exports the requested image type", async () => {
+    const png = await utils.exportScene({
+      type: "png",
+      data: diagramFactory(),
+    });
+    expect(png.type).toBe(MIME_TYPES.png);
 
-  afterEach(() => {
-    vi.clearAllMocks();
+    const jpeg = await utils.exportScene({
+      type: "jpeg",
+      data: diagramFactory(),
+    });
+    expect(jpeg.type).toBe(MIME_TYPES.jpg);
   });
+});
 
+describe("exportScene: svg", () => {
   it("with default arguments", async () => {
-    await utils.exportToSvg({
-      ...diagramFactory({
-        overrides: { appState: void 0 },
-      }),
+    const svg = await utils.exportScene({
+      type: "svg",
+      data: diagramFactory({ overrides: { appState: void 0 } }),
     });
 
-    const passedOptionsWhenDefault = {
-      ...passedOptions(),
-      // To avoid varying snapshots
-      name: "name",
-    };
-    expect(passedElements().length).toBe(3);
-    expect(passedOptionsWhenDefault).toMatchSnapshot();
+    expect(svg.querySelectorAll("[data-id]")).toHaveLength(3);
   });
 
-  // Regression test: when all elements are deleted, exportToSvg should pass
-  // zero elements to the lower-level export (line 184-188 of export.ts calls
-  // getNonDeletedElements which filters them out).
+  // Regression test (#11470): deleted elements must be filtered out at
+  // runtime (inside `configExportDimension`), since the type contract alone
+  // doesn't protect JS consumers passing raw scene data.
   it("with deleted elements", async () => {
-    await utils.exportToSvg({
-      ...diagramFactory({
+    const svg = await utils.exportScene({
+      type: "svg",
+      data: diagramFactory({
         overrides: { appState: void 0 },
         elementOverrides: { isDeleted: true },
       }),
     });
 
-    expect(passedElements().length).toBe(0);
+    expect(svg.querySelectorAll("[data-id]")).toHaveLength(0);
   });
 
-  it("with exportPadding", async () => {
-    await utils.exportToSvg({
-      ...diagramFactory({
-        overrides: { appState: { name: "diagram name" } },
-      }),
-      exportPadding: 0,
+  it("with embedScene", async () => {
+    const svg = await utils.exportScene({
+      type: "svg",
+      data: diagramFactory({ overrides: { appState: void 0 } }),
+      config: { embedScene: true },
     });
 
-    expect(passedElements().length).toBe(3);
-    expect(passedOptions()).toEqual(
-      expect.objectContaining({ exportPadding: 0 }),
-    );
-  });
-
-  it("with exportEmbedScene", async () => {
-    await utils.exportToSvg({
-      ...diagramFactory({
-        overrides: {
-          appState: { name: "diagram name", exportEmbedScene: true },
-        },
-      }),
-    });
-
-    expect(passedElements().length).toBe(3);
-    expect(passedOptions().exportEmbedScene).toBe(true);
+    expect(svg.querySelector("metadata")?.innerHTML).toContain("payload-start");
   });
 });
 
@@ -159,43 +282,55 @@ describe("elements lacking creation metadata", () => {
     vi.restoreAllMocks();
   });
 
-  it("exportToSvg and exportToCanvas restore the elements", async () => {
-    const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
+  it("svg and canvas exports render the restored elements", async () => {
+    const renderSvgSpy = vi.spyOn(staticSvgSceneModule, "renderSceneToSvg");
     const diagram = legacyDiagram();
 
-    await utils.exportToSvg(diagram);
+    await utils.exportScene({ type: "svg", data: diagram });
 
-    expect(createdOf(exportToSvgSpy.mock.calls[0][0])).toEqual([
+    expect(createdOf(renderSvgSpy.mock.calls[0][0])).toEqual([
       null,
       null,
       null,
     ]);
     expect(diagram.elements[0]).not.toHaveProperty("created");
 
-    const exportToCanvasSpy = vi.spyOn(
-      mockedSceneExportUtils,
-      "exportToCanvas",
-    );
-    const canvas = await utils.exportToCanvas(diagram);
+    const renderCanvasSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+    const canvas = await utils.exportScene({ type: "canvas", data: diagram });
 
-    expect(createdOf(exportToCanvasSpy.mock.calls[0][0])).toEqual([
+    expect(createdOf(renderCanvasSpy.mock.calls[0][0].visibleElements)).toEqual(
+      [null, null, null],
+    );
+    expect(canvas.width).toBeGreaterThan(0);
+  });
+
+  it("svg export embeds the restored scene", async () => {
+    const serializeSpy = vi.spyOn(jsonModule, "serializeAsJSON");
+
+    await utils.exportScene({
+      type: "svg",
+      data: legacyDiagram(),
+      config: { embedScene: true },
+    });
+
+    expect(serializeSpy).toHaveBeenCalledTimes(1);
+    expect(createdOf(serializeSpy.mock.calls[0][0])).toEqual([
       null,
       null,
       null,
     ]);
-    expect(canvas.width).toBeGreaterThan(0);
   });
 
-  it("exportToBlob embeds the restored scene into png metadata", async () => {
+  it("png export embeds the restored scene into its metadata", async () => {
     const serializeSpy = vi.spyOn(jsonModule, "serializeAsJSON");
     vi.spyOn(imageModule, "encodePngMetadata").mockImplementation(
       async ({ blob }) => blob,
     );
 
-    await utils.exportToBlob({
-      ...legacyDiagram(),
-      mimeType: MIME_TYPES.png,
-      appState: { exportEmbedScene: true },
+    await utils.exportScene({
+      type: "png",
+      data: legacyDiagram(),
+      config: { embedScene: true },
     });
 
     expect(serializeSpy).toHaveBeenCalledTimes(1);
@@ -211,7 +346,7 @@ describe("elements lacking creation metadata", () => {
       .spyOn(clipboardModule, "copyToClipboard")
       .mockResolvedValue(undefined);
 
-    await utils.exportToClipboard({ ...legacyDiagram(), type: "json" });
+    await utils.exportToClipboard({ type: "json", data: legacyDiagram() });
 
     expect(copySpy).toHaveBeenCalledTimes(1);
     expect(createdOf(copySpy.mock.calls[0][0])).toEqual([null, null, null]);

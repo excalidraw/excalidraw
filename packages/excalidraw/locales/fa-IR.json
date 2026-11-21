@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "ثبت‌نام",
     "signIn": "ورود",
+    "upgrade": "ارتقا",
     "paste": "جایگذاری",
     "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
@@ -27,6 +28,7 @@
     "copyStyles": "کپی سبک",
     "pasteStyles": "جایگذاری سبک",
     "stroke": "حاشیه",
+    "textColor": "رنگ متن",
     "changeStroke": "تغییر رنگ حاشیه",
     "background": "پس زمینه",
     "changeBackground": "تغییر رنگ پس زمینه",
@@ -113,6 +115,8 @@
     "collaborators": "همکاران",
     "you": "شما",
     "toggleGrid": "تغییر وضعیت خطوط شطرنجی",
+    "minimap": "نقشه کوچک",
+    "zoom": "بزرگنمایی",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
     "libraryLoadingMessage": "بارگذاری کتابخانه…",
@@ -182,11 +186,14 @@
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "installPWA": "نصب Excalidraw روی دستگاه (PWA)",
     "autoResize": "فعالسازی تنظیم خودکار سایز",
+    "toggleAutoResize": "تغییر وضعیت تنظیم خودکار اندازه متن",
     "imageCropping": "برش عکس",
     "unCroppedDimension": "اندازه غیر برشی",
     "copyElementLink": "کپی لینک به آیتم",
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
+    "removeFrame": "حذف فریم",
+    "toggleWrap": "دربرگرفتن یا آزادسازی انتخاب",
     "tab": "Tab",
     "shapeSwitch": "تعویض شکل",
     "preferences": "ترجیحات",
@@ -195,7 +202,11 @@
     "boxSelectionContain": "دربرگیری",
     "boxSelectionOverlap": "هم‌پوشانی",
     "arrowBinding": "اتصال پیکان",
-    "midpointSnapping": "چسبیدن به نقاط میانی"
+    "midpointSnapping": "چسبیدن به نقاط میانی",
+    "showHints": "راهنماهای نوار ابزار",
+    "inputDevice": "دستگاه ورودی",
+    "inputDeviceTrackpad": "ترک‌پد",
+    "inputDeviceMouse": "ماوس"
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -239,12 +250,14 @@
     "zoomIn": "بزرگ نمایی",
     "zoomOut": "کوچک نمایی",
     "resetZoom": "اندازه اصلی",
+    "zoomToFit": "بزرگنمایی متناسب با صفحه",
     "menu": "فهرست",
     "done": "انجام شد",
     "edit": "ویرایش",
     "undo": "بازگرد",
     "redo": "از سر",
     "resetLibrary": "تنظیم مجدد کتابخانه",
+    "reset": "بازنشانی",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "fullScreen": "تمام‌صفحه",
     "darkMode": "حالت تیره",
@@ -285,7 +298,7 @@
     "removeItemsFromsLibrary": "حذف {{count}} آیتم(ها) از کتابخانه?",
     "invalidEncryptionKey": "کلید رمزگذاری باید 22 کاراکتر باشد. همکاری زنده غیرفعال است.",
     "collabOfflineWarning": "اتصال به اینترنت در دسترس نیست.\nتغییرات شما ذخیره نمی شود!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "فضای ذخیره‌سازی مرورگر پر شده است. تغییرات ذخیره نخواهند شد."
   },
   "errors": {
     "unsupportedFileType": "نوع فایل پشتیبانی نشده.",
@@ -316,7 +329,7 @@
   },
   "toolBar": {
     "selection": "گزینش",
-    "lasso": "",
+    "lasso": "انتخاب کمندی",
     "image": "وارد کردن تصویر",
     "rectangle": "مستطیل",
     "diamond": "لوزی",
@@ -332,18 +345,19 @@
     "eraser": "پاک کن",
     "frame": "ابزار فریم",
     "magicframe": "وایرفریم به کد",
+    "stickynote": "یادداشت چسبان",
     "embeddable": "افزونه وب",
     "laser": "اشاره گر لیزری",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "تبدیل طرح به شکل",
+    "bucketfill": "سطل رنگ",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
     "mermaidToExcalidraw": "مرمید به excalidraw",
-    "convertElementType": ""
+    "convertElementType": "تغییر نوع شکل"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "ناحیه بسته‌ای برای رنگ‌آمیزی در اینجا پیدا نشد.",
+    "tooComplex": "این ناحیه برای رنگ‌آمیزی بیش از حد پیچیده است."
   },
   "element": {
     "rectangle": "مستطیل",
@@ -357,6 +371,7 @@
     "group": "گروه",
     "frame": "قاب",
     "magicframe": "وایرفریم به کد",
+    "stickynote": "یادداشت چسبان",
     "embeddable": "افزونه وب",
     "selection": "انتخاب",
     "iframe": "آی فریم"
@@ -367,36 +382,40 @@
     "shapes": "اشکال"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "برای بستن جستجو، {{shortcut}} را بزنید",
+    "canvasPanning": "برای جابجایی بوم، هنگام کشیدن {{shortcut_1}} یا {{shortcut_2}} را نگه دارید، یا از ابزار دست استفاده کنید",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "برای چند نقطه کلیک و برای یک خط بکشید. برای تغییر نوع پیکان، دوباره {{shortcut}} را بزنید.",
+    "arrowBindModifiers": "برای غیرفعال کردن اتصال {{shortcut_1}} را نگه دارید، یا برای اتصال در یک نقطه ثابت {{shortcut_2}} را نگه دارید",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "embeddable": "کلیک-درگ برای ساخت افزونه وب",
-    "autoshape": "",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "toggleArrowhead": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "stickynote": "برای قرار دادن یادداشت کلیک کنید، یا برای تعیین اندازه آن بکشید",
+    "autoshape": "مستطیل، دایره، لوزی، خط و پیکان رسم کنید",
+    "text_selected": "برای ویرایش متن، دوبار کلیک کنید یا {{shortcut}} را بزنید",
+    "text_editing": "برای پایان ویرایش، {{shortcut_1}} یا {{shortcut_2}} را بزنید",
+    "toggleTextAutoResize": "برای تغییر وضعیت تنظیم خودکار اندازه متن، {{shortcut}} را بزنید",
+    "linearElementMulti": "برای پایان، روی آخرین نقطه کلیک کنید یا {{shortcut_1}} یا {{shortcut_2}} را بزنید",
+    "lockAngle": "با نگه داشتن {{shortcut}} می‌توانید زاویه را محدود کنید",
+    "resize": "با نگه داشتن {{shortcut_1}} هنگام تغییر اندازه می‌توانید تناسب‌ها را حفظ کنید،\nبرای تغییر اندازه از مرکز، {{shortcut_2}} را نگه دارید",
+    "resizeImage": "با نگه داشتن {{shortcut_1}} می‌توانید اندازه را آزادانه تغییر دهید،\nبرای تغییر اندازه از مرکز، {{shortcut_2}} را نگه دارید",
+    "resizeStickyNote": "برای تغییر اندازه آزادانه {{shortcut_1}} و برای تغییر اندازه از مرکز {{shortcut_2}} را نگه دارید",
+    "rotate": "با نگه داشتن {{shortcut}} هنگام چرخاندن می‌توانید زاویه‌ها را محدود کنید",
+    "toggleArrowhead": "برای افزودن یا حذف سر پیکان، دوبار کلیک کنید",
+    "lineEditor_info": "برای ویرایش نقاط، {{shortcut_1}} را نگه دارید و دوبار کلیک کنید یا {{shortcut_2}} را بزنید",
+    "lineEditor_line_info": "برای ویرایش نقاط، دوبار کلیک کنید یا {{shortcut}} را بزنید",
+    "lineEditor_pointSelected": "برای حذف نقطه(ها) {{shortcut_1}} را بزنید،\nبرای تکثیر {{shortcut_2}} را بزنید، یا برای جابجایی بکشید",
+    "lineEditor_nothingSelected": "برای ویرایش، یک نقطه را انتخاب کنید (برای انتخاب چندتایی {{shortcut_1}} را نگه دارید)،\nیا برای افزودن نقاط جدید، {{shortcut_2}} را نگه دارید و کلیک کنید",
     "publishLibrary": "کتابخانه خود را منتشر کنید",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "برای افزودن متن، {{shortcut}} را بزنید",
+    "createFlowchart": "برای ایجاد فلوچارت، {{shortcut}} را بزنید",
+    "deepBoxSelect": "برای انتخاب عمیق و جلوگیری از کشیدن، {{shortcut}} را نگه دارید",
+    "cycleSelection": "برای چرخش انتخاب بین آیتم‌های روی هم، {{shortcut}} را نگه دارید و کلیک کنید، یا برای تکثیر بکشید",
+    "eraserRevert": "برای بازگرداندن آیتم‌هایی که برای حذف علامت‌گذاری شده‌اند، {{shortcut}} را نگه دارید",
     "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "برای غیرفعال کردن چسبیدن، {{shortcut}} را نگه دارید",
+    "enterCropEditor": "برای برش تصویر، روی آن دوبار کلیک کنید یا {{shortcut}} را بزنید",
+    "leaveCropEditor": "برای پایان برش، بیرون از تصویر کلیک کنید یا {{shortcut_1}} یا {{shortcut_2}} را بزنید"
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -428,8 +447,8 @@
     "title": "خطا"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "در حال ذخیره‌سازی",
+    "defaultMessage": "در حال آماده‌سازی برای ذخیره..."
   },
   "exportDialog": {
     "disk_title": "ذخیره در دیسک",
@@ -438,9 +457,9 @@
     "link_title": "لینک قابل اشتراک‌گذاری",
     "link_details": "خروجی به عنوان یک پیوند فقط خواندنی.",
     "link_button": "خروجی در فایل",
-    "excalidrawplus_description": "صحنه را در فضای کاری Excalidraw+ خود ذخیره کنید.",
+    "excalidrawplus_description": "صحنه را در فضای کاری Excalidraw+‎ خود ذخیره کنید.",
     "excalidrawplus_button": "خروجی گرفتن",
-    "excalidrawplus_exportError": "در حال حاضر نمی‌توان به Excalidraw+ صادر کرد..."
+    "excalidrawplus_exportError": "در حال حاضر نمی‌توان به Excalidraw+‎ صادر کرد..."
   },
   "helpDialog": {
     "blog": "بلاگ ما را بخوانید",
@@ -593,10 +612,10 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
-      "center_heading_plus": "آیا می‌خواهید به جای آن به Excalidraw+ بروید؟",
+      "center_heading": "نقاشی‌های شما در فضای ذخیره‌سازی مرورگرتان ذخیره می‌شوند.",
+      "center_heading_line2": "ممکن است فضای ذخیره‌سازی مرورگر به‌طور غیرمنتظره پاک شود.",
+      "center_heading_line3": "برای اینکه کارتان از دست نرود، آن را مرتب در یک فایل ذخیره کنید.",
+      "center_heading_plus": "آیا می‌خواهید به جای آن به Excalidraw+‎ بروید؟",
       "menuHint": "خروجی، ترجیحات، زبان ها، ..."
     },
     "defaults": {
@@ -613,10 +632,10 @@
     "shades": "جلوه‌ها",
     "hexCode": "کدِ هگز",
     "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "رنگ معتبر نیست",
+    "invalidHexLength": "کد هگز باید 3، 4، 6 یا 8 کاراکتر باشد",
+    "topPicksTip": "نکته: برای سنجاق کردن هر رنگ، آن را روی رنگ‌های برگزیده‌تان بکشید",
+    "resetTopPicks": "بازنشانی به رنگ‌های برگزیده پیش‌فرض"
   },
   "overwriteConfirm": {
     "action": {
@@ -631,9 +650,9 @@
         "description": "خروجی از داده های صحنه را به عنوان فایل که بعدا می توانید بیافزایید."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
-        "button": "خروجی به Excalidraw+",
-        "description": "ذخیره صفحه در میز کار Excalidraw+."
+        "title": "Excalidraw+‎",
+        "button": "خروجی به Excalidraw+‎",
+        "description": "ذخیره صفحه در میز کار Excalidraw+‎."
       }
     },
     "modal": {
@@ -649,61 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "برای جایگزینی محتوا رها کنید",
+    "add": "برای افزودن به بوم رها کنید",
+    "importLibrary": "برای وارد کردن کتابخانه رها کنید",
+    "replaceHint": "برای حفظ محتوای فعلی، <shift>Shift</shift> را نگه دارید",
+    "keepHint": "محتوای فعلی شما حفظ می‌شود",
+    "libraryHint": "فایل‌های کتابخانه به کتابخانه شما افزوده می‌شوند",
+    "replacedToast": "محتوا جایگزین شد. برای بازگرداندن، {{shortcut}} را بزنید"
+  },
   "mermaid": {
     "title": "مرمید به excalidraw",
     "button": "درج",
-    "description": "",
+    "description": "<flowchartLink>فلوچارت‌ها</flowchartLink>، نمودارهای <sequenceLink>توالی</sequenceLink>، <classLink>کلاس</classLink>، <stateLink>حالت</stateLink> و <erdLink>موجودیت-رابطه</erdLink>، <ganttLink>نمودارهای گانت</ganttLink>، <quadrantLink>نمودارهای ربعی</quadrantLink> و <timelineLink>خط‌های زمانی</timelineLink> به عناصر Excalidraw تبدیل می‌شوند. سایر انواع به صورت تصویر درج می‌شوند.",
     "syntax": "مرمید syntax",
     "preview": "پیشنمایش",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "تعریف نمودار Mermaid را اینجا بنویسید...",
+    "autoFixAvailable": "اصلاح خودکار در دسترس است",
+    "loadError": "بارگذاری Mermaid انجام نشد. اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.",
+    "loadErrorReload": "بارگذاری Mermaid انجام نشد. برای تلاش دوباره، صفحه را مجدداً بارگذاری کنید.",
+    "reload": "بارگذاری مجدد"
   },
   "ttd": {
     "error": "خطا!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "ایده نمودارتان را اینجا بنویسید... ({{shortcut}} برای خط جدید)",
+    "inputPlaceholderWithMessages": "به بهبود نمودارتان ادامه دهید...",
+    "generating": "در حال تولید...",
+    "rateLimitRemaining": "امروز {{count}} درخواست باقی مانده است",
     "role": {
       "user": "شما",
       "assistant": "دستیار هوش مصنوعی",
-      "system": ""
+      "system": "سیستم"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "هوش مصنوعی بتا",
+    "label": "چت",
+    "menu": "فهرست",
+    "newChat": "چت جدید",
+    "deleteChat": "حذف چت",
+    "deleteMessage": "حذف پیام",
+    "viewAsMermaid": "نمایش به صورت Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "بیایید نمودارتان را طراحی کنیم",
+      "description": "نموداری را که می‌خواهید بسازید توصیف کنید تا آن را برایتان تولید کنیم.",
+      "hint": "در حال حاضر از فلوچارت و نمودارهای توالی، کلاس، حالت و موجودیت-رابطه پشتیبانی می‌کنیم."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "پیش‌نمایش",
+    "insert": "درج",
+    "retry": "تلاش دوباره",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "پرامپت خیلی کوتاه است (حداقل {{min}} کاراکتر)",
+      "promptTooLong": "پرامپت خیلی طولانی است (حداکثر {{max}} کاراکتر)",
+      "generationFailed": "تولید ناموفق بود",
+      "invalidDiagram": "نمودار نامعتبری تولید شد :(. می‌توانید آن را دستی ویرایش کنید، با اصلاح خودکار دوباره تلاش کنید یا پرامپت دیگری را امتحان کنید.",
+      "fixInMermaid": "ویرایش دستی Mermaid ←",
+      "aiRepair": "تولید دوباره (اصلاح خودکار) ←",
+      "requestAborted": "درخواست لغو شد",
+      "requestFailed": "درخواست ناموفق بود",
+      "mermaidParseError": "خطای نحوی Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "به سقف استفاده از هوش مصنوعی در طرح رایگان رسیده‌اید. برای استفاده بیشتر Excalidraw+‎ را امتحان کنید یا فردا برگردید.",
+      "generalRateLimit": "کمی آهسته‌تر! شما برای ما زیادی سریع هستید. لطفاً پیش از تلاش دوباره کمی صبر کنید.",
+      "messageLimitInputPlaceholder": "به سقف تعداد پیام‌هایتان رسیده‌اید"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "ارتقا به Plus"
   },
   "quickSearch": {
     "placeholder": "جستجو فوری"
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "در این صحنه",
     "availableFonts": "قلم های در دسترس",
-    "empty": "قلمی یافت نشد"
+    "empty": "قلمی یافت نشد",
+    "topPicksTip": "نکته: برای سنجاق کردن هر قلم، آن را روی قلم‌های برگزیده‌تان بکشید",
+    "resetTopPicks": "بازنشانی به قلم‌های برگزیده پیش‌فرض"
   },
   "userList": {
     "empty": "کاربری یافت نشد",
@@ -742,15 +775,26 @@
     "shortcutHint": "برای تخته دستور ها {{shortcut}} را بکار بگیرید"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
     "shift": "Shift",
     "spacebar": "فاصله",
     "delete": "حذف",
-    "mmb": ""
+    "mmb": "چرخ ماوس"
+  },
+  "promoBanner": {
+    "presentations": "ارائه‌ها",
+    "mcp": "رسم با AI",
+    "comments": "افزودن نظر",
+    "teams": "کار تیمی",
+    "voiceChat": "چت صوتی",
+    "withExcalidrawPlus": "با Excalidraw+‎",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "برای انسان و AI"
   }
 }

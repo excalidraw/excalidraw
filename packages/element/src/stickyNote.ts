@@ -24,10 +24,11 @@ import { updateBoundElements } from "./binding";
 import { newElementWith } from "./mutateElement";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { computeBoundTextPosition, getBoundTextElement } from "./textElement";
-import { measureText } from "./textMeasurements";
+import { getLineWidth, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import { isStickyNoteElement, isTextElement } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { Scene } from "./Scene";
 import type { VerticalResizeAnchor } from "./sizeHelpers";
 import type { TransformHandleDirection } from "./transformHandles";
@@ -37,6 +38,7 @@ import type {
   ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FontString,
   NonDeletedExcalidrawElement,
   StickyNoteFooterOptions,
 } from "./types";
@@ -77,6 +79,7 @@ export const DEFAULT_STICKY_NOTE_FOOTER_OPTIONS: StickyNoteFooterOptions =
     format: STICKY_NOTE_FOOTER_FORMAT.SHORT,
   });
 
+/** Validates scene or host input and keeps only the supported footer fields. */
 export const normalizeStickyNoteFooterOptions = (
   footerOptions: unknown,
 ): StickyNoteFooterOptions | null => {
@@ -87,11 +90,16 @@ export const normalizeStickyNoteFooterOptions = (
     return DEFAULT_STICKY_NOTE_FOOTER_OPTIONS;
   }
   const value = footerOptions as Record<string, unknown>;
-  if (value.type === "date" && typeof value.format === "string") {
-    return footerOptions as StickyNoteFooterOptions;
+  if (
+    value.type === "date" &&
+    (value.format === STICKY_NOTE_FOOTER_FORMAT.SHORT ||
+      value.format === STICKY_NOTE_FOOTER_FORMAT.TIME ||
+      value.format === STICKY_NOTE_FOOTER_FORMAT.LONG)
+  ) {
+    return { type: "date", format: value.format };
   }
   if (value.type === "text" && typeof value.text === "string") {
-    return footerOptions as StickyNoteFooterOptions;
+    return { type: "text", text: value.text };
   }
   return DEFAULT_STICKY_NOTE_FOOTER_OPTIONS;
 };
@@ -494,41 +502,10 @@ export const getStickyNoteDateLabel = (
     : `${label} ${year}`;
 };
 
-const padDatePart = (value: number) => String(value).padStart(2, "0");
-
-const formatCustomStickyNoteDate = (date: Date, format: string) => {
-  const hours = date.getHours();
-  const replacements: Record<string, string> = {
-    YYYY: String(date.getFullYear()),
-    YY: String(date.getFullYear()).slice(-2),
-    MMMM: new Intl.DateTimeFormat(undefined, { month: "long" }).format(date),
-    MMM: new Intl.DateTimeFormat(undefined, { month: "short" }).format(date),
-    MM: padDatePart(date.getMonth() + 1),
-    M: String(date.getMonth() + 1),
-    DD: padDatePart(date.getDate()),
-    D: String(date.getDate()),
-    HH: padDatePart(hours),
-    H: String(hours),
-    hh: padDatePart(hours % 12 || 12),
-    h: String(hours % 12 || 12),
-    mm: padDatePart(date.getMinutes()),
-    m: String(date.getMinutes()),
-    ss: padDatePart(date.getSeconds()),
-    s: String(date.getSeconds()),
-    A: hours < 12 ? "AM" : "PM",
-    a: hours < 12 ? "am" : "pm",
-  };
-
-  return format.replace(
-    /\[([^\]]*)\]|YYYY|MMMM|MMM|YY|MM|M|DD|D|HH|H|hh|h|mm|m|ss|s|A|a/g,
-    (token, literal: string | undefined) =>
-      literal === undefined ? replacements[token] : literal,
-  );
-};
-
+/** Formats a creation timestamp; hosts can preformat other styles as text. */
 export const formatStickyNoteFooterDate = (
   created: ExcalidrawStickyNoteElement["created"],
-  format: string,
+  format: Extract<StickyNoteFooterOptions, { type: "date" }>["format"],
   { short = false, now = Date.now() }: { short?: boolean; now?: number } = {},
 ): string | null => {
   if (created === null || !Number.isFinite(created)) {
@@ -551,8 +528,6 @@ export const formatStickyNoteFooterDate = (
       return new Intl.DateTimeFormat(undefined, {
         dateStyle: "long",
       }).format(date);
-    default:
-      return formatCustomStickyNoteDate(date, format);
   }
 };
 
@@ -566,6 +541,7 @@ export const getStickyNoteFooter = (
   element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height"> &
     Partial<Pick<ExcalidrawStickyNoteElement, "footerOptions">>,
   now = Date.now(),
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const footerOptions = normalizeStickyNoteFooterOptions(element.footerOptions);
   if (
@@ -575,7 +551,7 @@ export const getStickyNoteFooter = (
   ) {
     return null;
   }
-  const text =
+  let text =
     footerOptions.type === "text"
       ? footerOptions.text
       : formatStickyNoteFooterDate(element.created, footerOptions.format, {
@@ -587,6 +563,43 @@ export const getStickyNoteFooter = (
   if (!text) {
     return null;
   }
+  // Preserve the existing width-bucket policy for the built-in short date.
+  // Host text and longer formats are a single line, ellipsized to the note's
+  // inner width. Use the render target's metrics for canvas and SVG alike.
+  if (
+    footerOptions.type === "text" ||
+    footerOptions.format !== STICKY_NOTE_FOOTER_FORMAT.SHORT
+  ) {
+    text = text.replace(/\s+/g, " ").trim();
+    if (!text) {
+      return null;
+    }
+    const font =
+      `${STICKY_NOTE_FOOTER.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}` as FontString;
+    const maxWidth = element.width - STICKY_NOTE_PADDING * 2;
+    const width = (value: string) =>
+      getLineWidth(value, font, renderEnvironment);
+    if (width(text) > maxWidth) {
+      const characters = Array.from(text);
+      const ellipsis = "…";
+      if (width(ellipsis) > maxWidth) {
+        return null;
+      }
+      let lo = 0;
+      let hi = characters.length;
+      while (lo < hi) {
+        const mid = Math.ceil((lo + hi) / 2);
+        if (
+          width(`${characters.slice(0, mid).join("")}${ellipsis}`) <= maxWidth
+        ) {
+          lo = mid;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      text = `${characters.slice(0, lo).join("")}${ellipsis}`;
+    }
+  }
   return {
     text,
     x: element.width - STICKY_NOTE_PADDING,
@@ -594,6 +607,7 @@ export const getStickyNoteFooter = (
   };
 };
 
+/** Vertical body padding, reclaiming the footer band when explicitly hidden. */
 export const getStickyNoteBodyInsetY = (
   element: Partial<Pick<ExcalidrawStickyNoteElement, "footerOptions">>,
 ) =>
@@ -652,6 +666,12 @@ export type StickyNoteLayoutOpts = {
   baseFontSize?: number;
   /** the edge that stays put when the content correction changes the height */
   anchor?: StickyNoteLayoutAnchor;
+  /**
+   * the host whose text metrics the fit measures with; omitted = the global
+   * environment. An editor passes its own so a note laid out in one window
+   * (or headlessly) is measured with that realm's fonts and canvas.
+   */
+  renderEnvironment?: RenderEnvironment;
 };
 
 export type StickyNoteLayout = {
@@ -786,6 +806,7 @@ export const getStickyNoteLayout = (
     STICKY_NOTE_MIN_SIZE,
   );
   const anchor = opts.anchor ?? "top";
+  const { renderEnvironment } = opts;
 
   if (!textElement) {
     // an empty note sits at its base height
@@ -812,8 +833,12 @@ export const getStickyNoteLayout = (
 
   const fit = (fontSize: number): FontFit => {
     const font = getFontString({ fontFamily, fontSize });
-    const text = wrapText(originalText, font, maxWidth);
-    return { text, fontSize, ...measureText(text, font, lineHeight) };
+    const text = wrapText(originalText, font, maxWidth, renderEnvironment);
+    return {
+      text,
+      fontSize,
+      ...measureText(text, font, lineHeight, renderEnvironment),
+    };
   };
 
   const isBlank = !originalText.trim();
@@ -825,6 +850,7 @@ export const getStickyNoteLayout = (
           "",
           getFontString({ fontFamily, fontSize: baseFontSize }),
           lineHeight,
+          renderEnvironment,
         ),
       }
     : fitStickyNoteFont(fit, {
@@ -964,11 +990,10 @@ export const updateStickyNoteLayout = (
     scene.mutateElement(textElement, layout.text);
   }
   if (bindings !== false && !container.isDeleted) {
-    updateBoundElements(
-      container as NonDeletedExcalidrawElement,
-      scene,
-      bindings || undefined,
-    );
+    updateBoundElements(container as NonDeletedExcalidrawElement, scene, {
+      ...bindings,
+      renderEnvironment: layoutOpts.renderEnvironment,
+    });
   }
 
   return layout;
@@ -1023,7 +1048,10 @@ const hasStickyNoteLayoutInputChanged = (
 export const relayoutStickyNotes = <T extends ExcalidrawElement>(
   elements: readonly T[],
   affectedIds: ReadonlySet<ExcalidrawElement["id"]>,
-  opts?: { prevElementsMap?: ElementsMap },
+  opts?: {
+    prevElementsMap?: ElementsMap;
+    renderEnvironment?: RenderEnvironment;
+  },
 ): readonly T[] => {
   if (!affectedIds.size) {
     return elements;
@@ -1062,7 +1090,9 @@ export const relayoutStickyNotes = <T extends ExcalidrawElement>(
     ) {
       continue;
     }
-    const layout = getStickyNoteLayout(container, textElement);
+    const layout = getStickyNoteLayout(container, textElement, {
+      renderEnvironment: opts?.renderEnvironment,
+    });
     const nextContainer = newElementWith(container, layout.container);
     if (nextContainer !== container) {
       replacements.set(id, nextContainer as unknown as T);

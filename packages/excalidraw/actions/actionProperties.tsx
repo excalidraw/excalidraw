@@ -31,8 +31,6 @@ import {
   normalizeStickyNote,
   getNonDeletedElements,
   isNonDeletedElement,
-  relayoutStickyNotes,
-  STICKY_NOTE_FOOTER_FORMAT,
   syncStickyNoteInk,
 } from "@excalidraw/element";
 
@@ -74,6 +72,7 @@ import {
 
 import {
   updateElbowArrowPoints,
+  updateElbowArrowRoute,
   CaptureUpdateAction,
   toggleLinePolygonState,
 } from "@excalidraw/element";
@@ -89,13 +88,11 @@ import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
-  ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
   FontFamilyValues,
   StrokeVariability,
   NonDeleted,
   NonDeletedExcalidrawElement,
-  StickyNoteFooterOptions,
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
@@ -157,11 +154,6 @@ import {
   ArrowheadCardinalityZeroOrOneIcon,
   strokeVariabilityConstantIcon,
   strokeVariabilityVariableIcon,
-  CalendarClockIcon,
-  CalendarCogIcon,
-  CalendarDaysIcon,
-  CalendarShortDateIcon,
-  CalendarXIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -323,7 +315,12 @@ const changeFontSize = (
           oldElement,
           getBaseFontSizeUpdate(oldElement, newFontSize, elementsMap),
         );
-        redrawTextBoundingBox(newElement, container, app.scene);
+        redrawTextBoundingBox(
+          newElement,
+          container,
+          app.scene,
+          app.renderEnvironment,
+        );
 
         newElement = offsetElementAfterFontResize(
           oldElement,
@@ -343,7 +340,9 @@ const changeFontSize = (
     includeBoundTextElement: true,
   }).forEach((element) => {
     if (isTextElement(element)) {
-      updateBoundElements(element, app.scene);
+      updateBoundElements(element, app.scene, {
+        renderEnvironment: app.renderEnvironment,
+      });
     }
   });
 
@@ -1152,7 +1151,10 @@ export const actionIncreaseFontSize = register({
 type ChangeFontFamilyData = Partial<
   Pick<
     AppState,
-    "openPopup" | "currentItemFontFamily" | "currentHoveredFontFamily"
+    | "openPopup"
+    | "currentItemFontFamily"
+    | "currentHoveredFontFamily"
+    | "fontTopPicks"
   >
 > & {
   /** cache of selected & editing elements populated on opened popup */
@@ -1334,7 +1336,12 @@ export const actionChangeFontFamily = register<{
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
-          redrawTextBoundingBox(element, container, app.scene);
+          redrawTextBoundingBox(
+            element,
+            container,
+            app.scene,
+            app.renderEnvironment,
+          );
         }
       } else {
         // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
@@ -1352,6 +1359,7 @@ export const actionChangeFontFamily = register<{
                 latestElement as ExcalidrawTextElement,
                 latestContainer,
                 app.scene,
+                app.renderEnvironment,
               );
             }
           }
@@ -1450,7 +1458,9 @@ export const actionChangeFontFamily = register<{
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
+          topPicks={appState.fontTopPicks}
           compactMode={stylesPanelMode !== "full"}
+          onTopPicksChange={(fontTopPicks) => updateData({ fontTopPicks })}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
@@ -1567,6 +1577,7 @@ export const actionChangeTextAlign = register<TextAlign>({
               newElement,
               app.scene.getContainerElement(oldElement),
               app.scene,
+              app.renderEnvironment,
             );
             return newElement;
           }
@@ -1649,226 +1660,6 @@ export const actionChangeTextAlign = register<TextAlign>({
   },
 });
 
-type StickyNoteFooterPreset = "none" | "short" | "time" | "long";
-type StickyNoteFooterPickerValue = StickyNoteFooterPreset | "custom" | "mixed";
-
-const getTargetStickyNotes = (
-  elements: readonly ExcalidrawElement[],
-  appState: Parameters<typeof getTargetElements>[1],
-) => {
-  const elementsMap = arrayToMap(elements);
-  const stickyNotes = new Map<string, ExcalidrawStickyNoteElement>();
-
-  for (const target of getTargetElements(elementsMap, appState)) {
-    const stickyNote = isStickyNoteElement(target)
-      ? target
-      : isTextElement(target) && target.containerId
-      ? elementsMap.get(target.containerId)
-      : null;
-
-    if (
-      stickyNote &&
-      !stickyNote.isDeleted &&
-      isStickyNoteElement(stickyNote)
-    ) {
-      stickyNotes.set(stickyNote.id, stickyNote);
-    }
-  }
-
-  return [...stickyNotes.values()];
-};
-
-const getStickyNoteFooterPreset = (
-  footerOptions: StickyNoteFooterOptions | null,
-): StickyNoteFooterPickerValue => {
-  if (footerOptions === null) {
-    return "none";
-  }
-  if (
-    footerOptions.type === "date" &&
-    (footerOptions.format === STICKY_NOTE_FOOTER_FORMAT.SHORT ||
-      footerOptions.format === STICKY_NOTE_FOOTER_FORMAT.TIME ||
-      footerOptions.format === STICKY_NOTE_FOOTER_FORMAT.LONG)
-  ) {
-    return footerOptions.format;
-  }
-  return "custom";
-};
-
-const getStickyNoteFooterPickerValue = (
-  stickyNotes: readonly ExcalidrawStickyNoteElement[],
-  currentFooterOptions: StickyNoteFooterOptions | null,
-) => {
-  if (stickyNotes.length === 0) {
-    return getStickyNoteFooterPreset(currentFooterOptions);
-  }
-  const first = getStickyNoteFooterPreset(stickyNotes[0].footerOptions);
-  return stickyNotes.every(
-    (stickyNote) =>
-      getStickyNoteFooterPreset(stickyNote.footerOptions) === first,
-  )
-    ? first
-    : "mixed";
-};
-
-const getStickyNoteFooterOptions = (
-  value: StickyNoteFooterPreset,
-): StickyNoteFooterOptions | null =>
-  value === "none"
-    ? null
-    : {
-        type: "date",
-        format:
-          value === "short"
-            ? STICKY_NOTE_FOOTER_FORMAT.SHORT
-            : value === "time"
-            ? STICKY_NOTE_FOOTER_FORMAT.TIME
-            : STICKY_NOTE_FOOTER_FORMAT.LONG,
-      };
-
-const areStickyNoteFooterOptionsEqual = (
-  a: StickyNoteFooterOptions | null,
-  b: StickyNoteFooterOptions | null,
-) =>
-  a === b ||
-  (a !== null &&
-    b !== null &&
-    a.type === b.type &&
-    (a.type === "date"
-      ? b.type === "date" && a.format === b.format
-      : b.type === "text" && a.text === b.text));
-
-export const actionChangeStickyNoteFooter = register<StickyNoteFooterPreset>({
-  name: "changeStickyNoteFooter",
-  label: "Change sticky note footer",
-  keywords: ["sticky note", "footer", "date", "time"],
-  trackEvent: { category: "element" },
-  predicate: (elements, appState) =>
-    appState.activeTool.type === "stickynote" ||
-    getTargetStickyNotes(elements, appState).length > 0,
-  perform: (elements, appState, value, app) => {
-    invariant(value, "actionChangeStickyNoteFooter: value must be defined");
-    const stickyNotes = getTargetStickyNotes(elements, appState);
-    const footerOptions = getStickyNoteFooterOptions(value);
-    const appStateChanged = !areStickyNoteFooterOptionsEqual(
-      appState.currentItemStickynoteFooterOptions,
-      footerOptions,
-    );
-    const changedStickyNotes = stickyNotes.filter(
-      (stickyNote) =>
-        !areStickyNoteFooterOptionsEqual(
-          stickyNote.footerOptions,
-          footerOptions,
-        ),
-    );
-
-    if (!appStateChanged && changedStickyNotes.length === 0) {
-      return false;
-    }
-    const nextAppState = {
-      ...appState,
-      currentItemStickynoteFooterOptions: footerOptions,
-    };
-    if (changedStickyNotes.length === 0) {
-      return {
-        appState: nextAppState,
-        captureUpdate: CaptureUpdateAction.EVENTUALLY,
-      };
-    }
-
-    const targetIds = new Set(
-      changedStickyNotes.map((stickyNote) => stickyNote.id),
-    );
-    const prevElementsMap = arrayToMap(elements);
-    const changedElements = elements.map((element) =>
-      targetIds.has(element.id) && isStickyNoteElement(element)
-        ? newElementWith(element, { footerOptions })
-        : element,
-    );
-    const nextElements = relayoutStickyNotes(changedElements, targetIds, {
-      prevElementsMap,
-    });
-
-    for (const element of nextElements) {
-      const prev = prevElementsMap.get(element.id);
-      if (
-        isStickyNoteElement(element) &&
-        isNonDeletedElement(element) &&
-        prev &&
-        (prev.x !== element.x ||
-          prev.y !== element.y ||
-          prev.height !== element.height)
-      ) {
-        updateBoundElements(element, app.scene);
-      }
-    }
-
-    return {
-      elements: nextElements,
-      appState: nextAppState,
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
-  },
-  PanelComponent: ({ elements, appState, updateData }) => {
-    const stickyNotes = getTargetStickyNotes(elements, appState);
-    if (stickyNotes.length === 0 && appState.activeTool.type !== "stickynote") {
-      return null;
-    }
-
-    const label = t("labels.stickyNote.footer");
-    const visibleSections = [
-      {
-        name: "default",
-        options: [
-          {
-            value: "none",
-            text: t("labels.stickyNote.footerNone"),
-            icon: CalendarXIcon,
-            keyBinding: null,
-          },
-          {
-            value: "short",
-            text: t("labels.stickyNote.footerShortDate"),
-            icon: CalendarShortDateIcon,
-            keyBinding: null,
-          },
-          {
-            value: "time",
-            text: t("labels.stickyNote.footerTime"),
-            icon: CalendarClockIcon,
-            keyBinding: null,
-          },
-          {
-            value: "long",
-            text: t("labels.stickyNote.footerFullDate"),
-            icon: CalendarDaysIcon,
-            keyBinding: null,
-          },
-        ],
-      },
-    ] as const;
-
-    return (
-      <div style={{ marginLeft: "auto" }}>
-        <IconPicker<StickyNoteFooterPickerValue>
-          visibleSections={visibleSections}
-          label={label}
-          value={getStickyNoteFooterPickerValue(
-            stickyNotes,
-            appState.currentItemStickynoteFooterOptions,
-          )}
-          triggerIcon={CalendarCogIcon}
-          onChange={(value) => {
-            if (value !== "custom" && value !== "mixed") {
-              updateData(value);
-            }
-          }}
-        />
-      </div>
-    );
-  },
-});
-
 export const actionChangeVerticalAlign = register<VerticalAlign>({
   name: "changeVerticalAlign",
   label: "Change vertical alignment",
@@ -1889,6 +1680,7 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               newElement,
               app.scene.getContainerElement(oldElement),
               app.scene,
+              app.renderEnvironment,
             );
             return newElement;
           }
@@ -1903,14 +1695,7 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({
-    elements,
-    appState,
-    updateData,
-    app,
-    data,
-    renderAction,
-  }) => {
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const { isCompact } = getStylesPanelInfo(app);
     return (
       <fieldset>
@@ -1970,7 +1755,6 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               );
             }}
           />
-          {renderAction("changeStickyNoteFooter")}
         </div>
       </fieldset>
     );
@@ -2180,7 +1964,7 @@ export const actionChangeArrowhead = register<{
   name: "changeArrowhead",
   label: "Change arrowheads",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeArrowhead: value must be defined");
 
     return {
@@ -2188,17 +1972,21 @@ export const actionChangeArrowhead = register<{
         if (isLinearElement(el)) {
           const { position, type } = value;
 
-          if (position === "start") {
-            const element: ExcalidrawLinearElement = newElementWith(el, {
-              startArrowhead: type,
-            });
-            return element;
-          } else if (position === "end") {
-            const element: ExcalidrawLinearElement = newElementWith(el, {
-              endArrowhead: type,
-            });
-            return element;
-          }
+          const element: ExcalidrawLinearElement = newElementWith(
+            el,
+            position === "start"
+              ? { startArrowhead: type }
+              : { endArrowhead: type },
+          );
+          return isElbowArrow(element)
+            ? newElementWith(
+                element,
+                updateElbowArrowRoute(
+                  element,
+                  app.scene.getNonDeletedElementsMap(),
+                ),
+              )
+            : element;
         }
 
         return el;
@@ -2384,6 +2172,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   startElement,
                   "start",
                   elementsMap,
+                  appState.zoom,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2398,6 +2187,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   endElement,
                   "end",
                   elementsMap,
+                  appState.zoom,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2430,6 +2220,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "start",
               app.scene,
+              appState.zoom,
             );
           }
         }
@@ -2444,6 +2235,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "end",
               app.scene,
+              appState.zoom,
             );
           }
         }

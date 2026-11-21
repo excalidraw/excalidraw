@@ -17,7 +17,7 @@ import {
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
-import { useColorPickerDnD } from "./topPicksDnD";
+import { useColorPickerDnD } from "./colorTopPicksDnD";
 
 interface ShadeListProps {
   theme: Theme;
@@ -89,7 +89,7 @@ export const ShadeList = ({
                   setActiveColorPickerSection("shades");
                 }}
                 onPointerDown={
-                  dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
+                  dnd ? (event) => dnd.startSourceDrag(event, color) : undefined
                 }
               >
                 <div className="color-picker__button-outline" />

@@ -1,10 +1,10 @@
-import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
+  THEME,
   VERSIONS,
   chunk,
   getExportSource,
@@ -13,7 +13,9 @@ import {
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
+import { exportScene } from "../scene/export";
 
+import { useExcalidrawContainer } from "./App";
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
 import { IconButton } from "./IconButton";
@@ -35,7 +37,10 @@ interface PublishLibraryDataParams {
   website: string;
 }
 
-const generatePreviewImage = async (libraryItems: LibraryItems) => {
+const generatePreviewImage = async (
+  libraryItems: LibraryItems,
+  ownerDocument: Document,
+) => {
   const MAX_ITEMS_PER_ROW = 6;
   const BOX_SIZE = 128;
   const BOX_PADDING = Math.round(BOX_SIZE / 16);
@@ -43,7 +48,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
 
   const rows = chunk(libraryItems, MAX_ITEMS_PER_ROW);
 
-  const canvas = document.createElement("canvas");
+  const canvas = ownerDocument.createElement("canvas");
 
   canvas.width =
     rows[0].length * BOX_SIZE +
@@ -62,10 +67,15 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
   // draw items
   // ---------------------------------------------------------------------------
   for (const [index, item] of libraryItems.entries()) {
-    const itemCanvas = await exportToCanvas({
-      elements: item.elements,
-      files: null,
-      maxWidthOrHeight: BOX_SIZE,
+    const itemCanvas = await exportScene({
+      type: "canvas",
+      data: {
+        elements: item.elements,
+        files: null,
+      },
+      config: {
+        maxWidthOrHeight: BOX_SIZE,
+      },
     });
 
     const { width, height } = itemCanvas;
@@ -126,15 +136,17 @@ const SingleLibraryItem = ({
       return;
     }
     (async () => {
-      const svg = await exportToSvg({
-        elements: libItem.elements,
-        appState: {
-          ...appState,
-          viewBackgroundColor: "#fff",
-          exportBackground: true,
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: libItem.elements,
+          files: null,
         },
-        files: null,
-        skipInliningFonts: true,
+        config: {
+          skipInliningFonts: true,
+          canvasBackgroundColor: "#fff",
+          theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+        },
       });
       node.innerHTML = svg.outerHTML;
     })();
@@ -220,6 +232,8 @@ const PublishLibrary = ({
   updateItemsInStorage: (items: LibraryItems) => void;
   onRemove: (id: string) => void;
 }) => {
+  const { container } = useExcalidrawContainer();
+
   const [libraryData, setLibraryData] = useState<PublishLibraryDataParams>({
     authorName: "",
     githubHandle: "",
@@ -275,7 +289,10 @@ const PublishLibrary = ({
       return;
     }
 
-    const previewImage = await generatePreviewImage(clonedLibItems);
+    const previewImage = await generatePreviewImage(
+      clonedLibItems,
+      container?.ownerDocument ?? document,
+    );
 
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,

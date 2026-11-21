@@ -94,14 +94,12 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
 
+/** Serializable footer content shared by the editor and exports. */
 export type StickyNoteFooterOptions =
   | Readonly<{
       type: "date";
-      /**
-       * One of the built-in formats (`short`, `time`, or `long`) or a custom
-       * date format using tokens such as `D`, `MMM`, `YYYY`, `HH`, and `mm`.
-       */
-      format: string;
+      /** Creation timestamp; hosts can preformat other styles as text. */
+      format: "short" | "time" | "long";
     }>
   | Readonly<{
       type: "text";
@@ -116,6 +114,7 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
      * note grows above it to fit its label and never shrinks below it
      */
     baseHeight: number;
+    /** Saved with the note. null hides the footer and reclaims its body space. */
     footerOptions: StickyNoteFooterOptions | null;
   }>;
 

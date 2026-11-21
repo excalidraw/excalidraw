@@ -9,7 +9,10 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 unmountComponent();
 
@@ -363,7 +366,7 @@ describe("flow chart band-search placement", () => {
     expect({ x: c2.x, y: c2.y }).toEqual({ x: 600, y: 200 });
   });
 
-  it("keeps pending nodes in place while the cluster grows", () => {
+  it("centers the pending cluster on the parent while it grows", () => {
     API.clearSelection();
     const parent = API.createElement({
       type: "rectangle",
@@ -379,8 +382,8 @@ describe("flow chart band-search placement", () => {
 
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
       expect(pendingRects()).toEqual([
-        { x: 300, y: 0 },
-        { x: 300, y: 200 },
+        { x: 300, y: -100 },
+        { x: 300, y: 100 },
       ]);
 
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
@@ -392,6 +395,102 @@ describe("flow chart band-search placement", () => {
     });
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
   });
+
+  it("keeps pending nodes in place while an obstacle blocks the centered slot", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+
+    // an obstacle above the band leaves room for the first node only
+    addChild(parent, KEYS.ARROW_RIGHT);
+    const [c1] = children(parent);
+    API.updateElement(c1, { y: -250 });
+
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([{ x: 300, y: 0 }]);
+
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: 0 },
+        { x: 300, y: 200 },
+      ]);
+
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      expect(pendingRects()).toEqual([
+        { x: 300, y: 0 },
+        { x: 300, y: 200 },
+        { x: 300, y: 400 },
+      ]);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+  });
+
+  it("keeps a gap from nodes between the parent's row and the band", () => {
+    API.clearSelection();
+    const parent = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 100,
+    });
+    API.setElements([parent]);
+    API.setSelectedElements([parent]);
+
+    // the centered right children: the lower one ends exactly where the
+    // band below the parent begins (y: 100..200)
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+
+    API.setSelectedElements([parent]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_DOWN);
+      Keyboard.keyPress(KEYS.ARROW_DOWN);
+      // the centered slot (x: -150..350) would sit flush under the lower
+      // right child (x: 300..500)
+      expect(pendingRects()).toEqual([
+        { x: -300, y: 200 },
+        { x: 0, y: 200 },
+      ]);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+  });
+
+  it.each([
+    { key: KEYS.ARROW_UP, y: -0.1, height: 100 },
+    { key: KEYS.ARROW_DOWN, y: 0.1, height: 100.3 },
+  ])(
+    "keeps children centered beside a node in the parent's row ($key, y=$y)",
+    ({ key, y, height }) => {
+      API.clearSelection();
+      const parent = API.createElement({
+        type: "rectangle",
+        y,
+        width: 200,
+        height,
+      });
+      API.setElements([parent]);
+
+      // Centering the right child can round its top or bottom edge slightly
+      // past the parent's, even though both nodes occupy the same row.
+      addChild(parent, KEYS.ARROW_RIGHT);
+
+      API.setSelectedElements([parent]);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(key);
+        Keyboard.keyPress(key);
+        expect(pendingRects().map(({ x }) => x)).toEqual([-150, 150]);
+      });
+      Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    },
+  );
 
   it("repositions the whole pending cluster when it no longer fits", () => {
     API.clearSelection();
@@ -495,189 +594,273 @@ describe("flow chart navigation", () => {
     expect(h.state.selectedElementIds[rightMostNode.id]).toBe(true);
   });
 
-  it("multiple nodes at each level", () => {
+  const createNode = (key: string) => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(key);
+    });
+    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    return h.app.scene
+      .getNonDeletedElements()
+      .find((el) => h.state.selectedElementIds[el.id])!;
+  };
+
+  const navigate = (...keys: string[]) => {
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      keys.forEach((key) => Keyboard.keyPress(key));
+    });
+    Keyboard.keyUp(KEYS.ALT);
+  };
+
+  const expectSelected = (element: ExcalidrawElement) => {
+    expect(Object.keys(h.state.selectedElementIds)).toEqual([element.id]);
+  };
+
+  const node = (x: number, y: number, width = 200, height = 80) =>
+    API.createElement({ type: "rectangle", x, y, width, height });
+
+  const link = (
+    from: ExcalidrawElement,
+    to: ExcalidrawElement,
+    elbowed = true,
+  ) =>
+    API.createElement({
+      type: "arrow",
+      elbowed,
+      startBinding: {
+        elementId: from.id,
+        fixedPoint: [0.5, 0.5],
+        mode: "orbit",
+      },
+      endBinding: { elementId: to.id, fixedPoint: [0.5, 0.5], mode: "orbit" },
+    });
+
+  it("moves to the node that's visually in that direction", () => {
     /**
-     * from the perspective of the first node, there're four layers, and
-     * there are four nodes at the second layer
-     *
-     *   -> ▨
-     * ▨ -> ▨ -> ▨ -> ▨ -> ▨
-     *   -> ▨
-     *   -> ▨
+     * A → B → C
+     *         ↓
+     *         D
+     *         ↓
+     *     F ← E
      */
+    const a = API.createElement({ type: "rectangle", width: 200, height: 100 });
+    API.setElements([a]);
+    API.setSelectedElements([a]);
 
-    API.clearSelection();
-    const rectangle = API.createElement({
-      type: "rectangle",
-      width: 200,
-      height: 100,
-    });
+    const b = createNode(KEYS.ARROW_RIGHT);
+    createNode(KEYS.ARROW_RIGHT);
+    const d = createNode(KEYS.ARROW_DOWN);
+    const e = createNode(KEYS.ARROW_DOWN);
+    const f = createNode(KEYS.ARROW_LEFT);
 
-    API.setElements([rectangle]);
-    API.setSelectedElements([rectangle]);
+    // straight up, not along the arrow back to E
+    navigate(KEYS.ARROW_UP);
+    expectSelected(b);
 
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    // nothing to the right of E
+    API.setSelectedElements([e]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(e);
 
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    // F is the only node more below A than beside it
+    API.setSelectedElements([a]);
+    navigate(KEYS.ARROW_DOWN);
+    expectSelected(f);
 
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    // B and F are equally far: the upper one wins
+    API.setSelectedElements([d]);
+    navigate(KEYS.ARROW_LEFT);
+    expectSelected(b);
 
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    const secondNode = h.elements[1];
-    const rightMostNode = h.elements[h.elements.length - 2];
-
-    API.setSelectedElements([rectangle]);
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    API.setSelectedElements([rectangle]);
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    API.setSelectedElements([rectangle]);
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    API.setSelectedElements([rectangle]);
-
-    // because of same level cycling,
-    // going right five times should take us back to the second node again
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.ALT);
-    expect(h.state.selectedElementIds[secondNode.id]).toBe(true);
-
-    // from the second node, going right three times should take us to the rightmost node
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.ALT);
-    expect(h.state.selectedElementIds[rightMostNode.id]).toBe(true);
-
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-    });
-    Keyboard.keyUp(KEYS.ALT);
-    expect(h.state.selectedElementIds[rectangle.id]).toBe(true);
+    // A sits between the rows, about as far off B's row as off D's: the much
+    // nearer B wins
+    API.updateElement(a, { y: a.y + 100.2 });
+    API.setSelectedElements([a]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(b);
   });
 
-  it("take the most obvious link when possible", () => {
+  it("breaks ties by links, alignment and reading order", () => {
     /**
-     * ▨ → ▨   ▨ → ▨
-     *     ↓   ↑
-     *     ▨ → ▨
+     * X ←┐
+     *    B
+     * A ─┤
+     *    C
+     * Y ←┘
      */
-
-    API.clearSelection();
-    const rectangle = API.createElement({
+    // at a fractional y, B and C are equally level with A only up to float
+    // noise, which mustn't decide between them
+    const a = API.createElement({
       type: "rectangle",
+      y: 0.7,
       width: 200,
       height: 100,
     });
-
-    API.setElements([rectangle]);
-    API.setSelectedElements([rectangle]);
-
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_DOWN);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    API.setElements([a]);
+    API.setSelectedElements([a]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_UP);
-    });
-    Keyboard.keyUp(KEYS.CTRL_OR_CMD);
-
-    Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
     });
     Keyboard.keyUp(KEYS.CTRL_OR_CMD);
+    const [b, c] = h.app.scene
+      .getNonDeletedElements()
+      .filter((el) => el.type === "rectangle" && el.id !== a.id)
+      .sort((el1, el2) => el1.y - el2.y);
 
-    // last node should be the one that's selected
-    const rightMostNode = h.elements[h.elements.length - 2];
-    expect(rightMostNode.type).toBe("rectangle");
-    expect(h.state.selectedElementIds[rightMostNode.id]).toBe(true);
+    API.setSelectedElements([b]);
+    const x = createNode(KEYS.ARROW_LEFT);
+    API.setSelectedElements([c]);
+    const y = createNode(KEYS.ARROW_LEFT);
+    API.updateElement(y, { y: y.y + 10 });
 
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-    });
-    Keyboard.keyUp(KEYS.ALT);
+    // siblings aren't linked, but C is right below B
+    API.setSelectedElements([b]);
+    navigate(KEYS.ARROW_DOWN);
+    expectSelected(c);
 
-    expect(h.state.selectedElementIds[rectangle.id]).toBe(true);
+    // A and Y are about equally far: C links to Y
+    navigate(KEYS.ARROW_LEFT);
+    expectSelected(y);
 
-    // going any direction takes us to the predecessor as well
-    const predecessorToRightMostNode = h.elements[h.elements.length - 4];
-    expect(predecessorToRightMostNode.type).toBe("rectangle");
+    // B and C are equally far, both linked and equally level: the upper one
+    // wins
+    API.setSelectedElements([a]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(b);
 
-    API.setSelectedElements([rightMostNode] as NonDeletedExcalidrawElement[]);
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    });
-    Keyboard.keyUp(KEYS.ALT);
-    expect(h.state.selectedElementIds[rightMostNode.id]).not.toBe(true);
-    expect(h.state.selectedElementIds[predecessorToRightMostNode.id]).toBe(
-      true,
-    );
-    API.setSelectedElements([rightMostNode] as NonDeletedExcalidrawElement[]);
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_UP);
-    });
-    Keyboard.keyUp(KEYS.ALT);
-    expect(h.state.selectedElementIds[rightMostNode.id]).not.toBe(true);
-    expect(h.state.selectedElementIds[predecessorToRightMostNode.id]).toBe(
-      true,
-    );
-    API.setSelectedElements([rightMostNode] as NonDeletedExcalidrawElement[]);
-    Keyboard.withModifierKeys({ alt: true }, () => {
-      Keyboard.keyPress(KEYS.ARROW_DOWN);
-    });
-    Keyboard.keyUp(KEYS.ALT);
-    expect(h.state.selectedElementIds[rightMostNode.id]).not.toBe(true);
-    expect(h.state.selectedElementIds[predecessorToRightMostNode.id]).toBe(
-      true,
-    );
+    // A and X are equally far: B links to X, even right after coming from A
+    API.setSelectedElements([a]);
+    navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
+    expectSelected(x);
+
+    // P and Q are about equally far from N and both linked from it: P is
+    // level with N's center, Q is higher
+    const n = node(0, 0, 200, 200);
+    const q = node(300, -30);
+    const p = node(300, 60);
+    API.setElements([n, q, p, link(n, q), link(n, p)]);
+    API.setSelectedElements([n]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(p);
+
+    // links still come first
+    API.setElements([n, q, p, link(n, q)]);
+    API.setSelectedElements([n]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(q);
+  });
+
+  it("weighs how near a node is against how far off to the side it is", () => {
+    /**
+     *          BLUE ←─┐
+     *                 UP
+     *     ┌→ TOP ─┐    ↑
+     * RED ┤       │ ┌→ R1
+     *     └→ BOT  └ MID
+     *               └→ R2
+     */
+    const box = (x: number, y: number) => node(x, y, 237, 117);
+    const red = box(0, 327);
+    const top = box(337, 218);
+    const bot = box(337, 435);
+    const mid = box(674, 435);
+    const r1 = box(1011, 327);
+    const r2 = box(1011, 544);
+    const up = box(844, 110);
+    let blue = box(506, 0);
+    API.setElements([
+      red,
+      top,
+      bot,
+      mid,
+      r1,
+      r2,
+      up,
+      blue,
+      link(red, top),
+      link(red, bot),
+      link(top, mid),
+      link(mid, r1),
+      link(mid, r2),
+      link(r1, up),
+      link(up, blue),
+    ]);
+
+    // nothing is level with BLUE: TOP, down and to the left, is much nearer
+    // than RED, which is more to the left than below
+    API.setSelectedElements([blue]);
+    navigate(KEYS.ARROW_LEFT);
+    expectSelected(top);
+
+    // TOP is also what's below BLUE, not UP: BLUE links to it, but it's
+    // beside BLUE rather than below
+    API.setSelectedElements([blue]);
+    navigate(KEYS.ARROW_DOWN);
+    expectSelected(top);
+
+    // RED is level with R1 but three columns away: MID, next to R1 and half
+    // a row lower, wins
+    API.setSelectedElements([r1]);
+    navigate(KEYS.ARROW_LEFT);
+    expectSelected(mid);
+
+    /**
+     *     GREEN
+     *     ↑
+     * L ──┘     R
+     * ↑         ↑
+     * └─ BLUE ──┘
+     */
+    const green = box(287, 0);
+    const l = box(0, 589);
+    const r = box(604, 589);
+    blue = box(288, 789);
+    API.setElements([
+      green,
+      l,
+      r,
+      blue,
+      link(blue, l),
+      link(blue, r),
+      link(l, green),
+    ]);
+
+    // L and R are linked from BLUE and several times nearer, but more beside
+    // it than above: GREEN, straight above, wins
+    API.setSelectedElements([blue]);
+    navigate(KEYS.ARROW_UP);
+    expectSelected(green);
+  });
+
+  it("takes a bigger node as near as its nearest part", () => {
+    /**
+     *      U
+     *      ↓
+     * L → [W          ]
+     *      ↓
+     *      K
+     */
+    const u = node(0, -180);
+    const w = node(0, 0, 800);
+    const k = node(40, 180);
+    const l = node(-300, 0);
+    API.setElements([u, w, k, l, link(u, w), link(l, w), link(w, k)]);
+
+    // W's center is far to the right of K's, but W is right above K
+    API.setSelectedElements([k]);
+    navigate(KEYS.ARROW_UP);
+    expectSelected(w);
+
+    // W's center is far, but W starts right next to L, nearer than U
+    API.setSelectedElements([l]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(w);
+
+    // W and K are below U, K a bit more to the right: neither is to the
+    // right of U
+    API.setSelectedElements([u]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(u);
   });
 });

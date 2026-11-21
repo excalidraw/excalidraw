@@ -1,9 +1,14 @@
-import { ROUNDNESS } from "@excalidraw/common";
+import { KEYS, ROUNDNESS } from "@excalidraw/common";
 
-import { convertElementTypes } from "../components/ConvertElementTypePopup";
+import {
+  convertElementTypePopupAtom,
+  convertElementTypes,
+} from "../components/ConvertElementTypePopup";
+import { editorJotaiStore } from "../editor-jotai";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
+import { Keyboard } from "./helpers/ui";
 import { act, render } from "./test-utils";
 
 const { h } = window;
@@ -43,4 +48,24 @@ describe("convert element type", () => {
     expect(h.elements[0].type).toBe("rectangle");
     expect(h.elements[0].roundness?.type).toBe(ROUNDNESS.ADAPTIVE_RADIUS);
   });
+
+  it.each([KEYS.ESCAPE, KEYS.ENTER])(
+    "%s only closes the popup, keeping the selection and not editing",
+    (key) => {
+      const rectangle = API.createElement({ type: "rectangle" });
+      API.setElements([rectangle]);
+      API.setSelectedElements([rectangle]);
+
+      act(() => {
+        editorJotaiStore.set(convertElementTypePopupAtom, { type: "panel" });
+      });
+
+      Keyboard.keyPress(key);
+
+      expect(editorJotaiStore.get(convertElementTypePopupAtom)).toBe(null);
+      expect(h.state.selectedElementIds).toEqual({ [h.elements[0].id]: true });
+      expect(h.state.editingTextElement).toBe(null);
+      expect(h.elements.length).toBe(1);
+    },
+  );
 });

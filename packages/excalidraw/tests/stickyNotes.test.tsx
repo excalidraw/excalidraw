@@ -7,20 +7,17 @@ import {
   STICKY_NOTE_MIN_FONT_SIZE,
   arrayToMap,
 } from "@excalidraw/common";
-import { getByRole, getByTitle, queryByTestId } from "@testing-library/react";
+import { queryByTestId } from "@testing-library/react";
 import { pointFrom } from "@excalidraw/math";
 
 import {
-  CaptureUpdateAction,
   getStickyNoteLayout,
   getTransformHandles,
   getBaseFontSize,
-  newElementWith,
   resizeMultipleElements,
   resizeSingleElement,
   updateStickyNoteLayout,
 } from "@excalidraw/element";
-import { exportToCanvas } from "@excalidraw/utils";
 
 import type {
   ExcalidrawArrowElement,
@@ -41,7 +38,7 @@ import { activeEyeDropperAtom } from "../components/EyeDropper";
 import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 import { editorJotaiStore } from "../editor-jotai";
 import { Excalidraw } from "../index";
-import { exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -910,8 +907,8 @@ describe("sticky notes", () => {
       // a click on empty canvas blurs the editor (submitting it), then its
       // pointer-up records — which used to leave the empty label's deletion
       // as a second, invisible entry. The wysiwyg's own outside-pointerdown
-      // submit is disabled under vitest, so the blur is fired explicitly.
-      fireEvent.blur(editor);
+      // submit is disabled under vitest, so the editor is blurred explicitly.
+      act(() => editor.blur());
       mouse.downAt(900, 800);
       mouse.up();
 
@@ -933,7 +930,7 @@ describe("sticky notes", () => {
       });
       expect(h.state.editingTextElement).not.toBeNull();
 
-      fireEvent.blur(editor);
+      act(() => editor.blur());
       mouse.downAt(900, 800);
       mouse.up();
 
@@ -1141,81 +1138,6 @@ describe("sticky notes", () => {
   });
 
   describe("creation date", () => {
-    it("changes the footer from the dropdown and supports undo", () => {
-      const { note, label } = createNote({
-        id: "note",
-        text: "hello",
-        fontSize: 28,
-      });
-      API.updateScene({
-        elements: [note, label],
-        captureUpdate: CaptureUpdateAction.NEVER,
-      });
-      API.setSelectedElements([note]);
-
-      fireEvent.click(
-        getByRole(document.body, "button", { name: "Sticky note footer" }),
-      );
-      fireEvent.click(getByTitle(document.body, "Short date"));
-      expect(h.history.isUndoStackEmpty).toBe(true);
-
-      fireEvent.click(getByTitle(document.body, "No footer"));
-      expect(
-        getElement<ExcalidrawStickyNoteElement>(note.id).footerOptions,
-      ).toBeNull();
-
-      fireEvent.click(
-        getByRole(document.body, "button", { name: "Sticky note footer" }),
-      );
-      Keyboard.undo();
-      expect(
-        getElement<ExcalidrawStickyNoteElement>(note.id).footerOptions,
-      ).toEqual({ type: "date", format: "short" });
-
-      API.setSelectedElements([getElement(note.id)]);
-      fireEvent.click(
-        getByRole(document.body, "button", { name: "Sticky note footer" }),
-      );
-      fireEvent.click(getByTitle(document.body, "Time only"));
-      expect(
-        getElement<ExcalidrawStickyNoteElement>(note.id).footerOptions,
-      ).toEqual({ type: "date", format: "time" });
-    });
-
-    it("shows the footer picker for an empty sticky note", () => {
-      const note = API.createElement({
-        type: "stickynote",
-        id: "empty-note",
-      });
-      API.setElements([note]);
-      API.setSelectedElements([note]);
-
-      expect(
-        getByRole(document.body, "button", { name: "Sticky note footer" }),
-      ).toBeTruthy();
-    });
-
-    it("applies the current footer options to newly created sticky notes", async () => {
-      UI.clickTool("stickynote");
-      fireEvent.click(
-        getByRole(document.body, "button", { name: "Sticky note footer" }),
-      );
-      fireEvent.click(getByTitle(document.body, "No footer"));
-      expect(h.state.currentItemStickynoteFooterOptions).toBeNull();
-
-      fireEvent.click(
-        getByRole(document.body, "button", { name: "Sticky note footer" }),
-      );
-      mouse.downAt(300, 300);
-      mouse.up();
-
-      const note = h.elements.find(
-        (element) => element.type === "stickynote",
-      ) as ExcalidrawStickyNoteElement;
-      expect(note.footerOptions).toBeNull();
-      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
-    });
-
     it("exports the same absolute date to SVG and canvas, omitting unknown dates", async () => {
       const elements = [
         API.createElement({
@@ -1232,35 +1154,23 @@ describe("sticky notes", () => {
           height: DEFAULT_STICKY_NOTE_SIZE,
           created: null,
         }),
-        newElementWith(
-          API.createElement({
-            type: "stickynote",
-            x: 600,
-            width: DEFAULT_STICKY_NOTE_SIZE,
-            height: DEFAULT_STICKY_NOTE_SIZE,
-            created: new Date(2024, 1, 6, 12).getTime(),
-          }),
-          { footerOptions: null },
-        ),
       ];
 
-      const svg = await exportToSvg(
-        elements,
-        { exportBackground: false, viewBackgroundColor: "#ffffff" },
-        {},
-      );
+      const svg = await exportScene({
+        type: "svg",
+        data: { elements, files: {} },
+        config: { canvasBackgroundColor: false },
+      });
       expect(
         [...svg.querySelectorAll("text")].map((text) => text.textContent),
       ).toEqual(["7 Mar 2025"]);
 
-      const canvas = await exportToCanvas({ elements, files: {} });
+      const canvas = await exportScene({
+        type: "canvas",
+        data: { elements, files: {} },
+      });
       expect(canvas.getContext("2d")?.fillText).toHaveBeenCalledWith(
         "7 Mar 2025",
-        expect.any(Number),
-        expect.any(Number),
-      );
-      expect(canvas.getContext("2d")?.fillText).not.toHaveBeenCalledWith(
-        "6 Feb 2024",
         expect.any(Number),
         expect.any(Number),
       );

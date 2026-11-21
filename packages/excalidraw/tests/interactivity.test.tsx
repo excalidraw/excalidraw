@@ -633,7 +633,7 @@ describe("ui={false}", () => {
 
     // The placement scaffold remains for host UI, but default controls don't.
     expect(queryContainer(".App-toolbar")).toBe(null);
-    expect(queryContainer(".dropdown-menu-button")).toBe(null);
+    expect(queryContainer(".main-menu-trigger")).toBe(null);
     expect(queryContainer(".default-sidebar-trigger")).toBe(null);
     expect(queryContainer(".layer-ui__wrapper__footer-left")).toBe(null);
     expect(queryContainer(".help-icon")).toBe(null);
@@ -707,7 +707,7 @@ describe("ui={{ enabled: ... }}", () => {
     expect(queryContainer(".zoom-actions")).not.toBe(null);
     expect(queryContainer(".undo-redo-buttons")).toBe(null);
     expect(queryContainer(".App-toolbar")).toBe(null);
-    expect(queryContainer(".dropdown-menu-button")).toBe(null);
+    expect(queryContainer(".main-menu-trigger")).toBe(null);
     expect(queryContainer(".default-sidebar-trigger")).toBe(null);
     expect(queryContainer(".help-icon")).toBe(null);
     expect(
@@ -794,7 +794,7 @@ describe("ui={false} with host UI", () => {
     expect(queryContainer("[data-testid='host-footer']")).not.toBe(null);
     expect(queryContainer("[aria-label='host sidebar']")).not.toBe(null);
 
-    fireEvent.click(container.querySelector(".dropdown-menu-button")!);
+    fireEvent.click(container.querySelector(".main-menu-trigger")!);
     expect(container.textContent).toContain("host menu item");
     // The internal fallback menu must not be composed.
     expect(queryContainer("[data-testid='load-button']")).toBe(null);
@@ -843,7 +843,7 @@ describe("interaction={false} ui={false}", () => {
     expect(queryContainer("canvas.static")).not.toBe(null);
     expect(queryContainer("canvas.interactive")).not.toBe(null);
     expect(queryContainer(".App-toolbar")).toBe(null);
-    expect(queryContainer(".dropdown-menu-button")).toBe(null);
+    expect(queryContainer(".main-menu-trigger")).toBe(null);
 
     const container = queryContainer(".excalidraw-container")!;
     expect(container.classList.contains("excalidraw--non-interactive")).toBe(

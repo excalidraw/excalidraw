@@ -18,7 +18,7 @@ const createConvertArgs = (
   return {
     canvasRef: { current: canvas },
     mermaidToExcalidrawLib: {
-      loaded: true,
+      status: "loaded" as const,
       api: Promise.resolve({ parseMermaidToExcalidraw }),
     },
     mermaidDefinition,

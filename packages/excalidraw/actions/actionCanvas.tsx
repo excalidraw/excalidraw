@@ -112,6 +112,7 @@ export const actionClearCanvas = register({
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
         colorTopPicks: appState.colorTopPicks,
+        fontTopPicks: appState.fontTopPicks,
         activeTool:
           appState.activeTool.type === "image"
             ? {
@@ -125,6 +126,22 @@ export const actionClearCanvas = register({
   },
 });
 
+/**
+ * The viewport point (client coords, see `ZoomOptions`) a zoom keeps in place.
+ * Defaults to the canvas center.
+ */
+type ZoomAnchor = { viewportX: number; viewportY: number };
+
+const getZoomAnchor = (
+  /** the action's formData */
+  anchor: unknown,
+  appState: AppState,
+): ZoomAnchor =>
+  (anchor as ZoomAnchor | null | undefined) ?? {
+    viewportX: appState.width / 2 + appState.offsetLeft,
+    viewportY: appState.height / 2 + appState.offsetTop,
+  };
+
 export const actionZoomIn = register({
   name: "zoomIn",
   label: "buttons.zoomIn",
@@ -133,14 +150,13 @@ export const actionZoomIn = register({
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, appState, anchor, app) => {
     app.requestUnfollow();
     const nextState = {
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
         {
-          viewportX: appState.width / 2 + appState.offsetLeft,
-          viewportY: appState.height / 2 + appState.offsetTop,
+          ...getZoomAnchor(anchor, appState),
           nextZoom: getNormalizedZoom(appState.zoom.value + ZOOM_STEP),
         },
         appState,
@@ -154,17 +170,24 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <IconButton
-        type="button"
-        className="zoom-in-button zoom-button"
-        icon={ZoomInIcon}
-        title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
-        aria-label={t("buttons.zoomIn")}
-        disabled={zoomValue >= MAX_ZOOM}
-        onClick={() => {
-          updateData(null);
-        }}
-      />
+      <Tooltip
+        label={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
+        className="zoom-in-button-wrapper"
+        delay
+      >
+        <IconButton
+          type="button"
+          className="zoom-in-button zoom-button"
+          icon={ZoomInIcon}
+          aria-label={t("buttons.zoomIn")}
+          // the shortcut used to reach AT via the (now removed) native title
+          aria-keyshortcuts={getShortcutKey("CtrlOrCmd++")}
+          disabled={zoomValue >= MAX_ZOOM}
+          onClick={() => {
+            updateData(null);
+          }}
+        />
+      </Tooltip>
     );
   },
   keyTest: (event) =>
@@ -180,14 +203,13 @@ export const actionZoomOut = register({
   navigation: true,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, appState, anchor, app) => {
     app.requestUnfollow();
     const nextState = {
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
         {
-          viewportX: appState.width / 2 + appState.offsetLeft,
-          viewportY: appState.height / 2 + appState.offsetTop,
+          ...getZoomAnchor(anchor, appState),
           nextZoom: getNormalizedZoom(appState.zoom.value - ZOOM_STEP),
         },
         appState,
@@ -201,17 +223,24 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <IconButton
-        type="button"
-        className="zoom-out-button zoom-button"
-        icon={ZoomOutIcon}
-        title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
-        aria-label={t("buttons.zoomOut")}
-        disabled={zoomValue <= MIN_ZOOM}
-        onClick={() => {
-          updateData(null);
-        }}
-      />
+      <Tooltip
+        label={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
+        className="zoom-out-button-wrapper"
+        delay
+      >
+        <IconButton
+          type="button"
+          className="zoom-out-button zoom-button"
+          icon={ZoomOutIcon}
+          aria-label={t("buttons.zoomOut")}
+          // the shortcut used to reach AT via the (now removed) native title
+          aria-keyshortcuts={getShortcutKey("CtrlOrCmd+-")}
+          disabled={zoomValue <= MIN_ZOOM}
+          onClick={() => {
+            updateData(null);
+          }}
+        />
+      </Tooltip>
     );
   },
   keyTest: (event) =>
@@ -227,7 +256,7 @@ export const actionResetZoom = register({
   navigation: true,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
-  perform: (_elements, appState, _, app) => {
+  perform: (_elements, appState, anchor, app) => {
     app.requestUnfollow();
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
@@ -238,8 +267,7 @@ export const actionResetZoom = register({
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
         {
-          viewportX: appState.width / 2 + appState.offsetLeft,
-          viewportY: appState.height / 2 + appState.offsetTop,
+          ...getZoomAnchor(anchor, appState),
           nextZoom: getNormalizedZoom(nextZoom),
         },
         appState,
@@ -253,11 +281,15 @@ export const actionResetZoom = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+      <Tooltip
+        label={t("buttons.resetZoom")}
+        style={{ height: "100%" }}
+        className="reset-zoom-button-wrapper"
+        delay
+      >
         <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
-          title={t("buttons.resetZoom")}
           aria-label={t("buttons.resetZoom")}
           onClick={() => {
             updateData(null);

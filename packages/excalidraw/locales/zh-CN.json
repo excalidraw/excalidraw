@@ -1,7 +1,8 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "注册",
+    "signIn": "登录",
+    "upgrade": "升级",
     "paste": "粘贴",
     "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
@@ -27,6 +28,7 @@
     "copyStyles": "拷贝样式",
     "pasteStyles": "粘贴样式",
     "stroke": "描边",
+    "textColor": "文本颜色",
     "changeStroke": "更改描边颜色",
     "background": "背景",
     "changeBackground": "更改背景颜色",
@@ -37,9 +39,9 @@
     "strokeStyle_dashed": "虚线",
     "strokeStyle_dotted": "点虚线",
     "sloppiness": "线条风格",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "压感",
+    "pressure_constant": "恒定",
+    "pressure_variable": "可变",
     "opacity": "透明度",
     "textAlign": "文本对齐",
     "edges": "边角",
@@ -111,8 +113,10 @@
     "group": "编组",
     "ungroup": "解除编组",
     "collaborators": "协作者",
-    "you": "",
+    "you": "您",
     "toggleGrid": "切换网格显示",
+    "minimap": "小地图",
+    "zoom": "缩放",
     "addToLibrary": "添加到素材库中",
     "removeFromLibrary": "从素材库中移除",
     "libraryLoadingMessage": "正在加载素材库…",
@@ -182,20 +186,27 @@
     "zoomToFit": "缩放以适应所有元素",
     "installPWA": "在本地安装 Excalidraw (PWA)",
     "autoResize": "启用文本自动缩放",
+    "toggleAutoResize": "切换文本自动缩放",
     "imageCropping": "图片裁剪",
     "unCroppedDimension": "未裁剪的尺寸",
     "copyElementLink": "复制此对象的链接",
     "linkToElement": "链接到对象",
     "wrapSelectionInFrame": "用选中的元素创建画框",
+    "removeFrame": "解除画框",
+    "toggleWrap": "包围或解除包围选中元素",
     "tab": "Tab",
     "shapeSwitch": "切换形状",
     "preferences": "首选项",
     "preferences_toolLock": "工具锁",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "框选方式",
+    "boxSelectionContain": "完全包含",
+    "boxSelectionOverlap": "部分重叠",
     "arrowBinding": "箭头绑定",
-    "midpointSnapping": "吸附到中点"
+    "midpointSnapping": "吸附到中点",
+    "showHints": "工具栏提示",
+    "inputDevice": "输入设备",
+    "inputDeviceTrackpad": "触控板",
+    "inputDeviceMouse": "鼠标"
   },
   "elementLink": {
     "title": "链接到对象",
@@ -239,12 +250,14 @@
     "zoomIn": "放大",
     "zoomOut": "缩小",
     "resetZoom": "重置缩放",
+    "zoomToFit": "缩放以适应所有元素",
     "menu": "菜单",
     "done": "完成",
     "edit": "编辑",
     "undo": "撤销",
     "redo": "重做",
     "resetLibrary": "重置素材库",
+    "reset": "重置",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
     "darkMode": "深色模式",
@@ -332,18 +345,19 @@
     "eraser": "橡皮",
     "frame": "画框工具",
     "magicframe": "线框图至代码",
+    "stickynote": "便利贴",
     "embeddable": "嵌入网页",
     "laser": "激光笔",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "手绘转形状",
+    "bucketfill": "油漆桶填充",
     "hand": "抓手（平移工具）",
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
     "convertElementType": "切换形状种类"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "此处找不到可填充的封闭区域。",
+    "tooComplex": "此区域过于复杂，无法填充。"
   },
   "element": {
     "rectangle": "矩形",
@@ -357,6 +371,7 @@
     "group": "组",
     "frame": "画框",
     "magicframe": "线框图至代码",
+    "stickynote": "便利贴",
     "embeddable": "嵌入网页",
     "selection": "选择",
     "iframe": "IFrame"
@@ -375,15 +390,18 @@
     "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
     "embeddable": "点击并拖动以创建嵌入网页",
-    "autoshape": "",
+    "stickynote": "点击放置便利贴，或拖动以调整大小",
+    "autoshape": "绘制矩形、圆形、菱形、线条和箭头",
     "text_selected": "双击或按{{shortcut}}编辑文本",
     "text_editing": "按{{shortcut_1}}或{{shortcut_2}}完成编辑",
+    "toggleTextAutoResize": "按{{shortcut}}切换文本自动缩放",
     "linearElementMulti": "点击最后的点或按{{shortcut_1}}或{{shortcut_2}}完成",
     "lockAngle": "可以按住{{shortcut}}来约束角度",
     "resize": "缩放时按住{{shortcut_1}}可以约束宽高比例，\n按住{{shortcut_2}}可以从中间缩放",
     "resizeImage": "按住{{shortcut_1}}可以自由缩放，\n按住{{shortcut_2}}可以从中间缩放",
+    "resizeStickyNote": "按住{{shortcut_1}}可以自由缩放，按住{{shortcut_2}}可以从中间缩放",
     "rotate": "旋转时可以按住{{shortcut}}来约束角度",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "双击以添加或移除此端的箭头",
     "lineEditor_info": "按住{{shortcut_1}}双击，或者按{{shortcut_2}}编辑点",
     "lineEditor_line_info": "双击或按{{shortcut}}编辑点",
     "lineEditor_pointSelected": "按{{shortcut_1}}移除点，按{{shortcut_2}}复制点，拖拽移动点",
@@ -392,6 +410,7 @@
     "bindTextToElement": "按{{shortcut}}添加文本",
     "createFlowchart": "按{{shortcut}}创建流程图",
     "deepBoxSelect": "按住{{shortcut}}深度选择，并避免拖拽",
+    "cycleSelection": "按住{{shortcut}}点击以循环选择重叠的元素，或拖动以复制",
     "eraserRevert": "按住{{shortcut}}反选被标记删除的元素",
     "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.clipboardItem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。",
     "disableSnapping": "按住{{shortcut}}禁用吸附",
@@ -613,10 +632,10 @@
     "shades": "色调明暗",
     "hexCode": "十六进制值",
     "noShades": "此颜色没有可用的明暗变化",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "无效的颜色",
+    "invalidHexLength": "十六进制值必须为 3、4、6 或 8 个字符",
+    "topPicksTip": "提示：将任意颜色拖到首选颜色上即可固定",
+    "resetTopPicks": "恢复默认首选颜色"
   },
   "overwriteConfirm": {
     "action": {
@@ -649,15 +668,27 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "松开以替换内容",
+    "add": "松开以添加到画布",
+    "importLibrary": "松开以导入素材库",
+    "replaceHint": "按住<shift>Shift</shift>可保留现有内容",
+    "keepHint": "将保留您现有的内容",
+    "libraryHint": "素材库文件将追加到素材库中",
+    "replacedToast": "内容已替换。按{{shortcut}}撤销"
+  },
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "目前仅支持<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>、<classLink>类图</classLink>和<erdLink>实体关系（ER）图</erdLink>。其他类型在 Excalidraw 中将以图像呈现。",
+    "description": "<flowchartLink>流程图</flowchartLink>、<sequenceLink>序列图</sequenceLink>、<classLink>类图</classLink>、<stateLink>状态图</stateLink>、<erdLink>实体关系（ER）图</erdLink>、<ganttLink>甘特图</ganttLink>、<quadrantLink>象限图</quadrantLink>和<timelineLink>时间线图</timelineLink>将被转换为 Excalidraw 元素。其他类型将以图像形式插入。",
     "syntax": "Mermaid 语法",
     "preview": "预览",
     "label": "Mermaid",
-    "inputPlaceholder": "在此处输入 Mermaid 图定义……",
-    "autoFixAvailable": "自动修复可用"
+    "inputPlaceholder": "在此处编写 Mermaid 图表定义……",
+    "autoFixAvailable": "自动修复可用",
+    "loadError": "无法加载 Mermaid。请检查您的网络连接，然后重试。",
+    "loadErrorReload": "无法加载 Mermaid。请重新加载页面后重试。",
+    "reload": "重新加载"
   },
   "ttd": {
     "error": "错误！"
@@ -682,7 +713,7 @@
     "placeholder": {
       "title": "让我们设计您的图表",
       "description": "描述您想要创建的图表，我们将为您生成它。",
-      "hint": ""
+      "hint": "目前我们支持流程图、序列图、类图、状态图和实体关系（ER）图。"
     },
     "preview": "预览",
     "insert": "插入",
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "画布中的",
     "availableFonts": "可用字体",
-    "empty": "未找到字体"
+    "empty": "未找到字体",
+    "topPicksTip": "提示：将任意字体拖到首选字体上即可固定",
+    "resetTopPicks": "恢复默认首选字体"
   },
   "userList": {
     "empty": "未找到用户",
@@ -752,5 +785,16 @@
     "spacebar": "空格",
     "delete": "Delete",
     "mmb": "鼠标滚轮"
+  },
+  "promoBanner": {
+    "presentations": "演示文稿",
+    "mcp": "用 AI 绘图",
+    "comments": "添加评论",
+    "teams": "团队协作",
+    "voiceChat": "语音聊天",
+    "withExcalidrawPlus": "使用 Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "为人类与 AI 打造"
   }
 }

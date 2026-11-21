@@ -38,6 +38,7 @@ import {
   getStickyNoteFooter,
   getStickyNoteMinSize,
   formatStickyNoteFooterDate,
+  normalizeStickyNoteFooterOptions,
   syncStickyNoteInk,
   normalizeStickyNoteFontSize,
   updateStickyNoteLayout,
@@ -49,6 +50,7 @@ import {
   redrawTextBoundingBox,
 } from "../textElement";
 
+import type { RenderEnvironment } from "../renderEnvironment";
 import type {
   ExcalidrawElement,
   ExcalidrawStickyNoteElement,
@@ -713,6 +715,42 @@ describe("sticky note text layout", () => {
     measure.mockRestore();
   });
 
+  it("measures the fit through the given render environment", () => {
+    // the test-env canvas provider reports 10px per character; a host whose
+    // canvas measures three times as wide is observable in the fitted label
+    const perChar = 3;
+    const env: RenderEnvironment = {
+      createCanvas: () =>
+        ({
+          getContext: () => ({
+            font: "",
+            measureText: (text: string) => ({ width: text.length * perChar }),
+          }),
+        } as unknown as HTMLCanvasElement),
+      createImage: () => ({} as HTMLImageElement),
+    };
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const defaultWidth = getStickyNoteLayout(sticky, text).text!.width;
+    expect(defaultWidth).toBe("short".length * 10);
+
+    // the pure layout
+    expect(
+      getStickyNoteLayout(sticky, text, { renderEnvironment: env }).text!.width,
+    ).toBe(defaultWidth * perChar);
+
+    // ...and both ways of applying it to a scene
+    updateStickyNoteLayout(sticky, scene, { renderEnvironment: env });
+    expect(getBoundText(scene, textId).width).toBe(defaultWidth * perChar);
+
+    redrawTextBoundingBox(getBoundText(scene, textId), sticky, scene);
+    expect(getBoundText(scene, textId).width).toBe(defaultWidth);
+
+    redrawTextBoundingBox(getBoundText(scene, textId), sticky, scene, env);
+    expect(getBoundText(scene, textId).width).toBe(defaultWidth * perChar);
+  });
+
   it("honors a lowered ceiling even when the old fitted size still fits", () => {
     const { scene, stickyId, textId } = createStickyWithText("short");
     const sticky = getSticky(scene, stickyId);
@@ -1046,7 +1084,7 @@ describe("sticky note creation date", () => {
     ).toBeNull();
   });
 
-  it("supports each footer type and custom date formats", () => {
+  it("supports each footer type", () => {
     const sticky = newStickyNoteElement({
       type: "stickynote",
       x: 0,
@@ -1068,9 +1106,6 @@ describe("sticky note creation date", () => {
         NOW,
       )?.text,
     ).toBe("Custom footer");
-    expect(
-      formatStickyNoteFooterDate(sticky.created, "YYYY-MM-DD [at] HH:mm"),
-    ).toBe("2025-05-30 at 12:00");
     expect(formatStickyNoteFooterDate(sticky.created, "time")).toBe(
       new Intl.DateTimeFormat(undefined, {
         hour: "numeric",
@@ -1082,6 +1117,42 @@ describe("sticky note creation date", () => {
         new Date(sticky.created!),
       ),
     );
+  });
+
+  it("fits a custom footer on one line without changing the saved text", () => {
+    const text = "A very long category label\nwith a second line";
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: 80,
+      height: 80,
+      footerOptions: { type: "text", text },
+    });
+    const measure = vi
+      .spyOn(textMeasurements, "getLineWidth")
+      .mockImplementation((value) => Array.from(value).length * 8);
+    try {
+      const footer = getStickyNoteFooter(sticky);
+      expect(footer?.text).toMatch(/…$/);
+      expect(footer?.text).not.toContain("\n");
+      expect(Array.from(footer!.text).length * 8).toBeLessThanOrEqual(
+        sticky.width - STICKY_NOTE_PADDING * 2,
+      );
+      expect(sticky.footerOptions).toEqual({ type: "text", text });
+    } finally {
+      measure.mockRestore();
+    }
+  });
+
+  it("does not retain extra properties from imported footer options", () => {
+    expect(
+      normalizeStickyNoteFooterOptions({
+        type: "text",
+        text: "Category",
+        unused: { large: "payload" },
+      }),
+    ).toEqual({ type: "text", text: "Category" });
   });
 
   it("reserves the footer below the label body", () => {
