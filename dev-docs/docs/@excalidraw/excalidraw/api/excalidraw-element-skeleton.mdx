@@ -305,7 +305,7 @@ Notes keep their invariants regardless of the properties you pass: the backgroun
 
 #### Host-controlled footers
 
-Use `footerOptions` to choose a note's footer. The existing short creation date remains the default when the property is omitted. The editor does not add a footer picker; the host app decides which controls to offer.
+Use `footerOptions` to choose a note's footer. The existing short creation date remains the default when the property is omitted. The built-in picker offers no footer, short date, creation time and full date. Hosts can hide it with `ui={{ disabled: { stickyNoteFooter: true } }}` and supply their own controls.
 
 | `footerOptions` | Result |
 | --- | --- |

@@ -196,6 +196,7 @@ export const SelectedShapeActions = ({
       )}
 
       {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+      {predicates.stickyNoteFooter && renderAction("changeStickyNoteFooter")}
       {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
 
       {predicates.opacity && renderAction("changeOpacity")}
@@ -452,7 +453,12 @@ const CombinedTextProperties = ({
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
             })}
-            title={t("labels.textAlign")}
+            aria-label={t(
+              predicates.text ? "labels.textAlign" : "labels.stickyNote.footer",
+            )}
+            title={t(
+              predicates.text ? "labels.textAlign" : "labels.stickyNote.footer",
+            )}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -488,6 +494,8 @@ const CombinedTextProperties = ({
               {predicates.text && renderAction("changeFontSize")}
               {predicates.textAlign && renderAction("changeTextAlign")}
               {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+              {predicates.stickyNoteFooter &&
+                renderAction("changeStickyNoteFooter")}
             </div>
           </PropertiesPopover>
         )}
@@ -686,11 +694,13 @@ export const CompactShapeActions = ({
       )}
 
       {/* Text Properties */}
-      {predicates.text && (
+      {(predicates.text || predicates.stickyNoteFooter) && (
         <>
-          <div className="compact-action-item">
-            {renderAction("changeFontFamily")}
-          </div>
+          {predicates.text && (
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily")}
+            </div>
+          )}
           <CombinedTextProperties
             appState={appState}
             renderAction={renderAction}
@@ -834,11 +844,13 @@ export const MobileShapeActions = ({
           predicates={predicates}
         />
         {/* Text Properties */}
-        {predicates.text && (
+        {(predicates.text || predicates.stickyNoteFooter) && (
           <>
-            <div className="compact-action-item">
-              {renderAction("changeFontFamily")}
-            </div>
+            {predicates.text && (
+              <div className="compact-action-item">
+                {renderAction("changeFontFamily")}
+              </div>
+            )}
             <CombinedTextProperties
               appState={appState}
               renderAction={renderAction}

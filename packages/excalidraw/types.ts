@@ -842,6 +842,8 @@ export type UIConfig =
          * @default false
          */
         minimap?: boolean;
+        /** Hide the footer picker when the host supplies its own controls. */
+        stickyNoteFooter?: boolean;
       };
     };
 
