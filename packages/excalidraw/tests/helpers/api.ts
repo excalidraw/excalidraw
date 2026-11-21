@@ -211,6 +211,9 @@ export class API {
     baseHeight?: T extends "stickynote"
       ? ExcalidrawStickyNoteElement["baseHeight"]
       : never;
+    footerOptions?: T extends "stickynote"
+      ? ExcalidrawStickyNoteElement["footerOptions"]
+      : never;
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
@@ -337,6 +340,10 @@ export class API {
           height,
           type,
           baseHeight: rest.baseHeight ?? height,
+          footerOptions:
+            rest.footerOptions === undefined
+              ? appState.currentItemStickynoteFooterOptions
+              : rest.footerOptions,
         });
         break;
       case "text":

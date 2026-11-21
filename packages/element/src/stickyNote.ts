@@ -24,7 +24,7 @@ import { updateBoundElements } from "./binding";
 import { newElementWith } from "./mutateElement";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { computeBoundTextPosition, getBoundTextElement } from "./textElement";
-import { measureText } from "./textMeasurements";
+import { getLineWidth, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import { isStickyNoteElement, isTextElement } from "./typeChecks";
 
@@ -38,7 +38,9 @@ import type {
   ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FontString,
   NonDeletedExcalidrawElement,
+  StickyNoteFooterOptions,
 } from "./types";
 
 export type StickyNoteRenderPoint = {
@@ -64,6 +66,43 @@ export type StickyNotePathCommand =
 const STICKY_NOTE_RENDER_ROUGHNESS = [0, 1.5, 8] as const;
 const STICKY_NOTE_CORNER_RADIUS_RATIO = 0.04;
 const STICKY_NOTE_MAX_CORNER_RADIUS = 16;
+
+export const STICKY_NOTE_FOOTER_FORMAT = {
+  SHORT: "short",
+  TIME: "time",
+  LONG: "long",
+} as const;
+
+export const DEFAULT_STICKY_NOTE_FOOTER_OPTIONS: StickyNoteFooterOptions =
+  Object.freeze({
+    type: "date",
+    format: STICKY_NOTE_FOOTER_FORMAT.SHORT,
+  });
+
+/** Validates scene or host input and keeps only the supported footer fields. */
+export const normalizeStickyNoteFooterOptions = (
+  footerOptions: unknown,
+): StickyNoteFooterOptions | null => {
+  if (footerOptions === null) {
+    return null;
+  }
+  if (typeof footerOptions !== "object" || Array.isArray(footerOptions)) {
+    return DEFAULT_STICKY_NOTE_FOOTER_OPTIONS;
+  }
+  const value = footerOptions as Record<string, unknown>;
+  if (
+    value.type === "date" &&
+    (value.format === STICKY_NOTE_FOOTER_FORMAT.SHORT ||
+      value.format === STICKY_NOTE_FOOTER_FORMAT.TIME ||
+      value.format === STICKY_NOTE_FOOTER_FORMAT.LONG)
+  ) {
+    return { type: "date", format: value.format };
+  }
+  if (value.type === "text" && typeof value.text === "string") {
+    return { type: "text", text: value.text };
+  }
+  return DEFAULT_STICKY_NOTE_FOOTER_OPTIONS;
+};
 
 export const normalizeStickyNoteStrokeColor = (
   strokeColor: string | null | undefined,
@@ -463,6 +502,35 @@ export const getStickyNoteDateLabel = (
     : `${label} ${year}`;
 };
 
+/** Formats a creation timestamp; hosts can preformat other styles as text. */
+export const formatStickyNoteFooterDate = (
+  created: ExcalidrawStickyNoteElement["created"],
+  format: Extract<StickyNoteFooterOptions, { type: "date" }>["format"],
+  { short = false, now = Date.now() }: { short?: boolean; now?: number } = {},
+): string | null => {
+  if (created === null || !Number.isFinite(created)) {
+    return null;
+  }
+  const date = new Date(created);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  switch (format) {
+    case STICKY_NOTE_FOOTER_FORMAT.SHORT:
+      return getStickyNoteDateLabel(created, { short, now });
+    case STICKY_NOTE_FOOTER_FORMAT.TIME:
+      return new Intl.DateTimeFormat(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(date);
+    case STICKY_NOTE_FOOTER_FORMAT.LONG:
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "long",
+      }).format(date);
+  }
+};
+
 /**
  * What the footer paints and where, in note-local coordinates — shared by the
  * canvas and SVG renderers, which take the font and opacity from
@@ -470,23 +538,67 @@ export const getStickyNoteDateLabel = (
  * the data floor, where the band would overlap the top padding.
  */
 export const getStickyNoteFooter = (
-  element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height">,
+  element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height"> &
+    Partial<Pick<ExcalidrawStickyNoteElement, "footerOptions">>,
   now = Date.now(),
+  renderEnvironment?: RenderEnvironment,
 ) => {
+  const footerOptions = normalizeStickyNoteFooterOptions(element.footerOptions);
   if (
+    footerOptions === null ||
     element.width < STICKY_NOTE_MIN_SIZE ||
     element.height < STICKY_NOTE_MIN_SIZE
   ) {
     return null;
   }
-  const text = getStickyNoteDateLabel(element.created, {
-    short:
-      element.width - STICKY_NOTE_PADDING * 2 <
-      STICKY_NOTE_FOOTER.minBodyWidthForYear,
-    now,
-  });
+  let text =
+    footerOptions.type === "text"
+      ? footerOptions.text
+      : formatStickyNoteFooterDate(element.created, footerOptions.format, {
+          short:
+            element.width - STICKY_NOTE_PADDING * 2 <
+            STICKY_NOTE_FOOTER.minBodyWidthForYear,
+          now,
+        });
   if (!text) {
     return null;
+  }
+  // Preserve the existing width-bucket policy for the built-in short date.
+  // Host text and longer formats are a single line, ellipsized to the note's
+  // inner width. Use the render target's metrics for canvas and SVG alike.
+  if (
+    footerOptions.type === "text" ||
+    footerOptions.format !== STICKY_NOTE_FOOTER_FORMAT.SHORT
+  ) {
+    text = text.replace(/\s+/g, " ").trim();
+    if (!text) {
+      return null;
+    }
+    const font =
+      `${STICKY_NOTE_FOOTER.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}` as FontString;
+    const maxWidth = element.width - STICKY_NOTE_PADDING * 2;
+    const width = (value: string) =>
+      getLineWidth(value, font, renderEnvironment);
+    if (width(text) > maxWidth) {
+      const characters = Array.from(text);
+      const ellipsis = "…";
+      if (width(ellipsis) > maxWidth) {
+        return null;
+      }
+      let lo = 0;
+      let hi = characters.length;
+      while (lo < hi) {
+        const mid = Math.ceil((lo + hi) / 2);
+        if (
+          width(`${characters.slice(0, mid).join("")}${ellipsis}`) <= maxWidth
+        ) {
+          lo = mid;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      text = `${characters.slice(0, lo).join("")}${ellipsis}`;
+    }
   }
   return {
     text,
@@ -494,6 +606,14 @@ export const getStickyNoteFooter = (
     y: element.height - STICKY_NOTE_FOOTER.baselineFromBottom,
   };
 };
+
+/** Vertical body padding, reclaiming the footer band when explicitly hidden. */
+export const getStickyNoteBodyInsetY = (
+  element: Partial<Pick<ExcalidrawStickyNoteElement, "footerOptions">>,
+) =>
+  element.footerOptions === null
+    ? STICKY_NOTE_PADDING * 2
+    : STICKY_NOTE_BODY_INSET_Y;
 
 /**
  * The smallest note the UI lets a user create or resize to: one line at the
@@ -505,7 +625,9 @@ export const getStickyNoteFooter = (
 export const getStickyNoteMinSize = ({
   fontSize,
   fontFamily,
-}: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily">) => {
+  footerOptions,
+}: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily"> &
+  Partial<Pick<ExcalidrawStickyNoteElement, "footerOptions">>) => {
   const lineHeightPx = Math.ceil(
     normalizeStickyNoteFontSize(fontSize) * getLineHeight(fontFamily),
   );
@@ -516,7 +638,7 @@ export const getStickyNoteMinSize = ({
     ),
     height: Math.max(
       STICKY_NOTE_MIN_SIZE,
-      lineHeightPx + STICKY_NOTE_BODY_INSET_Y,
+      lineHeightPx + getStickyNoteBodyInsetY({ footerOptions }),
     ),
   };
 };
@@ -705,7 +827,8 @@ export const getStickyNoteLayout = (
   );
   const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE, baseFontSize);
   const maxWidth = Math.max(baseWidth - STICKY_NOTE_PADDING * 2, 1);
-  const maxHeight = Math.max(baseHeight - STICKY_NOTE_BODY_INSET_Y, 0);
+  const bodyInsetY = getStickyNoteBodyInsetY(container);
+  const maxHeight = Math.max(baseHeight - bodyInsetY, 0);
   const { fontFamily, lineHeight } = textElement;
 
   const fit = (fontSize: number): FontFit => {
@@ -740,7 +863,7 @@ export const getStickyNoteLayout = (
 
   const height = isBlank
     ? baseHeight
-    : Math.max(baseHeight, fitted.height + STICKY_NOTE_BODY_INSET_Y);
+    : Math.max(baseHeight, fitted.height + bodyInsetY);
   const nextContainer = {
     ...getPositionAfterHeightChange(container, height, anchor),
     width: baseWidth,
@@ -877,7 +1000,7 @@ export const updateStickyNoteLayout = (
 };
 
 const STICKY_NOTE_LAYOUT_INPUTS = {
-  container: ["x", "y", "width", "baseHeight", "angle"],
+  container: ["x", "y", "width", "baseHeight", "angle", "footerOptions"],
   text: [
     "originalText",
     "baseFontSize",
