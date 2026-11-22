@@ -2,6 +2,9 @@ import React from "react";
 import { act, render } from "@testing-library/react";
 import { vi } from "vitest";
 
+import { Excalidraw } from "../index";
+import { render as renderApp } from "../tests/test-utils";
+
 import { Toast } from "./Toast";
 
 describe("Toast", () => {
@@ -25,5 +28,27 @@ describe("Toast", () => {
       });
     }
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("should give a toast shown again its full duration", async () => {
+    await renderApp(<Excalidraw />);
+    vi.useFakeTimers();
+    const showToast = () =>
+      act(() => {
+        window.h.app.setToast({ message: "hello", duration: 1000 });
+      });
+    const advanceTimersByTime = (ms: number) =>
+      act(() => {
+        vi.advanceTimersByTime(ms);
+      });
+
+    showToast();
+    advanceTimersByTime(900);
+    // the same message, but another toast
+    showToast();
+    advanceTimersByTime(900);
+    expect(window.h.state.toast).not.toBe(null);
+    advanceTimersByTime(100);
+    expect(window.h.state.toast).toBe(null);
   });
 });

@@ -695,6 +695,7 @@ const LayerUI = ({
                     duration={appState.toast.duration}
                     closable={appState.toast.closable}
                     action={appState.toast.action}
+                    timerKey={appState.toast}
                   />
                 )}
                 {!appState.toast &&

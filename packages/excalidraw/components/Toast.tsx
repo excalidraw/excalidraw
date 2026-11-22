@@ -29,6 +29,7 @@ const ToastComponent = ({
   // To prevent autoclose, pass duration as Infinity
   duration = DEFAULT_TOAST_TIMEOUT,
   action,
+  timerKey,
   style,
 }: {
   message: ReactNode;
@@ -37,12 +38,19 @@ const ToastComponent = ({
   duration?: number;
   /** a link-like button after the message; it closes the toast, too */
   action?: { label: string; onClick: () => void };
+  /**
+   * What the toast is shown for (its host's toast object, say): shown for
+   * something else, even if with the same message, it's given its full
+   * duration again.
+   */
+  timerKey?: unknown;
   style?: CSSProperties;
 }) => {
   const timerRef = useRef<number>(0);
   const shouldAutoClose = duration !== Infinity;
   // the host's onClose is likely a new function each render: the timer's
-  // restarted only for a toast showing something else, not on a render
+  // restarted only for another toast (`timerKey`, or its message), not on a
+  // render
   const stableOnClose = useStableCallback(onClose);
   const scheduleTimeout = useCallback(() => {
     if (!shouldAutoClose) {
@@ -57,7 +65,7 @@ const ToastComponent = ({
     }
     scheduleTimeout();
     return () => clearTimeout(timerRef.current);
-  }, [scheduleTimeout, message, action, duration, shouldAutoClose]);
+  }, [scheduleTimeout, message, timerKey, duration, shouldAutoClose]);
 
   const onMouseEnter = shouldAutoClose
     ? () => clearTimeout(timerRef?.current)
