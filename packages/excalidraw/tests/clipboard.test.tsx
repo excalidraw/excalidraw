@@ -9,11 +9,8 @@ import {
   KEYS,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
-  arrayToMap,
   getLineHeight,
 } from "@excalidraw/common";
-
-import { getElementBounds } from "@excalidraw/element";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
@@ -160,48 +157,72 @@ describe("paste text as single lines", () => {
     });
   });
 
-  it("should space items correctly", async () => {
-    const elementsMap = arrayToMap(h.elements);
-
-    const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
-    const lineHeightPx =
-      getLineHeightInPx(
-        h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
-      ) +
-      10 / h.app.state.zoom.value;
+  it("should space items by half a line height, ignoring blank lines", async () => {
+    const lineHeightPx = getLineHeightInPx(
+      h.app.state.currentItemFontSize,
+      getLineHeight(h.state.currentItemFontFamily),
+    );
     mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV(text);
-    await waitFor(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
-      for (let i = 1; i < h.elements.length; i++) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [fx, elY] = getElementBounds(h.elements[i], elementsMap);
-        expect(elY).toEqual(firstElY + lineHeightPx * i);
-      }
+    pasteWithCtrlCmdV("hkhkjhki\njgkjhffjh\n\n\njgkjhffjh");
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(3);
     });
+    for (let i = 1; i < h.elements.length; i++) {
+      expect(h.elements[i].y).toBeCloseTo(
+        h.elements[0].y + lineHeightPx * 1.5 * i,
+      );
+    }
   });
 
-  it("should leave a space for blank new lines", async () => {
-    const elementsMap = arrayToMap(h.elements);
-    const text = "hkhkjhki\n\njgkjhffjh";
-    const lineHeightPx =
-      getLineHeightInPx(
-        h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
-      ) +
-      10 / h.app.state.zoom.value;
-    mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV(text);
+  it("should align the lines as the current text align", async () => {
+    for (const textAlign of ["left", "center", "right"] as const) {
+      API.setAppState({ currentItemTextAlign: textAlign });
+      API.setSelectedElements([]);
+      const count = h.elements.length;
+      pasteWithCtrlCmdV("short\nmuch longer line");
+      await waitFor(() => {
+        expect(h.elements.length).toEqual(count + 2);
+      });
+      const [short, long] = h.elements.slice(count) as ExcalidrawTextElement[];
+      expect(short.textAlign).toBe(textAlign);
+      expect(long.textAlign).toBe(textAlign);
+      expect(short.width).toBeLessThan(long.width);
+      const getEdge = (text: ExcalidrawTextElement) =>
+        textAlign === "left"
+          ? text.x
+          : textAlign === "right"
+          ? text.x + text.width
+          : text.x + text.width / 2;
+      expect(getEdge(short)).toBeCloseTo(getEdge(long));
+    }
+  });
 
-    await waitFor(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [lx, lastElY] = getElementBounds(h.elements[1], elementsMap);
-      expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
+  it("should stack lines that wrap to different heights without overlap", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
     });
+    const long =
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+    pasteWithCtrlCmdV(`short\n${long}\n${long} ${long}\nshort`);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(4);
+    });
+    const texts = h.elements as ExcalidrawTextElement[];
+    expect(texts.map((text) => text.autoResize)).toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
+    expect(texts[2].height).toBeGreaterThan(texts[1].height);
+    const lineGap =
+      getLineHeightInPx(texts[0].fontSize, texts[0].lineHeight) / 2;
+    for (let i = 1; i < texts.length; i++) {
+      expect(texts[i].y).toBeCloseTo(
+        texts[i - 1].y + texts[i - 1].height + lineGap,
+      );
+    }
   });
 });
 
