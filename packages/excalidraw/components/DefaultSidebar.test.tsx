@@ -12,7 +12,7 @@ import {
 import {
   assertExcalidrawWithSidebar,
   assertSidebarDockButton,
-} from "./Sidebar/siderbar.test.helpers";
+} from "./Sidebar/sidebar.test.helpers";
 
 const { h } = window;
 
