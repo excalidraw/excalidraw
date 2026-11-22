@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
+import { useStableCallback } from "../hooks/useStableCallback";
+
 import { CloseIcon } from "./icons";
 import { IconButton } from "./IconButton";
 
@@ -36,12 +38,15 @@ const ToastComponent = ({
 }) => {
   const timerRef = useRef<number>(0);
   const shouldAutoClose = duration !== Infinity;
+  // the host's onClose is likely a new function each render: the timer's
+  // restarted only for a toast showing something else, not on a render
+  const stableOnClose = useStableCallback(onClose);
   const scheduleTimeout = useCallback(() => {
     if (!shouldAutoClose) {
       return;
     }
-    timerRef.current = window.setTimeout(() => onClose(), duration);
-  }, [onClose, duration, shouldAutoClose]);
+    timerRef.current = window.setTimeout(() => stableOnClose(), duration);
+  }, [stableOnClose, duration, shouldAutoClose]);
 
   useEffect(() => {
     if (!shouldAutoClose) {
