@@ -524,6 +524,9 @@ export const normalizeFile = async (file: File) => {
   if ((file as any)[normalizedFileSymbol]) {
     return file;
   }
+  // createFile() creates a new File instance, which drops the
+  // FileSystemFileHandle (if any), so we need to preserve it
+  const handle = (file as any).handle;
 
   if (file?.name?.endsWith(".excalidrawlib")) {
     file = createFile(file, MIME_TYPES.excalidrawlib, file.name);
@@ -539,6 +542,9 @@ export const normalizeFile = async (file: File) => {
     }
   }
 
+  if (handle && !(file as any).handle) {
+    (file as any).handle = handle;
+  }
   (file as any)[normalizedFileSymbol] = true;
 
   return file;
