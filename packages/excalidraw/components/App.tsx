@@ -15,7 +15,6 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
-  APP_NAME,
   CURSOR_TYPE,
   DEFAULT_STROKE_STREAMLINE,
   DEFAULT_STROKE_STREAMLINE_PRECISE,
@@ -270,6 +269,7 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggleMinimap,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -465,9 +465,13 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   UIConfig,
+  UIControl,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
+
+const isUIConfig = (ui: AppProps["ui"]): ui is UIConfig =>
+  typeof ui === "object" && ui !== null;
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1073,23 +1077,32 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  /** Whether Excalidraw's full default UI is rendered. */
+  /**
+   * Whether Excalidraw's default UI is rendered (with `ui.disabled`, minus the
+   * controls it removes).
+   */
   public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
     return (
-      props.ui !== false && (typeof props.ui !== "object" || props.ui === null)
+      props.ui !== false && !(isUIConfig(props.ui) && "enabled" in props.ui)
     );
   }
 
   /** Whether an individual default UI control is rendered. */
-  public isUIControlEnabled(
-    control: keyof UIConfig["enabled"],
+  public isUIControlEnabled = (
+    control: UIControl,
     props: Pick<AppProps, "ui"> = this.props,
-  ): boolean {
-    if (typeof props.ui === "object" && props.ui !== null) {
-      return props.ui.enabled?.[control] === true;
+  ): boolean => {
+    if (isUIConfig(props.ui)) {
+      return "enabled" in props.ui
+        ? (props.ui.enabled as Partial<Record<UIControl, boolean>>)?.[
+            control
+          ] === true
+        : (props.ui.disabled as Partial<Record<UIControl, boolean>>)?.[
+            control
+          ] !== true;
     }
     return props.ui !== false;
-  }
+  };
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
     atom: WritableAtom<Value, Args, Result>,
@@ -3878,16 +3891,7 @@ class App extends React.Component<AppProps, AppState> {
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
 
-    const searchParams = new URLSearchParams(
-      this.ownerWindow.location.search.slice(1),
-    );
-
-    if (searchParams.has("web-share-target")) {
-      // Obtain a file that was shared via the Web Share Target API.
-      this.restoreFileFromShare();
-    } else {
-      this.updateDOMRect(this.initializeScene);
-    }
+    this.updateDOMRect(this.initializeScene);
 
     // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
@@ -3947,6 +3951,7 @@ class App extends React.Component<AppProps, AppState> {
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
+    this.text.destroy();
     this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();
@@ -4319,6 +4324,13 @@ class App extends React.Component<AppProps, AppState> {
     this.handleForcedToolChange(prevProps, prevState);
     this.host.sync(prevProps);
 
+    // applied before the state change listeners below are notified, for
+    // those that read theme-dependent styles
+    this.excalidrawContainerRef.current?.classList.toggle(
+      "theme--dark",
+      this.state.theme === THEME.DARK,
+    );
+
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -4424,11 +4436,6 @@ class App extends React.Component<AppProps, AppState> {
     if (prevProps.theme !== this.props.theme && this.props.theme) {
       this.setState({ theme: this.props.theme });
     }
-
-    this.excalidrawContainerRef.current?.classList.toggle(
-      "theme--dark",
-      this.state.theme === THEME.DARK,
-    );
 
     if (
       this.state.selectedLinearElement?.isEditing &&
@@ -4901,27 +4908,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  restoreFileFromShare = async () => {
-    try {
-      const webShareTargetCache = await caches.open("web-share-target");
-
-      const response = await webShareTargetCache.match("shared-file");
-      if (response) {
-        const blob = await response.blob();
-        const file = new File([blob], blob.name || "", { type: blob.type });
-        this.loadFileToCanvas(file, null);
-        await webShareTargetCache.delete("shared-file");
-        this.ownerWindow.history.replaceState(
-          null,
-          APP_NAME,
-          this.ownerWindow.location.pathname,
-        );
-      }
-    } catch (error: any) {
-      this.setState({ errorMessage: error.message });
-    }
-  };
-
   /**
    * adds supplied files to existing files in the appState.
    * NOTE if file already exists in editor state, the file data is not updated
@@ -5191,8 +5177,16 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         // Shape switching
-        if (event.key === KEYS.ESCAPE) {
+        if (
+          (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+          editorJotaiStore.get(convertElementTypePopupAtom)
+        ) {
+          // only close the popup — don't fall through to deselecting (Esc)
+          // or entering text/line editing (Enter)
+          event.preventDefault();
           this.updateEditorAtom(convertElementTypePopupAtom, null);
+          this.focusContainer();
+          return;
         } else if (
           event.key === KEYS.TAB &&
           (this.ownerDocument.activeElement ===
@@ -7214,6 +7208,13 @@ class App extends React.Component<AppProps, AppState> {
       this.text.isHittingTextAutoResizeHandle(selectedElements, scenePointer)
     ) {
       this.cursor.set(CURSOR_TYPE.POINTER);
+      return;
+    }
+
+    const editedTextResizeHandle =
+      this.text.getEditedTextResizeHandleAt(scenePointer);
+    if (editedTextResizeHandle) {
+      this.cursor.set(getCursorForResizingElement(editedTextResizeHandle));
       return;
     }
 
@@ -11241,6 +11242,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleGridMode,
           actionToggleZenMode,
           actionToggleViewMode,
+          actionToggleMinimap,
           actionToggleStats,
         ];
       }
@@ -11261,6 +11263,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
+        actionToggleMinimap,
         actionToggleStats,
       ];
     }

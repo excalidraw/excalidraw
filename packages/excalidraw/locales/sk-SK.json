@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
@@ -27,6 +28,7 @@
     "copyStyles": "Kopírovať štýly",
     "pasteStyles": "Vložiť štýly",
     "stroke": "Obrys",
+    "textColor": "",
     "changeStroke": "Zmeniť farbu orámovania",
     "background": "Pozadie",
     "changeBackground": "Zmeniť farbu pozadia",
@@ -113,6 +115,8 @@
     "collaborators": "Spolupracovníci",
     "you": "",
     "toggleGrid": "Prepnúť mriežku",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
     "libraryLoadingMessage": "Načítavanie knižnice…",
@@ -182,11 +186,14 @@
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "installPWA": "Inštalovať Excalidraw lokálne (PWA)",
     "autoResize": "Zapnúť automatickú zmenu veľkosti textu",
+    "toggleAutoResize": "",
     "imageCropping": "Orezanie obrázka",
     "unCroppedDimension": "Pôvodné rozmery",
     "copyElementLink": "Kopírovať odkaz na objekt",
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "Zabaliť výber do rámu",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Zmeniť tvar",
     "preferences": "Nastavenia",
@@ -195,7 +202,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Pripájanie šípky",
-    "midpointSnapping": "Prichytiť k bodom"
+    "midpointSnapping": "Prichytiť k bodom",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -239,12 +250,14 @@
     "zoomIn": "Priblížiť",
     "zoomOut": "Oddialiť",
     "resetZoom": "Obnoviť priblíženie",
+    "zoomToFit": "",
     "menu": "Ponuka",
     "done": "Hotovo",
     "edit": "Upraviť",
     "undo": "Späť",
     "redo": "Znova",
     "resetLibrary": "Obnoviť knižnicu",
+    "reset": "",
     "createNewRoom": "Vytvoriť novú miestnosť",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -332,6 +345,7 @@
     "eraser": "Guma",
     "frame": "Nástroj rám",
     "magicframe": "Drôtený model na kód",
+    "stickynote": "",
     "embeddable": "Web Embed",
     "laser": "Laserový ukazovateľ",
     "autoshape": "",
@@ -357,6 +371,7 @@
     "group": "Skupina",
     "frame": "Rám",
     "magicframe": "Drôtený model na kód",
+    "stickynote": "",
     "embeddable": "Web Embed",
     "selection": "Výber",
     "iframe": "IFrame"
@@ -375,13 +390,16 @@
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Použite dvojklik alebo stlačte {{shortcut}} na editovanie textu",
     "text_editing": "Stlačte {{shortcut_1}} alebo {{shortcut_2}} pre ukončenie editovania",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "Kliknite na posledný bod alebo stačte {{shortcut_1}} alebo {{shortcut_2}} pre ukončenie",
     "lockAngle": "Počas rotácie obmedzíte uhol podržaním {{shortcut}}",
     "resize": "Počas zmeny veľkosti zachováte proporcie podržaním {{shortcut_1}}, podržaním {{shortcut_2}} meníte veľkosť so zachovaním stredu",
     "resizeImage": "Podržte {{shortcut_1}} pre voľnú zmenu veľkosti, podržte {{shortcut_2}} pre zmenu veľkosti od stredu",
+    "resizeStickyNote": "",
     "rotate": "Počas rotácie obmedzíte uhol podržaním {{shortcut}}",
     "toggleArrowhead": "",
     "lineEditor_info": "Podržte {{shortcut_1}} a spravte dvojklik alebo stačte {{shortcut_2}} na editovanie bodov",
@@ -392,6 +410,7 @@
     "bindTextToElement": "{{shortcut}} na pridanie textu",
     "createFlowchart": "{{shortcut}} pre vytvorenie vývojového diagramu",
     "deepBoxSelect": "Podržte {{shortcut}} na výber v skupine alebo zamedzeniu potiahnutia",
+    "cycleSelection": "",
     "eraserRevert": "Podržte {{shortcut}} pre prehodenie položiek určených na vymazanie",
     "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\".",
     "disableSnapping": "Podržte {{shortcut}} pre vypnutie prichytávania",
@@ -649,15 +668,27 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid do Excalidraw",
     "button": "Vložiť",
-    "description": "Aktuálne sú podporované iba <flowchartLink>vývojové diagramy</flowchartLink>, <sequenceLink>sekvenčné diagramy</sequenceLink>, <classLink>diagramy tried</classLink> a <erdLink>vzťahové diagramy</erdLink>. Ostatné typy budú v Excalidraw vykreslené ako obrázky.",
+    "description": "",
     "syntax": "Mermaid syntax",
     "preview": "Ukážka",
     "label": "Mermaid",
-    "inputPlaceholder": "Sem napíšte definíciu Mermaid diagramu...",
-    "autoFixAvailable": "Automatická oprava je dostupná"
+    "inputPlaceholder": "",
+    "autoFixAvailable": "Automatická oprava je dostupná",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Chyba!"
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "V tejto scéne",
     "availableFonts": "Dostupné písma",
-    "empty": "Nenašli sa žiadne písma"
+    "empty": "Nenašli sa žiadne písma",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nenašli sa žiadni používatelia",
@@ -752,5 +785,16 @@
     "spacebar": "Medzerník",
     "delete": "Delete",
     "mmb": "Rolovacie koliesko"
+  },
+  "promoBanner": {
+    "presentations": "Prezentácie",
+    "mcp": "Kreslite s AI",
+    "comments": "Komentáre",
+    "teams": "Tímová práca",
+    "voiceChat": "Hlasový chat",
+    "withExcalidrawPlus": "v Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pre ľudí aj AI"
   }
 }

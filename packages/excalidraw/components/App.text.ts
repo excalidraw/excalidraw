@@ -3,19 +3,30 @@ import { flushSync } from "react-dom";
 import {
   DEFAULT_VERTICAL_ALIGN,
   TEXT_MAX_WRAP_WIDTH,
+  TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TEXT_VIEWPORT_PADDING,
   VERTICAL_ALIGN,
   getFontString,
+  getGridPoint,
   getLineHeight,
+  KEYS,
   sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
   type Bounds,
   type StylesPanelMode,
 } from "@excalidraw/common";
-import { pointFrom, type Radians } from "@excalidraw/math";
+import {
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  canResizeFromSides,
+  deepCopyElement,
   fixBindingsAfterDeletion,
   getActiveTextElement,
   getApproxMinLineHeight,
@@ -23,9 +34,11 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  getCursorForResizingElement,
   getElementAbsoluteCoords,
   getElementBounds,
   getLineHeightInPx,
+  getResizeOffsetXY,
   getStickyNoteLayout,
   hitElementItself,
   isArrowElement,
@@ -40,6 +53,7 @@ import {
   newElementWith,
   newTextElement,
   refreshTextDimensions,
+  transformElements,
   updateBoundElements,
 } from "@excalidraw/element";
 
@@ -54,12 +68,27 @@ import type {
 
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { withBatchedUpdates } from "../reactUtils";
-import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
+import { SnapCache, snapResizingElements } from "../snapping";
+import {
+  getTextBoxPadding,
+  isPointHittingTextAutoResizeHandle,
+} from "../textAutoResizeHandle";
 import { scrollBoundsIntoView } from "../viewport";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 
 import type App from "./App";
 import type { AppState, Offsets, ViewportUIName } from "../types";
+
+/** the scene point in the (rotated) text's own axes */
+const unrotatePoint = (
+  point: Readonly<{ x: number; y: number }>,
+  text: ExcalidrawTextElement,
+) =>
+  pointRotateRads(
+    pointFrom<GlobalPoint>(point.x, point.y),
+    pointFrom<GlobalPoint>(text.x + text.width / 2, text.y + text.height / 2),
+    -text.angle as Radians,
+  );
 
 type AppTextDependencies = {
   getContainer: () => HTMLDivElement | null;
@@ -84,6 +113,15 @@ export class AppText {
   constructor(private app: App, private dependencies: AppTextDependencies) {}
 
   public textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null = null;
+
+  /**
+   * Tears down an open text editor with the app: its listeners on the window
+   * would otherwise outlive it.
+   */
+  public destroy = () => {
+    this.textWysiwygSubmitHandler?.();
+    this.textWysiwygSubmitHandler = null;
+  };
   private getTextCreationGridPoint = (x: number, y: number) => {
     const effectiveGridSize = this.app.getEffectiveGridSize();
 
@@ -153,15 +191,19 @@ export class AppText {
 
   /**
    * The widest a text may grow to as it's typed or pasted, in scene units:
-   * TEXT_MAX_WRAP_WIDTH, or less, so that a text never outgrows the part of
-   * the canvas it's kept within.
+   * TEXT_MAX_WRAP_WIDTH — when zoomed out, that much on screen, up to
+   * TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT — or less, so that a text never outgrows
+   * the part of the canvas it's kept within.
    */
   public getMaxTextWidth = (offsets: Required<Offsets>) => {
     const { left, right } = offsets;
+    const zoom = this.app.state.zoom.value;
     const viewWidth = this.app.state.width - left - right;
     return Math.min(
-      viewWidth > 0 ? viewWidth / this.app.state.zoom.value : Infinity,
-      TEXT_MAX_WRAP_WIDTH,
+      viewWidth > 0 ? viewWidth / zoom : Infinity,
+      zoom < 1
+        ? Math.min(TEXT_MAX_WRAP_WIDTH / zoom, TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT)
+        : TEXT_MAX_WRAP_WIDTH,
     );
   };
 
@@ -188,7 +230,12 @@ export class AppText {
       const latestTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
 
-      if (!latestTextElement || !isTextElement(latestTextElement)) {
+      if (
+        !latestTextElement ||
+        !isTextElement(latestTextElement) ||
+        // deleted from under the edit: the submit doesn't bring it back
+        latestTextElement.isDeleted
+      ) {
         return;
       }
 
@@ -377,6 +424,10 @@ export class AppText {
     });
     // deselect all other elements when inserting text
     this.app.selection.clear();
+    // the canvas keeps the cursor of what was hovered (the selected text's
+    // move cursor, a resize handle's…) until the pointer next moves over it:
+    // it would flash once the pointer leaves the editor
+    this.app.cursor.reset();
     // (the linear element editor stays up, to come back to on submit — but
     // without the hover affordances, which are for the selection)
     if (this.app.state.selectedLinearElement) {
@@ -477,6 +528,7 @@ export class AppText {
     const activeTextElement = getActiveTextElement(
       selectedElements,
       this.app.state,
+      this.app.scene.getNonDeletedElementsMap(),
     );
 
     if (
@@ -503,6 +555,7 @@ export class AppText {
     const activeTextElement = getActiveTextElement(
       selectedElements,
       this.app.state,
+      this.app.scene.getNonDeletedElementsMap(),
     );
     if (
       !activeTextElement ||
@@ -519,6 +572,227 @@ export class AppText {
       activeTextElement,
     );
     this.app.cursor.reset();
+    return true;
+  };
+
+  /**
+   * The side handle, at a scene point, of the free text being edited: dragging
+   * it sets the width the text wraps at, as it does for a selected text.
+   *
+   * A side's handle is the strip from the text's edge — where the editor
+   * ends, leaving no gap between the two — to as far past the box drawn
+   * around a wrapped text as the box is from the text.
+   *
+   * (The edited text isn't necessarily selected, and has no transform handles
+   * of the selection's: see `AppSelectionTool.getTransformHandleAt()`.)
+   */
+  public getEditedTextResizeHandleAt = (
+    point: Readonly<{ x: number; y: number }>,
+  ): {
+    element: NonDeleted<ExcalidrawTextElement>;
+    transformHandleType: "e" | "w";
+  } | null => {
+    const element = this.getEditedTextResizableFromSides();
+    if (!element) {
+      return null;
+    }
+
+    const padding = getTextBoxPadding(this.app.state.zoom.value);
+    const [x, y] = unrotatePoint(point, element);
+
+    if (y < element.y - padding || y > element.y + element.height + padding) {
+      return null;
+    }
+
+    const right = element.x + element.width;
+    const transformHandleType =
+      x >= right && x <= right + padding * 2
+        ? "e"
+        : x <= element.x && x >= element.x - padding * 2
+        ? "w"
+        : null;
+
+    return transformHandleType ? { element, transformHandleType } : null;
+  };
+
+  /**
+   * Gives the canvas, while the pointer is over the editor (at the scene
+   * point), the cursor of what the pointer would leave the editor onto: the
+   * side handle (see `getEditedTextResizeHandleAt()`) if a side is its
+   * nearest edge, the canvas itself otherwise.
+   *
+   * The browser shows the canvas' cursor as it is when the pointer gets
+   * there, and what the canvas then sets only a frame later — a flash of
+   * another cursor between the editor's and the handle's.
+   */
+  public primeCursorAroundEditedText = (
+    point: Readonly<{ x: number; y: number }>,
+  ) => {
+    const element = this.getEditedTextResizableFromSides();
+    if (!element) {
+      return;
+    }
+    const [x, y] = unrotatePoint(point, element);
+    const toLeft = x - element.x;
+    const toRight = element.x + element.width - x;
+    const toSide = Math.min(toLeft, toRight);
+    const toTopOrBottom = Math.min(
+      y - element.y,
+      element.y + element.height - y,
+    );
+
+    if (toSide < toTopOrBottom) {
+      this.app.cursor.set(
+        getCursorForResizingElement({
+          element,
+          transformHandleType: toLeft < toRight ? "w" : "e",
+        }),
+      );
+    } else {
+      this.app.cursor.reset();
+    }
+  };
+
+  /** the free text being edited, where texts are resized from their sides */
+  private getEditedTextResizableFromSides() {
+    const { editingTextElement } = this.app.state;
+    const element =
+      editingTextElement &&
+      this.app.scene.getNonDeletedElement(editingTextElement.id);
+
+    return element &&
+      isTextElement(element) &&
+      !element.containerId &&
+      canResizeFromSides(this.app.editorInterface)
+      ? element
+      : null;
+  }
+
+  /**
+   * Resizes the text being edited for as long as the pointer, pressed on one
+   * of its side handles, is dragged — without leaving the editor.
+   *
+   * @param onClick called on release if the pointer wasn't dragged
+   * @returns `false` if the press isn't on a side handle of the edited text
+   */
+  public resizeEditedTextOnPointerDown = (
+    event: PointerEvent,
+    onClick: () => void,
+  ): boolean => {
+    const origin = viewportCoordsToSceneCoords(event, this.app.state);
+    const handle = this.getEditedTextResizeHandleAt(origin);
+    if (!handle) {
+      return false;
+    }
+
+    const { element, transformHandleType } = handle;
+    const { ownerWindow } = this.app;
+    const originalElement = deepCopyElement(element);
+    const originalElements = new Map([[element.id, originalElement]]);
+    const getGridSize = (pointerEvent: PointerEvent) =>
+      pointerEvent[KEYS.CTRL_OR_CMD] ? null : this.app.getEffectiveGridSize();
+    const [originInGridX, originInGridY] = getGridPoint(
+      origin.x,
+      origin.y,
+      getGridSize(event),
+    );
+    const [offsetX, offsetY] = getResizeOffsetXY(
+      transformHandleType,
+      [element],
+      this.app.scene.getNonDeletedElementsMap(),
+      origin.x,
+      origin.y,
+    );
+    let dragged = false;
+
+    // the canvas stays the pointer's target, and so does its resize cursor,
+    // while the pointer is over the editor
+    const canvas = event.target as HTMLCanvasElement;
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {}
+
+    const stop = () => {
+      ownerWindow.removeEventListener("pointermove", onPointerMove, true);
+      ownerWindow.removeEventListener("pointerup", onPointerUp, true);
+      ownerWindow.removeEventListener("pointercancel", onPointerUp, true);
+      SnapCache.setReferenceSnapPoints(null);
+      if (this.app.state.snapLines.length) {
+        this.app.setState({ snapLines: [] });
+      }
+    };
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      // the editor may have been closed from the keyboard meanwhile
+      if (this.app.state.editingTextElement?.id !== element.id) {
+        stop();
+        return;
+      }
+      // the canvas' own handling is for hovering and for its selection
+      moveEvent.stopPropagation();
+
+      if (
+        !dragged &&
+        moveEvent.clientX === event.clientX &&
+        moveEvent.clientY === event.clientY
+      ) {
+        return;
+      }
+      dragged = true;
+
+      const pointer = viewportCoordsToSceneCoords(moveEvent, this.app.state);
+      const gridSize = getGridSize(moveEvent);
+      const [gridX, gridY] = getGridPoint(pointer.x, pointer.y, gridSize);
+      let [x, y] = getGridPoint(
+        pointer.x - offsetX,
+        pointer.y - offsetY,
+        gridSize,
+      );
+
+      // snap the dragged side to the other elements, as when resizing on the
+      // canvas
+      this.app.maybeCacheReferenceSnapPoints(moveEvent, [element]);
+      const { snapOffset, snapLines } = snapResizingElements(
+        [element],
+        [originalElement],
+        this.app,
+        moveEvent,
+        { x: gridX - originInGridX, y: gridY - originInGridY },
+        transformHandleType,
+      );
+      x += snapOffset.x;
+      y += snapOffset.y;
+      if (snapLines.length || this.app.state.snapLines.length) {
+        this.app.setState({ snapLines });
+      }
+
+      transformElements(
+        originalElements,
+        transformHandleType,
+        [element],
+        this.app.scene,
+        false,
+        moveEvent.altKey,
+        false,
+        x,
+        y,
+        origin.x,
+        origin.y,
+        this.app.renderEnvironment,
+      );
+    };
+
+    const onPointerUp = () => {
+      stop();
+      if (!dragged && this.app.state.editingTextElement?.id === element.id) {
+        onClick();
+      }
+    };
+
+    ownerWindow.addEventListener("pointermove", onPointerMove, true);
+    ownerWindow.addEventListener("pointerup", onPointerUp, true);
+    ownerWindow.addEventListener("pointercancel", onPointerUp, true);
+
     return true;
   };
 

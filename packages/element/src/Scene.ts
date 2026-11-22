@@ -316,9 +316,8 @@ export class Scene {
     this.callbacks.add(cb);
 
     return () => {
-      if (!this.callbacks.has(cb)) {
-        throw new Error();
-      }
+      // may already be gone if the scene was destroyed in the meantime
+      // (e.g. listeners of components unmounting along with the editor)
       this.callbacks.delete(cb);
     };
   }

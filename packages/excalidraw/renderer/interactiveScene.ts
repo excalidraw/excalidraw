@@ -1693,7 +1693,11 @@ const _renderInteractiveScene = ({
     }
   }
 
-  const activeTextElement = getActiveTextElement(selectedElements, appState);
+  const activeTextElement = getActiveTextElement(
+    selectedElements,
+    appState,
+    allElementsMap,
+  );
 
   if (activeTextElement && !activeTextElement.autoResize) {
     renderResetAutoResizeHandle(

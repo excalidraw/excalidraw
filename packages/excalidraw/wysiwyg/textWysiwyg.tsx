@@ -12,8 +12,14 @@ import {
   applyDarkModeFilter,
   isRTL,
   hasRTLChars,
+  viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
-import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
+import {
+  clamp,
+  pointFrom,
+  pointRotateRads,
+  type Radians,
+} from "@excalidraw/math";
 
 import {
   getTextFromElements,
@@ -64,6 +70,10 @@ import {
   parseDataTransferEventMimeTypes,
 } from "../clipboard";
 import {
+  actionTextAutoResize,
+  isTextAutoResizeShortcut,
+} from "../actions/actionTextAutoResize";
+import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
@@ -76,7 +86,6 @@ import {
 import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
-import type { AppState } from "../types";
 
 /**
  * How much further than the browser's caret reveal the canvas pans, in
@@ -86,22 +95,67 @@ import type { AppState } from "../types";
 export const CARET_FOLLOW_PADDING = 5;
 
 /**
- * The editor is scaled and rotated about the text's center (its transform
- * origin), as the canvas draws the text. The zoom puts that center at half
- * the *scaled* size from the box's top-left, while the origin sits at half
- * the unscaled size — the translate makes up the difference.
+ * Where the editor goes, as the transform that places its box (with a
+ * `0 0` origin) and the box's width.
+ *
+ * Unless it wraps, the box is whole px wide, a fraction wider than its
+ * text: the browser centers (or right-aligns) each line by an offset rounded
+ * to its layout units, and with a fractional width that rounding would
+ * change as the width does. A box that wraps keeps its exact width, which
+ * is where the canvas wraps the text too.
+ *
+ * The transform pins the text's anchor — the point its alignment grows it
+ * away from (top left, center or right) — to its place on the canvas, then
+ * scales and rotates the box about the same point of the box. Typing on a
+ * line then only changes the box's anchor (a whole or half px), so that the
+ * other lines' glyphs stay exactly where they are. Placing the box by
+ * `left`/`top` instead, or about any point that moves with the width, would
+ * make them shimmer by up to a pixel: browsers round a scaled element's
+ * layout offset and its transform origin.
  */
-const getTransform = (
-  width: number,
-  height: number,
-  angle: number,
-  appState: AppState,
-) => {
-  const { zoom } = appState;
+const getEditorPlacement = ({
+  x,
+  y,
+  textWidth,
+  textHeight,
+  boxWidth,
+  wraps,
+  textAlign,
+  angle,
+  zoom,
+  getViewportCoords,
+}: {
+  /** the text's (unrotated) top left, in scene coords */
+  x: number;
+  y: number;
+  textWidth: number;
+  textHeight: number;
+  /** the width the box needs, in scene units */
+  boxWidth: number;
+  /** whether the editor wraps the text at the box's width */
+  wraps: boolean;
+  textAlign: ExcalidrawTextElement["textAlign"];
+  angle: number;
+  zoom: number;
+  getViewportCoords: (x: number, y: number) => [number, number];
+}) => {
+  const editorWidth = wraps ? boxWidth : Math.ceil(boxWidth);
+  const anchorRatio =
+    textAlign === "center" ? 0.5 : textAlign === "right" ? 1 : 0;
+  // the canvas rotates the text about its center
+  const [anchorX, anchorY] = pointRotateRads(
+    pointFrom(x + textWidth * anchorRatio, y),
+    pointFrom(x + textWidth / 2, y + textHeight / 2),
+    angle as Radians,
+  );
+  const [viewportX, viewportY] = getViewportCoords(anchorX, anchorY);
   const degree = (180 * angle) / Math.PI;
-  const translateX = (width * (zoom.value - 1)) / 2;
-  const translateY = (height * (zoom.value - 1)) / 2;
-  return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
+  return {
+    editorWidth,
+    transform: `translate(${viewportX}px, ${viewportY}px) rotate(${degree}deg) scale(${zoom}) translate(${
+      -editorWidth * anchorRatio
+    }px, 0px)`,
+  };
 };
 
 const getLineDirection = (text: string, offset: number) => {
@@ -453,7 +507,6 @@ export const textWysiwyg = ({
           }
         }
       }
-      const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const angle = getTextElementAngle(updatedTextElement, container);
 
       // The editor box is the text's, never cut to the viewport: a caret past
@@ -468,6 +521,22 @@ export const textWysiwyg = ({
 
       const font = getFontString(updatedTextElement);
       const editorBoxLeft = updateEditorBoxInsets();
+      const { editorWidth, transform } = getEditorPlacement({
+        x: coordX,
+        y: coordY,
+        textWidth: updatedTextElement.width,
+        textHeight: updatedTextElement.height,
+        boxWidth: width,
+        // see the whiteSpace set below and at the editor's creation
+        wraps: !!container || !updatedTextElement.autoResize,
+        textAlign,
+        angle,
+        zoom: appState.zoom.value,
+        getViewportCoords: (x, y) => {
+          const [viewportX, viewportY] = getViewportCoords(x, y);
+          return [viewportX - editorBoxLeft, viewportY];
+        },
+      });
 
       // a free text that stopped growing at the viewport's width (see
       // AppText.getMaxTextWidth) wraps from then on, and so does its editor
@@ -478,26 +547,24 @@ export const textWysiwyg = ({
         editable.style.whiteSpace = "pre-wrap";
         editable.style.wordBreak = "break-word";
       }
+      // ...and no longer once the text grows with its content again
+      if (
+        !container &&
+        updatedTextElement.autoResize &&
+        editable.style.whiteSpace !== "pre"
+      ) {
+        editable.style.whiteSpace = "pre";
+        editable.style.wordBreak = "normal";
+      }
 
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${width}px`,
+        width: `${editorWidth}px`,
         height: `${height}px`,
-        left: `${viewportX - editorBoxLeft}px`,
-        top: `${viewportY}px`,
-        // about the text's center, whatever size the box itself ends up
-        // (the 5% buffer) — see getTransform
-        transformOrigin: `${updatedTextElement.width / 2}px ${
-          updatedTextElement.height / 2
-        }px`,
-        transform: getTransform(
-          updatedTextElement.width,
-          updatedTextElement.height,
-          angle,
-          appState,
-        ),
+        transformOrigin: "0 0",
+        transform,
         textAlign,
         verticalAlign,
         color: applyDarkModeFilter(
@@ -519,6 +586,13 @@ export const textWysiwyg = ({
         x: coordX,
         y: coordY,
       };
+      // a font's glyphs can reach past its lines, beyond the 5% buffer: the
+      // box then grows to its text, or the browser scrolls the text inside
+      // it to reveal the caret as you type, which shifts the lines you're
+      // not on (vertically, and by up to half a pixel sideways)
+      if (editable.scrollHeight > editable.clientHeight) {
+        editable.style.height = `${editable.scrollHeight}px`;
+      }
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
@@ -548,6 +622,9 @@ export const textWysiwyg = ({
   }
   Object.assign(editable.style, {
     position: "absolute",
+    // placed by its transform instead — see getEditorPlacement
+    left: 0,
+    top: 0,
     display: "inline-block",
     minHeight: "1em",
     backfaceVisibility: "hidden",
@@ -703,6 +780,22 @@ export const textWysiwyg = ({
   };
 
   /**
+   * Keyboard zoom keeps the caret where it is on screen (or, out of view, the
+   * nearest point of the canvas to it).
+   */
+  const getCaretZoomAnchor = () => {
+    const caret = getCaretViewportBounds();
+    if (!caret) {
+      return null;
+    }
+    const { width, height, offsetLeft, offsetTop } = app.state;
+    return {
+      viewportX: clamp((caret.left + caret.right) / 2, 0, width) + offsetLeft,
+      viewportY: clamp((caret.top + caret.bottom) / 2, 0, height) + offsetTop,
+    };
+  };
+
+  /**
    * A caret typed in under the stats or the styles panel (see
    * AppText.getTextSidePanels) is out of sight, yet inside the editor's box, so
    * the browser doesn't reveal it (unlike the sidebar, the panels don't span
@@ -851,6 +944,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
+      followsScene = false;
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
         const selectionStart = editable.selectionStart;
@@ -870,16 +964,40 @@ export const textWysiwyg = ({
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionZoomIn);
+      app.actionManager.executeAction(
+        actionZoomIn,
+        "api",
+        getCaretZoomAnchor(),
+      );
       updateWysiwygStyle();
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionZoomOut);
+      app.actionManager.executeAction(
+        actionZoomOut,
+        "api",
+        getCaretZoomAnchor(),
+      );
       updateWysiwygStyle();
     } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionResetZoom);
+      app.actionManager.executeAction(
+        actionResetZoom,
+        "api",
+        getCaretZoomAnchor(),
+      );
       updateWysiwygStyle();
+    } else if (
+      isTextAutoResizeShortcut(event) &&
+      !isBoundToContainer(element)
+    ) {
+      event.preventDefault();
+      // (not for the canvas, which acts on the selection)
+      event.stopPropagation();
+      app.actionManager.executeAction(
+        actionTextAutoResize,
+        "keyboard",
+        app.scene.getElement(element.id),
+      );
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
     } else if (actionIncreaseFontSize.keyTest(event)) {
@@ -1038,18 +1156,25 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = app.scene.getElement(
-      element.id,
-    ) as ExcalidrawTextElement;
-    if (!updateElement) {
+    // torn down with the app (see AppText.destroy): its scene is gone, and
+    // what was typed is in the last change it reported
+    if (app.unmounted) {
       return;
     }
-    const container = getContainerElement(
-      updateElement,
-      app.scene.getNonDeletedElementsMap(),
+    const updateElement = app.scene.getElement<ExcalidrawTextElement>(
+      element.id,
     );
+    // gone from the scene (see the scene update handler below): the edit
+    // still ends, and nothing is written
+    const container =
+      updateElement && !updateElement.isDeleted
+        ? getContainerElement(
+            updateElement,
+            app.scene.getNonDeletedElementsMap(),
+          )
+        : null;
 
-    if (container) {
+    if (updateElement && container) {
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -1088,7 +1213,33 @@ export const textWysiwyg = ({
     });
   };
 
+  // The textarea also blurs when the window does (switching tabs or apps).
+  // It stays the document's active element then, and gets the focus back
+  // with the window: the edit goes on. Only a focus that moved elsewhere in
+  // the document submits.
+  const handleBlur = () => {
+    if (ownerDocument.activeElement !== editable) {
+      handleSubmit();
+      return;
+    }
+    // nobody is typing while the window is away
+    followsScene = true;
+  };
+
+  // The window lost focus while submit was disabled for a press (see
+  // temporarilyDisableSubmit), whose pointerup may never come: the press is
+  // over, and submit on blur is back.
+  const onWindowBlur = () => {
+    ownerWindow.removeEventListener("blur", onWindowBlur);
+    ownerWindow.removeEventListener("pointerup", bindBlurEvent);
+    editable.onblur = handleBlur;
+    handleBlur();
+  };
+
   const cleanup = () => {
+    // (the canvas takes the editor's place under the pointer, with the
+    // cursor given to it for around the editor: see the pointermove below)
+    app.cursor.reset();
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.oninput = null;
@@ -1104,7 +1255,7 @@ export const textWysiwyg = ({
       capture: true,
     });
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
-    ownerWindow.removeEventListener("blur", handleSubmit);
+    ownerWindow.removeEventListener("blur", onWindowBlur);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -1148,7 +1299,7 @@ export const textWysiwyg = ({
       // let the focus scroll the container: for a box reaching past the
       // viewport, revealing the caret the textarea has until the click's is
       // placed (the end of the value) would pan the canvas there.
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
       editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
         editable.setSelectionRange(
@@ -1165,7 +1316,7 @@ export const textWysiwyg = ({
     ownerWindow.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    ownerWindow.addEventListener("blur", handleSubmit);
+    ownerWindow.addEventListener("blur", onWindowBlur);
   };
 
   // prevent blur when changing properties from the menu
@@ -1200,6 +1351,38 @@ export const textWysiwyg = ({
       submittedViaKeyboard = true;
       handleSubmit();
       app.duplicate.handOverTextEditorPress(event, element.id);
+      return;
+    }
+
+    // the auto-resize toggle on the box of the text being edited unwraps it
+    // without leaving the editor
+    if (
+      event.button === POINTER_BUTTON.MAIN &&
+      target instanceof ownerWindow.HTMLCanvasElement &&
+      app.text.handleTextAutoResizeHandlePointerDown(
+        app.scene.getSelectedElements(app.state),
+        viewportCoordsToSceneCoords(event, app.state),
+      )
+    ) {
+      // the press is the editor's: the canvas would otherwise act on it
+      event.preventDefault();
+      event.stopPropagation();
+      temporarilyDisableSubmit();
+      return;
+    }
+
+    // dragging a side of the text being edited resizes it (changing where it
+    // wraps) without leaving the editor; a mere click there still submits
+    if (
+      event.button === POINTER_BUTTON.MAIN &&
+      target instanceof ownerWindow.HTMLCanvasElement &&
+      app.text.resizeEditedTextOnPointerDown(event, handleSubmit)
+    ) {
+      // the press is the editor's: the canvas would otherwise act on it
+      // (deselect, box-select)
+      event.preventDefault();
+      event.stopPropagation();
+      temporarilyDisableSubmit();
       return;
     }
 
@@ -1250,6 +1433,34 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
+    const latestElement = app.scene.getElement(element.id);
+    if (!latestElement || latestElement.isDeleted) {
+      // the element went away under the edit (another tab's sync, a host's
+      // update): so does the editor. After the update that's under way, and
+      // unless that brought it back (a reset followed by a load).
+      queueMicrotask(() => {
+        const currentElement = app.scene.getElement(element.id);
+        if (!currentElement || currentElement.isDeleted) {
+          handleSubmit();
+        }
+      });
+      return;
+    }
+    // Until the user types, the editor shows the scene's text: a change
+    // from outside (another tab's sync, a collaborator's edit, a host's
+    // update) is taken. Setting the value fires no input event: nothing is
+    // written back.
+    if (followsScene && isTextElement(latestElement)) {
+      const nextValue = normalizeText(latestElement.originalText);
+      if (nextValue !== editable.value) {
+        const { selectionStart, selectionEnd } = editable;
+        editable.value = nextValue;
+        editable.setSelectionRange(
+          Math.min(selectionStart, nextValue.length),
+          Math.min(selectionEnd, nextValue.length),
+        );
+      }
+    }
     updateWysiwygStyle();
     const isPopupOpened = !!ownerDocument.activeElement?.closest(
       ".properties-content",
@@ -1297,6 +1508,12 @@ export const textWysiwyg = ({
   // ---------------------------------------------------------------------------
 
   let isDestroyed = false;
+  // Whether the editor takes the scene's text when it changes from outside
+  // (see the scene update handler). Typing makes the text the user's draft,
+  // which is theirs until submitted: a collaborator typing into the same
+  // text doesn't change it under them. The window going away gives it back
+  // to the scene.
+  let followsScene = true;
 
   if (autoSelect && !pendingInitialSelection) {
     // select on init (focusing is done separately inside the bindBlurEvent()
@@ -1318,6 +1535,12 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
+  // (the cursor the canvas will have once the pointer leaves the editor)
+  editable.addEventListener("pointermove", (event) =>
+    app.text.primeCursorAroundEditedText(
+      viewportCoordsToSceneCoords(event, app.state),
+    ),
+  );
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg

@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "Liitä",
     "pasteAsPlaintext": "Liitä pelkkänä tekstinä",
     "pasteCharts": "Liitä kaaviot",
@@ -27,6 +28,7 @@
     "copyStyles": "Kopioi tyyli",
     "pasteStyles": "Liitä tyyli",
     "stroke": "Piirto",
+    "textColor": "",
     "changeStroke": "",
     "background": "Tausta",
     "changeBackground": "",
@@ -113,6 +115,8 @@
     "collaborators": "Yhteistyökumppanit",
     "you": "",
     "toggleGrid": "Näytä tai piilota ruudukko",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Lisää kirjastoon",
     "removeFromLibrary": "Poista kirjastosta",
     "libraryLoadingMessage": "Ladataan kirjastoa…",
@@ -182,11 +186,14 @@
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
+    "toggleAutoResize": "",
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
@@ -195,7 +202,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -239,12 +250,14 @@
     "zoomIn": "Lähennä",
     "zoomOut": "Loitonna",
     "resetZoom": "Nollaa suurennuksen taso",
+    "zoomToFit": "",
     "menu": "Valikko",
     "done": "Valmis",
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
     "resetLibrary": "Tyhjennä kirjasto",
+    "reset": "",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -332,6 +345,7 @@
     "eraser": "Poistotyökalu",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "Verkkoupote",
     "laser": "Laserosoitin",
     "autoshape": "",
@@ -357,6 +371,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,13 +390,16 @@
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -392,6 +410,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Tämä ominaisuus voidaan todennäköisesti ottaa käyttöön asettamalla \"dom.events.asyncClipboard.clipboardItem\" kohta \"true\":ksi. Vaihtaaksesi selaimen kohdan Firefoxissa, käy \"about:config\" sivulla.",
     "disableSnapping": "",
@@ -649,6 +668,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -657,7 +685,10 @@
     "preview": "Esikatsele",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": ""
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
@@ -752,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "Esitykset",
+    "mcp": "Piirrä AI:lla",
+    "comments": "Kommentoi",
+    "teams": "Tiimityö",
+    "voiceChat": "Äänipuhelut",
+    "withExcalidrawPlus": "Excalidraw+:lla",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "ihmisille ja AI:lle"
   }
 }

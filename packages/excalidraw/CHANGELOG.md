@@ -13,6 +13,13 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Minimap, zoom menu and `ui.disabled` (2026-11-12) [#12605](https://github.com/excalidraw/excalidraw/pull/12605), [#12606](https://github.com/excalidraw/excalidraw/pull/12606)
+
+- A toggleable minimap above the bottom-left canvas actions: drag its viewport (or press outside of it) to pan, wheel over it to zoom. Toggled from the footer button next to the zoom level, the Preferences menu, the command palette and the context menu; stored as `appState.minimapEnabled` (in the browser, not in exported files). Not shown on phones or in editors shorter than 500px.
+- The zoom out / zoom in buttons are replaced by a zoom menu on the zoom level (zoom in and out, zoom to fit, zoom to selection, reset zoom), sharing the footer island with the minimap toggle. The zoom in, zoom out and reset zoom actions are unchanged.
+- New `ui={{ disabled: { minimap: true } }}`, the opt-out form of the `ui` prop: the full default UI minus the listed controls. It removes the minimap and every way to toggle it.
+- Without the minimap toggle (`ui.disabled.minimap`, or the reduced UI of `ui={{ enabled: { zoom: true } }}`), the zoom controls stay the zoom out / zoom level / zoom in buttons.
+
 ### Arrows aren't clipped to frames (2026-10-31) [#12516](https://github.com/excalidraw/excalidraw/pull/12516)
 
 - Arrows and their labels are no longer clipped to the frame they belong to, so they can connect elements across and out of frames, and their part outside the frame can be selected. They still belong to their frame, so they're moved, copied and deleted with it, but only while one of their ends is in it (bound to an element in the frame, or inside it). An arrow whose ends both leave its frame (moved, bound to elements outside it, or with the elements it's bound to) leaves the frame.

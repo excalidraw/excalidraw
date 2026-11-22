@@ -63,6 +63,7 @@ export type ActionName =
   | "midpointSnapping"
   | "showHints"
   | "stats"
+  | "minimap"
   | "changeStrokeColor"
   | "changeBackgroundColor"
   | "changeBucketFillBackgroundColor"

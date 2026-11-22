@@ -671,8 +671,8 @@ describe("flow chart navigation", () => {
     navigate(KEYS.ARROW_LEFT);
     expectSelected(b);
 
-    // A sits between the rows, overlapping D's row by a sliver: that doesn't
-    // put D in line with it, so the much nearer B wins
+    // A sits between the rows, about as far off B's row as off D's: the much
+    // nearer B wins
     API.updateElement(a, { y: a.y + 100.2 });
     API.setSelectedElements([a]);
     navigate(KEYS.ARROW_RIGHT);
@@ -734,7 +734,7 @@ describe("flow chart navigation", () => {
     navigate(KEYS.ARROW_RIGHT, KEYS.ARROW_LEFT);
     expectSelected(x);
 
-    // P and Q are both in line with N, equally far and linked from it: P is
+    // P and Q are about equally far from N and both linked from it: P is
     // level with N's center, Q is higher
     const n = node(0, 0, 200, 200);
     const q = node(300, -30);
@@ -751,71 +751,116 @@ describe("flow chart navigation", () => {
     expectSelected(q);
   });
 
-  it("prefers nodes in line, then linked, then in the cone, then any ahead", () => {
-    // to the left of S, A shares its row while B is linked to S but lower
-    let s = node(450, 170);
-    let a = node(0, 170);
-    let b = node(150, 530);
-    const c = node(750, 170);
-    API.setElements([s, a, b, c, link(s, c), link(c, a), link(s, b)]);
-    API.setSelectedElements([s]);
+  it("weighs how near a node is against how far off to the side it is", () => {
+    /**
+     *          BLUE ←─┐
+     *                 UP
+     *     ┌→ TOP ─┐    ↑
+     * RED ┤       │ ┌→ R1
+     *     └→ BOT  └ MID
+     *               └→ R2
+     */
+    const box = (x: number, y: number) => node(x, y, 237, 117);
+    const red = box(0, 327);
+    const top = box(337, 218);
+    const bot = box(337, 435);
+    const mid = box(674, 435);
+    const r1 = box(1011, 327);
+    const r2 = box(1011, 544);
+    const up = box(844, 110);
+    let blue = box(506, 0);
+    API.setElements([
+      red,
+      top,
+      bot,
+      mid,
+      r1,
+      r2,
+      up,
+      blue,
+      link(red, top),
+      link(red, bot),
+      link(top, mid),
+      link(mid, r1),
+      link(mid, r2),
+      link(r1, up),
+      link(up, blue),
+    ]);
+
+    // nothing is level with BLUE: TOP, down and to the left, is much nearer
+    // than RED, which is more to the left than below
+    API.setSelectedElements([blue]);
     navigate(KEYS.ARROW_LEFT);
-    expectSelected(a);
+    expectSelected(top);
 
-    // nothing shares S's row: A, linked to S, lies past S's right edge (if
-    // mostly above it) and wins over B, which is more to the right but isn't
-    // linked (through plain arrows, which link nodes just like elbow ones)
-    const d = node(300, 80);
-    a = node(300, 260);
-    b = node(580, 520);
-    s = node(0, 620);
-    API.setElements([
-      d,
-      a,
-      b,
-      s,
-      link(d, a, false),
-      link(d, b, false),
-      link(a, s, false),
-    ]);
-    API.setSelectedElements([s]);
-    navigate(KEYS.ARROW_RIGHT);
-    expectSelected(a);
-
-    // below S, A is in the cone while the nearer B is more beside S than
-    // below it
-    const e = node(0, -300);
-    s = node(0, 0);
-    a = node(150, 400);
-    b = node(400, 150);
-    API.setElements([e, s, a, b, link(e, s), link(e, a), link(e, b)]);
-    API.setSelectedElements([s]);
+    // TOP is also what's below BLUE, not UP: BLUE links to it, but it's
+    // beside BLUE rather than below
+    API.setSelectedElements([blue]);
     navigate(KEYS.ARROW_DOWN);
-    expectSelected(a);
+    expectSelected(top);
 
-    // A's center is more to the right of S's than below it, so A is in the
-    // cone and beats the farther F, though A's nearest corner is more below
-    // S than beside it (while below S, the linked B wins)
-    s = node(300, 270);
-    a = node(580, 470);
-    b = node(0, 630);
-    const f = node(900, 400);
+    // RED is level with R1 but three columns away: MID, next to R1 and half
+    // a row lower, wins
+    API.setSelectedElements([r1]);
+    navigate(KEYS.ARROW_LEFT);
+    expectSelected(mid);
+
+    /**
+     *     GREEN
+     *     ↑
+     * L ──┘     R
+     * ↑         ↑
+     * └─ BLUE ──┘
+     */
+    const green = box(287, 0);
+    const l = box(0, 589);
+    const r = box(604, 589);
+    blue = box(288, 789);
     API.setElements([
-      d,
-      s,
-      a,
-      b,
-      f,
-      link(d, s),
-      link(d, a),
-      link(s, b),
-      link(d, f),
+      green,
+      l,
+      r,
+      blue,
+      link(blue, l),
+      link(blue, r),
+      link(l, green),
     ]);
-    API.setSelectedElements([s]);
+
+    // L and R are linked from BLUE and several times nearer, but more beside
+    // it than above: GREEN, straight above, wins
+    API.setSelectedElements([blue]);
+    navigate(KEYS.ARROW_UP);
+    expectSelected(green);
+  });
+
+  it("takes a bigger node as near as its nearest part", () => {
+    /**
+     *      U
+     *      ↓
+     * L → [W          ]
+     *      ↓
+     *      K
+     */
+    const u = node(0, -180);
+    const w = node(0, 0, 800);
+    const k = node(40, 180);
+    const l = node(-300, 0);
+    API.setElements([u, w, k, l, link(u, w), link(l, w), link(w, k)]);
+
+    // W's center is far to the right of K's, but W is right above K
+    API.setSelectedElements([k]);
+    navigate(KEYS.ARROW_UP);
+    expectSelected(w);
+
+    // W's center is far, but W starts right next to L, nearer than U
+    API.setSelectedElements([l]);
     navigate(KEYS.ARROW_RIGHT);
-    expectSelected(a);
-    API.setSelectedElements([s]);
-    navigate(KEYS.ARROW_DOWN);
-    expectSelected(b);
+    expectSelected(w);
+
+    // W and K are below U, K a bit more to the right: neither is to the
+    // right of U
+    API.setSelectedElements([u]);
+    navigate(KEYS.ARROW_RIGHT);
+    expectSelected(u);
   });
 });

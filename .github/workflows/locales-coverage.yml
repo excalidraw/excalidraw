@@ -33,6 +33,8 @@ jobs:
       - name: Construct comment body
         id: getCommentBody
         run: |
+          # production coverage (diffed against in the description)
+          git fetch --depth=1 origin master:refs/remotes/origin/master
           body=$(npm run locales-coverage:description | grep '^[^>]')
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"

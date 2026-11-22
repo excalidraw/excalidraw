@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "Dán",
     "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
@@ -27,6 +28,7 @@
     "copyStyles": "Sao chép định dạng",
     "pasteStyles": "Dán định dạng",
     "stroke": "Nét",
+    "textColor": "",
     "changeStroke": "Đổi màu nét vẽ",
     "background": "Nền",
     "changeBackground": "Thay đổi màu nền",
@@ -113,6 +115,8 @@
     "collaborators": "Cộng tác viên",
     "you": "",
     "toggleGrid": "Bật/tắt lưới",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Thêm vào thư viện",
     "removeFromLibrary": "Xóa khỏi thư viện",
     "libraryLoadingMessage": "Đang tải thư viện…",
@@ -182,11 +186,14 @@
     "zoomToFit": "Thu phóng để hiển thị toàn bộ các phần tử",
     "installPWA": "Cài đặt Excalidraw trên máy (PWA)",
     "autoResize": "Bật tự động thay đổi kích thước văn bản",
+    "toggleAutoResize": "",
     "imageCropping": "Cắt ảnh",
     "unCroppedDimension": "Kích thước gốc (chưa cắt)",
     "copyElementLink": "Sao chép liên kết tới đối tượng",
     "linkToElement": "Liên kết đến đối tượng",
     "wrapSelectionInFrame": "Đưa vùng chọn vào khung",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
@@ -195,7 +202,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Liên kết đến đối tượng",
@@ -239,12 +250,14 @@
     "zoomIn": "Phóng to",
     "zoomOut": "Thu nhỏ",
     "resetZoom": "Đặt lại thu phóng",
+    "zoomToFit": "",
     "menu": "Bảng chọn",
     "done": "Xong",
     "edit": "Chỉnh sửa",
     "undo": "Hoàn tác",
     "redo": "Làm lại",
     "resetLibrary": "Cài lại thư viện",
+    "reset": "",
     "createNewRoom": "Tạo phòng mới",
     "fullScreen": "Toàn màn hình",
     "darkMode": "Chế độ tối",
@@ -332,6 +345,7 @@
     "eraser": "Xóa",
     "frame": "Công cụ tạo khung",
     "magicframe": "Wireframe thành code",
+    "stickynote": "",
     "embeddable": "Nhúng Web",
     "laser": "Con trỏ laser",
     "autoshape": "",
@@ -357,6 +371,7 @@
     "group": "Nhóm",
     "frame": "Khung hình",
     "magicframe": "Wireframe thành code",
+    "stickynote": "",
     "embeddable": "Nhúng Web",
     "selection": "Lựa chọn",
     "iframe": "IFrame"
@@ -375,13 +390,16 @@
     "freeDraw": "Ấn bà kéo, thả khi bạn xong",
     "text": "Mẹo: bạn có thể thêm văn bản tại bất cứ đâu bằng cách ấn hai lần bằng tool lựa chọn",
     "embeddable": "Nhấp và kéo để tạo nội dung nhúng từ website.",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "Giới hạn góc độ bằng cách giữ {{shortcut}} khi xoay",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -392,6 +410,7 @@
     "bindTextToElement": "Nhấn {{shortcut}} để thêm văn bản",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\".",
     "disableSnapping": "",
@@ -649,6 +668,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -657,7 +685,10 @@
     "preview": "",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": ""
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
@@ -752,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "Thuyết trình",
+    "mcp": "Vẽ bằng AI",
+    "comments": "Viết bình luận",
+    "teams": "Làm việc nhóm",
+    "voiceChat": "Gọi thoại",
+    "withExcalidrawPlus": "trên Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "cho người và AI"
   }
 }
