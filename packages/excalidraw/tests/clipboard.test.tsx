@@ -3,7 +3,10 @@ import { vi } from "vitest";
 
 import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
 
-import { getLineHeightInPx } from "@excalidraw/element";
+import {
+  getLineHeightInPx,
+  setCustomTextMetricsProvider,
+} from "@excalidraw/element";
 
 import {
   KEYS,
@@ -12,7 +15,10 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
@@ -132,36 +138,42 @@ describe("general paste behavior", () => {
   });
 });
 
-/** pastes a text with Ctrl/Cmd+V, and splits it from the toast */
-const pasteAndSplit = async (text: string) => {
+/**
+ * pastes a text with Ctrl/Cmd+V, and splits it from the toast (the pasted
+ * text, then the lines it's split into, are what's selected)
+ */
+const pasteAndSplit = async (
+  text: string,
+  beforeSplit?: (pasted: ExcalidrawTextElement) => void,
+) => {
   pasteWithCtrlCmdV(text);
   const button = await waitFor(() => {
     const button = document.querySelector<HTMLButtonElement>(".Toast__action");
     expect(button).not.toBe(null);
     return button!;
   });
-  const [pasted] = h.elements.filter(
-    (element) => !element.isDeleted,
-  ) as ExcalidrawTextElement[];
+  const pasted = API.getSelectedElement() as ExcalidrawTextElement;
+  beforeSplit?.(pasted);
+  // as a click does
+  button.focus();
   fireEvent.click(button);
   return {
     pasted,
-    texts: h.elements.filter(
-      (element) => !element.isDeleted,
-    ) as ExcalidrawTextElement[],
+    texts: API.getSelectedElements() as ExcalidrawTextElement[],
   };
 };
 
 describe("paste multiline text", () => {
   it("should paste a single element, and offer to split it into an element per line", async () => {
-    const text = "sajgfakfn\n\naaksfnknas\nakefnkasf\n";
+    const text = "sajgfakfn\n\n  aaksfnknas\nakefnkasf\n";
     const { pasted, texts } = await pasteAndSplit(text);
     expect(pasted.originalText).toBe(text.trim());
 
-    // blank lines dropped, in place of the pasted text, selected
+    // blank lines dropped (the indentation kept), in place of the pasted
+    // text, selected
     expect(texts.map((text) => text.originalText)).toEqual([
       "sajgfakfn",
-      "aaksfnknas",
+      "  aaksfnknas",
       "akefnkasf",
     ]);
     expect(h.elements.find((el) => el.id === pasted.id)?.isDeleted).toBe(true);
@@ -171,6 +183,10 @@ describe("paste multiline text", () => {
       texts.map((text) => text.id).sort(),
     );
     expect(h.state.toast).toBe(null);
+    // the button's gone, the focus is back in the editor (to paste again)
+    expect(document.activeElement).toBe(
+      document.querySelector(".excalidraw-container"),
+    );
 
     // one step to undo
     Keyboard.undo();
@@ -249,6 +265,95 @@ describe("paste multiline text", () => {
         texts[i - 1].y + texts[i - 1].height + lineGap,
       );
     }
+  });
+
+  it("should keep the split lines wrapped as they were, not wrap them anew", async () => {
+    // kerning: a row is narrower than its characters are, one by one — as
+    // a long word is measured when it's broken up
+    setCustomTextMetricsProvider({
+      getLineWidth: (text) => text.length * 10 - Math.max(0, text.length - 1),
+    });
+    try {
+      API.setAppState({
+        width: 1000,
+        zoom: { value: 8 as NormalizedZoomValue },
+      });
+      const { pasted, texts } = await pasteAndSplit(
+        "abcdefghijklmnopqrstuvwx\nshort",
+      );
+      // the word's broken up into rows that, measured one character at a
+      // time, wouldn't fit the width the text ends up with
+      const rows = pasted.text.split("\n");
+      expect(rows.length).toBeGreaterThan(2);
+      expect(rows[0].length * 10).toBeGreaterThan(pasted.width);
+      expect(texts.map((text) => text.text).join("\n")).toBe(pasted.text);
+    } finally {
+      setCustomTextMetricsProvider(undefined);
+    }
+  });
+
+  it("should take a split line that's left the frame out of it", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 200,
+      y: 240,
+      width: 200,
+      height: 120,
+    });
+    API.setElements([frame]);
+    // four lines fit the frame, not so half a line height apart
+    h.app.viewport.lastPosition.x = 300;
+    h.app.viewport.lastPosition.y = 300;
+    const { pasted, texts } = await pasteAndSplit("a\nb\nc\nd");
+    expect(pasted.frameId).toBe(frame.id);
+    expect(texts.map((text) => text.frameId)).toEqual([
+      frame.id,
+      frame.id,
+      frame.id,
+      null,
+    ]);
+  });
+
+  it("should put the split lines in the text's place in the layer order, and let go of arrows bound to it", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const arrow = API.createElement({ type: "arrow" });
+    const { texts } = await pasteAndSplit("a\nb", (pasted) => {
+      API.setElements([
+        {
+          ...pasted,
+          boundElements: [{ id: arrow.id, type: "arrow" }],
+        },
+        rectangle,
+        {
+          ...arrow,
+          startBinding: {
+            elementId: pasted.id,
+            fixedPoint: [0.5, 0.5],
+            mode: "orbit",
+          },
+        },
+      ]);
+    });
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.id),
+    ).toEqual([...texts.map((text) => text.id), rectangle.id, arrow.id]);
+    expect(
+      (h.elements.find((el) => el.id === arrow.id) as ExcalidrawArrowElement)
+        .startBinding,
+    ).toBe(null);
+  });
+
+  it("should offer to split the text pasted last only", async () => {
+    pasteWithCtrlCmdV("a\nb");
+    await waitFor(() => {
+      expect(h.state.toast).not.toBe(null);
+    });
+    // no offer for this one: the one for the text before is gone
+    pasteWithCtrlCmdShiftV("c\nd");
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+    });
+    expect(h.state.toast).toBe(null);
   });
 });
 
