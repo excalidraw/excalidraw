@@ -515,6 +515,8 @@ export interface AppState {
     message: React.ReactNode;
     closable?: boolean;
     duration?: number;
+    /** a link-like button after the message; it closes the toast, too */
+    action?: { label: string; onClick: () => void };
   } | null;
   zenModeEnabled: boolean;
   minimapEnabled: boolean;

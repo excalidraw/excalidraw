@@ -22,6 +22,7 @@ import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { Pointer, Keyboard } from "./helpers/ui";
 import {
+  fireEvent,
   render,
   waitFor,
   GlobalTestState,
@@ -131,21 +132,51 @@ describe("general paste behavior", () => {
   });
 });
 
-describe("paste text as single lines", () => {
-  it("should create an element for each line when copying with Ctrl/Cmd+V", async () => {
-    const text = "sajgfakfn\naaksfnknas\nakefnkasf";
-    pasteWithCtrlCmdV(text);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(text.split("\n").length);
-    });
+/** pastes a text with Ctrl/Cmd+V, and splits it from the toast */
+const pasteAndSplit = async (text: string) => {
+  pasteWithCtrlCmdV(text);
+  const button = await waitFor(() => {
+    const button = document.querySelector<HTMLButtonElement>(".Toast__action");
+    expect(button).not.toBe(null);
+    return button!;
   });
+  const [pasted] = h.elements.filter(
+    (element) => !element.isDeleted,
+  ) as ExcalidrawTextElement[];
+  fireEvent.click(button);
+  return {
+    pasted,
+    texts: h.elements.filter(
+      (element) => !element.isDeleted,
+    ) as ExcalidrawTextElement[],
+  };
+};
 
-  it("should ignore empty lines when creating an element for each line", async () => {
-    const text = "\n\nsajgfakfn\n\n\naaksfnknas\n\nakefnkasf\n\n\n";
-    pasteWithCtrlCmdV(text);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(3);
-    });
+describe("paste multiline text", () => {
+  it("should paste a single element, and offer to split it into an element per line", async () => {
+    const text = "sajgfakfn\n\naaksfnknas\nakefnkasf\n";
+    const { pasted, texts } = await pasteAndSplit(text);
+    expect(pasted.originalText).toBe(text.trim());
+
+    // blank lines dropped, in place of the pasted text, selected
+    expect(texts.map((text) => text.originalText)).toEqual([
+      "sajgfakfn",
+      "aaksfnknas",
+      "akefnkasf",
+    ]);
+    expect(h.elements.find((el) => el.id === pasted.id)?.isDeleted).toBe(true);
+    expect(texts[0].x).toBeCloseTo(pasted.x);
+    expect(texts[0].y).toBeCloseTo(pasted.y);
+    expect(Object.keys(h.state.selectedElementIds).sort()).toEqual(
+      texts.map((text) => text.id).sort(),
+    );
+    expect(h.state.toast).toBe(null);
+
+    // one step to undo
+    Keyboard.undo();
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.id),
+    ).toEqual([pasted.id]);
   });
 
   it("should not create any element if clipboard has only new lines", async () => {
@@ -157,33 +188,26 @@ describe("paste text as single lines", () => {
     });
   });
 
-  it("should space items by half a line height, ignoring blank lines", async () => {
+  it("should space the split lines by half a line height, ignoring blank lines", async () => {
     const lineHeightPx = getLineHeightInPx(
       h.app.state.currentItemFontSize,
       getLineHeight(h.state.currentItemFontFamily),
     );
     mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV("hkhkjhki\njgkjhffjh\n\n\njgkjhffjh");
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(3);
-    });
-    for (let i = 1; i < h.elements.length; i++) {
-      expect(h.elements[i].y).toBeCloseTo(
-        h.elements[0].y + lineHeightPx * 1.5 * i,
-      );
+    const { texts } = await pasteAndSplit("hkhkjhki\njgkjhffjh\n\n\njgkjhffjh");
+    expect(texts.length).toBe(3);
+    for (let i = 1; i < texts.length; i++) {
+      expect(texts[i].y).toBeCloseTo(texts[0].y + lineHeightPx * 1.5 * i);
     }
   });
 
-  it("should align the lines as the current text align", async () => {
+  it("should align the split lines as the text is", async () => {
     for (const textAlign of ["left", "center", "right"] as const) {
+      API.updateScene({ elements: [] });
       API.setAppState({ currentItemTextAlign: textAlign });
-      API.setSelectedElements([]);
-      const count = h.elements.length;
-      pasteWithCtrlCmdV("short\nmuch longer line");
-      await waitFor(() => {
-        expect(h.elements.length).toEqual(count + 2);
-      });
-      const [short, long] = h.elements.slice(count) as ExcalidrawTextElement[];
+      const { pasted, texts } = await pasteAndSplit("short\nmuch longer line");
+      const [short, long] = texts;
+      expect(pasted.textAlign).toBe(textAlign);
       expect(short.textAlign).toBe(textAlign);
       expect(long.textAlign).toBe(textAlign);
       expect(short.width).toBeLessThan(long.width);
@@ -193,22 +217,24 @@ describe("paste text as single lines", () => {
           : textAlign === "right"
           ? text.x + text.width
           : text.x + text.width / 2;
-      expect(getEdge(short)).toBeCloseTo(getEdge(long));
+      expect(getEdge(short)).toBeCloseTo(getEdge(pasted));
+      expect(getEdge(long)).toBeCloseTo(getEdge(pasted));
     }
   });
 
-  it("should stack lines that wrap to different heights without overlap", async () => {
+  it("should stack split lines that wrap to different heights without overlap", async () => {
     API.setAppState({
       width: 1000,
       zoom: { value: 8 as NormalizedZoomValue },
     });
     const long =
       "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
-    pasteWithCtrlCmdV(`short\n${long}\n${long} ${long}\nshort`);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(4);
-    });
-    const texts = h.elements as ExcalidrawTextElement[];
+    const { pasted, texts } = await pasteAndSplit(
+      `short\n${long}\n${long} ${long}\nshort`,
+    );
+    expect(pasted.autoResize).toBe(false);
+    // wrapped as they were in the pasted text
+    expect(texts.map((text) => text.text).join("\n")).toBe(pasted.text);
     expect(texts.map((text) => text.autoResize)).toEqual([
       true,
       false,
@@ -227,12 +253,13 @@ describe("paste text as single lines", () => {
 });
 
 describe("paste text as a single element", () => {
-  it("should create single text element when copying text with Ctrl/Cmd+Shift+V", async () => {
+  it("should create single text element when copying text with Ctrl/Cmd+Shift+V, not offering to split it", async () => {
     const text = "sajgfakfn\naaksfnknas\nakefnkasf";
     pasteWithCtrlCmdShiftV(text);
     await waitFor(() => {
       expect(h.elements.length).toEqual(1);
     });
+    expect(h.state.toast).toBe(null);
   });
   it("should not make a pasted text wider than the view", async () => {
     API.setAppState({
@@ -848,13 +875,9 @@ describe("clipboard - pasting mermaid definition", () => {
     const text = "flowchart TD xx\nA";
     pasteWithCtrlCmdV(text);
     await waitFor(() => {
-      expect(h.elements.length).toEqual(2);
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ type: "text", text: "flowchart TD xx" }),
-          expect.objectContaining({ type: "text", text: "A" }),
-        ]),
-      );
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: "flowchart TD xx\nA" }),
+      ]);
     });
   });
 });
@@ -959,8 +982,7 @@ describe("paste routing", () => {
     );
     await waitFor(() => {
       expect(h.elements.map((element) => (element as any).text)).toEqual([
-        "hello",
-        "world",
+        "hello\n\nworld",
       ]);
     });
   });

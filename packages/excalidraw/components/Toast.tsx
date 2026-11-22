@@ -28,12 +28,15 @@ const ToastComponent = ({
   closable = false,
   // To prevent autoclose, pass duration as Infinity
   duration = DEFAULT_TOAST_TIMEOUT,
+  action,
   style,
 }: {
   message: ReactNode;
   onClose: () => void;
   closable?: boolean;
   duration?: number;
+  /** a link-like button after the message; it closes the toast, too */
+  action?: { label: string; onClick: () => void };
   style?: CSSProperties;
 }) => {
   const timerRef = useRef<number>(0);
@@ -54,7 +57,7 @@ const ToastComponent = ({
     }
     scheduleTimeout();
     return () => clearTimeout(timerRef.current);
-  }, [scheduleTimeout, message, duration, shouldAutoClose]);
+  }, [scheduleTimeout, message, action, duration, shouldAutoClose]);
 
   const onMouseEnter = shouldAutoClose
     ? () => clearTimeout(timerRef?.current)
@@ -68,7 +71,24 @@ const ToastComponent = ({
       onMouseLeave={onMouseLeave}
       style={style}
     >
-      <div className="Toast__message">{message}</div>
+      <div className="Toast__message">
+        {message}
+        {action && (
+          <>
+            {" "}
+            <button
+              type="button"
+              className="Toast__action"
+              onClick={() => {
+                onClose();
+                action.onClick();
+              }}
+            >
+              {action.label}
+            </button>
+          </>
+        )}
+      </div>
       {closable && (
         <IconButton
           icon={CloseIcon}
