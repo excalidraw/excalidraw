@@ -6,8 +6,16 @@ services:
         - NODE_ENV=development
     container_name: excalidraw
     ports:
-      - "3000:80"
+      - "3000:8080"
     restart: on-failure
+    # hardened runtime: the image runs unprivileged nginx on port 8080
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     stdin_open: true
     healthcheck:
       disable: true

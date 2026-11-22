@@ -15,6 +15,19 @@ RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
 FROM nginx:stable-alpine-slim@sha256:2c605dbeab79a6b2a63340474fe58119d0ef95bdc4b1f41df0aa689659b3d13b
 
+# Run unprivileged: the custom nginx.conf listens on 8080 and only writes to
+# /tmp, so the image works with an arbitrary --user UID, --read-only
+# (plus --tmpfs /tmp), --cap-drop=ALL and --security-opt no-new-privileges.
+# The stock entrypoint scripts and default server config are removed because
+# they rewrite /etc/nginx/conf.d at startup, which fails on a read-only fs.
+RUN rm -rf /docker-entrypoint.d/* /etc/nginx/conf.d/default.conf
+
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+# 101 = the `nginx` user shipped with the official image
+USER 101
+
+EXPOSE 8080
+
+HEALTHCHECK CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1

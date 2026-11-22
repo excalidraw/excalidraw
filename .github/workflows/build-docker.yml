@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - release
+  pull_request:
+    paths:
+      - Dockerfile
+      - nginx.conf
+      - .dockerignore
+      - docker-compose.yml
+      - .github/workflows/build-docker.yml
 
 jobs:
   build-docker:
@@ -11,3 +18,27 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - run: docker build -t excalidraw .
+
+      - name: Smoke test hardened (unprivileged, read-only) container
+        run: |
+          docker run -d --name excalidraw -p 8080:8080 \
+            --user 1010:1010 \
+            --read-only --tmpfs /tmp \
+            --cap-drop=ALL --security-opt no-new-privileges \
+            --health-interval=2s --health-start-period=2s \
+            excalidraw
+
+          for i in $(seq 1 30); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' excalidraw)
+            [ "$status" = "healthy" ] && break
+            sleep 2
+          done
+
+          docker ps -a
+          docker logs excalidraw
+          test "$status" = "healthy"
+          curl -fsS http://localhost:8080/ | grep -qi "<title>.*excalidraw"
+
+      - name: Clean up
+        if: always()
+        run: docker rm -f excalidraw || true
