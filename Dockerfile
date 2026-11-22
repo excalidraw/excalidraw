@@ -15,6 +15,14 @@ RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
 FROM nginx:stable-alpine-slim@sha256:2c605dbeab79a6b2a63340474fe58119d0ef95bdc4b1f41df0aa689659b3d13b
 
+# Run unprivileged: non-root user on port 8080, only /tmp needs to be writable.
+# Supports: --read-only --tmpfs /tmp --cap-drop=ALL --security-opt no-new-privileges
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+# 101 is the uid/gid of the `nginx` user shipped with the base image
+USER 101:101
+
+EXPOSE 8080
+
+HEALTHCHECK CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1

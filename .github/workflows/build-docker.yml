@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - release
+  pull_request:
+    paths:
+      - Dockerfile
+      - nginx.conf
+      - docker-compose.yml
+      - .dockerignore
+      - .github/workflows/build-docker.yml
 
 jobs:
   build-docker:
@@ -11,3 +18,37 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - run: docker build -t excalidraw .
+
+      # Regression test for #10398: the image must serve the app as a non-root
+      # user with a read-only rootfs, all capabilities dropped and
+      # no-new-privileges. The arbitrary uid also covers `user: 1010:1010`.
+      - name: Smoke test hardened runtime
+        run: |
+          docker run -d --name excalidraw \
+            --read-only --tmpfs /tmp \
+            --cap-drop=ALL \
+            --security-opt no-new-privileges \
+            --user 1010:1010 \
+            --health-interval 2s \
+            -p 8080:8080 \
+            excalidraw
+
+          for i in $(seq 1 30); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' excalidraw)
+            [ "$status" = "healthy" ] && break
+            if [ "$(docker inspect -f '{{.State.Running}}' excalidraw)" != "true" ]; then
+              echo "container exited"; docker logs excalidraw; exit 1
+            fi
+            sleep 2
+          done
+          [ "$status" = "healthy" ] || { echo "container not healthy: $status"; docker logs excalidraw; exit 1; }
+
+          curl -fsS http://localhost:8080/ | grep -qi "<title>Excalidraw" \
+            || { echo "unexpected response"; docker logs excalidraw; exit 1; }
+
+          docker logs excalidraw
+          echo "hardened runtime OK"
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f excalidraw || true
