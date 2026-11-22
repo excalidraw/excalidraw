@@ -8,11 +8,19 @@ import type {
   Radians,
 } from "./types";
 
-export const normalizeRadians = (angle: Radians): Radians =>
-  angle < 0
-    ? (((angle % (2 * Math.PI)) + 2 * Math.PI) as Radians)
-    : ((angle % (2 * Math.PI)) as Radians);
+export const normalizeRadians = (angle: Radians): Radians => {
+  let normalized = (angle % (2 * Math.PI)) as Radians;
 
+  if (normalized < 0) {
+    normalized = (normalized + 2 * Math.PI) as Radians;
+  }
+
+  if (normalized >= 2 * Math.PI || normalized === 0) {
+    return 0 as Radians;
+  }
+
+  return normalized;
+};
 /**
  * Return the polar coordinates for the given cartesian point represented by
  * (x, y) for the center point 0,0 where the first number returned is the radius,
@@ -22,9 +30,9 @@ export const cartesian2Polar = <P extends GlobalPoint | LocalPoint>([
   x,
   y,
 ]: P): PolarCoords => [
-  Math.hypot(x, y),
-  normalizeRadians(Math.atan2(y, x) as Radians),
-];
+    Math.hypot(x, y),
+    normalizeRadians(Math.atan2(y, x) as Radians),
+  ];
 
 export function degreesToRadians(degrees: Degrees): Radians {
   return ((degrees * Math.PI) / 180) as Radians;
