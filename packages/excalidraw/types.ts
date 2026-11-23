@@ -621,6 +621,9 @@ export type UIAppState = Omit<
   | "textToolHover"
   | "frameToHighlight"
   | "elementsToHighlight"
+  // flipped by holding Cmd/Ctrl to suspend arrow binding; only the canvas and
+  // pointer handlers read it (the UI shows `bindingPreference` instead)
+  | "isBindingEnabled"
 >;
 
 export type NormalizedZoomValue = number & { _brand: "normalizedZoom" };

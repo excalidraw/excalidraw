@@ -749,6 +749,7 @@ const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
     suggestedBinding,
     frameToHighlight,
     elementsToHighlight,
+    isBindingEnabled,
     ...ret
   } = appState;
   return ret;
