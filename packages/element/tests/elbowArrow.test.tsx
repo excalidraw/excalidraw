@@ -299,6 +299,32 @@ describe("elbow arrow ui", () => {
     ]);
   });
 
+  it("enters a side its end is dragged onto from inside its element by that side", () => {
+    // a loop from the right of a wide rectangle, with the end dragged inside
+    // it towards the top, near its right: the end snaps onto the top (much
+    // further from the center sideways than up), and the arrow enters it
+    // from above, as it does once bound, rather than along it
+    UI.createElement("rectangle", { x: 0, y: 0, width: 200, height: 100 });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(200, 50);
+    mouse.down();
+    for (let i = 1; i <= 4; i++) {
+      mouse.moveTo(200 - (50 * i) / 6, 50 - (50 * i) / 6);
+    }
+
+    const arrow = h.elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawElbowArrowElement;
+    const [corner, end] = arrow.points.slice(-2);
+    expect(arrow.y + end[1]).toBeLessThan(0);
+    expect(end[0]).toBeCloseTo(corner[0]);
+    expect(end[1]).toBeGreaterThan(corner[1]);
+
+    mouse.up();
+  });
+
   it("can follow bound rotated shapes", async () => {
     UI.createElement("rectangle", {
       x: -150,
@@ -333,12 +359,17 @@ describe("elbow arrow ui", () => {
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
 
-    expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
-      [0, 0],
-      [51, 0],
-      [51, 164],
-      [101, 164],
-    ]);
+    // turning halfway between the elements' bounds (the rotated one's
+    // bounding box)
+    expect(arrow.points).toCloselyEqualPoints(
+      [
+        [0, 0],
+        [40, 0],
+        [40, 164],
+        [101, 164],
+      ],
+      0,
+    );
   });
 
   it("keeps arrow shape when the whole set of arrow and bindables are duplicated", async () => {
@@ -952,4 +983,703 @@ describe("elbow arrow endpoints exactly on the bound element's outline", () => {
     expect(points![1][0]).toBeCloseTo(points![0][0]);
     expect(points![1][1]).toBeLessThan(points![0][1]);
   });
+});
+
+describe("elbow arrow routing between overlapping elements", () => {
+  it("doesn't avoid them once an endpoint is within the padding around the other one", () => {
+    // an arrow from the right of the lower element to the left of the upper
+    // one, with the lower one dragged up through the upper one
+    const upper = API.createElement({
+      type: "rectangle",
+      x: 770.35,
+      y: 366.07,
+      width: 224.54,
+      height: 112,
+    });
+    let lower = API.createElement({
+      type: "rectangle",
+      x: 777.3,
+      y: 552.24,
+      width: 224.54,
+      height: 112,
+    });
+    let arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 1007.84,
+      y: 608.25,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(-243, -186)],
+      startBinding: {
+        elementId: lower.id,
+        fixedPoint: [1.0267, 0.5001],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: upper.id,
+        fixedPoint: [-0.0267, 0.5001],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const globalPoints = (element: ExcalidrawElbowArrowElement) =>
+      element.points.map(
+        ([px, py]) => [element.x + px, element.y + py] as [number, number],
+      );
+
+    /** The arrow's route with the lower element moved to `y` */
+    const routeWithLowerAt = (y: number) => {
+      lower = { ...lower, y };
+      const elementsMap = arrayToMap([
+        upper,
+        lower,
+      ]) as NonDeletedSceneElementsMap;
+      const routed = {
+        ...arrow,
+        ...updateElbowArrowRoute(arrow, elementsMap),
+      } as ExcalidrawElbowArrowElement;
+      arrow = routed;
+
+      // the same as for the arrow made anew between the same endpoints:
+      // where it was routed before doesn't matter
+      const fresh = {
+        ...arrow,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      } as ExcalidrawElbowArrowElement;
+      expect(globalPoints(routed)).toCloselyEqualPoints(
+        globalPoints({
+          ...fresh,
+          ...updateElbowArrowRoute(fresh, elementsMap),
+        } as ExcalidrawElbowArrowElement),
+      );
+
+      return globalPoints(routed);
+    };
+
+    // in 1px steps, from the end being within the padding above the lower
+    // one, until the start is no longer within the padding below the upper
+    // one, but where the endpoints are too close in height to turn back
+    // between them
+    for (let y = 466; y > 266; y -= 1) {
+      const points = routeWithLowerAt(y);
+      const [start, end] = [points[0], points[points.length - 1]];
+      if (Math.abs(start[1] - end[1]) < 34) {
+        continue;
+      }
+
+      // straight through the elements: right a padding, turning back
+      // halfway between the endpoints, and right a padding into the end
+      expect(points).toCloselyEqualPoints([
+        start,
+        [start[0] + 40, start[1]],
+        [start[0] + 40, (start[1] + end[1]) / 2],
+        [end[0] - 40, (start[1] + end[1]) / 2],
+        [end[0] - 40, end[1]],
+        end,
+      ]);
+    }
+  });
+});
+
+describe("elbow arrow clearance", () => {
+  it.each([740, 760, 770.35, 773.75, 776, 778.32, 790])(
+    "keeps the padding around an element where nothing is in front of it (the element above at x = %d)",
+    (upperX) => {
+      // the start leaves the right side of the lower element, which nothing
+      // is in front of: the upper element is above it, ending to the left of
+      // its right side, level with it or a little past it
+      const upper = API.createElement({
+        type: "rectangle",
+        x: upperX,
+        y: 366.07,
+        width: 224.54,
+        height: 112,
+      });
+      const lower = API.createElement({
+        type: "rectangle",
+        x: 773.75,
+        y: 502.38,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 1004.29,
+        y: 558.4,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(-240, -136),
+        ],
+        startBinding: {
+          elementId: lower.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: upper.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([upper, lower]) as NonDeletedSceneElementsMap,
+      );
+
+      // between the elements, with the first and last legs (out of the
+      // binding gap) a padding long
+      expect(points).toHaveLength(6);
+      expect(points![1][0] - points![0][0]).toBeCloseTo(40, 0);
+      expect(points![5][0] - points![4][0]).toBeCloseTo(40, 0);
+    },
+  );
+});
+
+describe("elbow arrow legs next to another element", () => {
+  it("gives the legs their padding when their endpoints are right by the other element", () => {
+    // overlapping elements, with the start on the right of the upper one
+    // just above the lower one, and the end on the left of the lower one
+    // just below the upper one: the elements aren't avoided, but the legs
+    // still get their padding
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 856.95,
+      y: 621.29,
+      width: 224.54,
+      height: 112,
+    });
+    const upper = API.createElement({
+      type: "rectangle",
+      x: 781.08,
+      y: 561.2,
+      width: 224.54,
+      height: 112,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: upper.id,
+        fixedPoint: [1.0267, 0.5001],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: lower.id,
+        fixedPoint: [-0.0267, 0.5001],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+    const length = (a: LocalPoint, b: LocalPoint) =>
+      Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]);
+
+    // around them, without hooking back to keep a leg short
+    expect(points!.length).toBeLessThanOrEqual(6);
+    expect(length(points![0], points![1])).toBeGreaterThanOrEqual(39.5);
+    expect(
+      length(points![points!.length - 2], points![points!.length - 1]),
+    ).toBeGreaterThanOrEqual(39.5);
+  });
+
+  it("turns back halfway between the endpoints when they're right by the other element", () => {
+    // partly overlapping elements, with the start on the right of the upper
+    // one just above the lower one, and the end on the left of the lower one
+    // just below the upper one
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 854.11,
+      y: 628.21,
+      width: 224.54,
+      height: 112,
+    });
+    const upper = API.createElement({
+      type: "rectangle",
+      x: 642.92,
+      y: 560.95,
+      width: 224.54,
+      height: 112,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: upper.id,
+        fixedPoint: [1.0267, 0.5001],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: lower.id,
+        fixedPoint: [-0.0267, 0.5001],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+
+    // right a padding, back halfway between the endpoints through both
+    // elements, and right a padding into the end
+    const start = points![0];
+    const end = points![points!.length - 1];
+    expect(points).toCloselyEqualPoints([
+      start,
+      [start[0] + 40, start[1]],
+      [start[0] + 40, (start[1] + end[1]) / 2],
+      [end[0] - 40, (start[1] + end[1]) / 2],
+      [end[0] - 40, end[1]],
+      end,
+    ]);
+  });
+
+  it.each([
+    [604.32, 517.29],
+    [604.32, 520],
+    [604.32, 525],
+    [608.24, 520],
+  ])(
+    "gives both legs their padding where the elements' corners nearly touch (the upper one at %d, %d)",
+    (upperX, upperY) => {
+      // the upper element's bottom right corner is just above and left of the
+      // lower one's top left corner (their binding gaps overlapping, and even
+      // their sides a little), and the route turns back between them
+      const lower = API.createElement({
+        type: "rectangle",
+        x: 848.21,
+        y: 630.52,
+        width: 224.54,
+        height: 112,
+      });
+      const upper = API.createElement({
+        type: "rectangle",
+        x: upperX,
+        y: upperY,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: upper.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: lower.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+      );
+
+      expect(points).toHaveLength(6);
+      expect(points![1][0] - points![0][0]).toBeCloseTo(40);
+      expect(points![5][0] - points![4][0]).toBeCloseTo(40);
+    },
+  );
+
+  it("gives the start leg its padding along the top of the other element", () => {
+    // the upper element's bottom right corner is above and left of the lower
+    // one's top left corner, and the route turns back through the gap
+    // between them: its middle runs along the top of the lower one by the
+    // start leg (but well along it, rather than by its corner)
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 848.21,
+      y: 630.52,
+      width: 224.54,
+      height: 112,
+    });
+    const upper = API.createElement({
+      type: "rectangle",
+      x: 607.42,
+      y: 506.33,
+      width: 224.54,
+      height: 112,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: upper.id,
+        fixedPoint: [1.0267, 0.5001],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: lower.id,
+        fixedPoint: [-0.0267, 0.5001],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+
+    expect(points).toHaveLength(6);
+    expect(points![1][0] - points![0][0]).toBeCloseTo(40);
+    expect(points![5][0] - points![4][0]).toBeCloseTo(40);
+  });
+
+  it.each([
+    [609.52, 521],
+    [608.24, 516.83],
+    [608.24, 510],
+    [608.24, 505],
+  ])(
+    "doesn't turn back too tightly to thread between elements with corners nearly touching (the upper one at %d, %d)",
+    (upperX, upperY) => {
+      // the upper element's bottom right corner is just above and left of the
+      // lower one's top left corner, and the endpoints are just past the
+      // padding around the other element
+      const lower = API.createElement({
+        type: "rectangle",
+        x: 848.21,
+        y: 630.52,
+        width: 224.54,
+        height: 112,
+      });
+      const upper = API.createElement({
+        type: "rectangle",
+        x: upperX,
+        y: upperY,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: upper.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: lower.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+      );
+
+      // wherever it turns back, with room to round both corners fully
+      for (let i = 1; i + 2 < points!.length; i++) {
+        const [a, b, c, d] = points!.slice(i - 1, i + 3);
+        const turnsBack =
+          Math.sign(b[0] - a[0]) === -Math.sign(d[0] - c[0]) &&
+          Math.sign(b[1] - a[1]) === -Math.sign(d[1] - c[1]);
+        if (turnsBack) {
+          expect(
+            Math.abs(c[0] - b[0]) + Math.abs(c[1] - b[1]),
+          ).toBeGreaterThanOrEqual(32);
+        }
+      }
+      expect(points!.length).toBeLessThanOrEqual(6);
+    },
+  );
+});
+
+describe("elbow arrow routing between elements overlapping each other's endpoints", () => {
+  it.each([664.89, 700, 740, 780])(
+    "stays orthogonal, without doubling back on itself, with the start element at x=%d",
+    (x) => {
+      // the start on the right of the left element is inside the right one,
+      // and the end on the left of the right element inside the left one
+      const right = API.createElement({
+        type: "rectangle",
+        x: 856.95,
+        y: 621.29,
+        width: 224.54,
+        height: 112,
+      });
+      const left = API.createElement({
+        type: "rectangle",
+        x,
+        y: 622.43,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: left.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: right.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([right, left]) as NonDeletedSceneElementsMap,
+      );
+
+      // around the elements: right, down, left, up, right
+      const headings = points!.slice(1).map((p, i) => {
+        const dx = p[0] - points![i][0];
+        const dy = p[1] - points![i][1];
+        expect(dx === 0 || dy === 0).toBe(true);
+        return dx > 0 ? "R" : dx < 0 ? "L" : dy > 0 ? "D" : "U";
+      });
+      expect(headings.join("")).toBe("RDLUR");
+      // with segments far enough apart to see the way it goes
+      for (let i = 1; i < points!.length - 2; i++) {
+        expect(
+          Math.abs(points![i + 1][0] - points![i][0]) +
+            Math.abs(points![i + 1][1] - points![i][1]),
+        ).toBeGreaterThan(40);
+      }
+    },
+  );
+});
+
+describe("elbow arrow routing through a narrow gap", () => {
+  it.each([752, 754, 754.94, 756, 758, 760, 765])(
+    "runs through the gap between elements a little apart, rather than around them (the lower one at y = %d)",
+    (lowerY) => {
+      // an S from the right of the lower element to the left of the upper
+      // one, with about 10px between them, the lower one a little to the
+      // left: the route runs through the gap, past the corners of both
+      const upper = API.createElement({
+        type: "rectangle",
+        x: 848.21,
+        y: 630.52,
+        width: 224.54,
+        height: 112,
+      });
+      const lower = API.createElement({
+        type: "rectangle",
+        x: 824.23,
+        y: lowerY,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: lower.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: upper.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { x, y, points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([upper, lower]) as NonDeletedSceneElementsMap,
+      );
+
+      // right, up into the gap, left through it, up and right into the end
+      expect(points).toHaveLength(6);
+      const middle = y! + points![2][1];
+      expect(points![3][1]).toBeCloseTo(points![2][1]);
+      expect(middle).toBeGreaterThan(upper.y + upper.height);
+      expect(middle).toBeLessThan(lower.y);
+      expect(x! + points![3][0]).toBeLessThan(upper.x);
+    },
+  );
+});
+
+describe("elbow arrow loops", () => {
+  it.each([
+    ["the right corner of a diamond", "diamond", 227, 249, [0.995, 0.5028]],
+    [
+      "the middle of the right of a rectangle",
+      "rectangle",
+      200,
+      100,
+      [1.03, 0.5],
+    ],
+    [
+      "the middle of the top of a rectangle",
+      "rectangle",
+      200,
+      100,
+      [0.5, -0.06],
+    ],
+  ] as const)(
+    "loops around the corner from %s back to the same point",
+    (_, type, width, height, fixedPoint) => {
+      const element = API.createElement({
+        type,
+        x: 0,
+        y: 0,
+        width,
+        height,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: element.id,
+          fixedPoint: fixedPoint as FixedPoint,
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: element.id,
+          fixedPoint: fixedPoint as FixedPoint,
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([element]) as NonDeletedSceneElementsMap,
+      );
+
+      // a padding (or so) across, turning the same way all around, back to
+      // where it started
+      expect(points).toHaveLength(5);
+      expect(points![4][0]).toBeCloseTo(points![0][0]);
+      expect(points![4][1]).toBeCloseTo(points![0][1]);
+      const segments = points!
+        .slice(1)
+        .map(([x, y], i) => [x - points![i][0], y - points![i][1]]);
+      segments.forEach(([dx, dy], i) => {
+        expect(Math.abs(dx) + Math.abs(dy)).toBeGreaterThanOrEqual(39.5);
+        expect(Math.abs(dx) + Math.abs(dy)).toBeLessThan(50);
+        const [nx, ny] = segments[(i + 1) % 4];
+        expect(dx * ny - dy * nx).toBeGreaterThan(0);
+      });
+    },
+  );
+});
+
+describe("elbow arrow routing while dragging elements", () => {
+  it.each([16, 24])(
+    "doesn't jitter between routes when dragged past another element %dpx below it",
+    (gap) => {
+      // an arrow from the right of the lower element to the left of the
+      // upper one (an S between them), with the lower one dragged sideways
+      const upper = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 224,
+        height: 112,
+      });
+      const lower = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 112 + gap,
+        width: 224,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: lower.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: upper.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const routeWithLowerAt = (x: number) => {
+        const update = updateElbowArrowRoute(
+          arrow,
+          arrayToMap([upper, { ...lower, x }]) as NonDeletedSceneElementsMap,
+        );
+        return update.points!.map(
+          ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+        );
+      };
+
+      // in half px steps, noting where the route changes more than the
+      // element moves
+      const routes = Array.from({ length: 1201 }, (_, step) =>
+        routeWithLowerAt(-300 + step / 2),
+      );
+      const changes = routes
+        .map((points, step) => {
+          const previous = routes[step - 1];
+          return previous &&
+            (points.length !== previous.length ||
+              points.some(
+                ([px, py], i) =>
+                  Math.abs(px - previous[i][0]) > 3 ||
+                  Math.abs(py - previous[i][1]) > 3,
+              ))
+            ? step
+            : null;
+        })
+        .filter((step): step is number => step !== null);
+
+      // it changes where it has to, but never back and forth from one step
+      // to the next
+      const flickers = changes.filter((step, i) => step - changes[i - 1] <= 2);
+      expect(flickers).toEqual([]);
+    },
+  );
 });

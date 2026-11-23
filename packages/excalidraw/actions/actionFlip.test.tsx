@@ -32,10 +32,10 @@ describe("flipping re-centers selection", () => {
       API.createElement({
         type: "arrow",
         id: "arr",
-        x: 149.9,
+        x: 149,
         y: 95,
-        width: 156,
-        height: 239.9,
+        width: 161,
+        height: 245,
         startBinding: {
           elementId: "rec1",
           fixedPoint: [0.49, -0.05],
@@ -49,11 +49,14 @@ describe("flipping re-centers selection", () => {
         startArrowhead: null,
         endArrowhead: "arrow",
         fixedSegments: null,
+        // as routed: flipping routes it again, so its bounds (and the
+        // selection's, which flipping is centered on) only stay the same if
+        // the route does
         points: [
           pointFrom(0, 0),
-          pointFrom(0, -35),
-          pointFrom(-90, -35),
-          pointFrom(-90, 204),
+          pointFrom(0, -41),
+          pointFrom(-95, -41),
+          pointFrom(-95, 204),
           pointFrom(66, 204),
         ],
         elbowed: true,
@@ -72,11 +75,11 @@ describe("flipping re-centers selection", () => {
 
     const rec1 = h.elements.find((el) => el.id === "rec1")!;
     expect(rec1.x).toBeCloseTo(100, 0);
-    expect(rec1.y).toBeCloseTo(101, 0);
+    expect(rec1.y).toBeCloseTo(100, 0);
 
     const rec2 = h.elements.find((el) => el.id === "rec2")!;
     expect(rec2.x).toBeCloseTo(220, 0);
-    expect(rec2.y).toBeCloseTo(251, 0);
+    expect(rec2.y).toBeCloseTo(250, 0);
   });
 });
 
