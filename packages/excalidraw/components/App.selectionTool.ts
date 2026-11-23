@@ -1193,7 +1193,11 @@ export class AppSelectionTool {
       );
 
       if (this.app.state.editingGroupId) {
-        updateGroupIdsAfterEditingGroup(elementsToAdd);
+        updateGroupIdsAfterEditingGroup(
+          elementsToAdd.filter(
+            (element) => element.frameId !== topLayerFrame.id,
+          ),
+        );
       }
 
       nextElements = addElementsToFrame(
