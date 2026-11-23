@@ -99,6 +99,12 @@ docker run --rm -dit --name excalidraw -p 5000:8080 \
   excalidraw/excalidraw:latest
 ```
 
+On Kubernetes, mount an `emptyDir` volume at `/tmp` and set `readOnlyRootFilesystem: true`, `runAsNonRoot: true`, `allowPrivilegeEscalation: false` and `capabilities: { drop: ["ALL"] }` in the container's `securityContext`.
+
+:::note
+Before this change the image listened on port `80`. Update existing port mappings from `-p <host>:80` to `-p <host>:8080`. The container listens on IPv4 only.
+:::
+
 The Docker image is free of analytics and other tracking libraries.
 
 **At the moment, self-hosting your own instance doesn't support sharing or collaboration features.**
