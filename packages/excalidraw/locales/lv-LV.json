@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Saglabāts kā {filename}",
     "canvas": "tāfeli",
     "selection": "atlasi",
-    "pasteAsSingleElement": "Izmantojiet {{shortcut}}, lai ielīmētu kā jaunu elementu, vai ielīmētu esošā teksta lauciņā",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
