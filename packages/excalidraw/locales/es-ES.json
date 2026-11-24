@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Guardado en {filename}",
     "canvas": "lienzo",
     "selection": "selección",
-    "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un solo elemento,\no pegar en un editor de texto existente",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "Incorporar esta url no está permitido actualmente. Señale esta incidencia en nuestro GitHub para solicitar que esta url esté entre las permitidas",
     "unrecognizedLinkFormat": "El enlace que incrustó no coincide con el formato esperado. Por favor intente pegar la cadena 'embed' proporcionada por el sitio de origen",
     "elementLinkCopied": "Enlace copiado al portapapeles"
