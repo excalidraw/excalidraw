@@ -588,7 +588,8 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "বাছাই",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
