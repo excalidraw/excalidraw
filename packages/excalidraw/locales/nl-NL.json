@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
     "selection": "selectie",
-    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "Het insluiten van deze URL is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
     "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken",
     "elementLinkCopied": "Link gekopieerd naar klembord"
