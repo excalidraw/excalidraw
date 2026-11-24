@@ -588,7 +588,8 @@
     "fileSavedToFilename": "",
     "canvas": "畫布",
     "selection": "",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
