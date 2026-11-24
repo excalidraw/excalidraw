@@ -588,7 +588,8 @@
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",
     "selection": "所选项",
-    "pasteAsSingleElement": "使用 {{shortcut}} 粘贴为单个元素，\n或粘贴到现有的文本编辑器里",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "目前不允许嵌入此网址。请在 GitHub 上提 issue 请求将此网址加入白名单",
     "unrecognizedLinkFormat": "您嵌入的链接不符合格式要求。请尝试粘贴源网站提供的“嵌入 (embed)”字符串",
     "elementLinkCopied": "链接已复制到剪贴板"
