@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",
     "selection": "kijelölés",
-    "pasteAsSingleElement": "Egyetlen elemként való beillesztéshez használd a {{shortcut}} billentyűkombinációt,\nvagy illeszd be egy éppen szerkesztett szövegbe",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "Ennek az URL-nek a beágyazása jelenleg nem engedélyezett. Nyiss egy hibajegyet a GitHubon, és kérd az URL felvételét az engedélyezett listára",
     "unrecognizedLinkFormat": "A beágyazott hivatkozás nem a várt formátumú. Próbáld meg a forrásoldal által biztosított 'embed' kódot beilleszteni",
     "elementLinkCopied": "Hivatkozás a vágólapra másolva"
