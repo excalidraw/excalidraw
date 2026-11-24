@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden objekt,\nnebo vložte do existujícího textového editoru",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "Vložení této URL adresy momentálně není povoleno. O přidání URL adresy na seznam povolených můžete požádat na GitHubu",
     "unrecognizedLinkFormat": "Vložený odkaz neodpovídá očekávanému formátu. Zkuste prosím vložit řetězec 'embed' poskytnutý zdrojovým webem",
     "elementLinkCopied": "Odkaz zkopírován do schránky"
