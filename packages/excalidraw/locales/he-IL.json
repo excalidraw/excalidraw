@@ -588,7 +588,8 @@
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "קנבאס",
     "selection": "בחירה",
-    "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "הטמעת כתובת הרשת הזו אינה מותרת לעת עתה. העלו סוגיה ב-GitHub כדי לבקש שכתובת זו תכנס לרשימה המותרת",
     "unrecognizedLinkFormat": "הקישור שהוטמע אינו בפורמט המצופה. אנא נסו להדביק מחדש את מחרוזת ההטמעה מהאתר המבוקש",
     "elementLinkCopied": "קישור הועתק ללוח"
