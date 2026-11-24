@@ -23,6 +23,7 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { getBindingGap } from "../src/binding";
 import { Scene } from "../src/Scene";
 
 import type {
@@ -986,7 +987,7 @@ describe("elbow arrow endpoints exactly on the bound element's outline", () => {
 });
 
 describe("elbow arrow routing between overlapping elements", () => {
-  it("doesn't avoid them once an endpoint is within the padding around the other one", () => {
+  it("goes around them both, as one, without jumping while they overlap", () => {
     // an arrow from the right of the lower element to the left of the upper
     // one, with the lower one dragged up through the upper one
     const upper = API.createElement({
@@ -1058,28 +1059,81 @@ describe("elbow arrow routing between overlapping elements", () => {
       return globalPoints(routed);
     };
 
-    // in 1px steps, from the end being within the padding above the lower
-    // one, until the start is no longer within the padding below the upper
-    // one, but where the endpoints are too close in height to turn back
-    // between them
+    // in 1px steps, the lower one dragged up through the upper one, the two
+    // overlapping all along
+    const routes: [number, number][][] = [];
     for (let y = 466; y > 266; y -= 1) {
-      const points = routeWithLowerAt(y);
-      const [start, end] = [points[0], points[points.length - 1]];
-      if (Math.abs(start[1] - end[1]) < 34) {
-        continue;
-      }
-
-      // straight through the elements: right a padding, turning back
-      // halfway between the endpoints, and right a padding into the end
-      expect(points).toCloselyEqualPoints([
-        start,
-        [start[0] + 40, start[1]],
-        [start[0] + 40, (start[1] + end[1]) / 2],
-        [end[0] - 40, (start[1] + end[1]) / 2],
-        [end[0] - 40, end[1]],
-        end,
-      ]);
+      routes.push(routeWithLowerAt(y));
     }
+
+    // around them both, as one, and only ever moving along with the element
+    // being dragged, never jumping
+    routes.forEach((points, step) => {
+      expect(points).toHaveLength(6);
+      if (step > 0) {
+        points.forEach(([px, py], i) => {
+          const [qx, qy] = routes[step - 1][i];
+          expect(Math.abs(px - qx) + Math.abs(py - qy)).toBeLessThanOrEqual(
+            1.01,
+          );
+        });
+      }
+    });
+  });
+  it("doesn't go around elements as one where only their bounds overlap", () => {
+    // diamonds tip to tip, their bounds overlapping, but not the diamonds,
+    // with the start on the top of the lower one, a little right of the end
+    // on the right of the upper one
+    const lower = API.createElement({
+      type: "diamond",
+      x: 2290.31,
+      y: -706.24,
+      width: 226.95,
+      height: 248.6,
+    });
+    const upper = API.createElement({
+      type: "diamond",
+      x: 2158.34,
+      y: -869.92,
+      width: 226.95,
+      height: 248.6,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: lower.id,
+        fixedPoint: [0.5023, 0.0073],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: upper.id,
+        fixedPoint: [0.995, 0.5028],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+
+    // up, turning back halfway between the endpoints, rather than a U turn
+    // squeezed in right next to the end
+    const start = points![0];
+    const end = points![points!.length - 1];
+    const middle = (start[1] + end[1]) / 2;
+    expect(points).toCloselyEqualPoints([
+      start,
+      [start[0], middle],
+      [end[0] + 40, middle],
+      [end[0] + 40, end[1]],
+      end,
+    ]);
   });
 });
 
@@ -1194,7 +1248,7 @@ describe("elbow arrow legs next to another element", () => {
     ).toBeGreaterThanOrEqual(39.5);
   });
 
-  it("turns back halfway between the endpoints when they're right by the other element", () => {
+  it("goes around them both, as one, when they overlap", () => {
     // partly overlapping elements, with the start on the right of the upper
     // one just above the lower one, and the end on the left of the lower one
     // just below the upper one
@@ -1231,21 +1285,29 @@ describe("elbow arrow legs next to another element", () => {
       endArrowhead: "arrow",
     }) as unknown as ExcalidrawElbowArrowElement;
 
-    const { points } = updateElbowArrowRoute(
+    const { points, x, y } = updateElbowArrowRoute(
       arrow,
       arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
     );
 
-    // right a padding, back halfway between the endpoints through both
-    // elements, and right a padding into the end
-    const start = points![0];
-    const end = points![points!.length - 1];
-    expect(points).toCloselyEqualPoints([
+    // right past the lower one by a padding, down below it by a padding,
+    // left past the upper one by a padding, and right into the end: around
+    // the bounds of both, rather than back between the endpoints through
+    // both of them
+    const gap = getBindingGap(upper);
+    const global = points!.map(
+      ([px, py]) => [px + x!, py + y!] as [number, number],
+    );
+    const [start, end] = [global[0], global[global.length - 1]];
+    const right = lower.x + lower.width + gap + 40;
+    const left = upper.x - gap - 40;
+    const bottom = lower.y + lower.height + gap + 40;
+    expect(global).toCloselyEqualPoints([
       start,
-      [start[0] + 40, start[1]],
-      [start[0] + 40, (start[1] + end[1]) / 2],
-      [end[0] - 40, (start[1] + end[1]) / 2],
-      [end[0] - 40, end[1]],
+      [right, start[1]],
+      [right, bottom],
+      [left, bottom],
+      [left, end[1]],
       end,
     ]);
   });

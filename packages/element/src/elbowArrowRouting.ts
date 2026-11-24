@@ -63,8 +63,16 @@ import {
   headingIsHorizontal,
 } from "./heading";
 import { isBindableElement } from "./typeChecks";
-import { aabbForElement, getArrowheadSize } from "./bounds";
-import { getHoveredElementForBinding } from "./collision";
+import {
+  aabbForElement,
+  getArrowheadSize,
+  getElementLineSegments,
+} from "./bounds";
+import {
+  getHoveredElementForBinding,
+  intersectElementWithLineSegment,
+  isPointInElement,
+} from "./collision";
 import { ELBOW_ARROW_CORNER_RADIUS } from "./shape";
 
 import type { Heading } from "./heading";
@@ -578,6 +586,44 @@ export const getElbowArrowRoute = (
     },
     obstacles,
     gaps,
+    !!hoveredStartElement &&
+      !!hoveredEndElement &&
+      hoveredStartElement.id !== hoveredEndElement.id &&
+      shapesOverlap(hoveredStartElement, hoveredEndElement, elementsMap),
+  );
+};
+
+/**
+ * Whether two elements overlap as they look (their outlines crossing, or
+ * one inside the other), rather than only their bounds: two diamonds or
+ * ellipses next to each other can have their bounds overlap with plenty of
+ * room between them
+ */
+const shapesOverlap = (
+  a: ExcalidrawBindableElement,
+  b: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+) => {
+  const [al, at, ar, ab] = aabbForElement(a, elementsMap);
+  const [bl, bt, br, bb] = aabbForElement(b, elementsMap);
+  if (al >= br || bl >= ar || at >= bb || bt >= ab) {
+    return false;
+  }
+  const outline = getElementLineSegments(a, elementsMap);
+
+  return (
+    outline.some(
+      (segment) =>
+        intersectElementWithLineSegment(b, elementsMap, segment, 0, true)
+          .length > 0,
+    ) ||
+    (outline.length > 0 && isPointInElement(outline[0][0], b, elementsMap)) ||
+    isPointInElement(
+      getElementLineSegments(b, elementsMap)[0]?.[0] ??
+        pointFrom<GlobalPoint>(b.x, b.y),
+      a,
+      elementsMap,
+    )
   );
 };
 
@@ -680,12 +726,40 @@ const findRoute = (
   end: Endpoint,
   elementObstacles: Bounds[],
   gaps: number[],
+  elementsOverlap = false,
 ): GlobalPoint[] => {
+  // Where the elements themselves overlap, they're one obstacle, the bounds
+  // around both, which the route leaves from and enters as it would a single
+  // element (its legs running through it where they start or end inside
+  // it): so it goes around them both as they look together, and only changes
+  // as the bounds around them do, continuously, rather than switching
+  // between the padding around one and the other as they move
+  if (
+    start.obstacle !== null &&
+    end.obstacle !== null &&
+    start.obstacle !== end.obstacle &&
+    elementsOverlap
+  ) {
+    const [a, b] = elementObstacles;
+    const union = [
+      Math.min(a[0], b[0]),
+      Math.min(a[1], b[1]),
+      Math.max(a[2], b[2]),
+      Math.max(a[3], b[3]),
+    ] as Bounds;
+
+    return findRoute(
+      { ...start, obstacle: 0 },
+      { ...end, obstacle: 0 },
+      [union],
+      [Math.max(...gaps)],
+    );
+  }
   const obstacles = shareGaps(elementObstacles, gaps);
-  // With an endpoint within the padding around the element the other end is
-  // bound to, there's no room for the route to keep its padding around both
-  // (and going around them gets more and more contrived as they get closer),
-  // so the elements overlap, and aren't avoided at all
+  // Otherwise, with an endpoint within the padding around the element the
+  // other end is bound to, there's no room for the route to keep its padding
+  // around both (and going around them gets more and more contrived as they
+  // get closer), so the elements overlap, and aren't avoided at all
   const overlapping =
     start.obstacle !== null &&
     end.obstacle !== null &&
