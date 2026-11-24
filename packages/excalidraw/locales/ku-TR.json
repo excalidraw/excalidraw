@@ -588,7 +588,8 @@
     "fileSavedToFilename": "هەڵگیراوە بۆ {filename}",
     "canvas": "تابلۆ",
     "selection": "دەستنیشانکراوەکان",
-    "pasteAsSingleElement": "بۆ دانانەوە وەکو یەک توخم یان دانانەوە بۆ نێو دەسکاریکەرێکی دەق کە بوونی هەیە {{shortcut}} بەکاربهێنە",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
