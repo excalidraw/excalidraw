@@ -780,9 +780,10 @@ const generateElementWithCanvas = (
  * path disables smoothing for exactly these — a nearest-neighbor 1:1 blit is
  * a pixel-exact copy, and rounding its origin keeps it off the half-pixel
  * boundary where it tears — and every eligible blit is snapped. It is
- * eligibility, not a guarantee of a 1:1 copy: freedraw is blitted with
- * smoothing on, and a size-capped cache is rescaled; snapping is harmless
- * for both.
+ * eligibility, not a guarantee of a 1:1 copy: a size-capped cache is rescaled,
+ * where snapping is harmless. Freedraw is excluded because it is already
+ * blitted with smoothing on and snapping its origin shifts small handwriting
+ * strokes visibly on commit at fractional DPR / non-integer zoom.
  *
  * Not during a zoom gesture: the bitmaps stay at the old scale and are
  * resampled, and blurry shapes look better on low resolution (while still
@@ -796,6 +797,7 @@ const canSnapElement = (
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) =>
   !appState?.shouldCacheIgnoreZoom &&
+  !isFreeDrawElement(element) &&
   (!element.angle || isRightAngleRads(element.angle));
 
 /**
