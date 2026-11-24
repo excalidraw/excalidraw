@@ -16,7 +16,11 @@
  * endpoints...), so they're placed exactly there, and move along with the
  * elements, rather than settling wherever some cost is least, which where
  * the costs are about flat, small differences can change from one frame to
- * the next.
+ * the next. The first and last legs are as long as worked out from where
+ * the endpoints and elements are, before the search (see {@link legLength}),
+ * which changes continuously with them, and the route only turns off them
+ * there or later, so they never get shorter in jumps, from one line of the
+ * grid to another.
  *
  * The elements are soft obstacles (much like yFiles' node crossing penalty)
  * rather than hard ones, and every cost changes continuously as the elements
@@ -65,16 +69,8 @@ import {
   headingIsHorizontal,
 } from "./heading";
 import { isBindableElement } from "./typeChecks";
-import {
-  aabbForElement,
-  getArrowheadSize,
-  getElementLineSegments,
-} from "./bounds";
-import {
-  getHoveredElementForBinding,
-  intersectElementWithLineSegment,
-  isPointInElement,
-} from "./collision";
+import { aabbForElement, getArrowheadSize } from "./bounds";
+import { getHoveredElementForBinding } from "./collision";
 import { ELBOW_ARROW_CORNER_RADIUS } from "./shape";
 
 import type { Heading } from "./heading";
@@ -119,13 +115,6 @@ const CLEARANCE_COST = 3;
 const closeness = (depth: number) => (depth + depth * depth) / 2;
 
 /**
- * The cost per px a first or last leg is shorter than it needs to be: so
- * steep that it's all but a limit, as a leg too short for its corner or
- * arrowhead looks broken however much shorter it is
- */
-const SHORT_LEG_COST = 200;
-
-/**
  * The additional cost per px of route running inside an element (and the
  * binding gap around it), ramped in over {@link CROSSING_RAMP} px past its
  * edge (to keep costs continuous)
@@ -150,16 +139,6 @@ const STRIP_RAMP = BASE_PADDING / 4;
 const SELF_CROSSING_COST = 4 * BEND_COST;
 
 /**
- * The cost per px a leg on an element is shorter than the padding, so it
- * gets the room it looks best with if there's any to spare (nothing else
- * makes it longer, where the elements aren't avoided): never as much as a
- * bend, and more than the route gets longer by for it, where it doubles back
- * past the leg. A leg with an arrowhead costs twice that, so where there's no
- * room for both, the arrowhead gets it.
- */
-const PADDING_LEG_COST = 4;
-
-/**
  * The cost per px the segments either side of a hairpin (two corners turning
  * the same way, where the route turns back) are closer together than they
  * need to be (see {@link minHairpin}), which looks like the route folding
@@ -168,7 +147,7 @@ const PADDING_LEG_COST = 4;
  * making it go much further around: in all, less than the two more bends
  * going around would take.
  */
-const SHORT_HAIRPIN_COST = SHORT_LEG_COST;
+const SHORT_HAIRPIN_COST = 200;
 const SHORT_FORCED_HAIRPIN_COST = 16;
 
 /**
@@ -427,28 +406,11 @@ type Endpoint = {
   /** The length the leg at this end needs, for its corner and arrowhead */
   minLeg: number;
   /**
-   * The cost per px the leg at this end is shorter than the padding (see
-   * {@link PADDING_LEG_COST})
+   * How long the leg at this end is, at least (see {@link findRoute}): the
+   * route doesn't turn off it any sooner, only (running on) later
    */
-  paddingLegCost: number;
-  /** The padding the leg at this end gets (see {@link legPadding}) */
-  padding: number;
+  leg: number;
 };
-
-/** The cost of the first or last leg being as long as it is */
-const legCost = (
-  { minLeg, paddingLegCost, padding }: Endpoint,
-  length: number,
-) =>
-  SHORT_LEG_COST * Math.max(0, minLeg - length) +
-  paddingLegCost * Math.max(0, padding - length);
-
-/**
- * Over how many px the padding a leg gets goes back up to the base padding,
- * once there's too little room ahead of it to turn between the elements
- * (see {@link legPadding})
- */
-const LEG_PADDING_RAMP = 1;
 
 /**
  * Where the other element is, from the leg at an endpoint: how far ahead of
@@ -484,46 +446,35 @@ const legSurroundings = (
 };
 
 /**
- * The padding a leg gets: the base padding, but only half the room ahead of
- * it where it runs straight at the other element, so where they're closer
- * than twice the padding, the leg is as long as halfway between them, where a
- * route through the gap runs (see {@link clearanceCost}), rather than the
- * route turning wherever that costs about the same as halfway (and so where
- * they face each other, neither leg gets its padding at the other's expense).
- * Plus how far the leg runs beside the other element, or how far behind the
- * leg it is, so it changes continuously as the elements move, and the leg
- * shortens along with the room ahead of it.
- *
- * With the legs facing each other with too little room ahead for both
- * (`room`), the route doesn't turn between them, but loops back past them,
- * with the legs passing each other (see {@link findRoute}), and they get the
- * base padding (going back up to it over {@link LEG_PADDING_RAMP} px, while
- * the legs turning between them are as short as they can be anyway).
+ * How long a leg is: the base padding, but where the other element (its
+ * bounds) is ahead of it, closer than twice that, only half the room to it,
+ * so the route turns halfway between them, where a route through the gap
+ * runs (see {@link clearanceCost}), and where they face each other, neither
+ * leg runs into the other's room. (Plus how far it is to the side
+ * of the leg's line, or how far behind the leg it starts, so the leg changes
+ * continuously as the elements move, and shortens along with the room ahead
+ * of it.) That's all that makes it any shorter: wherever else the route goes,
+ * the legs are as long as this, and the route runs on from them (see
+ * {@link findRoute}). Never shorter than it needs to be, for its corner and
+ * arrowhead, even with less room than that.
  */
-const legPadding = (
-  { point, heading, obstacle }: Endpoint,
+const legLength = (
+  { point, heading, obstacle, minLeg }: Endpoint,
   obstacles: Bounds[],
-  room: number,
-  facing: boolean,
 ) => {
   if (obstacle === null || obstacles.length !== 2) {
-    return BASE_PADDING;
+    return Math.max(minLeg, BASE_PADDING);
   }
   const { ahead, beside } = legSurroundings(
     { point, heading },
     obstacles[obstacle],
     obstacles[1 - obstacle],
   );
-  return facing
-    ? Math.min(
-        BASE_PADDING,
-        (ahead >= room
-          ? ahead / 2
-          : room / 2 +
-            ((room - ahead) / LEG_PADDING_RAMP) * (BASE_PADDING - room / 2)) +
-          beside,
-      )
-    : Math.min(BASE_PADDING, beside + (ahead >= 0 ? ahead / 2 : -ahead));
+
+  return Math.max(
+    minLeg,
+    Math.min(BASE_PADDING, beside + (ahead >= 0 ? ahead / 2 : -ahead)),
+  );
 };
 
 /**
@@ -593,11 +544,6 @@ export const getElbowArrowRoute = (
     arrowhead
       ? getArrowheadSize(arrowhead) + ELBOW_ARROW_CORNER_RADIUS / 4
       : ELBOW_ARROW_CORNER_RADIUS / 2;
-  const paddingLegCost = (
-    arrowhead: Arrowhead | null,
-    obstacle: number | null,
-  ) =>
-    obstacle === null ? 0 : arrowhead ? 2 * PADDING_LEG_COST : PADDING_LEG_COST;
 
   return findRoute(
     {
@@ -605,23 +551,21 @@ export const getElbowArrowRoute = (
       heading: startHeading,
       obstacle: obstacleIndex[0],
       minLeg: minLeg(arrow.startArrowhead),
-      paddingLegCost: paddingLegCost(arrow.startArrowhead, obstacleIndex[0]),
-      padding: BASE_PADDING,
+      leg: BASE_PADDING,
     },
     {
       point: endGlobalPoint,
       heading: endHeading,
       obstacle: obstacleIndex[1],
       minLeg: minLeg(arrow.endArrowhead),
-      paddingLegCost: paddingLegCost(arrow.endArrowhead, obstacleIndex[1]),
-      padding: BASE_PADDING,
+      leg: BASE_PADDING,
     },
     obstacles,
     gaps,
     !!hoveredStartElement &&
       !!hoveredEndElement &&
       hoveredStartElement.id !== hoveredEndElement.id &&
-      shapesOverlap(hoveredStartElement, hoveredEndElement, elementsMap),
+      boundsOverlap(hoveredStartElement, hoveredEndElement, elementsMap),
     elements.every(
       (element) => element?.type === "diamond" || element?.type === "ellipse",
     ),
@@ -629,37 +573,18 @@ export const getElbowArrowRoute = (
 };
 
 /**
- * Whether two elements overlap as they look (their outlines crossing, or
- * one inside the other), rather than only their bounds: two diamonds or
- * ellipses next to each other can have their bounds overlap with plenty of
- * room between them
+ * Whether two elements' bounds overlap (whatever their shapes: the route
+ * avoids their bounds, so where those overlap, it goes around both as one)
  */
-const shapesOverlap = (
+const boundsOverlap = (
   a: ExcalidrawBindableElement,
   b: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ) => {
   const [al, at, ar, ab] = aabbForElement(a, elementsMap);
   const [bl, bt, br, bb] = aabbForElement(b, elementsMap);
-  if (al >= br || bl >= ar || at >= bb || bt >= ab) {
-    return false;
-  }
-  const outline = getElementLineSegments(a, elementsMap);
 
-  return (
-    outline.some(
-      (segment) =>
-        intersectElementWithLineSegment(b, elementsMap, segment, 0, true)
-          .length > 0,
-    ) ||
-    (outline.length > 0 && isPointInElement(outline[0][0], b, elementsMap)) ||
-    isPointInElement(
-      getElementLineSegments(b, elementsMap)[0]?.[0] ??
-        pointFrom<GlobalPoint>(b.x, b.y),
-      a,
-      elementsMap,
-    )
-  );
+  return al < br && bl < ar && at < bb && bt < ab;
 };
 
 /**
@@ -772,7 +697,7 @@ const findRoute = (
   elementsOverlap = false,
   cornersClear = false,
 ): GlobalPoint[] => {
-  // Where the elements themselves overlap, they're one obstacle, the bounds
+  // Where the elements' bounds overlap, they're one obstacle, the bounds
   // around both, which the route leaves from and enters as it would a single
   // element (its legs running through it where they start or end inside
   // it): so it goes around them both as they look together, and only changes
@@ -816,7 +741,7 @@ const findRoute = (
     (headingIsHorizontal(start.heading)
       ? (end.point[0] - start.point[0]) * start.heading[0]
       : (end.point[1] - start.point[1]) * start.heading[1]) <
-      start.minLeg + end.minLeg;
+      start.minLeg + end.minLeg - LEG_TOLERANCE;
   const overlapping =
     facing &&
     start.obstacle !== null &&
@@ -853,9 +778,15 @@ const findRoute = (
           1,
         ),
   );
+  // The legs, worked out first (looping back past each other, ignoring the
+  // elements, nothing makes them any shorter), and the route between where
+  // they end, running on from them, and into them, where it does (see
+  // cheapestPath)
   const [from, to] = [start, end].map((endpoint) => ({
     ...endpoint,
-    padding: legPadding(endpoint, obstacles, start.minLeg + end.minLeg, facing),
+    leg: overlapping
+      ? Math.max(endpoint.minLeg, BASE_PADDING)
+      : legLength(endpoint, obstacles),
   }));
   const grid = buildGrid(from, to, obstacles, overlapping);
   // A leg heading straight at the other element, closer than it's long,
@@ -894,12 +825,8 @@ const findRoute = (
           elementObstacles[i],
         );
         return (
-          Math.max(
-            0,
-            Math.max(endpoint.minLeg, endpoint.padding) +
-              CROSSING_RAMP / 2 -
-              aheadOfPoint,
-          ) * clamp(1 - beside / STRIP_RAMP, 0, 1)
+          Math.max(0, endpoint.leg + CROSSING_RAMP / 2 - aheadOfPoint) *
+          clamp(1 - beside / STRIP_RAMP, 0, 1)
         );
       }),
     ),
@@ -953,8 +880,8 @@ type Line = {
 };
 
 /**
- * The grid the route runs on: the lines through the endpoints, the lines a
- * padding (and the shortest leg) away from them along their headings, the
+ * The grid the route runs on: the lines through the endpoints, the lines
+ * where their legs end (see {@link legLength}), the
  * edges of the padding around each element, and the lines halfway between the
  * ends (their elements, and the points themselves). All of them are there
  * whatever the elements' arrangement (and move with the elements), so a
@@ -974,7 +901,7 @@ const buildGrid = (
   const xs: Line[] = [];
   const ys: Line[] = [];
 
-  for (const { point, heading, minLeg, padding } of [start, end]) {
+  for (const { point, heading, leg } of [start, end]) {
     xs.push({
       at: point[0],
       kind: "preferred",
@@ -987,27 +914,14 @@ const buildGrid = (
       exact: true,
       fromEndpoints: true,
     });
-    // where the leg would be a padding long, or as short as it can be, or as
-    // long as the padding it gets (see legPadding), so it shortens along with
-    // that, rather than jumping from one of the others to the other (and is
-    // that long rather than any other where it costs the same)
+    // where the leg ends (see legLength)
     const axis = headingIsHorizontal(heading) ? 0 : 1;
-    for (const length of [BASE_PADDING, minLeg]) {
-      (axis === 0 ? xs : ys).push({
-        at: point[axis] + heading[axis] * length,
-        kind: "step",
-        exact: false,
-        fromEndpoints: true,
-      });
-    }
-    if (padding < BASE_PADDING) {
-      (axis === 0 ? xs : ys).push({
-        at: point[axis] + heading[axis] * Math.max(minLeg, padding),
-        kind: "preferred",
-        exact: false,
-        fromEndpoints: true,
-      });
-    }
+    (axis === 0 ? xs : ys).push({
+      at: point[axis] + heading[axis] * leg,
+      kind: "padding",
+      exact: true,
+      fromEndpoints: true,
+    });
   }
 
   for (const [left, top, right, bottom] of obstacles) {
@@ -1364,6 +1278,9 @@ const segmentClearanceCost = (
 // Search
 // -----------------------------------------------------------------------------
 
+/** How much shorter than it is a leg still counts as long enough */
+const LEG_TOLERANCE = 1e-6;
+
 /** Indexed as the directions of the search states */
 const DIRECTIONS = [HEADING_UP, HEADING_RIGHT, HEADING_DOWN, HEADING_LEFT];
 
@@ -1638,12 +1555,24 @@ const cheapestPath = (
     const secondLastStart = Math.floor(spiral / anchors) % anchors;
 
     for (let direction = 0; direction < 4; direction++) {
-      // no turning back, and no turning before leaving the start
-      if (
-        direction === (arrivedIn + 2) % 4 ||
-        (node === startNode && direction !== startDirection)
-      ) {
+      // no turning back, and no turning off the leg at the start before
+      // it's as long as it is, nor onto the leg at the end after it's
+      // shorter than it is (see legLength)
+      if (direction === (arrivedIn + 2) % 4) {
         continue;
+      }
+      if (direction !== arrivedIn) {
+        const p = pos(node);
+        if (
+          (arrivedIn === startDirection &&
+            isOnRay(p, start.point, start.heading) &&
+            manhattanDistance(p, start.point) < start.leg - LEG_TOLERANCE) ||
+          (direction === arrivalDirection &&
+            isOnRay(p, end.point, end.heading) &&
+            manhattanDistance(p, end.point) < end.leg - LEG_TOLERANCE)
+        ) {
+          continue;
+        }
       }
       const next = neighbor(node, direction);
       if (next === -1) {
@@ -1689,21 +1618,6 @@ const cheapestPath = (
           BEND_COST +
           (nextTurn === LEFT_TURN ? TURN_BIAS : 0) +
           LINE_COSTS[line.kind];
-
-        // a leg too short for its corner or arrowhead
-        const p = pos(node);
-        if (
-          arrivedIn === startDirection &&
-          isOnRay(p, start.point, start.heading)
-        ) {
-          nextCost += legCost(start, manhattanDistance(p, start.point));
-        }
-        if (
-          direction === arrivalDirection &&
-          isOnRay(p, end.point, end.heading)
-        ) {
-          nextCost += legCost(end, manhattanDistance(p, end.point));
-        }
       }
 
       // after three turns the same way, running back across the segment

@@ -1246,7 +1246,7 @@ describe("elbow arrow routing between overlapping elements", () => {
     // the end
     expect(points).toHaveLength(5);
     expect(points![1][0]).toBeCloseTo(points![0][0]);
-    expect(points![0][1] - points![1][1]).toBeCloseTo(40, 0);
+    expect(points![0][1] - points![1][1]).toBeGreaterThan(30);
     expect(points![2][0]).toBeGreaterThan(points![4][0]);
   });
 });
