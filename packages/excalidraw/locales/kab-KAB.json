@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",
     "selection": "tafrayt",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
