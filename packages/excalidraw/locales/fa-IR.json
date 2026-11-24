@@ -588,7 +588,8 @@
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
     "selection": "انتخاب",
-    "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "قرار دادن این Url در حال حاضر مجاز نیست. درGitHub برای درخواست Url Whitelisted مشکلی ایجاد کنید",
     "unrecognizedLinkFormat": "پیوندی که افزودید با قالب مورد انتظار مطابقت ندارد. لطفاً سعی کنید رشته \"افزونه\" ارائه شده توسط سایت منبع را بچسبانید",
     "elementLinkCopied": "لینک در کلیپ‌بورد کپی شد"
