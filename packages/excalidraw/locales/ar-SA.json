@@ -588,7 +588,8 @@
     "fileSavedToFilename": "تم الحفظ باسم {filename}",
     "canvas": "لوحة الرسم",
     "selection": "العنصر المحدد",
-    "pasteAsSingleElement": "استخدم {{shortcut}} للصق كعنصر واحد،\nأو لصق في محرر نص موجود",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "تضمين هذا الرابط غير مسموح حاليًا. افتح بلاغًا على GitHub لطلب إدراج عنوان URL في القائمة البيضاء",
     "unrecognizedLinkFormat": "الرابط الذي أدرجته لا يتطابق مع التنسيق المتوقع. الرجاء محاولة لصق النص 'المضمن' المُزوَد من موقع المصدر",
     "elementLinkCopied": "تم نسخ الرابط إلى الحافظة"
