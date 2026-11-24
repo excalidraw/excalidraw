@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Запазен към {filename}",
     "canvas": "платно",
     "selection": "селекция",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
