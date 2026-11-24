@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Išsaugota į {filename}",
     "canvas": "drobė",
     "selection": "",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
