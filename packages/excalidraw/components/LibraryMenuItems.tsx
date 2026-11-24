@@ -11,6 +11,7 @@ import {
   MIME_TYPES,
   arrayToMap,
   nextAnimationFrame,
+  randomId,
 } from "@excalidraw/common";
 
 import { duplicateElements } from "@excalidraw/element";
@@ -22,6 +23,8 @@ import { deburr } from "../deburr";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
+import { libraryItemsAtom } from "../data/library";
+import { useAtom } from "../editor-jotai";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
@@ -37,7 +40,7 @@ import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
 
-import { useEditorInterface } from "./App";
+import { useApp, useEditorInterface } from "./App";
 
 import { Button } from "./Button";
 
@@ -68,6 +71,8 @@ export default function LibraryMenuItems({
   libraryReturnUrl,
   onSelectItems,
   selectedItems,
+  onMoveSelectedItems,
+  onDeleteFolder,
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
@@ -79,7 +84,13 @@ export default function LibraryMenuItems({
   id: string;
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
+  onMoveSelectedItems: (folderId?: string) => void;
+  onDeleteFolder: (folderId: string) => void;
 }) {
+  const [libraryState] = useAtom(libraryItemsAtom);
+  const app = useApp();
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [newFolderName, setNewFolderName] = useState("");
   const editorInterface = useEditorInterface();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
@@ -109,21 +120,39 @@ export default function LibraryMenuItems({
     }
 
     return libraryItems.filter((item) => {
+      const isInCurrentFolder =
+        selectedFolderId === null ||
+        (selectedFolderId === ""
+          ? !item.folderId
+          : item.folderId === selectedFolderId);
       const itemName = item.name || "";
       return (
-        itemName.trim() && deburr(itemName.toLowerCase()).includes(searchQuery)
+        isInCurrentFolder &&
+        itemName.trim() &&
+        deburr(itemName.toLowerCase()).includes(searchQuery)
       );
     });
-  }, [libraryItems, searchInputValue]);
+  }, [libraryItems, searchInputValue, selectedFolderId]);
 
   const unpublishedItems = useMemo(
-    () => libraryItems.filter((item) => item.status !== "published"),
-    [libraryItems],
+    () =>
+      libraryItems.filter(
+        (item) =>
+          item.status !== "published" &&
+          (selectedFolderId === null ||
+            (selectedFolderId === ""
+              ? !item.folderId
+              : item.folderId === selectedFolderId)),
+      ),
+    [libraryItems, selectedFolderId],
   );
 
   const publishedItems = useMemo(
-    () => libraryItems.filter((item) => item.status === "published"),
-    [libraryItems],
+    () =>
+      libraryItems.filter(
+        (item) => item.status === "published" && selectedFolderId === null,
+      ),
+    [libraryItems, selectedFolderId],
   );
 
   const onItemSelectToggle = useCallback(
@@ -394,6 +423,86 @@ export default function LibraryMenuItems({
       }
     >
       <div className="library-menu-items-header">
+        <div
+          className="library-menu-folders"
+          role="group"
+          aria-label={t("library.folders.ariaLabel")}
+        >
+          <Button
+            selected={selectedFolderId === null}
+            onSelect={() => setSelectedFolderId(null)}
+          >
+            {t("library.folders.allItems")}
+          </Button>
+          <Button
+            selected={selectedFolderId === ""}
+            onSelect={() => setSelectedFolderId("")}
+          >
+            {t("library.folders.unfiled")}
+          </Button>
+          {libraryState.libraryFolders.map((folder) => (
+            <span key={folder.id} className="library-menu-folder">
+              <Button
+                selected={selectedFolderId === folder.id}
+                onSelect={() => {
+                  if (selectedItems.length) {
+                    onMoveSelectedItems(folder.id);
+                  } else {
+                    setSelectedFolderId(folder.id);
+                  }
+                }}
+              >
+                {folder.name}
+              </Button>
+              <Button
+                onSelect={() => {
+                  const name = app.ownerWindow
+                    .prompt(t("library.folders.renamePrompt"), folder.name)
+                    ?.trim();
+                  if (name) {
+                    void app.library.setLibraryFolders(
+                      libraryState.libraryFolders.map((entry) =>
+                        entry.id === folder.id ? { ...entry, name } : entry,
+                      ),
+                    );
+                  }
+                }}
+              >
+                {t("library.folders.rename")}
+              </Button>
+              <Button
+                onSelect={() => {
+                  onDeleteFolder(folder.id);
+                  setSelectedFolderId(null);
+                }}
+              >
+                {t("library.folders.delete")}
+              </Button>
+            </span>
+          ))}
+          {selectedItems.length > 0 && (
+            <Button onSelect={() => onMoveSelectedItems()}>
+              {t("library.folders.moveToUnfiled")}
+            </Button>
+          )}
+          <TextField
+            value={newFolderName}
+            placeholder={t("library.folders.newFolder")}
+            aria-label={t("library.folders.newFolder")}
+            onChange={setNewFolderName}
+            onKeyDown={(event) => {
+              if (event.key === KEYS.ENTER && newFolderName.trim()) {
+                const folder = { id: randomId(), name: newFolderName.trim() };
+                void app.library.setLibraryFolders([
+                  ...libraryState.libraryFolders,
+                  folder,
+                ]);
+                setSelectedFolderId(folder.id);
+                setNewFolderName("");
+              }
+            }}
+          />
+        </div>
         {!IS_LIBRARY_EMPTY && (
           <TextField
             ref={searchInputRef}

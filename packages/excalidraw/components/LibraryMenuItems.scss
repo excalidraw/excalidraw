@@ -11,6 +11,19 @@
     gap: 0.5rem;
   }
 
+  .library-menu-folders {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .library-menu-folder {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
   .library-menu-items__no-items {
     text-align: center;
     color: var(--color-gray-70);

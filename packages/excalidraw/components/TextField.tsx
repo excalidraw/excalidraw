@@ -25,6 +25,7 @@ type TextFieldProps = {
 
   icon?: React.ReactNode;
   label?: string;
+  "aria-label"?: string;
   className?: string;
   placeholder?: string;
   isRedacted?: boolean;
@@ -36,6 +37,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     {
       onChange,
       label,
+      "aria-label": ariaLabel,
       fullWidth,
       placeholder,
       readonly,
@@ -82,6 +84,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           })}
         >
           <input
+            aria-label={ariaLabel}
             className={clsx({
               "is-redacted":
                 "value" in rest &&
