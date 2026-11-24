@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",
     "selection": "seleção",
-    "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "No momento não é permitido incorporar esta URL. Crie uma issue no GitHub para solicitar a lista branca da URL",
     "unrecognizedLinkFormat": "O link incorporado não corresponde ao formato esperado. Por favor, tente colar a string 'incorporada' que foi fornecida pelo site de origem",
     "elementLinkCopied": "Link copiado para a área de transferência"
