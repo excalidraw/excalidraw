@@ -7,8 +7,9 @@
  * Connector Routing", GD 2009; see {@link buildGrid} and
  * {@link cheapestPath}), where the cost of a path is its length, a fixed cost
  * per bend, a cost for running close to, or through, the elements it
- * connects (see {@link CLEARANCE_COST}), and for turning back too tightly
- * (see {@link SHORT_HAIRPIN_COST}).
+ * connects (see {@link CLEARANCE_COST}), for turning back too tightly
+ * (see {@link SHORT_HAIRPIN_COST}), and for crossing itself (see
+ * {@link SELF_CROSSING_COST}).
  *
  * Its segments run on the grid's lines, which are where segments belong (a
  * padding away from the elements, halfway between them, through the
@@ -121,6 +122,16 @@ const SHORT_LEG_COST = 200;
  */
 const CROSSING_COST = 10;
 const CROSSING_RAMP = 2;
+
+/**
+ * The cost of the route crossing itself, as much as four more bends: a route
+ * crossing itself is hard to follow, so it goes most any other way instead
+ * (around the other side of an element, say), only not a contrived one.
+ * Ramped in over {@link CROSSING_RAMP} px, both of how far one segment gets
+ * past the other and of how far from the other's end it crosses, to keep
+ * costs continuous (see {@link cheapestPath}).
+ */
+const SELF_CROSSING_COST = 4 * BEND_COST;
 
 /**
  * The cost per px a leg on an element is shorter than the padding, so it
@@ -404,12 +415,76 @@ type Endpoint = {
    * {@link PADDING_LEG_COST})
    */
   paddingLegCost: number;
+  /** The padding the leg at this end gets (see {@link legPadding}) */
+  padding: number;
 };
 
 /** The cost of the first or last leg being as long as it is */
-const legCost = ({ minLeg, paddingLegCost }: Endpoint, length: number) =>
+const legCost = (
+  { minLeg, paddingLegCost, padding }: Endpoint,
+  length: number,
+) =>
   SHORT_LEG_COST * Math.max(0, minLeg - length) +
-  paddingLegCost * Math.max(0, BASE_PADDING - length);
+  paddingLegCost * Math.max(0, padding - length);
+
+/**
+ * Over how many px the padding a leg gets goes back up to the base padding,
+ * once there's too little room ahead of it to turn between the elements
+ * (see {@link legPadding})
+ */
+const LEG_PADDING_RAMP = 1;
+
+/**
+ * The padding a leg gets: the base padding, but only half the room ahead of
+ * it where it runs straight at the other element, so where they face each
+ * other closer than twice the padding, the legs are long enough halfway
+ * between them, where a route through the gap runs (see
+ * {@link clearanceCost}), rather than one of them getting its padding at the
+ * other's expense, and the route between them turning wherever that costs
+ * about the same as halfway. (Plus how far the leg runs beside the other
+ * element, so it changes continuously as the elements move.)
+ *
+ * With too little room ahead for both legs (`room`, or none, as where it
+ * starts alongside the other element), the route doesn't turn between them,
+ * but loops back past them, with the legs passing each other, and gets the
+ * base padding (going back up to it over {@link LEG_PADDING_RAMP} px, while
+ * the legs turning between them are as short as they can be anyway).
+ */
+const legPadding = (
+  { point, heading, obstacle }: Endpoint,
+  obstacles: Bounds[],
+  room: number,
+) => {
+  if (obstacle === null || obstacles.length !== 2) {
+    return BASE_PADDING;
+  }
+  const axis = headingIsHorizontal(heading) ? 0 : 1;
+  const sign = Math.sign(heading[axis]);
+  const own = obstacles[obstacle];
+  const other = obstacles[1 - obstacle];
+  // where the leg leaves its element (or the endpoint, past it, where it's
+  // cut back between them, see shareGaps), and how far ahead of that the
+  // other one's near side is (or behind, if negative)
+  const exit =
+    sign > 0
+      ? Math.max(own[axis + 2], point[axis])
+      : Math.min(own[axis], point[axis]);
+  const ahead = ((sign > 0 ? other[axis] : other[axis + 2]) - exit) * sign;
+  const across = point[1 - axis];
+  const beside = Math.max(
+    other[1 - axis] - across,
+    across - other[3 - axis],
+    0,
+  );
+
+  const between =
+    ahead >= room
+      ? ahead / 2
+      : room / 2 +
+        ((room - ahead) / LEG_PADDING_RAMP) * (BASE_PADDING - room / 2);
+
+  return Math.min(BASE_PADDING, between + beside);
+};
 
 /**
  * How far apart the segments either side of a hairpin need to be: between
@@ -491,6 +566,7 @@ export const getElbowArrowRoute = (
       obstacle: obstacleIndex[0],
       minLeg: minLeg(arrow.startArrowhead),
       paddingLegCost: paddingLegCost(arrow.startArrowhead, obstacleIndex[0]),
+      padding: BASE_PADDING,
     },
     {
       point: endGlobalPoint,
@@ -498,11 +574,18 @@ export const getElbowArrowRoute = (
       obstacle: obstacleIndex[1],
       minLeg: minLeg(arrow.endArrowhead),
       paddingLegCost: paddingLegCost(arrow.endArrowhead, obstacleIndex[1]),
+      padding: BASE_PADDING,
     },
     obstacles,
     gaps,
   );
 };
+
+/**
+ * How much more two elements diagonal from each other can overlap along one
+ * axis, and still meet halfway along it (see {@link shareGaps})
+ */
+const CORNER_SLACK = 2 * BASE_PADDING;
 
 /**
  * The obstacles with their binding gaps cut back where they overlap, to meet
@@ -511,12 +594,44 @@ export const getElbowArrowRoute = (
  * than counting as running through both. (Only between sides facing each
  * other, and fading out as the elements are further apart along them, or
  * overlap more, so the obstacles change continuously.)
+ *
+ * Where the elements are diagonal from each other, their corners close
+ * together or overlapping, they meet halfway along one axis as much as along
+ * the other, even overlapping more along it (by up to {@link CORNER_SLACK}).
+ * Otherwise there's only a way through between them along the other axis,
+ * and a route that has to leave or enter them across it zigzags into and out
+ * of it, with two more bends, where cutting across their corners (which a
+ * diamond or an ellipse is well clear of anyway) takes none.
  */
 const shareGaps = (obstacles: Bounds[], gaps: number[]): Bounds[] => {
   if (obstacles.length !== 2) {
     return obstacles;
   }
   const [a, b] = obstacles.map((bounds) => [...bounds]);
+  // How much they meet halfway along an axis, by how much the elements
+  // overlap along it (or are apart, if negative)
+  const meet = (overlap: number) =>
+    clamp(1 - (overlap - BASE_PADDING / 4) / (BASE_PADDING / 2), 0, 1);
+  // and diagonal from each other (see CORNER_SLACK), fading out over as far
+  // again, so the sides cut back don't sweep back any faster than the
+  // elements move
+  const meetDiagonally = (overlap: number) =>
+    clamp(2 - overlap / (BASE_PADDING / 4 + CORNER_SLACK), 0, 1);
+  // Along each axis, how much the elements overlap, and how far each sticks
+  // out past the other at its end (or, if negative, how far one is from
+  // overlapping the other all along it)
+  const axes = (
+    [
+      [0, 2],
+      [1, 3],
+    ] as const
+  ).map(([lo, hi]) => {
+    const [first, second] = a[lo] + a[hi] <= b[lo] + b[hi] ? [a, b] : [b, a];
+    return {
+      overlap: first[hi] - second[lo] - gaps[0] - gaps[1],
+      outside: Math.min(second[lo] - first[lo], second[hi] - first[hi]),
+    };
+  });
   for (const [lo, hi] of [
     [0, 2],
     [1, 3],
@@ -533,14 +648,22 @@ const shareGaps = (obstacles: Bounds[], gaps: number[]): Bounds[] => {
     }
     const [across, acrossHi] = lo === 0 ? [1, 3] : [0, 2];
     const apart = Math.max(a[across] - b[acrossHi], b[across] - a[acrossHi], 0);
+    // (and diagonal from each other: each sticking out past the other
+    // along this axis, and apart by little more than half a padding, if at
+    // all, along the other)
+    const { outside } = axes[lo];
+    const acrossOverlap = axes[1 - lo].overlap;
+    const corner =
+      clamp((BASE_PADDING + acrossOverlap) / (BASE_PADDING / 2), 0, 1) *
+      clamp(outside / (BASE_PADDING / 2), 0, 1);
     const share =
       clamp((BASE_PADDING - apart) / (BASE_PADDING / 2), 0, 1) *
-      clamp(
-        1 -
-          (overlap - firstGap - secondGap - BASE_PADDING / 4) /
-            (BASE_PADDING / 2),
-        0,
-        1,
+      Math.max(
+        meet(overlap - firstGap - secondGap),
+        Math.min(
+          meetDiagonally(acrossOverlap),
+          corner * meetDiagonally(overlap - firstGap - secondGap),
+        ),
       );
     // halfway between the elements' sides (or across where they overlap a
     // little, which a route between them has to cross anyway)
@@ -594,8 +717,20 @@ const findRoute = (
           1,
         ),
   );
-  const grid = buildGrid(start, end, obstacles, overlapping);
-  const path = cheapestPath(grid, start, end, obstacles, weights, overlapping);
+  const [from, to] = [start, end].map((endpoint) => ({
+    ...endpoint,
+    padding: legPadding(endpoint, obstacles, start.minLeg + end.minLeg),
+  }));
+  const grid = buildGrid(from, to, obstacles, overlapping);
+  let path = cheapestPath(grid, from, to, obstacles, weights, overlapping);
+  // (searching for the cheapest route with what it costs to cross itself
+  // takes much longer, and only makes a difference where the cheapest one
+  // without it crosses itself)
+  if (path && crossesItself(getCornerPoints(path))) {
+    path =
+      cheapestPath(grid, from, to, obstacles, weights, overlapping, true) ??
+      path;
+  }
   if (!path || path.length < 2) {
     return [start.point, end.point];
   }
@@ -993,7 +1128,7 @@ const LEFT_TURN = 2;
  * The cheapest path on the grid (Dijkstra's algorithm on the grid's nodes
  * combined with the direction they're arrived at in, so the bends are costed
  * exactly), leaving the start along its heading and entering the end against
- * its heading
+ * its heading, and costing where it crosses itself if `avoidSelfCrossing`
  */
 const cheapestPath = (
   { xs, ys }: Grid,
@@ -1002,6 +1137,7 @@ const cheapestPath = (
   obstacles: Bounds[],
   weights: readonly number[],
   overlapping: boolean,
+  avoidSelfCrossing = false,
 ): GlobalPoint[] | null => {
   // (see minHairpin)
   const betweenElements =
@@ -1041,15 +1177,40 @@ const cheapestPath = (
   // A search state is the node, the direction it's arrived at in, which way
   // the last corner turned, and where the current segment started (its row
   // moving vertically, or column horizontally), so hairpins are costed by
-  // how long they are
+  // how long they are.
+  //
+  // Avoiding crossing itself, it's also how the route spirals: a segment
+  // after three turns the same way crosses the one before them if the one
+  // before it is shorter than that one, and it gets further than the one
+  // after that. (That's the only way a route of up to five segments can
+  // cross itself, and by far the likeliest for a longer one.) So it's how
+  // many times in a row (up to three) the route turned the same way, and
+  // where the segments it turned from started (each along its own axis, as
+  // a line index plus one, or 0), the last one first
   const lineCount = Math.max(cols, rows);
+  const anchors = lineCount + 1;
+  const spiralStates = avoidSelfCrossing ? 4 * anchors ** 3 : 1;
+  const spiralOf = (
+    sameTurns: number,
+    lastStart: number,
+    secondLastStart: number,
+    thirdLastStart: number,
+  ) =>
+    ((sameTurns * anchors + thirdLastStart) * anchors + secondLastStart) *
+      anchors +
+    lastStart;
   const stateOf = (
     node: number,
     direction: number,
     turn: number,
     segmentStart: number,
-  ) => ((node * 4 + direction) * 3 + turn) * lineCount + segmentStart;
-  const nodeOf = (state: number) => Math.floor(state / (12 * lineCount));
+    spiral: number,
+  ) =>
+    (((node * 4 + direction) * 3 + turn) * lineCount + segmentStart) *
+      spiralStates +
+    spiral;
+  const nodeOf = (state: number) =>
+    Math.floor(state / (12 * lineCount * spiralStates));
   const indexAlong = (node: number, direction: number) =>
     direction % 2 === 0 ? Math.floor(node / cols) : node % cols;
   const startDirection = directionIndex(start.heading);
@@ -1124,9 +1285,59 @@ const cheapestPath = (
     }
     return cost;
   };
-  const stateCount = nodeCount * 12 * lineCount;
-  const best = new Float64Array(stateCount).fill(Infinity);
-  const parent = new Int32Array(stateCount).fill(-1);
+  // The cost of a step of the segment after three turns the same way (the
+  // fourth of a spiral) across the one before them (the first): by how far
+  // past the first the step gets, and how far short of where the first
+  // started the third stopped (both ramped in, see SELF_CROSSING_COST).
+  // `firstStart` is where the first started, along its own axis, and
+  // `firstAt` where it runs, along the fourth's (as line indices).
+  const lines = (direction: number) => (direction % 2 === 0 ? ys : xs);
+  const sign = (direction: number) =>
+    direction === 1 || direction === 2 ? 1 : -1;
+  const ramp = (distance: number) => clamp(distance / CROSSING_RAMP, 0, 1);
+  const selfCrossingCost = (
+    from: number,
+    to: number,
+    direction: number,
+    turn: number,
+    firstStart: number,
+    firstAt: number,
+  ) => {
+    // (the third ran back towards where the first started)
+    const third = (direction + (turn === RIGHT_TURN ? 3 : 1)) % 4;
+    const along = (direction + 1) % 2;
+    const shortBy =
+      (lines(third)[firstStart].at - pos(from)[1 - along]) * sign(third);
+    const past = (node: number) =>
+      ramp((pos(node)[along] - lines(direction)[firstAt].at) * sign(direction));
+
+    return SELF_CROSSING_COST * ramp(shortBy) * (past(to) - past(from));
+  };
+
+  // (with spirals tracked, there are far more states, few of which are ever
+  // reached, so they're kept sparsely)
+  const stateCount = avoidSelfCrossing ? 0 : nodeCount * 12 * lineCount;
+  const bestCosts = avoidSelfCrossing
+    ? null
+    : new Float64Array(stateCount).fill(Infinity);
+  const parents = avoidSelfCrossing
+    ? null
+    : new Int32Array(stateCount).fill(-1);
+  const sparseCosts = new Map<number, number>();
+  const sparseParents = new Map<number, number>();
+  const best = (state: number) =>
+    bestCosts ? bestCosts[state] : sparseCosts.get(state) ?? Infinity;
+  const parent = (state: number) =>
+    parents ? parents[state] : sparseParents.get(state) ?? -1;
+  const improve = (state: number, cost: number, from: number) => {
+    if (bestCosts && parents) {
+      bestCosts[state] = cost;
+      parents[state] = from;
+    } else {
+      sparseCosts.set(state, cost);
+      sparseParents.set(state, from);
+    }
+  };
   const open = new BinaryHeap<SearchState>((s) => s.cost);
 
   const initial = stateOf(
@@ -1134,22 +1345,28 @@ const cheapestPath = (
     startDirection,
     NO_TURN,
     indexAlong(startNode, startDirection),
+    0,
   );
-  best[initial] = 0;
+  improve(initial, 0, -1);
   open.push({ state: initial, cost: 0 });
 
   while (open.size() > 0) {
     const { state, cost } = open.pop()!;
-    if (cost > best[state]) {
+    if (cost > best(state)) {
       continue;
     }
-    const segmentStart = state % lineCount;
-    const lastTurn = Math.floor(state / lineCount) % 3;
-    const arrivedIn = Math.floor(state / (3 * lineCount)) % 4;
+    const spiral = state % spiralStates;
+    const rest = Math.floor(state / spiralStates);
+    const segmentStart = rest % lineCount;
+    const lastTurn = Math.floor(rest / lineCount) % 3;
+    const arrivedIn = Math.floor(rest / (3 * lineCount)) % 4;
     const node = nodeOf(state);
     if (node === endNode && arrivedIn === arrivalDirection) {
       return tracePath(state, parent, (s) => pos(nodeOf(s)));
     }
+    const sameTurns = Math.floor(spiral / anchors ** 3);
+    const lastStart = spiral % anchors;
+    const secondLastStart = Math.floor(spiral / anchors) % anchors;
 
     for (let direction = 0; direction < 4; direction++) {
       // no turning back, and no turning before leaving the start
@@ -1167,20 +1384,33 @@ const cheapestPath = (
       let nextCost = cost + edgeCost(node, next, direction);
       let nextTurn = lastTurn;
       let nextSegmentStart = segmentStart;
+      let nextSpiral = spiral;
       if (direction !== arrivedIn) {
         nextTurn = direction === (arrivedIn + 1) % 4 ? RIGHT_TURN : LEFT_TURN;
         nextSegmentStart = indexAlong(node, direction);
-        // turning back, too close to where it came from (unless only
-        // stepping from one endpoint's line to the other's, as the
-        // endpoints may need it to)
+        if (avoidSelfCrossing) {
+          // (only as many segments back as turned the same way)
+          const nextSameTurns =
+            nextTurn === lastTurn ? Math.min(sameTurns + 1, 3) : 1;
+          nextSpiral = spiralOf(
+            nextSameTurns,
+            segmentStart + 1,
+            nextSameTurns > 1 ? lastStart : 0,
+            nextSameTurns > 2 ? secondLastStart : 0,
+          );
+        }
+        // turning back, too close to where it came from (only too close to
+        // round its corners at all, if only stepping from one endpoint's
+        // line to the other's, as the endpoints may need it to)
         if (nextTurn === lastTurn) {
           const [from, to] =
             arrivedIn % 2 === 0
               ? [ys[segmentStart], ys[Math.floor(node / cols)]]
               : [xs[segmentStart], xs[node % cols]];
-          if (!from.exact || !to.exact) {
-            nextCost += hairpinCost(Math.abs(to.at - from.at), betweenElements);
-          }
+          nextCost += hairpinCost(
+            Math.abs(to.at - from.at),
+            betweenElements && !(from.exact && to.exact),
+          );
         }
         // (and onto the line the next segment runs on)
         const line =
@@ -1206,10 +1436,28 @@ const cheapestPath = (
         }
       }
 
-      const nextState = stateOf(next, direction, nextTurn, nextSegmentStart);
-      if (nextCost < best[nextState]) {
-        best[nextState] = nextCost;
-        parent[nextState] = state;
+      // after three turns the same way, running back across the segment
+      // before them
+      if (nextSpiral >= 3 * anchors ** 3) {
+        nextCost += selfCrossingCost(
+          node,
+          next,
+          direction,
+          nextTurn,
+          (Math.floor(nextSpiral / anchors ** 2) % anchors) - 1,
+          (Math.floor(nextSpiral / anchors) % anchors) - 1,
+        );
+      }
+
+      const nextState = stateOf(
+        next,
+        direction,
+        nextTurn,
+        nextSegmentStart,
+        nextSpiral,
+      );
+      if (nextCost < best(nextState)) {
+        improve(nextState, nextCost, state);
         open.push({ state: nextState, cost: nextCost });
       }
     }
@@ -1218,13 +1466,38 @@ const cheapestPath = (
   return null;
 };
 
+/**
+ * Whether any two segments of the route (as its corner points) cross each
+ * other
+ */
+const crossesItself = (points: GlobalPoint[]) => {
+  const between = (v: number, a: number, b: number) =>
+    v > Math.min(a, b) && v < Math.max(a, b);
+  for (let i = 1; i < points.length; i++) {
+    for (let j = i + 2; j < points.length; j++) {
+      const [a, b] = [points[i - 1], points[i]];
+      const [c, d] = [points[j - 1], points[j]];
+      const aHorizontal = a[1] === b[1];
+      if (aHorizontal === (c[1] === d[1])) {
+        continue;
+      }
+      const [h, hEnd, v, vEnd] = aHorizontal ? [a, b, c, d] : [c, d, a, b];
+      if (between(v[0], h[0], hEnd[0]) && between(h[1], v[1], vEnd[1])) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
 const tracePath = (
   state: number,
-  parent: Int32Array,
+  parent: (state: number) => number,
   pos: (state: number) => GlobalPoint,
 ): GlobalPoint[] => {
   const path: GlobalPoint[] = [];
-  for (let s = state; s !== -1; s = parent[s]) {
+  for (let s = state; s !== -1; s = parent(s)) {
     path.unshift(pos(s));
   }
 

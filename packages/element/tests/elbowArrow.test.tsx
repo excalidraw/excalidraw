@@ -1683,3 +1683,329 @@ describe("elbow arrow routing while dragging elements", () => {
     },
   );
 });
+
+describe("elbow arrow routing without crossing itself", () => {
+  /** Whether any two of the route's segments cross each other */
+  const crossesItself = (points: [number, number][]) =>
+    points.slice(1).some((b, i) => {
+      const a = points[i];
+      return points.slice(i + 3).some((d, j) => {
+        const c = points[i + j + 2];
+        const [[h, hEnd], [v, vEnd]] =
+          a[1] === b[1]
+            ? [
+                [a, b],
+                [c, d],
+              ]
+            : [
+                [c, d],
+                [a, b],
+              ];
+        return (
+          h[1] === hEnd[1] &&
+          v[0] === vEnd[0] &&
+          v[0] > Math.min(h[0], hEnd[0]) &&
+          v[0] < Math.max(h[0], hEnd[0]) &&
+          h[1] > Math.min(v[1], vEnd[1]) &&
+          h[1] < Math.max(v[1], vEnd[1])
+        );
+      });
+    });
+
+  const route = (
+    start: ExcalidrawBindableElement,
+    startFixedPoint: FixedPoint,
+    end: ExcalidrawBindableElement,
+    endFixedPoint: FixedPoint,
+  ) => {
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: start.id,
+        fixedPoint: startFixedPoint,
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: end.id,
+        fixedPoint: endFixedPoint,
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+    const update = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([start, end]) as NonDeletedSceneElementsMap,
+    );
+    return update.points!.map(
+      ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+    );
+  };
+
+  it("goes another way rather than crossing itself", () => {
+    // from the left of the lower element to the bottom of the upper one,
+    // which overhangs it on the left: the cheapest route leaves to the left,
+    // turns up and right under the upper one, then down and left back across
+    // where it started to come up into it
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 187.26,
+      height: 84.07,
+    }) as ExcalidrawBindableElement;
+    const upper = API.createElement({
+      type: "rectangle",
+      x: -62.31,
+      y: -115.94,
+      width: 173.59,
+      height: 102.93,
+    }) as ExcalidrawBindableElement;
+
+    const points = route(lower, [-0.03, 0.2383], upper, [0.3011, 1.03]);
+
+    expect(crossesItself(points)).toBe(false);
+  });
+
+  describe("between diamonds diagonal from each other", () => {
+    // an arrow from the right corner of a diamond to the left corner of
+    // another one just to its right, and higher up
+    const upper = API.createElement({
+      type: "diamond",
+      x: 859.3828125,
+      y: 46.66015625,
+      width: 226.953125,
+      height: 248.59765625,
+    }) as ExcalidrawBindableElement;
+    const lower = API.createElement({
+      type: "diamond",
+      x: 615.19140625,
+      y: 225.49609375,
+      width: 226.953125,
+      height: 248.59765625,
+    }) as ExcalidrawBindableElement;
+    const routeWithLowerAt = (dx: number, dy: number) =>
+      route(
+        { ...lower, x: lower.x + dx, y: lower.y + dy },
+        [0.995, 0.5028],
+        upper,
+        [0.005, 0.5028],
+      );
+
+    it.each([
+      // (once spiralling up between them, over the upper one and back down
+      // across where it went up)
+      ["close together", 0, 0],
+      // (once zigzagging into the narrow gap between their bounds, and back
+      // out of it)
+      ["with their bounds nearly touching", 15.77, 45.69],
+    ])("turns between them across their corners when %s", (_, dx, dy) => {
+      const points = routeWithLowerAt(dx, dy);
+
+      expect(crossesItself(points)).toBe(false);
+      expect(points).toHaveLength(6);
+      // the middle segment between the lower one's top and the upper
+      // one's bottom
+      expect(points[2][1]).toBe(points[3][1]);
+      expect(points[2][1]).toBeGreaterThan(lower.y + dy - 40);
+      expect(points[2][1]).toBeLessThan(upper.y + upper.height + 40);
+    });
+
+    it("keeps turning between them as one is dragged further over the other", () => {
+      // from their bounds nearly touching to overlapping by 80px more across
+      const routes = Array.from({ length: 161 }, (_, step) =>
+        routeWithLowerAt(22.52 + step / 2, 45.41),
+      );
+
+      expect(routes.filter((points) => points.length !== 6)).toEqual([]);
+      const jumps = routes.filter((points, step) =>
+        points.some(
+          ([px, py], i) =>
+            step > 0 &&
+            (Math.abs(px - routes[step - 1][i][0]) > 3 ||
+              Math.abs(py - routes[step - 1][i][1]) > 3),
+        ),
+      );
+      expect(jumps).toEqual([]);
+    });
+
+    it.each(["x", "y"] as const)(
+      "doesn't cross itself, zigzag or jitter as one is dragged along %s",
+      (axis) => {
+        const routes = Array.from({ length: 801 }, (_, step) =>
+          axis === "x"
+            ? routeWithLowerAt(-400 + step, 0)
+            : routeWithLowerAt(0, -400 + step),
+        );
+
+        expect(routes.filter(crossesItself)).toEqual([]);
+        expect(routes.filter((points) => points.length > 6)).toEqual([]);
+        const changes = routes
+          .map((points, step) => {
+            const previous = routes[step - 1];
+            return previous &&
+              (points.length !== previous.length ||
+                points.some(
+                  ([px, py], i) =>
+                    Math.abs(px - previous[i][0]) > 3 ||
+                    Math.abs(py - previous[i][1]) > 3,
+                ))
+              ? step
+              : null;
+          })
+          .filter((step): step is number => step !== null);
+        expect(changes.filter((step, i) => step - changes[i - 1] <= 1)).toEqual(
+          [],
+        );
+      },
+    );
+  });
+});
+
+describe("elbow arrow routing between elements facing each other", () => {
+  it("turns between them without jumping as they're dragged closer", () => {
+    // from the right of the left element to the left of the right one,
+    // closer than twice the padding: neither leg can have its padding, and
+    // the route turns between them
+    const left = API.createElement({
+      type: "rectangle",
+      x: 424.79,
+      y: 634.08,
+      width: 224.54,
+      height: 112,
+    });
+    const right = API.createElement({
+      type: "rectangle",
+      x: 718.73,
+      y: 688.27,
+      width: 224.54,
+      height: 112,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: left.id,
+        fixedPoint: [1.0267, 0.5001],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: right.id,
+        fixedPoint: [-0.0267, 0.5001],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    // the right one dragged left, in half px steps, past where the start is
+    // within the padding around it (and the elements overlap, and aren't
+    // avoided), and on until there's no room to turn between them
+    const routes = Array.from({ length: 101 }, (_, step) => {
+      const update = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([
+          left,
+          { ...right, x: right.x - step / 2 },
+        ]) as NonDeletedSceneElementsMap,
+      );
+      return update.points!.map(
+        ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+      );
+    });
+
+    // turning between them, then looping back past them (once the legs are
+    // too long to turn between them), and changing smoothly otherwise
+    const loops = routes.findIndex((points) => points.length !== 4);
+    expect(loops).toBeGreaterThan(40);
+    expect(routes.slice(loops).filter((points) => points.length !== 6)).toEqual(
+      [],
+    );
+    const jumps = routes.filter(
+      (points, step) =>
+        step > 0 &&
+        step !== loops &&
+        points.some(
+          ([px, py], i) =>
+            Math.abs(px - routes[step - 1][i][0]) > 1 ||
+            Math.abs(py - routes[step - 1][i][1]) > 1,
+        ),
+    );
+    expect(jumps).toEqual([]);
+    // halfway between them, as long as that leaves the arrowhead room
+    const [start, , , end] = routes[0];
+    expect(routes[0][1][0]).toBeCloseTo(
+      Math.min((start[0] + end[0]) / 2, end[0] - 29),
+    );
+  });
+});
+
+describe("elbow arrow routing between elements on top of each other", () => {
+  it("doesn't turn back on itself between endpoints nearly in line", () => {
+    // from the right corner of a diamond to the left corner of another one
+    // almost exactly over it, 3px higher: in line, the route would leave the
+    // start to the right, and come back to the end from the left
+    const end = API.createElement({
+      type: "diamond",
+      x: 1050.62,
+      y: 60.96,
+      width: 226.95,
+      height: 248.6,
+    });
+    const routeWithStartAt = (dx: number, dy: number) => {
+      const start = API.createElement({
+        type: "diamond",
+        x: 1067.4 + dx,
+        y: 64 + dy,
+        width: 226.95,
+        height: 248.6,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: start.id,
+          fixedPoint: [0.995, 0.5028],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: end.id,
+          fixedPoint: [0.005, 0.5028],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+      const update = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([start, end]) as NonDeletedSceneElementsMap,
+      );
+      return update.points!.map(
+        ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+      );
+    };
+    /** Whether the route turns back closer than it can round its corners */
+    const turnsBackTightly = (points: [number, number][]) =>
+      points.slice(3).some((d, i) => {
+        const [a, b, c] = points.slice(i, i + 3);
+        const turnsBack =
+          (b[0] - a[0]) * (d[0] - c[0]) + (b[1] - a[1]) * (d[1] - c[1]) < 0;
+        return turnsBack && Math.abs(c[0] - b[0]) + Math.abs(c[1] - b[1]) < 16;
+      });
+
+    // around them, rather than doubling back along the line between the
+    // endpoints, here and as the start is dragged a little either way
+    expect(routeWithStartAt(0, 0)).toHaveLength(6);
+    for (let step = -20; step <= 20; step++) {
+      expect(turnsBackTightly(routeWithStartAt(step, 0))).toBe(false);
+      expect(turnsBackTightly(routeWithStartAt(0, step / 2))).toBe(false);
+    }
+  });
+});
