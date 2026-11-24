@@ -129,14 +129,16 @@ const CROSSING_RAMP = 2;
 const STRIP_RAMP = BASE_PADDING / 4;
 
 /**
- * The cost of the route crossing itself, as much as four more bends: a route
+ * The cost of the route crossing itself, as much as eight more bends: a route
  * crossing itself is hard to follow, so it goes most any other way instead
- * (around the other side of an element, say), only not a contrived one.
+ * (around the other side of an element, say, or through the room between
+ * elements whose bounds overlap, which counts as crossing them), only not a
+ * contrived one.
  * Ramped in over {@link CROSSING_RAMP} px, both of how far one segment gets
  * past the other and of how far from the other's end it crosses, to keep
  * costs continuous (see {@link cheapestPath}).
  */
-const SELF_CROSSING_COST = 4 * BEND_COST;
+const SELF_CROSSING_COST = 8 * BEND_COST;
 
 /**
  * The cost per px the segments either side of a hairpin (two corners turning
@@ -545,7 +547,7 @@ export const getElbowArrowRoute = (
       ? getArrowheadSize(arrowhead) + ELBOW_ARROW_CORNER_RADIUS / 4
       : ELBOW_ARROW_CORNER_RADIUS / 2;
 
-  return findRoute(
+  const route = findRoute(
     {
       point: startGlobalPoint,
       heading: startHeading,
@@ -570,6 +572,137 @@ export const getElbowArrowRoute = (
       (element) => element?.type === "diamond" || element?.type === "ellipse",
     ),
   );
+
+  return resolveUTurns(route, startHeading, endHeading, obstacles);
+};
+
+/** How short a leg can get to resolve a U-turn (see {@link resolveUTurns}) */
+const MIN_RESOLVED_LEG = 5;
+
+/**
+ * The route with U-turns next to its ends resolved where it can be: the
+ * route leaving the start, turning, and turning back the way it came (or
+ * turning back into the end the same way, mirrored), only to make up for a
+ * leg longer than it needs to be there, gets the leg shorter by as much as
+ * it turns back (down to {@link MIN_RESOLVED_LEG}), so it doesn't turn back
+ * at all, and the segments either side of where it did run on as one. Only
+ * where the route is no worse for it: its legs still leaving and entering
+ * the endpoints the way they do, not crossing itself, not running any
+ * further inside the elements, with fewer turns. (Once the route is found:
+ * the search can't tell how long the legs need to be until it's found where
+ * the route goes, see legLength.)
+ */
+const resolveUTurns = (
+  route: GlobalPoint[],
+  startHeading: Heading,
+  endHeading: Heading,
+  obstacles: Bounds[],
+): GlobalPoint[] => {
+  const insideLength = (points: GlobalPoint[]) =>
+    segmentsOf(points).reduce(
+      (sum, [a, b]) =>
+        sum +
+        obstacles.reduce((inside, box) => {
+          const axis = a[1] === b[1] ? 0 : 1;
+          const across = a[1 - axis];
+          if (
+            across <= box[1 - axis] + DEDUP_THRESHOLD ||
+            across >= box[3 - axis] - DEDUP_THRESHOLD
+          ) {
+            return inside;
+          }
+          const lo = Math.max(Math.min(a[axis], b[axis]), box[axis]);
+          const hi = Math.min(Math.max(a[axis], b[axis]), box[axis + 2]);
+          return inside + Math.max(0, hi - lo);
+        }, 0),
+      0,
+    );
+  // (the U-turn after the leg leaving `points[0]` along `heading`, resolved,
+  // if it can be)
+  const resolveAtStart = (points: GlobalPoint[], heading: Heading) => {
+    if (points.length < 4) {
+      return null;
+    }
+    const [c0, c1, c2, c3] = points;
+    const axis = headingIsHorizontal(heading) ? 0 : 1;
+    const back = (c3[axis] - c2[axis]) * heading[axis];
+    const leg = (c1[axis] - c0[axis]) * heading[axis];
+    if (back >= 0 || leg + back < MIN_RESOLVED_LEG) {
+      return null;
+    }
+    // (the leg's end moved back to across from where the U-turn ends, and
+    // the segment after it on to there, so the one turning back is gone)
+    const corner =
+      axis === 0
+        ? pointFrom<GlobalPoint>(c3[0], c1[1])
+        : pointFrom<GlobalPoint>(c1[0], c3[1]);
+    return tidyRoute([c0, corner, ...points.slice(3)]);
+  };
+  const leaves = (points: GlobalPoint[], heading: Heading) => {
+    const [a, b] = points;
+    const axis = headingIsHorizontal(heading) ? 0 : 1;
+    return (
+      points.length >= 2 &&
+      a[1 - axis] === b[1 - axis] &&
+      (b[axis] - a[axis]) * heading[axis] >= MIN_RESOLVED_LEG - LEG_TOLERANCE
+    );
+  };
+  const isBetter = (points: GlobalPoint[], than: GlobalPoint[]) =>
+    points.length < than.length &&
+    leaves(points, startHeading) &&
+    leaves([...points].reverse(), endHeading) &&
+    !crossesItself(points) &&
+    insideLength(points) <= insideLength(than) + LEG_TOLERANCE;
+
+  let resolved = route;
+  for (let pass = 0; pass < route.length; pass++) {
+    const atStart = resolveAtStart(resolved, startHeading);
+    const atEnd = resolveAtStart([...resolved].reverse(), endHeading);
+    const next =
+      atStart && isBetter(atStart, resolved)
+        ? atStart
+        : atEnd && isBetter([...atEnd].reverse(), resolved)
+        ? [...atEnd].reverse()
+        : null;
+    if (!next) {
+      break;
+    }
+    resolved = next;
+  }
+
+  return resolved;
+};
+
+/** The route's segments, as pairs of their ends */
+const segmentsOf = (points: GlobalPoint[]) =>
+  points.slice(1).map((point, i) => [points[i], point] as const);
+
+/**
+ * The route's corner points, without any repeated, or between segments
+ * running on along the same line (either way: turning back on itself, the
+ * two make one, as far as it ends up)
+ */
+const tidyRoute = (points: GlobalPoint[]): GlobalPoint[] => {
+  const tidy: GlobalPoint[] = [];
+  for (const point of points) {
+    const last = tidy[tidy.length - 1];
+    if (last && last[0] === point[0] && last[1] === point[1]) {
+      continue;
+    }
+    tidy.push(point);
+    while (tidy.length >= 3) {
+      const [a, b, c] = tidy.slice(-3);
+      if (
+        (a[0] === b[0] && b[0] === c[0]) ||
+        (a[1] === b[1] && b[1] === c[1])
+      ) {
+        tidy.splice(tidy.length - 2, 1);
+      } else {
+        break;
+      }
+    }
+  }
+  return tidy;
 };
 
 /**
@@ -842,19 +975,29 @@ const findRoute = (
   );
   // (searching for the cheapest route with what it costs to cross itself
   // takes much longer, and only makes a difference where the cheapest one
-  // without it crosses itself)
+  // without it crosses itself. It only tells where a segment crosses one up
+  // to three turns before it, so a route can get past that by going around
+  // once more, crossing or running over itself all the same, where that
+  // costs less: that's never better than crossing itself once, as the
+  // cheapest one does)
   if (path && crossesItself(getCornerPoints(path))) {
-    path =
-      cheapestPath(
-        grid,
-        from,
-        to,
-        obstacles,
-        weights,
-        overlapping,
-        strip,
-        true,
-      ) ?? path;
+    const untangled = cheapestPath(
+      grid,
+      from,
+      to,
+      obstacles,
+      weights,
+      overlapping,
+      strip,
+      true,
+    );
+    if (
+      untangled &&
+      !crossesItself(getCornerPoints(untangled)) &&
+      !revisits(untangled)
+    ) {
+      path = untangled;
+    }
   }
   if (!path || path.length < 2) {
     return [start.point, end.point];
@@ -1648,6 +1791,19 @@ const cheapestPath = (
   }
 
   return null;
+};
+
+/** Whether the route (as the grid's nodes it runs through) runs through any twice */
+const revisits = (path: GlobalPoint[]) => {
+  const seen = new Set<string>();
+  return path.some((p) => {
+    const key = `${p[0]},${p[1]}`;
+    if (seen.has(key)) {
+      return true;
+    }
+    seen.add(key);
+    return false;
+  });
 };
 
 /**
