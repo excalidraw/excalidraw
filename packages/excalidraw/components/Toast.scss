@@ -25,6 +25,23 @@
       white-space: pre-wrap;
     }
 
+    .Toast__action {
+      all: unset;
+      color: var(--color-primary);
+      font-weight: 600;
+      cursor: pointer;
+      pointer-events: auto;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &:focus-visible {
+        outline: 1px solid var(--color-primary);
+        border-radius: 2px;
+      }
+    }
+
     .Toast__progress-bar {
       margin-top: 0.35rem;
       width: 100%;
