@@ -49,6 +49,7 @@ export const Minimap = ({ className }: { className?: string }) => {
   return (
     <div
       ref={containerRef}
+      tabIndex={-1}
       className={clsx("minimap", className)}
       role="img"
       aria-label={t("labels.minimap")}
