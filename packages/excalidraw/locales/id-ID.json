@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
     "selection": "pilihan",
-    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempel unsur tunggal,\natau tempel ke penyunting teks",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "Menyemat URL ini saat ini tidak boleh. Ajukan \"Issue\" di GitHub untuk meminta URL masuk daftar putih",
     "unrecognizedLinkFormat": "Tautan yang disematkan tidak sesuai dengan syarat format. Coba tempel untaian 'embed' (semat) yang disediakan situs sumber",
     "elementLinkCopied": "Tautan disalin ke papan klip"
