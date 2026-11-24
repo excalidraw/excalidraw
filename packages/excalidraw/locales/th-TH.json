@@ -588,7 +588,8 @@
     "fileSavedToFilename": "บันทึกเป็น {filename}",
     "canvas": "ผืนผ้าใบ",
     "selection": "การเลือก",
-    "pasteAsSingleElement": "ใช้ {{shortcut}} เพื่อวางเป็นองค์ประกอบเดียว\nหรือวางลงในตัวแก้ไขข้อความที่มีอยู่",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "ขณะนี้ไม่อนุญาตให้ฝัง URL นี้ โปรดเปิด issue บน GitHub เพื่อขอให้เพิ่ม URL นี้ในรายการที่อนุญาต",
     "unrecognizedLinkFormat": "ลิงก์ที่คุณฝังไม่ตรงกับรูปแบบที่คาดไว้ โปรดลองวางสตริง 'embed' ที่เว็บไซต์ต้นทางให้มา",
     "elementLinkCopied": "คัดลอกไปยังคลิปบอร์ดแล้ว"
