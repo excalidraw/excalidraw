@@ -588,7 +588,8 @@
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
     "selection": "таңдау",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
