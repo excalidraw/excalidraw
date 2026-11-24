@@ -588,7 +588,8 @@
     "fileSavedToFilename": "儲存為 {filename}",
     "canvas": "畫布",
     "selection": "已選項目",
-    "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "目前不允許嵌入此網址。您可至 GitHub 提出 issue 以要求將此網址加入合格名單。",
     "unrecognizedLinkFormat": "您嵌入的連結格式不符。請嘗試貼入原網站所提供的「嵌入」字串。",
     "elementLinkCopied": "連結已複製至剪貼簿"
