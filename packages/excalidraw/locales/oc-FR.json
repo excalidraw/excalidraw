@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",
     "selection": "seleccion",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": "Copiats al quichapapièrs"
