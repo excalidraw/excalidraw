@@ -27,7 +27,7 @@ import {
   restoreLibraryItems,
 } from "./restore";
 
-import type { AppState, DataURL, LibraryItem } from "../types";
+import type { AppState, DataURL, LibraryItem, LibraryItems } from "../types";
 
 import type { ImportedLibraryData } from "./types";
 
@@ -229,12 +229,47 @@ export const parseLibraryJSON = (
   return restoreLibraryItems(libraryItems, defaultStatus);
 };
 
+export const parseLibraryJSONWithFolders = (
+  json: string,
+  defaultStatus: LibraryItem["status"] = "unpublished",
+) => {
+  const data: ImportedLibraryData | undefined = JSON.parse(json);
+  if (!isValidLibrary(data)) {
+    throw new Error("Invalid library");
+  }
+  const libraryFolders = Array.isArray(data.libraryFolders)
+    ? data.libraryFolders.filter(
+        (folder) =>
+          folder &&
+          typeof folder.id === "string" &&
+          typeof folder.name === "string",
+      )
+    : [];
+  const folderIds = new Set(libraryFolders.map((folder) => folder.id));
+  const libraryItems: LibraryItems = restoreLibraryItems(
+    data.libraryItems || data.library,
+    defaultStatus,
+  ).map((item) => {
+    if (!item.folderId || folderIds.has(item.folderId)) {
+      return item;
+    }
+    const { folderId: _folderId, ...unassignedItem } = item;
+    return unassignedItem;
+  });
+  return { libraryItems, libraryFolders };
+};
+
 export const loadLibraryFromBlob = async (
   blob: Blob,
   defaultStatus: LibraryItem["status"] = "unpublished",
 ) => {
   return parseLibraryJSON(await parseFileContents(blob), defaultStatus);
 };
+
+export const loadLibraryFromBlobWithFolders = async (
+  blob: Blob,
+  defaultStatus: LibraryItem["status"] = "unpublished",
+) => parseLibraryJSONWithFolders(await parseFileContents(blob), defaultStatus);
 
 export const canvasToBlob = async (
   canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>,

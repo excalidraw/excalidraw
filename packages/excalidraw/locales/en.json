@@ -217,6 +217,17 @@
     "noItems": "No items added yet...",
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
     "hint_emptyPrivateLibrary": "Select an item on canvas to add it here.",
+    "folders": {
+      "ariaLabel": "Library folders",
+      "allItems": "All items",
+      "unfiled": "Unfiled",
+      "moveToUnfiled": "Move to unfiled",
+      "newFolder": "New folder",
+      "rename": "Rename",
+      "delete": "Delete",
+      "renamePrompt": "Rename folder",
+      "exportPrompt": "Include folder organization in the exported library? Select Cancel to export items without folders."
+    },
     "search": {
       "inputPlaceholder": "Search library",
       "heading": "Library matches",

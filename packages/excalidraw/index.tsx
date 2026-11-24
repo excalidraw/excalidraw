@@ -447,6 +447,7 @@ export type {
 } from "./scene/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
+export type { LibraryFolder } from "./types";
 export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,

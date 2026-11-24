@@ -54,6 +54,7 @@ export const LibraryDropdownMenuButton: React.FC<{
   appState,
   className,
 }) => {
+  const app = useApp();
   const [libraryItemsData] = useAtom(libraryItemsAtom);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
     isLibraryMenuOpenAtom,
@@ -182,7 +183,20 @@ export const LibraryDropdownMenuButton: React.FC<{
     const libraryItems = itemsSelected
       ? items
       : await library.getLatestLibrary();
-    saveLibraryAsJSON(libraryItems)
+    const includeFolders = app.ownerWindow.confirm(
+      t("library.folders.exportPrompt"),
+    );
+    const libraryFolders = includeFolders
+      ? itemsSelected
+        ? libraryItemsData.libraryFolders.filter((folder) =>
+            libraryItems.some((item) => item.folderId === folder.id),
+          )
+        : libraryItemsData.libraryFolders
+      : undefined;
+    const exportedItems = includeFolders
+      ? libraryItems
+      : libraryItems.map(({ folderId: _folderId, ...item }) => item);
+    saveLibraryAsJSON(exportedItems, libraryFolders)
       .catch(muteFSAbortError)
       .catch((error) => {
         setAppState({ errorMessage: error.message });
@@ -283,7 +297,8 @@ export const LibraryDropdownMenu = ({
   onSelectItems: (id: LibraryItem["id"][]) => void;
   className?: string;
 }) => {
-  const { library } = useApp();
+  const app = useApp();
+  const { library } = app;
   const { clearLibraryCache, deleteItemsFromLibraryCache } = useLibraryCache();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();

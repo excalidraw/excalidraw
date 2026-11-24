@@ -157,6 +157,47 @@ const LibraryMenuContent = memo(
           theme={theme}
           onSelectItems={onSelectItems}
           selectedItems={selectedItems}
+          onMoveSelectedItems={(folderId) => {
+            const selected = new Set(selectedItems);
+            library
+              .setLibrary((items) =>
+                items.map((item) => {
+                  if (!selected.has(item.id) || item.status === "published") {
+                    return item;
+                  }
+                  const { folderId: _folderId, ...rest } = item;
+                  return folderId ? { ...rest, folderId } : rest;
+                }),
+              )
+              .catch(() =>
+                setAppState({
+                  errorMessage: t("alerts.errorRemovingFromLibrary"),
+                }),
+              );
+            onSelectItems([]);
+          }}
+          onDeleteFolder={(folderId) => {
+            const folder = libraryItemsData.libraryFolders.find(
+              (entry) => entry.id === folderId,
+            );
+            if (!folder) {
+              return;
+            }
+            library.setLibraryFolders(
+              libraryItemsData.libraryFolders.filter(
+                (entry) => entry.id !== folderId,
+              ),
+            );
+            library.setLibrary((items) =>
+              items.map((item) => {
+                if (item.folderId !== folderId) {
+                  return item;
+                }
+                const { folderId: _folderId, ...rest } = item;
+                return rest;
+              }),
+            );
+          }}
         />
         {showBtn && (
           <LibraryMenuControlButtons
