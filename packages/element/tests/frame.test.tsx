@@ -1195,6 +1195,134 @@ describe("adding elements to frames", () => {
       expect(frameChild.frameId).toBe(frame.id);
     });
 
+    it("should keep group intact when dragging a member within the same frame while editing group", () => {
+      const containerFrame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 300,
+        height: 300,
+      });
+      const rectA = API.createElement({
+        type: "rectangle",
+        x: 20,
+        y: 20,
+        width: 50,
+        height: 50,
+        groupIds: ["g1"],
+        frameId: containerFrame.id,
+      });
+      const rectB = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 50,
+        height: 50,
+        groupIds: ["g1"],
+        frameId: containerFrame.id,
+      });
+
+      API.setElements([rectA, rectB, containerFrame]);
+      API.setSelectedElements([rectB], "g1");
+
+      mouse.downAt(rectB.x + rectB.width / 2, rectB.y + rectB.height / 2);
+      mouse.moveTo(150, 150);
+      mouse.upAt(150, 150);
+
+      expect(rectA.frameId).toBe(containerFrame.id);
+      expect(rectB.frameId).toBe(containerFrame.id);
+      expect(rectA.groupIds).toEqual(["g1"]);
+      expect(rectB.groupIds).toEqual(["g1"]);
+      expect(h.state.editingGroupId).toBe("g1");
+    });
+
+    it("should remove a group member from its group when dragging it into a different frame while editing group", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectA = API.createElement({
+        type: "rectangle",
+        x: 20,
+        y: 20,
+        width: 50,
+        height: 50,
+        groupIds: ["g1"],
+        frameId: frame1.id,
+      });
+      const rectB = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 50,
+        height: 50,
+        groupIds: ["g1"],
+        frameId: frame1.id,
+      });
+
+      API.setElements([rectA, rectB, frame1, frame2]);
+      API.setSelectedElements([rectB], "g1");
+
+      mouse.downAt(rectB.x + rectB.width / 2, rectB.y + rectB.height / 2);
+      mouse.moveTo(350, 50);
+      mouse.upAt(350, 50);
+
+      expect(rectA.frameId).toBe(frame1.id);
+      expect(rectB.frameId).toBe(frame2.id);
+      expect(rectA.groupIds).toEqual([]);
+      expect(rectB.groupIds).toEqual([]);
+      expect(h.state.editingGroupId).toBeNull();
+    });
+
+    it("should remove a group member from its group when dragging it from outside into a frame while editing group", () => {
+      const containerFrame = API.createElement({
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectA = API.createElement({
+        type: "rectangle",
+        x: 20,
+        y: 20,
+        width: 50,
+        height: 50,
+        groupIds: ["g1"],
+      });
+      const rectB = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 50,
+        height: 50,
+        groupIds: ["g1"],
+      });
+
+      API.setElements([rectA, rectB, containerFrame]);
+      API.setSelectedElements([rectB], "g1");
+
+      mouse.downAt(rectB.x + rectB.width / 2, rectB.y + rectB.height / 2);
+      mouse.moveTo(350, 50);
+      mouse.upAt(350, 50);
+
+      expect(rectA.frameId).toBeNull();
+      expect(rectB.frameId).toBe(containerFrame.id);
+      expect(rectA.groupIds).toEqual([]);
+      expect(rectB.groupIds).toEqual([]);
+      expect(h.state.editingGroupId).toBeNull();
+    });
+
     it.skip("should drag element inside, duplicate it and keep it in frame", () => {
       API.setElements([frame, rect2]);
 
