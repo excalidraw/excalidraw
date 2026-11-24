@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
     "selection": "výberu",
-    "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "Zapustenie tejto URL nie je povolené. Vytvorte issue na GitHub-e a požiadajte povolenie tejto URL",
     "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou",
     "elementLinkCopied": "Odkaz bol skopírovaný do schránky"
