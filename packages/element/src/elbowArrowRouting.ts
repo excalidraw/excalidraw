@@ -21,9 +21,11 @@
  * The elements are soft obstacles (much like yFiles' node crossing penalty)
  * rather than hard ones, and every cost changes continuously as the elements
  * move, so the route only changes its shape where another shape becomes as
- * cheap. The one exception is two elements overlapping, which here means an
- * endpoint within the padding around the element the other end is bound to:
- * the route then doesn't avoid either of them at all (see {@link findRoute}).
+ * cheap. The exceptions are two elements overlapping, which the route then
+ * goes around as one, and two legs heading straight at each other, too close
+ * to turn between them, with an endpoint within the padding around the other
+ * element: the route then doesn't avoid either of them at all (see
+ * {@link findRoute}).
  *
  * The route only depends on the endpoints, their headings and elements, and
  * the arrowheads (never on where the route was before), so the same arrow
@@ -130,6 +132,12 @@ const SHORT_LEG_COST = 200;
  */
 const CROSSING_COST = 10;
 const CROSSING_RAMP = 2;
+
+/**
+ * Over how many px to the side of a leg the other element's near side stops
+ * counting as in its way (see {@link findRoute})
+ */
+const STRIP_RAMP = BASE_PADDING / 4;
 
 /**
  * The cost of the route crossing itself, as much as four more bends: a route
@@ -443,41 +451,28 @@ const legCost = (
 const LEG_PADDING_RAMP = 1;
 
 /**
- * The padding a leg gets: the base padding, but only half the room ahead of
- * it where it runs straight at the other element, so where they face each
- * other closer than twice the padding, the legs are long enough halfway
- * between them, where a route through the gap runs (see
- * {@link clearanceCost}), rather than one of them getting its padding at the
- * other's expense, and the route between them turning wherever that costs
- * about the same as halfway. (Plus how far the leg runs beside the other
- * element, so it changes continuously as the elements move.)
- *
- * With too little room ahead for both legs (`room`, or none, as where it
- * starts alongside the other element), the route doesn't turn between them,
- * but loops back past them, with the legs passing each other, and gets the
- * base padding (going back up to it over {@link LEG_PADDING_RAMP} px, while
- * the legs turning between them are as short as they can be anyway).
+ * Where the other element is, from the leg at an endpoint: how far ahead of
+ * where the leg leaves its own element (or the endpoint, past it, where it's
+ * cut back between them, see shareGaps) the other one's near side is (or
+ * behind, if negative), as well as of the endpoint itself, and how far it is
+ * to the side of the leg's line
  */
-const legPadding = (
-  { point, heading, obstacle }: Endpoint,
-  obstacles: Bounds[],
-  room: number,
+const legSurroundings = (
+  { point, heading }: Pick<Endpoint, "point" | "heading">,
+  own: Bounds,
+  other: Bounds,
 ) => {
-  if (obstacle === null || obstacles.length !== 2) {
-    return BASE_PADDING;
-  }
   const axis = headingIsHorizontal(heading) ? 0 : 1;
   const sign = Math.sign(heading[axis]);
-  const own = obstacles[obstacle];
-  const other = obstacles[1 - obstacle];
-  // where the leg leaves its element (or the endpoint, past it, where it's
-  // cut back between them, see shareGaps), and how far ahead of that the
-  // other one's near side is (or behind, if negative)
   const exit =
     sign > 0
       ? Math.max(own[axis + 2], point[axis])
       : Math.min(own[axis], point[axis]);
-  const ahead = ((sign > 0 ? other[axis] : other[axis + 2]) - exit) * sign;
+  const near = sign > 0 ? other[axis] : other[axis + 2];
+  const ahead = (near - exit) * sign;
+  // (and how far ahead of the endpoint itself, which the leg's length is
+  // measured from)
+  const aheadOfPoint = (near - point[axis]) * sign;
   const across = point[1 - axis];
   const beside = Math.max(
     other[1 - axis] - across,
@@ -485,13 +480,50 @@ const legPadding = (
     0,
   );
 
-  const between =
-    ahead >= room
-      ? ahead / 2
-      : room / 2 +
-        ((room - ahead) / LEG_PADDING_RAMP) * (BASE_PADDING - room / 2);
+  return { ahead, aheadOfPoint, beside };
+};
 
-  return Math.min(BASE_PADDING, between + beside);
+/**
+ * The padding a leg gets: the base padding, but only half the room ahead of
+ * it where it runs straight at the other element, so where they're closer
+ * than twice the padding, the leg is as long as halfway between them, where a
+ * route through the gap runs (see {@link clearanceCost}), rather than the
+ * route turning wherever that costs about the same as halfway (and so where
+ * they face each other, neither leg gets its padding at the other's expense).
+ * Plus how far the leg runs beside the other element, or how far behind the
+ * leg it is, so it changes continuously as the elements move, and the leg
+ * shortens along with the room ahead of it.
+ *
+ * With the legs facing each other with too little room ahead for both
+ * (`room`), the route doesn't turn between them, but loops back past them,
+ * with the legs passing each other (see {@link findRoute}), and they get the
+ * base padding (going back up to it over {@link LEG_PADDING_RAMP} px, while
+ * the legs turning between them are as short as they can be anyway).
+ */
+const legPadding = (
+  { point, heading, obstacle }: Endpoint,
+  obstacles: Bounds[],
+  room: number,
+  facing: boolean,
+) => {
+  if (obstacle === null || obstacles.length !== 2) {
+    return BASE_PADDING;
+  }
+  const { ahead, beside } = legSurroundings(
+    { point, heading },
+    obstacles[obstacle],
+    obstacles[1 - obstacle],
+  );
+  return facing
+    ? Math.min(
+        BASE_PADDING,
+        (ahead >= room
+          ? ahead / 2
+          : room / 2 +
+            ((room - ahead) / LEG_PADDING_RAMP) * (BASE_PADDING - room / 2)) +
+          beside,
+      )
+    : Math.min(BASE_PADDING, beside + (ahead >= 0 ? ahead / 2 : -ahead));
 };
 
 /**
@@ -590,6 +622,9 @@ export const getElbowArrowRoute = (
       !!hoveredEndElement &&
       hoveredStartElement.id !== hoveredEndElement.id &&
       shapesOverlap(hoveredStartElement, hoveredEndElement, elementsMap),
+    elements.every(
+      (element) => element?.type === "diamond" || element?.type === "ellipse",
+    ),
   );
 };
 
@@ -642,14 +677,20 @@ const CORNER_SLACK = 2 * BASE_PADDING;
  * overlap more, so the obstacles change continuously.)
  *
  * Where the elements are diagonal from each other, their corners close
- * together or overlapping, they meet halfway along one axis as much as along
- * the other, even overlapping more along it (by up to {@link CORNER_SLACK}).
- * Otherwise there's only a way through between them along the other axis,
- * and a route that has to leave or enter them across it zigzags into and out
- * of it, with two more bends, where cutting across their corners (which a
- * diamond or an ellipse is well clear of anyway) takes none.
+ * together or overlapping, and both have their corners clear (diamonds and
+ * ellipses, `cornersClear`), they meet halfway along one axis as much as
+ * along the other, even overlapping more along it (by up to
+ * {@link CORNER_SLACK}). Otherwise there's only a way through between them
+ * along the other axis, and a route that has to leave or enter them across it
+ * zigzags into and out of it, with two more bends, where cutting across their
+ * corners (which a diamond or an ellipse is well clear of anyway) takes none.
+ * (Across the corners of a rectangle, the route would run through it.)
  */
-const shareGaps = (obstacles: Bounds[], gaps: number[]): Bounds[] => {
+const shareGaps = (
+  obstacles: Bounds[],
+  gaps: number[],
+  cornersClear: boolean,
+): Bounds[] => {
   if (obstacles.length !== 2) {
     return obstacles;
   }
@@ -706,10 +747,12 @@ const shareGaps = (obstacles: Bounds[], gaps: number[]): Bounds[] => {
       clamp((BASE_PADDING - apart) / (BASE_PADDING / 2), 0, 1) *
       Math.max(
         meet(overlap - firstGap - secondGap),
-        Math.min(
-          meetDiagonally(acrossOverlap),
-          corner * meetDiagonally(overlap - firstGap - secondGap),
-        ),
+        !cornersClear
+          ? 0
+          : Math.min(
+              meetDiagonally(acrossOverlap),
+              corner * meetDiagonally(overlap - firstGap - secondGap),
+            ),
       );
     // halfway between the elements' sides (or across where they overlap a
     // little, which a route between them has to cross anyway)
@@ -727,6 +770,7 @@ const findRoute = (
   elementObstacles: Bounds[],
   gaps: number[],
   elementsOverlap = false,
+  cornersClear = false,
 ): GlobalPoint[] => {
   // Where the elements themselves overlap, they're one obstacle, the bounds
   // around both, which the route leaves from and enters as it would a single
@@ -755,12 +799,26 @@ const findRoute = (
       [Math.max(...gaps)],
     );
   }
-  const obstacles = shareGaps(elementObstacles, gaps);
-  // Otherwise, with an endpoint within the padding around the element the
+  const obstacles = shareGaps(elementObstacles, gaps, cornersClear);
+  // Otherwise, with the legs heading straight at each other, the endpoints
+  // closer along them than both legs are long, the legs have to pass each
+  // other, and with an endpoint within the padding around the element the
   // other end is bound to, there's no room for the route to keep its padding
   // around both (and going around them gets more and more contrived as they
-  // get closer), so the elements overlap, and aren't avoided at all
+  // get closer): the elements overlap, and aren't avoided at all, and the
+  // route loops back past them halfway between the endpoints. (Only then:
+  // anywhere else, the route turning between them and the one ignoring them
+  // turn on different lines, so switching from one to the other as the
+  // elements move would make the route jump. A leg heading at the other
+  // element too close to it runs into it instead, see `strip`.)
+  const facing =
+    compareHeading(start.heading, flipHeading(end.heading)) &&
+    (headingIsHorizontal(start.heading)
+      ? (end.point[0] - start.point[0]) * start.heading[0]
+      : (end.point[1] - start.point[1]) * start.heading[1]) <
+      start.minLeg + end.minLeg;
   const overlapping =
+    facing &&
     start.obstacle !== null &&
     end.obstacle !== null &&
     start.obstacle !== end.obstacle &&
@@ -771,11 +829,15 @@ const findRoute = (
           signedDistance(point[0], point[1], bounds) < BASE_PADDING,
       ),
     );
-  // Otherwise, an (unbound) endpoint inside an element has to leave it
-  // anyway, so the element is an obstacle the less, the deeper the endpoint
-  // is in it (and not at all a padding deep), rather than every way out of it
-  // being about as expensive
-  const weights = obstacles.map((obstacle, i) =>
+  // Otherwise, an endpoint inside another element (unbound, or bound to an
+  // element next to it, which it doesn't overlap, only its bounds) has to
+  // leave it anyway, so the element is an obstacle the less, the deeper the
+  // endpoint is in it (and not at all a padding deep), rather than every way
+  // out of it being about as expensive. (How deep in its bounds, rather than
+  // in what's left of them where they're cut back between the elements, see
+  // shareGaps, which only makes a way between them, and doesn't make it any
+  // easier to leave.)
+  const weights = elementObstacles.map((obstacle, i) =>
     overlapping
       ? 0
       : Math.min(
@@ -793,17 +855,79 @@ const findRoute = (
   );
   const [from, to] = [start, end].map((endpoint) => ({
     ...endpoint,
-    padding: legPadding(endpoint, obstacles, start.minLeg + end.minLeg),
+    padding: legPadding(endpoint, obstacles, start.minLeg + end.minLeg, facing),
   }));
   const grid = buildGrid(from, to, obstacles, overlapping);
-  let path = cheapestPath(grid, from, to, obstacles, weights, overlapping);
+  // A leg heading straight at the other element, closer than it's long,
+  // leaves the route no way past its near side but through it: the route is
+  // free to run in it as deep as the leg is short of room (fading out as the
+  // leg passes it by), so the segment after the leg runs along just inside
+  // it, as far as it has to, rather than zigzagging around it, and the leg
+  // stays as long as it needs to be as the elements get closer, rather than
+  // the route switching to another shape. (As long as it needs to be, or as
+  // its padding, where that's longer, as where it starts inside the other
+  // one's bounds already: the route is no better for the leg turning any
+  // sooner, only a little less deep in them. Measured from the endpoint, as
+  // the leg is, with a little to spare, so the segment after a leg just as
+  // long as that isn't counted as running through it.)
+  const strip = obstacles.map((_, i) =>
+    Math.max(
+      0,
+      ...[from, to].map((endpoint) => {
+        if (
+          endpoint.obstacle === null ||
+          endpoint.obstacle === i ||
+          obstacles.length !== 2
+        ) {
+          return 0;
+        }
+        const { aheadOfPoint } = legSurroundings(
+          endpoint,
+          obstacles[endpoint.obstacle],
+          obstacles[i],
+        );
+        // (beside its bounds, rather than what's left of them where they're
+        // cut back between the elements, see weights)
+        const { beside } = legSurroundings(
+          endpoint,
+          elementObstacles[endpoint.obstacle],
+          elementObstacles[i],
+        );
+        return (
+          Math.max(
+            0,
+            Math.max(endpoint.minLeg, endpoint.padding) +
+              CROSSING_RAMP / 2 -
+              aheadOfPoint,
+          ) * clamp(1 - beside / STRIP_RAMP, 0, 1)
+        );
+      }),
+    ),
+  );
+  let path = cheapestPath(
+    grid,
+    from,
+    to,
+    obstacles,
+    weights,
+    overlapping,
+    strip,
+  );
   // (searching for the cheapest route with what it costs to cross itself
   // takes much longer, and only makes a difference where the cheapest one
   // without it crosses itself)
   if (path && crossesItself(getCornerPoints(path))) {
     path =
-      cheapestPath(grid, from, to, obstacles, weights, overlapping, true) ??
-      path;
+      cheapestPath(
+        grid,
+        from,
+        to,
+        obstacles,
+        weights,
+        overlapping,
+        strip,
+        true,
+      ) ?? path;
   }
   if (!path || path.length < 2) {
     return [start.point, end.point];
@@ -817,16 +941,24 @@ const findRoute = (
 // -----------------------------------------------------------------------------
 
 type LineKind = keyof typeof LINE_COSTS;
-type Line = { at: number; kind: LineKind; exact: boolean };
+type Line = {
+  at: number;
+  kind: LineKind;
+  exact: boolean;
+  /**
+   * Through the endpoints, where their legs would end, or halfway between
+   * them (see {@link cheapestPath})
+   */
+  fromEndpoints?: boolean;
+};
 
 /**
  * The grid the route runs on: the lines through the endpoints, the lines a
  * padding (and the shortest leg) away from them along their headings, the
- * edges of the padding
- * around each element, and the lines halfway between the ends (their elements,
- * or the points themselves if unbound). All of
- * them are there whatever the elements' arrangement (and move with the
- * elements), so a route never loses the line it runs on.
+ * edges of the padding around each element, and the lines halfway between the
+ * ends (their elements, and the points themselves). All of them are there
+ * whatever the elements' arrangement (and move with the elements), so a
+ * route never loses the line it runs on.
  */
 type Grid = {
   xs: Line[];
@@ -842,16 +974,38 @@ const buildGrid = (
   const xs: Line[] = [];
   const ys: Line[] = [];
 
-  for (const { point, heading, minLeg } of [start, end]) {
-    xs.push({ at: point[0], kind: "preferred", exact: true });
-    ys.push({ at: point[1], kind: "preferred", exact: true });
-    // where the leg would be a padding long, or as short as it can be
+  for (const { point, heading, minLeg, padding } of [start, end]) {
+    xs.push({
+      at: point[0],
+      kind: "preferred",
+      exact: true,
+      fromEndpoints: true,
+    });
+    ys.push({
+      at: point[1],
+      kind: "preferred",
+      exact: true,
+      fromEndpoints: true,
+    });
+    // where the leg would be a padding long, or as short as it can be, or as
+    // long as the padding it gets (see legPadding), so it shortens along with
+    // that, rather than jumping from one of the others to the other (and is
+    // that long rather than any other where it costs the same)
     const axis = headingIsHorizontal(heading) ? 0 : 1;
     for (const length of [BASE_PADDING, minLeg]) {
       (axis === 0 ? xs : ys).push({
         at: point[axis] + heading[axis] * length,
         kind: "step",
         exact: false,
+        fromEndpoints: true,
+      });
+    }
+    if (padding < BASE_PADDING) {
+      (axis === 0 ? xs : ys).push({
+        at: point[axis] + heading[axis] * Math.max(minLeg, padding),
+        kind: "preferred",
+        exact: false,
+        fromEndpoints: true,
       });
     }
   }
@@ -910,6 +1064,32 @@ const buildGrid = (
       );
     }
   }
+  // and halfway between the points themselves, between elements, wherever
+  // they are (rather than only where they don't avoid them), for a route
+  // turning back between endpoints right by each other
+  if (
+    !overlapping &&
+    start.obstacle !== null &&
+    end.obstacle !== null &&
+    start.obstacle !== end.obstacle
+  ) {
+    for (const [lines, axis] of [
+      [xs, 0],
+      [ys, 1],
+    ] as const) {
+      if (
+        Math.abs(end.point[axis] - start.point[axis]) >=
+        2 * ELBOW_ARROW_CORNER_RADIUS
+      ) {
+        lines.push({
+          at: (start.point[axis] + end.point[axis]) / 2,
+          kind: "step",
+          exact: false,
+          fromEndpoints: true,
+        });
+      }
+    }
+  }
 
   return { xs: mergeLines(xs), ys: mergeLines(ys) };
 };
@@ -925,7 +1105,15 @@ const mergeLines = (lines: Line[]): Line[] => {
     (line.exact ? 0 : 10) + Object.keys(LINE_COSTS).indexOf(line.kind);
   const sorted = [...lines].sort((a, b) => a.at - b.at || rank(a) - rank(b));
 
-  return sorted.filter((line, i) => i === 0 || line.at !== sorted[i - 1].at);
+  // (one from the endpoints still is, merged with another)
+  return sorted
+    .filter((line, i) => i === 0 || line.at !== sorted[i - 1].at)
+    .map((line) =>
+      !line.fromEndpoints &&
+      sorted.some((other) => other.at === line.at && other.fromEndpoints)
+        ? { ...line, fromEndpoints: true }
+        : line,
+    );
 };
 
 // -----------------------------------------------------------------------------
@@ -1211,6 +1399,7 @@ const cheapestPath = (
   obstacles: Bounds[],
   weights: readonly number[],
   overlapping: boolean,
+  strip: readonly number[],
   avoidSelfCrossing = false,
 ): GlobalPoint[] | null => {
   // (see minHairpin)
@@ -1303,9 +1492,15 @@ const cheapestPath = (
     obstacles.map((obstacle) =>
       Math.max(0, -signedDistance(point[0], point[1], obstacle)),
     );
-  const noAllowance = obstacles.map(() => 0);
-  const startAllowance = depthIn(start.point);
-  const endAllowance = depthIn(end.point);
+  // (and every segment as far into the other element as a leg heading at it
+  // is short of room, see findRoute)
+  const noAllowance = strip;
+  const startAllowance = depthIn(start.point).map((depth, i) =>
+    Math.max(depth, strip[i]),
+  );
+  const endAllowance = depthIn(end.point).map((depth, i) =>
+    Math.max(depth, strip[i]),
+  );
   const edgeCosts = new Map<number, number>();
   const edgeCost = (from: number, to: number, direction: number) => {
     const a = pos(from);
@@ -1474,8 +1669,9 @@ const cheapestPath = (
           );
         }
         // turning back, too close to where it came from (only too close to
-        // round its corners at all, if only stepping from one endpoint's
-        // line to the other's, as the endpoints may need it to)
+        // round its corners at all, if only stepping between lines of the
+        // endpoints, through them, their legs' or halfway between them, as
+        // the endpoints may need it to)
         if (nextTurn === lastTurn) {
           const [from, to] =
             arrivedIn % 2 === 0
@@ -1483,7 +1679,7 @@ const cheapestPath = (
               : [xs[segmentStart], xs[node % cols]];
           nextCost += hairpinCost(
             Math.abs(to.at - from.at),
-            betweenElements && !(from.exact && to.exact),
+            betweenElements && !(from.fromEndpoints && to.fromEndpoints),
           );
         }
         // (and onto the line the next segment runs on)

@@ -1135,6 +1135,120 @@ describe("elbow arrow routing between overlapping elements", () => {
       end,
     ]);
   });
+  it("keeps a leg's padding as it's dragged inside the other one's bounds", () => {
+    // diamonds diagonal from each other, not overlapping, with the start on
+    // the top of the lower one, inside the bounds of the upper one, and the
+    // end on the right of the upper one, the lower one dragged sideways in
+    // half px steps
+    const upper = API.createElement({
+      type: "diamond",
+      x: 2158.24,
+      y: -869.92,
+      width: 226.95,
+      height: 248.6,
+    });
+    const routes = Array.from({ length: 61 }, (_, step) => {
+      const lower = API.createElement({
+        type: "diamond",
+        x: 2072.06 + (step - 30) / 2,
+        y: -665.19,
+        width: 226.95,
+        height: 248.6,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: lower.id,
+          fixedPoint: [0.5023, 0.0073],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: upper.id,
+          fixedPoint: [0.995, 0.5028],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+      const update = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+      );
+      return update.points!.map(
+        ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+      );
+    });
+
+    // up about a padding all along (the route has to leave the upper one's
+    // bounds anyway), never cut short, and never jumping
+    routes.forEach((points, step) => {
+      expect(points).toHaveLength(5);
+      expect(points[0][1] - points[1][1]).toBeGreaterThan(30);
+      if (step > 0) {
+        points.forEach(([px, py], i) => {
+          const [qx, qy] = routes[step - 1][i];
+          expect(Math.abs(px - qx) + Math.abs(py - qy)).toBeLessThanOrEqual(
+            2.5,
+          );
+        });
+      }
+    });
+  });
+
+  it("gives a leg its padding where it starts inside the other one's bounds", () => {
+    // diamonds diagonal from each other, not overlapping, with the start on
+    // the top of the lower one, inside the bounds of the upper one, and the
+    // end on the right of the upper one
+    const lower = API.createElement({
+      type: "diamond",
+      x: 2074.24,
+      y: -673.58,
+      width: 226.95,
+      height: 248.6,
+    });
+    const upper = API.createElement({
+      type: "diamond",
+      x: 2158.24,
+      y: -869.92,
+      width: 226.95,
+      height: 248.6,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: lower.id,
+        fixedPoint: [0.5023, 0.0073],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: upper.id,
+        fixedPoint: [0.995, 0.5028],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+
+    // up a padding (the route has to leave the upper one's bounds anyway,
+    // so cutting the leg short to stay a little less deep in them doesn't
+    // make it any better), right past the upper one, and up and left into
+    // the end
+    expect(points).toHaveLength(5);
+    expect(points![1][0]).toBeCloseTo(points![0][0]);
+    expect(points![0][1] - points![1][1]).toBeCloseTo(40, 0);
+    expect(points![2][0]).toBeGreaterThan(points![4][0]);
+  });
 });
 
 describe("elbow arrow clearance", () => {
@@ -2070,4 +2184,89 @@ describe("elbow arrow routing between elements on top of each other", () => {
       expect(turnsBackTightly(routeWithStartAt(0, step / 2))).toBe(false);
     }
   });
+});
+
+describe("elbow arrow legs as the elements get closer", () => {
+  const sides = {
+    right: [1.0267, 0.5001],
+    left: [-0.0267, 0.5001],
+    top: [0.5001, -0.0267],
+    bottom: [0.5001, 1.0267],
+  } as Record<string, FixedPoint>;
+
+  it.each([
+    ["right", "top", "right"],
+    ["top", "left", "right"],
+    ["right", "top", "below"],
+    ["bottom", "left", "below"],
+  ])(
+    "shortens the legs along with the room, without jumping (from the %s to the %s of one %s)",
+    (from, to, where) => {
+      const start = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 224.54,
+        height: 112,
+      });
+      const end = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: start.id,
+          fixedPoint: sides[from],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: end.id,
+          fixedPoint: sides[to],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      // in 1px steps, from far apart until the elements are 2px apart
+      const routes = Array.from({ length: 200 }, (_, step) => {
+        const apart = 200 - step;
+        const update = updateElbowArrowRoute(
+          arrow,
+          arrayToMap([
+            start,
+            where === "right"
+              ? { ...end, x: start.width + apart }
+              : { ...end, y: start.height + apart },
+          ]) as NonDeletedSceneElementsMap,
+        );
+        return update.points!.map(
+          ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+        );
+      });
+
+      // the same route all along, moving along with the element being
+      // dragged (or, here and there, a px more, where it settles on another
+      // line next to the one it was on), the legs shortening as there's less
+      // room for them, never jumping
+      routes.forEach((points, step) => {
+        expect(points).toHaveLength(routes[0].length);
+        if (step > 0) {
+          points.forEach(([px, py], i) => {
+            const [qx, qy] = routes[step - 1][i];
+            expect(Math.abs(px - qx) + Math.abs(py - qy)).toBeLessThanOrEqual(
+              2.5,
+            );
+          });
+        }
+      });
+    },
+  );
 });
