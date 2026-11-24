@@ -588,7 +588,8 @@
     "fileSavedToFilename": "ගොනුව ගොනු නාමයට සුරැකිණි",
     "canvas": "කැන්වස ටෝස්ට්",
     "selection": "තේරීම ටෝස්ට්",
-    "pasteAsSingleElement": "තනි අංගයක් ලෙස ඇලවීම",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "බිහිදැමීමට නොහැක",
     "unrecognizedLinkFormat": "නොහඳුනන සබැඳි ආකෘතිය",
     "elementLinkCopied": ""
