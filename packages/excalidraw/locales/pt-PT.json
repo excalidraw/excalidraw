@@ -588,7 +588,8 @@
     "fileSavedToFilename": "Guardado como {filename}",
     "canvas": "área de desenho",
     "selection": "seleção",
-    "pasteAsSingleElement": "Usar {{shortcut}} para colar como um único elemento,\nou colar num editor de texto existente",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
     "unableToEmbed": "A incorporação deste URL não é atualmente permitida. Reporte o problema no GitHub para solicitar a inclusão do URL na lista branca para deixar de o bloquear",
     "unrecognizedLinkFormat": "A ligação que incorporou não corresponde ao formato esperado. Tente colar a cadeia de caracteres 'incorporada' fornecida pelo sítio de origem",
     "elementLinkCopied": "Hiperligação copiada para a área de transferência"
