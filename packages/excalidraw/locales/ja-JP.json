@@ -3,6 +3,8 @@
     "signUp": "新規登録",
     "signIn": "ログイン",
     "upgrade": "アップグレード",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "貼り付け",
     "pasteAsPlaintext": "書式なしテキストとして貼り付け",
     "pasteCharts": "チャートの貼り付け",
@@ -786,16 +788,5 @@
     "spacebar": "スペース",
     "delete": "Delete",
     "mmb": "スクロールホイール"
-  },
-  "promoBanner": {
-    "presentations": "プレゼン",
-    "mcp": "AIで作図",
-    "comments": "コメント",
-    "teams": "チーム作業",
-    "voiceChat": "音声通話",
-    "withExcalidrawPlus": "Excalidraw+で",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "人間とAI向け"
   }
 }
