@@ -480,8 +480,7 @@ export class AppClipboard {
     const isPhone = this.app.editorInterface.formFactor === "phone";
     // as last chosen from the toast after a paste (kept by the host, with
     // the app state it stores)
-    const asLines =
-      !isPlainPaste && !isPhone && this.app.state.splitPastedTextEnabled;
+    const asLines = !isPlainPaste && !isPhone && this.app.state.splitOnPaste;
     /** the text as one element, as laid out last: what its lines are of */
     let singleTextElement: ExcalidrawTextElement | null = null;
     // one element, centered at the pointer — or, as chosen from the toast
@@ -649,7 +648,7 @@ export class AppClipboard {
         t("toast.pastedAsTextElements"),
         t("toast.pasteAsSingleText"),
         () => {
-          this.app.setState({ splitPastedTextEnabled: false });
+          this.app.setState({ splitOnPaste: false });
           this.replaceTextLines(lineIds, single);
         },
       );
@@ -659,7 +658,7 @@ export class AppClipboard {
         t("toast.pastedAsSingleText"),
         t("toast.splitIntoTextElements"),
         () => {
-          this.app.setState({ splitPastedTextEnabled: true });
+          this.app.setState({ splitOnPaste: true });
           this.splitTextIntoLines(id);
         },
       );

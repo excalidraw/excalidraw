@@ -380,7 +380,7 @@ describe("paste multiline text", () => {
   });
 
   it("should center the lines a text's pasted split into at the pointer, whatever blank lines it has", async () => {
-    API.setAppState({ splitPastedTextEnabled: true });
+    API.setAppState({ splitOnPaste: true });
     h.app.viewport.lastPosition.x = 300;
     h.app.viewport.lastPosition.y = 300;
     pasteWithCtrlCmdV(`first${"\n".repeat(50)}second`);
@@ -403,7 +403,7 @@ describe("paste multiline text", () => {
     );
     fireEvent.resize(window);
     await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
-    API.setAppState({ splitPastedTextEnabled: true });
+    API.setAppState({ splitOnPaste: true });
     pasteWithCtrlCmdV("a\nb");
     await waitFor(() => {
       expect(h.elements.length).toBe(1);
@@ -425,13 +425,13 @@ describe("paste multiline text", () => {
 
     // kept in the app state, for the host to store: as an editor mounted
     // after gets it
-    expect(h.state.splitPastedTextEnabled).toBe(true);
+    expect(h.state.splitOnPaste).toBe(true);
     unmountComponent();
     await render(
       <Excalidraw
         autoFocus={true}
         handleKeyboardGlobally={true}
-        initialData={{ appState: { splitPastedTextEnabled: true } }}
+        initialData={{ appState: { splitOnPaste: true } }}
       />,
     );
     API.setAppState({
@@ -480,7 +480,7 @@ describe("paste multiline text", () => {
     );
 
     // pasted as one again
-    expect(h.state.splitPastedTextEnabled).toBe(false);
+    expect(h.state.splitOnPaste).toBe(false);
     pasteWithCtrlCmdV(text);
     expect((await getToastAction()).textContent).toBe(
       "Split into separate text elements",

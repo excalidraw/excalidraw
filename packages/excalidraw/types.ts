@@ -377,7 +377,7 @@ export interface AppState {
    * user preference whether multiline text is pasted split into a text
    * element per line (set from the toast shown after such a paste)
    */
-  splitPastedTextEnabled: boolean;
+  splitOnPaste: boolean;
   /**
    * user preference for what the wheel does: with a `trackpad` a plain wheel
    * pans; with a `mouse` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is
