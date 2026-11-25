@@ -592,6 +592,8 @@
     "selection": "Auswahl",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
     "unrecognizedLinkFormat": "Der eingebettete Link stimmt nicht mit dem erwarteten Format überein. Bitte versuche, den Einbettungs-Code der Quellseite einzufügen",
     "elementLinkCopied": "Link in Zwischenablage kopiert"
