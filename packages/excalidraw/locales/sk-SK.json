@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
@@ -786,16 +788,5 @@
     "spacebar": "Medzerník",
     "delete": "Delete",
     "mmb": "Rolovacie koliesko"
-  },
-  "promoBanner": {
-    "presentations": "Prezentácie",
-    "mcp": "Kreslite s AI",
-    "comments": "Komentáre",
-    "teams": "Tímová práca",
-    "voiceChat": "Hlasový chat",
-    "withExcalidrawPlus": "v Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pre ľudí aj AI"
   }
 }
