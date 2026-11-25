@@ -3,6 +3,8 @@
     "signUp": "Tilmeld dig",
     "signIn": "Log ind",
     "upgrade": "Opgrader",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Indsæt",
     "pasteAsPlaintext": "Indsæt som ren tekst",
     "pasteCharts": "Indsæt diagrammer",
@@ -786,16 +788,5 @@
     "spacebar": "Mellemrum",
     "delete": "Delete",
     "mmb": "Rullehjul"
-  },
-  "promoBanner": {
-    "presentations": "Præsentationer",
-    "mcp": "Tegn med AI",
-    "comments": "Skriv kommentarer",
-    "teams": "Arbejd i et team",
-    "voiceChat": "Talechat",
-    "withExcalidrawPlus": "med Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "til mennesker og AI"
   }
 }
