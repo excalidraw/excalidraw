@@ -592,6 +592,8 @@
     "selection": "výběr",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Vložení této URL adresy momentálně není povoleno. O přidání URL adresy na seznam povolených můžete požádat na GitHubu",
     "unrecognizedLinkFormat": "Vložený odkaz neodpovídá očekávanému formátu. Zkuste prosím vložit řetězec 'embed' poskytnutý zdrojovým webem",
     "elementLinkCopied": "Odkaz zkopírován do schránky"
