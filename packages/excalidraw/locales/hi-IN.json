@@ -592,6 +592,8 @@
     "selection": "चयन",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "यह यू-आर-एल जड़ने हेतु अस्वीकृत हैं. इस यू-आर-एल को श्वेतसूची मैं सम्मिलित कराने हेतु ग़िटहब पर मुद्दा उठायें",
     "unrecognizedLinkFormat": "जो कड़ी आपने जड़ी हैं, वह अनपेक्षित प्रारूप में हैं. कृपया मूल साइट द्वारा मुहैय्या कराया हुवा 'जड़ने हेतु' पाठ चिपकाने का प्रयास करें.",
     "elementLinkCopied": "कड़ी क्लिप बोर्ड पर कॉपी की गयी"
