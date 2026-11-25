@@ -15,7 +15,10 @@ import {
 } from "@excalidraw/element";
 
 import type { FontFamily } from "@excalidraw/common";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { Fonts } from "../fonts";
 
@@ -33,19 +36,36 @@ type AppFontsDependencies = {
 
 /**
  * Narrow the host-facing `FontProviders` down to what the font layer needs,
- * keeping it free of UI concerns. Bound, as a provider may legitimately be a
- * class instance resolving against its own `this`.
+ * keeping it free of UI concerns.
+ *
+ * Each resolver looks its provider up when called, rather than holding on to
+ * the callback it was built with: new callbacks under the same keys don't
+ * rebuild the `Fonts` instance (see `onPropsUpdated`), and a host's `resolve`
+ * may close over what its render had (i.e. a refreshed auth token). Called on
+ * the provider, as it may legitimately be a class instance resolving against
+ * its own `this`.
  */
 const toFontResolvers = (
-  fontProviders: FontProviders | undefined,
-): FontResolvers | undefined =>
-  fontProviders &&
-  Object.fromEntries(
-    Object.entries(fontProviders).map(([id, provider]) => [
-      id,
-      provider.resolve.bind(provider),
-    ]),
+  getFontProviders: () => FontProviders | undefined,
+): FontResolvers | undefined => {
+  const fontProviders = getFontProviders();
+
+  return (
+    fontProviders &&
+    Object.fromEntries(
+      Object.keys(fontProviders).map((id) => [
+        id,
+        async (familyName: string) => {
+          const latestFontProviders = getFontProviders();
+          if (!latestFontProviders || !Object.hasOwn(latestFontProviders, id)) {
+            throw new Error(`Font provider "${id}" is no longer available`);
+          }
+          return latestFontProviders[id].resolve(familyName);
+        },
+      ]),
+    )
   );
+};
 
 /**
  * Owns the App-bound font workflows: the lifecycle of the editor's `Fonts`
@@ -89,24 +109,30 @@ export class AppFonts {
   private createFonts = () =>
     new Fonts(
       this.app.scene,
-      toFontResolvers(this.app.props.fontProviders),
+      toFontResolvers(() => this.app.props.fontProviders),
       undefined,
       {
         onBeforeSceneMutation: this.dependencies.onBeforeSceneMutation,
-        // a reflow must wait out any in-flight gesture: `NEVER` wins the commit
-        // over the gesture's `EVENTUALLY`, corrupting its undo entry (flushed
-        // by `onStateUpdated` once the gesture ends)
+        // a reflow must wait out any in-flight gesture or text edit: `NEVER`
+        // wins the commit over the gesture's `EVENTUALLY`, corrupting its undo
+        // entry (flushed by `onStateUpdated` once it ends)
         shouldDeferSceneMutation: () => this.isGestureInFlight(this.app.state),
         ownerDocument: this.app.ownerDocument,
         getRenderEnvironment: () => this.app.renderEnvironment,
       },
     );
 
+  /**
+   * Whether the scene holds changes which are yet to be captured: a pointer
+   * gesture, or a text edit - typing writes to the element right away, while
+   * the edit is captured only once submitted.
+   */
   private isGestureInFlight = (state: AppState) =>
     state.selectedElementsAreBeingDragged ||
     state.isResizing ||
     state.isRotating ||
-    state.cursorButton === "down";
+    state.cursorButton === "down" ||
+    !!state.editingTextElement;
 
   /**
    * Whether text in the family should stay undrawn for now, rather than be
@@ -198,7 +224,8 @@ export class AppFonts {
 
     // per the `FontProviders` contract a key always denotes the same font
     // source, so only the key set matters - which also keeps an inline
-    // `fontProviders` object from churning the instance every render
+    // `fontProviders` object from churning the instance every render (its
+    // resolvers call whichever callbacks the props hold by then)
     const prevProviders = prevProps.fontProviders ?? {};
     const nextProviders = this.app.props.fontProviders ?? {};
     const addedKeys = Object.keys(nextProviders).filter(
@@ -212,7 +239,7 @@ export class AppFonts {
       return;
     }
 
-    // resolvers are captured by the instance, so swap the whole instance -
+    // the key set is captured by the instance, so swap the whole instance -
     // the page-global registry & failure set are unaffected
     this.instance = this.createFonts();
 
@@ -325,27 +352,55 @@ export class AppFonts {
   };
 
   /**
-   * Whether text in the family, measured right now, comes out in the fallback
-   * font's geometry: a custom family whose metrics or glyphs aren't in yet.
+   * Why the text, measured right now, comes out in the fallback font's
+   * geometry, if it does: nothing of its custom `family` is in yet (neither
+   * its metrics nor a face), or only the `glyphs` this text needs aren't - a
+   * family arrives one face at a time, i.e. per `unicode-range` subset.
    */
-  private isFontPending = (family: FontFamily) =>
-    isCustomFontFamily(family) &&
-    !(isFontMetadataAvailable(family) && this.instance.isFamilyLoaded(family));
+  private getPendingFont = (
+    element: ExcalidrawTextElement,
+  ): "family" | "glyphs" | null => {
+    const family = element.fontFamily;
+    if (!isCustomFontFamily(family)) {
+      return null;
+    }
+    if (
+      !isFontMetadataAvailable(family) ||
+      !this.instance.isFamilyLoaded(family)
+    ) {
+      return "family";
+    }
+    return this.instance.isTextLoaded(element) ? null : "glyphs";
+  };
 
   /**
-   * For text this session has just measured (created, pasted as text,
-   * switched to a family) while its custom font was still on its way: once
-   * the font is in, converge the line height on the family's and measure
-   * again.
+   * For text this session has just measured (created, edited, pasted as
+   * text, switched to a family) while its custom font was still on its way:
+   * once the font is in, measure again - and converge the line height on the
+   * family's, where the text got its line height before the family was in
+   * (so not for `keepLineHeight`: text which had one already).
    *
    * This is the only way a font load changes an element - text which was in
    * the document already is never rewritten (see `Fonts.onLoaded`).
    */
-  public repairTextOnFontLoad = (elements: readonly ExcalidrawElement[]) => {
-    const pending = new Map<ExcalidrawElement["id"], FontFamily>();
+  public repairTextOnFontLoad = (
+    elements: readonly ExcalidrawElement[],
+    { keepLineHeight = false }: { keepLineHeight?: boolean } = {},
+  ) => {
+    const pending = new Map<
+      ExcalidrawElement["id"],
+      { fontFamily: FontFamily; shouldReconcileLineHeight: boolean }
+    >();
     for (const element of elements) {
-      if (isTextElement(element) && this.isFontPending(element.fontFamily)) {
-        pending.set(element.id, element.fontFamily);
+      const pendingFont = isTextElement(element)
+        ? this.getPendingFont(element)
+        : null;
+      if (pendingFont) {
+        pending.set(element.id, {
+          fontFamily: (element as ExcalidrawTextElement).fontFamily,
+          shouldReconcileLineHeight:
+            !keepLineHeight && pendingFont === "family",
+        });
       }
     }
 
@@ -367,7 +422,10 @@ export class AppFonts {
 
       fonts.runSceneRepair(() => {
         const elementsMap = this.app.scene.getNonDeletedElementsMap();
-        for (const [elementId, fontFamily] of pending) {
+        for (const [
+          elementId,
+          { fontFamily, shouldReconcileLineHeight },
+        ] of pending) {
           // re-fetched - the repair may run late, after further edits
           const latestElement = elementsMap.get(elementId);
           if (
@@ -378,7 +436,9 @@ export class AppFonts {
             continue;
           }
 
-          const lineHeight = reconcileLineHeight(latestElement);
+          const lineHeight = shouldReconcileLineHeight
+            ? reconcileLineHeight(latestElement)
+            : null;
           if (lineHeight !== null) {
             this.app.scene.mutateElement(latestElement, { lineHeight });
           }
@@ -542,7 +602,7 @@ export class AppFonts {
     // not reach back into the store
     this.instance = new Fonts(
       this.app.scene,
-      toFontResolvers(this.app.props.fontProviders),
+      toFontResolvers(() => this.app.props.fontProviders),
       undefined,
       { ownerDocument: this.app.ownerDocument },
     );

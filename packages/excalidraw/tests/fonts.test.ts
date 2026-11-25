@@ -829,6 +829,29 @@ describe("Fonts.isFamilyLoaded", () => {
   });
 });
 
+describe("Fonts.retryFailedFontFaces", () => {
+  it("swaps a face whose file failed to download once its family is asked for again", async () => {
+    const family = uniqueFamily();
+    Fonts.registerCustomFont(family, METADATA, FONT_FACES[0], {
+      uri: "https://example.com/font-ext.woff2",
+    });
+    const [failed, fine] = Fonts.registered.get(family)!.fontFaces;
+    // the browser never fetches it again
+    Object.assign(failed.fontFace, { status: "error" });
+
+    const result = await new Fonts(new Scene()).registerCustomFamily(family);
+
+    const [retried, kept] = Fonts.registered.get(family)!.fontFaces;
+    expect(result.status).toBe("success");
+    expect(retried.fontFace).not.toBe(failed.fontFace);
+    expect(retried.fontFace.status).toBe("unloaded");
+    expect(retried.urls).toEqual(failed.urls);
+    expect(kept).toBe(fine);
+    // or loading the family would keep rejecting over it
+    expect(document.fonts.delete).toHaveBeenCalledWith(failed.fontFace);
+  });
+});
+
 describe("AppFonts.isFontBlocked", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -1059,6 +1082,24 @@ describe("ExcalidrawFontFace.toCSS", () => {
     expect(css).toContain("unicode-range: U+0000-00FF;");
   });
 
+  it.each([
+    ["a lowercase range", "u+0400-04ff"],
+    ["a wildcard range", "U+4??"],
+  ])("includes a face whose unicode range is %s", async (_, unicodeRange) => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const fontFace = new ExcalidrawFontFace(
+      "test.test:Ranges",
+      "https://example.com/font.woff2",
+      { unicodeRange },
+    );
+
+    expect(await fontFace.toCSS("Ж")).toContain(
+      `unicode-range: ${unicodeRange};`,
+    );
+    // ...while a face the text doesn't need is still left out
+    expect(fontFace.toCSS("1")).toBe(undefined);
+  });
+
   it("emits no descriptors for a default-descriptor face", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const fontFace = new ExcalidrawFontFace(
@@ -1175,6 +1216,44 @@ describe("AppFonts lifecycle", () => {
     appFonts.onMount();
     appFonts.instance.runSceneRepair(() => {});
     expect(onBeforeSceneMutation).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("AppFonts resolvers", () => {
+  it("resolve through the provider callbacks the props hold by then", async () => {
+    const provider = (resolve: FontResolver) => ({
+      "test.test": { icon: null, availableFonts: [], resolve },
+    });
+    const staleResolve = vi.fn<FontResolver>(async () => {
+      throw new Error("expired");
+    });
+    const app = {
+      scene: new Scene(),
+      props: { fontProviders: provider(staleResolve) },
+      state: {},
+      ownerDocument: document,
+      renderEnvironment: undefined,
+    };
+    const appFonts = new AppFonts(app as unknown as App, {
+      onBeforeSceneMutation: () => {},
+    });
+
+    // same key, new callbacks (i.e. an inline `fontProviders` object) - the
+    // `Fonts` instance stays, see `AppFonts.onPropsUpdated`
+    app.props = {
+      fontProviders: provider(async () => ({
+        fontFaces: FONT_FACES,
+        metadata: METADATA,
+      })),
+    };
+
+    const result = await appFonts.instance.registerCustomFamily(
+      uniqueFamily(),
+      { recordFailure: false },
+    );
+
+    expect(result.status).toBe("success");
+    expect(staleResolve).not.toHaveBeenCalled();
   });
 });
 
@@ -1299,6 +1378,34 @@ describe("AppFonts.repairTextOnFontLoad", () => {
     appFonts.repairTextOnFontLoad([getText(scene, element)]);
 
     expect(loadElementsFonts).not.toHaveBeenCalled();
+    expect(getText(scene, element).lineHeight).toBe(deliberate);
+  });
+
+  it("measures again once the glyphs of a loaded family are in, keeping the line height", async () => {
+    const { scene, appFonts } = createAppFonts();
+    const family = uniqueFamily();
+    Fonts.registerCustomFont(family, METADATA, FONT_FACES[0]);
+    appFonts.instance.onLoaded([
+      Fonts.registered.get(family)!.fontFaces[0].fontFace,
+    ]);
+
+    const deliberate = 2 as ExcalidrawTextElement["lineHeight"];
+    const element = createText(scene, family);
+    // i.e. as measured in the fallback font
+    const staleWidth = 999;
+    scene.mutateElement(getText(scene, element), {
+      lineHeight: deliberate,
+      width: staleWidth,
+    });
+
+    // the family is in, but not the face (i.e. `unicode-range` subset)
+    // holding this text's characters
+    vi.mocked(document.fonts.check).mockReturnValueOnce(false);
+    appFonts.repairTextOnFontLoad([getText(scene, element)]);
+
+    await vi.waitFor(() =>
+      expect(getText(scene, element).width).not.toBe(staleWidth),
+    );
     expect(getText(scene, element).lineHeight).toBe(deliberate);
   });
 

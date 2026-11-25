@@ -23,6 +23,8 @@ export class ExcalidrawFontFace {
 
   private readonly descriptors?: FontFaceDescriptors;
 
+  private readonly uri: string;
+
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
     import.meta.env.PKG_NAME
       ? `${import.meta.env.PKG_NAME}@${import.meta.env.PKG_VERSION}` // is provided during package build
@@ -35,6 +37,7 @@ export class ExcalidrawFontFace {
     descriptors?: FontFaceDescriptors,
     cssFamily: string = family,
   ) {
+    this.uri = uri;
     this.urls = ExcalidrawFontFace.createUrls(uri);
     this.family = family;
     this.cssFamily = cssFamily;
@@ -52,6 +55,16 @@ export class ExcalidrawFontFace {
       weight: "400",
       ...descriptors,
     });
+  }
+
+  /** the same face again, with a `FontFace` which hasn't been loaded yet */
+  public clone(): ExcalidrawFontFace {
+    return new (this.constructor as typeof ExcalidrawFontFace)(
+      this.family,
+      this.uri,
+      this.descriptors,
+      this.cssFamily,
+    );
   }
 
   /**
@@ -169,18 +182,30 @@ export class ExcalidrawFontFace {
     // otherwise we would get an "Invalid Unicode escape" error
     // e.g. U+0-1007F -> \u{0}-\u{1007F}
     const unicodeRangeRegex = unicodeRange
-      .split(/,\s*/)
+      .split(",")
       .map((range) => {
-        const [start, end] = range.replace("U+", "").split("-");
-        if (end) {
-          return `\\u{${start}}-\\u{${end}}`;
+        // a descriptor is the host's own text, so every form CSS takes:
+        // `U+26`, `u+0025-00ff`, and the wildcard `U+4??` (= U+400-4FF)
+        const match = range
+          .trim()
+          .match(/^u\+([0-9a-f]*)(\?*)(?:-([0-9a-f]+))?$/i);
+        if (!match || !(match[1] + match[2])) {
+          return "";
         }
-
-        return `\\u{${start}}`;
+        const [, digits, wildcards, end] = match;
+        const first = `${digits}${"0".repeat(wildcards.length)}`;
+        const last = wildcards
+          ? `${digits}${"F".repeat(wildcards.length)}`
+          : end;
+        return last ? `\\u{${first}}-\\u{${last}}` : `\\u{${first}}`;
       })
       .join("");
 
-    return new RegExp(`[${unicodeRangeRegex}]`, "u");
+    // (an empty class would be a syntax error - nothing valid matches nothing)
+    return new RegExp(
+      unicodeRangeRegex ? `[${unicodeRangeRegex}]` : "(?!)",
+      "u",
+    );
   }
 
   private static createUrls(uri: string): URL[] | DataURL[] {

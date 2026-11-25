@@ -66,6 +66,7 @@ import {
 } from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { getTextEditor } from "./queries/dom";
 import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
   GlobalTestState,
@@ -202,6 +203,47 @@ describe("history", () => {
       // of its entry
       expect(h.elements[0].x).toBe(10);
       expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2);
+    });
+
+    it("keeps a font repair deferred during a text edit out of the edit's undo entry", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      UI.clickTool("text");
+      mouse.clickAt(100, 100);
+      const editor = await getTextEditor();
+      fireEvent.input(editor, { target: { value: "hello" } });
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.text).toBe("hello");
+
+      // its font settles while typing - the repair must defer, as typing
+      // isn't captured until submitted: a `CaptureUpdateAction.NEVER` commit
+      // would take what's been typed into the snapshot, out of undo's reach
+      act(() => {
+        h.app.fonts.instance.runSceneRepair(() => {
+          h.app.scene.mutateElement(
+            h.app.scene.getElement(text.id) as ExcalidrawTextElement,
+            { lineHeight: 2 as ExcalidrawTextElement["lineHeight"] },
+          );
+        });
+      });
+      // (and something commits meanwhile, i.e. the font load's rerender)
+      act(() => {
+        h.app.scene.triggerUpdate();
+      });
+      expect((h.elements[0] as ExcalidrawTextElement).lineHeight).not.toBe(2);
+
+      Keyboard.exitTextEditor(editor);
+
+      // the edit got captured, then the repair ran in its own
+      // non-capturable pass
+      await waitFor(() =>
+        expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2),
+      );
+      expect(API.getUndoStack().length).toBe(1);
+
+      Keyboard.undo();
+      expect(h.elements[0].isDeleted).toBe(true);
     });
 
     it("should not collapse when applying corrupted history entry", async () => {

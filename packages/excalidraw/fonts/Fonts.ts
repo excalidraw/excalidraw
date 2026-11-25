@@ -368,6 +368,56 @@ export class Fonts {
     return !!parsed && !!this.getResolver(parsed.providerId);
   };
 
+  /**
+   * Whether every font face the text element needs has loaded. A family
+   * arrives one face at a time (i.e. per `unicode-range` subset), so one
+   * loaded face doesn't mean this text is drawn - or measured - in it.
+   *
+   * WARN: for custom families only - `check()` passes for any name which
+   * matches a font installed on the system (see `fontFacesLoader`), which the
+   * generated name of a custom family never does.
+   */
+  public isTextLoaded = (element: ExcalidrawTextElement): boolean =>
+    !this.fontFaceSet ||
+    this.fontFaceSet.check(getFontString(element), element.originalText || " ");
+
+  /**
+   * Swap the family's font faces whose file failed to download for fresh
+   * ones. A failed `FontFace` stays failed - the browser never fetches it
+   * again, and loading its family keeps rejecting - so without this a
+   * network blip would leave the text in the fallback font until a reload.
+   *
+   * Only where the user asks for the family again (see callers), never on a
+   * load pass: those repeat, and would refetch a missing file each time.
+   *
+   * @returns whether a face got swapped
+   */
+  public retryFailedFontFaces = (family: FontFamily): boolean => {
+    const registeredFont = this.registry.registered.get(family);
+    if (
+      !registeredFont?.fontFaces.some(
+        ({ fontFace }) => fontFace.status === "error",
+      )
+    ) {
+      return false;
+    }
+
+    const fontFaces = registeredFont.fontFaces.map((fontFace) => {
+      if (fontFace.fontFace.status !== "error") {
+        return fontFace;
+      }
+      // or a `load()` of the family would still reject over it
+      this.fontFaceSet?.delete(fontFace.fontFace);
+      return fontFace.clone();
+    });
+
+    this.registry.registered.set(family, { ...registeredFont, fontFaces });
+    this.registry.installFontFaces(fontFaces, this.fontFaceSet);
+    this.registry.scheduleEmit();
+
+    return true;
+  };
+
   /** own-property lookup, so "toString:Foo" can't resolve `Object.prototype` */
   private getResolver = (providerId: string): FontResolver | undefined =>
     Object.hasOwn(this.fontResolvers, providerId)
@@ -442,10 +492,13 @@ export class Fonts {
 
     const registeredFont = this.registry.registered.get(family);
     if (registeredFont) {
-      this.registry.installFontFaces(
-        registeredFont.fontFaces,
-        this.fontFaceSet,
-      );
+      // asking again is how a font whose file failed to download is retried
+      if (!this.retryFailedFontFaces(family)) {
+        this.registry.installFontFaces(
+          registeredFont.fontFaces,
+          this.fontFaceSet,
+        );
+      }
       this.registry.cache.clearFailed(family);
       return { family, status: "success" };
     }

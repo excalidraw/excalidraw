@@ -92,9 +92,10 @@ Object.defineProperty(document, "fonts", {
     load: vi.fn(() => Promise.resolve([])),
     // `check` and `has` are synchronous booleans in the browser - a promise
     // here would be always-truthy and silently skip loading branches
-    check: vi.fn().mockReturnValue(true),
-    has: vi.fn().mockReturnValue(true),
+    check: vi.fn(() => true),
+    has: vi.fn(() => true),
     add: vi.fn(),
+    delete: vi.fn(),
   },
 });
 

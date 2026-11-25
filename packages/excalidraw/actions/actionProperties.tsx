@@ -1364,6 +1364,12 @@ export const actionChangeFontFamily = register<{
       const chars = Array.from(uniqueChars.values()).join() || " ";
       const fontFaceSet = (app.props.ownerDocument ?? document).fonts;
 
+      if (!currentHoveredFontFamily) {
+        // picking a font again is how one whose file failed to download is
+        // retried - its faces would fail the load below for good otherwise
+        app.fonts.instance.retryFailedFontFaces(nextFontFamily);
+      }
+
       // WARN: `check()` can only be trusted when it says "unloaded" - Chrome
       // reports any family whose name matches an *installed* system font as
       // loaded, even with its web faces unloaded (i.e. anyone with Excalifont
