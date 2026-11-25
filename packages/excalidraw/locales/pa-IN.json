@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "ਪੇਸਟ ਕਰੋ",
     "pasteAsPlaintext": "ਸਾਦੇ ਪਾਠ ਵਜੋਂ ਪੇਸਟ ਕਰੋ",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
@@ -786,16 +788,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "ਪੇਸ਼ਕਾਰੀਆਂ",
-    "mcp": "AI ਨਾਲ ਵਾਹੋ",
-    "comments": "ਟਿੱਪਣੀਆਂ ਕਰੋ",
-    "teams": "ਮਿਲ ਕੇ ਕੰਮ ਕਰੋ",
-    "voiceChat": "ਵੌਇਸ ਚੈਟ",
-    "withExcalidrawPlus": "Excalidraw+ ਨਾਲ",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "ਮਨੁੱਖਾਂ ਅਤੇ AI ਲਈ"
   }
 }
