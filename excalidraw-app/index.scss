@@ -91,8 +91,6 @@
   --plus-banner-bg-hover: var(--color-primary-light);
   --plus-banner-border: var(--color-primary-light-darker);
   --plus-banner-subtitle: #8b88e0;
-  --plus-banner-color: var(--color-primary);
-  --plus-banner-active: var(--color-brand-active);
 
   display: flex;
   align-items: center;
@@ -102,7 +100,7 @@
   border: 1px solid var(--plus-banner-border);
   border-radius: var(--border-radius-lg);
   background-color: var(--plus-banner-bg);
-  color: var(--plus-banner-color) !important;
+  color: var(--color-primary) !important;
   text-decoration: none !important;
   font-family: var(--ui-font);
   box-sizing: border-box;
@@ -116,17 +114,7 @@
   }
 
   &:active {
-    border-color: var(--plus-banner-active);
-  }
-
-  // non-E+ promos (e.g. the CLI)
-  &--blue {
-    --plus-banner-bg: #e7f5ff;
-    --plus-banner-bg-hover: #d0ebff;
-    --plus-banner-border: #a5d8ff;
-    --plus-banner-subtitle: #339af0;
-    --plus-banner-color: #1971c2;
-    --plus-banner-active: #1971c2;
+    border-color: var(--color-brand-active);
   }
 
   &__icon {
@@ -166,14 +154,5 @@
     --plus-banner-bg: #2b2a40;
     --plus-banner-border: #4f4d6f;
     --plus-banner-subtitle: #8f8cc4;
-  }
-
-  .plus-banner--blue {
-    --plus-banner-bg: #1d2b38;
-    --plus-banner-bg-hover: #2a4257;
-    --plus-banner-border: #34516b;
-    --plus-banner-subtitle: #6b9cc4;
-    --plus-banner-color: #74c0fc;
-    --plus-banner-active: #74c0fc;
   }
 }
