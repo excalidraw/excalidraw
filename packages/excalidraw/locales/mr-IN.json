@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
+    "upgrade": "",
     "paste": "चिटकवा",
     "pasteAsPlaintext": "साधा मजकूर च्या रुपात पेस्ट करा",
     "pasteCharts": "चार्ट चिकटवा",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "समस्त निवडा",
     "multiSelect": "निवडित तत्व जोडा",
     "moveCanvas": "पटल हलवा",
@@ -21,6 +28,7 @@
     "copyStyles": "शैली कॉपी करा",
     "pasteStyles": "कॉपी केलेली शैली वापरा",
     "stroke": "रेघे चा रंग",
+    "textColor": "",
     "changeStroke": "रेषेचा रंग बदला",
     "background": "पार्श्वभूमी",
     "changeBackground": "पार्श्वभूमीचा रंग बदला",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "तुटित तुटित",
     "strokeStyle_dotted": "ठिपके ठिपके",
     "sloppiness": "गबाळेपणा",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "अपारदर्शक्ता",
     "textAlign": "मजकूर संरेखन",
     "edges": "किनारी",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "चिमणि पाय (अनेक)",
     "arrowhead_crowfoot_one": "चिमणि पाय (एक)",
     "arrowhead_crowfoot_one_or_many": "चिमणि पाय (एक अथवा अनेक)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "आणिक विकल्प",
+    "cardinality": "",
     "arrowtypes": "बाणाचे प्रकार",
     "arrowtype_sharp": "तीक्ष्ण तीर",
     "arrowtype_round": "वक्राकार तीर",
@@ -95,7 +113,10 @@
     "group": "समूह निवड",
     "ungroup": "समूह निवड ला रद्द करा",
     "collaborators": "Sahayog",
+    "you": "",
     "toggleGrid": "जाळी ऑन ऑफ़ करा",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "संग्रह मधे सम्मिलित करा",
     "removeFromLibrary": "संग्रहातून काढ़ा",
     "libraryLoadingMessage": "संग्रह लोड होत आहे…",
@@ -114,7 +135,7 @@
     "flipHorizontal": "आडवं फ्लिप करा",
     "flipVertical": "उभं फ्लिप करा",
     "viewMode": "पहायची पद्धत",
-    "share": "सामायिक करा",
+    "share": "शेअर करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
     "showFonts": "लिपि निवड़क दाखवा",
@@ -165,13 +186,27 @@
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
     "installPWA": "एक्षकाली ड्रॉ स्थानीय स्वरूपात इंस्टॉल करावे (PWA)",
     "autoResize": "स्वयं आकार पुनः निर्धारण",
+    "toggleAutoResize": "",
     "imageCropping": "प्रतिमा कापणे",
     "unCroppedDimension": "कापण्या पूर्विचे परिमाण",
     "copyElementLink": "वस्तू ह्याचा दुवा कॉपी करावे",
     "linkToElement": "वस्तू ह्याचा दुवा",
     "wrapSelectionInFrame": "चौकटित निवडलेले गुंडाळा",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
@@ -215,12 +250,14 @@
     "zoomIn": "मोठं करून पहा",
     "zoomOut": "छोटं करून पहा",
     "resetZoom": "छोटं मोठं करणं बंद करा",
+    "zoomToFit": "",
     "menu": "यादि",
     "done": "झालं",
     "edit": "संपादित करा",
     "undo": "पूर्ववत करा",
     "redo": "पुन्हा करा(&R)",
     "resetLibrary": "संग्रह पुनर्स्थित करा",
+    "reset": "",
     "createNewRoom": "एक नवी खोली बनवा",
     "fullScreen": "पूर्ण दृश्यपटल",
     "darkMode": "अंधार स्थिथि",
@@ -308,12 +345,19 @@
     "eraser": "खोड रबर",
     "frame": "चौकट यंत्र",
     "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
+    "stickynote": "",
     "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": "आणिक यंत्रे",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "आयत",
@@ -327,6 +371,7 @@
     "group": "गट",
     "frame": "चौकट",
     "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
+    "stickynote": "",
     "embeddable": "वेब रुतवा",
     "selection": "निवड",
     "iframe": "आयफ़्रेम"
@@ -345,13 +390,18 @@
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
     "embeddable": "वेबसाइट रुतोण्या साठी दाबून-खेचा (क्लिक-ड्रैग करा)",
+    "stickynote": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -360,6 +410,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा.",
     "disableSnapping": "",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "त्रुटि"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "डिस्क मधे जतन करा",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "तुमचा सर्व डेटा तुमच्या ब्राउझरमध्ये स्थानिक पातळीवर जतन केला जातो.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "त्याऐवजी तुम्हाला Excalidraw+ वर जायचे आहे का?",
       "menuHint": "निर्यात, आवड़ी-निवडी, भाषा, ..."
     },
@@ -569,12 +626,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "रंग",
     "mostUsedCustomColors": "सर्वात जास्त वापरणीस रंग",
     "colors": "रंग",
     "shades": "रंगछटा",
     "hexCode": "हेक्स कोड",
-    "noShades": "ह्या रंगाच्या छटा उपलब्ध नाहित"
+    "noShades": "ह्या रंगाच्या छटा उपलब्ध नाहित",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "मर्मेड पासून एक्सकाली मधे",
     "button": "शिरवा",
-    "description": "सध्या फक्त <flowchartLink> प्रवाह चित्र (फ़्लो चार्ट) </flowchartLink> आणि <sequenceLink> क्रम चित्र (सिकवेंस ड़ायग्राम) </sequenceLink> करता येतात. बाक़ीचे चित्र प्रकार एक्सकाली चित्र पद्धति नी चित्रित होतील.",
+    "description": "",
     "syntax": "मर्मेड संरचना नियम",
-    "preview": "पूर्वावलोकन"
+    "preview": "पूर्वावलोकन",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": "प्रणाली"
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "जलद शोध"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "ह्या दृश्या मधे",
     "availableFonts": "उपलब्ध लीपीं",
-    "empty": "लिपि सपडली नाहीं"
+    "empty": "लिपि सपडली नाहीं",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "वापरकर्ते सापडले नाहीत",
@@ -661,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "सादरीकरणे",
+    "mcp": "AI ने चित्र काढा",
+    "comments": "टिप्पणी करा",
+    "teams": "एकत्र काम करा",
+    "voiceChat": "व्हॉइस चॅट",
+    "withExcalidrawPlus": "Excalidraw+ सह",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "मानव व AI साठी"
   }
 }

@@ -4,7 +4,11 @@ import { getCommonBoundingBox } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { deepCopyElement } from "@excalidraw/element";
 import { resizeMultipleElements } from "@excalidraw/element";
-import { isArrowElement, isElbowArrow } from "@excalidraw/element";
+import {
+  isArrowElement,
+  isElbowArrow,
+  updateElbowArrowRoute,
+} from "@excalidraw/element";
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
@@ -121,10 +125,13 @@ const flipElements = (
   ) {
     return selectedElements.map((element) => {
       const _element = element as ExcalidrawArrowElement;
-      return newElementWith(_element, {
+      const flipped = newElementWith(_element, {
         startArrowhead: _element.endArrowhead,
         endArrowhead: _element.startArrowhead,
       });
+      return isElbowArrow(flipped)
+        ? newElementWith(flipped, updateElbowArrowRoute(flipped, elementsMap))
+        : flipped;
     });
   }
 
@@ -146,6 +153,7 @@ const flipElements = (
       flipByY: flipDirection === "vertical",
       shouldResizeFromCenter: true,
       shouldMaintainAspectRatio: true,
+      renderEnvironment: app.renderEnvironment,
     },
   );
 

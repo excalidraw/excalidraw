@@ -15,7 +15,7 @@ import type {
   ValueOf,
 } from "@excalidraw/common/utility-types";
 
-export type ChartType = "bar" | "line";
+export type ChartType = "bar" | "line" | "radar";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
@@ -76,6 +76,11 @@ type _ExcalidrawElementBase = Readonly<{
   boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
+  /** Client wall-clock creation time in epoch milliseconds; null if unknown.
+      Preserved for this element's lifetime, including edits and undo/redo,
+      and excluded from `ElementUpdate` (mutateElement / newElementWith).
+      Duplicating an element starts a new lifetime. Not an ordering clock. */
+  created: number | null;
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
@@ -88,6 +93,16 @@ export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
 export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
+
+export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "stickynote";
+    /**
+     * The height the user set, from which the layout derives `height`: the
+     * note grows above it to fit its label and never shrinks below it
+     */
+    baseHeight: number;
+  }>;
 
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
@@ -185,11 +200,13 @@ export type ExcalidrawGenericElement =
 
 export type ExcalidrawFlowchartNodeElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
 export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
@@ -205,6 +222,7 @@ export type ExcalidrawRectanguloidElement =
  */
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
@@ -227,7 +245,7 @@ export type Ordered<TElement extends ExcalidrawElement> = TElement & {
 export type OrderedExcalidrawElement = Ordered<ExcalidrawElement>;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
-  isDeleted: boolean;
+  isDeleted: false;
 };
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
@@ -237,10 +255,19 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     type: "text";
     fontSize: number;
     fontFamily: FontFamilyValues;
+    /**
+     * The font size the user picked, from which the layout derives `fontSize`.
+     * Today only sticky note labels have one: the auto-fit shrinks below it
+     * and never above it (compare `baseHeight`, which the note grows above).
+     * `null` for every other text. Read it through `getBaseFontSize` —
+     * generic binding repair can detach a label without clearing this, so
+     * the container decides its meaning.
+     */
+    baseFontSize: number | null;
     text: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    containerId: ExcalidrawGenericElement["id"] | null;
+    containerId: ExcalidrawTextContainer["id"] | null;
     originalText: string;
     /**
      * If `true` the width will fit the text. If `false`, the text will
@@ -254,10 +281,18 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * Position of text bound to a linear element (such as an arrow),
+     * expressed as a normalized arc-length parameter (0–1) along the
+     * container's whole path. Independent of how the path is segmented,
+     * so it survives midpoint insertion and other geometry changes.
+     * */
+    labelPosition?: number | null;
   }>;
 
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
@@ -269,6 +304,7 @@ export type ExcalidrawBindableElement =
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawArrowElement;
@@ -303,19 +339,32 @@ export type PointsPositionUpdates = Map<
   { point: LocalPoint; isDragging?: boolean }
 >;
 
+export type CardinalityArrowhead =
+  | "cardinality_one"
+  | "cardinality_many"
+  | "cardinality_one_or_many"
+  | "cardinality_exactly_one"
+  | "cardinality_zero_or_one"
+  | "cardinality_zero_or_many";
+
+export type ArrowheadLegacy =
+  | "dot"
+  | "crowfoot_one"
+  | "crowfoot_many"
+  | "crowfoot_one_or_many";
+
 export type Arrowhead =
   | "arrow"
   | "bar"
-  | "dot" // legacy. Do not use for new elements.
   | "circle"
   | "circle_outline"
   | "triangle"
   | "triangle_outline"
   | "diamond"
   | "diamond_outline"
-  | "crowfoot_one"
-  | "crowfoot_many"
-  | "crowfoot_one_or_many";
+  | CardinalityArrowhead;
+
+export type AnyArrowhead = Arrowhead | ArrowheadLegacy;
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
@@ -371,12 +420,20 @@ export type ExcalidrawElbowArrowElement = Merge<
   }
 >;
 
+export type StrokeVariability = "variable" | "constant";
+
+export type StrokeOptions = Readonly<{
+  variability: StrokeVariability;
+  streamline: number;
+}>;
+
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
     points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
+    strokeOptions: StrokeOptions;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
@@ -423,6 +480,10 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+export type NonDeletedElementsMapOrArray =
+  | readonly NonDeletedExcalidrawElement[]
+  | Readonly<NonDeletedElementsMap | NonDeletedSceneElementsMap>;
 
 export type ExcalidrawLinearElementSubType =
   | "line"

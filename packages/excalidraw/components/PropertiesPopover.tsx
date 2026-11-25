@@ -1,4 +1,4 @@
-import * as Popover from "@radix-ui/react-popover";
+import { Popover } from "radix-ui";
 import clsx from "clsx";
 import React, { type ReactNode } from "react";
 
@@ -64,6 +64,17 @@ export const PropertiesPopover = React.forwardRef<
           onFocusOutside={onFocusOutside}
           onPointerDownOutside={onPointerDownOutside}
           onOpenAutoFocus={(e) => {
+            // Radix checks the runtime document and can overwrite focus already
+            // placed by a picker rendered in another document.
+            const content = e.target;
+            const ownerWindow = container?.ownerDocument.defaultView;
+            if (
+              ownerWindow &&
+              content instanceof ownerWindow.HTMLElement &&
+              content.contains(content.ownerDocument.activeElement)
+            ) {
+              e.preventDefault();
+            }
             // prevent auto-focus on touch devices to avoid keyboard popup
             if (preventAutoFocusOnTouch && editorInterface.isTouchScreen) {
               e.preventDefault();

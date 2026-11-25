@@ -5,7 +5,7 @@ const MenuSeparator = () => (
     style={{
       height: "1px",
       backgroundColor: "var(--default-border-color)",
-      margin: ".5rem 0",
+      margin: "6px 0",
       flex: "0 0 auto",
     }}
   />

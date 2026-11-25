@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
+    "upgrade": "",
     "paste": "دانانەوە",
     "pasteAsPlaintext": "دایبنێ وەک دەقی سادە",
     "pasteCharts": "دانانەوەی خشتەکان",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "دیاریکردنی هەموو",
     "multiSelect": "زیادکردنی بۆ دیاریکراوەکان",
     "moveCanvas": "تابلۆ بجوڵێنە",
@@ -21,6 +28,7 @@
     "copyStyles": "لەبەرگرتنەوەی ستایل",
     "pasteStyles": "دانانەوەی ستایل",
     "stroke": "هێڵکار",
+    "textColor": "",
     "changeStroke": "",
     "background": "پاشبنەما",
     "changeBackground": "",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "پچڕ پچڕ",
     "strokeStyle_dotted": "خاڵدار",
     "sloppiness": "لێژی",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ڕوونی",
     "textAlign": "ڕێکخستنی دەق",
     "edges": "لێوارەکان",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,7 +113,10 @@
     "group": "دیاریکردنی گروپ",
     "ungroup": "گروپی دیاریکراوەکان لابەرە",
     "collaborators": "هاوکارەکان",
+    "you": "",
     "toggleGrid": "",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "زیادکردن بۆ کتێبخانە",
     "removeFromLibrary": "لابردن لە کتێبخانە",
     "libraryLoadingMessage": "...بارکردنی کتێبخانە",
@@ -114,7 +135,7 @@
     "flipHorizontal": "هەڵگەڕانەوەی ئاسۆیی",
     "flipVertical": "هەڵگەڕانەوەی ستونی",
     "viewMode": "دۆخی بینین",
-    "share": "هاوبەشی پێکردن",
+    "share": "هاوبەشکردن",
     "showStroke": "ڕەنگهەڵگری هێڵکار نیشانبدە",
     "showBackground": "ڕەنگهەڵگری باکگراوند نیشانبدە",
     "showFonts": "",
@@ -165,13 +186,27 @@
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
+    "toggleAutoResize": "",
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -215,12 +250,14 @@
     "zoomIn": "نزیک خستنەوە",
     "zoomOut": "دوورخستنەوە",
     "resetZoom": "ڕێستکردنی زووم",
+    "zoomToFit": "",
     "menu": "پێڕست",
     "done": "تەواو",
     "edit": "دەستکاری کردن",
     "undo": "گه‌ڕانه‌وه‌ بۆ پێشوو",
     "redo": "گه‌ڕانه‌وه‌ بۆ داهاتوو",
     "resetLibrary": "ڕێکخستنەوەی کتێبخانە",
+    "reset": "",
     "createNewRoom": "ژوورێکی نوێ دروست بکە",
     "fullScreen": "پڕ بە شاشە",
     "darkMode": "دۆخی تاریک",
@@ -308,12 +345,19 @@
     "eraser": "سڕەر",
     "frame": "ئامرازی چوارچێوە",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "دەست (ئامرازی پانکردن)",
     "extraTools": "ئامرازی زیاتر",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -327,6 +371,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -345,13 +390,18 @@
     "freeDraw": "کرتە بکە و ڕایبکێشە، کاتێک تەواو بوویت دەست هەڵگرە",
     "text": "زانیاری: هەروەها دەتوانیت دەق زیادبکەیت بە دوو کرتەکردن لە هەر شوێنێک لەگەڵ ئامڕازی دەستنیشانکردن",
     "embeddable": "",
+    "stickynote": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -360,6 +410,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "ئەم تایبەتمەندییە بە ئەگەرێکی زۆرەوە دەتوانرێت چالاک بکرێت بە ڕێکخستنی ئاڵای \"dom.events.asyncClipboard.clipboardItem\" بۆ \"true\". بۆ گۆڕینی ئاڵاکانی وێبگەڕ لە فایەرفۆکسدا، سەردانی لاپەڕەی \"about:config\" بکە.",
     "disableSnapping": "",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "هه‌ڵه‌ ڕوویدا"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "پاشەکەوت بکە لە دیسک",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "هەموو داتاکانت لە ناوخۆی وێنگەڕەکەتدا پاشەکەوت کراوە.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "ویستت بڕۆیت بۆ Excalidraw+?",
       "menuHint": "هەناردەکردن، ڕێکخستنەکان، زمانەکان، ..."
     },
@@ -574,7 +631,11 @@
     "colors": "ڕەنگەکان",
     "shades": "سێبەرەکان",
     "hexCode": "کۆدی هێکس",
-    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە"
+    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": ""
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
@@ -661,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "پێشکەشکردن",
+    "mcp": "کێشان بە AI",
+    "comments": "نووسینی لێدوان",
+    "teams": "کاری تیمی",
+    "voiceChat": "چاتی دەنگی",
+    "withExcalidrawPlus": "بە Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "بۆ مرۆڤ و AI"
   }
 }

@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "Registrer deg",
+    "signIn": "Logg inn",
+    "upgrade": "Oppgrader",
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som klartekst",
     "pasteCharts": "Lim inn diagrammer",
+    "chartType_bar": "Stolpediagram",
+    "chartType_line": "Linjediagram",
+    "chartType_radar": "Radardiagram",
+    "chartType_plaintext": "Ren tekst",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -21,6 +28,7 @@
     "copyStyles": "Kopier stiler",
     "pasteStyles": "Lim inn stiler",
     "stroke": "Strek",
+    "textColor": "Tekstfarge",
     "changeStroke": "Endre farge på omriss",
     "background": "Bakgrunn",
     "changeBackground": "Endre bakgrunnsfarge",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Stiplet",
     "strokeStyle_dotted": "Prikket",
     "sloppiness": "Ujevnhet",
+    "pressure": "Trykk",
+    "pressure_constant": "Konstant",
+    "pressure_variable": "Variabel",
     "opacity": "Synlighet",
     "textAlign": "Tekstjustering",
     "edges": "Kanter",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "Kråkefot (mange)",
     "arrowhead_crowfoot_one": "Kråkefot (én)",
     "arrowhead_crowfoot_one_or_many": "Kråkefot (én eller mange)",
+    "arrowhead_cardinality_one": "Kardinalitet (én)",
+    "arrowhead_cardinality_many": "Kardinalitet (mange)",
+    "arrowhead_cardinality_one_or_many": "Kardinalitet (en eller flere)",
+    "arrowhead_cardinality_exactly_one": "Kardinalitet (nøyaktig én)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalitet (null eller én)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalitet (null eller mange)",
     "more_options": "Flere alternativer",
+    "cardinality": "Kardinalitet",
     "arrowtypes": "Type pil",
     "arrowtype_sharp": "Skarp pil",
     "arrowtype_round": "Buet pil",
@@ -95,7 +113,10 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
+    "you": "Du",
     "toggleGrid": "Vis/skjul rutenett",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
     "libraryLoadingMessage": "Laster bibliotek…",
@@ -142,8 +163,8 @@
       "editArrow": "Rediger pil"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Bryt polygon",
+      "convertToPolygon": "Konverter til polygon"
     },
     "elementLock": {
       "lock": "Lås",
@@ -165,13 +186,27 @@
     "zoomToFit": "Zoom for å se alle elementer",
     "installPWA": "Installer Excalidraw lokalt (PWA)",
     "autoResize": "Aktiver automatisk endring av tekststørrelse",
+    "toggleAutoResize": "",
     "imageCropping": "Bildebeskjæring",
     "unCroppedDimension": "Ikke-beskåret dimensjon",
     "copyElementLink": "Kopier lenke til objekt",
     "linkToElement": "Lenke til objekt",
     "wrapSelectionInFrame": "Brekk om utvalg i ramme",
-    "tab": "",
-    "shapeSwitch": ""
+    "removeFrame": "Fjern rammen",
+    "toggleWrap": "Pakk utvalg inn eller ut",
+    "tab": "Fane",
+    "shapeSwitch": "Bytt form",
+    "preferences": "Innstillinger",
+    "preferences_toolLock": "Verktøylås",
+    "boxSelectionMode": "Velg på",
+    "boxSelectionContain": "Omslutt",
+    "boxSelectionOverlap": "Overlapp",
+    "arrowBinding": "Pilbinding",
+    "midpointSnapping": "Fest til midtpunkter",
+    "showHints": "",
+    "inputDevice": "Inndata",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mus"
   },
   "elementLink": {
     "title": "Lenke til objekt",
@@ -183,10 +218,10 @@
     "hint_emptyLibrary": "Velg et objekt på lerretet for å legge det til her, eller installer et bibliotek fra den offentlige samlingen under.",
     "hint_emptyPrivateLibrary": "Velg et objekt på lerretet for å legge det til her.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Søk i bibliotek",
+      "heading": "Treff i biblioteket",
+      "noResults": "Ingen samsvarende elementer funnet...",
+      "clearSearch": "Tøm søk"
     }
   },
   "search": {
@@ -195,8 +230,8 @@
     "singleResult": "resultat",
     "multipleResults": "resultater",
     "placeholder": "Finn tekst på lerret...",
-    "frames": "",
-    "texts": ""
+    "frames": "Rammer",
+    "texts": "Tekster"
   },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
@@ -215,12 +250,14 @@
     "zoomIn": "Zoom inn",
     "zoomOut": "Zoom ut",
     "resetZoom": "Nullstill zoom",
+    "zoomToFit": "",
     "menu": "Meny",
     "done": "Ferdig",
     "edit": "Rediger",
     "undo": "Angre",
     "redo": "Gjør om",
     "resetLibrary": "Nullstill bibliotek",
+    "reset": "Tilbakestill",
     "createNewRoom": "Opprett et nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -230,11 +267,11 @@
     "objectsSnapMode": "Fest til elementer",
     "exitZenMode": "Avslutt zen-modus",
     "cancel": "Avbryt",
-    "saveLibNames": "",
+    "saveLibNames": "Lagre navn og avslutt",
     "clear": "Tøm",
     "remove": "Fjern",
     "embed": "Slå av/på innebygging",
-    "publishLibrary": "",
+    "publishLibrary": "Gi nytt navn eller publiser",
     "submit": "Send inn",
     "confirm": "Bekreft",
     "embeddableInteractionButton": "Klikk for å samhandle"
@@ -261,7 +298,7 @@
     "removeItemsFromsLibrary": "Slett {{count}} element(er) fra biblioteket?",
     "invalidEncryptionKey": "Krypteringsnøkkel må ha 22 tegn. Live-samarbeid er deaktivert.",
     "collabOfflineWarning": "Ingen Internett-tilkobling tilgjengelig.\nEndringer dine vil ikke bli lagret!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Nettleserens lagringskvote er overskredet. Endringene vil ikke bli lagret."
   },
   "errors": {
     "unsupportedFileType": "Filtypen støttes ikke.",
@@ -292,7 +329,7 @@
   },
   "toolBar": {
     "selection": "Velg",
-    "lasso": "",
+    "lasso": "Lasso-utvalg",
     "image": "Sett inn bilde",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
@@ -308,12 +345,19 @@
     "eraser": "Viskelær",
     "frame": "Rammeverktøy",
     "magicframe": "Wireframe til kode",
+    "stickynote": "Klistrelapp",
     "embeddable": "Nettinnbygging",
     "laser": "Laserpeker",
+    "autoshape": "Tegn til form",
+    "bucketfill": "Bøttefyll",
     "hand": "Hånd (panoreringsverktøy)",
     "extraTools": "Flere verktøy",
     "mermaidToExcalidraw": "Mermaid til Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Veksle formtype"
+  },
+  "bucketfill": {
+    "noRegion": "Finner ikke noe innelukket område å fylle her.",
+    "tooComplex": "Dette området er for komplekst til å fylles."
   },
   "element": {
     "rectangle": "Rektangel",
@@ -327,6 +371,7 @@
     "group": "Gruppe",
     "frame": "Ramme",
     "magicframe": "Wireframe til kode",
+    "stickynote": "Klistrelapp",
     "embeddable": "Nettinnbygging",
     "selection": "Valg",
     "iframe": "IFrame"
@@ -337,34 +382,40 @@
     "shapes": "Former"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} for å avbryte søket",
+    "canvasPanning": "Hold {{shortcut_1}} eller {{shortcut_2}} mens du drar, eller bruk håndverktøyet, for å flytte lerretet",
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Klikk for å starte flere punkter, dra for en enkelt linje. Trykk {{shortcut}} igjen for å endre piltype.",
+    "arrowBindModifiers": "Hold {{shortcut_1}} for å slå av binding, eller {{shortcut_2}} for å binde i et fast punkt",
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
     "embeddable": "Klikk og dra for å opprette en nettside innebygd",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "stickynote": "Klikk for å plassere en lapp, eller dra for å endre størrelsen",
+    "autoshape": "Tegn rektangler, sirkler, romber, linjer og piler",
+    "text_selected": "Dobbeltklikk eller trykk {{shortcut}} for å redigere teksten",
+    "text_editing": "Trykk {{shortcut_1}} eller {{shortcut_2}} for å avslutte redigeringen",
+    "toggleTextAutoResize": "",
+    "linearElementMulti": "Klikk på det siste punktet eller trykk {{shortcut_1}} eller {{shortcut_2}} for å avslutte",
+    "lockAngle": "Du kan begrense vinkelen ved å holde {{shortcut}}",
+    "resize": "Du kan beholde proporsjonene ved å holde {{shortcut_1}} mens du endrer størrelsen.\nHold {{shortcut_2}} for å endre størrelsen fra midten",
+    "resizeImage": "Du kan endre størrelsen fritt ved å holde {{shortcut_1}}.\nHold {{shortcut_2}} for å endre størrelsen fra midten",
+    "resizeStickyNote": "Hold {{shortcut_1}} for å endre størrelsen fritt, {{shortcut_2}} for å endre størrelsen fra midten",
+    "rotate": "Du kan avgrense vinkler ved å holde {{shortcut}} mens du roterer",
+    "toggleArrowhead": "Dobbeltklikk for å slå pilspissen av/på",
+    "lineEditor_info": "Hold {{shortcut_1}} og dobbeltklikk, eller trykk {{shortcut_2}}, for å redigere punktene",
+    "lineEditor_line_info": "Dobbeltklikk eller trykk {{shortcut}} for å redigere punktene",
+    "lineEditor_pointSelected": "Trykk {{shortcut_1}} for å fjerne punktet,\n{{shortcut_2}} for å duplisere, eller dra for å flytte",
+    "lineEditor_nothingSelected": "Velg et punkt å redigere (hold {{shortcut_1}} for å velge flere),\neller hold {{shortcut_2}} og klikk for å legge til nye punkter",
     "publishLibrary": "Publiser ditt eget bibliotek",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} for å legge til tekst",
+    "createFlowchart": "{{shortcut}} for å lage et flytdiagram",
+    "deepBoxSelect": "Hold {{shortcut}} for å velge dypt og for å hindre flytting",
+    "cycleSelection": "{{shortcut}}-klikk for å bla gjennom utvalg, eller dra for å duplisere",
+    "eraserRevert": "Hold {{shortcut}} for å angre elementene som er merket for sletting",
     "firefox_clipboard_write": "Denne funksjonen kan sannsynligvis aktiveres ved å sette \"dom.events.asyncClipboard.clipboardItem\" flagget til \"true\". For å endre nettleserens flagg i Firefox, besøk \"about:config\"-siden.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Hold {{shortcut}} for å slå av festing",
+    "enterCropEditor": "Dobbeltklikk på bildet eller trykk {{shortcut}} for å beskjære bildet",
+    "leaveCropEditor": "Klikk utenfor bildet eller trykk {{shortcut_1}} eller {{shortcut_2}} for å avslutte beskjæringen"
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "Feil"
+  },
+  "progressDialog": {
+    "title": "Lagrer",
+    "defaultMessage": "Forbereder lagring..."
   },
   "exportDialog": {
     "disk_title": "Lagre til disk",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Alle dine data lagres lokalt i din nettleser.",
+      "center_heading": "Tegningene dine lagres i nettleserens lagringsområde.",
+      "center_heading_line2": "Nettleserlagringen kan tømmes uventet.",
+      "center_heading_line3": "Lagre arbeidet ditt i en fil regelmessig for å unngå å miste det.",
       "center_heading_plus": "Ønsker du å gå til Excalidraw+ i stedet?",
       "menuHint": "Eksporter, innstillinger, språk, ..."
     },
@@ -569,12 +626,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Farge",
     "mostUsedCustomColors": "Mest brukte egendefinerte farger",
     "colors": "Farger",
     "shades": "Toner",
     "hexCode": "Heksadesimal kode",
-    "noShades": "Ingen toner tilgjengelig for denne fargen"
+    "noShades": "Ingen toner tilgjengelig for denne fargen",
+    "invalidColor": "Ikke en gyldig farge",
+    "invalidHexLength": "Hex-kode må være 3, 4, 6 eller 8 tegn",
+    "topPicksTip": "Tips: dra en farge til dine toppvalg for å feste den",
+    "resetTopPicks": "Tilbakestill til standard toppval"
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Slipp for å erstatte innholdet",
+    "add": "Slipp for å legge til på lerretet",
+    "importLibrary": "Slipp for å importere biblioteket",
+    "replaceHint": "Hold <shift>Shift</shift> for å beholde eksisterende innhold",
+    "keepHint": "Ditt eksisterende innhold vil bli beholdt",
+    "libraryHint": "Bibliotekfilene vil legges til",
+    "replacedToast": "Innholdet er erstattet. {{shortcut}} for å angre"
+  },
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Sett inn",
-    "description": "Foreløpig er bare <flowchartLink>Flowchart</flowchartLink>-,<sequenceLink> Sequence</sequenceLink>- og <classLink>klasse </classLink>-diagrammer støttet. De andre typene vil bli gjengitt som bilde i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntaks",
-    "preview": "Forhåndsvisning"
+    "preview": "Forhåndsvisning",
+    "label": "Mermaid",
+    "inputPlaceholder": "Skriv Mermaid-diagramdefinisjon her...",
+    "autoFixAvailable": "Auto-retting er tilgjengelig",
+    "loadError": "Klarte ikke å laste Mermaid. Sjekk internettforbindelsen og prøv igjen.",
+    "loadErrorReload": "Kunne ikke laste Mermaid. Last inn siden på nytt for å prøve igjen.",
+    "reload": "Last på nytt"
+  },
+  "ttd": {
+    "error": "Feil!"
+  },
+  "chat": {
+    "inputPlaceholder": "Begynn å skrive diagramideen din her... ({{shortcut}} for ny linje)",
+    "inputPlaceholderWithMessages": "Fortsett å finpusse diagrammet ditt...",
+    "generating": "Lager...",
+    "rateLimitRemaining": "{{count}} forespørsler igjen i dag",
+    "role": {
+      "user": "Du",
+      "assistant": "KI-assistent",
+      "system": "System"
+    },
+    "aiBeta": "KI Beta",
+    "label": "Samtale",
+    "menu": "Meny",
+    "newChat": "Ny samtale",
+    "deleteChat": "Slett samtalen",
+    "deleteMessage": "Slett melding",
+    "viewAsMermaid": "Vis som Mermaid",
+    "placeholder": {
+      "title": "La oss designe diagrammet ditt",
+      "description": "Beskriv diagrammet du vil lage, så lager vi det for deg.",
+      "hint": "For tiden kjenner vi til flytdiagram, sekvensdiagram, klassediagram, tilstandsdiagram og entitetsrelasjonsdiagram."
+    },
+    "preview": "Forhåndsvisning",
+    "insert": "Sett inn",
+    "retry": "Prøv på nytt",
+    "errors": {
+      "promptTooShort": "Prompten er for kort (minst {{min}} tegn)",
+      "promptTooLong": "Prompten er for lang (maks {{max}} tegn)",
+      "generationFailed": "Genereringen feilet",
+      "invalidDiagram": "Genererte et ugyldig diagram :(. Du kan redigere manuelt, prøve på nytt med auto-retting, eller prøve en annen prompt.",
+      "fixInMermaid": "Rediger Mermaid manuelt →",
+      "aiRepair": "Regenerer (automatisk retting) →",
+      "requestAborted": "Forespørselen ble avbrutt",
+      "requestFailed": "Forespørselen feilet",
+      "mermaidParseError": "Mermaid-syntaksfeil"
+    },
+    "rateLimit": {
+      "messageLimit": "Du har nådd KI-grensen på gratisplanen. Prøv Excalidraw+ for mer eller kom tilbake i morgen.",
+      "generalRateLimit": "Ta det med ro, du er for rask for oss! Vent et øyeblikk før du prøver igjen.",
+      "messageLimitInputPlaceholder": "Du har nådd meldingsgrensen"
+    },
+    "upsellBtnLabel": "Oppgrader til Plus"
   },
   "quickSearch": {
     "placeholder": "Hurtigsøk"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "I denne scenen",
     "availableFonts": "Tilgjengelige skrifttyper",
-    "empty": "Ingen skrifttyper funnet"
+    "empty": "Ingen skrifttyper funnet",
+    "topPicksTip": "Tips: dra en font til dine toppvalg for å feste den",
+    "resetTopPicks": "Tilbakestill til standard toppvalg"
   },
   "userList": {
     "empty": "Ingen brukere funnet",
@@ -651,15 +775,26 @@
     "shortcutHint": "For kommandopalett, bruk {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Valg",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Trykk på Enter",
+    "shift": "Shift",
+    "spacebar": "Mellomrom",
+    "delete": "Slett",
+    "mmb": "Rullehjul"
+  },
+  "promoBanner": {
+    "presentations": "Presenter",
+    "mcp": "Tegn med KI",
+    "comments": "Kommenter",
+    "teams": "Jobb i team",
+    "voiceChat": "Taleanrop",
+    "withExcalidrawPlus": "med Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "for folk & KI"
   }
 }

@@ -15,6 +15,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw, getCommonBounds } from "../..";
@@ -135,7 +136,7 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    UI.updateInput(inputX, String("186"));
+    UI.updateInput(inputX, String("184"));
     expect(linear.startBinding).not.toBe(null);
   });
 
@@ -238,6 +239,24 @@ describe("stats for a generic element", () => {
     UI.updateInput(input, "88.98766");
     expect(input.value).toBe("88.99");
     expect(rectangle.width).toBe(88.99);
+  });
+
+  it("should reject non-finite values", () => {
+    const rectangle = h.elements[0];
+
+    const input = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(input).toBeDefined();
+
+    UI.updateInput(input, "100");
+    expect(rectangle.width).toBe(100);
+
+    for (const garbage of ["Infinity", "-Infinity", "1e999"]) {
+      UI.updateInput(input, garbage);
+      expect(rectangle.width).toBe(100);
+      expect(input.value).toBe("100");
+    }
   });
 
   it("should update input x and y when angle is changed", () => {
@@ -361,12 +380,10 @@ describe("stats for a non-generic element", () => {
     mouse.clickAt(20, 30);
     const editor = await getTextEditor();
     updateTextEditor(editor, "Hello!");
-    act(() => {
-      editor.blur();
-    });
+    Keyboard.exitTextEditor(editor);
 
     const text = h.elements[0] as ExcalidrawTextElement;
-    mouse.clickOn(text);
+    API.setSelectedElements([text] as NonDeletedExcalidrawElement[]);
 
     elementStats = stats?.querySelector("#elementStats");
 
@@ -752,7 +769,7 @@ describe("frame resizing behavior", () => {
       x: 0,
       y: 0,
       width: 100,
-      height: 100,
+      height: 103,
     });
 
     // Create a rectangle outside the frame

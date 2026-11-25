@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
+    "upgrade": "",
     "paste": "Dán",
     "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Chọn tất cả",
     "multiSelect": "Chọn thêm đối tượng này",
     "moveCanvas": "Di chuyển canvas",
@@ -21,6 +28,7 @@
     "copyStyles": "Sao chép định dạng",
     "pasteStyles": "Dán định dạng",
     "stroke": "Nét",
+    "textColor": "",
     "changeStroke": "Đổi màu nét vẽ",
     "background": "Nền",
     "changeBackground": "Thay đổi màu nền",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Gạch ngang",
     "strokeStyle_dotted": "Nhiều chấm",
     "sloppiness": "Hoa văn nét",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Độ trong suốt",
     "textAlign": "Căn chỉnh văn bản",
     "edges": "Cạnh",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Tùy chọn khác",
+    "cardinality": "",
     "arrowtypes": "Loại mũi tên",
     "arrowtype_sharp": "Mũi tên nhọn",
     "arrowtype_round": "Mũi tên cong",
@@ -95,7 +113,10 @@
     "group": "Gộp nhóm lại lựa chọn",
     "ungroup": "Tách nhóm lựa chọn",
     "collaborators": "Cộng tác viên",
+    "you": "",
     "toggleGrid": "Bật/tắt lưới",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Thêm vào thư viện",
     "removeFromLibrary": "Xóa khỏi thư viện",
     "libraryLoadingMessage": "Đang tải thư viện…",
@@ -165,13 +186,27 @@
     "zoomToFit": "Thu phóng để hiển thị toàn bộ các phần tử",
     "installPWA": "Cài đặt Excalidraw trên máy (PWA)",
     "autoResize": "Bật tự động thay đổi kích thước văn bản",
+    "toggleAutoResize": "",
     "imageCropping": "Cắt ảnh",
     "unCroppedDimension": "Kích thước gốc (chưa cắt)",
     "copyElementLink": "Sao chép liên kết tới đối tượng",
     "linkToElement": "Liên kết đến đối tượng",
     "wrapSelectionInFrame": "Đưa vùng chọn vào khung",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Liên kết đến đối tượng",
@@ -215,12 +250,14 @@
     "zoomIn": "Phóng to",
     "zoomOut": "Thu nhỏ",
     "resetZoom": "Đặt lại thu phóng",
+    "zoomToFit": "",
     "menu": "Bảng chọn",
     "done": "Xong",
     "edit": "Chỉnh sửa",
     "undo": "Hoàn tác",
     "redo": "Làm lại",
     "resetLibrary": "Cài lại thư viện",
+    "reset": "",
     "createNewRoom": "Tạo phòng mới",
     "fullScreen": "Toàn màn hình",
     "darkMode": "Chế độ tối",
@@ -308,12 +345,19 @@
     "eraser": "Xóa",
     "frame": "Công cụ tạo khung",
     "magicframe": "Wireframe thành code",
+    "stickynote": "",
     "embeddable": "Nhúng Web",
     "laser": "Con trỏ laser",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Tay kéo",
     "extraTools": "Công cụ khác",
     "mermaidToExcalidraw": "Mermaid sang Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Hình chữ nhật",
@@ -327,6 +371,7 @@
     "group": "Nhóm",
     "frame": "Khung hình",
     "magicframe": "Wireframe thành code",
+    "stickynote": "",
     "embeddable": "Nhúng Web",
     "selection": "Lựa chọn",
     "iframe": "IFrame"
@@ -345,21 +390,27 @@
     "freeDraw": "Ấn bà kéo, thả khi bạn xong",
     "text": "Mẹo: bạn có thể thêm văn bản tại bất cứ đâu bằng cách ấn hai lần bằng tool lựa chọn",
     "embeddable": "Nhấp và kéo để tạo nội dung nhúng từ website.",
+    "stickynote": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
-    "rotate": "",
+    "resizeStickyNote": "",
+    "rotate": "Giới hạn góc độ bằng cách giữ {{shortcut}} khi xoay",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Chia sẻ thư viện của bạn",
-    "bindTextToElement": "",
+    "bindTextToElement": "Nhấn {{shortcut}} để thêm văn bản",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\".",
     "disableSnapping": "",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "Lỗi"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Lưu về máy",
@@ -558,6 +613,8 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "",
       "menuHint": ""
     },
@@ -574,7 +631,11 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": ""
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
@@ -661,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "Thuyết trình",
+    "mcp": "Vẽ bằng AI",
+    "comments": "Viết bình luận",
+    "teams": "Làm việc nhóm",
+    "voiceChat": "Gọi thoại",
+    "withExcalidrawPlus": "trên Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "cho người và AI"
   }
 }

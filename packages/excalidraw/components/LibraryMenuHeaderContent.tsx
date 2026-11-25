@@ -16,7 +16,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import { Dialog } from "./Dialog";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import PublishLibrary from "./PublishLibrary";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import Trans from "./Trans";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
@@ -127,7 +127,7 @@ export const LibraryDropdownMenuButton: React.FC<{
             )}
           />
         </p>
-        <ToolButton
+        <IconButton
           type="button"
           title={t("buttons.close")}
           aria-label={t("buttons.close")}

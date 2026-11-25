@@ -1,11 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
-import { KEYS, reseed } from "@excalidraw/common";
+import { KEYS, reseed, DEFAULT_ZOOM } from "@excalidraw/common";
 import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   NonDeleted,
 } from "@excalidraw/element/types";
 
@@ -13,6 +14,7 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { render, fireEvent, act, unmountComponent } from "./test-utils";
 
@@ -72,29 +74,53 @@ describe("move element", () => {
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });
 
+  it("shift-drag moves along one axis only", async () => {
+    await render(<Excalidraw />);
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const mouse = new Pointer("mouse");
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.downAt(50, 50);
+      mouse.moveTo(90, 60);
+      mouse.upAt();
+    });
+
+    expect(API.getElement(rectangle)).toMatchObject({ x: 40, y: 0 });
+  });
+
   it("rectangles with binding arrow", async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
 
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
-    const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
+    const arrow = UI.createElement("arrow", { x: 105, y: 50, size: 88 });
 
     act(() => {
       // bind line to two rectangles
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
-        rectA.get(),
+        rectA.get() as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "start",
         h.app.scene,
+        DEFAULT_ZOOM,
       );
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
-        rectB.get(),
+        rectB.get() as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "end",
         h.app.scene,
+        DEFAULT_ZOOM,
       );
     });
 
@@ -110,11 +136,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[110, -4.576537]], 0);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
-      [[79, 132.89433]],
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
+      [[106.00000000000001, 55.6867741935484]],
       0,
     );
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[88, 88]], 0);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -132,11 +158,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[111, 6.1499]], 0);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
-      [[79, 124.1678]],
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
+      [[106, 55.6867741935484]],
       0,
     );
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[89, 90]], 0);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

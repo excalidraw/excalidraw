@@ -6,20 +6,20 @@ import {
   DEFAULT_SIDEBAR,
   EVENT,
   KEYS,
-  capitalizeString,
+  arrayToMap,
   isWritableElement,
 } from "@excalidraw/common";
 
-import { actionToggleShapeSwitch } from "@excalidraw/excalidraw/actions/actionToggleShapeSwitch";
-
-import { getShortcutKey } from "@excalidraw/excalidraw/shortcut";
-
 import type { MarkRequired } from "@excalidraw/common/utility-types";
+
+import { actionToggleShapeSwitch } from "../../actions/actionToggleShapeSwitch";
+import { getShortcutKey } from "../../shortcut";
 
 import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
+  actionToggleTheme,
 } from "../../actions";
 import {
   actionCopyElementLink,
@@ -44,7 +44,6 @@ import { getSelectedElements } from "../../scene";
 import {
   LockedIcon,
   UnlockedIcon,
-  clockIcon,
   searchIcon,
   boltIcon,
   bucketFillIcon,
@@ -52,9 +51,10 @@ import {
   mermaidLogoIcon,
   brainIconThin,
   LibraryIcon,
+  historyCommandIcon,
 } from "../icons";
 
-import { SHAPES } from "../shapes";
+import { TOOLS, getToolLetter } from "../Tools";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -76,6 +76,7 @@ import * as defaultItems from "./defaultCommandPaletteItems";
 import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
+import type { ToolbarToolType } from "../Tools";
 import type { AppProps, AppState, LibraryItem, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
@@ -261,7 +262,7 @@ function CommandPaletteInner({
           label = t(
             action.label(
               app.scene.getNonDeletedElements(),
-              uiAppState as AppState,
+              uiAppState,
               app,
             ) as unknown as TranslationKeys,
           );
@@ -313,6 +314,7 @@ function CommandPaletteInner({
         actionManager.actions.copy,
         actionManager.actions.deleteSelectedElements,
         actionManager.actions.wrapSelectionInFrame,
+        actionManager.actions.toggleWrap,
         actionManager.actions.copyStyles,
         actionManager.actions.pasteStyles,
         actionManager.actions.bringToFront,
@@ -356,12 +358,6 @@ function CommandPaletteInner({
           }),
         ),
       );
-      const toolCommands: CommandPaletteItem[] = [
-        actionManager.actions.toggleHandTool,
-        actionManager.actions.setFrameAsActiveTool,
-        actionManager.actions.toggleLassoTool,
-      ].map((action) => actionToCommand(action, DEFAULT_CATEGORIES.tools));
-
       const editorCommands: CommandPaletteItem[] = [
         actionManager.actions.undo,
         actionManager.actions.redo,
@@ -372,7 +368,9 @@ function CommandPaletteInner({
         actionManager.actions.zenMode,
         actionManager.actions.viewMode,
         actionManager.actions.gridMode,
+        actionManager.actions.minimap,
         actionManager.actions.objectsSnapMode,
+        actionManager.actions.showHints,
         actionManager.actions.toggleShortcuts,
         actionManager.actions.selectAll,
         actionManager.actions.toggleElementLock,
@@ -425,6 +423,7 @@ function CommandPaletteInner({
       ];
 
       const additionalCommands: CommandPaletteItem[] = [
+        actionToCommand(actionToggleTheme, DEFAULT_CATEGORIES.app),
         {
           label: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,
@@ -491,7 +490,11 @@ function CommandPaletteInner({
             const selectedElements = getSelectedElements(elements, appState);
             return (
               selectedElements.length > 0 &&
-              canChangeBackgroundColor(appState, selectedElements)
+              canChangeBackgroundColor(
+                appState,
+                selectedElements,
+                arrayToMap(elements),
+              )
             );
           },
           perform: () => {
@@ -513,47 +516,41 @@ function CommandPaletteInner({
             }));
           },
         },
-        ...SHAPES.reduce((acc: CommandPaletteItem[], shape) => {
-          const { value, icon, key, numericKey } = shape;
+        ...(Object.keys(TOOLS) as ToolbarToolType[]).reduce(
+          (acc: CommandPaletteItem[], value) => {
+            const config = TOOLS[value];
 
-          if (
-            appProps.UIOptions.tools?.[
-              value as Extract<
-                typeof value,
-                keyof AppProps["UIOptions"]["tools"]
-              >
-            ] === false
-          ) {
+            if (
+              appProps.UIOptions.tools?.[
+                value as Extract<
+                  typeof value,
+                  keyof AppProps["UIOptions"]["tools"]
+                >
+              ] === false
+            ) {
+              return acc;
+            }
+
+            const shortcut = getToolLetter(value) || config.numericKey;
+
+            const command: CommandPaletteItem = {
+              label: t(`toolBar.${value}`),
+              category: DEFAULT_CATEGORIES.tools,
+              shortcut,
+              icon: config.icon,
+              keywords: ["toolbar"],
+              viewMode: false,
+              perform: () => {
+                app.setActiveTool({ type: value }, { toggle: false });
+              },
+            };
+
+            acc.push(command);
+
             return acc;
-          }
-
-          const letter =
-            key && capitalizeString(typeof key === "string" ? key : key[0]);
-          const shortcut = letter || numericKey;
-
-          const command: CommandPaletteItem = {
-            label: t(`toolBar.${value}`),
-            category: DEFAULT_CATEGORIES.tools,
-            shortcut,
-            icon,
-            keywords: ["toolbar"],
-            viewMode: false,
-            perform: ({ event }) => {
-              if (value === "image") {
-                app.setActiveTool({
-                  type: value,
-                });
-              } else {
-                app.setActiveTool({ type: value });
-              }
-            },
-          };
-
-          acc.push(command);
-
-          return acc;
-        }, []),
-        ...toolCommands,
+          },
+          [],
+        ),
         {
           label: t("toolBar.lock"),
           category: DEFAULT_CATEGORIES.tools,
@@ -928,7 +925,7 @@ function CommandPaletteInner({
                   marginLeft: "6px",
                 }}
               >
-                {clockIcon}
+                {historyCommandIcon}
               </div>
             </div>
             <CommandItem

@@ -183,7 +183,11 @@ export const StatsInner = memo(
     }, [selectedElements]);
 
     return (
-      <div className="exc-stats">
+      <div
+        className="exc-stats"
+        data-viewport-ui="side"
+        data-viewport-ui-name="stats"
+      >
         <Island padding={3}>
           <div className="title">
             <h2>{t("stats.title")}</h2>

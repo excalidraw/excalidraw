@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "Zarejestruj się",
+    "signIn": "Zaloguj się",
+    "upgrade": "Przejdź na wyższy plan",
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
+    "chartType_bar": "Wykres słupkowy",
+    "chartType_line": "Wykres liniowy",
+    "chartType_radar": "Wykres radarowy",
+    "chartType_plaintext": "Zwykły tekst",
     "selectAll": "Zaznacz wszystko",
     "multiSelect": "Dodaj element do zaznaczenia",
     "moveCanvas": "Przesuń obszar roboczy",
@@ -21,6 +28,7 @@
     "copyStyles": "Kopiuj style",
     "pasteStyles": "Wklej style",
     "stroke": "Kreska",
+    "textColor": "Kolor tekstu",
     "changeStroke": "Zmień kolor kreski",
     "background": "Tło",
     "changeBackground": "Zmień kolor tła",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Linia przerywana",
     "strokeStyle_dotted": "Kropkowany",
     "sloppiness": "Styl kreski",
+    "pressure": "Nacisk",
+    "pressure_constant": "Stała",
+    "pressure_variable": "Zmienna",
     "opacity": "Przezroczystość",
     "textAlign": "Wyrównanie tekstu",
     "edges": "Krawędzie",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "Notacja Martina (wiele)",
     "arrowhead_crowfoot_one": "Notacja Martina (jeden)",
     "arrowhead_crowfoot_one_or_many": "Notacja Martina (jeden lub wiele)",
+    "arrowhead_cardinality_one": "Kardynalność (jedna)",
+    "arrowhead_cardinality_many": "Kardynalność (wiele)",
+    "arrowhead_cardinality_one_or_many": "Kardynalność (jedna lub wiele)",
+    "arrowhead_cardinality_exactly_one": "Kardynalność (dokładnie jedna)",
+    "arrowhead_cardinality_zero_or_one": "Kardynalność (zero lub jedna)",
+    "arrowhead_cardinality_zero_or_many": "Kardynalność (zero lub wiele)",
     "more_options": "Więcej opcji",
+    "cardinality": "Kardynalność",
     "arrowtypes": "Typ strzałki",
     "arrowtype_sharp": "Ostra strzałka",
     "arrowtype_round": "Zaokrąglona strzałka",
@@ -95,7 +113,10 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
+    "you": "Ty",
     "toggleGrid": "Przełącz widoczność siatki",
+    "minimap": "Minimapa",
+    "zoom": "Powiększenie",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
     "libraryLoadingMessage": "Wczytywanie biblioteki…",
@@ -165,13 +186,27 @@
     "zoomToFit": "Dopasuj widok do całej zawartości",
     "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)",
     "autoResize": "Włącz automatyczne zmiany rozmiaru tekstu",
+    "toggleAutoResize": "Przełącz automatyczną zmianę rozmiaru tekstu",
     "imageCropping": "Przycinanie obrazu",
     "unCroppedDimension": "Nieprzycięty wymiar",
     "copyElementLink": "Kopiuj link do obiektu",
     "linkToElement": "Link do obiektu",
     "wrapSelectionInFrame": "Owiń wybór w ramkę",
+    "removeFrame": "Usuń ramkę",
+    "toggleWrap": "Owiń lub odwiń zaznaczenie",
     "tab": "Tab",
-    "shapeSwitch": "Wybór kształtu"
+    "shapeSwitch": "Wybór kształtu",
+    "preferences": "Preferencje",
+    "preferences_toolLock": "Blokada narzędzi",
+    "boxSelectionMode": "Zaznacz na",
+    "boxSelectionContain": "Zawijaj",
+    "boxSelectionOverlap": "Nakładanie",
+    "arrowBinding": "Przyczepianie strzałki",
+    "midpointSnapping": "Przyciągnij do punktów środkowych",
+    "showHints": "Wskazówki paska narzędzi",
+    "inputDevice": "Urządzenie wejściowe",
+    "inputDeviceTrackpad": "Gładzik",
+    "inputDeviceMouse": "Myszka"
   },
   "elementLink": {
     "title": "Link do obiektu",
@@ -215,12 +250,14 @@
     "zoomIn": "Powiększ",
     "zoomOut": "Pomniejsz",
     "resetZoom": "Zresetuj powiększenie",
+    "zoomToFit": "Dopasuj widok do zawartości",
     "menu": "Menu",
     "done": "Gotowe",
     "edit": "Edytuj",
     "undo": "Cofnij",
     "redo": "Przywróć",
     "resetLibrary": "Resetuj bibliotekę",
+    "reset": "Resetuj",
     "createNewRoom": "Utwórz nowy pokój",
     "fullScreen": "Pełny ekran",
     "darkMode": "Ciemny motyw",
@@ -308,12 +345,19 @@
     "eraser": "Gumka",
     "frame": "Ramka",
     "magicframe": "Wireframe do kodu",
+    "stickynote": "Notatka",
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
+    "autoshape": "Rysuj do kształtu",
+    "bucketfill": "Wypełnienie wiadrem",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
     "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
     "convertElementType": "Przełącz typ kształtu"
+  },
+  "bucketfill": {
+    "noRegion": "Nie można znaleźć zamkniętego regionu do wypełnienia w tym miejscu.",
+    "tooComplex": "Ten region jest zbyt skomplikowany, aby go wypełnić."
   },
   "element": {
     "rectangle": "Prostokąt",
@@ -327,6 +371,7 @@
     "group": "Grupa",
     "frame": "Ramka",
     "magicframe": "Kod ze szkicu",
+    "stickynote": "Notatka",
     "embeddable": "Osadzenie",
     "selection": "Zaznaczenie",
     "iframe": "IFrame"
@@ -341,17 +386,22 @@
     "canvasPanning": "Aby przesunąć płótno, przytrzymaj {{shortcut_1}} lub {{shortcut_2}} podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "arrowTool": "Kliknij, aby rozpocząć rysowanie wielu punktów; przeciągnij, aby narysować pojedynczą linię. Naciśnij ponownie {{shortcut}}, aby zmienić typ strzałki.",
-    "arrowBindModifiers": "",
+    "arrowBindModifiers": "Przytrzymaj {{shortcut_1}}, aby wyłączyć przyczepianie lub {{shortcut_2}} aby przyłączyć w określonym punkcie",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",
+    "stickynote": "Kliknij, aby umieścić notatkę lub przeciągnij, aby zmienić jej rozmiar",
+    "autoshape": "Rysuj prostokąty, koła, diamenty, linie i strzałki",
     "text_selected": "Kliknij dwukrotnie lub naciśnij {{shortcut}}, aby edytować tekst",
     "text_editing": "Naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć edycję",
+    "toggleTextAutoResize": "Naciśnij {{shortcut}}, aby przełączyć automatyczną zmianę rozmiaru tekstu",
     "linearElementMulti": "Kliknij ostatni punkt lub naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć",
     "lockAngle": "Możesz ograniczyć kąt, przytrzymując {{shortcut}}",
     "resize": "Możesz zachować proporcje, przytrzymując {{shortcut_1}} podczas zmiany rozmiaru;\nprzytrzymaj {{shortcut_2}}, aby zmienić rozmiar względem środka",
     "resizeImage": "Możesz dowolnie zmieniać rozmiar, przytrzymując {{shortcut_1}};\nprzytrzymaj {{shortcut_2}}, aby zmienić rozmiar względem środka.",
+    "resizeStickyNote": "przytrzymaj {{shortcut_1}} aby dowolnie zmienić rozmiar {{shortcut_2}}, aby zmieniać rozmiar od środka",
     "rotate": "Możesz ograniczyć kąty, przytrzymując {{shortcut}} podczas obracania",
+    "toggleArrowhead": "Kliknij dwukrotnie, aby przełączyć grot strzałki",
     "lineEditor_info": "Przytrzymaj {{shortcut_1}} i kliknij dwukrotnie lub naciśnij {{shortcut_2}}, aby edytować punkty",
     "lineEditor_line_info": "Kliknij dwukrotnie lub naciśnij {{shortcut}}, aby edytować punkty",
     "lineEditor_pointSelected": "Naciśnij {{shortcut_1}}, aby usunąć punkty,\n{{shortcut_2}}, aby je powielić, lub przeciągnij, aby je przenieść",
@@ -360,6 +410,7 @@
     "bindTextToElement": "Naciśnij {{shortcut}}, aby dodać tekst",
     "createFlowchart": "Naciśnij {{shortcut}}, aby utworzyć diagram",
     "deepBoxSelect": "Przytrzymaj {{shortcut}}, aby wybrać w obrębie grupy i zapobiec przeciągnięciu",
+    "cycleSelection": "Przytrzymaj {{shortcut}} i kliknij, aby zaznaczać kolejno nakładające się elementy, lub przeciągnij, aby powielić",
     "eraserRevert": "Przytrzymaj {{shortcut}}, aby przywrócić elementy oznaczone do usunięcia",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
     "disableSnapping": "Przytrzymaj {{shortcut}} aby wyłączyć przyciąganie",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "Wystąpił błąd"
+  },
+  "progressDialog": {
+    "title": "Zapisywanie",
+    "defaultMessage": "Przygotowywanie do zapisu..."
   },
   "exportDialog": {
     "disk_title": "Zapisz na dysku",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Wszystkie dane są zapisywane lokalnie w przeglądarce.",
+      "center_heading": "Twoje rysunki są zapisane w pamięci przeglądarki.",
+      "center_heading_line2": "Pamięć przeglądarki może być nieoczekiwanie usunięta.",
+      "center_heading_line3": "Regularnie zapisuj swoją pracę w pliku, aby uniknąć jej utraty.",
       "center_heading_plus": "Czy zamiast tego chcesz przejść do Excalidraw+?",
       "menuHint": "Eksportuj, preferencje, języki..."
     },
@@ -574,7 +631,11 @@
     "colors": "Kolory",
     "shades": "Odcienie",
     "hexCode": "Kod HEX",
-    "noShades": "Brak dostępnych odcieni dla tego koloru"
+    "noShades": "Brak dostępnych odcieni dla tego koloru",
+    "invalidColor": "Nieprawidłowy kolor",
+    "invalidHexLength": "Kod szesnastkowy musi mieć 3, 4, 6 lub 8 znaków",
+    "topPicksTip": "Wskazówka: przeciągnij dowolny kolor na najczęściej wybierane, aby go przypiąć",
+    "resetTopPicks": "Przywróć domyślne najczęściej wybierane"
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Upuść, aby zastąpić zawartość",
+    "add": "Upuść, aby dodać na płótno",
+    "importLibrary": "Upuść, aby zaimportować bibliotekę",
+    "replaceHint": "Przytrzymaj <shift>Shift</shift>, aby zachować istniejącą zawartość",
+    "keepHint": "Istniejąca zawartość zostanie zachowana",
+    "libraryHint": "Pliki bibliotek zostaną dołączone do biblioteki",
+    "replacedToast": "Zastąpiono zawartość. Naciśnij {{shortcut}}, aby cofnąć"
+  },
   "mermaid": {
     "title": "Konwertuj diagram Mermaid do Excalidraw",
     "button": "Wstaw",
-    "description": "Obecnie wspierane są jedynie <flowchartLink>proste grafy</flowchartLink>, <sequenceLink>sekwencje</sequenceLink> i <classLink>diagramy klas</classLink>. Pozostałe typy będą wyświetlane jako obrazy w Excalidraw.",
+    "description": "<flowchartLink>Schematy blokowe</flowchartLink>, diagramy <sequenceLink>sekwencji</sequenceLink>, <classLink>klas</classLink>, <stateLink>stanów</stateLink> i <erdLink>związków encji</erdLink>, <ganttLink>wykresy Gantta</ganttLink>, <quadrantLink>wykresy kwadrantowe</quadrantLink> oraz <timelineLink>osie czasu</timelineLink> są konwertowane na elementy Excalidraw. Pozostałe typy są wstawiane jako obraz.",
     "syntax": "Składnia diagramów Mermaid",
-    "preview": "Podgląd"
+    "preview": "Podgląd",
+    "label": "Mermaid",
+    "inputPlaceholder": "Wpisz tutaj definicję diagramu Mermaid...",
+    "autoFixAvailable": "Dostępna jest automatyczna poprawka",
+    "loadError": "Nie udało się załadować Mermaid. Sprawdź połączenie z internetem i spróbuj ponownie.",
+    "loadErrorReload": "Nie udało się załadować Mermaid. Odśwież stronę, aby spróbować ponownie.",
+    "reload": "Odśwież"
+  },
+  "ttd": {
+    "error": "Błąd!"
+  },
+  "chat": {
+    "inputPlaceholder": "Zacznij tu opisywać swój pomysł na diagram... ({{shortcut}}, aby dodać nowy wiersz)",
+    "inputPlaceholderWithMessages": "Dopracuj dalej swój diagram...",
+    "generating": "Generowanie...",
+    "rateLimitRemaining": "Pozostało zapytań na dziś: {{count}}",
+    "role": {
+      "user": "Ty",
+      "assistant": "Asystent AI",
+      "system": "System"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Czat",
+    "menu": "Menu",
+    "newChat": "Nowy czat",
+    "deleteChat": "Usuń czat",
+    "deleteMessage": "Usuń wiadomość",
+    "viewAsMermaid": "Pokaż jako Mermaid",
+    "placeholder": {
+      "title": "Zaprojektujmy twój diagram",
+      "description": "Opisz diagram, który chcesz utworzyć, a my go dla ciebie wygenerujemy.",
+      "hint": "Na razie potrafimy tworzyć schematy blokowe oraz diagramy sekwencji, klas, stanów i związków encji."
+    },
+    "preview": "Podgląd",
+    "insert": "Wstaw",
+    "retry": "Spróbuj ponownie",
+    "errors": {
+      "promptTooShort": "Opis jest za krótki (minimalna liczba znaków: {{min}})",
+      "promptTooLong": "Opis jest za długi (maksymalna liczba znaków: {{max}})",
+      "generationFailed": "Generowanie nie powiodło się",
+      "invalidDiagram": "Wygenerowany diagram jest nieprawidłowy :(. Możesz go edytować ręcznie, spróbować ponownie z automatyczną poprawką lub użyć innego opisu.",
+      "fixInMermaid": "Edytuj kod Mermaid ręcznie →",
+      "aiRepair": "Wygeneruj ponownie (automatyczna poprawka) →",
+      "requestAborted": "Przerwano zapytanie",
+      "requestFailed": "Zapytanie nie powiodło się",
+      "mermaidParseError": "Błąd składni Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "Wykorzystano limit AI w bezpłatnym planie. Wypróbuj Excalidraw+, aby uzyskać więcej, lub wróć jutro.",
+      "generalRateLimit": "Hola, hola, nie nadążamy za tobą! Zaczekaj chwilę, zanim spróbujesz ponownie.",
+      "messageLimitInputPlaceholder": "Osiągnięto limit wiadomości"
+    },
+    "upsellBtnLabel": "Przejdź na Plus"
   },
   "quickSearch": {
     "placeholder": "Szybkie wyszukiwanie"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "W tej scenie",
     "availableFonts": "Dostępne czcionki",
-    "empty": "Nie znaleziono czcionek"
+    "empty": "Nie znaleziono czcionek",
+    "topPicksTip": "Wskazówka: przeciągnij dowolną czcionkę na najczęściej wybierane, aby ją przypiąć",
+    "resetTopPicks": "Przywróć domyślne najczęściej wybierane"
   },
   "userList": {
     "empty": "Nie znaleziono użytkowników",
@@ -661,5 +785,16 @@
     "spacebar": "Spacja",
     "delete": "Del",
     "mmb": "Kółko myszy"
+  },
+  "promoBanner": {
+    "presentations": "Prezentacje",
+    "mcp": "Rysuj z AI",
+    "comments": "Komentarze",
+    "teams": "Współpraca",
+    "voiceChat": "Czat głosowy",
+    "withExcalidrawPlus": "w Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "dla ludzi i AI"
   }
 }

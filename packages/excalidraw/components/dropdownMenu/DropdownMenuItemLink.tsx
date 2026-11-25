@@ -1,9 +1,11 @@
 import React from "react";
 
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
+
 import MenuItemContent from "./DropdownMenuItemContent";
 import {
   getDropdownMenuItemClassName,
-  useHandleDropdownMenuItemClick,
+  useHandleDropdownMenuItemSelect,
 } from "./common";
 
 import type { JSX } from "react";
@@ -28,23 +30,28 @@ const DropdownMenuItemLink = ({
   onSelect?: (event: Event) => void;
   rel?: string;
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-  const handleClick = useHandleDropdownMenuItemClick(rest.onClick, onSelect);
+  const handleSelect = useHandleDropdownMenuItemSelect(onSelect);
 
   return (
     // eslint-disable-next-line react/jsx-no-target-blank
-    <a
-      {...rest}
-      href={href}
-      target="_blank"
-      rel={rel || "noopener"}
-      className={getDropdownMenuItemClassName(className, selected)}
-      title={rest.title ?? rest["aria-label"]}
-      onClick={handleClick}
+    <DropdownMenuPrimitive.Item
+      className="radix-menu-item"
+      onSelect={handleSelect}
+      asChild
     >
-      <MenuItemContent icon={icon} shortcut={shortcut}>
-        {children}
-      </MenuItemContent>
-    </a>
+      <a
+        {...rest}
+        href={href}
+        target="_blank"
+        rel={`noopener ${rel}`}
+        className={getDropdownMenuItemClassName(className, selected)}
+        title={rest.title ?? rest["aria-label"]}
+      >
+        <MenuItemContent icon={icon} shortcut={shortcut}>
+          {children}
+        </MenuItemContent>
+      </a>
+    </DropdownMenuPrimitive.Item>
   );
 };
 

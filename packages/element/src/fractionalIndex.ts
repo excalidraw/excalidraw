@@ -1,15 +1,21 @@
-import { generateNKeysBetween } from "fractional-indexing";
-
 import { arrayToMap } from "@excalidraw/common";
 
+import {
+  validateOrderKey,
+  generateNKeysBetween,
+} from "@excalidraw/fractional-indexing";
+
 import { mutateElement, newElementWith } from "./mutateElement";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElementId } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
+
+import { isNonDeletedElement } from ".";
 
 import type {
   ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
+  Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./types";
@@ -61,6 +67,8 @@ export const validateFractionalIndices = (
   const stringifyElement = (element: ExcalidrawElement | void) =>
     `${element?.index}:${element?.id}:${element?.type}:${element?.isDeleted}:${element?.version}:${element?.versionNonce}`;
 
+  const elementsMap = includeBoundTextValidation ? arrayToMap(elements) : null;
+
   const indices = elements.map((x) => x.index);
   for (const [i, index] of indices.entries()) {
     const predecessorIndex = indices[i - 1];
@@ -77,11 +85,23 @@ export const validateFractionalIndices = (
     }
 
     // disabled by default, as we don't fix it
-    if (includeBoundTextValidation && hasBoundTextElement(elements[i])) {
+    if (
+      includeBoundTextValidation &&
+      elementsMap &&
+      hasBoundTextElement(elements[i]) &&
+      isNonDeletedElement(elements[i])
+    ) {
       const container = elements[i];
-      const text = getBoundTextElement(container, arrayToMap(elements));
+      const boundTextElementId = getBoundTextElementId(container);
+      const text = boundTextElementId
+        ? elementsMap.get(boundTextElementId)
+        : null;
 
-      if (text && text.index! <= container.index!) {
+      if (
+        text &&
+        isNonDeletedElement(text) &&
+        text.index! <= container.index!
+      ) {
         errorMessages.push(
           `Fractional indices invariant for bound elements has been compromised: "${stringifyElement(
             text,
@@ -200,9 +220,9 @@ export const syncMovedIndices = (
  *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
-export const syncInvalidIndices = (
-  elements: readonly ExcalidrawElement[],
-): OrderedExcalidrawElement[] => {
+export const syncInvalidIndices = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+): Ordered<T>[] => {
   const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
@@ -211,7 +231,7 @@ export const syncInvalidIndices = (
     mutateElement(element, elementsMap, { index });
   }
 
-  return elements as OrderedExcalidrawElement[];
+  return elements as Ordered<T>[];
 };
 
 /**
@@ -379,6 +399,13 @@ const isValidFractionalIndex = (
   successor: ExcalidrawElement["index"] | undefined,
 ) => {
   if (!index) {
+    return false;
+  }
+
+  try {
+    // Format validation
+    validateOrderKey(index);
+  } catch {
     return false;
   }
 

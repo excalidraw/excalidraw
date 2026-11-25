@@ -1,5 +1,4 @@
 import {
-  DEFAULT_FILENAME,
   EXPORT_DATA_TYPES,
   getExportSource,
   MIME_TYPES,
@@ -7,6 +6,8 @@ import {
 } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 
@@ -20,6 +21,12 @@ import type {
   ExportedLibraryData,
   ImportedLibraryData,
 } from "./types";
+
+export type JSONExportData = {
+  elements: readonly ExcalidrawElement[];
+  appState: AppState;
+  files: BinaryFiles;
+};
 
 /**
  * Strips out files which are only referenced by deleted elements
@@ -67,27 +74,29 @@ export const serializeAsJSON = (
   return JSON.stringify(data, null, 2);
 };
 
-export const saveAsJSON = async (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  files: BinaryFiles,
-  /** filename */
-  name: string = appState.name || DEFAULT_FILENAME,
-) => {
-  const serialized = serializeAsJSON(elements, appState, files, "local");
-  const blob = new Blob([serialized], {
-    type: MIME_TYPES.excalidraw,
+export const saveAsJSON = async ({
+  data,
+  filename,
+  fileHandle,
+}: {
+  data: MaybePromise<JSONExportData>;
+  filename: string;
+  fileHandle: AppState["fileHandle"];
+}) => {
+  const blob = Promise.resolve(data).then(({ elements, appState, files }) => {
+    const serialized = serializeAsJSON(elements, appState, files, "local");
+    return new Blob([serialized], {
+      type: MIME_TYPES.excalidraw,
+    });
   });
 
-  const fileHandle = await fileSave(blob, {
-    name,
+  const savedFileHandle = await fileSave(blob, {
+    name: filename,
     extension: "excalidraw",
     description: "Excalidraw file",
-    fileHandle: isImageFileHandle(appState.fileHandle)
-      ? null
-      : appState.fileHandle,
+    fileHandle: isImageFileHandle(fileHandle) ? null : fileHandle,
   });
-  return { fileHandle };
+  return { fileHandle: savedFileHandle };
 };
 
 export const loadFromJSON = async (

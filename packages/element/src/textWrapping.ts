@@ -2,8 +2,25 @@ import { isDevEnv, isTestEnv } from "@excalidraw/common";
 
 import { charWidth, getLineWidth } from "./textMeasurements";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type { FontString } from "./types";
 
+/**
+ * This module approximates browser-like soft wrapping for Excalidraw text.
+ *
+ * The flow is:
+ * 1. `parseTokens()` splits a hard line into breakable tokens using a unicode-aware regex.
+ * 2. `getWrappedTextLines()` reflows each hard line into one or more visual lines and
+ *    records where each visual line came from in the source text.
+ * 3. `wrapLine()` assembles tokens into lines, and `wrapWord()` handles a single token
+ *    that is wider than the available width.
+ * 4. `trimLine()` / `trimLineEndAtSoftBreak()` mirror browser behavior around trailing
+ *    whitespace so the rendered text stays consistent with what users see on canvas.
+ *
+ * Mostly, you'll want to use wrapText(). getWrappedTextLines() is for callers
+ * that need metadata such as mapping visual lines back to `originalText`
+ * for caret placement or future editor features.
+ */
 let cachedCjkRegex: RegExp | undefined;
 let cachedLineBreakRegex: RegExp | undefined;
 let cachedEmojiRegex: RegExp | undefined;
@@ -90,7 +107,7 @@ const CJK = {
    *         ↑ BREAK AFTER "」"
    */
   // eslint-disable-next-line prettier/prettier
-  OPENING:/（［｛〈《｟｢「『【〖〔〘〚＜〝/u,
+  OPENING: /（［｛〈《｟｢「『【〖〔〘〚＜〝/u,
   CLOSING: /）］｝〉》｠｣」』】〗〕〙〛＞。．，、〟‥？！：；・〜〞/u,
   /**
    * Currency symbols break before, not after
@@ -358,6 +375,10 @@ const Break = {
 
 /**
  * Breaks the line into the tokens based on the found line break opporutnities.
+ *
+ * Note: tokenization normalizes to NFC first so decomposed graphemes are treated as
+ * their composed variants for wrapping. Any code that needs exact source offsets should
+ * keep in mind that this assumes the input text is already NFC-normalized.
  */
 export const parseTokens = (line: string) => {
   const breakLineRegex = getLineBreakRegex();
@@ -370,96 +391,186 @@ export const parseTokens = (line: string) => {
 
 /**
  * Wraps the original text into the lines based on the given width.
+ *
+ * This is a convenience adapter over `getWrappedTextLines()` for call sites
+ * that only need the rendered wrapped string and not the source offsets.
  */
 export const wrapText = (
   text: string,
   font: FontString,
   maxWidth: number,
+  env?: RenderEnvironment,
 ): string => {
+  return getWrappedTextLines(text, font, maxWidth, env)
+    .map((line) => line.text)
+    .join("\n");
+};
+
+/**
+ * A single rendered visual line produced from the original text.
+ *
+ * `start` and `end` are end-exclusive code-unit offsets into the original text, and do
+ * not include synthetic soft line breaks inserted by this module. If trailing whitespace
+ * was trimmed away at a wrap boundary, `end` points to the last rendered character.
+ */
+export type WrappedTextLine = {
+  text: string;
+  start: number;
+  end: number;
+};
+
+/**
+ * Splits only on existing hard line breaks and preserves original offsets.
+ */
+const getHardLineBreaks = (text: string): WrappedTextLine[] => {
+  let offset = 0;
+
+  return text.split("\n").map((line) => {
+    const start = offset;
+    const end = start + line.length;
+
+    offset = end + 1;
+
+    return {
+      text: line,
+      start,
+      end,
+    };
+  });
+};
+
+/**
+ * Returns the rendered visual lines together with their source offsets.
+ *
+ * This is the source-of-truth wrapping pipeline for callers that need more than the
+ * final wrapped string, for example caret placement or future editor/rich-text mapping.
+ */
+export const getWrappedTextLines = (
+  text: string,
+  font: FontString,
+  maxWidth: number,
+  env?: RenderEnvironment,
+): WrappedTextLine[] => {
   // if maxWidth is not finite or NaN which can happen in case of bugs in
   // computation, we need to make sure we don't continue as we'll end up
   // in an infinite loop
   if (!Number.isFinite(maxWidth) || maxWidth < 0) {
-    return text;
+    return getHardLineBreaks(text);
   }
 
-  const lines: Array<string> = [];
-  const originalLines = text.split("\n");
+  const lines: WrappedTextLine[] = [];
+  let offset = 0;
 
-  for (const originalLine of originalLines) {
-    const currentLineWidth = getLineWidth(originalLine, font);
+  for (const originalLine of text.split("\n")) {
+    const originalLineWidth = getLineWidth(originalLine, font, env);
 
-    if (currentLineWidth <= maxWidth) {
-      lines.push(originalLine);
-      continue;
+    if (originalLineWidth <= maxWidth) {
+      lines.push({
+        text: originalLine,
+        start: offset,
+        end: offset + originalLine.length,
+      });
+    } else {
+      lines.push(...wrapLine(originalLine, font, maxWidth, offset, env));
     }
 
-    const wrappedLine = wrapLine(originalLine, font, maxWidth);
-    lines.push(...wrappedLine);
+    offset += originalLine.length + 1;
   }
 
-  return lines.join("\n");
+  return lines;
 };
 
 /**
- * Wraps the original line into the lines based on the given width.
+ * Wraps a single hard line into one or more visual lines.
+ *
+ * The line-local offsets are tracked in original-text code units so
+ * we can map the visual line back to the source.
  */
 const wrapLine = (
   line: string,
   font: FontString,
   maxWidth: number,
-): string[] => {
-  const lines: Array<string> = [];
+  lineStart: number,
+  env?: RenderEnvironment,
+): WrappedTextLine[] => {
+  const lines: WrappedTextLine[] = [];
   const tokens = parseTokens(line);
-  const tokenIterator = tokens[Symbol.iterator]();
 
   let currentLine = "";
+  let currentLineStart = lineStart;
+  let currentLineEnd = lineStart;
   let currentLineWidth = 0;
+  // Tracks the next token's code-unit position in the original source string.
+  let tokenOffset = lineStart;
+  let tokenIndex = 0;
 
-  let iterator = tokenIterator.next();
-
-  while (!iterator.done) {
-    const token = iterator.value;
+  while (tokenIndex < tokens.length) {
+    const token = tokens[tokenIndex];
+    const tokenStart = tokenOffset;
+    const tokenEnd = tokenStart + token.length;
     const testLine = currentLine + token;
 
     // cache single codepoint whitespace, CJK or emoji width calc. as kerning should not apply here
     const testLineWidth = isSingleCharacter(token)
-      ? currentLineWidth + charWidth.calculate(token, font)
-      : getLineWidth(testLine, font);
+      ? currentLineWidth + charWidth.calculate(token, font, env)
+      : getLineWidth(testLine, font, env);
 
     // build up the current line, skipping length check for possibly trailing whitespaces
     if (/\s/.test(token) || testLineWidth <= maxWidth) {
+      if (!currentLine) {
+        currentLineStart = tokenStart;
+      }
       currentLine = testLine;
+      currentLineEnd = tokenEnd;
       currentLineWidth = testLineWidth;
-      iterator = tokenIterator.next();
+      tokenOffset = tokenEnd;
+      tokenIndex++;
       continue;
     }
 
     // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
     if (!currentLine) {
-      const wrappedWord = wrapWord(token, font, maxWidth);
-      const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
+      const wrappedWord = wrapWord(token, font, maxWidth, tokenStart, env);
+      const trailingLine = wrappedWord[wrappedWord.length - 1] ?? {
+        text: "",
+        start: tokenStart,
+        end: tokenStart,
+      };
       const precedingLines = wrappedWord.slice(0, -1);
 
       lines.push(...precedingLines);
 
       // trailing line of the wrapped word might still be joined with next token/s
-      currentLine = trailingLine;
-      currentLineWidth = getLineWidth(trailingLine, font);
-      iterator = tokenIterator.next();
+      currentLine = trailingLine.text;
+      currentLineStart = trailingLine.start;
+      currentLineEnd = trailingLine.end;
+      currentLineWidth = getLineWidth(trailingLine.text, font, env);
+      tokenOffset = tokenEnd;
+      tokenIndex++;
     } else {
       // push & reset, but don't iterate on the next token, as we didn't use it yet!
-      lines.push(currentLine.trimEnd());
+      lines.push(
+        trimLineEndAtSoftBreak(currentLine, currentLineStart, currentLineEnd),
+      );
 
       // purposefully not iterating and not setting `currentLine` to `token`, so that we could use a simple !currentLine check above
       currentLine = "";
+      currentLineStart = tokenStart;
+      currentLineEnd = tokenStart;
       currentLineWidth = 0;
     }
   }
 
   // iterator done, push the trailing line if exists
   if (currentLine) {
-    const trailingLine = trimLine(currentLine, font, maxWidth);
+    const trailingLine = trimLine(
+      currentLine,
+      currentLineStart,
+      currentLineEnd,
+      font,
+      maxWidth,
+      env,
+    );
     lines.push(trailingLine);
   }
 
@@ -467,59 +578,102 @@ const wrapLine = (
 };
 
 /**
- * Wraps the word into the lines based on the given width.
+ * Wraps a single word that could not be placed on an empty line as-is.
  */
 const wrapWord = (
   word: string,
   font: FontString,
   maxWidth: number,
-): Array<string> => {
+  wordStart: number,
+  env?: RenderEnvironment,
+): WrappedTextLine[] => {
   // multi-codepoint emojis are already broken apart and shouldn't be broken further
   if (getEmojiRegex().test(word)) {
-    return [word];
+    return [
+      {
+        text: word,
+        start: wordStart,
+        end: wordStart + word.length,
+      },
+    ];
   }
 
   satisfiesWordInvariant(word);
 
-  const lines: Array<string> = [];
+  const lines: WrappedTextLine[] = [];
   const chars = Array.from(word);
 
   let currentLine = "";
+  let currentLineStart = wordStart;
+  let currentLineEnd = wordStart;
   let currentLineWidth = 0;
+  let offset = wordStart;
 
   for (const char of chars) {
-    const _charWidth = charWidth.calculate(char, font);
+    const charStart = offset;
+    const charEnd = charStart + char.length;
+    const _charWidth = charWidth.calculate(char, font, env);
     const testLineWidth = currentLineWidth + _charWidth;
 
     if (testLineWidth <= maxWidth) {
+      if (!currentLine) {
+        currentLineStart = charStart;
+      }
       currentLine = currentLine + char;
+      currentLineEnd = charEnd;
       currentLineWidth = testLineWidth;
+      offset = charEnd;
       continue;
     }
 
     if (currentLine) {
-      lines.push(currentLine);
+      lines.push({
+        text: currentLine,
+        start: currentLineStart,
+        end: currentLineEnd,
+      });
     }
 
     currentLine = char;
+    currentLineStart = charStart;
+    currentLineEnd = charEnd;
     currentLineWidth = _charWidth;
+    offset = charEnd;
   }
 
   if (currentLine) {
-    lines.push(currentLine);
+    lines.push({
+      text: currentLine,
+      start: currentLineStart,
+      end: currentLineEnd,
+    });
   }
 
   return lines;
 };
 
 /**
- * Similarly to browsers, does not trim all trailing whitespaces, but only those exceeding the `maxWidth`.
+ * Trims trailing whitespace that is exceeding the `maxWidth`.
+ *
+ * Used for the trailing visual line of a hard line, where some trailing
+ * whitespace may still be visible if it fits into the available width.
  */
-const trimLine = (line: string, font: FontString, maxWidth: number) => {
-  const shouldTrimWhitespaces = getLineWidth(line, font) > maxWidth;
+const trimLine = (
+  line: string,
+  start: number,
+  end: number,
+  font: FontString,
+  maxWidth: number,
+  env?: RenderEnvironment,
+): WrappedTextLine => {
+  const shouldTrimWhitespaces = getLineWidth(line, font, env) > maxWidth;
 
   if (!shouldTrimWhitespaces) {
-    return line;
+    return {
+      text: line,
+      start,
+      end,
+    };
   }
 
   // defensively default to `trimeEnd` in case the regex does not match
@@ -529,10 +683,10 @@ const trimLine = (line: string, font: FontString, maxWidth: number) => {
     "",
   ];
 
-  let trimmedLineWidth = getLineWidth(trimmedLine, font);
+  let trimmedLineWidth = getLineWidth(trimmedLine, font, env);
 
   for (const whitespace of Array.from(whitespaces)) {
-    const _charWidth = charWidth.calculate(whitespace, font);
+    const _charWidth = charWidth.calculate(whitespace, font, env);
     const testLineWidth = trimmedLineWidth + _charWidth;
 
     if (testLineWidth > maxWidth) {
@@ -543,7 +697,30 @@ const trimLine = (line: string, font: FontString, maxWidth: number) => {
     trimmedLineWidth = testLineWidth;
   }
 
-  return trimmedLine;
+  return {
+    text: trimmedLine,
+    start,
+    end: end - (line.length - trimmedLine.length),
+  };
+};
+
+/**
+ * Used for internal soft-wrap boundaries, where trailing whitespace should not
+ * survive into the rendered line even though it still exists in the original
+ * text.
+ */
+const trimLineEndAtSoftBreak = (
+  line: string,
+  start: number,
+  end: number,
+): WrappedTextLine => {
+  const trimmedLine = line.trimEnd();
+
+  return {
+    text: trimmedLine,
+    start,
+    end: end - (line.length - trimmedLine.length),
+  };
 };
 
 /**

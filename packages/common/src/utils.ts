@@ -1,5 +1,7 @@
 import { average } from "@excalidraw/math";
 
+import type { GlobalCoord } from "@excalidraw/math";
+
 import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
@@ -10,7 +12,6 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
-import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
   ENV,
@@ -47,10 +48,37 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+/**
+ * Resolves the window owning `target`, so that we keep working when the editor
+ * is rendered into another document. Accepts a `Document` as well, in which
+ * case its `defaultView` is used. Falls back to the module realm's window.
+ */
+export const getTargetWindow = (
+  target: Element | EventTarget | Document | null,
+): (Window & typeof globalThis) | null => {
+  const owner = target as
+    | (EventTarget & {
+        ownerDocument?: Document | null;
+        defaultView?: (Window & typeof globalThis) | null;
+      })
+    | null;
+  return (
+    owner?.ownerDocument?.defaultView ??
+    owner?.defaultView ??
+    (typeof window === "undefined" ? null : window)
+  );
+};
+
 export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement =>
-  target instanceof HTMLElement && target.className.includes("ToolIcon");
+): target is HTMLElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    target instanceof targetWindow.HTMLElement &&
+    target.className.includes("ToolIcon")
+  );
+};
 
 export const isInputLike = (
   target: Element | EventTarget | null,
@@ -59,17 +87,26 @@ export const isInputLike = (
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLInputElement ||
-  target instanceof HTMLTextAreaElement ||
-  target instanceof HTMLSelectElement;
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLInputElement ||
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      target instanceof targetWindow.HTMLSelectElement)
+  );
+};
 
 export const isInteractive = (target: Element | EventTarget | null) => {
+  const targetWindow = getTargetWindow(target);
   return (
     isInputLike(target) ||
-    (target instanceof Element && !!target.closest("label, button"))
+    (!!targetWindow &&
+      target instanceof targetWindow.Element &&
+      !!target.closest("label, button"))
   );
 };
 
@@ -79,15 +116,23 @@ export const isWritableElement = (
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLTextAreaElement ||
-  (target instanceof HTMLInputElement &&
-    (target.type === "text" ||
-      target.type === "number" ||
-      target.type === "password" ||
-      target.type === "search"));
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      (target instanceof targetWindow.HTMLInputElement &&
+        (target.type === "text" ||
+          target.type === "number" ||
+          target.type === "password" ||
+          target.type === "search")) ||
+      (target instanceof targetWindow.HTMLElement &&
+        target.closest(".cm-editor") !== null))
+  );
+};
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -149,54 +194,50 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
-// throttle callback to execute once per animation frame
+// throttle callback to execute once per animation frame using the latest args
 export const throttleRAF = <T extends any[]>(
   fn: (...args: T) => void,
-  opts?: { trailing?: boolean },
+  ownerWindow?: Pick<Window, "requestAnimationFrame" | "cancelAnimationFrame">,
 ) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = (args: T) => {
-    timerId = window.requestAnimationFrame(() => {
+  // resolved lazily so module-scope callers work in environments without
+  // a global window (headless import)
+  const getOwnerWindow = () => ownerWindow ?? window;
+
+  const scheduleFunc = () => {
+    timerId = getOwnerWindow().requestAnimationFrame(() => {
       timerId = null;
-      fn(...args);
+      const args = lastArgs;
       lastArgs = null;
-      if (lastArgsTrailing) {
-        lastArgs = lastArgsTrailing;
-        lastArgsTrailing = null;
-        scheduleFunc(lastArgs);
+
+      if (args) {
+        fn(...args);
       }
     });
   };
 
   const ret = (...args: T) => {
-    if (isTestEnv()) {
-      fn(...args);
-      return;
-    }
     lastArgs = args;
     if (timerId === null) {
-      scheduleFunc(lastArgs);
-    } else if (opts?.trailing) {
-      lastArgsTrailing = args;
+      scheduleFunc();
     }
   };
   ret.flush = () => {
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
     if (lastArgs) {
-      fn(...(lastArgsTrailing || lastArgs));
-      lastArgs = lastArgsTrailing = null;
+      fn(...lastArgs);
+      lastArgs = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = lastArgsTrailing = null;
+    lastArgs = null;
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
   };
@@ -211,135 +252,6 @@ export const throttleRAF = <T extends any[]>(
  */
 export const easeOut = (k: number) => {
   return 1 - Math.pow(1 - k, 4);
-};
-
-const easeOutInterpolate = (from: number, to: number, progress: number) => {
-  return (to - from) * easeOut(progress) + from;
-};
-
-/**
- * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
- * Executes the `onStep` callback on each step with the interpolated values.
- * Returns a function that can be called to cancel the animation.
- *
- * @example
- * // Example usage:
- * const fromValues = { x: 0, y: 0 };
- * const toValues = { x: 100, y: 200 };
- * const onStep = ({x, y}) => {
- *   setState(x, y)
- * };
- * const onCancel = () => {
- *   console.log("Animation canceled");
- * };
- *
- * const cancelAnimation = easeToValuesRAF({
- *   fromValues,
- *   toValues,
- *   onStep,
- *   onCancel,
- * });
- *
- * // To cancel the animation:
- * cancelAnimation();
- */
-export const easeToValuesRAF = <
-  T extends Record<keyof T, number>,
-  K extends keyof T,
->({
-  fromValues,
-  toValues,
-  onStep,
-  duration = 250,
-  interpolateValue,
-  onStart,
-  onEnd,
-  onCancel,
-}: {
-  fromValues: T;
-  toValues: T;
-  /**
-   * Interpolate a single value.
-   * Return undefined to be handled by the default interpolator.
-   */
-  interpolateValue?: (
-    fromValue: number,
-    toValue: number,
-    /** no easing applied  */
-    progress: number,
-    key: K,
-  ) => number | undefined;
-  onStep: (values: T) => void;
-  duration?: number;
-  onStart?: () => void;
-  onEnd?: () => void;
-  onCancel?: () => void;
-}) => {
-  let canceled = false;
-  let frameId = 0;
-  let startTime: number;
-
-  function step(timestamp: number) {
-    if (canceled) {
-      return;
-    }
-    if (startTime === undefined) {
-      startTime = timestamp;
-      onStart?.();
-    }
-
-    const elapsed = Math.min(timestamp - startTime, duration);
-    const factor = easeOut(elapsed / duration);
-
-    const newValues = {} as T;
-
-    Object.keys(fromValues).forEach((key) => {
-      const _key = key as keyof T;
-      const result = ((toValues[_key] - fromValues[_key]) * factor +
-        fromValues[_key]) as T[keyof T];
-      newValues[_key] = result;
-    });
-
-    onStep(newValues);
-
-    if (elapsed < duration) {
-      const progress = elapsed / duration;
-
-      const newValues = {} as T;
-
-      Object.keys(fromValues).forEach((key) => {
-        const _key = key as K;
-        const startValue = fromValues[_key];
-        const endValue = toValues[_key];
-
-        let result;
-
-        result = interpolateValue
-          ? interpolateValue(startValue, endValue, progress, _key)
-          : easeOutInterpolate(startValue, endValue, progress);
-
-        if (result == null) {
-          result = easeOutInterpolate(startValue, endValue, progress);
-        }
-
-        newValues[_key] = result as T[K];
-      });
-      onStep(newValues);
-
-      frameId = window.requestAnimationFrame(step);
-    } else {
-      onStep(toValues);
-      onEnd?.();
-    }
-  }
-
-  frameId = window.requestAnimationFrame(step);
-
-  return () => {
-    onCancel?.();
-    canceled = true;
-    window.cancelAnimationFrame(frameId);
-  };
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
@@ -390,7 +302,7 @@ export const updateActiveTool = (
       }
     | { type: "custom"; customType: string }
   ) & { locked?: boolean; fromSelection?: boolean }) & {
-    lastActiveToolBeforeEraser?: ActiveTool | null;
+    lastActiveTool?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
@@ -405,9 +317,9 @@ export const updateActiveTool = (
   return {
     ...appState.activeTool,
     lastActiveTool:
-      data.lastActiveToolBeforeEraser === undefined
+      data.lastActiveTool === undefined
         ? appState.activeTool.lastActiveTool
-        : data.lastActiveToolBeforeEraser,
+        : data.lastActiveTool,
     type: data.type,
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
@@ -442,7 +354,7 @@ export const viewportCoordsToSceneCoords = (
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y };
+  return { x, y } as GlobalCoord;
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -481,6 +393,13 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  * See https://github.com/excalidraw/excalidraw/pull/1722#discussion_r436340171
  */
 export const isRTL = (text: string) => RE_RTL_CHECK.test(text);
+
+const RE_RTL_CHARS = new RegExp(`[${RS_RTL_CHARS}]`);
+/**
+ * Checks whether the text has any RTL character, i.e. whether it may be laid
+ * out bidirectionally.
+ */
+export const hasRTLChars = (text: string) => RE_RTL_CHARS.test(text);
 
 export const tupleToCoors = (
   xyTuple: readonly [number, number],
@@ -548,16 +467,6 @@ export const mapFind = <T, K>(
   return undefined;
 };
 
-export const isTransparent = (color: string) => {
-  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
-  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
-  return (
-    isRGBTransparent ||
-    isRRGGBBTransparent ||
-    color === COLOR_PALETTE.transparent
-  );
-};
-
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
     ? (value?: MaybePromise<Awaited<T>>) => void
@@ -623,12 +532,14 @@ export const supportsEmoji = () => {
 export const getNearestScrollableContainer = (
   element: HTMLElement,
 ): HTMLElement | Document => {
+  const ownerDocument = element.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   let parent = element.parentElement;
   while (parent) {
-    if (parent === document.body) {
-      return document;
+    if (parent === ownerDocument.body) {
+      return ownerDocument;
     }
-    const { overflowY } = window.getComputedStyle(parent);
+    const { overflowY } = ownerWindow.getComputedStyle(parent);
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
@@ -640,7 +551,7 @@ export const getNearestScrollableContainer = (
     }
     parent = parent.parentElement;
   }
-  return document;
+  return ownerDocument;
 };
 
 export const focusNearestParent = (element: HTMLInputElement) => {
@@ -1157,39 +1068,69 @@ export const normalizeEOL = (str: string) => {
 };
 
 // -----------------------------------------------------------------------------
-type HasBrand<T> = {
+export type HasBrand<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [K in keyof T]: K extends `~brand${infer _}` ? true : never;
+  [K in keyof T]: K extends `~brand${infer _}` | "_brand" ? true : never;
 }[keyof T];
 
 type RemoveAllBrands<T> = HasBrand<T> extends true
   ? {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+      [K in keyof T as K extends `~brand~${infer _}` | "_brand"
+        ? never
+        : K]: T[K];
     }
-  : never;
+  : T;
 
-// adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
-// currently does not cover all types (e.g. tuples, promises...)
-type Unbrand<T> = T extends Map<infer E, infer F>
-  ? Map<E, F>
+// For accepting values - uses loose matching for branded types
+// Preserves readonly modifier: mutable array requires mutable input
+type UnbrandForValue<T> = T extends Map<infer E, infer F>
+  ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
   : T extends Set<infer E>
-  ? Set<E>
-  : T extends Array<infer E>
-  ? Array<E>
+  ? Set<UnbrandForValue<E>>
+  : T extends readonly any[]
+  ? T extends any[]
+    ? unknown[] // mutable array - require mutable input
+    : readonly unknown[] // readonly array - accept readonly input
   : RemoveAllBrands<T>;
+
+// For return types - preserves array element unbranding
+export type Unbrand<T> = T extends Map<infer E, infer F>
+  ? Map<Unbrand<E>, Unbrand<F>>
+  : T extends Set<infer E>
+  ? Set<Unbrand<E>>
+  : T extends readonly (infer E)[]
+  ? Array<Unbrand<E>>
+  : RemoveAllBrands<T>;
+
+export type CombineBrands<BrandedType, CurrentType> =
+  BrandedType extends readonly (infer BE)[]
+    ? CurrentType extends readonly (infer CE)[]
+      ? Array<CE & BE>
+      : CurrentType & BrandedType
+    : CurrentType & BrandedType;
+
+export type CombineBrandsIfNeeded<T, Required> = [T] extends [Required]
+  ? T[]
+  : HasBrand<T> extends true
+  ? CombineBrands<T, Required>[]
+  : Required[];
 
 /**
  * Makes type into a branded type, ensuring that value is assignable to
- * the base ubranded type. Optionally you can explicitly supply current value
+ * the base unbranded type. Optionally you can explicitly supply current value
  * type to combine both (useful for composite branded types. Make sure you
  * compose branded types which are not composite themselves.)
  */
-export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
-  value: Unbrand<BrandedType>,
-) => {
-  return value as CurrentType & BrandedType;
-};
+export function toBrandedType<BrandedType>(
+  value: UnbrandForValue<BrandedType>,
+): BrandedType;
+export function toBrandedType<BrandedType, CurrentType>(
+  value: CurrentType,
+): CombineBrands<BrandedType, CurrentType>;
+export function toBrandedType(value: unknown) {
+  return value;
+}
 
 // -----------------------------------------------------------------------------
 
@@ -1310,4 +1251,11 @@ export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
   } catch (e) {
     console.error("unable to set feature flag", e);
   }
+};
+
+export const oneOf = <N extends string | number | symbol | null, H extends N>(
+  needle: N,
+  haystack: readonly H[],
+): needle is H => {
+  return haystack.includes(needle as any);
 };

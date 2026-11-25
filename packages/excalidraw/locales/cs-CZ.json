@@ -1,10 +1,17 @@
 {
   "labels": {
+    "signUp": "Zaregistrovat se",
+    "signIn": "Přihlásit se",
+    "upgrade": "Upgradovat",
     "paste": "Vložit",
     "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
+    "chartType_bar": "Sloupcový graf",
+    "chartType_line": "Spojnicový graf",
+    "chartType_radar": "Radarový graf",
+    "chartType_plaintext": "Prostý text",
     "selectAll": "Vybrat vše",
-    "multiSelect": "Přidat prvek do výběru",
+    "multiSelect": "Přidat objekt do výběru",
     "moveCanvas": "Posunout plátno",
     "cut": "Vyjmout",
     "copy": "Kopírovat",
@@ -21,6 +28,7 @@
     "copyStyles": "Kopírovat styly",
     "pasteStyles": "Vložit styly",
     "stroke": "Obrys",
+    "textColor": "Barva textu",
     "changeStroke": "Změnit barvu ohraničení",
     "background": "Pozadí",
     "changeBackground": "Změnit barvu pozadí",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Čárkovaný",
     "strokeStyle_dotted": "Tečkovaný",
     "sloppiness": "Stylizace",
+    "pressure": "Přítlak",
+    "pressure_constant": "Konstantní",
+    "pressure_variable": "Proměnlivý",
     "opacity": "Průhlednost",
     "textAlign": "Zarovnání textu",
     "edges": "Hrany",
@@ -46,14 +57,21 @@
     "arrowhead_triangle_outline": "Trojúhelník (obrys)",
     "arrowhead_diamond": "Kosočtverec",
     "arrowhead_diamond_outline": "Kosočtverec (obrys)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Vraní noha (mnoho)",
+    "arrowhead_crowfoot_one": "Vraní noha (jedna)",
+    "arrowhead_crowfoot_one_or_many": "Vraní noha (jedna nebo více)",
+    "arrowhead_cardinality_one": "Kardinalita (jedna)",
+    "arrowhead_cardinality_many": "Kardinalita (mnoho)",
+    "arrowhead_cardinality_one_or_many": "Kardinalita (jedna nebo více)",
+    "arrowhead_cardinality_exactly_one": "Kardinalita (právě jedna)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalita (nula nebo jedna)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalita (nula nebo více)",
+    "more_options": "Další možnosti",
+    "cardinality": "Kardinalita",
     "arrowtypes": "Typ šipky",
     "arrowtype_sharp": "Ostrá šipka",
     "arrowtype_round": "Zakřivená šipka",
-    "arrowtype_elbowed": "",
+    "arrowtype_elbowed": "Lomená šipka",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
     "addWatermark": "Přidat \"Vyrobeno s Excalidraw\"",
@@ -95,7 +113,10 @@
     "group": "Sloučit výběr do skupiny",
     "ungroup": "Zrušit sloučení skupiny",
     "collaborators": "Spolupracovníci",
-    "toggleGrid": "Přepínač mřížky",
+    "you": "Vy",
+    "toggleGrid": "Zobrazit mřížku",
+    "minimap": "Minimapa",
+    "zoom": "Přiblížení",
     "addToLibrary": "Přidat do knihovny",
     "removeFromLibrary": "Odebrat z knihovny",
     "libraryLoadingMessage": "Načítání knihovny…",
@@ -113,7 +134,7 @@
     "distributeVertically": "Rozložit svisle",
     "flipHorizontal": "Převrátit vodorovně",
     "flipVertical": "Převrátit svisle",
-    "viewMode": "Náhled",
+    "viewMode": "Mód pro čtení",
     "share": "Sdílet",
     "showStroke": "Zobrazit výběr barvy",
     "showBackground": "Zobrazit výběr barev pozadí",
@@ -135,15 +156,15 @@
       "labelEmbed": "Odkaz & vložit",
       "empty": "Není nastaven žádný odkaz",
       "hint": "Napište nebo vložte svůj odkaz zde",
-      "goToElement": "Přejít na cílový prvek"
+      "goToElement": "Přejít na cílový objekt"
     },
     "lineEditor": {
       "edit": "Upravit čáru",
       "editArrow": "Upravit šipku"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Rozpojit mnohoúhelník",
+      "convertToPolygon": "Převést na mnohoúhelník"
     },
     "elementLock": {
       "lock": "Uzamknout",
@@ -153,25 +174,39 @@
     },
     "statusPublished": "Zveřejněno",
     "sidebarLock": "Ponechat postranní panel otevřený",
-    "selectAllElementsInFrame": "Vybrat všechny prvky v orámování",
-    "removeAllElementsFromFrame": "Odstranit všechny prvky z orámování",
+    "selectAllElementsInFrame": "Vybrat všechny objekty v orámování",
+    "removeAllElementsFromFrame": "Odstranit všechny objekty z orámování",
     "eyeDropper": "Vyberte barvu z plátna",
     "textToDiagram": "Z textu na diagram",
     "prompt": "Výzva",
     "followUs": "Sledujte nás",
     "discordChat": "Discord chat",
-    "zoomToFitViewport": "",
+    "zoomToFitViewport": "Přiblížit na velikost zobrazení",
     "zoomToFitSelection": "Přiblížit na výběr",
-    "zoomToFit": "Přiblížit na zobrazení všech prvků",
+    "zoomToFit": "Přiblížit na zobrazení všech objektů",
     "installPWA": "Instalovat Excalidraw lokálně (PWA)",
     "autoResize": "Povolit automatickou změnu velikosti textu",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "toggleAutoResize": "Přepnout automatickou změnu velikosti textu",
+    "imageCropping": "Oříznutí obrázku",
+    "unCroppedDimension": "Rozměr bez oříznutí",
     "copyElementLink": "Kopírovat odkaz na objekt",
     "linkToElement": "Odkaz na objekt",
-    "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": ""
+    "wrapSelectionInFrame": "Zabalit výběr do orámování",
+    "removeFrame": "Odstranit orámování",
+    "toggleWrap": "Zabalit nebo rozbalit výběr",
+    "tab": "Tab",
+    "shapeSwitch": "Změnit tvar",
+    "preferences": "Předvolby",
+    "preferences_toolLock": "Zamknout nástroj",
+    "boxSelectionMode": "Vybírat při",
+    "boxSelectionContain": "Obklopení",
+    "boxSelectionOverlap": "Překrytí",
+    "arrowBinding": "Vázání šipek",
+    "midpointSnapping": "Přichytávat ke středům stran",
+    "showHints": "Tipy pod panelem nástrojů",
+    "inputDevice": "Vstupní zařízení",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Myš"
   },
   "elementLink": {
     "title": "Odkaz na objekt",
@@ -180,13 +215,13 @@
   },
   "library": {
     "noItems": "Dosud neexistují žádné položky...",
-    "hint_emptyLibrary": "Vyberte položku na plátně a přidejte ji sem nebo nainstalujte knihovnu z veřejného úložiště níže.",
-    "hint_emptyPrivateLibrary": "Vyberte položku na plátně a přidejte ji sem.",
+    "hint_emptyLibrary": "Vyberte objekt na plátně a přidejte ho sem nebo nainstalujte knihovnu z veřejného úložiště níže.",
+    "hint_emptyPrivateLibrary": "Vyberte objekt na plátně a přidejte ho sem.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Hledat v knihovně",
+      "heading": "Výsledky v knihovně",
+      "noResults": "Nebyly nalezeny žádné odpovídající položky...",
+      "clearSearch": "Vymazat hledání"
     }
   },
   "search": {
@@ -194,9 +229,9 @@
     "noMatch": "Nebyla nalezena žádná shoda...",
     "singleResult": "výsledek",
     "multipleResults": "výsledky",
-    "placeholder": "",
-    "frames": "",
-    "texts": ""
+    "placeholder": "Najít text na plátně...",
+    "frames": "Orámování",
+    "texts": "Texty"
   },
   "buttons": {
     "clearReset": "Resetovat plátno",
@@ -215,12 +250,14 @@
     "zoomIn": "Přiblížit",
     "zoomOut": "Oddálit",
     "resetZoom": "Resetovat přiblížení",
+    "zoomToFit": "Zobrazit vše",
     "menu": "Hlavní nabídka",
     "done": "Hotovo",
     "edit": "Upravit",
     "undo": "Zpět",
     "redo": "Znovu",
     "resetLibrary": "Obnovit knihovnu",
+    "reset": "Resetovat",
     "createNewRoom": "Vytvořit novou místnost",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -230,11 +267,11 @@
     "objectsSnapMode": "Přichytávat k objektům",
     "exitZenMode": "Opustit zen mód",
     "cancel": "Zrušit",
-    "saveLibNames": "",
+    "saveLibNames": "Uložit názvy a zavřít",
     "clear": "Vyčistit",
     "remove": "Odstranit",
     "embed": "Přepínač vkládání",
-    "publishLibrary": "",
+    "publishLibrary": "Přejmenovat nebo publikovat",
     "submit": "Odeslat",
     "confirm": "Potvrdit",
     "embeddableInteractionButton": "Klikněte pro interakci"
@@ -261,7 +298,7 @@
     "removeItemsFromsLibrary": "Smazat {{count}} položek z knihovny?",
     "invalidEncryptionKey": "Šifrovací klíč musí mít 22 znaků. Live spolupráce je zakázána.",
     "collabOfflineWarning": "Není k dispozici žádné internetové připojení.\nVaše změny nebudou uloženy!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Kvóta úložiště prohlížeče byla překročena. Změny nebudou uloženy."
   },
   "errors": {
     "unsupportedFileType": "Nepodporovaný typ souboru.",
@@ -271,28 +308,28 @@
     "failedToFetchImage": "Nepodařilo se načíst obrázek.",
     "cannotResolveCollabServer": "Nelze se připojit ke sdílenému serveru. Prosím obnovte stránku a zkuste to znovu.",
     "importLibraryError": "Nelze načíst knihovnu",
-    "saveLibraryError": "",
+    "saveLibraryError": "Knihovnu se nepodařilo uložit do úložiště. Uložte si prosím knihovnu lokálně do souboru, abyste nepřišli o změny.",
     "collabSaveFailed": "Nelze uložit do databáze na serveru. Pokud problémy přetrvávají, měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "collabSaveFailed_sizeExceeded": "Nelze uložit do databáze na serveru, plátno se zdá být příliš velké. Měli byste uložit soubor lokálně, abyste se ujistili, že neztratíte svou práci.",
     "imageToolNotSupported": "Obrázky jsou vypnuty.",
     "brave_measure_text_error": {
       "line1": "Vypadá to, že používáte Brave prohlížeč s povoleným nastavením <bold>Aggressively Block Fingerprinting</bold>.",
-      "line2": "To by mohlo vést k narušení <bold>Textových elementů</bold> ve vašich výkresech.",
+      "line2": "To by mohlo vést k narušení <bold>Textových objektů</bold> ve vašich výkresech.",
       "line3": "Důrazně doporučujeme zakázat toto nastavení. Můžete sledovat <link>tyto kroky</link> jak to udělat.",
-      "line4": "Pokud vypnutí tohoto nastavení neopravuje zobrazení textových prvků, prosím, otevřete <issueLink>problém</issueLink> na našem GitHubu, nebo nám napište na <discordLink>Discord</discordLink>"
+      "line4": "Pokud vypnutí tohoto nastavení neopravuje zobrazení textových objektů, prosím, otevřete <issueLink>problém</issueLink> na našem GitHubu, nebo nám napište na <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "Objekty typu Web Embed nelze přidat do knihovny.",
+      "iframe": "Objekty typu IFrame nelze přidat do knihovny.",
+      "image": "Podpora přidávání obrázků do knihovny brzy přibude!"
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Nepodařilo se vložit (nelze číst ze systémové schránky).",
     "asyncPasteFailedOnParse": "Nepodařilo se vložit.",
-    "copyToSystemClipboardFailed": ""
+    "copyToSystemClipboardFailed": "Nepodařilo se zkopírovat do schránky."
   },
   "toolBar": {
     "selection": "Výběr",
-    "lasso": "",
+    "lasso": "Výběr lasem",
     "image": "Vložit obrázek",
     "rectangle": "Obdélník",
     "diamond": "Diamant",
@@ -304,16 +341,23 @@
     "library": "Knihovna",
     "lock": "Po kreslení ponechat vybraný nástroj aktivní",
     "penMode": "Režim Pera - zabránit dotyku",
-    "link": "",
+    "link": "Přidat / aktualizovat odkaz pro vybraný tvar",
     "eraser": "Guma",
     "frame": "Orámování",
     "magicframe": "Z wireframu na kód",
+    "stickynote": "Poznámka",
     "embeddable": "Web Embed",
     "laser": "Laserové ukazovátko",
+    "autoshape": "Z kresby na tvar",
+    "bucketfill": "Výplň barvou",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": "Více nástrojů",
-    "mermaidToExcalidraw": "",
-    "convertElementType": ""
+    "mermaidToExcalidraw": "Z Mermaid do Excalidraw",
+    "convertElementType": "Přepnout typ tvaru"
+  },
+  "bucketfill": {
+    "noRegion": "Zde se nepodařilo najít uzavřenou oblast k vyplnění.",
+    "tooComplex": "Tato oblast je na vyplnění příliš složitá."
   },
   "element": {
     "rectangle": "Obdélník",
@@ -327,7 +371,8 @@
     "group": "Skupina",
     "frame": "Rám",
     "magicframe": "Z wireframu na kód",
-    "embeddable": "",
+    "stickynote": "Poznámka",
+    "embeddable": "Web Embed",
     "selection": "Výběr",
     "iframe": "IFrame"
   },
@@ -337,39 +382,45 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} pro zavření vyhledávání",
+    "canvasPanning": "Chcete-li posunout plátno, podržte při tažení {{shortcut_1}} nebo {{shortcut_2}}, nebo použijte nástroj Ruka",
     "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Kliknutím pro více bodů, táhnutím pro jednu čáru. Opětovným stisknutím {{shortcut}} změníte typ šipky.",
+    "arrowBindModifiers": "Podržte {{shortcut_1}} pro vypnutí vázání, nebo {{shortcut_2}} pro vázání k pevnému bodu",
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
-    "embeddable": "",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "embeddable": "Klikněte a táhněte pro vložení webové stránky",
+    "stickynote": "Klikněte pro umístění poznámky, nebo táhněte pro určení její velikosti",
+    "autoshape": "Kreslete obdélníky, kruhy, kosočtverce, čáry a šipky",
+    "text_selected": "Dvakrát klikněte nebo stiskněte {{shortcut}} pro úpravu textu",
+    "text_editing": "Stiskněte {{shortcut_1}} nebo {{shortcut_2}} pro dokončení úprav",
+    "toggleTextAutoResize": "{{shortcut}} pro přepnutí automatické změny velikosti textu",
+    "linearElementMulti": "Klikněte na poslední bod nebo stiskněte {{shortcut_1}} či {{shortcut_2}} pro dokončení",
+    "lockAngle": "Úhel můžete omezit podržením {{shortcut}}",
+    "resize": "Při změně velikosti můžete zachovat proporce podržením {{shortcut_1}},\npodržte {{shortcut_2}} pro změnu velikosti od středu",
+    "resizeImage": "Velikost můžete volně měnit podržením {{shortcut_1}},\npodržte {{shortcut_2}} pro změnu velikosti od středu",
+    "resizeStickyNote": "Podržte {{shortcut_1}} pro volnou změnu velikosti, {{shortcut_2}} pro změnu velikosti od středu",
+    "rotate": "Při otáčení můžete omezit úhly podržením {{shortcut}}",
+    "toggleArrowhead": "Dvakrát klikněte pro přepnutí hrotu šipky",
+    "lineEditor_info": "Podržte {{shortcut_1}} a dvakrát klikněte, nebo stiskněte {{shortcut_2}} pro úpravu bodů",
+    "lineEditor_line_info": "Dvakrát klikněte nebo stiskněte {{shortcut}} pro úpravu bodů",
+    "lineEditor_pointSelected": "Stiskněte {{shortcut_1}} pro odstranění bodů,\n{{shortcut_2}} pro duplikování, nebo táhněte pro přesun",
+    "lineEditor_nothingSelected": "Vyberte bod k úpravě (podržte {{shortcut_1}} pro výběr více bodů),\nnebo podržte {{shortcut_2}} a klikněte pro přidání nových bodů",
     "publishLibrary": "Publikovat vlastní knihovnu",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} pro přidání textu",
+    "createFlowchart": "{{shortcut}} pro vytvoření vývojového diagramu",
+    "deepBoxSelect": "Podržte {{shortcut}} pro hluboký výběr a pro zabránění tažení",
+    "cycleSelection": "{{shortcut}}+kliknutí pro přepínání výběru, nebo tažení pro duplikování",
+    "eraserRevert": "Podržte {{shortcut}} pro obnovení objektů označených ke smazání",
     "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Podržte {{shortcut}} pro vypnutí přichytávání",
+    "enterCropEditor": "Dvakrát klikněte na obrázek nebo stiskněte {{shortcut}} pro oříznutí obrázku",
+    "leaveCropEditor": "Klikněte mimo obrázek nebo stiskněte {{shortcut_1}} či {{shortcut_2}} pro dokončení oříznutí"
   },
   "canvasError": {
     "cannotShowPreview": "Náhled nelze zobrazit",
     "canvasTooBig": "Plátno je možná příliš velké.",
-    "canvasTooBigTip": "Tip: zkus posunout nejvzdálenější prvky trochu blíže k sobě."
+    "canvasTooBigTip": "Tip: zkus posunout nejvzdálenější objekty trochu blíže k sobě."
   },
   "errorSplash": {
     "headingMain": "Chyba. Zkuste <button>znovu načíst stránku</button>.",
@@ -380,11 +431,11 @@
     "sceneContent": "Obsah scény:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Nebo"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Pozvěte ostatní ke spolupráci na vaší kresbě.",
+    "desc_privacy": "Nebojte se, relace je end-to-end šifrovaná a zcela soukromá. Ani náš server nevidí, co kreslíte.",
     "button_startSession": "Zahájit relaci",
     "button_stopSession": "Ukončit relaci",
     "desc_inProgressIntro": "Živá spolupráce právě probíhá.",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "Chyba"
+  },
+  "progressDialog": {
+    "title": "Ukládání",
+    "defaultMessage": "Příprava ukládání..."
   },
   "exportDialog": {
     "disk_title": "Uložit na disk",
@@ -411,14 +466,14 @@
     "click": "kliknutí",
     "deepSelect": "Hluboký výběr",
     "deepBoxSelect": "Hluboký výběr uvnitř boxu a zabránění táhnnutí",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Vytvořit vývojový diagram z obecného objektu",
+    "navigateFlowchart": "Procházet vývojový diagram",
     "curvedArrow": "Zakřivená šipka",
     "curvedLine": "Zakřivená čára",
     "documentation": "Dokumentace",
     "doubleClick": "dvojklik",
     "drag": "tažení",
-    "editor": "",
+    "editor": "Editor",
     "editLineArrowPoints": "Upravit body linií/šipek",
     "editText": "Upravit text / přidat popis",
     "github": "Našel jsi problém? Nahlaš ho",
@@ -431,13 +486,13 @@
     "textNewLine": "Přidat nový řádek (textový editor)",
     "title": "Nápověda",
     "view": "Zobrazení",
-    "zoomToFit": "Přiblížit na zobrazení všech prvků",
+    "zoomToFit": "Přiblížit na zobrazení všech objektů",
     "zoomToSelection": "Přiblížit na výběr",
     "toggleElementLock": "Zamknout/odemknout výběr",
     "movePageUpDown": "Posunout stránku nahoru/dolů",
     "movePageLeftRight": "Přesunout stránku doleva/doprava",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Oříznout obrázek",
+    "cropFinish": "Dokončit oříznutí obrázku"
   },
   "clearCanvasDialog": {
     "title": "Vymazat plátno"
@@ -528,15 +583,15 @@
     "copyStyles": "Styly byly zkopírovány.",
     "copyToClipboard": "Zkopírováno do schránky.",
     "copyToClipboardAsPng": "{{exportSelection}} zkopírován do schránky jako PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Zkopírováno do schránky jako SVG: {{exportSelection}}\n({{exportColorScheme}})",
     "fileSaved": "Soubor byl uložen.",
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden prvek,\nnebo vložte do existujícího textového editoru",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": "",
-    "elementLinkCopied": ""
+    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden objekt,\nnebo vložte do existujícího textového editoru",
+    "unableToEmbed": "Vložení této URL adresy momentálně není povoleno. O přidání URL adresy na seznam povolených můžete požádat na GitHubu",
+    "unrecognizedLinkFormat": "Vložený odkaz neodpovídá očekávanému formátu. Zkuste prosím vložit řetězec 'embed' poskytnutý zdrojovým webem",
+    "elementLinkCopied": "Odkaz zkopírován do schránky"
   },
   "colors": {
     "transparent": "Průhledná",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Všechna vaše data jsou uložena lokálně ve vašem prohlížeči.",
+      "center_heading": "Vaše kresby se ukládají do úložiště vašeho prohlížeče.",
+      "center_heading_line2": "Úložiště prohlížeče může být nečekaně vymazáno.",
+      "center_heading_line3": "Pravidelně ukládejte svou práci do souboru, abyste o ni nepřišli.",
       "center_heading_plus": "Chcete místo toho přejít na Excalidraw+?",
       "menuHint": "Export, nastavení, jazyky, ..."
     },
@@ -569,50 +626,115 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Barva",
     "mostUsedCustomColors": "Nejpoužívanější vlastní barvy",
     "colors": "Barvy",
     "shades": "Stíny",
     "hexCode": "Hex kód",
-    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny"
+    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny",
+    "invalidColor": "Neplatná barva",
+    "invalidHexLength": "Hex kód musí mít 3, 4, 6 nebo 8 znaků",
+    "topPicksTip": "Tip: libovolnou barvu připnete přetažením mezi oblíbené",
+    "resetTopPicks": "Obnovit výchozí oblíbené barvy"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Exportovat jako obrázek",
+        "button": "Exportovat jako obrázek",
+        "description": "Exportovat data scény jako obrázek, ze kterého můžete později importovat."
       },
       "saveToDisk": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Uložit na disk",
+        "button": "Uložit na disk",
+        "description": "Exportovat data scény do souboru, ze kterého můžete později importovat."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "Exportovat do Excalidraw+",
+        "description": "Uložit scénu do vašeho pracovního prostoru Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
         "title": "Načíst ze souboru",
         "button": "Načíst ze souboru",
-        "description": ""
+        "description": "Načtení ze souboru <bold>nahradí váš existující obsah</bold>.<br></br>Svou kresbu můžete nejprve zálohovat pomocí jedné z níže uvedených možností."
       },
       "shareableLink": {
         "title": "Načíst z odkazu",
         "button": "Nahradit můj obsah",
-        "description": ""
+        "description": "Načtení externí kresby <bold>nahradí váš existující obsah</bold>.<br></br>Svou kresbu můžete nejprve zálohovat pomocí jedné z níže uvedených možností."
       }
     }
   },
+  "fileDrop": {
+    "replace": "Pusťte pro nahrazení obsahu",
+    "add": "Pusťte pro přidání na plátno",
+    "importLibrary": "Pusťte pro import knihovny",
+    "replaceHint": "Podržte <shift>Shift</shift> pro zachování existujícího obsahu",
+    "keepHint": "Váš existující obsah zůstane zachován",
+    "libraryHint": "Soubory knihoven budou přidány ke stávající knihovně",
+    "replacedToast": "Obsah byl nahrazen. {{shortcut}} pro vrácení zpět"
+  },
   "mermaid": {
-    "title": "",
+    "title": "Z Mermaid do Excalidraw",
     "button": "Vložit",
-    "description": "",
+    "description": "<flowchartLink>Vývojové diagramy</flowchartLink>, <sequenceLink>sekvenční diagramy</sequenceLink>, <classLink>diagramy tříd</classLink>, <stateLink>stavové diagramy</stateLink>, <erdLink>diagramy entit a vztahů</erdLink>, <ganttLink>Ganttovy diagramy</ganttLink>, <quadrantLink>kvadrantové grafy</quadrantLink> a <timelineLink>časové osy</timelineLink> se převádějí na objekty Excalidraw. Ostatní typy se vloží jako obrázek.",
     "syntax": "Mermaid syntaxe",
-    "preview": "Náhled"
+    "preview": "Náhled",
+    "label": "Mermaid",
+    "inputPlaceholder": "Sem napište definici diagramu Mermaid...",
+    "autoFixAvailable": "K dispozici je automatická oprava",
+    "loadError": "Mermaid se nepodařilo načíst. Zkontrolujte připojení k internetu a zkuste to znovu.",
+    "loadErrorReload": "Mermaid se nepodařilo načíst. Pro další pokus znovu načtěte stránku.",
+    "reload": "Znovu načíst"
+  },
+  "ttd": {
+    "error": "Chyba!"
+  },
+  "chat": {
+    "inputPlaceholder": "Začněte sem psát svůj nápad na diagram... ({{shortcut}} pro nový řádek)",
+    "inputPlaceholderWithMessages": "Pokračujte ve vylepšování diagramu...",
+    "generating": "Generování...",
+    "rateLimitRemaining": "Zbývající požadavky pro dnešek: {{count}}",
+    "role": {
+      "user": "Vy",
+      "assistant": "AI asistent",
+      "system": "Systém"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Chat",
+    "menu": "Nabídka",
+    "newChat": "Nový chat",
+    "deleteChat": "Smazat chat",
+    "deleteMessage": "Smazat zprávu",
+    "viewAsMermaid": "Zobrazit jako Mermaid",
+    "placeholder": {
+      "title": "Pojďme navrhnout váš diagram",
+      "description": "Popište diagram, který chcete vytvořit, a my vám ho vygenerujeme.",
+      "hint": "Zatím umíme vývojové diagramy, sekvenční diagramy, diagramy tříd, stavové diagramy a diagramy entit a vztahů."
+    },
+    "preview": "Náhled",
+    "insert": "Vložit",
+    "retry": "Zkusit znovu",
+    "errors": {
+      "promptTooShort": "Výzva je příliš krátká (minimální počet znaků: {{min}})",
+      "promptTooLong": "Výzva je příliš dlouhá (maximální počet znaků: {{max}})",
+      "generationFailed": "Generování se nezdařilo",
+      "invalidDiagram": "Vygenerovaný diagram je neplatný :(. Můžete ho upravit ručně, zkusit to znovu s automatickou opravou, nebo zkusit jinou výzvu.",
+      "fixInMermaid": "Upravit Mermaid ručně →",
+      "aiRepair": "Vygenerovat znovu (automatická oprava) →",
+      "requestAborted": "Požadavek byl přerušen",
+      "requestFailed": "Požadavek selhal",
+      "mermaidParseError": "Chyba v syntaxi Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "Vyčerpali jste limit AI v bezplatném tarifu. Pro více vyzkoušejte Excalidraw+, nebo se vraťte zítra.",
+      "generalRateLimit": "Zpomalte, jste na nás moc rychlí! Před dalším pokusem prosím chvíli počkejte.",
+      "messageLimitInputPlaceholder": "Dosáhli jste limitu zpráv"
+    },
+    "upsellBtnLabel": "Přejít na Plus"
   },
   "quickSearch": {
     "placeholder": "Rychlé vyhledávání"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "V této scéně",
     "availableFonts": "Dostupná písma",
-    "empty": "Nebyla nalezena žádná písma"
+    "empty": "Nebyla nalezena žádná písma",
+    "topPicksTip": "Tip: libovolné písmo připnete přetažením mezi oblíbená",
+    "resetTopPicks": "Obnovit výchozí oblíbená písma"
   },
   "userList": {
     "empty": "Nebyli nalezeni žádní uživatelé",
@@ -644,22 +768,33 @@
     },
     "recents": "Naposledy použito",
     "search": {
-      "placeholder": "",
+      "placeholder": "Prohledávejte nabídky a příkazy a objevujte skryté poklady",
       "noMatch": "Žádné odpovídající příkazy..."
     },
     "itemNotAvailable": "Příkaz není k dispozici...",
-    "shortcutHint": ""
+    "shortcutHint": "Paletu příkazů otevřete pomocí {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Mezerník",
+    "delete": "Delete",
+    "mmb": "Kolečko myši"
+  },
+  "promoBanner": {
+    "presentations": "Prezentace",
+    "mcp": "Kreslete s AI",
+    "comments": "Komentáře",
+    "teams": "Týmová práce",
+    "voiceChat": "Hlasový chat",
+    "withExcalidrawPlus": "v Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pro lidi i AI"
   }
 }

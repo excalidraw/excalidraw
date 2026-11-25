@@ -1,17 +1,20 @@
 import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import type { MakeBrand } from "@excalidraw/common/utility-types";
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementRenderOverrides,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -26,19 +29,45 @@ export type RenderableElementsMap = NonDeletedElementsMap &
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  /**
+   * Backing-store scale the target canvas was bootstrapped with -- the owner
+   * window's devicePixelRatio when rendering into the editor, exportScale when
+   * exporting. Element caches are built and blitted at this ratio, so it must
+   * be the same value passed as `StaticSceneRenderConfig["scale"]`.
+   */
+  scale: number;
+  /**
+   * Host environment that creates the canvases and images this render
+   * rasterizes (per-editor owner window in the app; the export's
+   * `config.environment` when exporting). Defaults to the browser's.
+   */
+  renderEnvironment?: RenderEnvironment;
+  /** export only: clips everything drawn to this frame (square corners) */
+  clipToFrame?: ExcalidrawFrameLikeElement | null;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
   renderGrid: boolean;
+  /** whether to render link icons on elements with links (never rendered
+   when exporting). @default true */
+  renderLinks?: boolean;
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
+  theme: AppState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
 };
 
 export type SVGRenderConfig = {
+  /**
+   * Host environment used for the text measurements this render needs (the
+   * SVG itself is built through `exportToSvg`'s owner document). Defaults to
+   * the browser's.
+   */
+  renderEnvironment?: RenderEnvironment;
   offsetX: number;
   offsetY: number;
   isExporting: boolean;
@@ -54,6 +83,7 @@ export type SVGRenderConfig = {
    * @default true
    */
   reuseImages: boolean;
+  theme: AppState["theme"];
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -72,8 +102,6 @@ export type InteractiveCanvasRenderConfig = {
 };
 
 export type RenderInteractiveSceneCallback = {
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 
@@ -111,7 +139,7 @@ export type InteractiveSceneRenderConfig = {
 export type NewElementSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas;
-  newElement: ExcalidrawElement | null;
+  newElement: NonDeletedExcalidrawElement | null;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
@@ -148,7 +176,14 @@ export type ScrollBars = {
   } | null;
 };
 
-export type ElementShape = Drawable | Drawable[] | null;
+export type SVGPathString = string & { __brand: "SVGPathString" };
+
+export type ElementShape =
+  | Drawable
+  | Drawable[]
+  | Path2D
+  | (Drawable | SVGPathString)[]
+  | null;
 
 export type ElementShapes = {
   rectangle: Drawable;
@@ -156,10 +191,11 @@ export type ElementShapes = {
   diamond: Drawable;
   iframe: Drawable;
   embeddable: Drawable;
-  freedraw: Drawable | null;
+  freedraw: (Drawable | SVGPathString)[];
   arrow: Drawable[];
   line: Drawable[];
   text: null;
+  stickynote: null;
   image: null;
   frame: null;
   magicframe: null;

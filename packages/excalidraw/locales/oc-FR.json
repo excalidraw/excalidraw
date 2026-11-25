@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
+    "upgrade": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
     "moveCanvas": "Desplaçar lo canabàs",
@@ -21,6 +28,7 @@
     "copyStyles": "Copiar los estiles",
     "pasteStyles": "Pegar los estils",
     "stroke": "Contorn",
+    "textColor": "",
     "changeStroke": "Modificar la color d’emplenament",
     "background": "Rèireplan",
     "changeBackground": "Modificar la color de rèireplan",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Tiret",
     "strokeStyle_dotted": "Puntilhat",
     "sloppiness": "Estil de traça",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opacitat",
     "textAlign": "Alinhament tèxt",
     "edges": "Angles",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,7 +113,10 @@
     "group": "Gropar la seleccion",
     "ungroup": "Desunir la seleccion",
     "collaborators": "Collaborators",
+    "you": "",
     "toggleGrid": "",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Apondre a la bibliotèca",
     "removeFromLibrary": "Suprimir de la bibliotèca",
     "libraryLoadingMessage": "Cargament de la bibliotèca…",
@@ -165,13 +186,27 @@
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
+    "toggleAutoResize": "",
     "imageCropping": "Talhatge d’imatge",
     "unCroppedDimension": "",
     "copyElementLink": "Copiar lo ligam cap a l’objècte",
     "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Onglet",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -215,12 +250,14 @@
     "zoomIn": "Zoom avant",
     "zoomOut": "Zoom arrièr",
     "resetZoom": "Tirar lo zoom",
+    "zoomToFit": "",
     "menu": "Menú",
     "done": "Acabat",
     "edit": "Modificar",
     "undo": "Anullar",
     "redo": "Restablir",
     "resetLibrary": "Reïnicializar la bibliotèca",
+    "reset": "",
     "createNewRoom": "Crear sala novèla",
     "fullScreen": "Ecran complèt",
     "darkMode": "Mòde escur",
@@ -308,12 +345,19 @@
     "eraser": "Goma",
     "frame": "Esplech quadre",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "Integracion Web",
     "laser": "Puntador laser",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
     "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -327,6 +371,7 @@
     "group": "Grop",
     "frame": "Quadre",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "Seleccion",
     "iframe": ""
@@ -345,13 +390,18 @@
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "embeddable": "",
+    "stickynote": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -360,6 +410,7 @@
     "bindTextToElement": "{{shortcut}} per apondre un tèxt",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Salvar al disc",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Totas las donadas son enregistradas dins vòstre navegador.",
+      "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "Voliatz puslèu utilizar Excalidraw+ a la plaça ?",
       "menuHint": "Exportar, preferéncias, lengas, ..."
     },
@@ -574,7 +631,11 @@
     "colors": "Colors",
     "shades": "Nuanças",
     "hexCode": "Còdi exadecimal",
-    "noShades": "Cap de nuança pas disponibla per aquesta color"
+    "noShades": "Cap de nuança pas disponibla per aquesta color",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "De Mermaid cap a Excalidraw",
     "button": "Inserir",
-    "description": "Actualament, sonque los diagramas <flowchartLink>logics</flowchartLink>,<sequenceLink> de sequéncia</sequenceLink> e <classLink>de classa </classLink>son preses en carga. Los autres tipes seràn afichats coma imatge dins Excalidraw.",
+    "description": "",
     "syntax": "Sintaxi Mermaid",
-    "preview": "Apercebut"
+    "preview": "Apercebut",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "Recèrca rapida"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "Dins aquesta scèna",
     "availableFonts": "Polissas disponiblas",
-    "empty": "Cap de polissa pas trobada"
+    "empty": "Cap de polissa pas trobada",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Cap d’utilizaire pas trobat",
@@ -661,5 +785,16 @@
     "spacebar": "Espaci",
     "delete": "Suprimir",
     "mmb": "Clic rodeta"
+  },
+  "promoBanner": {
+    "presentations": "Presentacions",
+    "mcp": "L’IA dessenha",
+    "comments": "Comentaris",
+    "teams": "En equipa",
+    "voiceChat": "Apèls vocals",
+    "withExcalidrawPlus": "amb Excalidraw+",
+    "excalidrawPlusMcp": "MCP Excalidraw+",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "pels umans e l’IA"
   }
 }

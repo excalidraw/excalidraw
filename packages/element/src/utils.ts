@@ -7,6 +7,8 @@ import {
 } from "@excalidraw/common";
 
 import {
+  bezierEquation,
+  clamp,
   curve,
   curveCatmullRomCubicApproxPoints,
   curveOffsetPoints,
@@ -25,27 +27,41 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
-import type { Curve, LineSegment, LocalPoint } from "@excalidraw/math";
+import type { Curve, LineSegment, LocalPoint, Radians } from "@excalidraw/math";
 
-import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
+import type {
+  AppState,
+  NormalizedZoomValue,
+  Zoom,
+} from "@excalidraw/excalidraw/types";
 
 import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
 import { generateLinearCollisionShape } from "./shape";
 
-import { isPointInElement } from "./collision";
+import { hitElementItself, isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
-import { isRectangularElement } from "./typeChecks";
+import { isElbowArrow, isRectangularElement } from "./typeChecks";
+import { getBindingGap, maxBindingDistance_simple } from "./binding";
+
+import {
+  getGlobalFixedPointForBindableElement,
+  normalizeFixedPoint,
+} from "./binding";
+import { getStickyNoteCornerRadius } from "./stickyNote";
 
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+
+export type LinearPathSegment = LineSegment<GlobalPoint> | Curve<GlobalPoint>;
 
 type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
 
@@ -112,19 +128,17 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
  */
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+  elementsMap: ElementsMap,
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
   if (cachedShape) {
     return cachedShape;
   }
 
-  const ops = generateLinearCollisionShape(element) as {
-    op: string;
-    data: number[];
-  }[];
-  const lines = [];
-  const curves = [];
+  const ops = generateLinearCollisionShape(element, elementsMap);
+  const lines: LineSegment<GlobalPoint>[] = [];
+  const curves: Curve<GlobalPoint>[] = [];
 
   for (let idx = 0; idx < ops.length; idx += 1) {
     const op = ops[idx];
@@ -183,10 +197,41 @@ export function deconstructLinearOrFreeDrawElement(
     }
   }
 
-  const shape = [lines, curves] as ElementShape;
+  const shape: ElementShape = [lines, curves];
   setElementShapesCacheEntry(element, shape, 0);
 
   return shape;
+}
+
+export function getLinearElementPathSegments(
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+): LinearPathSegment[] {
+  // For now, model elbow arrows as their unrounded logical path. Rounded
+  // joints can be incorporated once the path model supports mixed straight
+  // and curved segments.
+  if (isElbowArrow(element)) {
+    return element.points
+      .slice(1)
+      .map((point, index) =>
+        lineSegment<GlobalPoint>(
+          pointFrom<GlobalPoint>(
+            element.x + element.points[index][0],
+            element.y + element.points[index][1],
+          ),
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+        ),
+      );
+  }
+
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
+
+  // Non-elbow paths currently contain only one segment type. Mixed paths
+  // should consume an ordered operation stream instead of these type buckets.
+  return curves.length > 0 ? curves : lines;
 }
 
 /**
@@ -200,17 +245,17 @@ export function deconstructLinearOrFreeDrawElement(
 export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {
     return cachedShape;
   }
 
-  let radius = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
+  let radius =
+    element.type === "stickynote"
+      ? getStickyNoteCornerRadius(element)
+      : getCornerRadius(Math.min(element.width, element.height), element);
 
   if (radius === 0) {
     radius = 0.01;
@@ -329,24 +374,10 @@ export function deconstructRectanguloidElement(
   return shape;
 }
 
-/**
- * Get the **unrotated** building components of a diamond element
- * in the form of line segments and curves as a tuple, in this order.
- *
- * @param element The element to deconstruct
- * @param offset An optional offset
- * @returns Tuple of line **unrotated** segments (0) and curves (1)
- */
-export function deconstructDiamondElement(
+export function getDiamondBaseCorners(
   element: ExcalidrawDiamondElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
-  const cachedShape = getElementShapesCacheEntry(element, offset);
-
-  if (cachedShape) {
-    return cachedShape;
-  }
-
+): Curve<GlobalPoint>[] {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element);
   const verticalRadius = element.roundness
@@ -363,7 +394,7 @@ export function deconstructDiamondElement(
     pointFrom(element.x + leftX, element.y + leftY),
   ];
 
-  const baseCorners = [
+  return [
     curve(
       pointFrom<GlobalPoint>(
         right[0] - verticalRadius,
@@ -413,11 +444,42 @@ export function deconstructDiamondElement(
       ),
     ), // TOP
   ];
+}
 
-  const corners = baseCorners.map(
-    (corner) =>
-      curveCatmullRomCubicApproxPoints(curveOffsetPoints(corner, offset))!,
-  );
+/**
+ * Get the **unrotated** building components of a diamond element
+ * in the form of line segments and curves as a tuple, in this order.
+ *
+ * @param element The element to deconstruct
+ * @param offset An optional offset
+ * @returns Tuple of line **unrotated** segments (0) and curves (1)
+ */
+export function deconstructDiamondElement(
+  element: ExcalidrawDiamondElement,
+  offset: number = 0,
+): ElementShape {
+  const cachedShape = getElementShapesCacheEntry(element, offset);
+
+  if (cachedShape) {
+    return cachedShape;
+  }
+
+  const baseCorners = getDiamondBaseCorners(element, offset);
+
+  const corners =
+    offset > 0
+      ? baseCorners.map(
+          (corner) =>
+            curveCatmullRomCubicApproxPoints(
+              curveOffsetPoints(corner, offset),
+            )!,
+        )
+      : [
+          [baseCorners[0]],
+          [baseCorners[1]],
+          [baseCorners[2]],
+          [baseCorners[3]],
+        ];
 
   const sides = [
     lineSegment<GlobalPoint>(
@@ -570,28 +632,245 @@ const getDiagonalsForBindableElement = (
   return [diagonalOne, diagonalTwo];
 };
 
+/**
+ * `onAxis` is true for the midpoints on the element's axes (the side midpoints,
+ * or a diamond's vertices), whose direction from the center is unambiguous,
+ * and false for a diamond's edge midpoints
+ */
+const getSnappedMidpointForElbowArrow = (
+  element: ExcalidrawBindableElement,
+  point: GlobalPoint,
+  elementsMap: ElementsMap,
+  center: GlobalPoint,
+  horizontalThreshold: number,
+  verticalThreshold: number,
+): { point: GlobalPoint; onAxis: boolean } | undefined => {
+  const { x, y, width, height, angle } = element;
+  const nonRotated = pointRotateRads(point, center, -angle as Radians);
+
+  const bindingGap = getBindingGap(element);
+
+  if (pointDistance(center, nonRotated) < bindingGap) {
+    return undefined;
+  }
+
+  const [right, bottom, left, top] = getAllMidpoints(element, elementsMap);
+
+  if (
+    nonRotated[0] <= x + width / 2 &&
+    nonRotated[1] > center[1] - verticalThreshold &&
+    nonRotated[1] < center[1] + verticalThreshold
+  ) {
+    return { point: left, onAxis: true };
+  } else if (
+    nonRotated[1] <= y + height / 2 &&
+    nonRotated[0] > center[0] - horizontalThreshold &&
+    nonRotated[0] < center[0] + horizontalThreshold
+  ) {
+    return { point: top, onAxis: true };
+  } else if (
+    nonRotated[0] >= x + width / 2 &&
+    nonRotated[1] > center[1] - verticalThreshold &&
+    nonRotated[1] < center[1] + verticalThreshold
+  ) {
+    return { point: right, onAxis: true };
+  } else if (
+    nonRotated[1] >= y + height / 2 &&
+    nonRotated[0] > center[0] - horizontalThreshold &&
+    nonRotated[0] < center[0] + horizontalThreshold
+  ) {
+    return { point: bottom, onAxis: true };
+  } else if (element.type === "diamond") {
+    // Elbow arrows can also snap to the midpoints of a diamond's edges
+    const threshold = Math.max(horizontalThreshold, verticalThreshold);
+    const edgeMidpoints = [
+      // top-left, top-right, bottom-left, bottom-right
+      [x + width / 4, y + height / 4, -1, -1],
+      [x + (3 * width) / 4, y + height / 4, 1, -1],
+      [x + width / 4, y + (3 * height) / 4, -1, 1],
+      [x + (3 * width) / 4, y + (3 * height) / 4, 1, 1],
+    ] as const;
+
+    for (const [edgeX, edgeY, dirX, dirY] of edgeMidpoints) {
+      // the snap zone sits a binding gap outside the edge
+      const zoneCenter = pointFrom<GlobalPoint>(
+        edgeX + dirX * bindingGap,
+        edgeY + dirY * bindingGap,
+      );
+
+      if (pointDistance(zoneCenter, nonRotated) < threshold) {
+        return {
+          point: pointRotateRads(
+            pointFrom<GlobalPoint>(edgeX, edgeY),
+            center,
+            angle,
+          ),
+          onAxis: false,
+        };
+      }
+    }
+  }
+
+  return undefined;
+};
+
+const getSnappedMidpointIndexForSimpleArrow = (
+  element: ExcalidrawBindableElement,
+  point: GlobalPoint,
+  elementsMap: ElementsMap,
+  threshold: number,
+) => {
+  const baseMidpoints = getAllMidpoints(element, elementsMap);
+
+  for (let i = 0; i < baseMidpoints.length; i++) {
+    if (
+      pointDistance(baseMidpoints[i], point) <= threshold &&
+      !hitElementItself({
+        point,
+        element,
+        threshold: 0,
+        elementsMap,
+        overrideShouldTestInside: true,
+      })
+    ) {
+      return i;
+    }
+  }
+
+  return -1;
+};
+
+export const getAllMidpoints = (
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+): GlobalPoint[] => {
+  const center = elementCenterPoint(element, elementsMap);
+
+  if (element.type === "diamond") {
+    return getDiamondBaseCorners(element).map((curve) =>
+      pointRotateRads(bezierEquation(curve, 0.5), center, element.angle),
+    );
+  }
+
+  return [
+    pointFrom(element.width, element.height / 2),
+    pointFrom(element.width / 2, element.height),
+    pointFrom(0, element.height / 2),
+    pointFrom(element.width / 2, 0),
+  ].map(([x, y]) =>
+    pointRotateRads(
+      pointFrom<GlobalPoint>(element.x + x, element.y + y),
+      center,
+      element.angle,
+    ),
+  );
+};
+
+export const getElbowArrowSnapMidPoint = (
+  point: GlobalPoint,
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+) => {
+  const TOLERANCE = 0.05;
+  const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
+
+  return getSnappedMidpointForElbowArrow(
+    element,
+    point,
+    elementsMap,
+    elementCenterPoint(element, elementsMap),
+    clamp(TOLERANCE * element.width, 5, maxDistance),
+    clamp(TOLERANCE * element.height, 5, maxDistance),
+  );
+};
+
+export const getSnapOutlineMidPoint = (
+  point: GlobalPoint,
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+  arrow: { elbowed: boolean },
+): GlobalPoint | undefined => {
+  if (arrow.elbowed) {
+    return getElbowArrowSnapMidPoint(point, element, elementsMap, zoom)?.point;
+  }
+
+  const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
+  const idx = getSnappedMidpointIndexForSimpleArrow(
+    element,
+    point,
+    elementsMap,
+    maxDistance,
+  );
+
+  return idx === -1 ? undefined : getAllMidpoints(element, elementsMap)[idx];
+};
+
 export const projectFixedPointOntoDiagonal = (
   arrow: ExcalidrawArrowElement,
   point: GlobalPoint,
-  element: ExcalidrawElement,
+  element: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+  isMidpointSnappingEnabled: boolean = true,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
+  if (isMidpointSnappingEnabled) {
+    const sideMidPoint = getSnapOutlineMidPoint(
+      point,
+      element,
+      elementsMap,
+      zoom,
+      arrow,
+    );
+    if (sideMidPoint) {
+      return sideMidPoint;
+    }
+  }
+
+  // Projection needs a meaningful arrow direction
   if (arrow.width < 3 && arrow.height < 3) {
     return null;
   }
 
+  // Do the projection onto the diagonals (or center lines
+  // for non-rectangular shapes)
   const [diagonalOne, diagonalTwo] = getDiagonalsForBindableElement(
     element,
     elementsMap,
   );
 
-  const a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+  // To avoid working with stale arrow state, we use the opposite focus point
+  // of the current endpoint, which will always be unchanged during moving of
+  // the endpoint. This is only needed when the arrow has only two points.
+  let a = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     arrow,
     startOrEnd === "start" ? 1 : arrow.points.length - 2,
     elementsMap,
   );
+  if (arrow.points.length === 2) {
+    const otherBinding =
+      startOrEnd === "start" ? arrow.endBinding : arrow.startBinding;
+    const otherBindable =
+      otherBinding &&
+      (elementsMap.get(otherBinding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined);
+    const otherFocusPoint =
+      otherBinding &&
+      otherBindable &&
+      getGlobalFixedPointForBindableElement(
+        normalizeFixedPoint(otherBinding.fixedPoint),
+        otherBindable,
+        elementsMap,
+      );
+    if (otherFocusPoint) {
+      a = otherFocusPoint;
+    }
+  }
+
   const b = pointFromVector<GlobalPoint>(
     vectorScale(
       vectorFromPoint(point, a),
@@ -603,18 +882,22 @@ export const projectFixedPointOntoDiagonal = (
     ),
     a,
   );
-  const intersector = lineSegment<GlobalPoint>(point, b);
+  const intersector = lineSegment<GlobalPoint>(b, a);
   const p1 = lineSegmentIntersectionPoints(diagonalOne, intersector);
   const p2 = lineSegmentIntersectionPoints(diagonalTwo, intersector);
   const d1 = p1 && pointDistance(a, p1);
   const d2 = p2 && pointDistance(a, p2);
 
-  let p = null;
+  let projection = null;
   if (d1 != null && d2 != null) {
-    p = d1 < d2 ? p1 : p2;
+    projection = d1 < d2 ? p1 : p2;
   } else {
-    p = p1 || p2 || null;
+    projection = p1 || p2 || null;
   }
 
-  return p && isPointInElement(p, element, elementsMap) ? p : null;
+  if (projection && isPointInElement(projection, element, elementsMap)) {
+    return projection;
+  }
+
+  return null;
 };

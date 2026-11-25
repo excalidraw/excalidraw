@@ -12,7 +12,7 @@ import { t } from "../i18n";
 
 import { Card } from "./Card";
 import { Dialog } from "./Dialog";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import { exportToFileIcon, LinkIcon } from "./icons";
 
 import "./ExportDialog.scss";
@@ -58,7 +58,7 @@ const JSONExportModal = ({
               {!nativeFileSystemSupported &&
                 actionManager.renderAction("changeProjectName")}
             </div>
-            <ToolButton
+            <IconButton
               className="Card-button"
               type="button"
               title={t("exportDialog.disk_button")}
@@ -75,7 +75,7 @@ const JSONExportModal = ({
             <div className="Card-icon">{LinkIcon}</div>
             <h2>{t("exportDialog.link_title")}</h2>
             <div className="Card-details">{t("exportDialog.link_details")}</div>
-            <ToolButton
+            <IconButton
               className="Card-button"
               type="button"
               title={t("exportDialog.link_button")}

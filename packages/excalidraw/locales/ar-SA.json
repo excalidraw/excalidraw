@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "أنشئ حسابًا",
+    "signIn": "سجّل الدخول",
+    "upgrade": "ترقية",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
+    "chartType_bar": "رسم بياني شريطي",
+    "chartType_line": "رسم بياني خطي",
+    "chartType_radar": "رسم بياني راداري",
+    "chartType_plaintext": "نص عادي",
     "selectAll": "تحديد الكل",
     "multiSelect": "إضافة عنصر للتحديد",
     "moveCanvas": "نقل لوح الرسم",
@@ -21,6 +28,7 @@
     "copyStyles": "نسخ الأنماط",
     "pasteStyles": "لصق الأنماط",
     "stroke": "الخط",
+    "textColor": "لون النص",
     "changeStroke": "تغيير لون القلم",
     "background": "الخلفية",
     "changeBackground": "تغيير لون الخلفية",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "متقطع",
     "strokeStyle_dotted": "منقط",
     "sloppiness": "الإمالة",
+    "pressure": "الضغط",
+    "pressure_constant": "ثابت",
+    "pressure_variable": "متغير",
     "opacity": "الشفافية",
     "textAlign": "محاذاة النص",
     "edges": "الحواف",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "Crow's foot (many)",
     "arrowhead_crowfoot_one": "Crow's foot (one)",
     "arrowhead_crowfoot_one_or_many": "Crow's foot (one or many)",
+    "arrowhead_cardinality_one": "التعددية (واحد)",
+    "arrowhead_cardinality_many": "التعددية (متعدد)",
+    "arrowhead_cardinality_one_or_many": "التعددية (واحد أو أكثر)",
+    "arrowhead_cardinality_exactly_one": "التعددية (واحد بالضبط)",
+    "arrowhead_cardinality_zero_or_one": "التعددية (صفر أو واحد)",
+    "arrowhead_cardinality_zero_or_many": "التعددية (صفر أو أكثر)",
     "more_options": "خيارات إضافية",
+    "cardinality": "التعددية",
     "arrowtypes": "نوع السهم",
     "arrowtype_sharp": "سهم حاد",
     "arrowtype_round": "سهم منحني",
@@ -95,7 +113,10 @@
     "group": "تحديد مجموعة",
     "ungroup": "إلغاء تحديد مجموعة",
     "collaborators": "المتعاونون",
+    "you": "أنت",
     "toggleGrid": "تبديل الشبكة",
+    "minimap": "الخريطة المصغرة",
+    "zoom": "التكبير",
     "addToLibrary": "أضف إلى المكتبة",
     "removeFromLibrary": "حذف من المكتبة",
     "libraryLoadingMessage": "جارٍ تحميل المكتبة...",
@@ -142,8 +163,8 @@
       "editArrow": "تحرير السهم"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "فك المضلع",
+      "convertToPolygon": "تحويل إلى مضلع"
     },
     "elementLock": {
       "lock": "قفل",
@@ -165,13 +186,27 @@
     "zoomToFit": "تكبير لتلائم جميع العناصر",
     "installPWA": "تثبيت Excalidraw محليًا (PWA)",
     "autoResize": "تمكين تغيير حجم النص تلقائيًا",
+    "toggleAutoResize": "تبديل تغيير حجم النص تلقائيًا",
     "imageCropping": "قص الصورة",
     "unCroppedDimension": "الأبعاد غير المقصوصة",
     "copyElementLink": "نسخ رابط الكائن",
     "linkToElement": "رابط إلى الكائن",
     "wrapSelectionInFrame": "تغليف التحديد في إطار",
-    "tab": "",
-    "shapeSwitch": ""
+    "removeFrame": "إزالة الإطار",
+    "toggleWrap": "تغليف التحديد أو فك تغليفه",
+    "tab": "Tab",
+    "shapeSwitch": "تبديل الشكل",
+    "preferences": "التفضيلات",
+    "preferences_toolLock": "قفل الأداة",
+    "boxSelectionMode": "التحديد عند",
+    "boxSelectionContain": "الإحاطة",
+    "boxSelectionOverlap": "التداخل",
+    "arrowBinding": "ربط الأسهم",
+    "midpointSnapping": "التقاط إلى نقاط المنتصف",
+    "showHints": "تلميحات شريط الأدوات",
+    "inputDevice": "جهاز الإدخال",
+    "inputDeviceTrackpad": "لوحة اللمس",
+    "inputDeviceMouse": "الماوس"
   },
   "elementLink": {
     "title": "رابط إلى الكائن",
@@ -183,10 +218,10 @@
     "hint_emptyLibrary": "حدد عنصر على القماش لإضافته هنا، أو تثبيت مكتبة من المستودع العام أدناه.",
     "hint_emptyPrivateLibrary": "حدد عنصر على القماش لإضافته هنا.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "ابحث في المكتبة",
+      "heading": "العناصر المطابقة في المكتبة",
+      "noResults": "لم يتم العثور على عناصر مطابقة...",
+      "clearSearch": "امحُ البحث"
     }
   },
   "search": {
@@ -195,8 +230,8 @@
     "singleResult": "نتيجة",
     "multipleResults": "نتائج",
     "placeholder": "ابحث عن نص على اللوحة...",
-    "frames": "",
-    "texts": ""
+    "frames": "إطارات",
+    "texts": "نصوص"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -215,12 +250,14 @@
     "zoomIn": "تكبير",
     "zoomOut": "تصغير",
     "resetZoom": "إعادة تعيين التكبير",
+    "zoomToFit": "تكبير للملاءمة",
     "menu": "القائمة",
     "done": "تم",
     "edit": "تعديل",
     "undo": "تراجع",
     "redo": "إعادة تنفيذ",
     "resetLibrary": "إعادة ضبط المكتبة",
+    "reset": "إعادة تعيين",
     "createNewRoom": "إنشاء غرفة جديدة",
     "fullScreen": "شاشة كاملة",
     "darkMode": "الوضع المظلم",
@@ -230,11 +267,11 @@
     "objectsSnapMode": "التقاط إلى العناصر",
     "exitZenMode": "إلغاء وضع التأمل",
     "cancel": "إلغاء",
-    "saveLibNames": "",
+    "saveLibNames": "احفظ الاسم(اء) واخرج",
     "clear": "مسح",
     "remove": "إزالة",
     "embed": "تبديل الإدراج",
-    "publishLibrary": "",
+    "publishLibrary": "أعد التسمية أو أُنشر",
     "submit": "إرسال",
     "confirm": "تأكيد",
     "embeddableInteractionButton": "اضغط للتفاعل"
@@ -261,7 +298,7 @@
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفًا. التعاون المباشر معطل.",
     "collabOfflineWarning": "لا يوجد اتصال بالإنترنت.\nلن يتم حفظ التغييرات التي قمت بها!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "تجاوز حصة تخزين المتصفح. لن تُحفظ التغييرات."
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
@@ -292,10 +329,10 @@
   },
   "toolBar": {
     "selection": "تحديد",
-    "lasso": "",
+    "lasso": "اختيار لاسو",
     "image": "إدراج صورة",
     "rectangle": "مستطيل",
-    "diamond": "مضلع",
+    "diamond": "معيّن",
     "ellipse": "دائرة",
     "arrow": "سهم",
     "line": "خط",
@@ -308,16 +345,23 @@
     "eraser": "ممحاة",
     "frame": "أداة الإطار",
     "magicframe": "Wireframe إلى كود",
+    "stickynote": "ملاحظة لاصقة",
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
+    "autoshape": "تحويل الرسم إلى شكل",
+    "bucketfill": "دلو التعبئة",
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من الأدوات",
     "mermaidToExcalidraw": "من Mermaid إلى Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "تبديل نوع الشكل"
+  },
+  "bucketfill": {
+    "noRegion": "تعذر العثور على منطقة مغلقة لتعبئتها هنا.",
+    "tooComplex": "هذه المنطقة معقدة جدًا ولا يمكن تعبئتها."
   },
   "element": {
     "rectangle": "مستطيل",
-    "diamond": "مضلع",
+    "diamond": "معيّن",
     "ellipse": "دائرة",
     "arrow": "سهم",
     "line": "خط",
@@ -327,6 +371,7 @@
     "group": "مجموعة",
     "frame": "إطار",
     "magicframe": "Wireframe إلى كود",
+    "stickynote": "ملاحظة لاصقة",
     "embeddable": "تضمين ويب",
     "selection": "تحديد",
     "iframe": "IFrame"
@@ -337,34 +382,40 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} لإلغاء البحث",
+    "canvasPanning": "لتحريك القماشة، اضغط مطولًا على {{shortcut_1}} أو {{shortcut_2}} أثناء السحب، أو استخدم الأداة اليدوية",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "انقر لبدء نقاط متعدّدة، اسحب لخط واحد. اضغط {{shortcut}} مرة أخرى لتغيير نوع السهم.",
+    "arrowBindModifiers": "اضغط مطولًا على {{shortcut_1}} لتعطيل الربط، أو على {{shortcut_2}} للربط عند نقطة ثابتة",
     "freeDraw": "انقر واسحب، أفرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
     "embeddable": "اضغط مع السحب لإنشاء موقع ويب مضمّن",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "stickynote": "انقر لوضع ملاحظة، أو اسحب لتحديد حجمها",
+    "autoshape": "ارسم مستطيلات ودوائر ومعيّنات وخطوطًا وأسهمًا",
+    "text_selected": "انقر نقرًا مزدوجًا أو اضغط {{shortcut}} لتحرير النص",
+    "text_editing": "اضغط {{shortcut_1}} أو {{shortcut_2}} لإنهاء التحرير",
+    "toggleTextAutoResize": "{{shortcut}} لتبديل تغيير حجم النص تلقائيًا",
+    "linearElementMulti": "انقر على النقطة الأخيرة أو اضغط {{shortcut_1}} أو {{shortcut_2}} للإنهاء",
+    "lockAngle": "يمكنك تقييد الزاوية بالضغط على {{shortcut}}",
+    "resize": "يمكنك تقييد النسب بالضغط على {{shortcut_1}} أثناء تغيير الحجم،\nاضغط مطولاً على {{shortcut_2}} لتغيير الحجم من المركز",
+    "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط مطولًا على {{shortcut_1}}،\nاضغط مطولًا على {{shortcut_2}} لتغيير الحجم من المركز",
+    "resizeStickyNote": "اضغط مطولًا على {{shortcut_1}} لتغيير الحجم بحرية، أو على {{shortcut_2}} لتغيير الحجم من المركز",
+    "rotate": "يمكنك تقييد الزوايا بالضغط مطولًا على {{shortcut}} أثناء التدوير",
+    "toggleArrowhead": "انقر نقرًا مزدوجًا لتبديل رأس السهم",
+    "lineEditor_info": "اضغط مطولًا على {{shortcut_1}} وانقر نقرًا مزدوجًا أو اضغط {{shortcut_2}} لتحرير النقاط",
+    "lineEditor_line_info": "انقر نقرًا مزدوجًا أو اضغط {{shortcut}} لتحرير النقاط",
+    "lineEditor_pointSelected": "اضغط {{shortcut_1}} لإزالة النقاط المحددة،\nأو {{shortcut_2}} للتكرار، أو اسحب للتحريك",
+    "lineEditor_nothingSelected": "حدد نقطة لتحريرها (اضغط مطولًا على {{shortcut_1}} لتحديد عدة نقاط)،\nأو اضغط مطولًا على {{shortcut_2}} وانقر لإضافة نقاط جديدة",
     "publishLibrary": "نشر مكتبتك",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} لإضافة نص",
+    "createFlowchart": "{{shortcut}} لإنشاء مخطط تدفق",
+    "deepBoxSelect": "اضغط مطولًا على {{shortcut}} للتحديد العميق ولمنع السحب",
+    "cycleSelection": "انقر مع {{shortcut}} للتنقل بين العناصر المتراكبة، أو اسحب للتكرار",
+    "eraserRevert": "اضغط مطولًا على {{shortcut}} لاستعادة العناصر المعلَّمة للحذف",
     "firefox_clipboard_write": "يمكن على الأرجح تمكين هذه الميزة عن طريق تعيين علم \"dom.events.asyncClipboard.clipboardItem\" إلى \"true\". لتغيير أعلام المتصفح في Firefox، قم بزيارة صفحة \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "اضغط مطولًا على {{shortcut}} لتعطيل الالتقاط",
+    "enterCropEditor": "انقر نقرًا مزدوجًا على الصورة أو اضغط {{shortcut}} لقص الصورة",
+    "leaveCropEditor": "انقر خارج الصورة أو اضغط {{shortcut_1}} أو {{shortcut_2}} لإنهاء القص"
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -395,6 +446,10 @@
   "errorDialog": {
     "title": "خطأ"
   },
+  "progressDialog": {
+    "title": "يحفظ",
+    "defaultMessage": "جارٍ الإعداد للحفظ..."
+  },
   "exportDialog": {
     "disk_title": "حفظ الملف على الجهاز",
     "disk_details": "تصدير بيانات المشهد إلى ملف يمكنك الاستيراد منه لاحقًا.",
@@ -404,7 +459,7 @@
     "link_button": "تصدير كرابط",
     "excalidrawplus_description": "حفظ المشهد إلى مساحة العمل +Excalidraw الخاصة بك.",
     "excalidrawplus_button": "تصدير",
-    "excalidrawplus_exportError": "تعذر التص несп في الوقت الحالي إلى +Excalidraw..."
+    "excalidrawplus_exportError": "تعذر التصدير في الوقت الحالي إلى +Excalidraw..."
   },
   "helpDialog": {
     "blog": "اقرأ مدونتنا",
@@ -557,8 +612,10 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "جميع بياناتك محفوظة محليًا في المتصفح الخاص بك.",
-      "center_heading_plus": "هل تريد الانتقال إلى Excalidraw+ بدلاً من ذلك؟",
+      "center_heading": "رسوماتك محفوظة في تخزين متصفحك.",
+      "center_heading_line2": "يُمكن محُ تخزين المتصفح بشكل غير متوقع.",
+      "center_heading_line3": "احفظ عملك في ملف بانتظام لتجنب فقدانه.",
+      "center_heading_plus": "هل تريد الانتقال إلى Excalidraw+‎ بدلاً من ذلك؟",
       "menuHint": "التصدير، التفضيلات، اللغات..."
     },
     "defaults": {
@@ -569,12 +626,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "اللون",
     "mostUsedCustomColors": "الألوان المخصصة الأكثر استخدامًا",
     "colors": "الألوان",
     "shades": "الدرجات",
     "hexCode": "رمز Hex",
-    "noShades": "لا تتوفر درجات لهذا اللون"
+    "noShades": "لا تتوفر درجات لهذا اللون",
+    "invalidColor": "لون غير صالح",
+    "invalidHexLength": "يجب أن يتكون رمز Hex من 3 أو 4 أو 6 أو 8 أحرف",
+    "topPicksTip": "نصيحة: اسحب أي لون إلى اختياراتك المفضلة لتثبيته",
+    "resetTopPicks": "إعادة تعيين الاختيارات المفضلة إلى الافتراضية"
   },
   "overwriteConfirm": {
     "action": {
@@ -589,8 +650,8 @@
         "description": "تصدير بيانات المشهد إلى ملف يمكنك الاستيراد منه لاحقًا."
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
-        "button": "تصدير إلى Excalidraw+",
+        "title": "Excalidraw+‎",
+        "button": "تصدير إلى Excalidraw+‎",
         "description": "حفظ المشهد إلى مساحة العمل +Excalidraw الخاصة بك."
       }
     },
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "أفلِت لاستبدال المحتوى",
+    "add": "أفلِت للإضافة إلى اللوحة",
+    "importLibrary": "أفلِت لاستيراد المكتبة",
+    "replaceHint": "اضغط مطولًا على <shift>Shift</shift> للإبقاء على المحتوى الحالي",
+    "keepHint": "سيُحتفظ بمحتواك الحالي",
+    "libraryHint": "تُضاف ملفات المكتبة إلى مكتبتك",
+    "replacedToast": "تم استبدال المحتوى. {{shortcut}} للتراجع"
+  },
   "mermaid": {
     "title": "Mermaid إلى Excalidraw",
     "button": "إدراج",
-    "description": "حاليًا، يتم دعم <flowchartLink>مخططات التدفق</flowchartLink>، <sequenceLink>التسلسلات</sequenceLink>، و<classLink>الفئات</classLink> فقط. سيتم عرض الأنواع الأخرى كصورة في Excalidraw.",
+    "description": "تُحوَّل <flowchartLink>مخططات التدفق</flowchartLink> ومخططات <sequenceLink>التسلسل</sequenceLink> و<classLink>الفئات</classLink> و<stateLink>الحالة</stateLink> و<erdLink>الكيانات والعلاقات</erdLink> و<ganttLink>مخططات جانت</ganttLink> و<quadrantLink>المخططات الرباعية</quadrantLink> و<timelineLink>المخططات الزمنية</timelineLink> إلى عناصر Excalidraw. أما الأنواع الأخرى فتُدرج كصورة.",
     "syntax": "صيغة Mermaid",
-    "preview": "معاينة"
+    "preview": "معاينة",
+    "label": "Mermaid",
+    "inputPlaceholder": "اكتب تعريف مخطط Mermaid هنا...",
+    "autoFixAvailable": "الإصلاح التلقائي متوفر",
+    "loadError": "تعذر تحميل Mermaid. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+    "loadErrorReload": "تعذر تحميل Mermaid. أعد تحميل الصفحة للمحاولة مرة أخرى.",
+    "reload": "إعادة التحميل"
+  },
+  "ttd": {
+    "error": "خطأ!"
+  },
+  "chat": {
+    "inputPlaceholder": "ابدأ كتابة فكرة الرسم البياني هنا... ({{shortcut}} للسطر الجديد)",
+    "inputPlaceholderWithMessages": "استمر في تحسين رسمتك البيانية...",
+    "generating": "يُولّد...",
+    "rateLimitRemaining": "{{count}} طلبات متبقية اليوم",
+    "role": {
+      "user": "أنت",
+      "assistant": "مساعد الذكاء الاصطناعي",
+      "system": "النظام"
+    },
+    "aiBeta": "الذكاء الاصطناعي تجريبي",
+    "label": "محادثة",
+    "menu": "القائمة",
+    "newChat": "محادثة جديدة",
+    "deleteChat": "احذف المحادثة",
+    "deleteMessage": "احذف الرسالة",
+    "viewAsMermaid": "عرض كـ Mermaid",
+    "placeholder": {
+      "title": "لنصمّم رسمك البياني",
+      "description": "صِف الرسم البياني الذي تريد إنشاءه، وسنولّده لك.",
+      "hint": "ندعم حاليًا مخططات التدفق والتسلسل والفئات والحالة والكيانات والعلاقات."
+    },
+    "preview": "معاينة",
+    "insert": "إدراج",
+    "retry": "إعادة المحاولة",
+    "errors": {
+      "promptTooShort": "التعليمات قصيرة جدًا (الحد الأدنى لعدد الأحرف: {{min}})",
+      "promptTooLong": "التعليمات طويلة جدًا (الحد الأقصى لعدد الأحرف: {{max}})",
+      "generationFailed": "فشل التوليد",
+      "invalidDiagram": "تم توليد رسم بياني غير صالح. يمكنك تعديله يدويًا، أو إعادة المحاولة مع الإصلاح التلقائي، أو تجربة تعليمات مختلفة.",
+      "fixInMermaid": "تعديل Mermaid يدويًا ←",
+      "aiRepair": "إعادة التوليد (الإصلاح التلقائي) ←",
+      "requestAborted": "تم إلغاء الطلب",
+      "requestFailed": "فشل الطلب",
+      "mermaidParseError": "خطأ في صيغة Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "لقد بلغت حد استخدام الذكاء الاصطناعي في الخطة المجانية. جرّب Excalidraw+‎ للحصول على المزيد، أو عُد غدًا.",
+      "generalRateLimit": "تمهّل قليلًا، فأنت أسرع مما نستطيع مجاراته! يُرجى الانتظار لحظة قبل المحاولة مرة أخرى.",
+      "messageLimitInputPlaceholder": "لقد بلغت الحد الأقصى للرسائل"
+    },
+    "upsellBtnLabel": "الترقية إلى Plus"
   },
   "quickSearch": {
     "placeholder": "بحث سريع"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "في هذا المشهد",
     "availableFonts": "الخطوط المتوفرة",
-    "empty": "لم يتم العثور على خطوط"
+    "empty": "لم يتم العثور على خطوط",
+    "topPicksTip": "نصيحة: اسحب أي خط إلى اختياراتك المفضلة لتثبيته",
+    "resetTopPicks": "إعادة تعيين الاختيارات المفضلة إلى الافتراضية"
   },
   "userList": {
     "empty": "لم يتم العثور على مستخدمين",
@@ -651,15 +775,26 @@
     "shortcutHint": "للحصول على لوحة الأوامر، استخدم {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "مسافة",
+    "delete": "احذف",
+    "mmb": "عجلة التمرير"
+  },
+  "promoBanner": {
+    "presentations": "عروض تقديمية",
+    "mcp": "ارسم بـ AI",
+    "comments": "أضف تعليقات",
+    "teams": "العمل الجماعي",
+    "voiceChat": "محادثة صوتية",
+    "withExcalidrawPlus": "مع Excalidraw+‎",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "للبشر و AI"
   }
 }

@@ -40,23 +40,27 @@ export const hashString = (s: string): number => {
   return hash >>> 0; // Ensure unsigned 32-bit integer
 };
 
-export const getVisibleElements = (elements: readonly ExcalidrawElement[]) =>
-  elements.filter(
-    (el) => !el.isDeleted && !isInvisiblySmallElement(el),
-  ) as readonly NonDeletedExcalidrawElement[];
-
-export const getNonDeletedElements = <T extends ExcalidrawElement>(
-  elements: readonly T[],
-) =>
-  elements.filter((element) => !element.isDeleted) as readonly NonDeleted<T>[];
-
 export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
 ): element is NonDeleted<T> => !element.isDeleted;
 
+export const getVisibleElements = (
+  elements: readonly ExcalidrawElement[],
+): readonly NonDeletedExcalidrawElement[] =>
+  elements.filter(
+    (el): el is NonDeletedExcalidrawElement =>
+      isNonDeletedElement(el) && !isInvisiblySmallElement(el),
+  );
+
+export const getNonDeletedElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+): readonly NonDeleted<T>[] => elements.filter(isNonDeletedElement);
+
 export * from "./align";
+export * from "./arrowEndpointText";
 export * from "./binding";
 export * from "./bounds";
+export * from "./bucketFill";
 export * from "./collision";
 export * from "./comparisons";
 export * from "./containerCache";
@@ -70,16 +74,19 @@ export * from "./elbowArrow";
 export * from "./elementLink";
 export * from "./embeddable";
 export * from "./flowchart";
+export * from "./arrows/focus";
 export * from "./fractionalIndex";
 export * from "./frame";
 export * from "./groups";
 export * from "./heading";
 export * from "./image";
 export * from "./linearElementEditor";
+export * from "./listMarker";
 export * from "./mutateElement";
 export * from "./newElement";
 export * from "./positionElementsOnGrid";
 export * from "./renderElement";
+export * from "./renderEnvironment";
 export * from "./resizeElements";
 export * from "./resizeTest";
 export * from "./Scene";
@@ -89,6 +96,7 @@ export * from "./showSelectedShapeActions";
 export * from "./sizeHelpers";
 export * from "./sortElements";
 export * from "./store";
+export * from "./stickyNote";
 export * from "./textElement";
 export * from "./textMeasurements";
 export * from "./textWrapping";
@@ -97,3 +105,6 @@ export * from "./transformHandles";
 export * from "./typeChecks";
 export * from "./utils";
 export * from "./zindex";
+export * from "./arrows/helpers";
+export * from "./arrowheads";
+export * from "./convertToShape";

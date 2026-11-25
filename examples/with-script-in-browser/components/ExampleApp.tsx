@@ -80,9 +80,7 @@ export default function ExampleApp({
   excalidrawLib,
 }: AppProps) {
   const {
-    exportToCanvas,
-    exportToSvg,
-    exportToBlob,
+    exportScene,
     exportToClipboard,
     useHandleLibrary,
     MIME_TYPES,
@@ -102,6 +100,12 @@ export default function ExampleApp({
   } = excalidrawLib;
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [interactive, setInteractive] = useState(true);
+  const [interactiveLinks, setInteractiveLinks] = useState(false);
+  const [interactiveEmbeds, setInteractiveEmbeds] = useState(false);
+  const [interactiveNavigation, setInteractiveNavigation] = useState(false);
+  const [interactiveBrowserZoom, setInteractiveBrowserZoom] = useState(false);
+  const [ui, setUi] = useState(true);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
   const [renderScrollbars, setRenderScrollbars] = useState(false);
@@ -109,6 +113,10 @@ export default function ExampleApp({
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
+  const exportConfig = {
+    theme: exportWithDarkMode ? "dark" : "light",
+    padding: 10,
+  } as const;
   const [theme, setTheme] = useState<Theme>("light");
   const [disableImageTool, setDisableImageTool] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
@@ -192,6 +200,17 @@ export default function ExampleApp({
           pointersMap: Gesture["pointers"];
         }) => setPointerData(payload),
         viewModeEnabled,
+        interaction: interactive
+          ? true
+          : {
+              enabled: {
+                links: interactiveLinks,
+                embeds: interactiveEmbeds,
+                navigation: interactiveNavigation,
+                browserZoom: interactiveBrowserZoom,
+              },
+            },
+        ui,
         zenModeEnabled,
         renderScrollbars,
         gridModeEnabled,
@@ -370,10 +389,12 @@ export default function ExampleApp({
       return false;
     }
     await exportToClipboard({
-      elements: excalidrawAPI.getSceneElements(),
-      appState: excalidrawAPI.getAppState(),
-      files: excalidrawAPI.getFiles(),
       type,
+      data: {
+        elements: excalidrawAPI.getSceneElements(),
+        appState: excalidrawAPI.getAppState(),
+        files: excalidrawAPI.getFiles(),
+      },
     });
     window.alert(`Copied to clipboard as ${type} successfully`);
   };
@@ -699,6 +720,52 @@ export default function ExampleApp({
           <label>
             <input
               type="checkbox"
+              checked={!interactive}
+              onChange={() => setInteractive(!interactive)}
+            />
+            Non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveLinks}
+              onChange={() => setInteractiveLinks(!interactiveLinks)}
+            />
+            Links when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveEmbeds}
+              onChange={() => setInteractiveEmbeds(!interactiveEmbeds)}
+            />
+            Embeds when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveNavigation}
+              onChange={() => setInteractiveNavigation(!interactiveNavigation)}
+            />
+            Navigation when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveBrowserZoom}
+              onChange={() =>
+                setInteractiveBrowserZoom(!interactiveBrowserZoom)
+              }
+            />
+            Browser zoom when non-interactive
+          </label>
+          <label>
+            <input type="checkbox" checked={!ui} onChange={() => setUi(!ui)} />
+            Hide UI
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={zenModeEnabled}
               onChange={() => setZenModeEnabled(!zenModeEnabled)}
             />
@@ -825,16 +892,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const svg = await exportToSvg({
-                elements: excalidrawAPI?.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                  exportEmbedScene,
-                  width: 300,
-                  height: 100,
+              const svg = await exportScene({
+                type: "svg",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI?.getFiles(),
+                config: { ...exportConfig, embedScene: exportEmbedScene },
               });
               appRef.current.querySelector(".export-svg").innerHTML =
                 svg.outerHTML;
@@ -849,15 +914,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const blob = await exportToBlob({
-                elements: excalidrawAPI?.getSceneElements(),
-                mimeType: "image/png",
-                appState: {
-                  ...initialData.appState,
-                  exportEmbedScene,
-                  exportWithDarkMode,
+              const blob = await exportScene({
+                type: "png",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI?.getFiles(),
+                config: { ...exportConfig, embedScene: exportEmbedScene },
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}
@@ -872,13 +936,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
+              const canvas = await exportScene({
+                type: "canvas",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI.getFiles(),
+                config: exportConfig,
               });
               const ctx = canvas.getContext("2d")!;
               ctx.font = "30px Excalifont";
@@ -893,13 +958,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
+              const canvas = await exportScene({
+                type: "canvas",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI.getFiles(),
+                config: exportConfig,
               });
               const ctx = canvas.getContext("2d")!;
               ctx.font = "30px Excalifont";
@@ -917,8 +983,9 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToViewport: true,
+              excalidrawAPI.setViewport({
+                target: elements[0],
+                fit: "contain",
               });
             }}
           >
@@ -932,33 +999,13 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
+              excalidrawAPI.setViewport({
+                target: elements[0],
+                fit: "scale-down",
               });
             }}
           >
             Fit to content, first element
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!excalidrawAPI) {
-                return;
-              }
-
-              const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0]);
-            }}
-          >
-            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />

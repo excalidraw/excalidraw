@@ -1,4 +1,6 @@
-import { simplify } from "points-on-curve";
+import { pointsOnBezierCurves, simplify } from "points-on-curve";
+import { getStroke, getStrokePoints } from "perfect-freehand";
+import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
   type GeometricShape,
@@ -14,18 +16,22 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
+  polygonFromPoints,
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
+  THEME,
   isTransparent,
   assertNever,
   COLOR_PALETTE,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
+  applyDarkModeFilter,
+  DEFAULT_STROKE_STREAMLINE,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint, Polygon } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -36,6 +42,7 @@ import type {
 import type {
   ElementShape,
   ElementShapes,
+  SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
@@ -52,10 +59,13 @@ import { getCornerRadius, isPathALoop } from "./utils";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
-import { generateFreeDrawShape } from "./renderElement";
 import {
+  CARDINALITY_INNER_BAR_OFFSET,
+  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_SCALE,
+  elementCenterPoint,
   getArrowheadPoints,
-  getCenterForBounds,
   getDiamondPoints,
   getElementAbsoluteCoords,
 } from "./bounds";
@@ -63,13 +73,12 @@ import { shouldTestInside } from "./collision";
 
 import type {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
-  Arrowhead,
   ExcalidrawFreeDrawElement,
   ElementsMap,
   ExcalidrawLineElement,
+  Arrowhead,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -77,29 +86,32 @@ import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
-  private static cache = new WeakMap<ExcalidrawElement, ElementShape>();
+  private static cache = new WeakMap<
+    ExcalidrawElement,
+    { shape: ElementShape; theme: AppState["theme"] }
+  >();
 
   /**
    * Retrieves shape from cache if available. Use this only if shape
    * is optional and you have a fallback in case it's not cached.
    */
-  public static get = <T extends ExcalidrawElement>(element: T) => {
-    return ShapeCache.cache.get(
-      element,
-    ) as T["type"] extends keyof ElementShapes
-      ? ElementShapes[T["type"]] | undefined
-      : ElementShape | undefined;
+  public static get = <T extends ExcalidrawElement>(
+    element: T,
+    theme: AppState["theme"] | null,
+  ) => {
+    const cached = ShapeCache.cache.get(element);
+    if (cached && (theme === null || cached.theme === theme)) {
+      return cached.shape as T["type"] extends keyof ElementShapes
+        ? ElementShapes[T["type"]] | undefined
+        : ElementShape | undefined;
+    }
+    return undefined;
   };
 
-  public static set = <T extends ExcalidrawElement>(
-    element: T,
-    shape: T["type"] extends keyof ElementShapes
-      ? ElementShapes[T["type"]]
-      : Drawable,
-  ) => ShapeCache.cache.set(element, shape);
-
-  public static delete = (element: ExcalidrawElement) =>
+  public static delete = (element: ExcalidrawElement) => {
     ShapeCache.cache.delete(element);
+    elementWithCanvasCache.delete(element);
+  };
 
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
@@ -117,12 +129,13 @@ export class ShapeCache {
       isExporting: boolean;
       canvasBackgroundColor: AppState["viewBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
+      theme: AppState["theme"];
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
     const cachedShape = renderConfig?.isExporting
       ? undefined
-      : ShapeCache.get(element);
+      : ShapeCache.get(element, renderConfig ? renderConfig.theme : null);
 
     // `null` indicates no rc shape applicable for this element type,
     // but it's considered a valid cache value (= do not regenerate)
@@ -132,19 +145,25 @@ export class ShapeCache {
 
     elementWithCanvasCache.delete(element);
 
-    const shape = generateElementShape(
+    const shape = _generateElementShape(
       element,
       ShapeCache.rg,
       renderConfig || {
         isExporting: false,
         canvasBackgroundColor: COLOR_PALETTE.white,
         embedsValidationStatus: null,
+        theme: THEME.LIGHT,
       },
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]
       : Drawable | null;
 
-    ShapeCache.cache.set(element, shape);
+    if (!renderConfig?.isExporting) {
+      ShapeCache.cache.set(element, {
+        shape,
+        theme: renderConfig?.theme || THEME.LIGHT,
+      });
+    }
 
     return shape;
   };
@@ -180,6 +199,7 @@ function adjustRoughness(element: ExcalidrawElement): number {
 export const generateRoughOptions = (
   element: ExcalidrawElement,
   continuousPath = false,
+  isDarkMode: boolean = false,
 ): Options => {
   const options: Options = {
     seed: element.seed,
@@ -204,7 +224,7 @@ export const generateRoughOptions = (
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
-    stroke: element.strokeColor,
+    stroke: applyDarkModeFilter(element.strokeColor, isDarkMode),
     preserveVertices:
       continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
@@ -218,7 +238,7 @@ export const generateRoughOptions = (
       options.fillStyle = element.fillStyle;
       options.fill = isTransparent(element.backgroundColor)
         ? undefined
-        : element.backgroundColor;
+        : applyDarkModeFilter(element.backgroundColor, isDarkMode);
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -231,7 +251,7 @@ export const generateRoughOptions = (
         options.fill =
           element.backgroundColor === "transparent"
             ? undefined
-            : element.backgroundColor;
+            : applyDarkModeFilter(element.backgroundColor, isDarkMode);
       }
       return options;
     }
@@ -244,7 +264,7 @@ export const generateRoughOptions = (
 };
 
 const modifyIframeLikeForRoughOptions = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   isExporting: boolean,
   embedsValidationStatus: EmbedsValidationStatus | null,
 ) => {
@@ -276,6 +296,108 @@ const modifyIframeLikeForRoughOptions = (
   return element;
 };
 
+const generateArrowheadCardinalityOne = (
+  generator: RoughGenerator,
+  arrowheadPoints: number[] | null,
+  lineOptions: Options,
+) => {
+  if (arrowheadPoints === null) {
+    return [];
+  }
+
+  const [, , x3, y3, x4, y4] = arrowheadPoints;
+
+  return [generator.line(x3, y3, x4, y4, lineOptions)];
+};
+
+const generateArrowheadLinesToTip = (
+  generator: RoughGenerator,
+  arrowheadPoints: number[] | null,
+  lineOptions: Options,
+) => {
+  if (arrowheadPoints === null) {
+    return [];
+  }
+
+  const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
+
+  return [
+    generator.line(x3, y3, x2, y2, lineOptions),
+    generator.line(x4, y4, x2, y2, lineOptions),
+  ];
+};
+
+const getArrowheadLineOptions = (
+  element: ExcalidrawLinearElement,
+  options: Options,
+) => {
+  const lineOptions = { ...options };
+
+  if (element.strokeStyle === "dotted") {
+    // for dotted arrows caps, reduce gap to make it more legible
+    const dash = getDashArrayDotted(element.strokeWidth - 1);
+    lineOptions.strokeLineDash = [dash[0], dash[1] - 1];
+  } else {
+    // for solid/dashed, keep solid arrow cap
+    delete lineOptions.strokeLineDash;
+  }
+  lineOptions.roughness = Math.min(1, lineOptions.roughness || 0);
+
+  return lineOptions;
+};
+
+const generateArrowheadOutlineCircle = (
+  generator: RoughGenerator,
+  options: Options,
+  strokeColor: string,
+  arrowheadPoints: number[] | null,
+  fill: string,
+  diameterScale = 1,
+) => {
+  if (arrowheadPoints === null) {
+    return [];
+  }
+
+  const [x, y, diameter] = arrowheadPoints;
+  const circleOptions = {
+    ...options,
+    stroke: strokeColor,
+    roughness: Math.min(0.5, options.roughness || 0),
+    // a second stroke would stray from the fill
+    disableMultiStroke: true,
+  };
+
+  delete circleOptions.strokeLineDash;
+
+  return [
+    fillArrowheadOutline(
+      generator.circle(x, y, diameter * diameterScale, circleOptions),
+      fill,
+    ),
+  ];
+};
+
+/**
+ * Fills an arrowhead's outline (a polygon or circle drawn as a single rough
+ * stroke) along that stroke. rough.js' own solid fill is jittered separately
+ * from the outline, by up to 2px, which shows on shapes as small as
+ * arrowheads.
+ */
+const fillArrowheadOutline = (outline: Drawable, fill: string): Drawable => {
+  // polygons are drawn edge by edge, each starting with a move
+  const ops = outline.sets
+    .flatMap((set) => set.ops)
+    .map((op, index) =>
+      index > 0 && op.op === "move" ? { ...op, op: "lineTo" as const } : op,
+    );
+
+  return {
+    ...outline,
+    options: { ...outline.options, fill },
+    sets: [{ type: "fillPath", ops }, ...outline.sets],
+  };
+};
+
 const getArrowheadShapes = (
   element: ExcalidrawLinearElement,
   shape: Drawable[],
@@ -284,144 +406,282 @@ const getArrowheadShapes = (
   generator: RoughGenerator,
   options: Options,
   canvasBackgroundColor: string,
+  isDarkMode: boolean,
 ) => {
-  const arrowheadPoints = getArrowheadPoints(
-    element,
-    shape,
-    position,
-    arrowhead,
-  );
-
-  if (arrowheadPoints === null) {
+  if (arrowhead === null) {
     return [];
   }
 
-  const generateCrowfootOne = (
-    arrowheadPoints: number[] | null,
-    options: Options,
-  ) => {
-    if (arrowheadPoints === null) {
-      return [];
-    }
-
-    const [, , x3, y3, x4, y4] = arrowheadPoints;
-
-    return [generator.line(x3, y3, x4, y4, options)];
-  };
-
+  const strokeColor = applyDarkModeFilter(element.strokeColor, isDarkMode);
+  const backgroundFillColor = applyDarkModeFilter(
+    canvasBackgroundColor,
+    isDarkMode,
+  );
   switch (arrowhead) {
-    case "dot":
     case "circle":
     case "circle_outline": {
-      const [x, y, diameter] = arrowheadPoints;
-
-      // always use solid stroke for arrowhead
-      delete options.strokeLineDash;
-
-      return [
-        generator.circle(x, y, diameter, {
-          ...options,
-          fill:
-            arrowhead === "circle_outline"
-              ? canvasBackgroundColor
-              : element.strokeColor,
-
-          fillStyle: "solid",
-          stroke: element.strokeColor,
-          roughness: Math.min(0.5, options.roughness || 0),
-        }),
-      ];
+      return generateArrowheadOutlineCircle(
+        generator,
+        options,
+        strokeColor,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        arrowhead === "circle_outline" ? backgroundFillColor : strokeColor,
+      );
     }
     case "triangle":
     case "triangle_outline": {
+      const arrowheadPoints = getArrowheadPoints(
+        element,
+        shape,
+        position,
+        arrowhead,
+      );
+
+      if (arrowheadPoints === null) {
+        return [];
+      }
+
       const [x, y, x2, y2, x3, y3] = arrowheadPoints;
+      const triangleOptions = {
+        ...options,
+        roughness: Math.min(1, options.roughness || 0),
+        // a second stroke would stray from the fill
+        disableMultiStroke: true,
+        // keep the corners of the small polygon in place, only bow the edges
+        preserveVertices: true,
+      };
 
       // always use solid stroke for arrowhead
-      delete options.strokeLineDash;
+      delete triangleOptions.strokeLineDash;
 
       return [
-        generator.polygon(
-          [
-            [x, y],
-            [x2, y2],
-            [x3, y3],
-            [x, y],
-          ],
-          {
-            ...options,
-            fill:
-              arrowhead === "triangle_outline"
-                ? canvasBackgroundColor
-                : element.strokeColor,
-            fillStyle: "solid",
-            roughness: Math.min(1, options.roughness || 0),
-          },
+        fillArrowheadOutline(
+          generator.polygon(
+            [
+              [x, y],
+              [x2, y2],
+              [x3, y3],
+            ],
+            triangleOptions,
+          ),
+          arrowhead === "triangle_outline" ? backgroundFillColor : strokeColor,
         ),
       ];
     }
     case "diamond":
     case "diamond_outline": {
+      const arrowheadPoints = getArrowheadPoints(
+        element,
+        shape,
+        position,
+        arrowhead,
+      );
+
+      if (arrowheadPoints === null) {
+        return [];
+      }
+
       const [x, y, x2, y2, x3, y3, x4, y4] = arrowheadPoints;
+      const diamondOptions = {
+        ...options,
+        roughness: Math.min(1, options.roughness || 0),
+        // a second stroke would stray from the fill
+        disableMultiStroke: true,
+        // keep the corners of the small polygon in place, only bow the edges
+        preserveVertices: true,
+      };
 
       // always use solid stroke for arrowhead
-      delete options.strokeLineDash;
+      delete diamondOptions.strokeLineDash;
 
       return [
-        generator.polygon(
-          [
-            [x, y],
-            [x2, y2],
-            [x3, y3],
-            [x4, y4],
-            [x, y],
-          ],
-          {
-            ...options,
-            fill:
-              arrowhead === "diamond_outline"
-                ? canvasBackgroundColor
-                : element.strokeColor,
-            fillStyle: "solid",
-            roughness: Math.min(1, options.roughness || 0),
-          },
+        fillArrowheadOutline(
+          generator.polygon(
+            [
+              [x, y],
+              [x2, y2],
+              [x3, y3],
+              [x4, y4],
+            ],
+            diamondOptions,
+          ),
+          arrowhead === "diamond_outline" ? backgroundFillColor : strokeColor,
         ),
       ];
     }
-    case "crowfoot_one":
-      return generateCrowfootOne(arrowheadPoints, options);
+    case "cardinality_one":
+      return generateArrowheadCardinalityOne(
+        generator,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        getArrowheadLineOptions(element, options),
+      );
+    case "cardinality_many":
+      return generateArrowheadLinesToTip(
+        generator,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        getArrowheadLineOptions(element, options),
+      );
+    case "cardinality_one_or_many": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadLinesToTip(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_many"),
+          lineOptions,
+        ),
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
+          ),
+          lineOptions,
+        ),
+      ];
+    }
+    case "cardinality_exactly_one": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_INNER_BAR_OFFSET,
+          ),
+          lineOptions,
+        ),
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_one"),
+          lineOptions,
+        ),
+      ];
+    }
+    case "cardinality_zero_or_one": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadOutlineCircle(
+          generator,
+          options,
+          strokeColor,
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "circle_outline",
+            CARDINALITY_ZERO_CIRCLE_OFFSET,
+          ),
+          backgroundFillColor,
+          CARDINALITY_ZERO_CIRCLE_SCALE,
+        ),
+        ...generateArrowheadCardinalityOne(
+          generator,
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_INNER_BAR_OFFSET,
+          ),
+          lineOptions,
+        ),
+      ];
+    }
+    case "cardinality_zero_or_many": {
+      const lineOptions = getArrowheadLineOptions(element, options);
+
+      return [
+        ...generateArrowheadLinesToTip(
+          generator,
+          getArrowheadPoints(element, shape, position, "cardinality_many"),
+          lineOptions,
+        ),
+        ...generateArrowheadOutlineCircle(
+          generator,
+          options,
+          strokeColor,
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "circle_outline",
+            CARDINALITY_ZERO_CIRCLE_OFFSET,
+          ),
+          backgroundFillColor,
+          CARDINALITY_ZERO_CIRCLE_SCALE,
+        ),
+      ];
+    }
     case "bar":
     case "arrow":
-    case "crowfoot_many":
-    case "crowfoot_one_or_many":
     default: {
-      const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
-
-      if (element.strokeStyle === "dotted") {
-        // for dotted arrows caps, reduce gap to make it more legible
-        const dash = getDashArrayDotted(element.strokeWidth - 1);
-        options.strokeLineDash = [dash[0], dash[1] - 1];
-      } else {
-        // for solid/dashed, keep solid arrow cap
-        delete options.strokeLineDash;
-      }
-      options.roughness = Math.min(1, options.roughness || 0);
-      return [
-        generator.line(x3, y3, x2, y2, options),
-        generator.line(x4, y4, x2, y2, options),
-        ...(arrowhead === "crowfoot_one_or_many"
-          ? generateCrowfootOne(
-              getArrowheadPoints(element, shape, position, "crowfoot_one"),
-              options,
-            )
-          : []),
-      ];
+      return generateArrowheadLinesToTip(
+        generator,
+        getArrowheadPoints(element, shape, position, arrowhead),
+        getArrowheadLineOptions(element, options),
+      );
     }
   }
 };
 
+/** The simplified centerline the freedraw fill is drawn along. */
+const getFreedrawFillCurvePoints = (element: ExcalidrawFreeDrawElement) =>
+  simplify(element.points as Mutable<LocalPoint[]>, 0.75) as [number, number][];
+
+const freedrawFillPolygonCache = new WeakMap<
+  ExcalidrawFreeDrawElement,
+  { version: number; polygon: Polygon<LocalPoint> }
+>();
+
+/**
+ * Returns the flattened fill contour of a freedraw loop in local, unrotated
+ * coordinates, following the rendered fill rather than the stroke outline.
+ */
+export const getFreedrawFillPolygon = (element: ExcalidrawFreeDrawElement) => {
+  const cached = freedrawFillPolygonCache.get(element);
+  if (cached?.version === element.version) {
+    return cached.polygon;
+  }
+
+  // Same curve as the rendered fill, without roughness jitter. RoughJS also
+  // handles inputs simplified to two points.
+  const ops = new RoughGenerator().curve(getFreedrawFillCurvePoints(element), {
+    roughness: 0,
+    disableMultiStroke: true,
+  }).sets[0].ops;
+  const bezierPoints: LocalPoint[] = [];
+  // A single curve pass consists of a move followed by cubic control points.
+  for (const { data } of ops) {
+    for (let i = 0; i < data.length; i += 2) {
+      bezierPoints.push(pointFrom<LocalPoint>(data[i], data[i + 1]));
+    }
+  }
+
+  // Omit the optional distance argument to avoid simplifying the boundary again.
+  const polygon = polygonFromPoints(
+    pointsOnBezierCurves(bezierPoints, 0.5) as LocalPoint[],
+  );
+  freedrawFillPolygonCache.set(element, { version: element.version, polygon });
+
+  return polygon;
+};
+
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
-) => {
+  elementsMap: ElementsMap,
+): {
+  op: string;
+  data: number[];
+}[] => {
   const generator = new RoughGenerator();
   const options: Options = {
     seed: element.seed,
@@ -430,20 +690,7 @@ export const generateLinearCollisionShape = (
     roughness: 0,
     preserveVertices: true,
   };
-  const center = getCenterForBounds(
-    // Need a non-rotated center point
-    element.points.reduce(
-      (acc, point) => {
-        return [
-          Math.min(element.x + point[0], acc[0]),
-          Math.min(element.y + point[1], acc[1]),
-          Math.max(element.x + point[0], acc[2]),
-          Math.max(element.y + point[1], acc[3]),
-        ];
-      },
-      [Infinity, Infinity, -Infinity, -Infinity],
-    ),
-  );
+  const center = elementCenterPoint(element, elementsMap);
 
   switch (element.type) {
     case "line":
@@ -455,8 +702,10 @@ export const generateLinearCollisionShape = (
         : [pointFrom<LocalPoint>(0, 0)];
 
       if (isElbowArrow(element)) {
-        return generator.path(generateElbowArrowShape(points, 16), options)
-          .sets[0].ops;
+        return generator.path(
+          generateElbowArrowShape(points, ELBOW_ARROW_CORNER_RADIUS),
+          options,
+        ).sets[0].ops;
       } else if (!element.roundness) {
         return points.map((point, idx) => {
           const p = pointRotateRads(
@@ -528,69 +777,44 @@ export const generateLinearCollisionShape = (
         });
     }
     case "freedraw": {
-      if (element.points.length < 2) {
+      const outlinePoints = getFreedrawOutlinePoints(element);
+
+      if (outlinePoints.length < 2) {
         return [];
       }
 
-      const simplifiedPoints = simplify(
-        element.points as Mutable<LocalPoint[]>,
-        0.75,
-      );
+      const collisionOutline =
+        element.strokeOptions?.variability === "constant"
+          ? (simplify(
+              outlinePoints as Mutable<LocalPoint[]>,
+              CONSTANT_WIDTH_FREEDRAW.COLLISION_SIMPLIFY_TOLERANCE,
+            ) as [number, number][])
+          : outlinePoints;
 
-      return generator
-        .curve(simplifiedPoints as [number, number][], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
+      if (collisionOutline.length < 2) {
+        return [];
+      }
 
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
+      // Close the outline polygon so its boundary never has a gap at the seam.
+      const [firstX, firstY] = collisionOutline[0];
+      const [lastX, lastY] = collisionOutline[collisionOutline.length - 1];
+      const closedOutline =
+        firstX === lastX && firstY === lastY
+          ? collisionOutline
+          : [...collisionOutline, collisionOutline[0]];
 
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
-        });
+      return closedOutline.map((point, idx) => {
+        const p = pointRotateRads<GlobalPoint>(
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+          center,
+          element.angle,
+        );
+
+        return {
+          op: idx === 0 ? "move" : "lineTo",
+          data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+        };
+      });
     }
   }
 };
@@ -602,19 +826,22 @@ export const generateLinearCollisionShape = (
  *
  * @private
  */
-const generateElementShape = (
-  element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
+const _generateElementShape = (
+  element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
     isExporting,
     canvasBackgroundColor,
     embedsValidationStatus,
+    theme,
   }: {
     isExporting: boolean;
     canvasBackgroundColor: string;
     embedsValidationStatus: EmbedsValidationStatus | null;
+    theme?: AppState["theme"];
   },
-): Drawable | Drawable[] | null => {
+): ElementShape => {
+  const isDarkMode = theme === THEME.DARK;
   switch (element.type) {
     case "rectangle":
     case "iframe":
@@ -640,6 +867,7 @@ const generateElementShape = (
               embedsValidationStatus,
             ),
             true,
+            isDarkMode,
           ),
         );
       } else {
@@ -655,6 +883,7 @@ const generateElementShape = (
               embedsValidationStatus,
             ),
             false,
+            isDarkMode,
           ),
         );
       }
@@ -692,7 +921,7 @@ const generateElementShape = (
             C ${topX} ${topY}, ${topX} ${topY}, ${topX + verticalRadius} ${
             topY + horizontalRadius
           }`,
-          generateRoughOptions(element, true),
+          generateRoughOptions(element, true, isDarkMode),
         );
       } else {
         shape = generator.polygon(
@@ -702,7 +931,7 @@ const generateElementShape = (
             [bottomX, bottomY],
             [leftX, leftY],
           ],
-          generateRoughOptions(element),
+          generateRoughOptions(element, false, isDarkMode),
         );
       }
       return shape;
@@ -713,14 +942,14 @@ const generateElementShape = (
         element.height / 2,
         element.width,
         element.height,
-        generateRoughOptions(element),
+        generateRoughOptions(element, false, isDarkMode),
       );
       return shape;
     }
     case "line":
     case "arrow": {
       let shape: ElementShapes[typeof element.type];
-      const options = generateRoughOptions(element);
+      const options = generateRoughOptions(element, false, isDarkMode);
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
@@ -744,8 +973,8 @@ const generateElementShape = (
         } else {
           shape = [
             generator.path(
-              generateElbowArrowShape(points, 16),
-              generateRoughOptions(element, true),
+              generateElbowArrowShape(points, ELBOW_ARROW_CORNER_RADIUS),
+              generateRoughOptions(element, true, isDarkMode),
             ),
           ];
         }
@@ -778,6 +1007,7 @@ const generateElementShape = (
             generator,
             options,
             canvasBackgroundColor,
+            isDarkMode,
           );
           shape.push(...shapes);
         }
@@ -795,6 +1025,7 @@ const generateElementShape = (
             generator,
             options,
             canvasBackgroundColor,
+            isDarkMode,
           );
           shape.push(...shapes);
         }
@@ -802,24 +1033,28 @@ const generateElementShape = (
       return shape;
     }
     case "freedraw": {
-      let shape: ElementShapes[typeof element.type];
-      generateFreeDrawShape(element);
+      // oredered in terms of z-index [background, stroke]
+      const shapes: ElementShapes[typeof element.type] = [];
 
+      // (1) background fill (rc shape), optional
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
+        shapes.push(
+          generator.curve(getFreedrawFillCurvePoints(element), {
+            ...generateRoughOptions(element, false, isDarkMode),
+            stroke: "none",
+          }),
         );
-        shape = generator.curve(simplifiedPoints as [number, number][], {
-          ...generateRoughOptions(element),
-          stroke: "none",
-        });
-      } else {
-        shape = null;
       }
-      return shape;
+
+      // (2) stroke
+      shapes.push(getFreeDrawSvgPath(element));
+
+      return shapes;
     }
+    // sticky notes are painted directly (canvas + SVG) from
+    // `getStickyNoteRenderPoints`, never through roughjs
+    case "stickynote":
     case "frame":
     case "magicframe":
     case "text":
@@ -839,10 +1074,30 @@ const generateElementShape = (
   }
 };
 
-const generateElbowArrowShape = (
-  points: readonly LocalPoint[],
+export const ELBOW_ARROW_CORNER_RADIUS = 16;
+
+export const generateElbowArrowShape = (
+  routePoints: readonly LocalPoint[],
   radius: number,
 ) => {
+  // a jog too short to see (e.g. a fixed segment lined up with the ones
+  // around it, while dragging an element the arrow is bound to) is drawn
+  // straight, as rough.js draws its two corners as a knot: a segment shorter
+  // than 1px between two longer ones heading the same way (not a U-turn, nor
+  // a corner of short segments)
+  const isJog = (i: number) => {
+    if (i < 2 || i > routePoints.length - 2) {
+      return false;
+    }
+    const [a, b, c, d] = routePoints.slice(i - 2, i + 2);
+    return (
+      pointDistance(b, c) < 1 &&
+      pointDistance(a, b) >= 1 &&
+      pointDistance(c, d) >= 1 &&
+      (b[0] - a[0]) * (d[0] - c[0]) + (b[1] - a[1]) * (d[1] - c[1]) > 0
+    );
+  };
+  const points = routePoints.filter((_, i) => !isJog(i) && !isJog(i + 1));
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
@@ -914,6 +1169,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 ): GeometricShape<Point> => {
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "diamond":
     case "frame":
     case "magicframe":
@@ -925,9 +1181,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
       return getPolygonShape(element);
     case "arrow":
     case "line": {
-      const roughShape =
-        ShapeCache.get(element)?.[0] ??
-        ShapeCache.generateElementShape(element, null)[0];
+      const roughShape = ShapeCache.generateElementShape(element, null)[0];
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
@@ -1003,3 +1257,169 @@ export const toggleLinePolygonState = (
 
   return ret;
 };
+
+// -----------------------------------------------------------------------------
+//                         freedraw shape helper
+// -----------------------------------------------------------------------------
+
+// NOTE not cached (-> for SVG export)
+const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
+  return getSvgPathFromStroke(
+    getFreedrawOutlinePoints(element),
+  ) as SVGPathString;
+};
+
+/**
+ * Freedraw stroke geometry tuning constants.
+ *
+ * These factors are not derived analytically — they were tuned empirically by
+ * visually comparing rendered strokes until they matched the desired feel.
+ * Treat them as magic numbers backed by visual verification.
+ */
+const VARIABLE_WIDTH_FREEDRAW = {
+  /** Stroke size relative to `strokeWidth` for pressure-sensitive strokes. */
+  SIZE_FACTOR: 4.25,
+  THINNING: 0.6,
+  SMOOTHING: 0.5,
+} as const;
+
+const CONSTANT_WIDTH_FREEDRAW = {
+  /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
+  SIZE_FACTOR: 1.4,
+  /**
+   * Max deviation (px) when dropping vertices of the dense laser outline for
+   * collision. Perfect-freehand outlines are already thinned by `smoothing`.
+   */
+  COLLISION_SIMPLIFY_TOLERANCE: 0.2,
+} as const;
+
+const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
+  element.strokeOptions?.streamline ?? DEFAULT_STROKE_STREAMLINE;
+
+/**
+ * Pressure-sensitive (variable width) freedraw outline, rendered with
+ * perfect-freehand. This is the original Excalidraw freedraw look.
+ */
+const getVariableWidthFreedrawOutline = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
+  // If input points are empty (should they ever be?) return a dot
+  const inputPoints = element.simulatePressure
+    ? element.points
+    : element.points.length
+    ? element.points.map(
+        ([x, y], i) => [x, y, element.pressures[i]] as [number, number, number],
+      )
+    : [[0, 0, 0.5]];
+
+  return getStroke(inputPoints as number[][], {
+    simulatePressure: element.simulatePressure,
+    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+    thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
+    smoothing: VARIABLE_WIDTH_FREEDRAW.SMOOTHING,
+    streamline: getFreedrawStreamline(element),
+    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
+    last: true,
+  }) as [number, number][];
+};
+
+const createLaserPointer = (element: ExcalidrawFreeDrawElement) =>
+  new LaserPointer({
+    size: element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR,
+    streamline: getFreedrawStreamline(element),
+    simplify: 0,
+    sizeMapping: (details) => Math.max(0.1, details.pressure),
+  });
+
+/**
+ * Uniform (constant width) freedraw outline, rendered with the laser-pointer
+ * geometry. Pressure is pinned to 1 so the stroke keeps a constant width.
+ */
+const getConstantWidthFreedrawOutline = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
+  const laserPointer = createLaserPointer(element);
+  element.points.map(([x, y]) => laserPointer.addPoint([x, y, 1]));
+
+  return laserPointer
+    .getStrokeOutline()
+    .map(([x, y]) => [x, y] as [number, number]);
+};
+
+export const getFreedrawOutlinePoints = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] => {
+  // Unknown/absent variability falls back to the original variable rendering.
+  return element.strokeOptions?.variability === "constant"
+    ? getConstantWidthFreedrawOutline(element)
+    : getVariableWidthFreedrawOutline(element);
+};
+
+/**
+ * Upper bound on how far a freedraw stroke's ink reaches past its centerline
+ * points. Both stroke generators scale the stroke size by at most 1 (easing
+ * or pressure), so the size itself bounds the radius, except for
+ * perfect-freehand's short strokes: under 3px long, the start cap is drawn
+ * around the first point from an outline point of the last one (reaching
+ * sqrt(size² + 3²)), and a single point gets a synthetic neighbor 1px away.
+ */
+export const getFreedrawMaxStrokeRadius = (
+  element: ExcalidrawFreeDrawElement,
+) =>
+  element.strokeOptions?.variability === "constant"
+    ? element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
+    : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR + 3;
+
+/**
+ * The streamline-smoothed centerline the freedraw stroke is rendered
+ * around, in element-local coordinates. Boundary-sensitive consumers (e.g.
+ * bucket fill) should use this instead of `element.points`: raw input
+ * points can sit 20px+ apart and the rendered stroke is smoothed between
+ * them, so raw chords visibly deviate from what's on screen.
+ *
+ * Constant-width ("laser geometry") strokes technically smooth via
+ * `LaserPointer` instead; the perfect-freehand centerline with the same
+ * `streamline` is a close approximation the stroke width hides.
+ */
+export const getFreedrawStrokeCenterPoints = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] =>
+  getStrokePoints(element.points as unknown as number[][], {
+    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+    streamline: getFreedrawStreamline(element),
+    last: true,
+  }).map((strokePoint) => strokePoint.point as [number, number]);
+
+const med = (A: number[], B: number[]) => {
+  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+};
+
+// Trim SVG path data so number are each two decimal points. This
+// improves SVG exports, and prevents rendering errors on points
+// with long decimals.
+const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
+
+const getSvgPathFromStroke = (points: number[][]): string => {
+  if (!points.length) {
+    return "";
+  }
+
+  const max = points.length - 1;
+
+  return points
+    .reduce(
+      (acc, point, i, arr) => {
+        if (i === max) {
+          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
+        } else {
+          acc.push(point, med(point, arr[i + 1]));
+        }
+        return acc;
+      },
+      ["M", points[0], "Q"],
+    )
+    .join(" ")
+    .replace(TO_FIXED_PRECISION, "$1");
+};
+
+// -----------------------------------------------------------------------------

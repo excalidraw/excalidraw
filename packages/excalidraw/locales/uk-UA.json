@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "Зареєструватися",
+    "signIn": "Увійти",
+    "upgrade": "Оновити план",
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
+    "chartType_bar": "Стовпчикова діаграма",
+    "chartType_line": "Лінійна діаграма",
+    "chartType_radar": "Пелюсткова діаграма",
+    "chartType_plaintext": "Звичайний текст",
     "selectAll": "Вибрати все",
     "multiSelect": "Додати елемент до вибраного",
     "moveCanvas": "Перемістити полотно",
@@ -21,6 +28,7 @@
     "copyStyles": "Копіювати стилі",
     "pasteStyles": "Вставити стилі",
     "stroke": "Контур",
+    "textColor": "Колір тексту",
     "changeStroke": "Змінити колір обведення",
     "background": "Тло",
     "changeBackground": "Змінити колір фону",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Пунктир",
     "strokeStyle_dotted": "Крапки",
     "sloppiness": "Охайність",
+    "pressure": "Натиск",
+    "pressure_constant": "Сталий",
+    "pressure_variable": "Змінний",
     "opacity": "Прозорість",
     "textAlign": "Вирівнювання тексту",
     "edges": "Краї",
@@ -46,10 +57,17 @@
     "arrowhead_triangle_outline": "Трикутник (контур)",
     "arrowhead_diamond": "Ромб",
     "arrowhead_diamond_outline": "Ромб (контур)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_crowfoot_many": "Вороняча лапка (багато)",
+    "arrowhead_crowfoot_one": "Вороняча лапка (один)",
+    "arrowhead_crowfoot_one_or_many": "Вороняча лапка (один або багато)",
+    "arrowhead_cardinality_one": "Кардинальність (один)",
+    "arrowhead_cardinality_many": "Кардинальність (багато)",
+    "arrowhead_cardinality_one_or_many": "Кардинальність (один або багато)",
+    "arrowhead_cardinality_exactly_one": "Кардинальність (рівно один)",
+    "arrowhead_cardinality_zero_or_one": "Кардинальність (нуль або один)",
+    "arrowhead_cardinality_zero_or_many": "Кардинальність (нуль або багато)",
     "more_options": "Інші опції",
+    "cardinality": "Кардинальність",
     "arrowtypes": "Тип стрілки",
     "arrowtype_sharp": "Гостра стрілка",
     "arrowtype_round": "Вигнута стрілка",
@@ -95,7 +113,10 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
+    "you": "Ви",
     "toggleGrid": "Перемикати сітку",
+    "minimap": "Мінікарта",
+    "zoom": "Масштаб",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
     "libraryLoadingMessage": "Завантаження бібліотеки…",
@@ -142,8 +163,8 @@
       "editArrow": "Редагувати стрілку"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Розімкнути багатокутник",
+      "convertToPolygon": "Перетворити на багатокутник"
     },
     "elementLock": {
       "lock": "Блокувати",
@@ -165,13 +186,27 @@
     "zoomToFit": "Збільшити, щоб умістити всі елементи",
     "installPWA": "Встановити Excalidraw локально (PWA)",
     "autoResize": "Увімкнути автоматичне змінення розміру тексту",
+    "toggleAutoResize": "Перемикати автоматичне змінення розміру тексту",
     "imageCropping": "Обрізка зображення",
     "unCroppedDimension": "Необрізаний розмір",
     "copyElementLink": "Копіювати посилання на об'єкт",
     "linkToElement": "Посилання на об’єкт",
     "wrapSelectionInFrame": "Обтікання виділеного фрагмента рамкою",
-    "tab": "",
-    "shapeSwitch": ""
+    "removeFrame": "Прибрати рамку",
+    "toggleWrap": "Огорнути виділене або зняти обгортку",
+    "tab": "Tab",
+    "shapeSwitch": "Змінити фігуру",
+    "preferences": "Налаштування",
+    "preferences_toolLock": "Закріплення інструмента",
+    "boxSelectionMode": "Виділення рамкою",
+    "boxSelectionContain": "Охоплення",
+    "boxSelectionOverlap": "Перетин",
+    "arrowBinding": "Прив'язка стрілок",
+    "midpointSnapping": "Прив'язка до середніх точок",
+    "showHints": "Підказки на панелі інструментів",
+    "inputDevice": "Пристрій введення",
+    "inputDeviceTrackpad": "Трекпад",
+    "inputDeviceMouse": "Миша"
   },
   "elementLink": {
     "title": "Посилання на об’єкт",
@@ -183,10 +218,10 @@
     "hint_emptyLibrary": "Виберіть об'єкт на полотні, щоб додати його сюди або встановіть бібліотеку з публічного репозиторію, що нижче.",
     "hint_emptyPrivateLibrary": "Виберіть елемент на полотні, щоб додати його сюди.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Шукати в бібліотеці",
+      "heading": "Збіги в бібліотеці",
+      "noResults": "Збігів не знайдено...",
+      "clearSearch": "Очистити пошук"
     }
   },
   "search": {
@@ -195,8 +230,8 @@
     "singleResult": "результат",
     "multipleResults": "результати",
     "placeholder": "Знайти текст на полотні...",
-    "frames": "",
-    "texts": ""
+    "frames": "Рамки",
+    "texts": "Тексти"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -215,12 +250,14 @@
     "zoomIn": "Збільшити",
     "zoomOut": "Зменшити",
     "resetZoom": "Скинути масштаб",
+    "zoomToFit": "Умістити все",
     "menu": "Меню",
     "done": "Готово",
     "edit": "Редагувати",
     "undo": "Відмінити",
     "redo": "Повторити",
     "resetLibrary": "Очистити бібліотеку",
+    "reset": "Скинути",
     "createNewRoom": "Створити нову кімнату",
     "fullScreen": "Повноекранний режим",
     "darkMode": "Темна тема",
@@ -230,11 +267,11 @@
     "objectsSnapMode": "Прив'язати до об'єктів",
     "exitZenMode": "Вийти з дзен-режиму",
     "cancel": "Скасувати",
-    "saveLibNames": "",
+    "saveLibNames": "Зберегти назви та вийти",
     "clear": "Очистити",
     "remove": "Видалити",
     "embed": "Перемкнути вкладення",
-    "publishLibrary": "",
+    "publishLibrary": "Перейменувати або опублікувати",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
     "embeddableInteractionButton": "Натисніть для взаємодії"
@@ -261,7 +298,7 @@
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
     "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
     "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Перевищено ліміт сховища браузера. Зміни не буде збережено."
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -292,7 +329,7 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "lasso": "",
+    "lasso": "Ласо",
     "image": "Вставити зображення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
@@ -308,12 +345,19 @@
     "eraser": "Гумка",
     "frame": "Інструмент фрейму",
     "magicframe": "Перетворити у код",
+    "stickynote": "Стікер",
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
+    "autoshape": "Ескіз у фігуру",
+    "bucketfill": "Заливка",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Перемикати тип фігури"
+  },
+  "bucketfill": {
+    "noRegion": "Не вдалося знайти замкнену область для заливки.",
+    "tooComplex": "Ця область занадто складна для заливки."
   },
   "element": {
     "rectangle": "Прямокутник",
@@ -327,6 +371,7 @@
     "group": "Група",
     "frame": "Рамка",
     "magicframe": "Перетворити у код",
+    "stickynote": "Стікер",
     "embeddable": "Веб вкладення",
     "selection": "Виділення",
     "iframe": "IFrame"
@@ -337,34 +382,40 @@
     "shapes": "Фігури"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}}, щоб закрити пошук",
+    "canvasPanning": "Щоб перемістити полотно, утримуйте {{shortcut_1}} або {{shortcut_2}} під час перетягування чи скористайтеся інструментом «Рука»",
     "linearElement": "Натисніть щоб додати кілька точок. Перетягніть щоб намалювати одну лінію",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Натисніть, щоб додати кілька точок, або перетягніть, щоб намалювати одну лінію. Натисніть {{shortcut}} ще раз, щоб змінити тип стрілки.",
+    "arrowBindModifiers": "Утримуйте {{shortcut_1}}, щоб вимкнути прив'язку, або {{shortcut_2}}, щоб прив'язати у фіксованій точці",
     "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
     "text": "Порада: можна також додати текст, двічі клацнувши по будь-якому місці інструментом вибору",
     "embeddable": "Клікніть та перетягніть для створення вбудованого вебсайту",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "stickynote": "Клацніть, щоб розмістити стікер, або перетягніть, щоб задати його розмір",
+    "autoshape": "Малюйте прямокутники, кола, ромби, лінії та стрілки",
+    "text_selected": "Двічі клацніть або натисніть {{shortcut}}, щоб редагувати текст",
+    "text_editing": "Натисніть {{shortcut_1}} або {{shortcut_2}}, щоб завершити редагування",
+    "toggleTextAutoResize": "{{shortcut}}, щоб перемкнути автоматичне змінення розміру тексту",
+    "linearElementMulti": "Клацніть останню точку або натисніть {{shortcut_1}} чи {{shortcut_2}}, щоб завершити",
+    "lockAngle": "Ви можете обмежити кут, утримуючи {{shortcut}}",
+    "resize": "Ви можете зберегти пропорції, утримуючи {{shortcut_1}} під час змінення розміру,\nутримуйте {{shortcut_2}}, щоб змінювати розмір від центру",
+    "resizeImage": "Ви можете вільно змінювати розмір, утримуючи {{shortcut_1}},\nутримуйте {{shortcut_2}}, щоб змінювати розмір від центру",
+    "resizeStickyNote": "Утримуйте {{shortcut_1}}, щоб вільно змінювати розмір, {{shortcut_2}} — щоб змінювати розмір від центру",
+    "rotate": "Ви можете обмежити кути, утримуючи {{shortcut}} під час обертання",
+    "toggleArrowhead": "Двічі клацніть, щоб додати або прибрати закінчення стрілки",
+    "lineEditor_info": "Утримуйте {{shortcut_1}} і двічі клацніть або натисніть {{shortcut_2}}, щоб редагувати точки",
+    "lineEditor_line_info": "Двічі клацніть або натисніть {{shortcut}}, щоб редагувати точки",
+    "lineEditor_pointSelected": "Натисніть {{shortcut_1}}, щоб видалити точки,\n{{shortcut_2}} — щоб дублювати, або перетягніть, щоб перемістити",
+    "lineEditor_nothingSelected": "Виберіть точку для редагування (утримуйте {{shortcut_1}}, щоб вибрати кілька),\nабо утримуйте {{shortcut_2}} і клацніть, щоб додати нові точки",
     "publishLibrary": "Опублікувати свою власну бібліотеку",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} щоб додати текст",
+    "createFlowchart": "{{shortcut}}, щоб створити блок-схему",
+    "deepBoxSelect": "Утримуйте {{shortcut}} для глибокого виділення без перетягування",
+    "cycleSelection": "Клацайте, утримуючи {{shortcut}}, щоб перебирати виділення, або перетягніть, щоб дублювати",
+    "eraserRevert": "Утримуйте {{shortcut}}, щоб повернути елементи, позначені для видалення",
     "firefox_clipboard_write": "Цю функцію можна ввімкнути, встановивши значення \"true\" для налаштування \"dom.events.asyncClipboard.clipboardItem\". Перейдіть на сторінку «about:config», щоб змінити налаштування браузера у Firefox.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Утримуйте {{shortcut}}, щоб вимкнути прив'язку",
+    "enterCropEditor": "Двічі клацніть зображення або натисніть {{shortcut}}, щоб обрізати його",
+    "leaveCropEditor": "Клацніть поза зображенням або натисніть {{shortcut_1}} чи {{shortcut_2}}, щоб завершити обрізку"
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "Помилка"
+  },
+  "progressDialog": {
+    "title": "Збереження",
+    "defaultMessage": "Підготовка до збереження..."
   },
   "exportDialog": {
     "disk_title": "Зберегти на диск",
@@ -557,7 +612,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Всі ваші дані збережено локально у Вашому браузері.",
+      "center_heading": "Ваші малюнки зберігаються у сховищі браузера.",
+      "center_heading_line2": "Дані, збережені в браузері, можуть бути несподівано видалені.",
+      "center_heading_line3": "Регулярно зберігайте свою роботу у файл, щоб не втратити її.",
       "center_heading_plus": "Чи бажаєте перейти до Excalidraw+?",
       "menuHint": "Експорт, налаштування, мови, ..."
     },
@@ -569,12 +626,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Колір",
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
     "shades": "Тіні",
     "hexCode": "Hex-код",
-    "noShades": "Немає доступних відтінків цього кольору"
+    "noShades": "Немає доступних відтінків цього кольору",
+    "invalidColor": "Некоректний колір",
+    "invalidHexLength": "Код Hex має містити 3, 4, 6 або 8 символів",
+    "topPicksTip": "Порада: перетягніть будь-який колір до обраних, щоб закріпити його",
+    "resetTopPicks": "Скинути до стандартного набору кольорів"
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Відпустіть, щоб замінити вміст",
+    "add": "Відпустіть, щоб додати на полотно",
+    "importLibrary": "Відпустіть, щоб імпортувати бібліотеку",
+    "replaceHint": "Утримуйте <shift>Shift</shift>, щоб зберегти наявний вміст",
+    "keepHint": "Ваш наявний вміст буде збережено",
+    "libraryHint": "Файли бібліотек буде додано до бібліотеки",
+    "replacedToast": "Вміст замінено. {{shortcut}}, щоб відмінити"
+  },
   "mermaid": {
     "title": "Mermaid у Excalidraw",
     "button": "Вставити",
-    "description": "Наразі підтримується тільки <flowchartLink>блок-схеми</flowchartLink><sequenceLink>діаграми послідовностей</sequenceLink> та <classLink>діаграми класів</classLink>. Інші типи будуть відображатися як зображення в Excalidraw.",
+    "description": "<flowchartLink>Блок-схеми</flowchartLink>, діаграми <sequenceLink>послідовностей</sequenceLink>, <classLink>класів</classLink>, <stateLink>станів</stateLink> і <erdLink>зв'язків між сутностями</erdLink>, <ganttLink>діаграми Ганта</ganttLink>, <quadrantLink>квадрантні діаграми</quadrantLink> і <timelineLink>часові шкали</timelineLink> перетворюються на елементи Excalidraw. Інші типи вставляються як зображення.",
     "syntax": "Синтаксис Mermaid",
-    "preview": "Попередній перегляд"
+    "preview": "Попередній перегляд",
+    "label": "Mermaid",
+    "inputPlaceholder": "Напишіть тут визначення діаграми Mermaid...",
+    "autoFixAvailable": "Доступне автовиправлення",
+    "loadError": "Не вдалося завантажити Mermaid. Перевірте підключення до Інтернету та спробуйте ще раз.",
+    "loadErrorReload": "Не вдалося завантажити Mermaid. Перезавантажте сторінку, щоб спробувати ще раз.",
+    "reload": "Перезавантажити"
+  },
+  "ttd": {
+    "error": "Помилка!"
+  },
+  "chat": {
+    "inputPlaceholder": "Почніть описувати ідею діаграми... ({{shortcut}} для нового рядка)",
+    "inputPlaceholderWithMessages": "Продовжити редагувати діаграму...",
+    "generating": "Генерація...",
+    "rateLimitRemaining": "Сьогодні залишилося {{count}} запитів",
+    "role": {
+      "user": "Ви",
+      "assistant": "ШІ-асистент",
+      "system": "Система"
+    },
+    "aiBeta": "AI бета-версія",
+    "label": "Чат",
+    "menu": "Меню",
+    "newChat": "Новий чат",
+    "deleteChat": "Видалити чат",
+    "deleteMessage": "Видалити повідомлення",
+    "viewAsMermaid": "Переглянути як Mermaid",
+    "placeholder": {
+      "title": "Створімо вашу діаграму",
+      "description": "Опишіть діаграму, яку хочете створити, — ми згенеруємо її для вас.",
+      "hint": "Наразі можна створювати блок-схеми, діаграми послідовностей, класів, станів і зв'язків між сутностями."
+    },
+    "preview": "Попередній перегляд",
+    "insert": "Вставити",
+    "retry": "Спробувати знову",
+    "errors": {
+      "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
+      "promptTooLong": "Запит задовгий (максимум {{max}} символів)",
+      "generationFailed": "Не вдалося згенерувати",
+      "invalidDiagram": "Не вдалося створити коректну діаграму :(. Ви можете відредагувати її вручну, повторити спробу з автовиправленням або спробувати інший запит.",
+      "fixInMermaid": "Редагувати Mermaid вручну",
+      "aiRepair": "Згенерувати знову (автовиправлення)",
+      "requestAborted": "Запит перервано",
+      "requestFailed": "Не вдалося виконати запит",
+      "mermaidParseError": "Помилка синтаксису Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "Ви вичерпали ліміт AI на безплатному плані. Спробуйте Excalidraw+ або поверніться завтра.",
+      "generalRateLimit": "Притримайте коней, ви надто поспішаєте! Зачекайте трохи, перш ніж спробувати ще раз.",
+      "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
+    },
+    "upsellBtnLabel": "Перейти на Plus"
   },
   "quickSearch": {
     "placeholder": "Швидкий пошук"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "На цій сцені",
     "availableFonts": "Доступні шрифти",
-    "empty": "Шрифти не знайдено"
+    "empty": "Шрифти не знайдено",
+    "topPicksTip": "Порада: перетягніть будь-який шрифт до обраних, щоб закріпити його",
+    "resetTopPicks": "Скинути до стандартного набору шрифтів"
   },
   "userList": {
     "empty": "Користувачів не знайдено",
@@ -651,15 +775,26 @@
     "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Коліщатко"
+  },
+  "promoBanner": {
+    "presentations": "Презентації",
+    "mcp": "Малюйте з ШІ",
+    "comments": "Коментарі",
+    "teams": "Співпраця",
+    "voiceChat": "Аудіочат",
+    "withExcalidrawPlus": "в Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "для людей і ШІ"
   }
 }

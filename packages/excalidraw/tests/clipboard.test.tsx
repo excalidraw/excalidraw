@@ -1,11 +1,24 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { getLineHeightInPx } from "@excalidraw/element";
+import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
 
-import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+import {
+  getLineHeightInPx,
+  setCustomTextMetricsProvider,
+} from "@excalidraw/element";
 
-import { getElementBounds } from "@excalidraw/element";
+import {
+  KEYS,
+  TEXT_VIEWPORT_PADDING,
+  TEXT_MAX_WRAP_WIDTH,
+  getLineHeight,
+} from "@excalidraw/common";
+
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
@@ -15,6 +28,7 @@ import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { Pointer, Keyboard } from "./helpers/ui";
 import {
+  fireEvent,
   render,
   waitFor,
   GlobalTestState,
@@ -28,7 +42,9 @@ const { h } = window;
 const mouse = new Pointer("mouse");
 
 vi.mock("@excalidraw/common", async (importOriginal) => {
-  const module: any = await importOriginal();
+  const module = await importOriginal<typeof import("@excalidraw/common")>();
+  const { mockThrottleRAF } = await import("./helpers/mocks");
+
   return {
     __esmodule: true,
     ...module,
@@ -37,6 +53,7 @@ vi.mock("@excalidraw/common", async (importOriginal) => {
       ...module.KEYS,
       CTRL_OR_CMD: "ctrlKey",
     },
+    throttleRAF: mockThrottleRAF,
   };
 });
 
@@ -121,21 +138,61 @@ describe("general paste behavior", () => {
   });
 });
 
-describe("paste text as single lines", () => {
-  it("should create an element for each line when copying with Ctrl/Cmd+V", async () => {
-    const text = "sajgfakfn\naaksfnknas\nakefnkasf";
-    pasteWithCtrlCmdV(text);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(text.split("\n").length);
-    });
+/**
+ * pastes a text with Ctrl/Cmd+V, and splits it from the toast (the pasted
+ * text, then the lines it's split into, are what's selected)
+ */
+const pasteAndSplit = async (
+  text: string,
+  beforeSplit?: (pasted: ExcalidrawTextElement) => void,
+) => {
+  pasteWithCtrlCmdV(text);
+  const button = await waitFor(() => {
+    const button = document.querySelector<HTMLButtonElement>(".Toast__action");
+    expect(button).not.toBe(null);
+    return button!;
   });
+  const pasted = API.getSelectedElement() as ExcalidrawTextElement;
+  beforeSplit?.(pasted);
+  // as a click does
+  button.focus();
+  fireEvent.click(button);
+  return {
+    pasted,
+    texts: API.getSelectedElements() as ExcalidrawTextElement[],
+  };
+};
 
-  it("should ignore empty lines when creating an element for each line", async () => {
-    const text = "\n\nsajgfakfn\n\n\naaksfnknas\n\nakefnkasf\n\n\n";
-    pasteWithCtrlCmdV(text);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(3);
-    });
+describe("paste multiline text", () => {
+  it("should paste a single element, and offer to split it into an element per line", async () => {
+    const text = "sajgfakfn\n\n  aaksfnknas\nakefnkasf\n";
+    const { pasted, texts } = await pasteAndSplit(text);
+    expect(pasted.originalText).toBe(text.trim());
+
+    // blank lines dropped (the indentation kept), in place of the pasted
+    // text, selected
+    expect(texts.map((text) => text.originalText)).toEqual([
+      "sajgfakfn",
+      "  aaksfnknas",
+      "akefnkasf",
+    ]);
+    expect(h.elements.find((el) => el.id === pasted.id)?.isDeleted).toBe(true);
+    expect(texts[0].x).toBeCloseTo(pasted.x);
+    expect(texts[0].y).toBeCloseTo(pasted.y);
+    expect(Object.keys(h.state.selectedElementIds).sort()).toEqual(
+      texts.map((text) => text.id).sort(),
+    );
+    expect(h.state.toast).toBe(null);
+    // the button's gone, the focus is back in the editor (to paste again)
+    expect(document.activeElement).toBe(
+      document.querySelector(".excalidraw-container"),
+    );
+
+    // one step to undo
+    Keyboard.undo();
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.id),
+    ).toEqual([pasted.id]);
   });
 
   it("should not create any element if clipboard has only new lines", async () => {
@@ -147,58 +204,346 @@ describe("paste text as single lines", () => {
     });
   });
 
-  it("should space items correctly", async () => {
-    const elementsMap = arrayToMap(h.elements);
-
-    const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
-    const lineHeightPx =
-      getLineHeightInPx(
-        h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
-      ) +
-      10 / h.app.state.zoom.value;
+  it("should space the split lines by half a line height, ignoring blank lines", async () => {
+    const lineHeightPx = getLineHeightInPx(
+      h.app.state.currentItemFontSize,
+      getLineHeight(h.state.currentItemFontFamily),
+    );
     mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV(text);
-    await waitFor(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
-      for (let i = 1; i < h.elements.length; i++) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [fx, elY] = getElementBounds(h.elements[i], elementsMap);
-        expect(elY).toEqual(firstElY + lineHeightPx * i);
-      }
-    });
+    const { texts } = await pasteAndSplit("hkhkjhki\njgkjhffjh\n\n\njgkjhffjh");
+    expect(texts.length).toBe(3);
+    for (let i = 1; i < texts.length; i++) {
+      expect(texts[i].y).toBeCloseTo(texts[0].y + lineHeightPx * 1.5 * i);
+    }
   });
 
-  it("should leave a space for blank new lines", async () => {
-    const elementsMap = arrayToMap(h.elements);
-    const text = "hkhkjhki\n\njgkjhffjh";
-    const lineHeightPx =
-      getLineHeightInPx(
-        h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
-      ) +
-      10 / h.app.state.zoom.value;
-    mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV(text);
+  it("should align the split lines as the text is", async () => {
+    for (const textAlign of ["left", "center", "right"] as const) {
+      API.updateScene({ elements: [] });
+      API.setAppState({ currentItemTextAlign: textAlign });
+      const { pasted, texts } = await pasteAndSplit("short\nmuch longer line");
+      const [short, long] = texts;
+      expect(pasted.textAlign).toBe(textAlign);
+      expect(short.textAlign).toBe(textAlign);
+      expect(long.textAlign).toBe(textAlign);
+      expect(short.width).toBeLessThan(long.width);
+      const getEdge = (text: ExcalidrawTextElement) =>
+        textAlign === "left"
+          ? text.x
+          : textAlign === "right"
+          ? text.x + text.width
+          : text.x + text.width / 2;
+      expect(getEdge(short)).toBeCloseTo(getEdge(pasted));
+      expect(getEdge(long)).toBeCloseTo(getEdge(pasted));
+    }
+  });
 
-    await waitFor(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [lx, lastElY] = getElementBounds(h.elements[1], elementsMap);
-      expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
+  it("should stack split lines that wrap to different heights without overlap", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
     });
+    const long =
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+    const { pasted, texts } = await pasteAndSplit(
+      `short\n${long}\n${long} ${long}\nshort`,
+    );
+    expect(pasted.autoResize).toBe(false);
+    // wrapped as they were in the pasted text
+    expect(texts.map((text) => text.text).join("\n")).toBe(pasted.text);
+    expect(texts.map((text) => text.autoResize)).toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
+    expect(texts[2].height).toBeGreaterThan(texts[1].height);
+    const lineGap =
+      getLineHeightInPx(texts[0].fontSize, texts[0].lineHeight) / 2;
+    for (let i = 1; i < texts.length; i++) {
+      expect(texts[i].y).toBeCloseTo(
+        texts[i - 1].y + texts[i - 1].height + lineGap,
+      );
+    }
+  });
+
+  it("should keep the split lines wrapped as they were, not wrap them anew", async () => {
+    // kerning: a row is narrower than its characters are, one by one — as
+    // a long word is measured when it's broken up
+    setCustomTextMetricsProvider({
+      getLineWidth: (text) => text.length * 10 - Math.max(0, text.length - 1),
+    });
+    try {
+      API.setAppState({
+        width: 1000,
+        zoom: { value: 8 as NormalizedZoomValue },
+      });
+      const { pasted, texts } = await pasteAndSplit(
+        "abcdefghijklmnopqrstuvwx\nshort",
+      );
+      // the word's broken up into rows that, measured one character at a
+      // time, wouldn't fit the width the text ends up with
+      const rows = pasted.text.split("\n");
+      expect(rows.length).toBeGreaterThan(2);
+      expect(rows[0].length * 10).toBeGreaterThan(pasted.width);
+      expect(texts.map((text) => text.text).join("\n")).toBe(pasted.text);
+    } finally {
+      setCustomTextMetricsProvider(undefined);
+    }
+  });
+
+  it("should take a split line that's left the frame out of it", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 200,
+      y: 240,
+      width: 200,
+      height: 120,
+    });
+    API.setElements([frame]);
+    // four lines fit the frame, not so half a line height apart
+    h.app.viewport.lastPosition.x = 300;
+    h.app.viewport.lastPosition.y = 300;
+    const { pasted, texts } = await pasteAndSplit("a\nb\nc\nd");
+    expect(pasted.frameId).toBe(frame.id);
+    expect(texts.map((text) => text.frameId)).toEqual([
+      frame.id,
+      frame.id,
+      frame.id,
+      null,
+    ]);
+  });
+
+  it("should put the split lines in the text's place in the layer order, and let go of arrows bound to it", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const arrow = API.createElement({ type: "arrow" });
+    const { texts } = await pasteAndSplit("a\nb", (pasted) => {
+      API.setElements([
+        {
+          ...pasted,
+          boundElements: [{ id: arrow.id, type: "arrow" }],
+        },
+        rectangle,
+        {
+          ...arrow,
+          startBinding: {
+            elementId: pasted.id,
+            fixedPoint: [0.5, 0.5],
+            mode: "orbit",
+          },
+        },
+      ]);
+    });
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.id),
+    ).toEqual([...texts.map((text) => text.id), rectangle.id, arrow.id]);
+    expect(
+      (h.elements.find((el) => el.id === arrow.id) as ExcalidrawArrowElement)
+        .startBinding,
+    ).toBe(null);
+  });
+
+  it("should offer to split the text pasted last only", async () => {
+    pasteWithCtrlCmdV("a\nb");
+    await waitFor(() => {
+      expect(h.state.toast).not.toBe(null);
+    });
+    // no offer for this one: the one for the text before is gone
+    pasteWithCtrlCmdShiftV("c\nd");
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+    });
+    expect(h.state.toast).toBe(null);
   });
 });
 
 describe("paste text as a single element", () => {
-  it("should create single text element when copying text with Ctrl/Cmd+Shift+V", async () => {
+  it("should create single text element when copying text with Ctrl/Cmd+Shift+V, not offering to split it", async () => {
     const text = "sajgfakfn\naaksfnknas\nakefnkasf";
     pasteWithCtrlCmdShiftV(text);
     await waitFor(() => {
       expect(h.elements.length).toEqual(1);
     });
+    expect(h.state.toast).toBe(null);
+  });
+  it("should not make a pasted text wider than the view", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+    // the view at 800%, less some room at each side
+    const maxWidth = (1000 - 2 * TEXT_VIEWPORT_PADDING) / 8;
+
+    pasteWithCtrlCmdShiftV(
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+    );
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(1);
+    });
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(text.autoResize).toBe(false);
+    expect(text.width).toBeLessThanOrEqual(maxWidth);
+  });
+  it("should wrap a pasted text as a typed one: at TEXT_MAX_WRAP_WIDTH, clear of the full styles panel", async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        UIOptions={{ getFormFactor: () => "desktop" }}
+      />,
+    );
+    API.setAppState({ width: 1000 });
+    // nothing's selected: the panel shows only once the text is in
+    expect(
+      document.querySelector('[data-viewport-ui-name="stylesPanel"]'),
+    ).toBe(null);
+
+    pasteWithCtrlCmdShiftV(
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+    );
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(1);
+    });
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(text.autoResize).toBe(false);
+    // not at half the view…
+    expect(text.width).toBeGreaterThan(1000 / 2);
+    // …but the view less the panel's room (216, approximately, while never
+    // shown) and some room at each side
+    expect(text.width).toBeLessThanOrEqual(
+      Math.min(1000 - 216 - 2 * TEXT_VIEWPORT_PADDING, TEXT_MAX_WRAP_WIDTH),
+    );
+  });
+  describe("next to the stats panel (desktop)", () => {
+    const { getBoundingClientRect } = HTMLElement.prototype;
+    /** the stats panel's bottom: it grows to show a selection's properties */
+    let getStatsBottom = () => 200;
+
+    beforeEach(async () => {
+      unmountComponent();
+      await render(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      API.setAppState({
+        width: 1000,
+        height: 800,
+        stats: { ...h.state.stats, open: true },
+      });
+      // the styles panel up to 216px, the stats panel from 700px
+      getStatsBottom = () => 200;
+      HTMLElement.prototype.getBoundingClientRect = function (
+        this: HTMLElement,
+      ) {
+        switch (this.dataset.viewportUiName) {
+          case "stylesPanel":
+            return {
+              left: 16,
+              right: 216,
+              width: 200,
+              top: 0,
+              bottom: 400,
+            } as DOMRect;
+          case "stats":
+            return {
+              left: 700,
+              right: 904,
+              width: 204,
+              top: 0,
+              bottom: getStatsBottom(),
+            } as DOMRect;
+        }
+        return getBoundingClientRect.call(this);
+      };
+    });
+
+    afterEach(() => {
+      HTMLElement.prototype.getBoundingClientRect = getBoundingClientRect;
+    });
+
+    const pasteAt = async (y: number) => {
+      API.setSelectedElements([]);
+      h.app.viewport.lastPosition.x = 500;
+      h.app.viewport.lastPosition.y = y;
+      const count = h.elements.length;
+      pasteWithCtrlCmdShiftV(
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+      );
+      await waitFor(() => {
+        expect(h.elements.length).toEqual(count + 1);
+      });
+      return h.elements[count] as ExcalidrawTextElement;
+    };
+    const getRight = (text: ExcalidrawTextElement) =>
+      (text.x + text.width + h.state.scrollX) * h.state.zoom.value;
+    // the view less the styles panel's room, and some room at each side
+    const maxWidth = 1000 - 216 - 2 * TEXT_VIEWPORT_PADDING;
+    // and the stats panel's
+    const maxWidthBesideStats = maxWidth - (1000 - 700);
+
+    it("should keep a pasted text clear of the stats panel only where it lands beside it", async () => {
+      // below it, it's wrapped past it
+      let text = await pasteAt(600);
+      expect(text.width).toBeGreaterThan(maxWidthBesideStats);
+      expect(text.width).toBeLessThanOrEqual(maxWidth);
+
+      // beside it, it's wrapped, and moved, clear of it
+      text = await pasteAt(100);
+      expect(text.width).toBeLessThanOrEqual(maxWidthBesideStats);
+      expect(getRight(text)).toBeLessThanOrEqual(
+        700 - TEXT_VIEWPORT_PADDING + 0.01,
+      );
+    });
+
+    it("should keep a pasted text clear of the stats panel grown to show it, as one step", async () => {
+      getStatsBottom = () =>
+        Object.keys(h.state.selectedElementIds).length ? 500 : 200;
+      const undoSteps = h.history.undoStack.length;
+
+      // below it as it is before the paste, beside it as it is after
+      const text = await pasteAt(350);
+      expect(text.width).toBeLessThanOrEqual(maxWidthBesideStats);
+      expect(getRight(text)).toBeLessThanOrEqual(
+        700 - TEXT_VIEWPORT_PADDING + 0.01,
+      );
+      expect(h.history.undoStack.length).toBe(undoSteps + 1);
+    });
+  });
+  it("should move a pasted text that wraps into view, not the view", async () => {
+    API.setAppState({ width: 1000, height: 800 });
+    const { scrollX, scrollY } = h.state;
+    // pasted at the pointer, near the bottom-right corner
+    h.app.viewport.lastPosition.x = 950;
+    h.app.viewport.lastPosition.y = 780;
+
+    pasteWithCtrlCmdShiftV(
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+    );
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(1);
+    });
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(text.autoResize).toBe(false);
+    expect(h.state.scrollX).toBe(scrollX);
+    expect(h.state.scrollY).toBe(scrollY);
+    // all of it within the view, with room at each side
+    const zoom = h.state.zoom.value;
+    expect((text.x + scrollX) * zoom).toBeGreaterThanOrEqual(
+      TEXT_VIEWPORT_PADDING - 0.01,
+    );
+    expect((text.x + text.width + scrollX) * zoom).toBeLessThanOrEqual(
+      1000 - TEXT_VIEWPORT_PADDING + 0.01,
+    );
+    expect((text.y + scrollY) * zoom).toBeGreaterThanOrEqual(
+      TEXT_VIEWPORT_PADDING - 0.01,
+    );
+    expect((text.y + text.height + scrollY) * zoom).toBeLessThanOrEqual(
+      800 - TEXT_VIEWPORT_PADDING + 0.01,
+    );
   });
   it("should not create any element when only new lines in clipboard", async () => {
     const text = "\n\n\n\n";
@@ -302,8 +647,88 @@ describe("pasting & frames", () => {
 
     await waitFor(() => {
       expect(h.elements.length).toBe(2);
+      expect(h.elements[0].type).toBe(rect.type);
+      expect(h.elements[0].frameId).toBe(frame.id);
+      expect(h.elements[1].id).toBe(frame.id);
+      expect(h.elements[0].index! < frame.index!).toBe(true);
+    });
+  });
+
+  it("should layer pasted elements above the highest frame child", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const frameChild = API.createElement({
+      id: "frameChild",
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+    const rect = API.createElement({ type: "rectangle" });
+
+    API.setElements([frameChild, frame]);
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [rect],
+      files: null,
+    });
+
+    mouse.moveTo(50, 50);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(3);
       expect(h.elements[1].type).toBe(rect.type);
       expect(h.elements[1].frameId).toBe(frame.id);
+      expect(h.elements.map((element) => element.id)).toEqual([
+        frameChild.id,
+        h.elements[1].id,
+        frame.id,
+      ]);
+      expect(h.elements[1].index! > frameChild.index!).toBe(true);
+      expect(h.elements[1].index! < frame.index!).toBe(true);
+    });
+  });
+
+  it("should preserve denormalized pasted frame child order", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    const frameChild = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    const clipboardJSON = await serializeAsClipboardJSON({
+      elements: [frame, frameChild],
+      files: null,
+    });
+
+    mouse.moveTo(200, 200);
+
+    pasteWithCtrlCmdV(clipboardJSON);
+
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+      expect(h.elements[0].type).toBe(frame.type);
+      expect(h.elements[1].type).toBe(frameChild.type);
+      expect(h.elements[1].frameId).toBe(h.elements[0].id);
     });
   });
 
@@ -376,8 +801,9 @@ describe("pasting & frames", () => {
 
     await waitFor(() => {
       expect(h.elements.length).toBe(3);
-      expect(h.elements[1].type).toBe(rect.type);
-      expect(h.elements[1].frameId).toBe(frame.id);
+      expect(h.elements[0].type).toBe(rect.type);
+      expect(h.elements[0].frameId).toBe(frame.id);
+      expect(h.elements[1].id).toBe(frame.id);
       expect(h.elements[2].type).toBe(rect2.type);
       expect(h.elements[2].frameId).toBe(null);
     });
@@ -419,10 +845,11 @@ describe("pasting & frames", () => {
 
     await waitFor(() => {
       expect(h.elements.length).toBe(3);
-      expect(h.elements[1].type).toBe(rect.type);
+      expect(h.elements[0].type).toBe(rect.type);
+      expect(h.elements[0].frameId).toBe(frame.id);
+      expect(h.elements[1].type).toBe(rect2.type);
       expect(h.elements[1].frameId).toBe(frame.id);
-      expect(h.elements[2].type).toBe(rect2.type);
-      expect(h.elements[2].frameId).toBe(frame.id);
+      expect(h.elements[2].id).toBe(frame.id);
     });
   });
 
@@ -470,8 +897,9 @@ describe("pasting & frames", () => {
 
     await waitFor(() => {
       expect(h.elements.length).toBe(4);
-      expect(h.elements[1].type).toBe(rect.type);
-      expect(h.elements[1].frameId).toBe(frame.id);
+      expect(h.elements[0].type).toBe(rect.type);
+      expect(h.elements[0].frameId).toBe(frame.id);
+      expect(h.elements[1].id).toBe(frame.id);
       expect(h.elements[2].type).toBe(rect2.type);
       expect(h.elements[2].frameId).toBe(h.elements[3].id);
       expect(h.elements[3].type).toBe(frame2.type);
@@ -528,6 +956,9 @@ describe("clipboard - pasting mermaid definition", () => {
         ]),
       );
     });
+    expect(
+      MermaidToExcalidrawLib.parseMermaidToExcalidraw,
+    ).toHaveBeenCalledWith(text, { elbow: { flowchart: true } });
   });
 
   it("should support directives", async () => {
@@ -549,13 +980,115 @@ describe("clipboard - pasting mermaid definition", () => {
     const text = "flowchart TD xx\nA";
     pasteWithCtrlCmdV(text);
     await waitFor(() => {
-      expect(h.elements.length).toEqual(2);
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ type: "text", text: "flowchart TD xx" }),
-          expect.objectContaining({ type: "text", text: "A" }),
-        ]),
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: "flowchart TD xx\nA" }),
+      ]);
+    });
+  });
+});
+
+describe("copy and cut events", () => {
+  const dispatchClipboardEvent = (type: "copy" | "cut") => {
+    const clipboardData = new DataTransfer();
+    document.dispatchEvent(
+      Object.assign(new Event(type, { bubbles: true, cancelable: true }), {
+        clipboardData,
+      }),
+    );
+    return clipboardData;
+  };
+
+  it("should copy the selection on a copy event, and cut it on a cut event", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const copied = dispatchClipboardEvent("copy");
+    await waitFor(() => {
+      expect(JSON.parse(copied.getData("text/plain")).elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+      ]);
+    });
+    expect(h.elements[0].isDeleted).toBe(false);
+
+    const cut = dispatchClipboardEvent("cut");
+    await waitFor(() => {
+      expect(h.elements[0].isDeleted).toBe(true);
+    });
+    expect(JSON.parse(cut.getData("text/plain")).elements).toEqual([
+      expect.objectContaining({ id: rectangle.id }),
+    ]);
+  });
+});
+
+describe("paste routing", () => {
+  it("should paste embed code with its loader <script> on a separate line as an embeddable", async () => {
+    pasteWithCtrlCmdV(
+      `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"><div style="padding:16px;"> <a href="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">View this post on Instagram</a></div></blockquote>
+<script async src="//www.instagram.com/embed.js"></script>`,
+    );
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link: "https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading",
+        }),
+      ]);
+    });
+  });
+
+  it("should leave a paste to the host when its onPaste returns false", async () => {
+    unmountComponent();
+    const onPaste = vi.fn(() => false);
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        onPaste={onPaste}
+      />,
+    );
+
+    pasteWithCtrlCmdV("hello");
+    await waitFor(() => {
+      expect(onPaste).toHaveBeenCalledWith(
+        expect.objectContaining({ text: "hello" }),
+        expect.anything(),
       );
+    });
+    await sleep(50);
+    expect(h.elements.length).toBe(0);
+  });
+
+  it("should open the charts dialog for a pasted spreadsheet", async () => {
+    pasteWithCtrlCmdV("time\tvalue\n1\t10\n2\t20\n3\t30");
+    await waitFor(() => {
+      expect(h.state.openDialog?.name).toBe("charts");
+    });
+    expect(h.elements.length).toBe(0);
+  });
+
+  it("should paste the text of mixed content when images can't be inserted", async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        UIOptions={{ tools: { image: false } }}
+      />,
+    );
+
+    document.dispatchEvent(
+      createPasteEvent({
+        types: {
+          "text/html":
+            '<p>hello</p><img src="https://example.com/a.png" /><p>world</p>',
+        },
+      }),
+    );
+    await waitFor(() => {
+      expect(h.elements.map((element) => (element as any).text)).toEqual([
+        "hello\n\nworld",
+      ]);
     });
   });
 });

@@ -1,10 +1,13 @@
-import { isEmbeddableElement } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  isEmbeddableElement,
+} from "@excalidraw/element";
 
 import { KEYS } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
 import { t } from "../i18n";
@@ -15,7 +18,8 @@ import { register } from "./register";
 
 export const actionLink = register({
   name: "hyperlink",
-  label: (elements, appState) => getContextMenuLabel(elements, appState),
+  label: (elements, appState) =>
+    getContextMenuLabel(getNonDeletedElements(elements), appState),
   icon: LinkIcon,
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
@@ -42,17 +46,19 @@ export const actionLink = register({
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
-      <ToolButton
-        type="button"
+      <IconButton
+        type="toggle"
         icon={LinkIcon}
-        aria-label={t(getContextMenuLabel(elements, appState))}
+        aria-label={t(
+          getContextMenuLabel(getNonDeletedElements(elements), appState),
+        )}
         title={`${
           isEmbeddableElement(elements[0])
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
-        onClick={() => updateData(null)}
-        selected={selectedElements.length === 1 && !!selectedElements[0].link}
+        onSelect={() => updateData(null)}
+        checked={selectedElements.length === 1 && !!selectedElements[0].link}
       />
     );
   },

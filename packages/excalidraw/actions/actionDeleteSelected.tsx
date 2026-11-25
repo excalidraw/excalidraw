@@ -16,10 +16,7 @@ import {
 } from "@excalidraw/element";
 import { getFrameChildren } from "@excalidraw/element";
 
-import {
-  getElementsInGroup,
-  selectGroupsForSelectedElements,
-} from "@excalidraw/element";
+import { getElementsInGroup } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -28,9 +25,11 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 
-import { useStylesPanelMode } from "..";
+import { useStylesPanelMode } from "../components/App";
+
+import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { register } from "./register";
 
@@ -40,6 +39,8 @@ const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   app: AppClassProperties,
+  /** a deleted frame takes its children along, rather than leaving them */
+  withFrameChildren: boolean,
 ) => {
   const framesToBeDeleted = new Set(
     getSelectedElements(
@@ -47,6 +48,8 @@ const deleteSelectedElements = (
       appState,
     ).map((el) => el.id),
   );
+  const isChildOfDeletedFrame = (el: ExcalidrawElement) =>
+    !!el.frameId && framesToBeDeleted.has(el.frameId);
 
   const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
 
@@ -54,7 +57,7 @@ const deleteSelectedElements = (
 
   const processedElements = new Set<ExcalidrawElement["id"]>();
 
-  for (const frameId of framesToBeDeleted) {
+  for (const frameId of withFrameChildren ? [] : framesToBeDeleted) {
     const frameChildren = getFrameChildren(elements, frameId);
     for (const el of frameChildren) {
       if (processedElements.has(el.id)) {
@@ -76,20 +79,24 @@ const deleteSelectedElements = (
   let shouldSelectEditingGroup = true;
 
   const nextElements = elements.map((el) => {
-    if (appState.selectedElementIds[el.id]) {
+    if (
+      appState.selectedElementIds[el.id] ||
+      (withFrameChildren && isChildOfDeletedFrame(el))
+    ) {
       const boundElement = isBoundToContainer(el)
         ? getContainerElement(el, elementsMap)
         : null;
 
-      if (el.frameId && framesToBeDeleted.has(el.frameId)) {
+      if (!withFrameChildren && isChildOfDeletedFrame(el)) {
         shouldSelectEditingGroup = false;
         selectedElementIds[el.id] = true;
         return el;
       }
 
       if (
-        boundElement?.frameId &&
-        framesToBeDeleted.has(boundElement?.frameId)
+        !withFrameChildren &&
+        boundElement &&
+        isChildOfDeletedFrame(boundElement)
       ) {
         return el;
       }
@@ -113,7 +120,7 @@ const deleteSelectedElements = (
     }
 
     // if deleting a frame, remove the children from it and select them
-    if (el.frameId && framesToBeDeleted.has(el.frameId)) {
+    if (isChildOfDeletedFrame(el)) {
       shouldSelectEditingGroup = false;
       if (!isBoundToContainer(el)) {
         selectedElementIds[el.id] = true;
@@ -178,7 +185,7 @@ const deleteSelectedElements = (
           selectedElementIds,
           editingGroupId: nextEditingGroupId,
         },
-        nextElements,
+        getNonDeletedElements(nextElements),
         appState,
         null,
       ),
@@ -205,7 +212,9 @@ const handleGroupEditingState = (
   return appState;
 };
 
-export const actionDeleteSelected = register({
+export const actionDeleteSelected = register<{
+  withFrameChildren?: boolean;
+} | null>({
   name: "deleteSelectedElements",
   label: "labels.delete",
   icon: TrashIcon,
@@ -273,7 +282,12 @@ export const actionDeleteSelected = register({
     }
 
     let { elements: nextElements, appState: nextAppState } =
-      deleteSelectedElements(elements, appState, app);
+      deleteSelectedElements(
+        elements,
+        appState,
+        app,
+        !!formData?.withFrameChildren,
+      );
 
     fixBindingsAfterDeletion(
       nextElements,
@@ -309,7 +323,7 @@ export const actionDeleteSelected = register({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={TrashIcon}
         title={t("labels.delete")}

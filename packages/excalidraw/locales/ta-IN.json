@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
+    "upgrade": "",
     "paste": "ஒட்டு",
     "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "எல்லாம் தேர்ந்தெடு",
     "multiSelect": "உறுப்பைத் தெரிவில் சேர்",
     "moveCanvas": "கித்தானை நகர்த்து",
@@ -21,6 +28,7 @@
     "copyStyles": "ஒயில்களை நகலெடு",
     "pasteStyles": "ஒயில்களை ஒட்டு",
     "stroke": "கீறல்",
+    "textColor": "",
     "changeStroke": "கீறல் நிறத்தை மாற்று",
     "background": "பின்புலம்",
     "changeBackground": "பின்புல நிறத்தை மாற்று",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "கோடிட்ட",
     "strokeStyle_dotted": "புள்ளியிட்ட",
     "sloppiness": "அசட்டுத்தனம்",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ஒளிபுகாவியல்பு",
     "textAlign": "உரைச் சீரமைப்பு",
     "edges": "விளிம்புகள்",
@@ -49,7 +60,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "கூடுதல் விருப்பங்கள்",
+    "cardinality": "",
     "arrowtypes": "அம்புக்குறி வகை",
     "arrowtype_sharp": "கூர்மையான குறி",
     "arrowtype_round": "வளைந்தக் குறி",
@@ -95,7 +113,10 @@
     "group": "தேர்ந்ததை ஒன்றிணை",
     "ungroup": "தேர்ந்ததைப் பிரி",
     "collaborators": "கூட்டுப்பணியினர்",
+    "you": "",
     "toggleGrid": "கட்டத்தை இருநிலைமாற்று",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "நூலகத்தில் சேர்",
     "removeFromLibrary": "நூலகத்திலிருந்து நீக்கு",
     "libraryLoadingMessage": "நூலகத்தை ஏற்றுகிறது…",
@@ -165,13 +186,27 @@
     "zoomToFit": "அனைத்து கூறுகளுக்கும் பொருந்துமாறு பெரிதாக்கு",
     "installPWA": "",
     "autoResize": "உரையின் தானியங்கி அளவுத்திருத்தத்தை இயக்கு",
+    "toggleAutoResize": "",
     "imageCropping": "படத்தை வெட்டுதல்",
     "unCroppedDimension": "முழு அளவு",
     "copyElementLink": "இணைப்பை நகலெடு",
     "linkToElement": "இணைப்பு",
     "wrapSelectionInFrame": "தேர்வை வடிவத்தில் சுற்று",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "இணைப்பு",
@@ -215,12 +250,14 @@
     "zoomIn": "பெரிதாக்கு",
     "zoomOut": "சிறிதாக்கு",
     "resetZoom": "உருவளவை அகரமாக்கு",
+    "zoomToFit": "",
     "menu": "சிறுபட்டி",
     "done": "முடிந்தது",
     "edit": "திருத்து",
     "undo": "செயல்தவிர்",
     "redo": "மீண்டும்செய்",
     "resetLibrary": "நூலகத்தை அகரமாக்கு",
+    "reset": "",
     "createNewRoom": "புதிய அறையை உருவாக்கு",
     "fullScreen": "முழுத் திரை",
     "darkMode": "கருமை பயன்முறை",
@@ -308,12 +345,19 @@
     "eraser": "அழிப்பி",
     "frame": "சட்டகம் கருவி",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "வலை நுழைப்பு",
     "laser": "சீரொளி குறிமுள்",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "செவ்வகம்",
@@ -327,6 +371,7 @@
     "group": "குழு",
     "frame": "வடிவு",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "தேர்வு",
     "iframe": "IFrame"
@@ -345,13 +390,18 @@
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
     "embeddable": "இழுத்து வலை நுழைப்பு உருவாக்கு",
+    "stickynote": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -360,6 +410,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": "பிழை"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "வட்டில் சேமி",
@@ -558,6 +613,8 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "நீங்கள் Excalidraw+க்கு செல்ல விரும்புகிறீர்களா?",
       "menuHint": "விருப்பத்தேர்வுகள், மொழிகள் போன்றனவை ஏற்றுமதிசெய்..."
     },
@@ -574,7 +631,11 @@
     "colors": "நிறங்கள்",
     "shades": "சாயல்கள்",
     "hexCode": "ஹெக்ஸ் குறியீடு",
-    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை"
+    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "மெர்மெய்டிலிருந்து எக்ஸ்காலிட்ரா",
     "button": "புகுத்து",
     "description": "",
     "syntax": "மெர்மெய்டு தொடரியல்",
-    "preview": "முன்னோட்டம்"
+    "preview": "முன்னோட்டம்",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": "விரைவு தேடல்"
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "இந்தத் தளவட்டத்தில்",
     "availableFonts": "எழுத்துருக்கள்",
-    "empty": "எழுத்துருக்கள் எதுவும் இல்லை"
+    "empty": "எழுத்துருக்கள் எதுவும் இல்லை",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "பயனர்கள் காணவில்லை",
@@ -661,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }

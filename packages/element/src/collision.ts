@@ -8,6 +8,7 @@ import {
   pointFromVector,
   pointRotateRads,
   pointsEqual,
+  polygonIncludesPoint,
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
@@ -22,10 +23,11 @@ import type {
   Curve,
   GlobalPoint,
   LineSegment,
+  LocalPoint,
   Radians,
 } from "@excalidraw/math";
 
-import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
+import type { AppState, FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
 import {
@@ -40,6 +42,7 @@ import {
 import {
   hasBoundTextElement,
   isBindableElement,
+  isBoundToContainer,
   isFrameLikeElement,
   isFreeDrawElement,
   isIframeLikeElement,
@@ -53,11 +56,18 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import { getBoundTextElement } from "./textElement";
-
-import { LinearElementEditor } from "./linearElementEditor";
+import {
+  getBoundTextElement,
+  getTextElementWithAccuratePosition,
+} from "./textElement";
 
 import { distanceToElement } from "./distance";
+
+import { maxBindingDistance_simple } from "./binding";
+
+import { hasBackground } from "./comparisons";
+
+import { getFreedrawFillPolygon, getFreedrawMaxStrokeRadius } from "./shape";
 
 import type {
   ElementsMap,
@@ -80,7 +90,7 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   }
 
   const isDraggableFromInside =
-    !isTransparent(element.backgroundColor) ||
+    (hasBackground(element.type) && !isTransparent(element.backgroundColor)) ||
     hasBoundTextElement(element) ||
     isIframeLikeElement(element) ||
     isTextElement(element);
@@ -105,6 +115,25 @@ export type HitTestArgs = {
   overrideShouldTestInside?: boolean;
 };
 
+let cachedPoint: GlobalPoint | null = null;
+let cachedElement: WeakRef<ExcalidrawElement> | null = null;
+let cachedThreshold: number = Infinity;
+let cachedHit: boolean = false;
+let cachedOverrideShouldTestInside = false;
+let cachedFrameNameBound: FrameNameBounds | null = null;
+
+const frameNameBoundsEqual = (
+  a: FrameNameBounds | null,
+  b: FrameNameBounds | null,
+) =>
+  a === b ||
+  (!!a &&
+    !!b &&
+    a.x === b.x &&
+    a.y === b.y &&
+    a.width === b.width &&
+    a.height === b.height);
+
 export const hitElementItself = ({
   point,
   element,
@@ -113,6 +142,31 @@ export const hitElementItself = ({
   frameNameBound = null,
   overrideShouldTestInside = false,
 }: HitTestArgs) => {
+  // Return cached result if the same point and element version is tested again.
+  // A cached hit stays valid for any larger threshold, while a cached miss
+  // stays valid only for a threshold no larger than the cached one (a larger
+  // threshold could turn a miss into a hit).
+  // Skipped for container-bound labels — their position can change without
+  // their version being bumped (see ElementBounds.getBounds).
+  if (
+    !isBoundToContainer(element) &&
+    cachedPoint &&
+    pointsEqual(point, cachedPoint) &&
+    (cachedHit ? cachedThreshold <= threshold : cachedThreshold >= threshold) &&
+    overrideShouldTestInside === cachedOverrideShouldTestInside &&
+    frameNameBoundsEqual(frameNameBound, cachedFrameNameBound)
+  ) {
+    const derefElement = cachedElement?.deref();
+    if (
+      derefElement &&
+      derefElement.id === element.id &&
+      derefElement.version === element.version &&
+      derefElement.versionNonce === element.versionNonce
+    ) {
+      return cachedHit;
+    }
+  }
+
   // Hit test against a frame's name
   const hitFrameName = frameNameBound
     ? isPointWithinBounds(
@@ -127,20 +181,29 @@ export const hitElementItself = ({
 
   // Hit test against the extended, rotated bounding box of the element first
   const bounds = getElementBounds(element, elementsMap, true);
-  const hitBounds = isPointWithinBounds(
-    pointFrom(bounds[0] - threshold, bounds[1] - threshold),
-    pointRotateRads(
-      point,
-      getCenterForBounds(bounds),
-      -element.angle as Radians,
-    ),
-    pointFrom(bounds[2] + threshold, bounds[3] + threshold),
+  const hitBounds = isPointInRotatedBounds(
+    point,
+    bounds,
+    element.angle,
+    // Freedraw bounds follow the centerline points, but the ink extends past them
+    isFreeDrawElement(element)
+      ? threshold + getFreedrawMaxStrokeRadius(element)
+      : threshold,
   );
 
   // PERF: Bail out early if the point is not even in the
   // rotated bounding box or not hitting the frame name (saves 99%)
   if (!hitBounds && !hitFrameName) {
     return false;
+  }
+
+  // an arrow label's stored coords can be stale. The bounds test above
+  // already accounts for it (getElementBounds derives the position
+  // internally), but the precise test below reads the element coords
+  // directly, so substitute them. Done after the early bail so the common
+  // miss path stays allocation-free.
+  if (isTextElement(element)) {
+    element = getTextElementWithAccuratePosition(element, elementsMap);
   }
 
   // Do the precise (and relatively costly) hit test
@@ -153,7 +216,35 @@ export const hitElementItself = ({
       isPointOnElementOutline(point, element, elementsMap, threshold)
     : isPointOnElementOutline(point, element, elementsMap, threshold);
 
-  return hitElement || hitFrameName;
+  const result = hitElement || hitFrameName;
+
+  // Cache end result
+  cachedPoint = point;
+  cachedElement = new WeakRef(element);
+  cachedThreshold = threshold;
+  cachedOverrideShouldTestInside = overrideShouldTestInside;
+  cachedFrameNameBound = frameNameBound;
+  cachedHit = result;
+
+  return result;
+};
+
+const isPointInRotatedBounds = (
+  point: GlobalPoint,
+  bounds: Bounds,
+  angle: Radians,
+  tolerance = 0,
+) => {
+  const adjustedPoint =
+    angle === 0
+      ? point
+      : pointRotateRads(point, getCenterForBounds(bounds), -angle as Radians);
+
+  return isPointWithinBounds(
+    pointFrom(bounds[0] - tolerance, bounds[1] - tolerance),
+    adjustedPoint,
+    pointFrom(bounds[2] + tolerance, bounds[3] + tolerance),
+  );
 };
 
 export const hitElementBoundingBox = (
@@ -162,12 +253,8 @@ export const hitElementBoundingBox = (
   elementsMap: ElementsMap,
   tolerance = 0,
 ) => {
-  let [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-  x1 -= tolerance;
-  y1 -= tolerance;
-  x2 += tolerance;
-  y2 += tolerance;
-  return isPointWithinBounds(pointFrom(x1, y1), point, pointFrom(x2, y2));
+  const bounds = getElementBounds(element, elementsMap, true);
+  return isPointInRotatedBounds(point, bounds, element.angle, tolerance);
 };
 
 export const hitElementBoundingBoxOnly = (
@@ -189,78 +276,121 @@ export const hitElementBoundText = (
   if (!boundTextElementCandidate) {
     return false;
   }
-  const boundTextElement = isLinearElement(element)
-    ? {
-        ...boundTextElementCandidate,
-        // arrow's bound text accurate position is not stored in the element's property
-        // but rather calculated and returned from the following static method
-        ...LinearElementEditor.getBoundTextElementPosition(
-          element,
-          boundTextElementCandidate,
-          elementsMap,
-        ),
-      }
-    : boundTextElementCandidate;
+  const boundTextElement = getTextElementWithAccuratePosition(
+    boundTextElementCandidate,
+    elementsMap,
+  );
 
   return isPointInElement(point, boundTextElement, elementsMap);
 };
 
-const bindingBorderTest = (
-  element: NonDeleted<ExcalidrawBindableElement>,
-  [x, y]: Readonly<GlobalPoint>,
-  elementsMap: NonDeletedSceneElementsMap,
-  tolerance: number = 0,
-): boolean => {
-  const p = pointFrom<GlobalPoint>(x, y);
-  const shouldTestInside =
-    // disable fullshape snapping for frame elements so we
-    // can bind to frame children
-    !isFrameLikeElement(element);
+// Frame children are clipped to their enclosing frame, so a point outside
+// the frame cannot hit them
+const isPointClippedByEnclosingFrame = (
+  element: ExcalidrawElement,
+  point: Readonly<GlobalPoint>,
+  elementsMap: ElementsMap,
+) => {
+  if (!element.frameId) {
+    return false;
+  }
 
+  const enclosingFrame = elementsMap.get(element.frameId);
+
+  return (
+    !!enclosingFrame &&
+    isFrameLikeElement(enclosingFrame) &&
+    !pointInsideBounds(point, getElementBounds(enclosingFrame, elementsMap))
+  );
+};
+
+const bindableElementBorderDistanceIfClose = (
+  element: NonDeleted<ExcalidrawBindableElement>,
+  point: GlobalPoint,
+  elementsMap: ElementsMap,
+  tolerance: number = 0,
+) => {
   // PERF: Run a cheap test to see if the binding element
   // is even close to the element
+  const [x, y] = point;
   const t = Math.max(1, tolerance);
   const bounds = [x - t, y - t, x + t, y + t] as Bounds;
   const elementBounds = getElementBounds(element, elementsMap);
   if (!doBoundsIntersect(bounds, elementBounds)) {
-    return false;
+    return -Infinity;
   }
 
-  // If the element is inside a frame, we should clip the element
-  if (element.frameId) {
-    const enclosingFrame = elementsMap.get(element.frameId);
-    if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-      const enclosingFrameBounds = getElementBounds(
-        enclosingFrame,
-        elementsMap,
-      );
-      if (!pointInsideBounds(p, enclosingFrameBounds)) {
-        return false;
-      }
-    }
+  const isInside = isPointInElement(point, element, elementsMap);
+  // frames are only bindable from the outside, so arrows ending inside
+  // a frame can bind to its children (or stay unbound)
+  if (isInside && isFrameLikeElement(element)) {
+    return -Infinity;
   }
 
-  // Do the intersection test against the element since it's close enough
-  const intersections = intersectElementWithLineSegment(
-    element,
-    elementsMap,
-    lineSegment(elementCenterPoint(element, elementsMap), p),
-  );
-  const distance = distanceToElement(element, elementsMap, p);
+  const distance = distanceToElement(element, elementsMap, point);
+  if (isInside) {
+    return distance;
+  }
 
-  return shouldTestInside
-    ? intersections.length === 0 || distance <= tolerance
-    : intersections.length > 0 && distance <= t;
+  return distance > tolerance ? -Infinity : -distance;
 };
 
-export const getAllHoveredElementAtPoint = (
+/**
+ * Whether an arrow endpoint at the point could bind to the element: inside it,
+ * or within binding distance of its outline. Unlike `getBindingCandidates`,
+ * it ignores frame clipping, as frames may not be sized yet (e.g. while
+ * converting skeletons, where frames are sized around their children last)
+ */
+export const isPointInBindingArea = (
+  point: GlobalPoint,
+  element: NonDeleted<ExcalidrawBindableElement>,
+  elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+) => {
+  const maxDistance = maxBindingDistance_simple(zoom);
+  return (
+    bindableElementBorderDistanceIfClose(
+      element,
+      point,
+      elementsMap,
+      maxDistance,
+    ) > -maxDistance
+  );
+};
+
+type BindingCandidate = {
+  element: NonDeleted<ExcalidrawBindableElement>;
+  /** distance to the outline: positive inside, negative outside */
+  distance: number;
+};
+
+/**
+ * Whether the element hides what is behind it from binding — an arrow's or a
+ * text label's. Images count as opaque, and frames once they support a
+ * background.
+ */
+export const isOpaqueForBinding = (element: ExcalidrawElement) =>
+  isImageElement(element) ||
+  (hasBackground(element.type) && !isTransparent(element.backgroundColor));
+
+/**
+ * Bindable elements within binding distance of the point, front to back.
+ * Stops at the first opaque element containing the point, since it hides
+ * everything behind it. Locked elements can't be bound to, but still hide
+ * what is behind them.
+ */
+const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
-): NonDeleted<ExcalidrawBindableElement>[] => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  zoom: AppState["zoom"],
+): BindingCandidate[] => {
+  const maxDistance = maxBindingDistance_simple(zoom);
+  const candidates: BindingCandidate[] = [];
+  // A frame's children sit just below it in z-order, so a frame's background
+  // can't end the search: it only hides the non-children behind it
+  let occludingFrameId: ExcalidrawElement["id"] | null = null;
+  // We need to do hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
   for (let index = elements.length - 1; index >= 0; --index) {
@@ -268,51 +398,113 @@ export const getAllHoveredElementAtPoint = (
 
     invariant(
       !element.isDeleted,
-      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
+      "Elements passed to binding hit tests should not contain deleted elements",
     );
 
-    if (
-      isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, toleranceFn?.(element))
-    ) {
-      candidateElements.push(element);
+    if (occludingFrameId && element.frameId !== occludingFrameId) {
+      continue;
+    }
 
-      if (!isTransparent(element.backgroundColor)) {
+    if (!isBindableElement(element)) {
+      continue;
+    }
+
+    if (isFrameLikeElement(element)) {
+      if (
+        isOpaqueForBinding(element) &&
+        isPointInElement(point, element, elementsMap)
+      ) {
+        occludingFrameId = element.id;
+      }
+    }
+
+    if (isPointClippedByEnclosingFrame(element, point, elementsMap)) {
+      continue;
+    }
+
+    const distance = bindableElementBorderDistanceIfClose(
+      element,
+      point,
+      elementsMap,
+      maxDistance,
+    );
+
+    if (distance > -maxDistance) {
+      if (!element.locked) {
+        candidates.push({ element, distance });
+      }
+
+      if (distance >= 0 && isOpaqueForBinding(element)) {
         break;
       }
     }
   }
 
-  return candidateElements;
+  return candidates;
 };
+
+/**
+ * All elements an arrow endpoint at the point could bind to. Always includes
+ * the result of `getHoveredElementForBinding` for the same arguments.
+ */
+export const getAllHoveredElementAtPoint = (
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): NonDeleted<ExcalidrawBindableElement>[] =>
+  getBindingCandidates(point, elements, elementsMap, zoom).map(
+    ({ element }) => element,
+  );
 
 export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  toleranceFn?: (element: ExcalidrawBindableElement) => number,
+  zoom: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidateElements = getAllHoveredElementAtPoint(
-    point,
-    elements,
-    elementsMap,
-    toleranceFn,
-  );
+  const candidates = getBindingCandidates(point, elements, elementsMap, zoom);
 
-  if (!candidateElements || candidateElements.length === 0) {
+  if (candidates.length === 0) {
     return null;
   }
 
-  if (candidateElements.length === 1) {
-    return candidateElements[0];
+  if (candidates.length === 1) {
+    return candidates[0].element;
   }
 
-  // Prefer smaller shapes
-  return candidateElements
-    .sort(
-      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
-    )
-    .pop() as NonDeleted<ExcalidrawBindableElement>;
+  const closestElements = candidates.sort(
+    (a, b) => Math.abs(a.distance) - Math.abs(b.distance),
+  );
+
+  const candidate = closestElements[0];
+  const [cx1, cy1, cx2, cy2] = getElementBounds(candidate.element, elementsMap);
+  const candidateArea = Math.max(
+    0.00001,
+    Math.abs(cx2 - cx1) * Math.abs(cy2 - cy1),
+  );
+  // A smaller element overlapping the closest one takes precedence, but only
+  // when the point is inside it: otherwise the closest outline wins, e.g. an
+  // arrow ending just inside a container's edge next to a nested element
+  const overlaps = closestElements
+    .filter((c) => c.element !== candidate.element && c.distance >= 0)
+    .map((c) => {
+      const [x1, y1, x2, y2] = getElementBounds(c.element, elementsMap);
+      const overlapWidth = Math.max(0, Math.min(x2, cx2) - Math.max(x1, cx1));
+      const overlapHeight = Math.max(0, Math.min(y2, cy2) - Math.max(y1, cy1));
+      const area = Math.max(0.00001, Math.abs(x2 - x1) * Math.abs(y2 - y1));
+
+      return {
+        ...c,
+        overlapPercent: (overlapHeight * overlapWidth) / area,
+        relativeArea: area / candidateArea,
+      };
+    })
+    .filter((c) => c.overlapPercent > 0.25 && c.relativeArea < 0.75);
+
+  return candidate.distance >= 0 && overlaps.length > 0
+    ? overlaps[0].element
+    : candidate.element;
 };
 
 /**
@@ -347,6 +539,7 @@ export const intersectElementWithLineSegment = (
   // Do the actual intersection test against the element's shape
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "image":
     case "text":
     case "iframe":
@@ -379,9 +572,16 @@ export const intersectElementWithLineSegment = (
     case "line":
     case "freedraw":
     case "arrow":
-      return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
+      return intersectLinearOrFreeDrawWithLineSegment(
+        element,
+        line,
+        elementsMap,
+        onlyFirst,
+      );
   }
 };
+
+const CURVE_BOUNDS_EPSILON = 1e-6;
 
 const curveIntersections = (
   curves: Curve<GlobalPoint>[],
@@ -391,15 +591,19 @@ const curveIntersections = (
   angle: Radians,
   onlyFirst = false,
 ) => {
+  // Pad the segment bounds so an axis-aligned segment passing exactly through
+  // the joint of two curves still overlaps their bounds, as
+  // `doBoundsIntersect` treats bounds that only touch as not intersecting
+  const b2 = [
+    Math.min(segment[0][0], segment[1][0]) - CURVE_BOUNDS_EPSILON,
+    Math.min(segment[0][1], segment[1][1]) - CURVE_BOUNDS_EPSILON,
+    Math.max(segment[0][0], segment[1][0]) + CURVE_BOUNDS_EPSILON,
+    Math.max(segment[0][1], segment[1][1]) + CURVE_BOUNDS_EPSILON,
+  ] as Bounds;
+
   for (const c of curves) {
     // Optimize by doing a cheap bounding box check first
     const b1 = getCubicBezierCurveBound(c[0], c[1], c[2], c[3]);
-    const b2 = [
-      Math.min(segment[0][0], segment[1][0]),
-      Math.min(segment[0][1], segment[1][1]),
-      Math.max(segment[0][0], segment[1][0]),
-      Math.max(segment[0][1], segment[1][1]),
-    ] as Bounds;
 
     if (!doBoundsIntersect(b1, b2)) {
       continue;
@@ -446,11 +650,15 @@ const lineIntersections = (
 const intersectLinearOrFreeDrawWithLineSegment = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   segment: LineSegment<GlobalPoint>,
+  elementsMap: ElementsMap,
   onlyFirst = false,
 ): GlobalPoint[] => {
   // NOTE: This is the only one which return the decomposed elements
   // rotated! This is due to taking advantage of roughjs definitions.
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
   const intersections: GlobalPoint[] = [];
 
   for (const l of lines) {
@@ -478,7 +686,9 @@ const intersectLinearOrFreeDrawWithLineSegment = (
       continue;
     }
 
-    const hits = curveIntersectLineSegment(c, segment);
+    const hits = curveIntersectLineSegment(c, segment, {
+      iterLimit: 10,
+    });
 
     if (hits.length > 0) {
       intersections.push(...hits);
@@ -651,6 +861,26 @@ export const isPointInElement = (
   ) {
     // There isn't any "inside" for a non-looping path
     return false;
+  }
+
+  if (isFreeDrawElement(element)) {
+    // Test before the rotated-bounds check below: the smoothed fill can bulge
+    // past the recorded points, and how much of it those bounds would clip
+    // depends on the angle. An asymmetric loop's rotated bounds center is also
+    // not its rotation pivot.
+    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap, true);
+    const [px, py] = pointRotateRads(
+      point,
+      pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2),
+      -element.angle as Radians,
+    );
+
+    // The fill follows the centerline rather than the stroke outline, and uses
+    // the same even-odd rule as RoughJS's filled curves.
+    return polygonIncludesPoint(
+      pointFrom<LocalPoint>(px - element.x, py - element.y),
+      getFreedrawFillPolygon(element),
+    );
   }
 
   const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);

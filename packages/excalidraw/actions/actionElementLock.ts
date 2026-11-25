@@ -2,6 +2,7 @@ import { KEYS, arrayToMap, randomId } from "@excalidraw/common";
 
 import {
   elementsAreInSameGroup,
+  getNonDeletedElements,
   newElementWith,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
@@ -114,7 +115,10 @@ export const actionToggleElementLock = register({
     );
     const nextSelectedGroupIds = nextLockState
       ? {}
-      : selectGroupsFromGivenElements(unlockedSelectedElements, appState);
+      : selectGroupsFromGivenElements(
+          getNonDeletedElements(unlockedSelectedElements),
+          appState,
+        );
 
     const activeLockedId = nextLockState
       ? newGroupId
@@ -192,16 +196,17 @@ export const actionUnlockAllElements = register({
     const unlockedElements = lockedElements.map(
       (el) => nextElementsMap.get(el.id) || el,
     );
+    const unlockedNonDeletedElements = getNonDeletedElements(unlockedElements);
 
     return {
       elements: nextElements,
       appState: {
         ...appState,
         selectedElementIds: Object.fromEntries(
-          lockedElements.map((el) => [el.id, true]),
+          unlockedNonDeletedElements.map((el) => [el.id, true]),
         ),
         selectedGroupIds: selectGroupsFromGivenElements(
-          unlockedElements,
+          unlockedNonDeletedElements,
           appState,
         ),
         lockedMultiSelections: {},

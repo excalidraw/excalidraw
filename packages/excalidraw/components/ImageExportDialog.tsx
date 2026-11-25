@@ -1,4 +1,3 @@
-import { exportToCanvas } from "@excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -26,6 +25,7 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
+import { exportScene, getExportConfigFromAppState } from "../scene/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -39,9 +39,6 @@ import "./ImageExportDialog.scss";
 import type { ActionManager } from "../actions/manager";
 
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
-
-const supportsContextFilters =
-  "filter" in document.createElement("canvas").getContext("2d")!;
 
 export const ErrorCanvasPreview = () => {
   return (
@@ -62,6 +59,7 @@ type ImageExportModalProps = {
   actionManager: ActionManager;
   onExportImage: AppClassProperties["onExportImage"];
   name: string;
+  exportWithDarkMode: boolean;
 };
 
 const ImageExportModal = ({
@@ -71,6 +69,7 @@ const ImageExportModal = ({
   actionManager,
   onExportImage,
   name,
+  exportWithDarkMode,
 }: ImageExportModalProps) => {
   const hasSelection = isSomeElementSelected(
     elementsSnapshot,
@@ -82,15 +81,13 @@ const ImageExportModal = ({
   const [exportWithBackground, setExportWithBackground] = useState(
     appStateSnapshot.exportBackground,
   );
-  const [exportDarkMode, setExportDarkMode] = useState(
-    appStateSnapshot.exportWithDarkMode,
-  );
   const [embedScene, setEmbedScene] = useState(
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
   const previewRef = useRef<HTMLDivElement>(null);
+  const previewRenderRequestIdRef = useRef(0);
   const [renderError, setRenderError] = useState<Error | null>(null);
 
   const { onCopy, copyStatus, resetCopyStatus } = useCopyStatus();
@@ -102,7 +99,7 @@ const ImageExportModal = ({
   }, [
     projectName,
     exportWithBackground,
-    exportDarkMode,
+    exportWithDarkMode,
     exportScale,
     embedScene,
     resetCopyStatus,
@@ -125,40 +122,66 @@ const ImageExportModal = ({
       return;
     }
 
-    exportToCanvas({
-      elements: exportedElements,
-      appState: {
-        ...appStateSnapshot,
-        name: projectName,
-        exportBackground: exportWithBackground,
-        exportWithDarkMode: exportDarkMode,
-        exportScale,
-        exportEmbedScene: embedScene,
+    const requestId = ++previewRenderRequestIdRef.current;
+    const isStaleRequest = () => {
+      return requestId !== previewRenderRequestIdRef.current;
+    };
+
+    exportScene({
+      type: "canvas",
+      data: {
+        elements: exportedElements,
+        appState: appStateSnapshot,
+        files,
       },
-      files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight: Math.max(maxWidth, maxHeight),
-      exportingFrame,
+      config: {
+        ...getExportConfigFromAppState({
+          ...appStateSnapshot,
+          exportBackground: exportWithBackground,
+          exportWithDarkMode,
+          // the preview fits `maxWidthOrHeight`
+          exportScale: 1,
+        }),
+        padding: DEFAULT_EXPORT_PADDING,
+        maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+        exportingFrame,
+      },
     })
-      .then((canvas) => {
+      .then(async (canvas) => {
+        if (isStaleRequest()) {
+          return;
+        }
+
+        // If converting to blob fails, there's some problem that will likely
+        // prevent preview and export (e.g. canvas too big).
+        try {
+          await canvasToBlob(canvas);
+        } catch (error: any) {
+          if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
+            throw new Error(t("canvasError.canvasTooBig"));
+          }
+          throw error;
+        }
+
+        if (isStaleRequest()) {
+          return;
+        }
+
         setRenderError(null);
-        // if converting to blob fails, there's some problem that will
-        // likely prevent preview and export (e.g. canvas too big)
-        return canvasToBlob(canvas)
-          .then(() => {
-            previewNode.replaceChildren(canvas);
-          })
-          .catch((e) => {
-            if (e.name === "CANVAS_POSSIBLY_TOO_BIG") {
-              throw new Error(t("canvasError.canvasTooBig"));
-            }
-            throw e;
-          });
+        previewNode.replaceChildren(canvas);
       })
       .catch((error) => {
+        if (isStaleRequest()) {
+          return;
+        }
+
         console.error(error);
         setRenderError(error);
       });
+
+    return () => {
+      previewRenderRequestIdRef.current += 1;
+    };
   }, [
     appStateSnapshot,
     files,
@@ -166,7 +189,7 @@ const ImageExportModal = ({
     exportingFrame,
     projectName,
     exportWithBackground,
-    exportDarkMode,
+    exportWithDarkMode,
     exportScale,
     embedScene,
   ]);
@@ -230,25 +253,22 @@ const ImageExportModal = ({
             }}
           />
         </ExportSetting>
-        {supportsContextFilters && (
-          <ExportSetting
-            label={t("imageExportDialog.label.darkMode")}
+        <ExportSetting
+          label={t("imageExportDialog.label.darkMode")}
+          name="exportDarkModeSwitch"
+        >
+          <Switch
             name="exportDarkModeSwitch"
-          >
-            <Switch
-              name="exportDarkModeSwitch"
-              checked={exportDarkMode}
-              onChange={(checked) => {
-                setExportDarkMode(checked);
-                actionManager.executeAction(
-                  actionExportWithDarkMode,
-                  "ui",
-                  checked,
-                );
-              }}
-            />
-          </ExportSetting>
-        )}
+            checked={exportWithDarkMode}
+            onChange={(checked) => {
+              actionManager.executeAction(
+                actionExportWithDarkMode,
+                "ui",
+                checked,
+              );
+            }}
+          />
+        </ExportSetting>
         <ExportSetting
           label={t("imageExportDialog.label.embedScene")}
           tooltip={t("imageExportDialog.tooltip.embedScene")}
@@ -404,6 +424,7 @@ export const ImageExportDialog = ({
         actionManager={actionManager}
         onExportImage={onExportImage}
         name={name}
+        exportWithDarkMode={appState.exportWithDarkMode}
       />
     </Dialog>
   );

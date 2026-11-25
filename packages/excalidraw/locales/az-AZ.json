@@ -1,8 +1,15 @@
 {
   "labels": {
+    "signUp": "Qeydiyyat",
+    "signIn": "Daxil ol",
+    "upgrade": "",
     "paste": "Yapışdır",
     "pasteAsPlaintext": "Düz mətn kimi yapışdırın",
     "pasteCharts": "Diaqramları yapışdırın",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Hamısını seç",
     "multiSelect": "Seçimə element əlavə edin",
     "moveCanvas": "Kanvası köçürün",
@@ -21,6 +28,7 @@
     "copyStyles": "Stilləri kopyalayın",
     "pasteStyles": "Stilləri yapışdırın",
     "stroke": "Strok rəngi",
+    "textColor": "Mətn rəngi",
     "changeStroke": "Ştrix rəngini dəyişdir",
     "background": "Arxa fon",
     "changeBackground": "Fon rəngini dəyişdir",
@@ -31,6 +39,9 @@
     "strokeStyle_dashed": "Kəsik",
     "strokeStyle_dotted": "Nöqtəli",
     "sloppiness": "Səliqəsizlik",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Şəffaflıq",
     "textAlign": "Mətni uyğunlaşdır",
     "edges": "Kənarlar",
@@ -49,11 +60,18 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
+    "more_options": "Daha çox seçim",
+    "cardinality": "",
+    "arrowtypes": "Ox tipi",
+    "arrowtype_sharp": "İti ox",
+    "arrowtype_round": "Əyri ox",
+    "arrowtype_elbowed": "Dirsəkli ox",
     "fontSize": "Şrift ölçüsü",
     "fontFamily": "Şrift qrupu",
     "addWatermark": "\"Made with Excalidraw\" əlavə et",
@@ -95,7 +113,10 @@
     "group": "Qrup şəklində seçim",
     "ungroup": "Qrupsuz seçim",
     "collaborators": "Əməkdaşlar",
+    "you": "Siz",
     "toggleGrid": "Toru dəyiş",
+    "minimap": "",
+    "zoom": "",
     "addToLibrary": "Kitabxanaya əlavə et",
     "removeFromLibrary": "Kitabxanadan sil",
     "libraryLoadingMessage": "Kitabxana yüklənir...",
@@ -117,7 +138,7 @@
     "share": "Paylaş",
     "showStroke": "Çevrə rəng seçimini göstər",
     "showBackground": "Fon rəng seçimini göstər",
-    "showFonts": "",
+    "showFonts": "Şrift seçicisini göstər",
     "toggleTheme": "Gecə/Güzdüz rejiminə dəyiş",
     "theme": "Fon",
     "personalLib": "Şəxsi kitabxana",
@@ -130,48 +151,62 @@
     "link": {
       "edit": "Keçidi düzəliş et",
       "editEmbed": "",
-      "create": "",
+      "create": "Bağlantı əlavə et",
       "label": "Keçid",
-      "labelEmbed": "",
-      "empty": "",
-      "hint": "",
+      "labelEmbed": "Bağlantı və yerləşdirmə",
+      "empty": "Bağlantı təyin olunmayıb",
+      "hint": "Bağlantını yaz və ya yapışdır",
       "goToElement": ""
     },
     "lineEditor": {
-      "edit": "",
-      "editArrow": ""
+      "edit": "Xətti düzəlt",
+      "editArrow": "Oxu düzəlt"
     },
     "polygon": {
       "breakPolygon": "",
       "convertToPolygon": ""
     },
     "elementLock": {
-      "lock": "",
-      "unlock": "",
-      "lockAll": "",
-      "unlockAll": ""
+      "lock": "Kilidlə",
+      "unlock": "Kilidi aç",
+      "lockAll": "Hamısını kilidlə",
+      "unlockAll": "Hamısının kilidini aç"
     },
-    "statusPublished": "",
+    "statusPublished": "Dərc olunub",
     "sidebarLock": "",
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "",
     "textToDiagram": "",
     "prompt": "",
-    "followUs": "",
-    "discordChat": "",
+    "followUs": "Bizi izləyin",
+    "discordChat": "Discord çat",
     "zoomToFitViewport": "",
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
     "autoResize": "",
+    "toggleAutoResize": "",
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "Tənzimləmələr",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -215,14 +250,16 @@
     "zoomIn": "",
     "zoomOut": "",
     "resetZoom": "",
+    "zoomToFit": "",
     "menu": "",
     "done": "",
-    "edit": "",
-    "undo": "",
-    "redo": "",
+    "edit": "Düzəliş et",
+    "undo": "Geri al",
+    "redo": "Yenidən et",
     "resetLibrary": "",
+    "reset": "Sıfırla",
     "createNewRoom": "",
-    "fullScreen": "",
+    "fullScreen": "Tam ekran",
     "darkMode": "",
     "lightMode": "",
     "systemMode": "Sistem rejimi",
@@ -264,7 +301,7 @@
     "localStorageQuotaExceeded": ""
   },
   "errors": {
-    "unsupportedFileType": "",
+    "unsupportedFileType": "Dəstəklənməyən fayl növü.",
     "imageInsertError": "",
     "fileTooBig": "",
     "svgImageInsertError": "",
@@ -298,22 +335,29 @@
     "diamond": "",
     "ellipse": "",
     "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "library": "",
+    "line": "Xətt",
+    "freedraw": "Çək",
+    "text": "Mətn",
+    "library": "Kitabxana",
     "lock": "",
     "penMode": "",
     "link": "",
     "eraser": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "",
-    "extraTools": "",
+    "extraTools": "Daha çox alət",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -327,6 +371,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -345,13 +390,18 @@
     "freeDraw": "",
     "text": "",
     "embeddable": "",
+    "stickynote": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
+    "toggleTextAutoResize": "",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -360,6 +410,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
@@ -394,6 +445,10 @@
   },
   "errorDialog": {
     "title": ""
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "",
@@ -558,6 +613,8 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
+      "center_heading_line2": "",
+      "center_heading_line3": "",
       "center_heading_plus": "",
       "menuHint": ""
     },
@@ -574,7 +631,11 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -607,12 +668,73 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "",
+    "label": "",
+    "inputPlaceholder": "",
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
+  },
+  "ttd": {
+    "error": ""
+  },
+  "chat": {
+    "inputPlaceholder": "",
+    "inputPlaceholderWithMessages": "",
+    "generating": "",
+    "rateLimitRemaining": "",
+    "role": {
+      "user": "",
+      "assistant": "",
+      "system": ""
+    },
+    "aiBeta": "",
+    "label": "",
+    "menu": "",
+    "newChat": "",
+    "deleteChat": "",
+    "deleteMessage": "",
+    "viewAsMermaid": "",
+    "placeholder": {
+      "title": "",
+      "description": "",
+      "hint": ""
+    },
+    "preview": "",
+    "insert": "",
+    "retry": "",
+    "errors": {
+      "promptTooShort": "",
+      "promptTooLong": "",
+      "generationFailed": "",
+      "invalidDiagram": "",
+      "fixInMermaid": "",
+      "aiRepair": "",
+      "requestAborted": "",
+      "requestFailed": "",
+      "mermaidParseError": ""
+    },
+    "rateLimit": {
+      "messageLimit": "",
+      "generalRateLimit": "",
+      "messageLimitInputPlaceholder": ""
+    },
+    "upsellBtnLabel": ""
   },
   "quickSearch": {
     "placeholder": ""
@@ -623,7 +745,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
@@ -661,5 +785,16 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "promoBanner": {
+    "presentations": "",
+    "mcp": "",
+    "comments": "",
+    "teams": "",
+    "voiceChat": "",
+    "withExcalidrawPlus": "",
+    "excalidrawPlusMcp": "",
+    "cli": "",
+    "cliTagline": ""
   }
 }
