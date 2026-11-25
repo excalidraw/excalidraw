@@ -592,6 +592,8 @@
     "selection": "val",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Innebygging av denne nettadressa er ikkje tillate for tida. Opprett ei sak på GitHub og be om at nettadressa vert lagd på kvitlista",
     "unrecognizedLinkFormat": "Lenkja du bygde inn, har ikkje det forventa formatet. Prøv å lime inn «embed»-strengen frå kjeldenettstaden",
     "elementLinkCopied": "Lenkja er kopiert til utklippstavla"
