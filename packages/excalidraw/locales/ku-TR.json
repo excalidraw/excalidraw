@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "دانانەوە",
     "pasteAsPlaintext": "دایبنێ وەک دەقی سادە",
     "pasteCharts": "دانانەوەی خشتەکان",
@@ -786,16 +788,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "پێشکەشکردن",
-    "mcp": "کێشان بە AI",
-    "comments": "نووسینی لێدوان",
-    "teams": "کاری تیمی",
-    "voiceChat": "چاتی دەنگی",
-    "withExcalidrawPlus": "بە Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "بۆ مرۆڤ و AI"
   }
 }
