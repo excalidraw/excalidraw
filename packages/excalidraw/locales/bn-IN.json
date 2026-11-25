@@ -592,6 +592,8 @@
     "selection": "বাছাই",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
