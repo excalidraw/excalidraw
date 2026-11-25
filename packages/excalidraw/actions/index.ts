@@ -83,6 +83,7 @@ export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
 export { actionToggleShowHints } from "./actionToggleShowHints";
+export { actionToggleWheelToolSwitching } from "./actionToggleWheelToolSwitching";
 
 export { actionToggleStats } from "./actionToggleStats";
 export { actionToggleMinimap } from "./actionToggleMinimap";
