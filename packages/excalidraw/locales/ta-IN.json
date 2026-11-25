@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "ஒட்டு",
     "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
@@ -786,16 +788,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
   }
 }
