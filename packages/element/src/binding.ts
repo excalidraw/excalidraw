@@ -1125,8 +1125,14 @@ const applyBinding = (
   startOrEnd: "start" | "end",
   scene: Scene,
 ): void => {
+  const field = startOrEnd === "start" ? "startBinding" : "endBinding";
+  const prevBinding = arrow[field];
+  if (prevBinding && prevBinding.elementId !== bindableElement.id) {
+    unbindBindingElement(arrow, startOrEnd, scene);
+  }
+
   scene.mutateElement(arrow, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
+    [field]: binding,
   });
 
   const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
@@ -1280,6 +1286,79 @@ export const getBoundEndExtension = (
   );
 };
 
+const removeArrowFromBoundElements = (
+  arrow: ExcalidrawArrowElement,
+  bindableId: ExcalidrawBindableElement["id"],
+  scene: Scene,
+  options?: { informMutation: boolean; isDragging: boolean },
+) => {
+  const boundElement = scene.getNonDeletedElementsMap().get(bindableId) as
+    | NonDeleted<ExcalidrawBindableElement>
+    | undefined;
+  if (boundElement?.boundElements) {
+    scene.mutateElement(
+      boundElement,
+      {
+        boundElements: boundElement.boundElements.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      },
+      options,
+    );
+  }
+};
+
+/**
+ * Removes `arrow.id` from `boundElements` of any bindable element that `arrow`
+ * is detaching from when `startBinding` or `endBinding` is directly replaced or
+ * cleared (e.g. during point dragging).
+ */
+export const cleanupReplacedArrowBindings = (
+  arrow: ExcalidrawArrowElement,
+  nextBindings: {
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
+  },
+  scene: Scene,
+): void => {
+  const nextStartBinding =
+    nextBindings.startBinding !== undefined
+      ? nextBindings.startBinding
+      : arrow.startBinding;
+  const nextEndBinding =
+    nextBindings.endBinding !== undefined
+      ? nextBindings.endBinding
+      : arrow.endBinding;
+
+  const idsToUnbind = new Set<ExcalidrawBindableElement["id"]>();
+  const prevStartId = arrow.startBinding?.elementId;
+  if (
+    prevStartId &&
+    nextBindings.startBinding !== undefined &&
+    prevStartId !== nextStartBinding?.elementId &&
+    prevStartId !== nextEndBinding?.elementId
+  ) {
+    idsToUnbind.add(prevStartId);
+  }
+
+  const prevEndId = arrow.endBinding?.elementId;
+  if (
+    prevEndId &&
+    nextBindings.endBinding !== undefined &&
+    prevEndId !== nextEndBinding?.elementId &&
+    prevEndId !== nextStartBinding?.elementId
+  ) {
+    idsToUnbind.add(prevEndId);
+  }
+
+  for (const id of idsToUnbind) {
+    removeArrowFromBoundElements(arrow, id, scene, {
+      informMutation: false,
+      isDragging: false,
+    });
+  }
+};
+
 export const unbindBindingElement = (
   arrow: ExcalidrawArrowElement,
   startOrEnd: "start" | "end",
@@ -1297,14 +1376,7 @@ export const unbindBindingElement = (
   if (!oppositeBinding || oppositeBinding.elementId !== binding.elementId) {
     // Only remove the record on the bound element if the other
     // end is not bound to the same element
-    const boundElement = scene
-      .getNonDeletedElementsMap()
-      .get(binding.elementId) as NonDeleted<ExcalidrawBindableElement>;
-    scene.mutateElement(boundElement, {
-      boundElements: boundElement.boundElements?.filter(
-        (element) => element.id !== arrow.id,
-      ),
-    });
+    removeArrowFromBoundElements(arrow, binding.elementId, scene);
   }
 
   scene.mutateElement(arrow, { [field]: null });
@@ -2877,7 +2949,13 @@ export class BindableElement {
       bindableElement,
       (boundElement, _, boundElementId) => {
         // unbind from bindable elements, as bindings from non deleted elements into deleted elements are incorrect
-        if (!boundElement || boundElement.isDeleted) {
+        if (
+          !boundElement ||
+          boundElement.isDeleted ||
+          (isArrowElement(boundElement) &&
+            boundElement.startBinding?.elementId !== bindableElement.id &&
+            boundElement.endBinding?.elementId !== bindableElement.id)
+        ) {
           updateElementWith(bindableElement, {
             boundElements: newBoundElements(
               bindableElement.boundElements,

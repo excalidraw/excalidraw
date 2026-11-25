@@ -795,6 +795,14 @@ const repairContainerElement = (
             return acc;
           }
 
+          if (
+            isArrowElement(boundElement) &&
+            boundElement.startBinding?.elementId !== container.id &&
+            boundElement.endBinding?.elementId !== container.id
+          ) {
+            return acc;
+          }
+
           acc.push(binding);
 
           if (

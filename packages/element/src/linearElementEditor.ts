@@ -56,6 +56,7 @@ import type { Bounds } from "@excalidraw/common";
 
 import {
   calculateFixedPointForNonElbowArrowBinding,
+  cleanupReplacedArrowBindings,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
   updateBoundPoint,
@@ -1852,6 +1853,10 @@ export class LinearElementEditor {
       isMidpointSnappingEnabled?: boolean;
     },
   ) {
+    if (isArrowElement(element) && otherUpdates) {
+      cleanupReplacedArrowBindings(element, otherUpdates, scene);
+    }
+
     if (isElbowArrow(element)) {
       const updates: {
         startBinding?: FixedPointBinding | null;
