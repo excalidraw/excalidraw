@@ -3,6 +3,8 @@
     "signUp": "S'inscrire",
     "signIn": "Se connecter",
     "upgrade": "Mettre à niveau",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Coller",
     "pasteAsPlaintext": "Coller comme texte brut",
     "pasteCharts": "Coller les graphiques",
@@ -786,16 +788,5 @@
     "spacebar": "Espace",
     "delete": "Supprimer",
     "mmb": "Clic molette"
-  },
-  "promoBanner": {
-    "presentations": "Présentations",
-    "mcp": "Dessin par IA",
-    "comments": "Commentaires",
-    "teams": "Travail d'équipe",
-    "voiceChat": "Chat vocal",
-    "withExcalidrawPlus": "avec Excalidraw+",
-    "excalidrawPlusMcp": "MCP Excalidraw+",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pour vous et l'IA"
   }
 }
