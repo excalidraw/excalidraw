@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Қою",
     "pasteAsPlaintext": "",
     "pasteCharts": "Диаграммаларды қою",
@@ -786,16 +788,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Презентация",
-    "mcp": "AI-мен сызу",
-    "comments": "Пікір қалдыру",
-    "teams": "Топтық жұмыс",
-    "voiceChat": "Дауыстық чат",
-    "withExcalidrawPlus": "Excalidraw+-пен",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "адам мен AI үшін"
   }
 }
