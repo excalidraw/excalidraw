@@ -592,6 +592,8 @@
     "selection": "выделение",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Встраивание этого URL в данный момент не разрешено. Сделайте Issue на GitHub для добавления URL в белый список",
     "unrecognizedLinkFormat": "Ссылка, которую вы ввели не соответствует ожидаемому формату. Пожалуйста, попробуйте вставить строку «встраивание», предоставленную исходным сайтом",
     "elementLinkCopied": "Ссылка скопирована в буфер обмена"
