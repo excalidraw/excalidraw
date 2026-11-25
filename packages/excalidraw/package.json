@@ -33,7 +33,8 @@
     }
   },
   "files": [
-    "dist/*"
+    "dist/*",
+    "fonts/LXGWWenKai/OFL.txt"
   ],
   "publishConfig": {
     "access": "public"

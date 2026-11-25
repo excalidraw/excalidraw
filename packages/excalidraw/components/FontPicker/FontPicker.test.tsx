@@ -32,6 +32,18 @@ describe("FontPicker", () => {
     });
   });
 
+  it("should allow selecting LXGW WenKai", async () => {
+    const { getByTestId, findByTitle } = await render(
+      <Excalidraw handleKeyboardGlobally={true} />,
+    );
+
+    Keyboard.keyPress(KEYS.T);
+    fireEvent.click(getByTestId("font-family-show-fonts"));
+    fireEvent.click(await findByTitle("LXGW WenKai"));
+
+    expect(h.state.currentItemFontFamily).toBe(FONT_FAMILY["LXGW WenKai"]);
+  });
+
   describe("top picks drag & drop", () => {
     const SLOT_SIZE = 32;
     const SLOT_SPAN = 40;
