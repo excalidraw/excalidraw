@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Senṭeḍ",
     "pasteAsPlaintext": "",
     "pasteCharts": "Senṭeḍ udlifen",
@@ -786,16 +788,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Tiskanin",
-    "mcp": "Suneɣ s AI",
-    "comments": "Rnu iwenniten",
-    "teams": "Amɛiwen",
-    "voiceChat": "Asiwel s taɣect",
-    "withExcalidrawPlus": "s Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "i yimdanen d AI"
   }
 }
