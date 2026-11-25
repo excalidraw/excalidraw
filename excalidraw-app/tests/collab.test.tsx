@@ -7,12 +7,20 @@ import { syncInvalidIndices } from "@excalidraw/element";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import { vi } from "vitest";
+import { KEYS } from "@excalidraw/common";
+import { Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
+import {
+  getTextEditor,
+  updateTextEditor,
+} from "@excalidraw/excalidraw/tests/queries/dom";
 
 import { StoreIncrement } from "@excalidraw/element";
 
 import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 
 import ExcalidrawApp from "../App";
+import { saveToFirebase } from "../data/firebase";
 
 const { h } = window;
 
@@ -29,7 +37,7 @@ Object.defineProperty(window, "crypto", {
 
 vi.mock("../../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
-  const saveToFirebase = () => {};
+  const saveToFirebase = vi.fn();
   const isSavedToFirebase = () => true;
   const loadFilesFromFirebase = async () => ({
     loadedFiles: [],
@@ -69,6 +77,45 @@ vi.mock("socket.io-client", () => {
  * i.e. multiplayer history tests could be a good first candidate, as we could test both history stacks simultaneously.
  */
 describe("collaboration", () => {
+  it("cancels text editing when a Firebase save returns a winning deletion", async () => {
+    await render(<ExcalidrawApp />);
+    const collaborating = vi
+      .spyOn(window.collab, "isCollaborating")
+      .mockReturnValue(true);
+    const text = API.createElement({ type: "text", id: "T", text: "original" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    Keyboard.keyPress(KEYS.ENTER);
+    const editor = await getTextEditor();
+    updateTextEditor(editor, "Edited by A");
+    const staleSubmit = h.app.text.textWysiwygSubmitHandler!;
+    const current = h.elements.find((element) => element.id === "T")!;
+    const deleted = newElementWith(current, {
+      isDeleted: true,
+    }) as RemoteExcalidrawElement;
+    vi.mocked(saveToFirebase).mockResolvedValueOnce([deleted]);
+    await act(async () => {
+      await window.collab.saveCollabRoomToFirebase(
+        h.elements as Parameters<typeof saveToFirebase>[1],
+      );
+    });
+    await waitFor(() => expect(editor.isConnected).toBe(false));
+    act(() => staleSubmit());
+    expect(h.state.editingTextElement).toBeNull();
+    expect(h.elements.find((element) => element.id === "T")?.isDeleted).toBe(
+      true,
+    );
+    await act(async () => {
+      await window.collab.saveCollabRoomToFirebase(
+        h.elements as Parameters<typeof saveToFirebase>[1],
+      );
+    });
+    expect(vi.mocked(saveToFirebase).mock.lastCall?.[1]).toEqual([
+      expect.objectContaining({ id: "T", isDeleted: true }),
+    ]);
+    collaborating.mockRestore();
+  });
+
   it("should emit two ephemeral increments even though updates get batched", async () => {
     const durableIncrements: DurableIncrement[] = [];
     const ephemeralIncrements: EphemeralIncrement[] = [];

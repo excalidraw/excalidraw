@@ -304,6 +304,7 @@ type SubmitHandler = () => void;
 export const textWysiwyg = ({
   onChange,
   onSubmit,
+  onCancel,
   getViewportCoords,
   element,
   canvas,
@@ -321,6 +322,7 @@ export const textWysiwyg = ({
    */
   onChange?: (nextOriginalText: string) => void;
   onSubmit: (data: { viaKeyboard: boolean; nextOriginalText: string }) => void;
+  onCancel: () => void;
   getViewportCoords: (x: number, y: number) => [number, number];
   element: ExcalidrawTextElement;
   canvas: HTMLCanvasElement;
@@ -944,6 +946,9 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
+      if (cancelIfDeleted()) {
+        return;
+      }
       followsScene = false;
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
@@ -962,6 +967,9 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    if (cancelIfDeleted()) {
+      return;
+    }
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(
@@ -1145,9 +1153,26 @@ export const textWysiwyg = ({
   // using a state variable instead of passing it to the handleSubmit callback
   // so that we don't need to create separate a callback for event handlers
   let submittedViaKeyboard = false;
+  // Consult the scene, rather than the immutable snapshot from edit start.
+  // A pending input/blur must never turn an accepted tombstone active again.
+  const cancelIfDeleted = () => {
+    if (isDestroyed) {
+      return true;
+    }
+    const latestElement = app.scene.getElement(element.id);
+    if (!latestElement || latestElement.isDeleted) {
+      isDestroyed = true;
+      cleanup();
+      if (!app.unmounted) {
+        onCancel();
+      }
+      return true;
+    }
+    return false;
+  };
   const handleSubmit = () => {
     // prevent double submit
-    if (isDestroyed) {
+    if (cancelIfDeleted()) {
       return;
     }
 
@@ -1289,6 +1314,9 @@ export const textWysiwyg = ({
         !!(target as Element).closest(".compact-shape-actions-island"));
 
     ownerWindow.setTimeout(() => {
+      if (cancelIfDeleted()) {
+        return;
+      }
       // If we interacted within shape actions menu or its popovers/triggers,
       // keep submit disabled and don't steal focus back to textarea.
       if (inShapeActionsMenu || isPropertiesTrigger || isPropertiesContent) {
@@ -1441,7 +1469,7 @@ export const textWysiwyg = ({
       queueMicrotask(() => {
         const currentElement = app.scene.getElement(element.id);
         if (!currentElement || currentElement.isDeleted) {
-          handleSubmit();
+          cancelIfDeleted();
         }
       });
       return;
@@ -1545,6 +1573,9 @@ export const textWysiwyg = ({
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg
   ownerWindow.requestAnimationFrame(() => {
+    if (cancelIfDeleted()) {
+      return;
+    }
     ownerWindow.addEventListener("pointerdown", onPointerDown, {
       capture: true,
     });
