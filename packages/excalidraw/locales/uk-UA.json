@@ -3,6 +3,8 @@
     "signUp": "Зареєструватися",
     "signIn": "Увійти",
     "upgrade": "Оновити план",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
@@ -786,16 +788,5 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Коліщатко"
-  },
-  "promoBanner": {
-    "presentations": "Презентації",
-    "mcp": "Малюйте з ШІ",
-    "comments": "Коментарі",
-    "teams": "Співпраця",
-    "voiceChat": "Аудіочат",
-    "withExcalidrawPlus": "в Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "для людей і ШІ"
   }
 }
