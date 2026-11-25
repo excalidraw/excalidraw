@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "ထား",
     "pasteAsPlaintext": "",
     "pasteCharts": "",
@@ -786,16 +788,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "တင်ပြမှု",
-    "mcp": "AI ဖြင့်ရေးဆွဲ",
-    "comments": "မှတ်ချက်ပေး",
-    "teams": "အဖွဲ့လိုက်လုပ်",
-    "voiceChat": "အသံခေါ်ဆိုမှု",
-    "withExcalidrawPlus": "Excalidraw+ ဖြင့်",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "လူနှင့် AI အတွက်"
   }
 }
