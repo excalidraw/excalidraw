@@ -7,7 +7,7 @@
  *   yarn gen:google-fonts --new-only  # the same, without checking existing ones
  *   yarn gen:google-fonts --refresh   # also take over drifted metrics
  *   yarn gen:google-fonts --allow "A Family" --allow "Another"
- *                                     # add families held back as heavy
+ *                                     # add families which were held back
  *
  * Per family it asks Google's `css2` API for the regular (400) face, downloads
  * the first subset file and reads the vertical metrics out of its `head` and
@@ -37,6 +37,14 @@
  * - No families which are slow to draw - see `SLOW_FAMILIES`. A family new
  *   to Google's list whose font file looks like one of those is held back
  *   until someone has measured it - see `getHeavyOutlinesReason`.
+ * - No families whose text would jump when the text editor opens, because
+ *   browsers don't agree on their vertical metrics - see
+ *   `OFF_BASELINE_FAMILIES`. A family new to Google's list is held back
+ *   when its font file says the same - see `getOffBaselineReason`.
+ * - No families whose lines the canvas and the text editor lay out at
+ *   different widths - see `UNEVEN_WIDTH_FAMILIES`. A font file doesn't
+ *   tell, so a family new to Google's list isn't held back for it: that
+ *   takes measuring in a browser.
  *   A family already in the catalog stays, whatever it's classified as
  *   later - see the first rule.
  *
@@ -86,6 +94,11 @@ const BROKEN_FAMILIES = new Map([
   // seen 2026-11-14 in Chromium: "⊂" draws as a mark on top of the letter
   // before it ("ℕ ⊂ ℤ"), and "𝑓(" overlaps
   ["Libertinus Math", "relation signs draw over the preceding letter"],
+  // seen 2026-11-19 in Chromium and Firefox, 2026-11-24 in Safari: at 20 px a
+  // line starting with "rs" is about 900 px wide, where a sentence is 317
+  ["Vibur", 'a line starting with "rs" is drawn three times too wide'],
+  // seen 2026-11-19 in Chromium: not a font to write with
+  ["Libertinus Keyboard", "draws key caps for sequences of letters"],
 ]);
 
 /**
@@ -179,6 +192,160 @@ const getHeavyOutlinesReason = (sfnt) => {
     : undefined;
 };
 
+/**
+ * Families whose text jumps up or down when the text editor opens and
+ * closes. The canvas places a line's baseline from the catalog's metrics
+ * (the file's `hhea` table). The editor is a textarea, which the browser
+ * lays out with the metrics it reads itself - and a font file has three
+ * sets of those:
+ *
+ * - `hhea`: what browsers read on macOS
+ * - OS/2 `usWinAscent` / `usWinDescent`: what Chrome and Firefox read on
+ *   Windows
+ * - OS/2 `sTypoAscender` / `sTypoDescender`: what they read there when the
+ *   font sets `USE_TYPO_METRICS`
+ *
+ * Google's rules ask for the three to agree. Where they don't, no catalog
+ * value is right on every platform, and a catalog entry never changes once
+ * shipped - so these are out.
+ *
+ * Measured 2026-11-16 for every family of the catalog, as the distance
+ * between the browser's baseline and the canvas' for a line at 40 px: in
+ * Chrome, Firefox and Safari on macOS and in Chrome and Firefox on Windows.
+ * Out are the ones over 3.2 px, which is what system Helvetica has always
+ * had. The rest of the catalog is within 2.9 px, and nine in ten families
+ * within pixel snapping (about 1 px). Linux and Android weren't measured.
+ */
+const OFF_BASELINE_FAMILIES = new Map([
+  ["Katibeh", "16.4 px at 40 px on Windows"],
+  ["Mirza", "14.1 px at 40 px on Windows"],
+  // their `hhea` descender is positive, which browsers read as a descent
+  ["Coiny", "10 px at 40 px on every platform"],
+  ["Revalia", "7.9 px at 40 px on every platform"],
+  ["Tajawal", "7.3 px at 40 px on Windows"],
+  ["Luckiest Guy", "5.9 px at 40 px on Windows"],
+  ["Noto Traditional Nushu", "5.2 px at 40 px on every platform"],
+  ["Maiden Orange", "4.9 px at 40 px on Windows"],
+  ["Jomolhari", "3.8 px at 40 px on Windows"],
+  ["Farsan", "3.6 px at 40 px on Windows"],
+  ["Meera Inimai", "3.4 px at 40 px on Windows, and in Firefox on macOS"],
+]);
+
+/**
+ * Families whose metrics give a line height lines of text don't fit in.
+ * A text's line height is the one its font asks for, and it's saved with
+ * the text.
+ */
+const UNUSABLE_LINE_HEIGHT_FAMILIES = new Map([
+  // a descender of zero: its baseline is right, but lines overlap
+  ["Allkin", 0.6],
+]);
+
+/**
+ * Families whose lines come out at different widths on the canvas and in
+ * the text editor, in a browser where no setting brings the two together.
+ * A line which fits on the canvas then wraps in the editor or the other way
+ * round, and letters shift as the editor opens and closes.
+ *
+ * Measured 2026-11-19 to 2026-11-24 for every family of the catalog, in px
+ * at 20 px, on 21 lines of Latin text and a line in each of the family's own
+ * scripts: in Chromium 145 and Firefox 146 on Linux, in Chrome 150, Firefox
+ * 157 and Safari 15.5 on macOS, and the families over the limit in Safari
+ * 27.2. Chrome was measured with its canvas set to kern and shape text the
+ * way its editor does (`fontKerning`, `textRendering`); without that it
+ * disagrees for hundreds more.
+ *
+ * Out are the ones off by over 5 px on a line, off at every punctuation mark
+ * or off after nearly every edit. Smaller gaps stay: Caveat is 2.2 px off on
+ * a line in Safari.
+ *
+ * A font file doesn't tell which family is of this kind, so nothing holds a
+ * new one back, and families added since aren't measured.
+ */
+const UNEVEN_WIDTH_FAMILIES = new Map([
+  // Chrome's canvas and editor disagree, whatever the canvas is set to
+  ["Arvo", "2.3 px for every comma followed by a space, in Chrome"],
+  ["Ruslan Display", "2.2 px on a line with punctuation, in Chrome"],
+  ["Orelega One", "up to 2.3 px on a line, in Chrome"],
+  // the same on Japanese text, and the other way round in Safari
+  ["Cherry Bomb One", "5.2 px on a Japanese sentence, in Chrome and Safari"],
+  // Safari's canvas draws their Latin letters unlike its editor, and unlike
+  // every other browser
+  ["Qahiri", "58.7 px on a sentence, in Safari"],
+  ["Aref Ruqaa", "41.2 px on a sentence, in Safari"],
+  ["Aref Ruqaa Ink", "41.2 px on a sentence, in Safari"],
+  ["Gulzar", "13.2 px on a sentence, in Safari"],
+  ["Tiro Bangla", "8.8 px on a sentence, in Safari"],
+  ["Tiro Devanagari Hindi", "8.8 px on a sentence, in Safari"],
+  ["Tiro Devanagari Marathi", "8.8 px on a sentence, in Safari"],
+  ["Tiro Devanagari Sanskrit", "8.8 px on a sentence, in Safari"],
+  ["Tiro Gurmukhi", "8.8 px on a sentence, in Safari"],
+  ["Tiro Kannada", "8.8 px on a sentence, in Safari"],
+  ["Tiro Tamil", "8.8 px on a sentence, in Safari"],
+  ["Tiro Telugu", "8.8 px on a sentence, in Safari"],
+  ["Playpen Sans", "7.1 px on a sentence, in Safari"],
+  ["Playpen Sans Arabic", "7.1 px on a sentence, in Safari"],
+  ["Playpen Sans Deva", "7.1 px on a sentence, in Safari"],
+  ["Playpen Sans Hebrew", "7.1 px on a sentence, in Safari"],
+  ["Playpen Sans Thai", "7.1 px on a sentence, in Safari"],
+  // Safari's editor lays their Latin letters out unlike its canvas
+  ["Barrio", "13.1 px on a sentence, in Safari"],
+  ["Mansalva", "5.9 px on a sentence, in Safari"],
+  ["Mynerve", "5.9 px on a sentence, in Safari"],
+  // Safari keeps two letters unkerned once a line break was removed between
+  // them. Any kerned font has that; in these nearly every pair is kerned
+  ["Betania Patmos", "2.2 to 2.7 px wider per edit, in Safari"],
+  ["Betania Patmos GDL", "2.2 to 2.7 px wider per edit, in Safari"],
+  ["Betania Patmos In", "2.2 to 2.7 px wider per edit, in Safari"],
+  ["Betania Patmos In GDL", "2.2 to 2.7 px wider per edit, in Safari"],
+  ["Momo Signature", "1.7 px wider per edit, in Safari"],
+]);
+
+/** the gap system Helvetica has between editor and canvas, in em */
+const MAX_BASELINE_GAP = 0.08;
+const MIN_LINE_HEIGHT = 0.75;
+
+/**
+ * Why a font file's vertical metrics would put its text off the baseline, or
+ * give it an unusable line height, if they do - see `OFF_BASELINE_FAMILIES`.
+ *
+ * Read from the file alone: the baseline a browser on Windows gives a line,
+ * against the one the catalog's `hhea` values give. Checked 2026-11-16
+ * against the measurements: of the catalog's 1,895 families it tells
+ * exactly the 11 measured over the limit.
+ */
+const getOffBaselineReason = (sfnt) => {
+  const { view, tables } = readSfntTables(sfnt);
+  const [unitsPerEm, ascender, descender, lineGap] = readMetrics(sfnt);
+
+  const lineHeight = (ascender - descender + lineGap) / unitsPerEm;
+  if (lineHeight < MIN_LINE_HEIGHT) {
+    return `a line height of ${lineHeight.toFixed(2)}`;
+  }
+
+  const os2 = tables.get("OS/2")?.offset;
+  if (os2 === undefined) {
+    return undefined;
+  }
+  // fsSelection bit 7
+  const useTypoMetrics = (view.getUint16(os2 + 62) & 0x80) !== 0;
+  const [ascent, descent] = useTypoMetrics
+    ? [view.getInt16(os2 + 68), -view.getInt16(os2 + 70)]
+    : [view.getUint16(os2 + 74), view.getUint16(os2 + 76)];
+
+  // a line's baseline sits at half the line height plus half of (ascent -
+  // descent), so the two differ by half of what the metrics differ by
+  const gap = (ascent - descent - (ascender + descender)) / (2 * unitsPerEm);
+
+  return Math.abs(gap) > MAX_BASELINE_GAP
+    ? `baseline off by ${Math.round(
+        Math.abs(gap) * 100,
+      )}% of the font size on Windows (hhea ${ascender} / ${descender}, ${
+        useTypoMetrics ? "typo" : "win"
+      } ${ascent} / ${useTypoMetrics ? -descent : descent})`
+    : undefined;
+};
+
 /** why a family is left out, if it is */
 const getExclusionReason = (family) => {
   const name = family.family;
@@ -194,10 +361,21 @@ const getExclusionReason = (family) => {
   if (SLOW_FAMILIES.has(name)) {
     return `slow to draw: ${SLOW_FAMILIES.get(name)} ms a line`;
   }
+  if (OFF_BASELINE_FAMILIES.has(name)) {
+    return `text jumps in the editor: ${OFF_BASELINE_FAMILIES.get(name)}`;
+  }
+  if (UNEVEN_WIDTH_FAMILIES.has(name)) {
+    return `canvas and text editor disagree on its width: ${UNEVEN_WIDTH_FAMILIES.get(
+      name,
+    )}`;
+  }
+  if (UNUSABLE_LINE_HEIGHT_FAMILIES.has(name)) {
+    return `a line height of ${UNUSABLE_LINE_HEIGHT_FAMILIES.get(name)}`;
+  }
   return undefined;
 };
 
-/** families held back as heavy, which got measured and may come in */
+/** families which were held back, got measured and may come in */
 const allowed = new Set(
   process.argv.flatMap((arg, i) =>
     arg === "--allow" && process.argv[i + 1] ? [process.argv[i + 1]] : [],
@@ -276,14 +454,18 @@ const readMetrics = (sfnt) => {
   return [unitsPerEm, ascender, descender, lineGap];
 };
 
+// copied: what `decompress` returns doesn't outlive the next call to it
 const fetchSfnt = async (url) =>
-  wawoff2.decompress(
-    new Uint8Array(await (await fetchWithRetry(url)).arrayBuffer()),
+  Uint8Array.from(
+    await wawoff2.decompress(
+      new Uint8Array(await (await fetchWithRetry(url)).arrayBuffer()),
+    ),
   );
 
 /**
  * The family's metrics, and for a family new to the catalog (`checkOutlines`)
- * whether its font file looks slow to draw.
+ * why it's held back, if it is: its font file looks slow to draw, or its
+ * vertical metrics would put its text off the baseline.
  */
 const resolveFamily = async (family, checkOutlines) => {
   const css = await (
@@ -309,7 +491,11 @@ const resolveFamily = async (family, checkOutlines) => {
   // CJK family's first ones hold its most intricate glyphs, which says
   // little about the design
   const mainSfnt = urls.length > 1 ? await fetchSfnt(urls.at(-1)) : sfnt;
-  return { metrics, heavyReason: getHeavyOutlinesReason(mainSfnt) };
+  return {
+    metrics,
+    heldBackReason:
+      getOffBaselineReason(sfnt) ?? getHeavyOutlinesReason(mainSfnt),
+  };
 };
 
 const main = async () => {
@@ -369,8 +555,8 @@ const main = async () => {
     if (!before || !newOnly) {
       try {
         const resolved = await resolveFamily(name, !before);
-        if (resolved.heavyReason && !allowed.has(name)) {
-          heldBack.push(`${name} (${resolved.heavyReason})`);
+        if (resolved.heldBackReason && !allowed.has(name)) {
+          heldBack.push(`${name} (${resolved.heldBackReason})`);
           return;
         }
         live = resolved.metrics;
@@ -456,7 +642,7 @@ const main = async () => {
   );
   report("Left out", excluded);
   report(
-    "Held back: looks slow to draw. Measure it (see getHeavyOutlinesReason), then add it to SLOW_FAMILIES or run with --allow",
+    "Held back: looks slow to draw, or off the baseline. Measure it (see getHeavyOutlinesReason, OFF_BASELINE_FAMILIES), then add it to the list it belongs to or run with --allow",
     heldBack,
   );
   report("Left out, no regular 400 face", skipped);

@@ -93,6 +93,28 @@ describe("Google Fonts catalog", () => {
     expect(catalog.get("Rubik")).not.toBe(undefined);
   });
 
+  it("leaves out families whose text would jump in the text editor", async () => {
+    const catalog = await loadGoogleFontCatalog();
+
+    // browsers don't agree on their vertical metrics, or the metrics are
+    // broken - so the textarea and the canvas place their text differently
+    for (const name of ["Katibeh", "Tajawal", "Coiny", "Revalia", "Allkin"]) {
+      expect(catalog.get(name)).toBe(undefined);
+    }
+    // a descender of zero alone is fine
+    expect(catalog.get("Press Start 2P")).not.toBe(undefined);
+  });
+
+  it("leaves out families the canvas and the text editor lay out differently", async () => {
+    const catalog = await loadGoogleFontCatalog();
+
+    for (const name of ["Arvo", "Cherry Bomb One", "Playpen Sans", "Vibur"]) {
+      expect(catalog.get(name)).toBe(undefined);
+    }
+    // a small gap in one browser stays
+    expect(catalog.get("Caveat")).not.toBe(undefined);
+  });
+
   it("holds every default pick", async () => {
     const catalog = await loadGoogleFontCatalog();
 
