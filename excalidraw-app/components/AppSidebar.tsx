@@ -1,11 +1,20 @@
-import { DefaultSidebar, Sidebar, THEME } from "@excalidraw/excalidraw";
+import {
+  DefaultSidebar,
+  Sidebar,
+  THEME,
+  useExcalidrawAPI,
+} from "@excalidraw/excalidraw";
 import {
   messageCircleIcon,
   presentationIcon,
+  MagicIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import { AIAgentSidebarTab } from "./ai-agent/AIAgentSidebarTab";
 import "./AppSidebar.scss";
 
 type SidebarPromoCopyProps = {
@@ -65,12 +74,25 @@ const SidebarPromoCopy = (props: SidebarPromoCopyProps) => {
   );
 };
 
-export const AppSidebar = () => {
+export const AppSidebar = ({
+  excalidrawAPI,
+}: {
+  excalidrawAPI?: ExcalidrawImperativeAPI | null;
+} = {}) => {
   const { theme, openSidebar } = useUIAppState();
+  const hookApi = useExcalidrawAPI();
+  const api = excalidrawAPI || hookApi;
 
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
+        <Sidebar.TabTrigger
+          tab="ai-agent"
+          style={{ opacity: openSidebar?.tab === "ai-agent" ? 1 : 0.4 }}
+          title="AI Whiteboard Agent"
+        >
+          {MagicIcon}
+        </Sidebar.TabTrigger>
         <Sidebar.TabTrigger
           tab="comments"
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
@@ -84,6 +106,9 @@ export const AppSidebar = () => {
           {presentationIcon}
         </Sidebar.TabTrigger>
       </DefaultSidebar.TabTriggers>
+      <Sidebar.Tab tab="ai-agent">
+        {api && <AIAgentSidebarTab excalidrawAPI={api} />}
+      </Sidebar.Tab>
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">
           <div
