@@ -3,6 +3,8 @@
     "signUp": "أنشئ حسابًا",
     "signIn": "سجّل الدخول",
     "upgrade": "ترقية",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
@@ -786,16 +788,5 @@
     "spacebar": "مسافة",
     "delete": "احذف",
     "mmb": "عجلة التمرير"
-  },
-  "promoBanner": {
-    "presentations": "عروض تقديمية",
-    "mcp": "ارسم بـ AI",
-    "comments": "أضف تعليقات",
-    "teams": "العمل الجماعي",
-    "voiceChat": "محادثة صوتية",
-    "withExcalidrawPlus": "مع Excalidraw+‎",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "للبشر و AI"
   }
 }
