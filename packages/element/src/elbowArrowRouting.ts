@@ -829,13 +829,18 @@ const findRoute = (
   gaps: number[],
   elementsOverlap = false,
   cornersClear = false,
+  parts: readonly ObstacleParts[] = [],
 ): GlobalPoint[] => {
   // Where the elements' bounds overlap, they're one obstacle, the bounds
   // around both, which the route leaves from and enters as it would a single
   // element (its legs running through it where they start or end inside
   // it): so it goes around them both as they look together, and only changes
   // as the bounds around them do, continuously, rather than switching
-  // between the padding around one and the other as they move
+  // between the padding around one and the other as they move. (Only its
+  // grid and legs are the union's, though: inside it, the route runs as
+  // close to and through the elements' own bounds as it does, so through the
+  // room in the corners of the union, around neither element, as freely as
+  // it would anywhere else, see clearanceCost.)
   if (
     start.obstacle !== null &&
     end.obstacle !== null &&
@@ -855,6 +860,9 @@ const findRoute = (
       { ...end, obstacle: 0 },
       [union],
       [Math.max(...gaps)],
+      false,
+      false,
+      [[a, b]],
     );
   }
   const obstacles = shareGaps(elementObstacles, gaps, cornersClear);
@@ -972,6 +980,7 @@ const findRoute = (
     weights,
     overlapping,
     strip,
+    parts,
   );
   // (searching for the cheapest route with what it costs to cross itself
   // takes much longer, and only makes a difference where the cheapest one
@@ -989,6 +998,7 @@ const findRoute = (
       weights,
       overlapping,
       strip,
+      parts,
       true,
     );
     if (
@@ -1009,6 +1019,13 @@ const findRoute = (
 // -----------------------------------------------------------------------------
 // Grid
 // -----------------------------------------------------------------------------
+
+/**
+ * The elements' own bounds within an obstacle that's the bounds around them
+ * (where their bounds overlap, see {@link findRoute}), or null for one
+ * that's a single element's
+ */
+type ObstacleParts = readonly Bounds[] | null;
 
 type LineKind = keyof typeof LINE_COSTS;
 type Line = {
@@ -1147,6 +1164,25 @@ const buildGrid = (
       }
     }
   }
+  // With the ends bound to the same obstacle (the bounds around elements
+  // that overlap, see findRoute), there's nothing halfway between them, so
+  // a hairpin's width either side of the lines the legs run on, for a route
+  // turning back onto one where it's right by the line the other leg ends
+  // on: rather than folding back onto itself (see minHairpin), or going
+  // around the obstacle instead
+  if (start.obstacle !== null && start.obstacle === end.obstacle) {
+    for (const { point, heading } of [start, end]) {
+      const axis = headingIsHorizontal(heading) ? 1 : 0;
+      for (const side of [-1, 1]) {
+        (axis === 0 ? xs : ys).push({
+          at: point[axis] + side * minHairpin(false),
+          kind: "step",
+          exact: false,
+          fromEndpoints: true,
+        });
+      }
+    }
+  }
 
   return { xs: mergeLines(xs), ys: mergeLines(ys) };
 };
@@ -1232,6 +1268,7 @@ const clearanceCost = (
   allowance: readonly number[],
   exclude: number,
   crossingOnly: boolean,
+  parts: readonly ObstacleParts[],
 ) => {
   // (this runs a lot, so it doesn't allocate)
   const count = obstacles.length;
@@ -1249,6 +1286,19 @@ const clearanceCost = (
   for (let i = 0; i < count; i++) {
     const distance = scratch.distance[i];
     if (exclude & (1 << i) || distance >= BASE_PADDING) {
+      continue;
+    }
+    if (distance < 0 && parts[i]) {
+      cost +=
+        weights[i] *
+        partsClearanceCost(
+          x,
+          y,
+          parts[i]!,
+          -distance,
+          allowance[i],
+          crossingOnly,
+        );
       continue;
     }
     if (distance < 0) {
@@ -1315,6 +1365,45 @@ const clearanceCost = (
   return cost;
 };
 
+/**
+ * The cost per px of route at a point `depth` px inside an obstacle that's
+ * the bounds around elements (see {@link findRoute}): as close to, or
+ * through, the elements' own bounds as it is (as {@link clearanceCost} would
+ * have it for one of them), so the room in the obstacle's corners, around
+ * neither of them, is as free as any other. (Counting it as no further from
+ * them than from the obstacle's edge, though, so the cost is continuous
+ * across it, and only falls off a padding inside it.)
+ */
+const partsClearanceCost = (
+  x: number,
+  y: number,
+  parts: readonly Bounds[],
+  depth: number,
+  allowance: number,
+  crossingOnly: boolean,
+) => {
+  let distance = Infinity;
+  for (const part of parts) {
+    distance = Math.min(distance, signedDistance(x, y, part));
+  }
+  if (distance < 0) {
+    // through one of them, past the allowance
+    const through = -distance - allowance;
+    return (
+      (crossingOnly ? 0 : CLEARANCE_COST) +
+      (through > 0 ? CROSSING_COST * Math.min(through / CROSSING_RAMP, 1) : 0)
+    );
+  }
+  if (crossingOnly) {
+    return 0;
+  }
+  const room = Math.min(distance, depth);
+
+  return room < BASE_PADDING
+    ? CLEARANCE_COST * closeness(1 - room / BASE_PADDING)
+    : 0;
+};
+
 /** Scratch space for {@link clearanceCost}, for up to two obstacles */
 const scratch = {
   distance: new Float64Array(2),
@@ -1337,6 +1426,7 @@ const segmentClearanceCost = (
   allowance: readonly number[],
   exclude: number,
   crossingOnly: boolean,
+  parts: readonly ObstacleParts[],
 ) => {
   const horizontal = a[1] === b[1];
   const axis = horizontal ? 0 : 1;
@@ -1371,6 +1461,26 @@ const segmentClearanceCost = (
     ]) {
       breakpoints.push(lo - offset, hi + offset);
     }
+    // (and inside one that's the bounds around elements, where it's a
+    // padding in from its edge, and around the elements, see
+    // partsClearanceCost)
+    for (const part of parts[i] ?? []) {
+      const partAcross = Math.max(
+        part[1 - axis] - across,
+        across - part[3 - axis],
+      );
+      breakpoints.push(lo + BASE_PADDING, hi - BASE_PADDING);
+      for (const offset of [
+        BASE_PADDING,
+        0,
+        -allowance[i],
+        -allowance[i] - CROSSING_RAMP,
+        partAcross,
+        -partAcross,
+      ]) {
+        breakpoints.push(part[axis] - offset, part[axis + 2] + offset);
+      }
+    }
   });
   from = Math.max(from, reachFrom);
   to = Math.min(to, reachTo);
@@ -1391,6 +1501,7 @@ const segmentClearanceCost = (
           allowance,
           exclude,
           crossingOnly,
+          parts,
         )
       : clearanceCost(
           across,
@@ -1400,6 +1511,7 @@ const segmentClearanceCost = (
           allowance,
           exclude,
           crossingOnly,
+          parts,
         );
 
   let cost = 0;
@@ -1460,6 +1572,7 @@ const cheapestPath = (
   weights: readonly number[],
   overlapping: boolean,
   strip: readonly number[],
+  parts: readonly ObstacleParts[],
   avoidSelfCrossing = false,
 ): GlobalPoint[] | null => {
   // (see minHairpin)
@@ -1609,6 +1722,7 @@ const cheapestPath = (
           (exemptStart && start.obstacle !== null ? 1 << start.obstacle : 0) |
             (exemptEnd && end.obstacle !== null ? 1 << end.obstacle : 0),
           nearEndpoint,
+          parts,
         );
       edgeCosts.set(key, cost);
     }

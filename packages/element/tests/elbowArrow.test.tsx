@@ -25,6 +25,7 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import { getBindingGap } from "../src/binding";
 import { Scene } from "../src/Scene";
+import { ELBOW_ARROW_CORNER_RADIUS } from "../src/shape";
 
 import type {
   ExcalidrawArrowElement,
@@ -1249,6 +1250,108 @@ describe("elbow arrow routing between overlapping elements", () => {
     expect(points![0][1] - points![1][1]).toBeGreaterThan(30);
     expect(points![2][0]).toBeGreaterThan(points![4][0]);
   });
+
+  it("loops through the room in the corner of the bounds around both, rather than around them", () => {
+    // diamonds diagonal from each other, their bounds overlapping, with the
+    // start on top of the lower one and the end on the right of the upper
+    // one, just above the start: only their bounds' corners overlap, so the
+    // room above the lower one and right of the upper one is clear of both
+    const upper = API.createElement({
+      type: "diamond",
+      x: 2123.26,
+      y: -856.89,
+      width: 226.95,
+      height: 248.6,
+    });
+    const lower = API.createElement({
+      type: "diamond",
+      x: 2235.93,
+      y: -711.21,
+      width: 226.95,
+      height: 248.6,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: lower.id,
+        fixedPoint: [0.5023, 0.0073],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: upper.id,
+        fixedPoint: [0.995, 0.5028],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+
+    // up a padding, right a padding past the end, down and left into it:
+    // a short loop, rather than one around the bounds of both
+    expect(points).toHaveLength(5);
+    expect(points![0][1] - points![1][1]).toBeCloseTo(40, 0);
+    expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
+  });
+
+  it("loops back a hairpin's width where the end is right by where the start's leg ends", () => {
+    // as above, but with the end's line about where the start's leg ends:
+    // turning back onto it would fold the route back onto itself
+    const upper = API.createElement({
+      type: "diamond",
+      x: 2123.59,
+      y: -863.11,
+      width: 226.95,
+      height: 248.6,
+    });
+    const lower = API.createElement({
+      type: "diamond",
+      x: 2226.3,
+      y: -698.96,
+      width: 226.95,
+      height: 248.6,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 0,
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+      startBinding: {
+        elementId: lower.id,
+        fixedPoint: [0.5023, 0.0073],
+        mode: "orbit",
+      },
+      endBinding: {
+        elementId: upper.id,
+        fixedPoint: [0.995, 0.5028],
+        mode: "orbit",
+      },
+      endArrowhead: "arrow",
+    }) as unknown as ExcalidrawElbowArrowElement;
+
+    const { points } = updateElbowArrowRoute(
+      arrow,
+      arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+    );
+
+    // up past where the end is by a hairpin's width, right a padding past
+    // the end, and down and left into it: a short loop, rather than one
+    // around the bounds of both
+    expect(points).toHaveLength(5);
+    expect(points![3][1] - points![2][1]).toBeCloseTo(
+      ELBOW_ARROW_CORNER_RADIUS,
+      0,
+    );
+    expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
+  });
 });
 
 describe("elbow arrow clearance", () => {
@@ -1362,7 +1465,7 @@ describe("elbow arrow legs next to another element", () => {
     ).toBeGreaterThanOrEqual(39.5);
   });
 
-  it("goes around them both, as one, when they overlap", () => {
+  it("goes around the bounds of both, but through the room in their corner, when they overlap", () => {
     // partly overlapping elements, with the start on the right of the upper
     // one just above the lower one, and the end on the left of the lower one
     // just below the upper one
@@ -1405,23 +1508,25 @@ describe("elbow arrow legs next to another element", () => {
     );
 
     // right past the lower one by a padding, down below it by a padding,
-    // left past the upper one by a padding, and right into the end: around
-    // the bounds of both, rather than back between the endpoints through
-    // both of them
+    // left to where the end's leg starts, up through the room in the corner
+    // of the bounds around both (below the upper one, left of the lower
+    // one, around neither), and right into the end: around the bounds of
+    // both, rather than back between the endpoints through both of them,
+    // and not around the upper one too, as nothing's in the way
     const gap = getBindingGap(upper);
     const global = points!.map(
       ([px, py]) => [px + x!, py + y!] as [number, number],
     );
     const [start, end] = [global[0], global[global.length - 1]];
     const right = lower.x + lower.width + gap + 40;
-    const left = upper.x - gap - 40;
+    const leg = end[0] - 40;
     const bottom = lower.y + lower.height + gap + 40;
     expect(global).toCloselyEqualPoints([
       start,
       [right, start[1]],
       [right, bottom],
-      [left, bottom],
-      [left, end[1]],
+      [leg, bottom],
+      [leg, end[1]],
       end,
     ]);
   });
