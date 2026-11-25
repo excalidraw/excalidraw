@@ -496,22 +496,24 @@ const routeAcross = (input: RouteInput): Route => {
     const gap = b.t - a.b;
     const squeeze = input.sameElement ? 0 : ms + me + 2 * input.radius;
     // (halfway between the elements, clear of the start's leg, short of the
-    // end's, but past the start's element (only just: its binding gap is
-    // room enough) where the segment there runs back over it, as far as it
-    // does, at the expense of the end's leg, as far as it has to)
-    let y = clampClear(
+    // end's)
+    const hi = Math.max(0, endExit - me);
+    let y = clamp(
       mid(outlineEdge(a, false, ex, x1), outlineEdge(b, true, ex, x1)),
-      0,
-      Math.max(0, endExit - me),
-      input.radius,
+      Math.min(input.radius, hi / 2),
+      hi,
     );
+    // (but where the segment there runs back under the start's element, as
+    // far as it does, no closer to it than to the end, where there isn't
+    // room for the end's leg as well, at the expense of the end's leg: so it
+    // stays between them, rather than running along the element)
     const reach = a.solid
       ? Math.min(x1, a.r - a.gap) - Math.max(ex, a.l + a.gap)
       : 0;
     y += Math.max(
       0,
       Math.min(
-        a.b - a.gap - y,
+        mid(outlineEdge(a, false, ex, x1) - a.gap, endExit) - y,
         DODGE_RATE * reach,
         endExit - input.radius / 2 - y,
       ),

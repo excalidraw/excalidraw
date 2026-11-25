@@ -2427,3 +2427,78 @@ describe("elbow arrow legs as the elements get closer", () => {
     },
   );
 });
+
+describe("elbow arrow routing back under the start's element", () => {
+  it("turns between the elements as long as there's room, rather than along the start's element", () => {
+    // from the right of one element to the top of another just below it,
+    // the end behind the start: the route turns back between them
+    const start = API.createElement({
+      type: "rectangle",
+      x: 2226.84,
+      y: 371.39,
+      width: 224.54,
+      height: 112,
+    });
+    const startBottom = start.y + start.height;
+    const routeWithEndAt = (y: number) => {
+      const end = API.createElement({
+        type: "rectangle",
+        x: 2234.41,
+        y,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: start.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: end.id,
+          fixedPoint: [0.5001, -0.0536],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+      const update = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([start, end]) as NonDeletedSceneElementsMap,
+      );
+      return update.points!.map(
+        ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+      );
+    };
+
+    // dragged up, in 1px steps, from 150px below the start's element until
+    // it's 25px below it (closer, the end's leg keeps the length to turn)
+    const routes = Array.from({ length: 126 }, (_, step) =>
+      routeWithEndAt(startBottom + 150 - step),
+    );
+    routes.forEach((points, step) => {
+      expect(points).toHaveLength(5);
+      const [, , [, turn], , [, endY]] = points;
+      // under the start's element, at least as far from it as from the end,
+      // where there isn't room for both the end's leg and the padding
+      expect(turn - startBottom).toBeGreaterThanOrEqual(endY - turn - 0.01);
+      expect(endY - turn).toBeGreaterThan(0);
+      if (step > 0) {
+        points.forEach(([px, py], i) => {
+          const [qx, qy] = routes[step - 1][i];
+          expect(Math.abs(px - qx) + Math.abs(py - qy)).toBeLessThanOrEqual(
+            2.5,
+          );
+        });
+      }
+    });
+    // (halfway between their outlines, where the gap between them is as in
+    // the scene this was reported in)
+    const [, , [, turn]] = routeWithEndAt(startBottom + 45.67);
+    expect(turn).toBeCloseTo(startBottom + 20, 0);
+  });
+});
