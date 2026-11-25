@@ -1301,6 +1301,58 @@ describe("elbow arrow routing between overlapping elements", () => {
     expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
   });
 
+  it.each([2160, 2180, 2189.7, 2200, 2220, 2240])(
+    "loops on out of the other one's bounds, rather than around them, the start deep in them (the lower one at x=%d)",
+    (lowerX) => {
+      // as above, the start on top of the lower one inside the upper one's
+      // bounds, the deeper the further left: the route has to get out of
+      // them anyway, and gets out the nearer way, rather than through them
+      // the whole way up on its first leg
+      const upper = API.createElement({
+        type: "diamond",
+        x: 2123.59,
+        y: -863.11,
+        width: 226.95,
+        height: 248.6,
+      });
+      const lower = API.createElement({
+        type: "diamond",
+        x: lowerX,
+        y: -720.93,
+        width: 226.95,
+        height: 248.6,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: lower.id,
+          fixedPoint: [0.5023, 0.0073],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: upper.id,
+          fixedPoint: [0.995, 0.5028],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+
+      const { points } = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
+      );
+
+      // up a padding, right a padding past the end, down and left into it
+      expect(points).toHaveLength(5);
+      expect(points![0][1] - points![1][1]).toBeCloseTo(40, 0);
+      expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
+    },
+  );
+
   it("loops back a hairpin's width where the end is right by where the start's leg ends", () => {
     // as above, but with the end's line about where the start's leg ends:
     // turning back onto it would fold the route back onto itself

@@ -840,7 +840,8 @@ const findRoute = (
   // grid and legs are the union's, though: inside it, the route runs as
   // close to and through the elements' own bounds as it does, so through the
   // room in the corners of the union, around neither element, as freely as
-  // it would anywhere else, see clearanceCost.)
+  // it would anywhere else, and its legs only through the other element as
+  // deep as their endpoints are in it, see clearanceCost.)
   if (
     start.obstacle !== null &&
     end.obstacle !== null &&
@@ -1022,10 +1023,18 @@ const findRoute = (
 
 /**
  * The elements' own bounds within an obstacle that's the bounds around them
- * (where their bounds overlap, see {@link findRoute}), or null for one
- * that's a single element's
+ * (where their bounds overlap, see {@link findRoute}), the start's first, or
+ * null for an obstacle that's a single element's
  */
 type ObstacleParts = readonly Bounds[] | null;
+
+/**
+ * Per element of an obstacle that's the bounds around elements (the
+ * start's first), how deep into it a segment runs free, and which of them (a
+ * bitmask) it doesn't count, as a leg doesn't its own (see
+ * {@link cheapestPath})
+ */
+type PartAllowance = { allowance: readonly number[]; exclude: number };
 
 type LineKind = keyof typeof LINE_COSTS;
 type Line = {
@@ -1269,6 +1278,7 @@ const clearanceCost = (
   exclude: number,
   crossingOnly: boolean,
   parts: readonly ObstacleParts[],
+  partAllowance: PartAllowance,
 ) => {
   // (this runs a lot, so it doesn't allocate)
   const count = obstacles.length;
@@ -1285,9 +1295,8 @@ const clearanceCost = (
   let cost = 0;
   for (let i = 0; i < count; i++) {
     const distance = scratch.distance[i];
-    if (exclude & (1 << i) || distance >= BASE_PADDING) {
-      continue;
-    }
+    // (inside one that's the bounds around elements, its elements count,
+    // even on a leg, which only doesn't count its own)
     if (distance < 0 && parts[i]) {
       cost +=
         weights[i] *
@@ -1296,9 +1305,12 @@ const clearanceCost = (
           y,
           parts[i]!,
           -distance,
-          allowance[i],
+          partAllowance,
           crossingOnly,
         );
+      continue;
+    }
+    if (exclude & (1 << i) || distance >= BASE_PADDING) {
       continue;
     }
     if (distance < 0) {
@@ -1372,36 +1384,52 @@ const clearanceCost = (
  * have it for one of them), so the room in the obstacle's corners, around
  * neither of them, is as free as any other. (Counting it as no further from
  * them than from the obstacle's edge, though, so the cost is continuous
- * across it, and only falls off a padding inside it.)
+ * across it, and only falls off a padding inside it.) Each element is free
+ * as deep as the endpoint not bound to it is in it, on the way there.
  */
 const partsClearanceCost = (
   x: number,
   y: number,
-  parts: readonly Bounds[],
+  bounds: NonNullable<ObstacleParts>,
   depth: number,
-  allowance: number,
+  { allowance, exclude }: PartAllowance,
   crossingOnly: boolean,
 ) => {
-  let distance = Infinity;
-  for (const part of parts) {
-    distance = Math.min(distance, signedDistance(x, y, part));
+  // (where they overlap, not free in either, unless on a leg: running
+  // through both isn't on the way into or out of either, see cheapestPath)
+  const inBoth =
+    !exclude && bounds.every((part) => signedDistance(x, y, part) < 0);
+  let cost = 0;
+  for (let k = 0; k < bounds.length; k++) {
+    if (exclude & (1 << k)) {
+      continue;
+    }
+    const distance = signedDistance(x, y, bounds[k]);
+    let partCost = 0;
+    if (distance < 0) {
+      // as close as it gets, and through it, past as deep as it runs free
+      // (and only past that, if it does at all, ramped in)
+      const free = inBoth ? 0 : allowance[k];
+      const through = Math.min(
+        Math.max(0, -distance - free) / CROSSING_RAMP,
+        1,
+      );
+      partCost =
+        (crossingOnly ? 0 : CLEARANCE_COST) * (free > 0 ? through : 1) +
+        CROSSING_COST * through;
+    } else if (!crossingOnly) {
+      const room = Math.min(distance, depth);
+      partCost =
+        room < BASE_PADDING
+          ? CLEARANCE_COST * closeness(1 - room / BASE_PADDING)
+          : 0;
+    }
+    // (the costlier of them: where their paddings overlap, the route is no
+    // worse for being by both)
+    cost = Math.max(cost, partCost);
   }
-  if (distance < 0) {
-    // through one of them, past the allowance
-    const through = -distance - allowance;
-    return (
-      (crossingOnly ? 0 : CLEARANCE_COST) +
-      (through > 0 ? CROSSING_COST * Math.min(through / CROSSING_RAMP, 1) : 0)
-    );
-  }
-  if (crossingOnly) {
-    return 0;
-  }
-  const room = Math.min(distance, depth);
 
-  return room < BASE_PADDING
-    ? CLEARANCE_COST * closeness(1 - room / BASE_PADDING)
-    : 0;
+  return cost;
 };
 
 /** Scratch space for {@link clearanceCost}, for up to two obstacles */
@@ -1427,6 +1455,7 @@ const segmentClearanceCost = (
   exclude: number,
   crossingOnly: boolean,
   parts: readonly ObstacleParts[],
+  partAllowance: PartAllowance,
 ) => {
   const horizontal = a[1] === b[1];
   const axis = horizontal ? 0 : 1;
@@ -1464,7 +1493,7 @@ const segmentClearanceCost = (
     // (and inside one that's the bounds around elements, where it's a
     // padding in from its edge, and around the elements, see
     // partsClearanceCost)
-    for (const part of parts[i] ?? []) {
+    (parts[i] ?? []).forEach((part, k) => {
       const partAcross = Math.max(
         part[1 - axis] - across,
         across - part[3 - axis],
@@ -1473,14 +1502,14 @@ const segmentClearanceCost = (
       for (const offset of [
         BASE_PADDING,
         0,
-        -allowance[i],
-        -allowance[i] - CROSSING_RAMP,
+        -partAllowance.allowance[k],
+        -partAllowance.allowance[k] - CROSSING_RAMP,
         partAcross,
         -partAcross,
       ]) {
         breakpoints.push(part[axis] - offset, part[axis + 2] + offset);
       }
-    }
+    });
   });
   from = Math.max(from, reachFrom);
   to = Math.min(to, reachTo);
@@ -1502,6 +1531,7 @@ const segmentClearanceCost = (
           exclude,
           crossingOnly,
           parts,
+          partAllowance,
         )
       : clearanceCost(
           across,
@@ -1512,6 +1542,7 @@ const segmentClearanceCost = (
           exclude,
           crossingOnly,
           parts,
+          partAllowance,
         );
 
   let cost = 0;
@@ -1674,6 +1705,48 @@ const cheapestPath = (
   const endAllowance = depthIn(end.point).map((depth, i) =>
     Math.max(depth, strip[i]),
   );
+  // (and in the elements of an obstacle that's the bounds around them,
+  // each as deep as the other endpoint is in it, as the route has to get
+  // there anyway: on the leg, where the endpoint is, and on the way out of
+  // the end's element from the start (away from its middle), or into the
+  // start's element to the end (towards its middle), see PartAllowance)
+  const startEndParts = parts.find((p) => p) ?? [];
+  const depthInPart = (point: GlobalPoint, bounds: Bounds | undefined) =>
+    bounds ? Math.max(0, -signedDistance(point[0], point[1], bounds)) : 0;
+  const partAllowance = startEndParts.length
+    ? [
+        depthInPart(end.point, startEndParts[0]),
+        depthInPart(start.point, startEndParts[1]),
+      ]
+    : [];
+  const partAllowanceFor = (
+    a: GlobalPoint,
+    b: GlobalPoint,
+    direction: number,
+    exemptStart: boolean,
+    exemptEnd: boolean,
+  ): PartAllowance => {
+    const axis = direction % 2 === 0 ? 1 : 0;
+    const forward = direction === 1 || direction === 2;
+    return {
+      allowance: partAllowance.map((depth, k) => {
+        const bounds = startEndParts[k];
+        const leg = k === 0 ? exemptEnd : exemptStart;
+        if (leg) {
+          return depth;
+        }
+        // (in the half of it it's heading out of, leaving the end's, or
+        // into, entering the start's)
+        const middle = (bounds[axis] + bounds[axis + 2]) / 2;
+        const farHalf = forward === (k === 1);
+        const onTheWay = farHalf
+          ? Math.min(a[axis], b[axis]) >= middle
+          : Math.max(a[axis], b[axis]) <= middle;
+        return onTheWay ? depth : 0;
+      }),
+      exclude: (exemptStart ? 1 : 0) | (exemptEnd ? 2 : 0),
+    };
+  };
   const edgeCosts = new Map<number, number>();
   const edgeCost = (from: number, to: number, direction: number) => {
     const a = pos(from);
@@ -1697,11 +1770,14 @@ const cheapestPath = (
       (exemptStart && withinPadding(start.point)) ||
       (exemptEnd && withinPadding(end.point));
     const vertical = direction % 2 === 0;
+    // (which way along it, too, where it runs in the elements of an obstacle
+    // that's the bounds around them, see partAllowanceFor)
     const key =
-      (Math.min(from, to) * 2 + (vertical ? 1 : 0)) * 8 +
+      (Math.min(from, to) * 2 + (vertical ? 1 : 0)) * 16 +
       (exemptStart ? 1 : 0) +
       (exemptEnd ? 2 : 0) +
-      (nearEndpoint ? 4 : 0);
+      (nearEndpoint ? 4 : 0) +
+      (startEndParts.length && to > from ? 8 : 0);
     let cost = edgeCosts.get(key);
     if (cost === undefined) {
       const length = manhattanDistance(a, b);
@@ -1723,6 +1799,7 @@ const cheapestPath = (
             (exemptEnd && end.obstacle !== null ? 1 << end.obstacle : 0),
           nearEndpoint,
           parts,
+          partAllowanceFor(a, b, direction, exemptStart, exemptEnd),
         );
       edgeCosts.set(key, cost);
     }
