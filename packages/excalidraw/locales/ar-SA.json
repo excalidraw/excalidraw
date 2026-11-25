@@ -592,6 +592,8 @@
     "selection": "العنصر المحدد",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "تضمين هذا الرابط غير مسموح حاليًا. افتح بلاغًا على GitHub لطلب إدراج عنوان URL في القائمة البيضاء",
     "unrecognizedLinkFormat": "الرابط الذي أدرجته لا يتطابق مع التنسيق المتوقع. الرجاء محاولة لصق النص 'المضمن' المُزوَد من موقع المصدر",
     "elementLinkCopied": "تم نسخ الرابط إلى الحافظة"
