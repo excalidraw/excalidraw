@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Yapıştır",
     "pasteAsPlaintext": "Düz metin olarak yapıştır",
     "pasteCharts": "Grafikleri yapıştır",
@@ -786,16 +788,5 @@
     "spacebar": "Boşluk",
     "delete": "Sil",
     "mmb": "Kaydırma tekerleği"
-  },
-  "promoBanner": {
-    "presentations": "Sunumlar",
-    "mcp": "YZ ile çiz",
-    "comments": "Yorum yap",
-    "teams": "Ekip çalışması",
-    "voiceChat": "Sesli sohbet",
-    "withExcalidrawPlus": "Excalidraw+ ile",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "insan ve YZ için"
   }
 }
