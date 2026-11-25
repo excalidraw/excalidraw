@@ -3,6 +3,8 @@
     "signUp": "Regisztráció",
     "signIn": "Bejelentkezés",
     "upgrade": "Frissítés",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
@@ -786,16 +788,5 @@
     "spacebar": "Szóköz",
     "delete": "Delete",
     "mmb": "Görgő"
-  },
-  "promoBanner": {
-    "presentations": "Prezentációk",
-    "mcp": "Rajzolj AI-jal",
-    "comments": "Megjegyzések",
-    "teams": "Csapatmunka",
-    "voiceChat": "Hangcsevegés",
-    "withExcalidrawPlus": "Excalidraw+-szal",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "embernek & AI-nak"
   }
 }
