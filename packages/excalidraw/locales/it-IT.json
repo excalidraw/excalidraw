@@ -592,6 +592,8 @@
     "selection": "selezione",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
     "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine",
     "elementLinkCopied": "Link copiato negli appunti"
