@@ -592,6 +592,8 @@
     "selection": "la selecció",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Actualment no es permet incrustar aquesta URL. Planteja un problema a GitHub per sol·licitar que l'URL estigui a la llista blanca",
     "unrecognizedLinkFormat": "L'enllaç que has incrustat no coincideix amb el format esperat. Si us plau, intenta enganxar l'enllaç 'embed' proporcionada pel lloc web d'origen",
     "elementLinkCopied": "Enllaç copiat al porta-retalls"
