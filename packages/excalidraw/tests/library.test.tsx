@@ -14,6 +14,7 @@ import type {
 import { parseLibraryJSON, parseLibraryJSONWithFolders } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
 import {
+  deleteLibraryFolder,
   distributeLibraryItemsOnSquareGrid,
   useHandleLibrary,
 } from "../data/library";
@@ -194,6 +195,67 @@ describe("library", () => {
     expect(parsed.libraryItems[1]).not.toHaveProperty("folderId");
   });
 
+  it("restores nested folder metadata and repairs invalid parent links", () => {
+    const parsed = parseLibraryJSONWithFolders(
+      JSON.stringify({
+        type: "excalidrawlib",
+        version: 2,
+        libraryItems: [],
+        libraryFolders: [
+          { id: "root", name: "Root" },
+          { id: "child", name: "Child", parentId: "root" },
+          { id: "orphan", name: "Orphan", parentId: "missing" },
+          { id: "cycle-a", name: "Cycle A", parentId: "cycle-b" },
+          { id: "cycle-b", name: "Cycle B", parentId: "cycle-a" },
+        ],
+      }),
+    );
+
+    expect(parsed.libraryFolders).toEqual([
+      { id: "root", name: "Root" },
+      { id: "child", name: "Child", parentId: "root" },
+      { id: "orphan", name: "Orphan" },
+      { id: "cycle-a", name: "Cycle A" },
+      { id: "cycle-b", name: "Cycle B" },
+    ]);
+  });
+
+  it("deletes a folder subtree while either unfiling or deleting its items", () => {
+    const folders = [
+      { id: "root", name: "Root" },
+      { id: "child", name: "Child", parentId: "root" },
+      { id: "grandchild", name: "Grandchild", parentId: "child" },
+      { id: "other", name: "Other" },
+    ];
+    const item = (id: string, folderId?: string): LibraryItem => ({
+      id,
+      status: "unpublished",
+      created: 1,
+      elements: [API.createElement({ id: `element-${id}`, type: "rectangle" })],
+      ...(folderId ? { folderId } : {}),
+    });
+    const items = [
+      item("root-item", "root"),
+      item("child-item", "child"),
+      item("grandchild-item", "grandchild"),
+      item("other-item", "other"),
+    ];
+
+    expect(deleteLibraryFolder(folders, items, "root", false)).toEqual({
+      libraryFolders: [{ id: "other", name: "Other" }],
+      libraryItems: [
+        item("root-item"),
+        item("child-item"),
+        item("grandchild-item"),
+        item("other-item", "other"),
+      ],
+    });
+    expect(deleteLibraryFolder(folders, items, "root", true)).toEqual({
+      libraryFolders: [{ id: "other", name: "Other" }],
+      libraryItems: [item("other-item", "other")],
+    });
+  });
+
   beforeEach(async () => {
     await render(<Excalidraw />);
     await act(() => {
@@ -304,6 +366,45 @@ describe("library menu", () => {
     expect(getByText("Sketches")).toBeTruthy();
   });
 
+  it("creates and navigates into a subfolder", async () => {
+    const { container, getByRole } = await render(<Excalidraw />);
+    await act(async () => {
+      await h.app.library.setLibraryFolders([
+        { id: "projects", name: "Projects" },
+      ]);
+    });
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    fireEvent.click(getByRole("button", { name: "Open Projects" }));
+
+    const folderInput = getByRole("textbox", { name: "New folder" });
+    fireEvent.change(folderInput, { target: { value: "Drafts" } });
+    fireEvent.keyDown(folderInput, { key: KEYS.ENTER });
+
+    expect(getByRole("button", { name: "Projects" })).toBeTruthy();
+    expect(getByRole("button", { name: "Drafts" })).toBeTruthy();
+  });
+
+  it("offers both delete choices and leaves the folder intact on cancel", async () => {
+    const { container, getByRole, getAllByRole } = await render(<Excalidraw />);
+    await act(async () => {
+      await h.app.library.setLibraryFolders([
+        { id: "projects", name: "Projects" },
+        { id: "drafts", name: "Drafts", parentId: "projects" },
+      ]);
+    });
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    fireEvent.click(getAllByRole("button", { name: "Delete" })[0]);
+
+    expect(
+      getByRole("button", { name: "Delete folders, keep items" }),
+    ).toBeTruthy();
+    expect(
+      getByRole("button", { name: "Delete folders and items" }),
+    ).toBeTruthy();
+    fireEvent.click(getByRole("button", { name: "Cancel" }));
+    expect(getByRole("button", { name: "Open Projects" })).toBeTruthy();
+  });
+
   it("passes folder changes to onLibraryChange", async () => {
     const onLibraryChange = vi.fn();
     await render(<Excalidraw onLibraryChange={onLibraryChange} />);
@@ -333,10 +434,10 @@ describe("library menu", () => {
       return <Excalidraw onExcalidrawAPI={setApi} />;
     };
 
-    const { container, getByText } = await render(<AdapterHarness />);
+    const { container, getByRole } = await render(<AdapterHarness />);
     await waitFor(() => expect(adapter.load).toHaveBeenCalled());
     fireEvent.click(container.querySelector(".sidebar-trigger")!);
-    expect(getByText("Loaded")).toBeTruthy();
+    expect(getByRole("button", { name: /Loaded/ })).toBeTruthy();
 
     const updatedFolders = [
       ...initialFolders,

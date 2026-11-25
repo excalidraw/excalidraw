@@ -32,7 +32,7 @@ import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
 
 import { loadLibraryFromBlobWithFolders } from "./blob";
-import { restoreLibraryItems } from "./restore";
+import { restoreLibraryFolders, restoreLibraryItems } from "./restore";
 
 import type App from "../components/App";
 
@@ -180,6 +180,61 @@ export const mergeLibraryItems = (
   }
 
   return [...newItems, ...localItems];
+};
+
+export const getLibraryFolderDescendantIds = (
+  libraryFolders: readonly LibraryFolder[],
+  folderId: LibraryFolder["id"],
+): Set<LibraryFolder["id"]> => {
+  const deletedFolderIds = new Set([folderId]);
+  let hasNewDescendants = true;
+  while (hasNewDescendants) {
+    hasNewDescendants = false;
+    for (const folder of libraryFolders) {
+      if (
+        folder.parentId &&
+        deletedFolderIds.has(folder.parentId) &&
+        !deletedFolderIds.has(folder.id)
+      ) {
+        deletedFolderIds.add(folder.id);
+        hasNewDescendants = true;
+      }
+    }
+  }
+
+  return deletedFolderIds;
+};
+
+export const deleteLibraryFolder = (
+  libraryFolders: readonly LibraryFolder[],
+  libraryItems: LibraryItems,
+  folderId: LibraryFolder["id"],
+  deleteItems: boolean,
+): { libraryFolders: LibraryFolder[]; libraryItems: LibraryItems } => {
+  const deletedFolderIds = getLibraryFolderDescendantIds(
+    libraryFolders,
+    folderId,
+  );
+
+  const nextLibraryItems: LibraryItem[] = [];
+  for (const item of libraryItems) {
+    if (item.folderId && deletedFolderIds.has(item.folderId)) {
+      if (deleteItems) {
+        continue;
+      }
+      const { folderId: _folderId, ...unfiledItem } = item;
+      nextLibraryItems.push(unfiledItem);
+      continue;
+    }
+    nextLibraryItems.push(item);
+  }
+
+  return {
+    libraryFolders: libraryFolders.filter(
+      (folder) => !deletedFolderIds.has(folder.id),
+    ),
+    libraryItems: nextLibraryItems,
+  };
 };
 
 /**
@@ -939,7 +994,9 @@ export const useHandleLibrary = (
                   libraryData.libraryItems || [],
                   "published",
                 );
-                setLibraryFolders(libraryData.libraryFolders || []);
+                setLibraryFolders(
+                  restoreLibraryFolders(libraryData.libraryFolders),
+                );
 
                 // we don't queue this operation because it's running inside
                 // a promise that's running inside Library update queue itself
@@ -974,7 +1031,7 @@ export const useHandleLibrary = (
       } else {
         initDataPromise.resolve(
           promiseTry(adapter.load, { source: "load" }).then((data) => {
-            setLibraryFolders(data?.libraryFolders || []);
+            setLibraryFolders(restoreLibraryFolders(data?.libraryFolders));
             return restoreLibraryItems(data?.libraryItems || [], "published");
           }),
         );

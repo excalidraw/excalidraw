@@ -434,6 +434,7 @@ export {
   restoreElement,
   restoreElements,
   restoreLibraryItems,
+  restoreLibraryFolders,
 } from "./data/restore";
 
 export { reconcileElements } from "./data/reconcile";

@@ -24,6 +24,7 @@ import { isValidExcalidrawData, isValidLibrary } from "./json";
 import {
   restoreAppState,
   restoreElements,
+  restoreLibraryFolders,
   restoreLibraryItems,
 } from "./restore";
 
@@ -237,14 +238,7 @@ export const parseLibraryJSONWithFolders = (
   if (!isValidLibrary(data)) {
     throw new Error("Invalid library");
   }
-  const libraryFolders = Array.isArray(data.libraryFolders)
-    ? data.libraryFolders.filter(
-        (folder) =>
-          folder &&
-          typeof folder.id === "string" &&
-          typeof folder.name === "string",
-      )
-    : [];
+  const libraryFolders = restoreLibraryFolders(data.libraryFolders);
   const folderIds = new Set(libraryFolders.map((folder) => folder.id));
   const libraryItems: LibraryItems = restoreLibraryItems(
     data.libraryItems || data.library,

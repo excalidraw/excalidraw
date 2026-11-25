@@ -26,6 +26,7 @@ import type {
 import { trackEvent } from "../analytics";
 import { useUIAppState } from "../context/ui-appState";
 import {
+  deleteLibraryFolder,
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
@@ -176,25 +177,17 @@ const LibraryMenuContent = memo(
               );
             onSelectItems([]);
           }}
-          onDeleteFolder={(folderId) => {
-            const folder = libraryItemsData.libraryFolders.find(
-              (entry) => entry.id === folderId,
+          onDeleteFolder={(folderId, deleteContents) => {
+            const { libraryFolders, libraryItems } = deleteLibraryFolder(
+              libraryItemsData.libraryFolders,
+              libraryItemsData.libraryItems,
+              folderId,
+              deleteContents,
             );
-            if (!folder) {
-              return;
-            }
-            library.setLibraryFolders(
-              libraryItemsData.libraryFolders.filter(
-                (entry) => entry.id !== folderId,
-              ),
-            );
-            library.setLibrary((items) =>
-              items.map((item) => {
-                if (item.folderId !== folderId) {
-                  return item;
-                }
-                const { folderId: _folderId, ...rest } = item;
-                return rest;
+            void library.setLibraryFolders(libraryFolders);
+            library.setLibrary(libraryItems).catch(() =>
+              setAppState({
+                errorMessage: t("alerts.errorRemovingFromLibrary"),
               }),
             );
           }}

@@ -23,7 +23,10 @@ import { deburr } from "../deburr";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
-import { libraryItemsAtom } from "../data/library";
+import {
+  getLibraryFolderDescendantIds,
+  libraryItemsAtom,
+} from "../data/library";
 import { useAtom } from "../editor-jotai";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
@@ -39,6 +42,8 @@ import Stack from "./Stack";
 import "./LibraryMenuItems.scss";
 
 import { TextField } from "./TextField";
+import { Dialog } from "./Dialog";
+import DialogActionButton from "./DialogActionButton";
 
 import { useApp, useEditorInterface } from "./App";
 
@@ -48,6 +53,7 @@ import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
   ExcalidrawProps,
+  LibraryFolder,
   LibraryItem,
   LibraryItems,
   UIAppState,
@@ -85,12 +91,15 @@ export default function LibraryMenuItems({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
   onMoveSelectedItems: (folderId?: string) => void;
-  onDeleteFolder: (folderId: string) => void;
+  onDeleteFolder: (folderId: string, deleteContents: boolean) => void;
 }) {
   const [libraryState] = useAtom(libraryItemsAtom);
   const app = useApp();
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState("");
+  const [folderToDelete, setFolderToDelete] = useState<LibraryFolder | null>(
+    null,
+  );
   const editorInterface = useEditorInterface();
   const libraryContainerRef = useRef<HTMLDivElement>(null);
   const scrollPosition = useScrollPosition<HTMLDivElement>(libraryContainerRef);
@@ -108,6 +117,38 @@ export default function LibraryMenuItems({
   >(null);
 
   const [searchInputValue, setSearchInputValue] = useState("");
+
+  const currentFolderId =
+    selectedFolderId && selectedFolderId !== "" ? selectedFolderId : undefined;
+  const visibleFolders =
+    selectedFolderId === ""
+      ? []
+      : libraryState.libraryFolders.filter(
+          (folder) => folder.parentId === currentFolderId,
+        );
+  const folderBreadcrumbs: LibraryFolder[] = [];
+  let breadcrumbFolder = libraryState.libraryFolders.find(
+    (folder) => folder.id === currentFolderId,
+  );
+  while (breadcrumbFolder) {
+    folderBreadcrumbs.unshift(breadcrumbFolder);
+    const parentId = breadcrumbFolder.parentId;
+    breadcrumbFolder = libraryState.libraryFolders.find(
+      (folder) => folder.id === parentId,
+    );
+  }
+  const folderToDeleteItemCount = useMemo(() => {
+    if (!folderToDelete) {
+      return 0;
+    }
+    const folderIds = getLibraryFolderDescendantIds(
+      libraryState.libraryFolders,
+      folderToDelete.id,
+    );
+    return libraryItems.filter(
+      (item) => item.folderId && folderIds.has(item.folderId),
+    ).length;
+  }, [folderToDelete, libraryItems, libraryState.libraryFolders]);
 
   const IS_LIBRARY_EMPTY = !libraryItems.length && !pendingElements.length;
 
@@ -440,19 +481,22 @@ export default function LibraryMenuItems({
           >
             {t("library.folders.unfiled")}
           </Button>
-          {libraryState.libraryFolders.map((folder) => (
+          {folderBreadcrumbs.map((folder) => (
+            <Button
+              key={`breadcrumb-${folder.id}`}
+              selected={folder.id === currentFolderId}
+              aria-current={
+                folder.id === currentFolderId ? "location" : undefined
+              }
+              onSelect={() => setSelectedFolderId(folder.id)}
+            >
+              {folder.name}
+            </Button>
+          ))}
+          {visibleFolders.map((folder) => (
             <span key={folder.id} className="library-menu-folder">
-              <Button
-                selected={selectedFolderId === folder.id}
-                onSelect={() => {
-                  if (selectedItems.length) {
-                    onMoveSelectedItems(folder.id);
-                  } else {
-                    setSelectedFolderId(folder.id);
-                  }
-                }}
-              >
-                {folder.name}
+              <Button onSelect={() => setSelectedFolderId(folder.id)}>
+                {t("library.folders.openFolder", { folderName: folder.name })}
               </Button>
               <Button
                 onSelect={() => {
@@ -472,14 +516,18 @@ export default function LibraryMenuItems({
               </Button>
               <Button
                 onSelect={() => {
-                  onDeleteFolder(folder.id);
-                  setSelectedFolderId(null);
+                  setFolderToDelete(folder);
                 }}
               >
                 {t("library.folders.delete")}
               </Button>
             </span>
           ))}
+          {selectedItems.length > 0 && currentFolderId && (
+            <Button onSelect={() => onMoveSelectedItems(currentFolderId)}>
+              {t("library.folders.moveSelectedHere")}
+            </Button>
+          )}
           {selectedItems.length > 0 && (
             <Button onSelect={() => onMoveSelectedItems()}>
               {t("library.folders.moveToUnfiled")}
@@ -493,9 +541,12 @@ export default function LibraryMenuItems({
             onKeyDown={(event) => {
               if (event.key === KEYS.ENTER && newFolderName.trim()) {
                 const folder = { id: randomId(), name: newFolderName.trim() };
+                const currentParent = currentFolderId
+                  ? { parentId: currentFolderId }
+                  : {};
                 void app.library.setLibraryFolders([
                   ...libraryState.libraryFolders,
-                  folder,
+                  { ...folder, ...currentParent },
                 ]);
                 setSelectedFolderId(folder.id);
                 setNewFolderName("");
@@ -565,6 +616,43 @@ export default function LibraryMenuItems({
           />
         )}
       </Stack.Col>
+      {folderToDelete && (
+        <Dialog
+          onCloseRequest={() => setFolderToDelete(null)}
+          size="small"
+          title={t("library.folders.deleteDialogTitle")}
+        >
+          <p>
+            {t("library.folders.deleteDialogDescription", {
+              folderName: folderToDelete.name,
+              count: folderToDeleteItemCount,
+            })}
+          </p>
+          <div className="library-folder-delete-dialog__buttons">
+            <DialogActionButton
+              label={t("library.folders.deleteFolderOnly")}
+              onClick={() => {
+                onDeleteFolder(folderToDelete.id, false);
+                setFolderToDelete(null);
+                setSelectedFolderId(null);
+              }}
+            />
+            <DialogActionButton
+              label={t("library.folders.deleteFolderAndContents")}
+              actionType="danger"
+              onClick={() => {
+                onDeleteFolder(folderToDelete.id, true);
+                setFolderToDelete(null);
+                setSelectedFolderId(null);
+              }}
+            />
+            <DialogActionButton
+              label={t("buttons.cancel")}
+              onClick={() => setFolderToDelete(null)}
+            />
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -224,10 +224,16 @@
       "allItems": "All items",
       "unfiled": "Unfiled",
       "moveToUnfiled": "Move to unfiled",
+      "moveSelectedHere": "Move selected here",
       "newFolder": "New folder",
+      "openFolder": "Open {{folderName}}",
       "rename": "Rename",
       "delete": "Delete",
       "renamePrompt": "Rename folder",
+      "deleteDialogTitle": "Delete folder?",
+      "deleteDialogDescription": "{{folderName}} contains {{count}} items in this folder and its subfolders. Choose how to delete it.",
+      "deleteFolderOnly": "Delete folders, keep items",
+      "deleteFolderAndContents": "Delete folders and items",
       "exportPrompt": "Include folder organization in the exported library? Select Cancel to export items without folders."
     },
     "search": {
