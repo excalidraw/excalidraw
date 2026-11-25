@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
@@ -786,16 +788,5 @@
     "spacebar": "רווח",
     "delete": "מחיקה",
     "mmb": "גלגלת העכבר"
-  },
-  "promoBanner": {
-    "presentations": "מצגות",
-    "mcp": "ציור בעזרת AI",
-    "comments": "הוספת הערות",
-    "teams": "עבודת צוות",
-    "voiceChat": "שיחה קולית",
-    "withExcalidrawPlus": "ב־Excalidraw+‎",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "לבני אדם ול־AI"
   }
 }
