@@ -592,6 +592,8 @@
     "selection": "selección",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Incorporar esta url no está permitido actualmente. Señale esta incidencia en nuestro GitHub para solicitar que esta url esté entre las permitidas",
     "unrecognizedLinkFormat": "El enlace que incrustó no coincide con el formato esperado. Por favor intente pegar la cadena 'embed' proporcionada por el sitio de origen",
     "elementLinkCopied": "Enlace copiado al portapapeles"
