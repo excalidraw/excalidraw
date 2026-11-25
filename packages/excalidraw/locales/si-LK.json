@@ -592,6 +592,8 @@
     "selection": "තේරීම ටෝස්ට්",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "බිහිදැමීමට නොහැක",
     "unrecognizedLinkFormat": "නොහඳුනන සබැඳි ආකෘතිය",
     "elementLinkCopied": ""
