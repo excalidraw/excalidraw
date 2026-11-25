@@ -2,7 +2,6 @@ import { flushSync } from "react-dom";
 
 import {
   DEFAULT_VERTICAL_ALIGN,
-  EDITOR_LS_KEYS,
   getFontString,
   getLineHeight,
   isWritableElement,
@@ -41,7 +40,6 @@ import { actionCopy, actionCut } from "../actions";
 import { tryParseSpreadsheet } from "../charts";
 import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import { ImageURLToFile, SVGStringToFile } from "../data/blob";
-import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { t } from "../i18n";
 import {
   isMaybeMermaidDefinition,
@@ -480,14 +478,10 @@ export class AppClipboard {
     const originalText = normalizeText(text).trim();
     // a phone shows no toast, to have a text the other way from
     const isPhone = this.app.editorInterface.formFactor === "phone";
-    // as last chosen from the toast after a paste, kept in the browser
+    // as last chosen from the toast after a paste (kept by the host, with
+    // the app state it stores)
     const asLines =
-      !isPlainPaste &&
-      !isPhone &&
-      EditorLocalStorage.get<boolean>(
-        EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES,
-        this.app.ownerWindow,
-      ) === true;
+      !isPlainPaste && !isPhone && this.app.state.splitPastedTextEnabled;
     /** the text as one element, as laid out last: what its lines are of */
     let singleTextElement: ExcalidrawTextElement | null = null;
     // one element, centered at the pointer — or, as chosen from the toast
@@ -655,10 +649,7 @@ export class AppClipboard {
         t("toast.pastedAsTextElements"),
         t("toast.pasteAsSingleText"),
         () => {
-          EditorLocalStorage.delete(
-            EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES,
-            this.app.ownerWindow,
-          );
+          this.app.setState({ splitPastedTextEnabled: false });
           this.replaceTextLines(lineIds, single);
         },
       );
@@ -668,11 +659,7 @@ export class AppClipboard {
         t("toast.pastedAsSingleText"),
         t("toast.splitIntoTextElements"),
         () => {
-          EditorLocalStorage.set(
-            EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES,
-            true,
-            this.app.ownerWindow,
-          );
+          this.app.setState({ splitPastedTextEnabled: true });
           this.splitTextIntoLines(id);
         },
       );

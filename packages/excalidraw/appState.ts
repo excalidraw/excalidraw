@@ -84,6 +84,7 @@ export const getDefaultAppState = (): Omit<
     bindingPreference: "enabled",
     isMidpointSnappingEnabled: true,
     showHints: true,
+    splitPastedTextEnabled: false,
     inputDevice: "auto",
     defaultSidebarDockedPreference: false,
     isLoading: false,
@@ -234,6 +235,7 @@ const APP_STATE_STORAGE_CONF = (<
   bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
   showHints: { browser: true, export: false, server: false },
+  splitPastedTextEnabled: { browser: true, export: false, server: false },
   inputDevice: { browser: true, export: false, server: false },
   defaultSidebarDockedPreference: {
     browser: true,
