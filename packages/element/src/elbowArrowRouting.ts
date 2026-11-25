@@ -462,7 +462,9 @@ export const getElbowArrowRoute = (
 /**
  * The route's corner points, without any repeated (or closer than a tiny
  * fraction of a px, from rounding), or between segments running on along
- * the same line the same way
+ * the same line the same way, and without any step too short to see
+ * (between endpoints nearly, but not exactly, in line): only where the route
+ * carries on the same way after it, so it's never left doubling back
  */
 const tidyRoute = (points: GlobalPoint[]): GlobalPoint[] => {
   const same = (a: number, b: number) => Math.abs(a - b) < 1e-6;
@@ -487,5 +489,17 @@ const tidyRoute = (points: GlobalPoint[]): GlobalPoint[] => {
       }
     }
   }
-  return tidy;
+
+  const isStep = (i: number) =>
+    i >= 1 &&
+    i + 2 < tidy.length &&
+    Math.abs(tidy[i][0] - tidy[i + 1][0]) +
+      Math.abs(tidy[i][1] - tidy[i + 1][1]) <
+      DEDUP_THRESHOLD &&
+    Math.sign(tidy[i][0] - tidy[i - 1][0]) ===
+      Math.sign(tidy[i + 2][0] - tidy[i + 1][0]) &&
+    Math.sign(tidy[i][1] - tidy[i - 1][1]) ===
+      Math.sign(tidy[i + 2][1] - tidy[i + 1][1]);
+
+  return tidy.filter((_, i) => !isStep(i) && !isStep(i - 1));
 };

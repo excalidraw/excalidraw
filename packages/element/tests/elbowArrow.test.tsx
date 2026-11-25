@@ -361,14 +361,14 @@ describe("elbow arrow ui", () => {
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
 
-    // turning halfway between the elements' bounds (the rotated one's
-    // bounding box)
+    // turning halfway between the elements (the rotated one's outline,
+    // rather than its bounding box)
     expect(arrow.points).toCloselyEqualPoints(
       [
         [0, 0],
-        [40, 0],
-        [40, 164],
-        [101, 164],
+        [50.5, 0],
+        [50.5, 164],
+        [101.1, 164],
       ],
       0,
     );
@@ -595,7 +595,8 @@ describe("elbow arrow routes with one or two corners", () => {
     const connectEllipse = (strokeWidth: number) => {
       API.setAppState({ currentItemEndArrowhead: null });
       // the ellipse's top is 12px below the rectangle's side's middle, and
-      // the arrow enters its upper left, below its top
+      // the arrow enters its upper right, below its top, the first leg
+      // running over its top on the way there
       UI.createElement("rectangle", { x: 0, y: 100, width: 120, height: 55 });
       UI.createElement("ellipse", {
         x: 220,
@@ -609,7 +610,7 @@ describe("elbow arrow routes with one or two corners", () => {
       mouse.reset();
       mouse.moveTo(120, 127.5);
       mouse.click();
-      mouse.moveTo(260, 151.9);
+      mouse.moveTo(380, 151.9);
       mouse.click();
 
       return h.elements.find(
@@ -1123,15 +1124,16 @@ describe("elbow arrow routing between overlapping elements", () => {
       arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
     );
 
-    // up, turning back halfway between the endpoints, rather than a U turn
-    // squeezed in right next to the end
+    // up, turning back about halfway between the endpoints (halfway between
+    // the elements), rather than a U turn squeezed in right next to the end
     const start = points![0];
     const end = points![points!.length - 1];
-    const middle = (start[1] + end[1]) / 2;
+    const turn = points![1][1];
+    expect(turn).toBeCloseTo((start[1] + end[1]) / 2, -1);
     expect(points).toCloselyEqualPoints([
       start,
-      [start[0], middle],
-      [end[0] + 40, middle],
+      [start[0], turn],
+      [end[0] + 40, turn],
       [end[0] + 40, end[1]],
       end,
     ]);
@@ -1354,21 +1356,25 @@ describe("elbow arrow routing between overlapping elements", () => {
   );
 
   it("loops back a hairpin's width where the end is right by where the start's leg ends", () => {
-    // as above, but with the end's line about where the start's leg ends:
-    // turning back onto it would fold the route back onto itself
-    const upper = API.createElement({
-      type: "diamond",
-      x: 2123.59,
-      y: -863.11,
-      width: 226.95,
-      height: 248.6,
-    });
+    // the start on top of the lower one, just right of the upper one, which
+    // overlaps the lower one's top left, and the end on the right of the
+    // upper one, about where the start's leg ends: turning back onto the
+    // end's line would fold the route back onto itself (rectangles, as a
+    // diamond's corner by the end would reach across the start's line, and
+    // the route would turn back under it instead)
     const lower = API.createElement({
-      type: "diamond",
-      x: 2226.3,
-      y: -698.96,
-      width: 226.95,
-      height: 248.6,
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 224.54,
+      height: 112,
+    });
+    const upper = API.createElement({
+      type: "rectangle",
+      x: -115.25,
+      y: -99,
+      width: 224.54,
+      height: 112,
     });
     const arrow = API.createElement({
       type: "arrow",
@@ -1378,12 +1384,12 @@ describe("elbow arrow routing between overlapping elements", () => {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
       startBinding: {
         elementId: lower.id,
-        fixedPoint: [0.5023, 0.0073],
+        fixedPoint: [0.5001, -0.0267],
         mode: "orbit",
       },
       endBinding: {
         elementId: upper.id,
-        fixedPoint: [0.995, 0.5028],
+        fixedPoint: [1.0267, 0.5001],
         mode: "orbit",
       },
       endArrowhead: "arrow",
