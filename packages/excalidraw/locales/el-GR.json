@@ -592,6 +592,8 @@
     "selection": "επιλογή",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Η ενσωμάτωση αυτού του url δεν επιτρέπεται αυτήν τη στιγμή. Θέστε ένα πρόβλημα στο GitHub για να ζητήσετε το url να είναι στη λίστα των επιτρεπόμενων.",
     "unrecognizedLinkFormat": "Ο σύνδεσμος που ενσωματώσατε δεν ταιριάζει με την αναμενόμενη μορφή. Παρακαλώ προσπαθήστε να επικολλήσετε τη συμβολοσειρά 'embed' που παρέχεται από τον ιστότοπο προορισμού",
     "elementLinkCopied": ""
