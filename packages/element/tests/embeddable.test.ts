@@ -271,3 +271,25 @@ describe("Instagram embedding", () => {
     }
   });
 });
+
+describe("TradingView widget embedding", () => {
+  it.each([
+    "https://www.tradingview-widget.com/embed-widget/symbol-overview/?locale=en#%7B%22symbols%22%3A%5B%5B%22Apple%22%2C%22NASDAQ%3AAAPL%7C1D%22%5D%5D%7D",
+    "https://tradingview-widget.com/embed-widget/symbol-overview/?locale=en",
+    "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_123&symbol=NASDAQ%3AAAPL",
+  ])("should allow TradingView embed URL: %s", (url) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    const result = getEmbedLink(url);
+    expect(result).toMatchObject({
+      link: url,
+      type: "generic",
+      sandbox: { allowSameOrigin: true },
+    });
+  });
+
+  it("should reject unrelated tradingview.com URLs", () => {
+    expect(
+      embeddableURLValidator("https://www.tradingview.com/chart/", undefined),
+    ).toBe(false);
+  });
+});

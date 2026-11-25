@@ -154,6 +154,8 @@ const ALLOWED_DOMAINS = new Set([
   "reddit.com",
   "forms.microsoft.com",
   "instagram.com",
+  "tradingview-widget.com",
+  "s.tradingview.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -170,6 +172,8 @@ const ALLOW_SAME_ORIGIN = new Set([
   "reddit.com",
   "forms.microsoft.com",
   "instagram.com",
+  "tradingview-widget.com",
+  "s.tradingview.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
