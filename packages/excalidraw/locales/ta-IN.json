@@ -592,6 +592,8 @@
     "selection": "தெரிவு",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "இந்த Url-ஐ நுழைக்க தற்போது அனுமதி இல்லை. Url-ஐ வெள்ளிய பட்டியலில் சேர்க்க GitHub-ல் பிரச்சனை எழுப்பவும்",
     "unrecognizedLinkFormat": "நீங்கள் நுழைத்த இணைப்பு எதிர்பார்க்கப்படும் வடிவத்துடன் பொருந்தவில்லை. மூலத்தளத்தால் வழங்கப்பட்ட 'embed' ஸ்டிரிங்கை ஒட்ட முயற்சிக்கவும்",
     "elementLinkCopied": "இணைப்பு கிளிப்போர்டிற்கு நகலெடுக்கப்பட்டது"
