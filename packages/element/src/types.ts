@@ -388,10 +388,25 @@ export type FixedSegment = {
   index: Index;
 };
 
+/** Which way the packets of an animated ("flow") arrow travel. */
+export type ArrowFlowDirection = "forward" | "backward" | "both";
+export type ArrowFlowSpeed = "slow" | "normal" | "fast";
+/**
+ * An arrow with a flow shows small packets moving along it, to show data or
+ * traffic in motion (network, architecture and process diagrams). Only shown
+ * in the editor; exports draw the arrow as usual.
+ */
+export type ArrowFlow = Readonly<{
+  direction: ArrowFlowDirection;
+  speed: ArrowFlowSpeed;
+}>;
+
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
+    /** packets moving along the arrow; absent or null for a still arrow */
+    flow?: ArrowFlow | null;
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<

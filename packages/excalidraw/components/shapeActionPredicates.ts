@@ -5,6 +5,7 @@ import {
   suppportsHorizontalAlign,
   getColorTargetElement,
   hasBoundTextElement,
+  isArrowElement,
   isElbowArrow,
   isImageElement,
   isLinearElement,
@@ -146,6 +147,8 @@ export const getShapeActionPredicates = (
     roundness: forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),
+    // a flow is set on arrows already drawn, so only for a selection
+    arrowFlow: targetElements.some(isArrowElement),
 
     // text
     text: activeToolType === "text" || targetElements.some(isTextElement),

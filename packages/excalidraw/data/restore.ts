@@ -39,6 +39,7 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
   normalizeArrowhead,
+  normalizeArrowFlow,
   isPointInElement,
   isValidPolygon,
   projectFixedPointOntoDiagonal,
@@ -709,6 +710,10 @@ export const restoreElement = (
         x: x ?? 0,
         y: y ?? 0,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
+        // only arrows that had a flow carry the key, so plain arrows stay as they were
+        ...("flow" in element
+          ? { flow: normalizeArrowFlow(element.flow) }
+          : {}),
         ...getSizeFromPoints(points),
       };
 
