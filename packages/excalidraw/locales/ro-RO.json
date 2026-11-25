@@ -3,6 +3,8 @@
     "signUp": "Înscrie-te",
     "signIn": "Conectează-te",
     "upgrade": "Treci la un plan superior",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Lipire",
     "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
@@ -786,16 +788,5 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Rotiță maus"
-  },
-  "promoBanner": {
-    "presentations": "Prezentări",
-    "mcp": "Desen cu IA",
-    "comments": "Scrie comentarii",
-    "teams": "Lucru în echipă",
-    "voiceChat": "Apeluri vocale",
-    "withExcalidrawPlus": "cu Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pentru tine și IA"
   }
 }
