@@ -4,11 +4,13 @@ import { vi } from "vitest";
 import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
 
 import {
+  getCommonBounds,
   getLineHeightInPx,
   setCustomTextMetricsProvider,
 } from "@excalidraw/element";
 
 import {
+  EDITOR_LS_KEYS,
   KEYS,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
@@ -138,6 +140,20 @@ describe("general paste behavior", () => {
   });
 });
 
+/** the toast's button, once it's shown */
+const getToastAction = () =>
+  waitFor(() => {
+    const button = document.querySelector<HTMLButtonElement>(".Toast__action");
+    expect(button).not.toBe(null);
+    return button!;
+  });
+
+const clickToastAction = (button: HTMLButtonElement) => {
+  // as a click does
+  button.focus();
+  fireEvent.click(button);
+};
+
 /**
  * pastes a text with Ctrl/Cmd+V, and splits it from the toast (the pasted
  * text, then the lines it's split into, are what's selected)
@@ -147,16 +163,10 @@ const pasteAndSplit = async (
   beforeSplit?: (pasted: ExcalidrawTextElement) => void,
 ) => {
   pasteWithCtrlCmdV(text);
-  const button = await waitFor(() => {
-    const button = document.querySelector<HTMLButtonElement>(".Toast__action");
-    expect(button).not.toBe(null);
-    return button!;
-  });
+  const button = await getToastAction();
   const pasted = API.getSelectedElement() as ExcalidrawTextElement;
   beforeSplit?.(pasted);
-  // as a click does
-  button.focus();
-  fireEvent.click(button);
+  clickToastAction(button);
   return {
     pasted,
     texts: API.getSelectedElements() as ExcalidrawTextElement[],
@@ -217,9 +227,9 @@ describe("paste multiline text", () => {
     }
   });
 
-  it("should align the split lines as the text is", async () => {
-    for (const textAlign of ["left", "center", "right"] as const) {
-      API.updateScene({ elements: [] });
+  it.each(["left", "center", "right"] as const)(
+    "should align the split lines as the text is (%s)",
+    async (textAlign) => {
       API.setAppState({ currentItemTextAlign: textAlign });
       const { pasted, texts } = await pasteAndSplit("short\nmuch longer line");
       const [short, long] = texts;
@@ -235,8 +245,8 @@ describe("paste multiline text", () => {
           : text.x + text.width / 2;
       expect(getEdge(short)).toBeCloseTo(getEdge(pasted));
       expect(getEdge(long)).toBeCloseTo(getEdge(pasted));
-    }
-  });
+    },
+  );
 
   it("should stack split lines that wrap to different heights without overlap", async () => {
     API.setAppState({
@@ -354,6 +364,119 @@ describe("paste multiline text", () => {
       expect(h.elements.length).toBe(2);
     });
     expect(h.state.toast).toBe(null);
+  });
+
+  it("should tell the rows of a wrapped line with characters that wrapping composes", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+    // e + a combining accent: one character in the rows
+    const { texts } = await pasteAndSplit(
+      "Excalidraw is an opensource virtual cafe\u0301 whiteboard\nTAIL",
+    );
+    expect(texts.length).toBe(2);
+    expect(texts[0].autoResize).toBe(false);
+    expect(texts[1].text).toBe("TAIL");
+  });
+
+  it("should center the lines a text's pasted split into at the pointer, whatever blank lines it has", async () => {
+    localStorage.setItem(EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES, "true");
+    h.app.viewport.lastPosition.x = 300;
+    h.app.viewport.lastPosition.y = 300;
+    pasteWithCtrlCmdV(`first${"\n".repeat(50)}second`);
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+    });
+    const [x1, y1, x2, y2] = getCommonBounds(h.elements);
+    expect((x1 + x2) / 2).toBeCloseTo(300);
+    expect((y1 + y2) / 2).toBeCloseTo(300);
+  });
+
+  it("should never paste split into lines on a phone, which shows no toast to have it as one from", async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        UIOptions={{ getFormFactor: () => "phone" }}
+      />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+    localStorage.setItem(EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES, "true");
+    pasteWithCtrlCmdV("a\nb");
+    await waitFor(() => {
+      expect(h.elements.length).toBe(1);
+    });
+    expect(h.state.toast).toBe(null);
+  });
+
+  it("should paste split into lines once a text's been split (in this browser), and as one again once they've been joined", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+    const long =
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+    // spaces at a line's end, too: kept in a single text
+    const text = `short  \n\n${long}\nshort`;
+    const { pasted } = await pasteAndSplit(text);
+    expect(pasted.autoResize).toBe(false);
+
+    // kept in the browser: for an editor mounted after, too
+    unmountComponent();
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+
+    // not for a plain paste
+    pasteWithCtrlCmdShiftV(text);
+    await waitFor(() => {
+      expect(API.getSelectedElements()).toEqual([
+        expect.objectContaining({ originalText: pasted.originalText }),
+      ]);
+    });
+    expect(h.state.toast).toBe(null);
+
+    // split, offered as one
+    pasteWithCtrlCmdV(text);
+    const button = await getToastAction();
+    expect(button.textContent).toBe("Paste as a single text element");
+    const lines = API.getSelectedElements() as ExcalidrawTextElement[];
+    expect(lines.map((line) => line.originalText)).toEqual([
+      "short",
+      long,
+      "short",
+    ]);
+
+    // replaced with the text as it'd have been pasted as one (the blank
+    // line, the spaces, the rows), in their place
+    clickToastAction(button);
+    const [joined] = API.getSelectedElements() as ExcalidrawTextElement[];
+    expect(joined.originalText).toBe(text);
+    expect(joined.text).toBe(
+      ["short  ", "", lines[1].text, lines[2].text].join("\n"),
+    );
+    expect(joined.autoResize).toBe(false);
+    expect(joined.x).toBeCloseTo(lines[0].x);
+    expect(joined.y).toBeCloseTo(lines[0].y);
+    expect(document.activeElement).toBe(
+      document.querySelector(".excalidraw-container"),
+    );
+    // one step to undo
+    Keyboard.undo();
+    expect(API.getSelectedElements().map((element) => element.id)).toEqual(
+      lines.map((line) => line.id),
+    );
+
+    // pasted as one again
+    pasteWithCtrlCmdV(text);
+    expect((await getToastAction()).textContent).toBe(
+      "Split into separate text elements",
+    );
   });
 });
 

@@ -581,6 +581,8 @@ export const EDITOR_LS_KEYS = {
   PUBLISH_LIBRARY: "publish-library-data",
   // TEMPORARY (see MinimapAnnouncementDot)
   MINIMAP_ANNOUNCEMENT_DISMISSED: "excalidraw-minimap-announcement-dismissed",
+  /** multiline text is pasted split into lines (as chosen from its toast) */
+  PASTE_TEXT_AS_LINES: "excalidraw-paste-text-as-lines",
 } as const;
 
 /**

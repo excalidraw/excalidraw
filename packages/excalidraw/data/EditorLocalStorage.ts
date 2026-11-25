@@ -2,10 +2,17 @@ import type { EDITOR_LS_KEYS } from "@excalidraw/common";
 
 import type { JSONValue } from "../types";
 
+/**
+ * The browser's storage for what the editor keeps itself. An editor mounted
+ * in another window than the code runs in passes its own (`app.ownerWindow`).
+ */
 export class EditorLocalStorage {
-  static has(key: typeof EDITOR_LS_KEYS[keyof typeof EDITOR_LS_KEYS]) {
+  static has(
+    key: typeof EDITOR_LS_KEYS[keyof typeof EDITOR_LS_KEYS],
+    ownerWindow: Window = window,
+  ) {
     try {
-      return !!window.localStorage.getItem(key);
+      return !!ownerWindow.localStorage.getItem(key);
     } catch (error: any) {
       console.warn(`localStorage.getItem error: ${error.message}`);
       return false;
@@ -14,9 +21,10 @@ export class EditorLocalStorage {
 
   static get<T extends JSONValue>(
     key: typeof EDITOR_LS_KEYS[keyof typeof EDITOR_LS_KEYS],
+    ownerWindow: Window = window,
   ) {
     try {
-      const value = window.localStorage.getItem(key);
+      const value = ownerWindow.localStorage.getItem(key);
       if (value) {
         return JSON.parse(value) as T;
       }
@@ -30,9 +38,10 @@ export class EditorLocalStorage {
   static set = (
     key: typeof EDITOR_LS_KEYS[keyof typeof EDITOR_LS_KEYS],
     value: JSONValue,
+    ownerWindow: Window = window,
   ) => {
     try {
-      window.localStorage.setItem(key, JSON.stringify(value));
+      ownerWindow.localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error: any) {
       console.warn(`localStorage.setItem error: ${error.message}`);
@@ -42,9 +51,10 @@ export class EditorLocalStorage {
 
   static delete = (
     name: typeof EDITOR_LS_KEYS[keyof typeof EDITOR_LS_KEYS],
+    ownerWindow: Window = window,
   ) => {
     try {
-      window.localStorage.removeItem(name);
+      ownerWindow.localStorage.removeItem(name);
     } catch (error: any) {
       console.warn(`localStorage.removeItem error: ${error.message}`);
     }
