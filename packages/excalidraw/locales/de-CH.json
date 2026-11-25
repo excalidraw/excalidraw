@@ -3,6 +3,8 @@
     "signUp": "Registrieren",
     "signIn": "Login",
     "upgrade": "Upgrade",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Einfügen",
     "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
@@ -786,16 +788,5 @@
     "spacebar": "Leertaste",
     "delete": "Löschen",
     "mmb": "Mausrad"
-  },
-  "promoBanner": {
-    "presentations": "Präsentieren",
-    "mcp": "Zeichne mit KI",
-    "comments": "Kommentieren",
-    "teams": "Teamarbeit",
-    "voiceChat": "Sprachchat",
-    "withExcalidrawPlus": "mit Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "für Mensch & KI"
   }
 }
