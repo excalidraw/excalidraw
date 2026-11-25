@@ -3,6 +3,8 @@
     "signUp": "Регистрация",
     "signIn": "Вход",
     "upgrade": "Обновить",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
@@ -786,16 +788,5 @@
     "spacebar": "Пробел",
     "delete": "Delete",
     "mmb": "Колёсико мыши"
-  },
-  "promoBanner": {
-    "presentations": "Презентации",
-    "mcp": "Рисуйте с ИИ",
-    "comments": "Комментарии",
-    "teams": "Команды",
-    "voiceChat": "Аудиочат",
-    "withExcalidrawPlus": "в Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "для людей и ИИ"
   }
 }
