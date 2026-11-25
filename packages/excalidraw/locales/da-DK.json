@@ -592,6 +592,8 @@
     "selection": "markering",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Det er i øjeblikket ikke tilladt at indlejre denne URL. Opret et issue på GitHub for at få URL'en sat på tilladelseslisten",
     "unrecognizedLinkFormat": "Det link, du har indlejret, har ikke det forventede format. Prøv at indsætte den »embed«-streng, som kildewebstedet stiller til rådighed",
     "elementLinkCopied": "Linket er kopieret til udklipsholderen"
