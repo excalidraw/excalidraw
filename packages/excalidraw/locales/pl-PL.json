@@ -592,6 +592,8 @@
     "selection": "zaznaczenie",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Osadzenie tego linku jest obecnie niedozwolone. Zgłoś propozycję na portalu GitHub, aby dodać go do listy dozwolonych wyjątków",
     "unrecognizedLinkFormat": "Osadzony link ma niewłaściwy format. Spróbuj wkleić całą zawartość pola \"embed\" z oryginalnej strony.",
     "elementLinkCopied": "Łącze skopiowane do schowka"
