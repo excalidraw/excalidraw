@@ -592,6 +592,8 @@
     "selection": "선택한 요소",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "이 URL의 임베딩이 허용되지 않았습니다. GitHub에 이슈를 남겨서 이 URL이 화이트리스트에 등재될 수 있도록 요청하세요",
     "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 텍스트를 그대로 붙여 넣어 주세요",
     "elementLinkCopied": "링크를 클립보드에 복사했습니다"
