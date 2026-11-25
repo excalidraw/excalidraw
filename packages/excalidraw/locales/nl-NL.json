@@ -3,6 +3,8 @@
     "signUp": "Aanmelden",
     "signIn": "Inloggen",
     "upgrade": "Upgraden",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Grafieken plakken",
@@ -786,16 +788,5 @@
     "spacebar": "Spatie",
     "delete": "Delete",
     "mmb": "Muiswiel"
-  },
-  "promoBanner": {
-    "presentations": "Presentaties",
-    "mcp": "Teken met AI",
-    "comments": "Opmerkingen",
-    "teams": "Samenwerken",
-    "voiceChat": "Spraakchat",
-    "withExcalidrawPlus": "met Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "voor mens & AI"
   }
 }
