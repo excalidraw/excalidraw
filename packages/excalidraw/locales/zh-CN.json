@@ -3,6 +3,8 @@
     "signUp": "注册",
     "signIn": "登录",
     "upgrade": "升级",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "粘贴",
     "pasteAsPlaintext": "粘贴为纯文本",
     "pasteCharts": "粘贴图表",
@@ -786,16 +788,5 @@
     "spacebar": "空格",
     "delete": "Delete",
     "mmb": "鼠标滚轮"
-  },
-  "promoBanner": {
-    "presentations": "演示文稿",
-    "mcp": "用 AI 绘图",
-    "comments": "添加评论",
-    "teams": "团队协作",
-    "voiceChat": "语音聊天",
-    "withExcalidrawPlus": "使用 Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "为人类与 AI 打造"
   }
 }
