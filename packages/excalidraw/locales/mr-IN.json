@@ -592,6 +592,8 @@
     "selection": "निवड",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "युआरेल रूतवणे प्रतिबंधित आहेत. आपली युआरेल श्वेतसूचित आणण्या साठी कृपया एक मुद्दा ग़िटहब वर उठवा",
     "unrecognizedLinkFormat": "जी युआरेल तुम्हीं रतवली आहे, ती आपेक्षित प्रकारे नाही आहे. कृपया स्त्रोत साइट नी 'रूतवण्या साठी दिलेलि लिपि' चिपकावण्याचा प्रयास करा",
     "elementLinkCopied": "दुवा क्लिप बोर्ड वर कॉपी झाली"
