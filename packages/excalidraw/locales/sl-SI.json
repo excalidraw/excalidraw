@@ -3,6 +3,8 @@
     "signUp": "Registriraj se",
     "signIn": "Prijavi se",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
@@ -786,16 +788,5 @@
     "spacebar": "Presledek",
     "delete": "Izbriši",
     "mmb": "Kolesce za pomikanje"
-  },
-  "promoBanner": {
-    "presentations": "Predstavitve",
-    "mcp": "Rišite z UI",
-    "comments": "Komentarji",
-    "teams": "Timsko delo",
-    "voiceChat": "Glasovni klici",
-    "withExcalidrawPlus": "v Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "za ljudi in UI"
   }
 }
