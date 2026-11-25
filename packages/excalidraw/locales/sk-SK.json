@@ -592,6 +592,8 @@
     "selection": "výberu",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Zapustenie tejto URL nie je povolené. Vytvorte issue na GitHub-e a požiadajte povolenie tejto URL",
     "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou",
     "elementLinkCopied": "Odkaz bol skopírovaný do schránky"
