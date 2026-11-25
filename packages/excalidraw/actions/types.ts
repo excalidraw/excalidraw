@@ -129,6 +129,7 @@ export type ActionName =
   | "unlockAllElements"
   | "toggleElementLock"
   | "toggleLinearEditor"
+  | "reverseArrow"
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"

@@ -68,6 +68,7 @@ export {
 } from "./actionDistribute";
 
 export { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
+export { actionReverseArrow } from "./actionReverseArrow";
 
 export {
   actionCopy,
