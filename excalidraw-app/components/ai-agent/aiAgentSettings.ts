@@ -3,11 +3,11 @@ import type { AIAgentProvider, AIAgentSettings } from "./types";
 export const STORAGE_KEY_AI_SETTINGS = "excalidraw_byok_ai_settings";
 
 export const DEFAULT_AI_SETTINGS: AIAgentSettings = {
-  apiKey: "",
-  baseURL: "https://api.openai.com/v1",
-  model: "gpt-4o",
+  apiKey: "litellm-proxy",
+  baseURL: "/api/llm",
+  model: "gpt-6-luna",
   showCursor: true,
-  provider: "openai",
+  provider: "custom",
 };
 
 export interface ProviderPreset {
@@ -68,12 +68,13 @@ export const PROVIDER_PRESETS: Record<AIAgentProvider, ProviderPreset> = {
     notes: "Requires OLLAMA_ORIGINS='*' for browser CORS access",
   },
   custom: {
-    name: "Custom (OpenAI Compatible)",
+    name: "LiteLLM (Home Server)",
     provider: "custom",
-    baseURL: "https://api.openai.com/v1",
-    defaultModel: "gpt-4o",
-    popularModels: ["gpt-4o", "gpt-4o-mini"],
-    placeholderKey: "API Key",
+    baseURL: "/api/llm",
+    defaultModel: "gpt-6-luna",
+    popularModels: ["gpt-6-luna", "claude-sonnet-5.5", "mimo-v2.6-flash", "deepseek-chat", "kimi-k3"],
+    placeholderKey: "litellm-proxy (auto-authenticated)",
+    notes: "Pre-configured for Home Server LiteLLM via /api/llm proxy",
   },
 };
 
@@ -149,7 +150,7 @@ export const testLLMConnection = async (
         messages: [
           { role: "user", content: "Respond with the single word: OK" },
         ],
-        max_tokens: 10,
+        max_tokens: 64,
         temperature: 0,
       }),
     });
