@@ -4,8 +4,8 @@
  *
  * The route is worked out in the arrow's frame (see `elbowArrowFrame.ts`),
  * where it has one shape for each way the ends can face each other, with its
- * corners where they are by continuous functions of the elements' bounds and
- * the endpoints (see `elbowArrowTemplates.ts`). So it only changes
+ * corners where they are by continuous functions of the elements' outlines
+ * and the endpoints (see `elbowArrowTemplates.ts`). So it only changes
  * continuously as the elements move, except where it has to go another way
  * altogether, such as around the other side of the elements.
  *
@@ -44,16 +44,16 @@ import {
   HEADING_UP,
 } from "./heading";
 import { isBindableElement } from "./typeChecks";
-import { aabbForElement, getArrowheadSize } from "./bounds";
+import { aabbForElement, elementCenterPoint, getArrowheadSize } from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
 import { ELBOW_ARROW_CORNER_RADIUS } from "./shape";
 import {
-  boundsToFrame,
   frameFor,
   fromFrame,
   headingToFrame,
   toFrame,
 } from "./elbowArrowFrame";
+import { growOutline, shapeOutline } from "./elbowArrowOutline";
 import { PADDING, routeInFrame } from "./elbowArrowTemplates";
 
 import type { Box, RouteSignature } from "./elbowArrowTemplates";
@@ -346,42 +346,56 @@ export const routeElbowArrow = (
       : ELBOW_ARROW_CORNER_RADIUS / 2;
 
   const frame = frameFor(startGlobalPoint, startHeading, endHeading);
-  // the elements (with their binding gap) in the frame, or the endpoints
-  // themselves where they're not bound
+  // the elements' outlines (with their binding gap, and with the padding
+  // around that) in the frame, or the endpoints themselves where they're not
+  // bound
   const box = (
     element: ExcalidrawBindableElement | null,
     point: GlobalPoint,
   ): Box => {
     if (!element) {
-      const [x, y] = toFrame(frame, point);
+      const at = toFrame(frame, point);
       return {
-        l: x,
-        t: y,
-        r: x,
-        b: y,
+        l: at[0],
+        t: at[1],
+        r: at[0],
+        b: at[1],
         solid: false,
         gap: 0,
         shape: "rectangle",
+        outline: [at],
+        near: [at],
+        far: growOutline([at], PADDING),
       };
     }
     const gap = getBindingGap(element);
-    const [l, t, r, b] = boundsToFrame(
-      frame,
-      aabbForElement(element, elementsMap, [gap, gap, gap, gap]) as Bounds,
-    );
+    const shape =
+      element.type === "diamond" || element.type === "ellipse"
+        ? element.type
+        : "rectangle";
+    const [cx, cy] = elementCenterPoint(element, elementsMap);
+    const outline = shapeOutline(
+      shape,
+      cx,
+      cy,
+      Math.abs(element.width) / 2,
+      Math.abs(element.height) / 2,
+      element.angle,
+    ).map((point) => toFrame(frame, point));
+    const near = growOutline(outline, gap);
+    const xs = near.map(([x]) => x);
+    const ys = near.map(([, y]) => y);
     return {
-      l,
-      t,
-      r,
-      b,
+      l: Math.min(...xs),
+      t: Math.min(...ys),
+      r: Math.max(...xs),
+      b: Math.max(...ys),
       solid: true,
       gap,
-      // (by its bounds, if it's turned other than by quarter turns)
-      shape:
-        !element.angle &&
-        (element.type === "diamond" || element.type === "ellipse")
-          ? element.type
-          : "rectangle",
+      shape,
+      outline,
+      near,
+      far: growOutline(outline, gap + PADDING),
     };
   };
   const start = box(hoveredStartElement, startGlobalPoint);

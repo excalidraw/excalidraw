@@ -11,8 +11,6 @@
  * into the frame and back is exact.
  */
 
-import type { Bounds } from "@excalidraw/common";
-
 import type { Heading } from "./heading";
 
 export type Point = readonly [number, number];
@@ -76,15 +74,4 @@ export const fromFrame = (frame: Frame, point: Point): Point => {
 export const headingToFrame = (frame: Frame, heading: Heading): Point => {
   const v = turnVector(heading, frame.turns);
   return frame.mirrored ? [v[0], -v[1]] : v;
-};
-
-export const boundsToFrame = (frame: Frame, [l, t, r, b]: Bounds): Bounds => {
-  const [x1, y1] = toFrame(frame, [l, t]);
-  const [x2, y2] = toFrame(frame, [r, b]);
-  return [
-    Math.min(x1, x2),
-    Math.min(y1, y2),
-    Math.max(x1, x2),
-    Math.max(y1, y2),
-  ] as Bounds;
 };

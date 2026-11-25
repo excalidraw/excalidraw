@@ -5,7 +5,7 @@
  * way) or up (across), the route entering it against that.
  *
  * Each of the three has one route shape, with every corner where it is by
- * a continuous function of where the elements are (their bounds and the
+ * a continuous function of where the elements are (their outlines and the
  * endpoints): a shape with fewer corners is the same shape with some of its
  * segments down to nothing. So the route only ever changes continuously as
  * the elements move, except where it has to go another way altogether (see
@@ -14,13 +14,21 @@
  * Those are decided by comparing positions linearly, so dragging an element
  * along a line crosses each of them once at most, never back and forth.
  *
+ * The route keeps clear of the elements' actual outlines (see
+ * `elbowArrowOutline.ts`), rather than their bounds: each segment of them
+ * only as far as the outlines reach over the span the segment runs along, so
+ * a route runs as close by a diamond or an ellipse as by a rectangle.
+ *
  * Nothing is remembered between routes: the route is a function of the
  * elements and the endpoints alone.
  */
 
 import { clamp } from "@excalidraw/math";
 
+import { reach, runsThrough } from "./elbowArrowOutline";
+
 import type { Point } from "./elbowArrowFrame";
+import type { Side } from "./elbowArrowOutline";
 
 /** The clearance a route keeps around the elements it connects */
 export const PADDING = 40;
@@ -43,9 +51,9 @@ const DODGE_RATE = 3;
 const SQUEEZE_OVERLAP = PADDING / 2;
 
 /**
- * An endpoint's element's bounds (with the binding gap), or the endpoint
- * itself (`solid` false), where it's not bound, which the route doesn't
- * avoid
+ * An endpoint's element: its outline, and its bounds (with the binding gap),
+ * or the endpoint itself (`solid` false), where it's not bound, which the
+ * route doesn't avoid
  */
 export type Box = {
   l: number;
@@ -55,8 +63,14 @@ export type Box = {
   solid: boolean;
   /** how far out the bounds are from the element's (its binding gap) */
   gap: number;
-  /** the element's outline in the bounds */
+  /** what the element is, for whether there's room in its bounds' corners */
   shape: "rectangle" | "diamond" | "ellipse";
+  /** the element's outline (convex, see `elbowArrowOutline.ts`) */
+  outline: Point[];
+  /** the outline with the binding gap around it (bounded by `l`...`b`) */
+  near: Point[];
+  /** and with the padding around that */
+  far: Point[];
 };
 
 export type RouteInput = {
@@ -91,6 +105,18 @@ export type Route = { points: Point[]; signature: RouteSignature };
 const mid = (a: number, b: number) => (a + b) / 2;
 
 /**
+ * How far an element (with its binding gap) reaches toward `side` over the
+ * span from `from` to `to` across it, which a segment over that span keeps
+ * clear of
+ */
+const near = (box: Box, side: Side, from: number, to: number) =>
+  reach(box.near, side, from, to);
+
+/** And with the padding around it */
+const far = (box: Box, side: Side, from: number, to: number) =>
+  reach(box.far, side, from, to);
+
+/**
  * `v` between `lo` and `hi`, but kept a corner radius clear of either where
  * there's room (and halfway between them where there isn't), so a segment
  * there doesn't run on along the one before or after it
@@ -104,11 +130,11 @@ const clampClear = (v: number, lo: number, hi: number, radius: number) => {
 };
 
 /**
- * How long a leg is: the padding, but with the other element (its bounds)
- * ahead of it, closer than twice that, only half the room to it, so the
- * route turns halfway between them; plus how far it is to the side of the
- * leg's line, or how far behind the leg it starts, so the leg changes
- * continuously as the elements move. Never shorter than `minLeg`.
+ * How long a leg is: the padding, but with the other element ahead of it,
+ * closer than twice that, only half the room to it, so the route turns
+ * halfway between them; plus how far it is to the side of the leg's line, or
+ * how far behind the leg it starts, so the leg changes continuously as the
+ * elements move. Never shorter than `minLeg`.
  */
 const legLength = (
   point: Point,
@@ -122,20 +148,23 @@ const legLength = (
   }
   const axis = heading[0] !== 0 ? 0 : 1;
   const sign = heading[axis];
-  const ownLo = axis === 0 ? own.l : own.t;
-  const ownHi = axis === 0 ? own.r : own.b;
-  const otherLo = axis === 0 ? other.l : other.t;
-  const otherHi = axis === 0 ? other.r : other.b;
+  const [back, forward]: Side[] = axis === 0 ? ["l", "r"] : ["t", "b"];
+  const [acrossLo, acrossHi]: Side[] = axis === 0 ? ["t", "b"] : ["l", "r"];
+  const across = point[1 - axis];
+  // (where the leg leaves its element along its line, and where it would run
+  // into the other one, or how far the other one is to the side of it)
   const exit = own.solid
     ? sign > 0
-      ? Math.max(ownHi, point[axis])
-      : Math.min(ownLo, point[axis])
+      ? Math.max(near(own, forward, across, across), point[axis])
+      : Math.min(near(own, back, across, across), point[axis])
     : point[axis];
-  const ahead = ((sign > 0 ? otherLo : otherHi) - exit) * sign;
-  const across = point[1 - axis];
-  const acrossLo = axis === 0 ? other.t : other.l;
-  const acrossHi = axis === 0 ? other.b : other.r;
-  const beside = Math.max(acrossLo - across, across - acrossHi, 0);
+  const ahead =
+    (near(other, sign > 0 ? back : forward, across, across) - exit) * sign;
+  const beside = Math.max(
+    near(other, acrossLo, -Infinity, Infinity) - across,
+    across - near(other, acrossHi, -Infinity, Infinity),
+    0,
+  );
 
   return Math.max(
     minLeg,
@@ -151,18 +180,6 @@ const legLength = (
 const grow = (overshoot: number, leg: number, minLeg: number) =>
   clamp(2 * overshoot, 0, Math.max(0, leg - minLeg));
 
-/** The bounds around the solid ones of the boxes, or null if none is */
-const around = (boxes: Box[]) => {
-  const solid = boxes.filter((box) => box.solid);
-  if (!solid.length) {
-    return null;
-  }
-  return {
-    top: Math.min(...solid.map((box) => box.t)) - PADDING,
-    bottom: Math.max(...solid.map((box) => box.b)) + PADDING,
-  };
-};
-
 /**
  * Whether a detour between `y1` and `y2` goes over the top (to `top`) rather
  * than under the bottom (to `bottom`): the shorter way, the one it runs less
@@ -173,11 +190,11 @@ const overTheTop = (y1: number, y2: number, top: number, bottom: number) =>
 
 /**
  * How far a segment at `at` (across it), from `from` to `to` (along it),
- * has to move to clear `box` with the padding around it: negative to move up
- * (or left), positive down (or right), the shallower way (so it only flips
- * as the box's middle passes it), ramped in with how far its span reaches
- * into the element along it (rather than its binding gap), so it starts
- * dodging from nothing
+ * has to move to clear `box` with the padding around it, where its outline
+ * reaches over the segment's span: negative to move up (or left), positive
+ * down (or right), the shallower way (so it only flips as the box's middle
+ * passes it), ramped in with how far its span reaches into the element along
+ * it (rather than its binding gap), so it starts dodging from nothing
  */
 const dodge = (
   box: Box,
@@ -190,18 +207,18 @@ const dodge = (
     return 0;
   }
   const [lo, hi] = horizontal ? [box.l, box.r] : [box.t, box.b];
-  const [acrossLo, acrossHi] = horizontal ? [box.t, box.b] : [box.l, box.r];
-  const reach =
+  const [acrossLo, acrossHi]: Side[] = horizontal ? ["t", "b"] : ["l", "r"];
+  const reachAlong =
     Math.min(Math.max(from, to), hi - box.gap) -
     Math.max(Math.min(from, to), lo + box.gap);
-  const up = at - (acrossLo - PADDING);
-  const down = acrossHi + PADDING - at;
-  if (reach <= 0 || up <= 0 || down <= 0) {
+  const up = at - far(box, acrossLo, from, to);
+  const down = far(box, acrossHi, from, to) - at;
+  if (reachAlong <= 0 || up <= 0 || down <= 0) {
     return 0;
   }
   return up < down
-    ? -Math.min(up, DODGE_RATE * reach)
-    : Math.min(down, DODGE_RATE * reach);
+    ? -Math.min(up, DODGE_RATE * reachAlong)
+    : Math.min(down, DODGE_RATE * reachAlong);
 };
 
 /**
@@ -213,65 +230,13 @@ const dodgeUp = (box: Box, at: number, from: number, to: number) => {
   if (!box.solid) {
     return 0;
   }
-  const reach =
+  const reachAlong =
     Math.min(Math.max(from, to), box.r - box.gap) -
     Math.max(Math.min(from, to), box.l + box.gap);
-  return -Math.max(0, Math.min(at - (box.t - PADDING), DODGE_RATE * reach));
-};
-
-/**
- * Whether an axis-aligned segment runs through the element's outline in
- * `box` (its own, without the binding gap)
- */
-const crosses = (box: Box, [x1, y1]: Point, [x2, y2]: Point) => {
-  if (!box.solid) {
-    return false;
-  }
-  const cx = mid(box.l, box.r);
-  const cy = mid(box.t, box.b);
-  const hw = (box.r - box.l) / 2 - box.gap;
-  const hh = (box.b - box.t) / 2 - box.gap;
-  const horizontal = y1 === y2;
-  // (how far across from the middle it runs, as a share of the half size,
-  // and how far the outline reaches along it there)
-  const [across, half, alongHalf, center] = horizontal
-    ? [Math.abs(y1 - cy) / hh, hw, hh, cx]
-    : [Math.abs(x1 - cx) / hw, hh, hw, cy];
-  if (!(across < 1) || !(alongHalf > 0)) {
-    return false;
-  }
-  const reach =
-    box.shape === "diamond"
-      ? half * (1 - across)
-      : box.shape === "ellipse"
-      ? half * Math.sqrt(1 - across * across)
-      : half;
-  const [from, to] = horizontal
-    ? [Math.min(x1, x2), Math.max(x1, x2)]
-    : [Math.min(y1, y2), Math.max(y1, y2)];
-  return from < center + reach && to > center - reach;
-};
-
-/**
- * How far up (`top`) or down an element's outline (with its binding gap)
- * reaches between `from` and `to` across: its bounds' side for a rectangle,
- * and for a diamond or an ellipse, only as far as it does there (as far as
- * its side corner past it), so a segment between two of them runs between
- * their outlines, rather than their bounds
- */
-const outlineEdge = (box: Box, top: boolean, from: number, to: number) => {
-  if (box.shape === "rectangle") {
-    return top ? box.t : box.b;
-  }
-  const cx = mid(box.l, box.r);
-  const cy = mid(box.t, box.b);
-  const hw = (box.r - box.l) / 2 - box.gap;
-  const hh = (box.b - box.t) / 2 - box.gap;
-  const x = clamp(cx, Math.min(from, to), Math.max(from, to));
-  const d = hw > 0 ? Math.min(1, Math.abs(x - cx) / hw) : 1;
-  const reach =
-    hh * (box.shape === "diamond" ? 1 - d : Math.sqrt(1 - d * d)) + box.gap;
-  return top ? cy - reach : cy + reach;
+  return -Math.max(
+    0,
+    Math.min(at - far(box, "t", from, to), DODGE_RATE * reachAlong),
+  );
 };
 
 /**
@@ -285,7 +250,9 @@ const clearBetween = (points: Point[], boxes: Box[]) =>
   points
     .slice(2, -1)
     .every((point, i) =>
-      boxes.every((box) => !crosses(box, points[i + 1], point)),
+      boxes.every(
+        (box) => !box.solid || !runsThrough(box.outline, points[i + 1], point),
+      ),
     );
 
 // -----------------------------------------------------------------------------
@@ -302,8 +269,10 @@ const routeFacing = (input: RouteInput): Route => {
   const [ex, ey] = end;
   const ms = input.startMinLeg;
   const me = input.endMinLeg;
-  const startExit = a.solid ? Math.max(0, a.r) : 0;
-  const endExit = b.solid ? Math.min(ex, b.l) : ex;
+  // (where the turn between them, from the start's line to the end's, is
+  // clear of them)
+  const startExit = a.solid ? Math.max(0, near(a, "r", 0, ey)) : 0;
+  const endExit = b.solid ? Math.min(ex, near(b, "l", 0, ey)) : ex;
   const legS = legLength([0, 0], [1, 0], a, b, ms);
   const legE = legLength(end, [-1, 0], b, a, me);
   const lo = Math.max(ms, startExit);
@@ -334,25 +303,19 @@ const routeFacing = (input: RouteInput): Route => {
   }
 
   const down = ey >= 0;
-  const gap = down ? b.t - a.b : a.t - b.b;
   const squeeze = input.sameElement ? 0 : ms + me + 2 * input.radius;
   const x1 = lo + grow(overshoot, legS, ms);
   const x2 = hi - grow(overshoot, legE, me);
+  // (between where the upper one reaches down to and the lower one up to,
+  // over the span the segment between them runs)
+  const [upper, lower] = down ? [a, b] : [b, a];
+  const upperEdge = near(upper, "b", x2, x1);
+  const lowerEdge = near(lower, "t", x2, x1);
   const y = down
-    ? clampClear(
-        mid(outlineEdge(a, false, x2, x1), outlineEdge(b, true, x2, x1)),
-        0,
-        ey,
-        input.radius,
-      )
-    : clampClear(
-        mid(outlineEdge(a, true, x2, x1), outlineEdge(b, false, x2, x1)),
-        ey,
-        0,
-        input.radius,
-      );
+    ? clampClear(mid(upperEdge, lowerEdge), 0, ey, input.radius)
+    : clampClear(mid(upperEdge, lowerEdge), ey, 0, input.radius);
   const between: Point[] = [[0, 0], [x1, 0], [x1, y], [x2, y], [x2, ey], end];
-  const apart = gap >= -(a.gap + b.gap);
+  const apart = lowerEdge - upperEdge >= -(a.gap + b.gap);
   if (apart || overshoot <= squeeze || clearBetween(between, [a, b])) {
     return {
       points: between,
@@ -361,20 +324,43 @@ const routeFacing = (input: RouteInput): Route => {
     };
   }
 
-  const lines = around([a, b])!;
-  const top = overTheTop(0, ey, lines.top, lines.bottom);
-  const ay = top ? lines.top : lines.bottom;
-  // (clear of the other element on the way there)
-  let ax1 = Math.max(startExit, legS);
-  ax1 += Math.min(
-    Math.max(0, b.r + PADDING - ax1),
-    DODGE_RATE * Math.max(0, Math.min(ax1 - b.l, top ? -b.t : b.b)),
-  );
-  let ax2 = Math.min(endExit, ex - legE);
-  ax2 -= Math.min(
-    Math.max(0, ax2 - (a.l - PADDING)),
-    DODGE_RATE * Math.max(0, Math.min(a.r - ax2, top ? ey - a.t : a.b - ey)),
-  );
+  // around them, over the top or under the bottom
+  const around = (top: boolean) => {
+    // (the start's segment up or down from its line, and the end's down or
+    // up to its line)
+    const [s1, s2] = top ? [-Infinity, 0] : [0, Infinity];
+    const [e1, e2] = top ? [-Infinity, ey] : [ey, Infinity];
+    // (clear of the other element on the way there, where its outline
+    // reaches past the segment there, ramped in with how far the segment
+    // runs into its bounds, which moves no faster than the element does)
+    let ax1 = Math.max(a.solid ? Math.max(0, near(a, "r", s1, s2)) : 0, legS);
+    ax1 += Math.min(
+      Math.max(0, far(b, "r", s1, s2) - ax1),
+      DODGE_RATE * Math.max(0, Math.min(ax1 - b.l, top ? -b.t : b.b)),
+    );
+    let ax2 = Math.min(
+      b.solid ? Math.min(ex, near(b, "l", e1, e2)) : ex,
+      ex - legE,
+    );
+    ax2 -= Math.min(
+      Math.max(0, ax2 - far(a, "l", e1, e2)),
+      DODGE_RATE * Math.max(0, Math.min(a.r - ax2, top ? ey - a.t : a.b - ey)),
+    );
+    // (and as far out as the elements reach over the span it runs past them)
+    const solid = [a, b].filter((box) => box.solid);
+    const lines = solid.map((box) =>
+      far(box, top ? "t" : "b", Math.min(ax1, ax2), Math.max(ax1, ax2)),
+    );
+    return {
+      ax1,
+      ax2,
+      ay: top ? Math.min(...lines) : Math.max(...lines),
+    };
+  };
+  const over = around(true);
+  const under = around(false);
+  const top = overTheTop(0, ey, over.ay, under.ay);
+  const { ax1, ax2, ay } = top ? over : under;
   return {
     points: [[0, 0], [ax1, 0], [ax1, ay], [ax2, ay], [ax2, ey], end],
     signature: top ? "facing:over" : "facing:under",
@@ -390,16 +376,31 @@ const routeParallel = (input: RouteInput): Route => {
   const [ex, ey] = end;
   const ms = input.startMinLeg;
   const me = input.endMinLeg;
-  const startExit = a.solid ? Math.max(0, a.r) : 0;
-  const endExit = b.solid ? Math.max(ex, b.r) : ex;
-  const xs = Math.max(startExit, legLength([0, 0], [1, 0], a, b, ms));
-  const xe = Math.max(endExit, ex + legLength(end, [1, 0], b, a, me));
-  const x = Math.max(xs, xe);
+  // (where the turn from the start's line to the end's is clear of them)
+  const startExit = a.solid ? Math.max(0, near(a, "r", 0, ey)) : 0;
+  const endExit = b.solid ? Math.max(ex, near(b, "r", 0, ey)) : ex;
+  let xs = Math.max(startExit, legLength([0, 0], [1, 0], a, b, ms));
+  let xe = Math.max(endExit, ex + legLength(end, [1, 0], b, a, me));
+  let x = Math.max(xs, xe);
 
   // (the first segment past the start's leg, clear of the end's element,
   // and the last one before the end's, clear of the start's)
   const ys = dodge(b, 0, xs, x, true);
   const ye = ey + dodge(a, ey, xe, x, true);
+  // (and the turns, clear of the elements where they reach past the lines)
+  if (a.solid) {
+    xs = Math.max(xs, near(a, "r", 0, ys));
+  }
+  if (b.solid) {
+    xe = Math.max(xe, near(b, "r", ye, ey));
+  }
+  x = Math.max(
+    x,
+    xs,
+    xe,
+    a.solid ? near(a, "r", ys, ye) : -Infinity,
+    b.solid ? near(b, "r", ys, ye) : -Infinity,
+  );
 
   return {
     points: [
@@ -428,8 +429,11 @@ const routeAcross = (input: RouteInput): Route => {
   const [ex, ey] = end;
   const ms = input.startMinLeg;
   const me = input.endMinLeg;
-  const startExit = a.solid ? Math.max(0, a.r) : 0;
-  const endExit = b.solid ? Math.min(ey, b.t) : ey;
+  // (where the L's turn, down from the start's line to the end, is clear of
+  // the start's element, and where the end's leg, up from it, is clear of
+  // the end's, under the start's line along to it)
+  const startExit = a.solid ? Math.max(0, near(a, "r", 0, Math.max(0, ey))) : 0;
+  const endExit = b.solid ? Math.min(ey, near(b, "t", 0, ex)) : ey;
   const legS = legLength([0, 0], [1, 0], a, b, ms);
   const legE = legLength(end, [0, -1], b, a, me);
   const lo = Math.max(ms, startExit);
@@ -438,30 +442,36 @@ const routeAcross = (input: RouteInput): Route => {
   const behind = lo - ex;
   const above = Math.max(me - ey, -endExit);
 
-  let x1 =
-    behind > 0
-      ? lo + grow(behind, legS, ms)
-      : clamp(mid(startExit, b.solid ? b.l : ex), lo, ex);
-
   if (above > 0) {
+    // (clear of the start's element above its line, where it climbs)
+    const upExit = a.solid ? Math.max(0, near(a, "r", -Infinity, 0)) : 0;
+    const upLo = Math.max(ms, upExit);
+    const upBehind = upLo - ex;
+    const endLeft = b.solid ? near(b, "l", -Infinity, 0) : ex;
+    let x1 =
+      upBehind > 0
+        ? upLo + grow(upBehind, legS, ms)
+        : clamp(mid(upExit, endLeft), upLo, ex);
     // (climbing a leg's length out, or as far as halfway to the end's
     // element ahead of it, past the end, the further the higher it climbs,
     // so it's turning onto the end's line where it doesn't climb at all, but
     // not where the end is below the start's leg, which coming back down to
     // it would cross)
-    const ahead = b.solid ? b.l - startExit : Infinity;
+    const ahead = b.solid ? endLeft - upExit : Infinity;
     const past = Math.max(
       x1,
       Math.min(
-        Math.max(startExit, legS),
+        Math.max(upExit, legS),
         ex + 2 * Math.max(0, above - DODGE_RATE * Math.max(0, ey)),
-        startExit + Math.max(0, ahead) / 2 + DODGE_RATE * Math.max(0, -ahead),
+        upExit + Math.max(0, ahead) / 2 + DODGE_RATE * Math.max(0, -ahead),
       ),
     );
     // (but a corner's width clear of the end's line, where it would turn
     // back right by it, rather than squeezing a U turn in next to the end)
     x1 = past > ex - input.radius ? Math.max(past, ex + input.radius) : past;
-    let y = -above - grow(above, legE, me);
+    // (above the end's element, where it reaches over the segment's span)
+    const climb = Math.max(above, b.solid ? -near(b, "t", ex, x1) : -Infinity);
+    let y = -climb - grow(climb, legE, me);
     // (over the start's element, where the segment there runs back over
     // it, as far as it does)
     y += dodgeUp(a, y, ex, x1);
@@ -470,17 +480,20 @@ const routeAcross = (input: RouteInput): Route => {
     // gradually would run through it)
     // (where it would run through more of it than running on past it
     // would, where the start's leg runs into it)
-    const climbing = b.solid ? Math.min(b.b, 0) - Math.max(b.t, y) : 0;
-    const passing = b.solid && b.t < 0 && b.b > 0 ? Math.max(0, b.r - x1) : 0;
+    const climbing = b.solid
+      ? Math.min(near(b, "b", x1, x1), 0) - Math.max(near(b, "t", x1, x1), y)
+      : 0;
+    const passing =
+      b.solid && b.t < 0 && b.b > 0 ? Math.max(0, near(b, "r", 0, 0) - x1) : 0;
     const blocked =
       b.solid &&
       climbing > SQUEEZE_OVERLAP &&
       passing < climbing &&
-      x1 > b.l + b.gap + SQUEEZE_OVERLAP &&
-      x1 < b.r + PADDING;
+      x1 > near(b, "l", y, 0) + b.gap + SQUEEZE_OVERLAP &&
+      x1 < far(b, "r", y, 0);
     if (blocked) {
-      x1 = b.r + PADDING;
-      y = Math.min(y, endExit, ey - legE);
+      x1 = far(b, "r", -Infinity, 0);
+      y = Math.min(y, near(b, "t", ex, x1), ey - legE);
     }
     return {
       points: [[0, 0], [x1, 0], [x1, y], [ex, y], end],
@@ -493,33 +506,34 @@ const routeAcross = (input: RouteInput): Route => {
   }
 
   if (behind > 0) {
-    const gap = b.t - a.b;
+    const x1 = lo + grow(behind, legS, ms);
+    // (between where the start's element reaches down to and the end's up
+    // to, over the span the segment between them runs)
+    const startEdge = near(a, "b", ex, x1);
+    const endEdge = near(b, "t", ex, x1);
+    const endTop = b.solid ? Math.min(ey, endEdge) : ey;
     const squeeze = input.sameElement ? 0 : ms + me + 2 * input.radius;
     // (halfway between the elements, clear of the start's leg, short of the
     // end's)
-    const hi = Math.max(0, endExit - me);
-    let y = clamp(
-      mid(outlineEdge(a, false, ex, x1), outlineEdge(b, true, ex, x1)),
-      Math.min(input.radius, hi / 2),
-      hi,
-    );
+    const hi = Math.max(0, endTop - me);
+    let y = clamp(mid(startEdge, endEdge), Math.min(input.radius, hi / 2), hi);
     // (but where the segment there runs back under the start's element, as
     // far as it does, no closer to it than to the end, where there isn't
     // room for the end's leg as well, at the expense of the end's leg: so it
     // stays between them, rather than running along the element)
-    const reach = a.solid
+    const reachAlong = a.solid
       ? Math.min(x1, a.r - a.gap) - Math.max(ex, a.l + a.gap)
       : 0;
     y += Math.max(
       0,
       Math.min(
-        mid(outlineEdge(a, false, ex, x1) - a.gap, endExit) - y,
-        DODGE_RATE * reach,
-        endExit - input.radius / 2 - y,
+        mid(reach(a.outline, "b", ex, x1), endTop) - y,
+        DODGE_RATE * reachAlong,
+        endTop - input.radius / 2 - y,
       ),
     );
     const between: Point[] = [[0, 0], [x1, 0], [x1, y], [ex, y], end];
-    const apart = gap >= -(a.gap + b.gap);
+    const apart = endEdge - startEdge >= -(a.gap + b.gap);
     if (apart || behind <= squeeze || clearBetween(between, [a, b])) {
       return {
         points: between,
@@ -527,9 +541,11 @@ const routeAcross = (input: RouteInput): Route => {
           apart || behind > squeeze ? "across:between" : "across:squeeze",
       };
     }
-    const over = Math.min(endExit, ey - legE, a.t - PADDING);
+    const over = Math.min(endTop, ey - legE, far(a, "t", ex, x1));
+    // (clear of the start's element above its line, climbing over it)
+    const xo = Math.max(x1, a.solid ? near(a, "r", over, 0) : 0);
     return {
-      points: [[0, 0], [x1, 0], [x1, over], [ex, over], end],
+      points: [[0, 0], [xo, 0], [xo, over], [ex, over], end],
       signature: "across:over",
     };
   }
