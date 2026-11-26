@@ -744,13 +744,19 @@ export interface FontProvider {
    */
   availableFonts: readonly ProvidedFont[];
   /**
-   * Text previewing a family when pinned to the font picker's top picks,
-   * written in that family - "Aa" when omitted, empty or failed, and while a
-   * returned promise is pending. Return a sample in the family's script, i.e.
-   * "あ" for a Japanese font, as "Aa" falls back to another font where the
-   * family has no Latin glyphs.
+   * Text previewing a family, written in that family. Return a sample in the
+   * family's script, i.e. "あ" for a Japanese font, and nothing for a Latin
+   * one.
    *
-   * Asked once per family, the answer is kept for the session.
+   * It stands for the family when pinned to the font picker's top picks -
+   * "Aa" when omitted, empty or failed, and while a returned promise is
+   * pending ("Aa" falls back to another font where the family has no Latin
+   * glyphs). In the font list it takes the place of `icon` in the family's
+   * row, so that a family named in Latin letters shows which script it
+   * writes; without one the row keeps `icon`.
+   *
+   * Asked once per listed or pinned family, the answer is kept for the
+   * session.
    *
    * @param fontFamily the family's id, i.e. "Roboto" - see {@link ProvidedFont}
    */

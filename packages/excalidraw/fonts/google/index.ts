@@ -71,7 +71,7 @@ type CatalogEntry = [string, number, number, number, number, string?];
 const PREVIEW_TEXT_BY_SCRIPT: Record<string, string> = {
   Jpan: "あ",
   Hira: "あ",
-  Kore: "가",
+  Kore: "한",
   Hans: "汉",
   Hant: "漢",
   Khmr: "ក",

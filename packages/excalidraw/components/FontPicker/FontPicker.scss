@@ -88,6 +88,18 @@
     line-height: 1;
   }
 
+  // a family's own-script sample standing in for its provider's icon, in the
+  // box an icon takes
+  .FontPicker__glyph-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
   .FontPicker__tip {
     margin-top: 0.5rem;
   }

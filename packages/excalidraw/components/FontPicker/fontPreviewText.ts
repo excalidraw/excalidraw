@@ -20,6 +20,16 @@ export const getFontPreviewText = (fontFamily: FontFamily) =>
   DEFAULT_PREVIEW_TEXT;
 
 /**
+ * The preview text a family's provider gave it - `null` where it gave none
+ * (or hasn't answered yet). Stands in for the provider's icon in the font
+ * list: a family named in Latin letters shows that it writes another script.
+ */
+export const getProvidedFontPreviewText = (fontFamily: FontFamily) => {
+  const text = isCustomFontFamily(fontFamily) && previewTexts.get(fontFamily);
+  return text && text !== DEFAULT_PREVIEW_TEXT ? text : null;
+};
+
+/**
  * Ask the family's provider for its preview text. A synchronous answer is
  * cached before this returns; a failed one caches the default, so a broken
  * provider isn't asked (and doesn't log) on every render.

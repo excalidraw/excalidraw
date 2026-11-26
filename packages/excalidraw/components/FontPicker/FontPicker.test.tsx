@@ -300,6 +300,45 @@ describe("FontPicker", () => {
     expect(h.state.currentHoveredFontFamily).toBeNull();
   });
 
+  it("lists a family by its preview text in place of the provider's icon", async () => {
+    let resolvePreviewText!: (text: string) => void;
+    const { queryByTestId } = await render(
+      <Excalidraw
+        handleKeyboardGlobally={true}
+        fontProviders={{
+          "test.provider": {
+            icon: <span data-testid="provider-icon" />,
+            resolve: createDeferredResolver().resolver,
+            availableFonts: ["Latin Row", "Kana Row"],
+            getPreviewText: (name) =>
+              name === "Kana Row"
+                ? new Promise((resolve) => (resolvePreviewText = resolve))
+                : "",
+          },
+        }}
+      />,
+    );
+    Keyboard.keyPress(KEYS.T);
+    act(() => {
+      queryByTestId("font-family-show-fonts")!.click();
+    });
+
+    const getIcon = async (label: string) =>
+      (await screen.findByText(label))
+        .closest("button")!
+        .querySelector(".dropdown-menu-item__icon")!;
+    const hasProviderIcon = (icon: Element) =>
+      !!icon.querySelector('[data-testid="provider-icon"]');
+
+    expect(hasProviderIcon(await getIcon("Kana Row"))).toBe(true);
+    await act(async () => resolvePreviewText("あ"));
+
+    const kanaIcon = await getIcon("Kana Row");
+    expect(kanaIcon.textContent).toBe("あ");
+    expect(hasProviderIcon(kanaIcon)).toBe(false);
+    expect(hasProviderIcon(await getIcon("Latin Row"))).toBe(true);
+  });
+
   it("registers a visible available font before previewing it", async () => {
     const restoreIntersectionObserver = mockVisibleIntersections();
     const deferred = createDeferredResolver();

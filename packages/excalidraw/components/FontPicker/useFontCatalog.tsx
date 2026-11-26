@@ -1,9 +1,17 @@
-import { useCallback, useMemo, useState, type JSX } from "react";
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useState,
+  type JSX,
+} from "react";
 
 import {
   arrayToList,
   createProviderFontFamily,
   FONT_FAMILY,
+  getFontFamilyString,
   isCustomFontFamily,
   parseProviderFontFamily,
 } from "@excalidraw/common";
@@ -20,6 +28,11 @@ import {
   FontFamilyNormalIcon,
   FreedrawIcon,
 } from "../icons";
+
+import {
+  getProvidedFontPreviewText,
+  loadFontPreviewText,
+} from "./fontPreviewText";
 
 import type { Fonts } from "../../fonts";
 
@@ -76,11 +89,36 @@ export interface FontDescriptor {
   };
 }
 
+// one element per family and text: a row re-renders when its icon changes
+const glyphIcons = new Map<string, JSX.Element>();
+
+/** the family's preview text, written in the family - see `getPreviewText` */
+const getGlyphIcon = (fontFamily: CustomFontFamily, text: string) => {
+  const key = `${fontFamily}\n${text}`;
+  let icon = glyphIcons.get(key);
+  if (!icon) {
+    icon = (
+      <span
+        className="FontPicker__glyph-icon"
+        style={{ fontFamily: getFontFamilyString({ fontFamily }) }}
+      >
+        {text}
+      </span>
+    );
+    glyphIcons.set(key, icon);
+  }
+  return icon;
+};
+
 export const getFontFamilyIcon = (
   fontFamily: FontFamily,
   icons?: Record<string, { icon: JSX.Element }>,
 ): JSX.Element => {
   if (isCustomFontFamily(fontFamily)) {
+    const previewText = getProvidedFontPreviewText(fontFamily);
+    if (previewText) {
+      return getGlyphIcon(fontFamily, previewText);
+    }
     const parsed = parseProviderFontFamily(fontFamily);
     const icon = parsed ? icons?.[parsed.providerId]?.icon : undefined;
     if (icon) {
@@ -227,6 +265,18 @@ export const useFontCatalog = ({
     [searchResults],
   );
 
+  // the preview texts arrive after the rows they change the icon of
+  const [previewTextsVersion, onPreviewTextChange] = useReducer(
+    (version: number) => version + 1,
+    0,
+  );
+  const getIcon = useMemo(() => {
+    // a new function per version: the lists below rebuild with the new icons
+    void previewTextsVersion;
+    return (fontFamily: FontFamily) =>
+      getFontFamilyIcon(fontFamily, fontProviders);
+  }, [fontProviders, previewTextsVersion]);
+
   const { allFonts, moreOnlyFamilies } = useMemo(() => {
     const descriptors = new Map<FontFamily, FontDescriptor>();
     // loaded on demand, and listed for no other reason
@@ -237,7 +287,7 @@ export const useFontCatalog = ({
         const familyId = createProviderFontFamily(providerId, id);
         descriptors.set(familyId, {
           value: familyId,
-          icon: provider.icon,
+          icon: getIcon(familyId),
           text: label,
           status: getCustomFontStatus(familyId),
         });
@@ -265,7 +315,7 @@ export const useFontCatalog = ({
       }
       descriptors.set(familyId, {
         value: familyId,
-        icon: getFontFamilyIcon(familyId, fontProviders),
+        icon: getIcon(familyId),
         text: getFontFamilyLabel(familyId, registeredFonts.get(familyId)),
         status: getCustomFontStatus(familyId),
       });
@@ -276,7 +326,7 @@ export const useFontCatalog = ({
         moreOnlyFamilies.add(value);
         descriptors.set(value, {
           value,
-          icon: getFontFamilyIcon(value, fontProviders),
+          icon: getIcon(value),
           text,
           status: getCustomFontStatus(value),
         });
@@ -299,7 +349,7 @@ export const useFontCatalog = ({
 
       const fontDescriptor: FontDescriptor = {
         value: familyId,
-        icon: getFontFamilyIcon(familyId, fontProviders),
+        icon: getIcon(familyId),
         // an offered custom font keeps the label its provider offered it by
         text:
           descriptors.get(familyId)?.text ??
@@ -333,6 +383,7 @@ export const useFontCatalog = ({
     sceneFamilies,
     favoriteFamilies,
     selectedFontFamily,
+    getIcon,
   ]);
 
   // a font is listed once: with the scene's, else among the favorites, else
@@ -412,7 +463,7 @@ export const useFontCatalog = ({
               listed.add(familyId);
               descriptors.push({
                 value: familyId,
-                icon: getFontFamilyIcon(familyId, fontProviders),
+                icon: getIcon(familyId),
                 text: label,
                 status: getCustomFontStatus(familyId),
               });
@@ -434,12 +485,36 @@ export const useFontCatalog = ({
                 SEARCH_SUGGESTIONS_LIMIT,
               ),
       };
-    }, [
-      filteredFontDescriptors,
-      searchResults,
-      fontProviders,
-      getCustomFontStatus,
-    ]);
+    }, [filteredFontDescriptors, searchResults, getCustomFontStatus, getIcon]);
+
+  // layout effect: a synchronous answer lands before paint, without flashing
+  // the provider's icon first
+  useLayoutEffect(() => {
+    let isCurrent = true;
+    /** @returns whether the answer came synchronously, and changed the text */
+    const load = (fontFamily: FontFamily) => {
+      const previousText = getProvidedFontPreviewText(fontFamily);
+      const hasChanged = () =>
+        getProvidedFontPreviewText(fontFamily) !== previousText;
+      const pending = loadFontPreviewText(fontFamily, fontProviders);
+      pending?.then(() => {
+        if (isCurrent && hasChanged()) {
+          onPreviewTextChange();
+        }
+      });
+      return !pending && hasChanged();
+    };
+    // `map`, not `some`: every family gets asked
+    const hasSyncAnswer = [...allFonts, ...searchMatches, ...searchSuggestions]
+      .map((font) => load(font.value))
+      .includes(true);
+    if (hasSyncAnswer) {
+      onPreviewTextChange();
+    }
+    return () => {
+      isCurrent = false;
+    };
+  }, [allFonts, searchMatches, searchSuggestions, fontProviders]);
 
   const selectableFonts = useMemo(
     () =>
