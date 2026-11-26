@@ -5332,7 +5332,10 @@ class App extends React.Component<AppProps, AppState> {
           return;
         } else if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.handleSkipBindMode();
-        } else {
+        } else if (!event.repeat) {
+          // Alt changes how the point being placed or dragged binds, so re-run
+          // it now instead of on the next pointer move. Auto-repeats change
+          // nothing.
           maybeHandleArrowPointlikeDrag({ app: this, event });
         }
       }
