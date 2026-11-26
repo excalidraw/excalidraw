@@ -44,7 +44,7 @@ import {
   HEADING_UP,
 } from "./heading";
 import { isBindableElement } from "./typeChecks";
-import { aabbForElement, elementCenterPoint, getArrowheadSize } from "./bounds";
+import { aabbForElement, elementCenterPoint } from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
 import { ELBOW_ARROW_CORNER_RADIUS } from "./shape";
 import {
@@ -339,12 +339,6 @@ export const routeElbowArrow = (
       ? DIRECTIONS[(directionIndex(boundEndHeading) + 1) % 4]
       : boundEndHeading;
 
-  // room to round the corner, or for an arrowhead and some of the rounding
-  const minLeg = (arrowhead: Arrowhead | null) =>
-    arrowhead
-      ? getArrowheadSize(arrowhead) + ELBOW_ARROW_CORNER_RADIUS / 4
-      : ELBOW_ARROW_CORNER_RADIUS / 2;
-
   const frame = frameFor(startGlobalPoint, startHeading, endHeading);
   // the elements' outlines (with their binding gap, and with the padding
   // around that) in the frame, or the endpoints themselves where they're not
@@ -415,8 +409,8 @@ export const routeElbowArrow = (
     end: toFrame(frame, endGlobalPoint),
     facing:
       facingVector[0] === -1 ? "left" : facingVector[0] === 1 ? "right" : "up",
-    startMinLeg: minLeg(arrow.startArrowhead),
-    endMinLeg: minLeg(arrow.endArrowhead),
+    startArrowhead: !!arrow.startArrowhead,
+    endArrowhead: !!arrow.endArrowhead,
     sameElement,
     radius: ELBOW_ARROW_CORNER_RADIUS,
   });
@@ -462,9 +456,13 @@ export const getElbowArrowRoute = (
 /**
  * The route's corner points, without any repeated (or closer than a tiny
  * fraction of a px, from rounding), or between segments running on along
- * the same line the same way, and without any step too short to see
- * (between endpoints nearly, but not exactly, in line): only where the route
- * carries on the same way after it, so it's never left doubling back
+ * the same line the same way, and without any step too short to see: only
+ * where the route carries on the same way after it, so it's never left
+ * doubling back. The segments either side of the step are put on one line,
+ * moving the corner after it (or, where that's the end, the one before it)
+ * along the segment it turns onto, so the route stays orthogonal, but for
+ * between endpoints nearly, but not exactly, in line, which it runs straight
+ * between.
  */
 const tidyRoute = (points: GlobalPoint[]): GlobalPoint[] => {
   const same = (a: number, b: number) => Math.abs(a - b) < 1e-6;
@@ -491,8 +489,6 @@ const tidyRoute = (points: GlobalPoint[]): GlobalPoint[] => {
   }
 
   const isStep = (i: number) =>
-    i >= 1 &&
-    i + 2 < tidy.length &&
     Math.abs(tidy[i][0] - tidy[i + 1][0]) +
       Math.abs(tidy[i][1] - tidy[i + 1][1]) <
       DEDUP_THRESHOLD &&
@@ -501,5 +497,28 @@ const tidyRoute = (points: GlobalPoint[]): GlobalPoint[] => {
     Math.sign(tidy[i][1] - tidy[i - 1][1]) ===
       Math.sign(tidy[i + 2][1] - tidy[i + 1][1]);
 
-  return tidy.filter((_, i) => !isStep(i) && !isStep(i - 1));
+  for (let i = 1; i + 2 < tidy.length; ) {
+    if (!isStep(i)) {
+      i++;
+      continue;
+    }
+    // (the segments either side of the step run along x where they're
+    // horizontal, the step moving them apart in y)
+    const x =
+      Math.abs(tidy[i][0] - tidy[i - 1][0]) >
+      Math.abs(tidy[i][1] - tidy[i - 1][1]);
+    const onto = (point: GlobalPoint, line: GlobalPoint) =>
+      x
+        ? pointFrom<GlobalPoint>(point[0], line[1])
+        : pointFrom<GlobalPoint>(line[0], point[1]);
+    if (i + 3 < tidy.length) {
+      tidy[i + 2] = onto(tidy[i + 2], tidy[i]);
+    } else if (i > 1) {
+      tidy[i - 1] = onto(tidy[i - 1], tidy[i + 1]);
+    }
+    tidy.splice(i, 2);
+    i = Math.max(1, i - 1);
+  }
+
+  return tidy;
 };

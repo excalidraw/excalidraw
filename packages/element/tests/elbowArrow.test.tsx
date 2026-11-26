@@ -26,6 +26,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import { getBindingGap } from "../src/binding";
 import { Scene } from "../src/Scene";
 import { ELBOW_ARROW_CORNER_RADIUS } from "../src/shape";
+import { MIN_LEG, PADDING } from "../src/elbowArrowTemplates";
 
 import type {
   ExcalidrawArrowElement,
@@ -539,14 +540,24 @@ describe("elbow arrow routes with one or two corners", () => {
     expect(arrow.points.length).toBeGreaterThan(3);
   });
 
-  it("doesn't put the arrowhead on a leg too short for it", () => {
+  it("connects elements with a single corner on a short leg, arrowhead and all", () => {
     // 25px from the rectangle's side to the diamond's top
     const arrow = connect(152.5);
 
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [195, 0],
+      [195, 19.15],
+    ]);
+  });
+
+  it("doesn't route a leg shorter than the shortest a leg can be", () => {
+    // about 9px from the rectangle's side to the diamond's top
+    const arrow = connect(142.5);
     expect(arrow.points.length).toBeGreaterThan(3);
   });
 
-  it("routes again to fit an arrowhead added to a short leg", () => {
+  it("keeps a short leg the same with an arrowhead added to it", () => {
     API.setAppState({ currentItemEndArrowhead: null });
     // about 10px from the rectangle's side to the diamond's top
     const arrow = connect(143.5);
@@ -566,9 +577,12 @@ describe("elbow arrow routes with one or two corners", () => {
     const updated = h.elements.find(
       (element) => element.id === arrow.id,
     ) as ExcalidrawElbowArrowElement;
-    const [corner, end] = updated.points.slice(-2);
     expect(updated.endArrowhead).toBe("arrow");
-    expect(end[1] - corner[1]).toBeGreaterThanOrEqual(25);
+    expect(updated.points).toCloselyEqualPoints([
+      [0, 0],
+      [195, 0],
+      [195, 10.15],
+    ]);
   });
 
   it("doesn't route a leg too short to keep its corner", () => {
@@ -635,28 +649,28 @@ describe("elbow arrow routes with one or two corners", () => {
     mouse.reset();
     mouse.moveTo(0, 120);
     mouse.down();
-    mouse.moveTo(0, 140);
+    mouse.moveTo(0, 150);
     mouse.up();
     h.app.scene.mutateElement(arrow, {
       fixedSegments: [
         {
           index: 3,
-          start: pointFrom<LocalPoint>(44, -20),
-          end: pointFrom<LocalPoint>(195, -20),
+          start: pointFrom<LocalPoint>(44, -30),
+          end: pointFrom<LocalPoint>(195, -30),
         },
       ],
     });
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
       [44, 0],
-      [44, -20],
-      [195, -20],
-      [195, 14.15],
+      [44, -30],
+      [195, -30],
+      [195, 4.15],
     ]);
 
     // and back up, the first leg lines up with the fixed segment
     mouse.reset();
-    mouse.moveTo(0, 140);
+    mouse.moveTo(0, 150);
     mouse.down();
     mouse.moveTo(0, 120);
     mouse.up();
@@ -728,9 +742,19 @@ describe("elbow arrow routes with one or two corners", () => {
     ]);
   });
 
-  it("doesn't put the arrowhead on a half too short for it", () => {
+  it("turns between them on legs as short as they can be, the arrowhead's getting the rest", () => {
     const arrow = connectBelow(40);
 
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [0, 10],
+      [518, 10],
+      [518, 28],
+    ]);
+  });
+
+  it("doesn't turn between them where there isn't room for both legs", () => {
+    const arrow = connectBelow(30);
     expect(arrow.points.length).toBeGreaterThan(4);
   });
 });
@@ -1082,13 +1106,13 @@ describe("elbow arrow routing between overlapping elements", () => {
       }
     });
   });
-  it("doesn't go around elements as one where only their bounds overlap", () => {
-    // diamonds tip to tip, their bounds overlapping, but not the diamonds,
-    // with the start on the top of the lower one, a little right of the end
-    // on the right of the upper one
+  // diamonds tip to tip, their bounds overlapping, but not the diamonds,
+  // with the start on the top of the lower one, and the end on the right of
+  // the upper one
+  const routeTipToTip = (lowerX: number) => {
     const lower = API.createElement({
       type: "diamond",
-      x: 2290.31,
+      x: lowerX,
       y: -706.24,
       width: 226.95,
       height: 248.6,
@@ -1119,22 +1143,39 @@ describe("elbow arrow routing between overlapping elements", () => {
       endArrowhead: "arrow",
     }) as unknown as ExcalidrawElbowArrowElement;
 
-    const { points } = updateElbowArrowRoute(
+    return updateElbowArrowRoute(
       arrow,
       arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
-    );
+    ).points!;
+  };
+
+  it("doesn't go around elements as one where only their bounds overlap", () => {
+    // the start 20px right of the end: up, and left into it
+    const points = routeTipToTip(2290.31);
+
+    const start = points[0];
+    const end = points[points.length - 1];
+    expect(end[0]).toBeCloseTo(start[0] - 20.15);
+    expect(points).toCloselyEqualPoints([start, [start[0], end[1]], end]);
+  });
+
+  it("turns back about halfway where only their bounds overlap, the end right by the start's line", () => {
+    // the start just right of the end, too close to it for the end's leg
+    const points = routeTipToTip(2270.31);
 
     // up, turning back about halfway between the endpoints (halfway between
     // the elements), rather than a U turn squeezed in right next to the end
-    const start = points![0];
-    const end = points![points!.length - 1];
-    const turn = points![1][1];
+    const start = points[0];
+    const end = points[points.length - 1];
+    const turn = points[1][1];
+    const back = points[2][0];
     expect(turn).toBeCloseTo((start[1] + end[1]) / 2, -1);
+    expect(back - end[0]).toBeGreaterThan(MIN_LEG);
     expect(points).toCloselyEqualPoints([
       start,
       [start[0], turn],
-      [end[0] + 40, turn],
-      [end[0] + 40, end[1]],
+      [back, turn],
+      [back, end[1]],
       end,
     ]);
   });
@@ -1296,16 +1337,30 @@ describe("elbow arrow routing between overlapping elements", () => {
       arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
     );
 
-    // up a padding, right a padding past the end, down and left into it:
-    // a short loop, rather than one around the bounds of both
+    // up a hairpin's width past the end, right past the end (the end's leg
+    // short of the padding, ramping in from its shortest, as the end is
+    // just by the start's line), down and left into it: a short loop,
+    // rather than one around the bounds of both
     expect(points).toHaveLength(5);
-    expect(points![0][1] - points![1][1]).toBeCloseTo(40, 0);
-    expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
+    expect(points![3][1] - points![2][1]).toBeCloseTo(
+      ELBOW_ARROW_CORNER_RADIUS,
+      0,
+    );
+    expect(points![2][0] - points![4][0]).toBeCloseTo(28.3, 0);
   });
 
-  it.each([2160, 2180, 2189.7, 2200, 2220, 2240])(
+  it.each([
+    [2160, 40, 40],
+    [2180, 40, 40],
+    [2189.7, 40, 40],
+    [2200, 40, 40],
+    [2220, 40, 40],
+    // (the end just left of the start's line, its leg ramping in from its
+    // shortest, and the start's a hairpin's width past it)
+    [2240, 35, 20.8],
+  ])(
     "loops on out of the other one's bounds, rather than around them, the start deep in them (the lower one at x=%d)",
-    (lowerX) => {
+    (lowerX, startLeg, endLeg) => {
       // as above, the start on top of the lower one inside the upper one's
       // bounds, the deeper the further left: the route has to get out of
       // them anyway, and gets out the nearer way, rather than through them
@@ -1350,10 +1405,94 @@ describe("elbow arrow routing between overlapping elements", () => {
 
       // up a padding, right a padding past the end, down and left into it
       expect(points).toHaveLength(5);
-      expect(points![0][1] - points![1][1]).toBeCloseTo(40, 0);
-      expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
+      expect(points![0][1] - points![1][1]).toBeCloseTo(startLeg, 0);
+      expect(points![2][0] - points![4][0]).toBeCloseTo(endLeg, 0);
     },
   );
+
+  it("goes around both by the padding past the other one, rather than along its side, as either is dragged sideways", () => {
+    // rectangles the same size, nearly on top of each other, from the right
+    // of the one behind to the left of the one in front, which reaches out
+    // past it by just short of the padding (and the binding gap): the route
+    // goes around under both
+    const routeWith = (startX: number, endX: number) => {
+      const start = API.createElement({
+        type: "rectangle",
+        x: startX,
+        y: 440.49,
+        width: 224.54,
+        height: 112,
+      });
+      const end = API.createElement({
+        type: "rectangle",
+        x: endX,
+        y: 447.76,
+        width: 224.54,
+        height: 112,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1, 1)],
+        startBinding: {
+          elementId: start.id,
+          fixedPoint: [1.0267, 0.5001],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: end.id,
+          fixedPoint: [-0.0267, 0.5001],
+          mode: "orbit",
+        },
+        endArrowhead: "arrow",
+      }) as unknown as ExcalidrawElbowArrowElement;
+      const update = updateElbowArrowRoute(
+        arrow,
+        arrayToMap([start, end]) as NonDeletedSceneElementsMap,
+      );
+      return {
+        start,
+        end,
+        points: update.points!.map(
+          ([px, py]) => [update.x! + px, update.y! + py] as [number, number],
+        ),
+      };
+    };
+
+    // past the other one's far side by the padding: down past the right of
+    // the one in front, and up past the left of the one behind
+    const { start, end, points } = routeWith(985.19, 1030.78);
+    expect(points).toHaveLength(6);
+    expect(points[1][0]).toBeCloseTo(
+      end.x + end.width + getBindingGap(end) + PADDING,
+    );
+    expect(points[3][0]).toBeCloseTo(start.x - getBindingGap(start) - PADDING);
+
+    // and either dragged sideways, in half px steps, the route only ever
+    // moving along with it, never jumping
+    for (const drag of [
+      (dx: number) => routeWith(985.19 + dx, 1030.78),
+      (dx: number) => routeWith(985.19, 1030.78 + dx),
+    ]) {
+      const routes = Array.from(
+        { length: 121 },
+        (_, step) => drag((step - 60) / 2).points,
+      );
+      routes.forEach((route, step) => {
+        expect(route).toHaveLength(6);
+        if (step > 0) {
+          route.forEach(([px, py], i) => {
+            const [qx, qy] = routes[step - 1][i];
+            expect(Math.abs(px - qx) + Math.abs(py - qy)).toBeLessThanOrEqual(
+              0.51,
+            );
+          });
+        }
+      });
+    }
+  });
 
   it("loops back a hairpin's width where the end is right by where the start's leg ends", () => {
     // the start on top of the lower one, just right of the upper one, which
@@ -1400,15 +1539,16 @@ describe("elbow arrow routing between overlapping elements", () => {
       arrayToMap([lower, upper]) as NonDeletedSceneElementsMap,
     );
 
-    // up past where the end is by a hairpin's width, right a padding past
-    // the end, and down and left into it: a short loop, rather than one
-    // around the bounds of both
+    // up past where the end is by a hairpin's width, right past the end
+    // (its leg short of the padding, ramping in from its shortest, as the
+    // end is just right of the start's line), and down and left into it: a
+    // short loop, rather than one around the bounds of both
     expect(points).toHaveLength(5);
     expect(points![3][1] - points![2][1]).toBeCloseTo(
       ELBOW_ARROW_CORNER_RADIUS,
       0,
     );
-    expect(points![2][0] - points![4][0]).toBeCloseTo(40, 0);
+    expect(points![2][0] - points![4][0]).toBeCloseTo(36, 0);
   });
 });
 
@@ -1590,13 +1730,16 @@ describe("elbow arrow legs next to another element", () => {
   });
 
   it.each([
-    [604.32, 517.29],
-    [604.32, 520],
-    [604.32, 525],
-    [608.24, 520],
+    // (the endpoints 7px apart, closer than both legs at their shortest: the
+    // legs ramp in from their shortest as the endpoints close in, and only
+    // get their whole padding a few px further on)
+    [604.32, 517.29, 35.28],
+    [604.32, 520, 35.28],
+    [604.32, 525, 35.28],
+    [608.24, 520, 40],
   ])(
     "gives both legs their padding where the elements' corners nearly touch (the upper one at %d, %d)",
-    (upperX, upperY) => {
+    (upperX, upperY, leg) => {
       // the upper element's bottom right corner is just above and left of the
       // lower one's top left corner (their binding gaps overlapping, and even
       // their sides a little), and the route turns back between them
@@ -1639,8 +1782,8 @@ describe("elbow arrow legs next to another element", () => {
       );
 
       expect(points).toHaveLength(6);
-      expect(points![1][0] - points![0][0]).toBeCloseTo(40);
-      expect(points![5][0] - points![4][0]).toBeCloseTo(40);
+      expect(points![1][0] - points![0][0]).toBeCloseTo(leg);
+      expect(points![5][0] - points![4][0]).toBeCloseTo(leg);
     },
   );
 
@@ -1928,8 +2071,9 @@ describe("elbow arrow loops", () => {
         arrayToMap([element]) as NonDeletedSceneElementsMap,
       );
 
-      // a padding (or so) across, turning the same way all around, back to
-      // where it started
+      // three times the shortest leg (or so) across, as far as the legs
+      // ramp in from their shortest, turning the same way all around, back
+      // to where it started
       expect(points).toHaveLength(5);
       expect(points![4][0]).toBeCloseTo(points![0][0]);
       expect(points![4][1]).toBeCloseTo(points![0][1]);
@@ -1937,8 +2081,10 @@ describe("elbow arrow loops", () => {
         .slice(1)
         .map(([x, y], i) => [x - points![i][0], y - points![i][1]]);
       segments.forEach(([dx, dy], i) => {
-        expect(Math.abs(dx) + Math.abs(dy)).toBeGreaterThanOrEqual(39.5);
-        expect(Math.abs(dx) + Math.abs(dy)).toBeLessThan(50);
+        expect(Math.abs(dx) + Math.abs(dy)).toBeGreaterThanOrEqual(
+          3 * MIN_LEG - 0.5,
+        );
+        expect(Math.abs(dx) + Math.abs(dy)).toBeLessThan(40);
         const [nx, ny] = segments[(i + 1) % 4];
         expect(dx * ny - dy * nx).toBeGreaterThan(0);
       });
@@ -2276,10 +2422,11 @@ describe("elbow arrow routing between elements facing each other", () => {
         ),
     );
     expect(jumps).toEqual([]);
-    // halfway between them, as long as that leaves the arrowhead room
+    // halfway between them, as long as that leaves the end's leg its
+    // shortest
     const [start, , , end] = routes[0];
     expect(routes[0][1][0]).toBeCloseTo(
-      Math.min((start[0] + end[0]) / 2, end[0] - 29),
+      Math.min((start[0] + end[0]) / 2, end[0] - MIN_LEG),
     );
   });
 });
@@ -2482,7 +2629,7 @@ describe("elbow arrow routing back under the start's element", () => {
     };
 
     // dragged up, in 1px steps, from 150px below the start's element until
-    // it's 25px below it (closer, the end's leg keeps the length to turn)
+    // it's 25px below it (closer, the end's leg keeps its shortest)
     const routes = Array.from({ length: 126 }, (_, step) =>
       routeWithEndAt(startBottom + 150 - step),
     );
@@ -2490,9 +2637,12 @@ describe("elbow arrow routing back under the start's element", () => {
       expect(points).toHaveLength(5);
       const [, , [, turn], , [, endY]] = points;
       // under the start's element, at least as far from it as from the end,
-      // where there isn't room for both the end's leg and the padding
-      expect(turn - startBottom).toBeGreaterThanOrEqual(endY - turn - 0.01);
-      expect(endY - turn).toBeGreaterThan(0);
+      // where there isn't room for both the end's leg and the padding (but
+      // for the end's leg's shortest)
+      expect(endY - turn).toBeGreaterThanOrEqual(MIN_LEG - 0.01);
+      if (endY - turn > MIN_LEG + 0.01) {
+        expect(turn - startBottom).toBeGreaterThanOrEqual(endY - turn - 0.01);
+      }
       if (step > 0) {
         points.forEach(([px, py], i) => {
           const [qx, qy] = routes[step - 1][i];
@@ -2505,6 +2655,6 @@ describe("elbow arrow routing back under the start's element", () => {
     // (halfway between their outlines, where the gap between them is as in
     // the scene this was reported in)
     const [, , [, turn]] = routeWithEndAt(startBottom + 45.67);
-    expect(turn).toBeCloseTo(startBottom + 20, 0);
+    expect(turn).toBeCloseTo(startBottom + 45.67 / 2, 0);
   });
 });

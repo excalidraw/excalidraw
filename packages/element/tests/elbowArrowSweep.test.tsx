@@ -18,7 +18,12 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { getElbowArrowData, routeElbowArrow } from "../src/elbowArrowRouting";
+import {
+  DEDUP_THRESHOLD,
+  getElbowArrowData,
+  routeElbowArrow,
+} from "../src/elbowArrowRouting";
+import { MIN_LEG } from "../src/elbowArrowTemplates";
 
 import type {
   ExcalidrawElbowArrowElement,
@@ -203,8 +208,9 @@ const sweep = (shape: keyof typeof SHAPES) => {
 };
 
 // How a route looks: segments not orthogonal, legs not along the headings
-// (or too short for the arrowhead), crossing itself, and how far it runs
-// inside either element, besides its legs
+// (or shorter than they can be, but for a step too short to see taken out
+// next to them), crossing itself, and how far it runs inside either element,
+// besides its legs
 const quality = (r: ReturnType<typeof route>) => {
   const { points, boxes, headings } = r;
   const issues: string[] = [];
@@ -231,7 +237,11 @@ const quality = (r: ReturnType<typeof route>) => {
     }
   }
   const len = (a: Pt, b: Pt) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
-  if (points.length > 2 && len(e1, e0) < 20) {
+  const shortest = MIN_LEG - DEDUP_THRESHOLD;
+  if (points.length > 2 && len(s0, s1) < shortest) {
+    issues.push("short start leg");
+  }
+  if (points.length > 2 && len(e1, e0) < shortest) {
     issues.push("short end leg");
   }
   // crossing itself

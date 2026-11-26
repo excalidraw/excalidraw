@@ -36,6 +36,12 @@ import type { Side } from "./elbowArrowOutline";
 export const PADDING = 40;
 
 /**
+ * The shortest the first and the last segment can be, where there isn't
+ * room for more (an arrowhead on a shorter one is drawn smaller to fit)
+ */
+export const MIN_LEG = 10;
+
+/**
  * How much faster than an element moves a segment moves out of its way, as
  * it moves into the segment's way: fast, so the segment is soon clear of it,
  * but not so fast it jumps (a segment moving more than three times as far as
@@ -90,9 +96,12 @@ export type RouteInput = {
   end: Point;
   /** which way the end faces: left, right or up */
   facing: "left" | "right" | "up";
-  /** the shortest the first and the last segment can be */
-  startMinLeg: number;
-  endMinLeg: number;
+  /**
+   * whether the ends have arrowheads: where there isn't room for both legs,
+   * the one to an arrowhead gets it first
+   */
+  startArrowhead: boolean;
+  endArrowhead: boolean;
   /** both ends bound to the same element */
   sameElement: boolean;
   /** the corner radius, for how far apart segments turning back are */
@@ -143,7 +152,7 @@ const clampClear = (v: number, lo: number, hi: number, radius: number) => {
  * ahead of it, closer than twice that, only half the room to it, so the
  * route turns halfway between them; plus how far it is to the side of the
  * leg's line, or how far behind the leg it starts, so the leg changes
- * continuously as the elements move. Never shorter than `minLeg`.
+ * continuously as the elements move. Never shorter than `MIN_LEG`.
  *
  * By the elements' bounds, rather than their outlines: off the leg's line,
  * an outline only reaches as far as its corner nearest the line, which for a
@@ -151,15 +160,9 @@ const clampClear = (v: number, lo: number, hi: number, radius: number) => {
  * that's beside it, rather than ahead of it (and change as fast as a slanted
  * side slides past the line, rather than as fast as the element moves).
  */
-const legLength = (
-  point: Point,
-  heading: Point,
-  own: Box,
-  other: Box,
-  minLeg: number,
-) => {
+const legLength = (point: Point, heading: Point, own: Box, other: Box) => {
   if (!other.solid || other === own) {
-    return Math.max(minLeg, PADDING);
+    return PADDING;
   }
   const axis = heading[0] !== 0 ? 0 : 1;
   const sign = heading[axis];
@@ -179,7 +182,7 @@ const legLength = (
   const beside = Math.max(acrossLo - across, across - acrossHi, 0);
 
   return Math.max(
-    minLeg,
+    MIN_LEG,
     Math.min(PADDING, beside + (ahead >= 0 ? ahead / 2 : -ahead)),
   );
 };
@@ -189,8 +192,8 @@ const legLength = (
  * other (`overshoot`), twice as fast, up to its full length: so the route
  * turning back between them widens continuously from nothing, but soon
  */
-const grow = (overshoot: number, leg: number, minLeg: number) =>
-  clamp(2 * overshoot, 0, Math.max(0, leg - minLeg));
+const grow = (overshoot: number, leg: number) =>
+  clamp(2 * overshoot, 0, Math.max(0, leg - MIN_LEG));
 
 /**
  * Whether a detour between `y1` and `y2` goes over the top (to `top`) rather
@@ -296,6 +299,23 @@ const overlapping = (a: Box, b: Box) =>
   Math.max(a.l + a.gap, b.l + b.gap) < Math.min(a.r - a.gap, b.r - b.gap) &&
   Math.max(a.t + a.gap, b.t + b.gap) < Math.min(a.b - a.gap, b.b - b.gap);
 
+/**
+ * Where a vertical segment at `at`, from `from` to `to`, runs beside `box`
+ * (over the element's own extent along it) within its padding, or through
+ * it: the span it does over, or null where it doesn't, as where it only
+ * runs by its padding's corner, past the element's end
+ */
+const besidePadding = (box: Box, at: number, from: number, to: number) => {
+  if (!box.solid) {
+    return null;
+  }
+  const lo = Math.max(Math.min(from, to), box.t + box.gap);
+  const hi = Math.min(Math.max(from, to), box.b - box.gap);
+  return lo < hi && runsThrough(box.far, [at, lo], [at, hi])
+    ? ([lo, hi] as const)
+    : null;
+};
+
 // -----------------------------------------------------------------------------
 // Routes
 // -----------------------------------------------------------------------------
@@ -309,30 +329,28 @@ const overlapping = (a: Box, b: Box) =>
 const routeFacing = (input: RouteInput): Route => {
   const { start: a, endBox: b, end } = input;
   const [ex, ey] = end;
-  const ms = input.startMinLeg;
-  const me = input.endMinLeg;
   // (where the turn between them, from the start's line to the end's, is
   // clear of them)
   const startExit = a.solid ? Math.max(0, near(a, "r", 0, ey)) : 0;
   const endExit = b.solid ? Math.min(ex, near(b, "l", 0, ey)) : ex;
-  const legS = legLength([0, 0], [1, 0], a, b, ms);
-  const legE = legLength(end, [-1, 0], b, a, me);
-  const lo = Math.max(ms, startExit);
-  const hi = Math.min(ex - me, endExit);
+  const legS = legLength([0, 0], [1, 0], a, b);
+  const legE = legLength(end, [-1, 0], b, a);
+  const lo = Math.max(MIN_LEG, startExit);
+  const hi = Math.min(ex - MIN_LEG, endExit);
   const overshoot = lo - hi;
 
   if (overshoot <= 0) {
     // (halfway between the elements, past both legs, or, where there isn't
-    // room for both, as far into it as the end with the arrowhead (the
-    // longer shortest leg) leaves, or halfway, with the same at both ends)
+    // room for both, as far into it as the leg to the only arrowhead
+    // leaves, or halfway, with the same at both ends)
     const legsFrom = Math.max(lo, legS);
     const legsTo = Math.min(hi, ex - legE);
     const x = clamp(
       legsFrom <= legsTo
         ? clamp(mid(startExit, endExit), legsFrom, legsTo)
-        : me > ms
+        : input.endArrowhead && !input.startArrowhead
         ? legsTo
-        : ms > me
+        : input.startArrowhead && !input.endArrowhead
         ? legsFrom
         : mid(legsFrom, legsTo),
       lo,
@@ -346,15 +364,15 @@ const routeFacing = (input: RouteInput): Route => {
 
   const down = ey >= 0;
   const [upper, lower] = down ? [a, b] : [b, a];
-  const squeeze = input.sameElement ? 0 : ms + me + 2 * input.radius;
+  const squeeze = input.sameElement ? 0 : 2 * (MIN_LEG + input.radius);
   // (only squeezing between elements beside each other, rather than through
   // where they overlap)
   const squeezes = overshoot <= squeeze && !overlapping(a, b);
   // the S, with its legs shortened by `shorten` (from none, to as short as
   // they can be)
   const turnBack = (shorten: number) => {
-    const x1 = lo + (1 - shorten) * grow(overshoot, legS, ms);
-    const x2 = hi - (1 - shorten) * grow(overshoot, legE, me);
+    const x1 = lo + (1 - shorten) * grow(overshoot, legS);
+    const x2 = hi - (1 - shorten) * grow(overshoot, legE);
     // (between where the upper one reaches down to and the lower one up to,
     // over the span the segment between them runs)
     const upperEdge = near(upper, "b", x2, x1);
@@ -409,22 +427,24 @@ const routeFacing = (input: RouteInput): Route => {
     // (with legs of their whole length, as it's not turning between them)
     let ax1 = Math.max(
       a.solid ? Math.max(0, near(a, "r", s1, s2)) : 0,
-      Math.max(ms, PADDING),
+      PADDING,
     );
-    // (and around the far side of the other element, where the segment
-    // there would run through it: going over to there gradually would run
-    // through it all the way)
-    const pastEnd = b.solid && runsThrough(b.outline, [ax1, 0], [ax1, out]);
+    // (and around the far side of the other element, with its padding,
+    // where the segment there would run beside it within its padding, or
+    // through it: going over to there gradually would run through it all
+    // the way, and from its padding, the far side of the padding is just
+    // where the segment is as it runs into it, so it doesn't jump there)
+    const pastEnd = besidePadding(b, ax1, s1, s2);
     if (pastEnd) {
-      ax1 = Math.max(ax1, far(b, "r", s1, s2));
+      ax1 = Math.max(ax1, far(b, "r", ...pastEnd));
     }
     let ax2 = Math.min(
       b.solid ? Math.min(ex, near(b, "l", e1, e2)) : ex,
-      ex - Math.max(me, PADDING),
+      ex - PADDING,
     );
-    const pastStart = a.solid && runsThrough(a.outline, [ax2, ey], [ax2, out]);
+    const pastStart = besidePadding(a, ax2, e1, e2);
     if (pastStart) {
-      ax2 = Math.min(ax2, far(a, "l", e1, e2));
+      ax2 = Math.min(ax2, far(a, "l", ...pastStart));
     }
     // (and as far out as the elements reach over the span it runs past them)
     const solid = [a, b].filter((box) => box.solid);
@@ -457,13 +477,11 @@ const routeFacing = (input: RouteInput): Route => {
 const routeParallel = (input: RouteInput): Route => {
   const { start: a, endBox: b, end } = input;
   const [ex, ey] = end;
-  const ms = input.startMinLeg;
-  const me = input.endMinLeg;
   // (where the turn from the start's line to the end's is clear of them)
   const startExit = a.solid ? Math.max(0, near(a, "r", 0, ey)) : 0;
   const endExit = b.solid ? Math.max(ex, near(b, "r", 0, ey)) : ex;
-  let xs = Math.max(startExit, legLength([0, 0], [1, 0], a, b, ms));
-  let xe = Math.max(endExit, ex + legLength(end, [1, 0], b, a, me));
+  let xs = Math.max(startExit, legLength([0, 0], [1, 0], a, b));
+  let xe = Math.max(endExit, ex + legLength(end, [1, 0], b, a));
   let x = Math.max(xs, xe);
 
   // (the first segment past the start's leg, clear of the end's element,
@@ -510,30 +528,28 @@ const routeParallel = (input: RouteInput): Route => {
 const routeAcross = (input: RouteInput): Route => {
   const { start: a, endBox: b, end } = input;
   const [ex, ey] = end;
-  const ms = input.startMinLeg;
-  const me = input.endMinLeg;
   // (where the L's turn, down from the start's line to the end, is clear of
   // the start's element, and where the end's leg, up from it, is clear of
   // the end's, under the start's line along to it)
   const startExit = a.solid ? Math.max(0, near(a, "r", 0, Math.max(0, ey))) : 0;
   const endExit = b.solid ? Math.min(ey, near(b, "t", 0, ex)) : ey;
-  const legS = legLength([0, 0], [1, 0], a, b, ms);
-  const legE = legLength(end, [0, -1], b, a, me);
-  const lo = Math.max(ms, startExit);
+  const legS = legLength([0, 0], [1, 0], a, b);
+  const legE = legLength(end, [0, -1], b, a);
+  const lo = Math.max(MIN_LEG, startExit);
   // how far the end is behind where the start's leg can turn, and how far
   // above where the end's leg can start
   const behind = lo - ex;
-  const above = Math.max(me - ey, -endExit);
+  const above = Math.max(MIN_LEG - ey, -endExit);
 
   if (above > 0) {
     // (clear of the start's element above its line, where it climbs)
     const upExit = a.solid ? Math.max(0, near(a, "r", -Infinity, 0)) : 0;
-    const upLo = Math.max(ms, upExit);
+    const upLo = Math.max(MIN_LEG, upExit);
     const upBehind = upLo - ex;
     const endLeft = b.solid ? near(b, "l", -Infinity, 0) : ex;
     let x1 =
       upBehind > 0
-        ? upLo + grow(upBehind, legS, ms)
+        ? upLo + grow(upBehind, legS)
         : clamp(mid(upExit, endLeft), upLo, ex);
     // (climbing a leg's length out, or as far as halfway to the end's
     // element ahead of it, past the end, the further the higher it climbs,
@@ -560,7 +576,7 @@ const routeAcross = (input: RouteInput): Route => {
       past > ex - input.radius ? Math.max(past, leg, ex + input.radius) : past;
     // (above the end's element, where it reaches over the segment's span)
     const climb = Math.max(above, b.solid ? -near(b, "t", ex, x1) : -Infinity);
-    let y = -climb - grow(climb, legE, me);
+    let y = -climb - grow(climb, legE);
     // (over the start's element, where the segment there runs back over
     // it, as far as it does)
     y += dodgeUp(a, y, ex, x1);
@@ -595,31 +611,22 @@ const routeAcross = (input: RouteInput): Route => {
   }
 
   if (behind > 0) {
-    const x1 = lo + grow(behind, legS, ms);
+    const x1 = lo + grow(behind, legS);
     // (between where the start's element reaches down to and the end's up
     // to, over the span the segment between them runs)
     const startEdge = near(a, "b", ex, x1);
     const endEdge = near(b, "t", ex, x1);
     const endTop = b.solid ? Math.min(ey, endEdge) : ey;
-    const squeeze = input.sameElement ? 0 : ms + me + 2 * input.radius;
-    // (halfway between the elements, clear of the start's leg, short of the
-    // end's)
-    const hi = Math.max(0, endTop - me);
-    let y = clamp(mid(startEdge, endEdge), Math.min(input.radius, hi / 2), hi);
-    // (but where the segment there runs back under the start's element, as
-    // far as it does, no closer to it than to the end, where there isn't
-    // room for the end's leg as well, at the expense of the end's leg: so it
-    // stays between them, rather than running along the element)
-    const reachAlong = a.solid
-      ? Math.min(x1, a.r - a.gap) - Math.max(ex, a.l + a.gap)
-      : 0;
-    y += Math.max(
-      0,
-      Math.min(
-        mid(reach(a.outline, "b", ex, x1), endTop) - y,
-        DODGE_RATE * reachAlong,
-        endTop - input.radius / 2 - y,
-      ),
+    const squeeze = input.sameElement ? 0 : 2 * (MIN_LEG + input.radius);
+    // (halfway between the elements, clear of the start's leg: where there
+    // isn't room for the end's whole leg as well, at the expense of the
+    // end's leg, down to its shortest, so it stays between them rather than
+    // running along the start's element)
+    const hi = Math.max(0, endTop - MIN_LEG);
+    const y = clamp(
+      mid(startEdge, endEdge),
+      Math.min(input.radius, hi / 2),
+      hi,
     );
     const between: Point[] = [[0, 0], [x1, 0], [x1, y], [ex, y], end];
     const apart = endEdge - startEdge >= -(a.gap + b.gap);
