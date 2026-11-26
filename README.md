@@ -43,7 +43,7 @@
     </a>
     <figcaption>
       <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
+        Create beautiful hand-drawn-like diagrams, wireframes, or whatever you like.
       </p>
     </figcaption>
   </figure>
@@ -62,7 +62,7 @@ The Excalidraw editor (npm package) supports:
 - 😀&nbsp;Shape libraries support.
 - 🌐&nbsp;Localization (i18n) support.
 - 🖼️&nbsp;Export to PNG, SVG & clipboard.
-- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
+- 💾&nbsp;Open format - export drawings as an `.excalidraw` JSON file.
 - ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
 - ➡️&nbsp;Arrow-binding & labeled arrows.
 - 🔙&nbsp;Undo / Redo.
@@ -76,13 +76,13 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 - 🤼&nbsp;Real-time collaboration.
 - 🔒&nbsp;End-to-end encryption.
 - 💾&nbsp;Local-first support (autosaves to the browser).
-- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
+- 🔗&nbsp;Shareable links (export to a read-only link you can share with others).
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
 ## Quick start
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
+**Note:** The following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
 
 Use `npm` or `yarn` to install the package.
 
@@ -102,7 +102,7 @@ Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excal
 
 ## Integrations
 
-- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
+- [VS Code extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
 - [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
 
 ## Who's integrating Excalidraw
