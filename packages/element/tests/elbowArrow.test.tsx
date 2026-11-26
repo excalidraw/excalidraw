@@ -439,11 +439,17 @@ describe("elbow arrow ui", () => {
     expect(arrow.endBinding?.elementId).toBe(rect.id);
     expect(arrow.endBinding?.mode).toBe("inside");
     expect(endOf()).toCloselyEqualPoints([[240, 40]]);
+    // no midpoint indicators while binding inside
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.suggestedBinding?.inside).toBe(true);
+    expect(h.state.suggestedBinding?.midPoint).toBeUndefined();
 
     Keyboard.keyUp(KEYS.ALT);
 
     expect(arrow.endBinding?.mode).not.toBe("inside");
     expect(endOf()[0][1]).toBeLessThan(0);
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.suggestedBinding?.inside).toBe(false);
 
     mouse.up();
 
@@ -482,6 +488,8 @@ describe("elbow arrow ui", () => {
     // the preview already shows where the click will put the end
     expect(endOf()[0]).toBeCloseTo(240);
     expect(endOf()[1]).toBeCloseTo(40);
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.suggestedBinding?.inside).toBe(true);
 
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.click();

@@ -2511,6 +2511,7 @@ const pointDraggingUpdates = (
         suggestedBinding: suggestedBindingElement
           ? {
               element: suggestedBindingElement,
+              inside: isInside,
               midPoint:
                 app.state.isMidpointSnappingEnabled && !isInside
                   ? getSnapOutlineMidPoint(

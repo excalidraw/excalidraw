@@ -445,6 +445,7 @@ const renderBindingHighlightForBindableElement_simple = (
     appState.isMidpointSnappingEnabled &&
     !appState.gridModeEnabled &&
     !angleLocked &&
+    !suggestedBinding.inside &&
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {

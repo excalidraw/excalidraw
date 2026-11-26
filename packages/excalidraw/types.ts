@@ -388,6 +388,11 @@ export interface AppState {
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
     midPoint?: GlobalPoint;
+    /**
+     * The endpoint binds inside the element where it is (elbow arrows with
+     * Alt held), so there are no midpoints to snap to
+     */
+    inside?: boolean;
   } | null;
   /**
    * What a text-tool click at the hovered position would act on — the text
