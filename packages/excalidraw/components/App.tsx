@@ -7055,16 +7055,25 @@ class App extends React.Component<AppProps, AppState> {
           this.state.zoom,
         );
         if (hoveredElement) {
+          // An elbow arrow started here with Alt held binds inside, where
+          // there are no midpoints to snap to
+          const inside =
+            arrow.elbowed &&
+            event.altKey &&
+            isPointInElement(globalPoint, hoveredElement, elementsMap);
           this.setState({
             suggestedBinding: {
               element: hoveredElement,
-              midPoint: getSnapOutlineMidPoint(
-                globalPoint,
-                hoveredElement,
-                elementsMap,
-                this.state.zoom,
-                arrow,
-              ),
+              inside,
+              midPoint: inside
+                ? undefined
+                : getSnapOutlineMidPoint(
+                    globalPoint,
+                    hoveredElement,
+                    elementsMap,
+                    this.state.zoom,
+                    arrow,
+                  ),
             },
           });
         } else if (this.state.suggestedBinding) {
@@ -8780,6 +8789,11 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
+      // An elbow arrow's start bound inside (Alt held) has no midpoints to
+      // snap to
+      const startsInside =
+        isElbowArrow(element) && element.startBinding?.mode === "inside";
+
       // NOTE: We need the flushSync here for the
       // delayed bind mode change to see the right state
       // (specifically the `newElement`)
@@ -8821,13 +8835,16 @@ class App extends React.Component<AppProps, AppState> {
               boundElement && isBindingElement(element)
                 ? {
                     element: boundElement,
-                    midPoint: getSnapOutlineMidPoint(
-                      point,
-                      boundElement,
-                      elementsMap,
-                      this.state.zoom,
-                      element,
-                    ),
+                    inside: startsInside,
+                    midPoint: startsInside
+                      ? undefined
+                      : getSnapOutlineMidPoint(
+                          point,
+                          boundElement,
+                          elementsMap,
+                          this.state.zoom,
+                          element,
+                        ),
                   }
                 : null,
             selectedElementIds: nextSelectedElementIds,
