@@ -309,7 +309,9 @@ export class LinearElementEditor {
   }
 
   static handlePointerMove(
-    event: PointerEvent,
+    // only its modifier keys are used, so a keyboard event can re-run the
+    // preview when they change without the pointer moving
+    event: PointerEvent | KeyboardEvent,
     app: AppClassProperties,
     scenePointerX: number,
     scenePointerY: number,

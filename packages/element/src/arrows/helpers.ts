@@ -13,6 +13,7 @@ export const maybeHandleArrowPointlikeDrag = ({
 }): boolean => {
   const appState = app.state;
   if (appState.selectedLinearElement && app.lastPointerMoveCoords) {
+    const { multiElement } = appState;
     // Update focus point status if the binding mode is changing
     if (appState.selectedLinearElement.draggedFocusPointBinding) {
       handleFocusPointDrag(
@@ -24,6 +25,25 @@ export const maybeHandleArrowPointlikeDrag = ({
         app.getEffectiveGridSize(),
         event.altKey,
       );
+      return true;
+    } else if (
+      multiElement &&
+      multiElement.id === appState.selectedLinearElement.elementId &&
+      multiElement.points[multiElement.points.length - 1] !==
+        appState.selectedLinearElement.lastCommittedPoint
+    ) {
+      // Click-to-place: re-run the preview of the uncommitted end point, so
+      // it already shows where the next click (with these modifiers) puts it
+      const newState = LinearElementEditor.handlePointerMove(
+        "nativeEvent" in event ? event.nativeEvent : event,
+        app,
+        app.lastPointerMoveCoords.x,
+        app.lastPointerMoveCoords.y,
+        appState.selectedLinearElement,
+      );
+      if (newState) {
+        app.setState(newState);
+      }
       return true;
     } else if (
       appState.selectedLinearElement.hoverPointIndex !== null &&

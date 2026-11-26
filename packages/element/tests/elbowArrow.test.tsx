@@ -451,6 +451,93 @@ describe("elbow arrow ui", () => {
     expect(arrow.endBinding?.mode).toBe("orbit");
   });
 
+  it("moves the click-to-place preview inside when Alt is pressed without moving", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 50);
+    mouse.click();
+    mouse.moveTo(240, 40);
+
+    const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+    const endOf = () => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [arrow.x + end[0], arrow.y + end[1]];
+    };
+
+    expect(endOf()[1]).toBeLessThan(0);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+
+    // the preview already shows where the click will put the end
+    expect(endOf()[0]).toBeCloseTo(240);
+    expect(endOf()[1]).toBeCloseTo(40);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.click();
+    });
+
+    expect(h.state.multiElement).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    expect(endOf()[0]).toBeCloseTo(240);
+    expect(endOf()[1]).toBeCloseTo(40);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
+  it("moves the click-to-place preview onto the outline when Alt is released without moving", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 50);
+    mouse.click();
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(240, 40);
+    });
+
+    const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+    const endOf = () => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [arrow.x + end[0], arrow.y + end[1]];
+    };
+
+    expect(endOf()[0]).toBeCloseTo(240);
+    expect(endOf()[1]).toBeCloseTo(40);
+
+    Keyboard.keyUp(KEYS.ALT);
+
+    // the preview already shows where the click will put the end
+    const [previewX, previewY] = endOf();
+    expect(previewY).toBeLessThan(0);
+
+    mouse.click();
+
+    expect(h.state.multiElement).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    expect(endOf()[0]).toBeCloseTo(previewX);
+    expect(endOf()[1]).toBeCloseTo(previewY);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
   describe("retargeting a bound end with Alt held", () => {
     // An elbow arrow bound to `from`, with `to` below it, and the arrow's end
     // ready to be dragged
