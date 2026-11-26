@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import React from "react";
 
 import { FONT_FAMILY, KEYS } from "@excalidraw/common";
-import { Scene } from "@excalidraw/element";
+import { Scene, updateStickyNoteLayout } from "@excalidraw/element";
 
 import type { FontMetadata } from "@excalidraw/common";
 import type {
@@ -195,7 +195,7 @@ describe("FontPicker", () => {
     fireEvent.click(trigger);
 
     let textVersion = API.getElement(text).version;
-    let containerVersion = API.getElement(container).version;
+    const containerVersion = API.getElement(container).version;
     for (const fontName of ["Nunito", "Comic Shanns"] as const) {
       fireEvent.mouseMove(
         (await screen.findByText(fontName)).closest("button")!,
@@ -204,11 +204,7 @@ describe("FontPicker", () => {
         expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY[fontName]),
       );
       expect(API.getElement(text).version).toBeGreaterThan(textVersion);
-      expect(API.getElement(container).version).toBeGreaterThan(
-        containerVersion,
-      );
       textVersion = API.getElement(text).version;
-      containerVersion = API.getElement(container).version;
     }
 
     fireEvent.click(trigger);
@@ -217,7 +213,152 @@ describe("FontPicker", () => {
       expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
     );
     expect(API.getElement(text).version).toBeGreaterThan(textVersion);
-    expect(API.getElement(container).version).toBeGreaterThan(containerVersion);
+    // the previews never changed its size, so there was nothing to restore
+    expect(API.getElement(container).version).toBe(containerVersion);
+  });
+
+  it("leaves the elements alone when the picker closes without a preview", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    const trigger = queryByTestId("font-family-show-fonts")!;
+    fireEvent.click(trigger);
+    await screen.findByText("Comic Shanns");
+
+    // i.e. by a collaborator, while the picker is open
+    API.updateElement(API.getElement(text) as ExcalidrawTextElement, {
+      originalText: "Hello there",
+      text: "Hello there",
+      x: 100,
+    });
+    const { version } = API.getElement(text);
+
+    fireEvent.click(trigger);
+    await waitFor(() => expect(h.state.openPopup).toBe(null));
+
+    expect(API.getElement(text)).toMatchObject({
+      originalText: "Hello there",
+      x: 100,
+      version,
+    });
+  });
+
+  it("takes a preview back to where it started, not to where the picker opened", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    // selected along with the text, which is all it has to do with a font
+    const rectangle = API.createElement({ type: "rectangle", x: 200 });
+    API.setElements([text, rectangle]);
+    API.setSelectedElements([text, rectangle]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+
+    const trigger = queryByTestId("font-family-show-fonts")!;
+    fireEvent.click(trigger);
+    const comicShanns = (await screen.findByText("Comic Shanns")).closest(
+      "button",
+    )!;
+
+    // i.e. by a collaborator, with the picker open and nothing hovered yet
+    API.updateElement(API.getElement(text), { y: 300 });
+
+    fireEvent.mouseMove(comicShanns);
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    // and during the preview
+    API.updateElement(API.getElement(rectangle), { x: 350 });
+
+    fireEvent.click(trigger);
+
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
+    );
+    expect(API.getElement(text).y).toBe(300);
+    expect(API.getElement(rectangle).x).toBe(350);
+  });
+
+  it("restores the font size a preview refitted on a sticky note", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const note = API.createElement({
+      type: "stickynote",
+      id: "note",
+      width: 250,
+      height: 250,
+      baseHeight: 250,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      containerId: note.id,
+      text: "one\ntwo\nthree\nfour\nfive\nsix\nseven",
+      fontSize: 28,
+      textAlign: "center",
+      verticalAlign: "middle",
+    });
+    API.setElements([note, label]);
+    act(() => {
+      updateStickyNoteLayout(API.getElement(note), h.app.scene, {
+        renderEnvironment: h.app.renderEnvironment,
+      });
+    });
+    API.setSelectedElements([API.getElement(note)]);
+    const { fontFamily, fontSize } = API.getElement(label);
+
+    const trigger = queryByTestId("font-family-show-fonts")!;
+    fireEvent.click(trigger);
+    fireEvent.mouseMove(
+      (await screen.findByText("Lilita One")).closest("button")!,
+    );
+    await waitFor(() =>
+      expect(API.getElement(label).fontFamily).toBe(FONT_FAMILY["Lilita One"]),
+    );
+    expect(API.getElement(label).fontSize).not.toBe(fontSize);
+
+    fireEvent.click(trigger);
+
+    await waitFor(() =>
+      expect(API.getElement(label).fontFamily).toBe(fontFamily),
+    );
+    expect(API.getElement(label).fontSize).toBe(fontSize);
+  });
+
+  it("takes back the font alone when the text was edited during the preview", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+
+    const trigger = queryByTestId("font-family-show-fonts")!;
+    fireEvent.click(trigger);
+    fireEvent.mouseMove(
+      (await screen.findByText("Comic Shanns")).closest("button")!,
+    );
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    // i.e. by a collaborator
+    API.updateElement(API.getElement(text) as ExcalidrawTextElement, {
+      originalText: "Hello there",
+      text: "Hello there",
+      strokeColor: "#ff0000",
+    });
+
+    fireEvent.click(trigger);
+
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
+    );
+    expect(API.getElement(text)).toMatchObject({
+      originalText: "Hello there",
+      text: "Hello there",
+      strokeColor: "#ff0000",
+    });
   });
 
   it("reverts a hover preview when clicking outside the picker", async () => {
@@ -1784,6 +1925,32 @@ describe("FontPicker", () => {
         await waitFor(() => expect(loadMore).toHaveBeenCalledTimes(1));
         await act(async () => {});
         expect(screen.queryByText("Browse more fonts")).toBe(null);
+      });
+
+      it("offers more also when the scene uses every available font", async () => {
+        await open(
+          {
+            fontProviders: {
+              "test.provider": {
+                resolve,
+                availableFonts: [],
+                loadMore: async () => ["Zulu"],
+              },
+            },
+          },
+          [
+            FONT_FAMILY.Excalifont,
+            FONT_FAMILY.Nunito,
+            FONT_FAMILY["Comic Shanns"],
+            FONT_FAMILY["Lilita One"],
+          ].map((fontFamily) =>
+            API.createElement({ type: "text", text: "a", fontFamily }),
+          ),
+        );
+
+        expect(getGroupFamilies("Available fonts")).toEqual([]);
+        fireEvent.click(await screen.findByText("Browse more fonts"));
+        await screen.findByText("Zulu");
       });
 
       it("offers nothing more without a provider able to page", async () => {

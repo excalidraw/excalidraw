@@ -6,7 +6,32 @@ type DataURL = string;
 
 export class ExcalidrawFontFace {
   public readonly urls: URL[] | DataURL[];
-  public readonly fontFace: FontFace;
+
+  /**
+   * Built when first asked for: an export running where there is no
+   * `FontFace` (Node, a worker without one) registers fonts as well - for
+   * their metrics, and to inline their files into an SVG - and never gets
+   * here, having no font set to put a face into.
+   */
+  public get fontFace(): FontFace {
+    if (!this._fontFace) {
+      const sources = this.urls
+        .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
+        .join(", ");
+
+      // WARN: the bare name, unquoted - it takes the name itself, so a
+      // pre-quoted value double-quotes and matches nothing
+      this._fontFace = new FontFace(this.cssFamily, sources, {
+        display: "swap",
+        style: "normal",
+        weight: "400",
+        ...this.descriptors,
+      });
+    }
+    return this._fontFace;
+  }
+
+  private _fontFace: FontFace | undefined;
 
   /**
    * The family as we know it, i.e. "Excalifont" or "google:Roboto" - our
@@ -42,19 +67,6 @@ export class ExcalidrawFontFace {
     this.family = family;
     this.cssFamily = cssFamily;
     this.descriptors = descriptors;
-
-    const sources = this.urls
-      .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
-      .join(", ");
-
-    // WARN: the bare name, unquoted - it takes the name itself, so a
-    // pre-quoted value double-quotes and matches nothing
-    this.fontFace = new FontFace(this.cssFamily, sources, {
-      display: "swap",
-      style: "normal",
-      weight: "400",
-      ...descriptors,
-    });
   }
 
   /** the same face again, with a `FontFace` which hasn't been loaded yet */
@@ -172,11 +184,12 @@ export class ExcalidrawFontFace {
   }
 
   private getUnicodeRangeRegex() {
-    // prefer our own descriptor - `fontFace.unicodeRange` is the browser's
-    // serialization of it (and a hardcoded stub in tests). A real gate here
-    // also keeps non-intersecting faces out of exports entirely
-    const unicodeRange =
-      this.descriptors?.unicodeRange ?? this.fontFace.unicodeRange;
+    // From our own descriptor, not from `fontFace.unicodeRange`: that is the
+    // browser's serialization of it, and takes a `FontFace`, which an export
+    // running headless hasn't got. A face without one covers every character
+    // (the default in CSS, and what the browser says for it too). A real gate
+    // here also keeps non-intersecting faces out of exports entirely
+    const unicodeRange = this.descriptors?.unicodeRange ?? "U+0-10FFFF";
 
     // using \u{h} or \u{hhhhh} to match any number of hex digits,
     // otherwise we would get an "Invalid Unicode escape" error
@@ -227,15 +240,17 @@ export class ExcalidrawFontFace {
     // absolute assets paths, which are found in tests and excalidraw-app build, won't work with base url, so we are stripping initial slash away
     const assetUrl: string = uri.replace(/^\/+/, "");
     const urls: URL[] = [];
+    // no `window` where an export runs headless (i.e. Node) - the bundled
+    // fonts come from the fallback url there
+    const assetPath =
+      typeof window !== "undefined" ? window.EXCALIDRAW_ASSET_PATH : undefined;
 
-    if (typeof window.EXCALIDRAW_ASSET_PATH === "string") {
-      const normalizedBaseUrl = this.normalizeBaseUrl(
-        window.EXCALIDRAW_ASSET_PATH,
-      );
+    if (typeof assetPath === "string") {
+      const normalizedBaseUrl = this.normalizeBaseUrl(assetPath);
 
       urls.push(new URL(assetUrl, normalizedBaseUrl));
-    } else if (Array.isArray(window.EXCALIDRAW_ASSET_PATH)) {
-      window.EXCALIDRAW_ASSET_PATH.forEach((path) => {
+    } else if (Array.isArray(assetPath)) {
+      assetPath.forEach((path) => {
         const normalizedBaseUrl = this.normalizeBaseUrl(path);
         urls.push(new URL(assetUrl, normalizedBaseUrl));
       });

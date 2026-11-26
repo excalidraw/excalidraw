@@ -5,7 +5,6 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useSyncExternalStore,
   type KeyboardEventHandler,
 } from "react";
 
@@ -14,6 +13,7 @@ import { isCustomFontFamily, KEYS } from "@excalidraw/common";
 import type { FontFamily } from "@excalidraw/common";
 
 import { useStableCallback } from "../../hooks/useStableCallback";
+import { useSyncExternalStore } from "../../hooks/useSyncExternalStore";
 import { t } from "../../i18n";
 import {
   useApp,
@@ -430,7 +430,9 @@ export const FontPickerList = React.memo(
       groupFonts: readonly FontDescriptor[],
       footer?: React.ReactNode,
     ) => {
-      if (!groupFonts.length) {
+      // a footer is shown also on its own, i.e. "Browse more fonts" when the
+      // scene uses every available font
+      if (!groupFonts.length && !footer) {
         return;
       }
       groups.push(

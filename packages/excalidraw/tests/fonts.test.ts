@@ -326,6 +326,47 @@ describe("custom font registration", () => {
     }
   });
 
+  it("leaves the font faces unbuilt where there is no font set (headless export)", async () => {
+    // jsdom implements no `document.fonts`; only the test document is mocked
+    vi.stubGlobal("document", document.implementation.createHTMLDocument());
+    try {
+      // building the built-in faces takes `FontFace`, which such an
+      // environment needn't have
+      const registry = new FontRegistry();
+      const registered = vi.spyOn(registry, "registered", "get");
+      const text = API.createElement({
+        type: "text",
+        text: "hi",
+        fontFamily: FONT_FAMILY.Helvetica,
+      });
+
+      expect(
+        await Fonts.loadElementsFonts(
+          [text],
+          new Fonts(new Scene(), {}, registry),
+        ),
+      ).toEqual([]);
+      expect(registered).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("loads into a document passed in place of a `Fonts`", async () => {
+    const ownerDocument = document.implementation.createHTMLDocument();
+    const load = vi.fn(async () => []);
+    Object.defineProperty(ownerDocument, "fonts", {
+      value: { has: () => true, add: vi.fn(), check: () => false, load },
+    });
+
+    await Fonts.loadElementsFonts(
+      [API.createElement({ type: "text", text: "hi" })],
+      ownerDocument,
+    );
+
+    expect(load).toHaveBeenCalled();
+  });
+
   it("keeps registered custom families loadable", async () => {
     const fonts = new Fonts(new Scene(), {
       "test.loadable": vi
@@ -690,6 +731,31 @@ describe("Fonts.warnAboutUnresolvableFonts", () => {
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain('"com.unresolvable:Font"');
+    warn.mockRestore();
+  });
+});
+
+describe("Fonts.warnAboutUnresolvableFonts (headless)", () => {
+  it("leaves the font faces unbuilt", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    // building the built-in faces takes `FontFace`, which an environment
+    // without a font set needn't have
+    const registry = new FontRegistry();
+    const registered = vi.spyOn(registry, "registered", "get");
+
+    Fonts.warnAboutUnresolvableFonts(
+      [
+        API.createElement({
+          type: "text",
+          text: "a",
+          fontFamily: "test.unconfigured:Brand",
+        }),
+      ],
+      new Fonts(new Scene(), {}, registry),
+    );
+
+    expect(registered).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
 });

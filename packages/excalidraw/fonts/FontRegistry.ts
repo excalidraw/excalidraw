@@ -9,7 +9,11 @@ import {
   Emitter,
 } from "@excalidraw/common";
 
-import type { FontFamily, FontMetadata } from "@excalidraw/common";
+import type {
+  CustomFontFamily,
+  FontFamily,
+  FontMetadata,
+} from "@excalidraw/common";
 
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";
@@ -129,6 +133,15 @@ export class FontRegistry {
   }
 
   /**
+   * Whether a custom family is registered. Reads the backing map directly,
+   * as {@link hasCustomFamilies} does: the lazy built-in init builds font
+   * faces, which a headless export has no `FontFace` for.
+   */
+  public hasCustomFamily(family: CustomFontFamily): boolean {
+    return !!this._registered?.has(family);
+  }
+
+  /**
    * Announce registry changes at most once per microtask - registrations
    * arrive in bursts, and each emit hands React a fresh map identity.
    *
@@ -183,8 +196,13 @@ export class FontRegistry {
     fontFaces: readonly ExcalidrawFontFace[],
     fontFaceSet: FontFaceSet | null = getFontFaceSet(),
   ) {
+    // nothing to install into (i.e. a headless export) - and no reason to
+    // build the faces' `FontFace`s, which such an environment may not have
+    if (!fontFaceSet) {
+      return;
+    }
     for (const { fontFace } of fontFaces) {
-      if (fontFaceSet && !fontFaceSet.has(fontFace)) {
+      if (!fontFaceSet.has(fontFace)) {
         fontFaceSet.add(fontFace);
       }
     }

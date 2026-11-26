@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import {
   applyDarkModeFilter,
   BOUND_TEXT_PADDING,
@@ -495,6 +498,32 @@ describe("registerFontResolvers", () => {
     warn.mockRestore();
   });
 
+  it("doesn't resolve the font of a deleted element", async () => {
+    const resolver = createResolver();
+
+    await exportScene({
+      type: "svg",
+      data: {
+        elements: [
+          API.createElement({
+            type: "text",
+            text: "a",
+            fontFamily: "test.deleted:Gone",
+            isDeleted: true,
+          }),
+        ],
+        appState: {},
+        files: null,
+      },
+      config: {
+        skipInliningFonts: true,
+        fontResolvers: { "test.deleted": resolver },
+      },
+    });
+
+    expect(resolver).not.toHaveBeenCalled();
+  });
+
   it("lets a resolver passed to the export win", async () => {
     const registered = createResolver();
     const passed = createResolver();
@@ -750,6 +779,99 @@ describe("export inputs", () => {
       consoleWarn.mockRestore();
     });
 
+    it.each([
+      ["a local font", FONT_FAMILY.Helvetica],
+      ["a font of a provider nobody configured", "test.unconfigured:Brand"],
+      ["a font a configured resolver supplies", "test.headless:Brand"],
+    ] as const)("needs no `FontFace` either, for %s", async (_, fontFamily) => {
+      const consoleWarn = vi
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      const ownerDocument = document.implementation.createHTMLDocument();
+      vi.stubGlobal("document", ownerDocument);
+      vi.stubGlobal("FontFace", undefined);
+      const loadFonts = vi.fn(async () => {});
+
+      // twice: the second export finds the resolved family registered
+      for (let i = 0; i < 2; i++) {
+        const svg = await exportScene({
+          type: "svg",
+          data: {
+            elements: [
+              API.createElement({ type: "text", text: "hi", fontFamily }),
+            ],
+          },
+          config: {
+            skipInliningFonts: true,
+            fontResolvers: {
+              "test.headless": async () => ({
+                fontFaces: [{ uri: "https://example.com/font.woff2" }],
+                metadata: {
+                  metrics: {
+                    unitsPerEm: 1000,
+                    ascender: 800,
+                    descender: -200,
+                    lineHeight: 1.2,
+                  },
+                },
+              }),
+            },
+            environment: { document: ownerDocument, loadFonts },
+          },
+        });
+
+        expect(svg.querySelector("text")?.textContent).toBe("hi");
+      }
+      expect(loadFonts).toHaveBeenCalledTimes(2);
+      consoleWarn.mockRestore();
+    });
+
+    it("embeds a resolved font with no `window`, `document` or `FontFace` at all (i.e. Node)", async () => {
+      // the export is handed the document to build the SVG in
+      const ownerDocument = document.implementation.createHTMLDocument();
+      const font = readFileSync(
+        path.resolve(__dirname, "../../fonts/Virgil/Virgil-Regular.woff2"),
+      );
+      const element = API.createElement({
+        type: "text",
+        text: "hi",
+        fontFamily: "test.node:Virgil",
+      });
+      vi.stubGlobal("FontFace", undefined);
+      vi.stubGlobal("window", undefined);
+      vi.stubGlobal("document", undefined);
+      vi.stubGlobal("self", undefined);
+
+      const svg = await exportScene({
+        type: "svg",
+        data: { elements: [element] },
+        config: {
+          fontResolvers: {
+            // a face without a `unicodeRange`
+            "test.node": async () => ({
+              fontFaces: [
+                { uri: `data:font/woff2;base64,${font.toString("base64")}` },
+              ],
+              metadata: {
+                metrics: {
+                  unitsPerEm: 1000,
+                  ascender: 800,
+                  descender: -200,
+                  lineHeight: 1.25,
+                },
+              },
+            }),
+          },
+          environment: { document: ownerDocument, loadFonts: async () => {} },
+        },
+      });
+
+      expect(svg.querySelector("text")?.textContent).toBe("hi");
+      expect(svg.querySelector("style.style-fonts")?.textContent).toMatch(
+        /@font-face.*url\(data:/,
+      );
+    });
+
     it("loads fonts into a worker's own font set", async () => {
       const fonts = {
         has: () => true,
@@ -770,6 +892,25 @@ describe("export inputs", () => {
         "hi",
       );
     });
+  });
+
+  it("loads fonts into the document it's given (e.g. a popout window's)", async () => {
+    const ownerDocument = document.implementation.createHTMLDocument();
+    const load = vi.fn(async () => []);
+    Object.defineProperty(ownerDocument, "fonts", {
+      value: { has: () => true, add: vi.fn(), check: () => false, load },
+    });
+
+    await exportScene({
+      type: "svg",
+      data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      config: { environment: { document: ownerDocument } },
+    });
+
+    expect(load).toHaveBeenCalledWith(
+      expect.stringContaining("Excalifont"),
+      "hi",
+    );
   });
 
   it("renders frame decorations per config.frames", async () => {

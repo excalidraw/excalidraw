@@ -590,18 +590,31 @@ const configExportDimension = async ({
   // exports never record resolution failures - a transient one must not mark
   // the family failed for a live editor sharing the page-scoped failure set
   const fontResolvers = getExportFontResolvers(cfg.fontResolvers);
-  const fonts = new Fonts(new Scene(), fontResolvers);
+  // The fonts go into the document the export draws in: a canvas can't use
+  // the faces of another one (i.e. an editor in a popout window, whose
+  // exports would otherwise load them into the opener's). A document without
+  // a font set (a DOM implementation's) is left to the defaults.
+  const fontsDocument = renderEnvironment.document?.fonts
+    ? renderEnvironment.document
+    : undefined;
+  const fonts = new Fonts(new Scene(), fontResolvers, undefined, {
+    ownerDocument: fontsDocument,
+  });
 
   // resolve custom families before `restore` - a programmatic text element
   // (one without `lineHeight`/`height`) derives its line height from the
   // family metrics, which only exist once registered
+  // (not for what won't be exported: `data.elements` may hold deleted ones)
+  const exportedElements = data.elements.filter(
+    (element) => !element.isDeleted,
+  );
   if (Object.keys(fontResolvers).length) {
-    await Fonts.registerElementsFonts(data.elements, fonts, {
+    await Fonts.registerElementsFonts(exportedElements, fonts, {
       recordFailure: false,
     });
   }
   // nothing else would tell: the text just comes out in another font
-  Fonts.warnAboutUnresolvableFonts(data.elements, fonts);
+  Fonts.warnAboutUnresolvableFonts(exportedElements, fonts);
 
   // restore elements (normalizes & drops invisible elements) and filter out
   // deleted ones. The type contract requires non-deleted elements already,

@@ -1,5 +1,6 @@
 import {
   FONT_FAMILY_FALLBACKS,
+  FONT_METADATA,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   getFontFamilyFallbacks,
   FONT_SIZES,
@@ -393,6 +394,10 @@ export class Fonts {
    * @returns whether a face got swapped
    */
   public retryFailedFontFaces = (family: FontFamily): boolean => {
+    // without a font set no face was ever loaded, or failed to
+    if (!this.fontFaceSet) {
+      return false;
+    }
     const registeredFont = this.registry.registered.get(family);
     if (
       !registeredFont?.fontFaces.some(
@@ -685,18 +690,31 @@ export class Fonts {
 
   /**
    * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
+   *
+   * @param fontsOrDocument the `Fonts` to load with (its resolvers, and the
+   * document its faces go into), or just the document to load into
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
-    fonts: Fonts = new Fonts(new Scene()),
+    fontsOrDocument: Fonts | Document = new Fonts(new Scene()),
     options?: Pick<RegistrationOptions, "recordFailure">,
   ): Promise<FontFace[]> => {
+    const fonts =
+      fontsOrDocument instanceof Fonts
+        ? fontsOrDocument
+        : new Fonts(new Scene(), undefined, undefined, {
+            ownerDocument: fontsOrDocument,
+          });
+
     if (!fonts.fontFaceSet) {
-      // local fonts (e.g. Helvetica) are never loaded anyway
+      // local fonts (e.g. Helvetica) are never loaded anyway. Told from the
+      // metadata: the registry builds font faces, which an environment
+      // without a font set needn't have (`FontFace`)
       if (
         !warnedNoFontFaceSet &&
         Fonts.getUniqueFamilies(elements).some(
-          (family) => !fonts.registry.registered.get(family)?.metadata.local,
+          (family) =>
+            isCustomFontFamily(family) || !FONT_METADATA[family]?.local,
         )
       ) {
         warnedNoFontFaceSet = true;
@@ -735,9 +753,9 @@ export class Fonts {
   ) => {
     for (const family of Fonts.getUniqueFamilies(elements)) {
       if (
-        typeof family !== "string" ||
+        !isCustomFontFamily(family) ||
         warnedUnresolvableFamilies.has(family) ||
-        fonts.registry.registered.has(family)
+        fonts.registry.hasCustomFamily(family)
       ) {
         continue;
       }

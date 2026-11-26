@@ -1175,13 +1175,46 @@ type ChangeFontFamilyData = Partial<
   refreshCache?: (activeHoveredFontFamily?: FontFamily | null) => void;
 };
 
-// a revert must be a newer version, or collab never syncs it
-const withoutVersion = <T extends Partial<ExcalidrawElement>>({
-  version,
-  versionNonce,
-  updated,
-  ...rest
-}: T) => rest;
+/**
+ * What a font preview changes: the font of a text, and the layout which
+ * follows from it - of the text, and of its container. See
+ * `redrawTextBoundingBox`; a sticky note also fits its label's font size and
+ * keeps a base height.
+ */
+const FONT_PREVIEW_GEOMETRY_KEYS = ["x", "y", "width", "height"] as const;
+const FONT_PREVIEW_CONTAINER_KEYS = [
+  ...FONT_PREVIEW_GEOMETRY_KEYS,
+  "baseHeight",
+] as const;
+const FONT_PREVIEW_FONT_KEYS = ["fontFamily", "lineHeight"] as const;
+const FONT_PREVIEW_TEXT_KEYS = [
+  ...FONT_PREVIEW_FONT_KEYS,
+  "text",
+  "fontSize",
+  "baseFontSize",
+  ...FONT_PREVIEW_GEOMETRY_KEYS,
+] as const;
+
+/**
+ * The cached values of the properties a font preview has changed. Taking a
+ * preview back restores these and nothing else: the rest of the element may
+ * have been changed meanwhile by someone else (a collaborator), for real.
+ */
+const getFontPreviewRevert = <T extends ExcalidrawElement>(
+  element: T,
+  cachedElement: ExcalidrawElement,
+  keys: readonly string[],
+) => {
+  const current = element as Record<string, unknown>;
+  const cached = cachedElement as Record<string, unknown>;
+  const update: Record<string, unknown> = {};
+  for (const key of keys) {
+    if (key in cached && current[key] !== cached[key]) {
+      update[key] = cached[key];
+    }
+  }
+  return Object.keys(update).length ? (update as ElementUpdate<T>) : null;
+};
 
 export const actionChangeFontFamily = register<{
   currentItemFontFamily: any;
@@ -1200,24 +1233,79 @@ export const actionChangeFontFamily = register<{
     } = value as ChangeFontFamilyData;
 
     if (resetAll) {
-      // by id, not selection - a click outside the picker may have cleared it.
-      // A deleted one stays so, i.e. when deleted by a collaborator meanwhile
+      const resetAppState = { ...appState, ...nextAppState };
+
+      // Only a live preview has something to take back. Without one (the
+      // picker got opened and closed, or the hover was reverted already) the
+      // elements are left alone: whatever changed since they were cached
+      // wasn't ours, and a restore would also be a newer version of each
+      if (appState.currentHoveredFontFamily == null) {
+        return {
+          appState: resetAppState,
+          captureUpdate: CaptureUpdateAction.NEVER,
+        };
+      }
+
+      // a preview touches texts and their containers - whatever else is
+      // selected along with them (and so cached) isn't ours to restore
+      const containerIds = new Set<string>();
+      for (const cachedElement of cachedElements?.values() ?? []) {
+        if (isTextElement(cachedElement) && cachedElement.containerId) {
+          containerIds.add(cachedElement.containerId);
+        }
+      }
+
+      // By id, not selection - a click outside the picker may have cleared it.
+      // A deleted one stays so, i.e. when deleted by a collaborator meanwhile.
+      // What gets restored is a newer version, or collab never syncs it
       const nextElements = elements.map((element) => {
         const cachedElement = cachedElements?.get(element.id);
-        return cachedElement && !element.isDeleted
-          ? newElementWith(
-              element,
-              withoutVersion(cachedElement) as ElementUpdate<typeof element>,
-            )
-          : element;
+        if (
+          !cachedElement ||
+          element.isDeleted ||
+          (!isTextElement(element) && !containerIds.has(element.id))
+        ) {
+          return element;
+        }
+
+        if (
+          isTextElement(element) &&
+          isTextElement(cachedElement) &&
+          element.originalText !== cachedElement.originalText
+        ) {
+          // edited during the preview: the cached wrapping and geometry are
+          // another text's, so only the font goes back, and it's laid out anew
+          const update = getFontPreviewRevert(
+            element,
+            cachedElement,
+            FONT_PREVIEW_FONT_KEYS,
+          );
+          if (!update) {
+            return element;
+          }
+          const nextElement = newElementWith(element, update);
+          redrawTextBoundingBox(
+            nextElement,
+            app.scene.getContainerElement(element),
+            app.scene,
+            app.renderEnvironment,
+          );
+          return nextElement;
+        }
+
+        const update = getFontPreviewRevert(
+          element,
+          cachedElement,
+          isTextElement(element)
+            ? FONT_PREVIEW_TEXT_KEYS
+            : FONT_PREVIEW_CONTAINER_KEYS,
+        );
+        return update ? newElementWith(element, update) : element;
       });
 
       return {
         elements: nextElements,
-        appState: {
-          ...appState,
-          ...nextAppState,
-        },
+        appState: resetAppState,
         captureUpdate: CaptureUpdateAction.NEVER,
       };
     }
@@ -1318,15 +1406,23 @@ export const actionChangeFontFamily = register<{
                 },
               );
 
-              const cachedContainer = withoutVersion(
-                cachedElements?.get(oldElement.containerId || "") || {},
+              const cachedContainer = cachedElements?.get(
+                oldElement.containerId || "",
               );
 
               const container = app.scene.getContainerElement(oldElement);
 
               if (resetContainers && container && cachedContainer) {
-                // reset the container back to it's cached version
-                app.scene.mutateElement(container, { ...cachedContainer });
+                // back to the size it had before the previews, so that it
+                // doesn't keep the largest one's
+                const update = getFontPreviewRevert(
+                  container,
+                  cachedContainer,
+                  FONT_PREVIEW_CONTAINER_KEYS,
+                );
+                if (update) {
+                  app.scene.mutateElement(container, update);
+                }
               }
 
               if (!skipFontFaceCheck) {
@@ -1464,6 +1560,8 @@ export const actionChangeFontFamily = register<{
     const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
     const isUnmounted = useRef(true);
     const pendingRefreshRef = useRef(false);
+    /** a hover preview is applied to the scene, and not taken back yet */
+    const isPreviewAppliedRef = useRef(false);
     const { stylesPanelMode } = getStylesPanelInfo(app);
 
     const refreshCachedElements = useCallback(
@@ -1564,7 +1662,24 @@ export const actionChangeFontFamily = register<{
 
     useEffect(() => {
       if (Object.keys(batchedData).length) {
-        updateData(batchedData);
+        let data = batchedData;
+        if (batchedData.resetAll || batchedData.currentItemFontFamily) {
+          isPreviewAppliedRef.current = false;
+        } else if (
+          batchedData.currentHoveredFontFamily &&
+          !isPreviewAppliedRef.current
+        ) {
+          // A preview starts here. What it's taken back to is the scene as
+          // it is now, not as it was when the picker opened - it may have
+          // been open for a while, with collaborators at work
+          isPreviewAppliedRef.current = true;
+          refreshCachedElements(null);
+          data = {
+            ...batchedData,
+            cachedElements: new Map(cachedElementsRef.current),
+          };
+        }
+        updateData(data);
         // the async font load path re-runs this from within the action once it
         // settles. Hover is passed explicitly - committed app state still
         // holds the pre-action value here
@@ -1639,6 +1754,7 @@ export const actionChangeFontFamily = register<{
       }
       const cachedElements = cachedElementsRef.current;
       return () => {
+        isPreviewAppliedRef.current = false;
         if (cachedElements.size && app.state.currentHoveredFontFamily) {
           updateDataRef.current(getResetData());
           // a batched reset would only repeat this

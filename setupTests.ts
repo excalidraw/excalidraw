@@ -64,6 +64,8 @@ Object.defineProperty(window, "matchMedia", {
 
 Object.defineProperty(window, "FontFace", {
   enumerable: true,
+  // a test of an environment without one takes it away (`vi.stubGlobal`)
+  configurable: true,
   value: class {
     private family: string;
     private source: string;
