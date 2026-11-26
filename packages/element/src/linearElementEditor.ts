@@ -58,6 +58,7 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
+  syncBoundElementsWithNextBindings,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -1854,6 +1855,10 @@ export class LinearElementEditor {
       isMidpointSnappingEnabled?: boolean;
     },
   ) {
+    if (otherUpdates && isArrowElement(element)) {
+      syncBoundElementsWithNextBindings(element, otherUpdates, scene);
+    }
+
     if (isElbowArrow(element)) {
       const updates: {
         startBinding?: FixedPointBinding | null;

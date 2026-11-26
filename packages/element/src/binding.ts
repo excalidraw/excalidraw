@@ -1338,6 +1338,72 @@ export const unbindBindingElement = (
   return binding.elementId;
 };
 
+/**
+ * For bindings about to be written onto the arrow directly (e.g. while its
+ * endpoint is dragged), records the arrow on the elements it becomes bound to
+ * and drops it from those it no longer is, so the elements it's dragged away
+ * from don't keep listing it. Call before writing the bindings.
+ */
+export const syncBoundElementsWithNextBindings = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  nextBindings: {
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
+  },
+  scene: Scene,
+): void => {
+  const boundIds = (
+    startBinding: FixedPointBinding | null,
+    endBinding: FixedPointBinding | null,
+  ) =>
+    new Set(
+      [startBinding?.elementId, endBinding?.elementId].filter(
+        (id): id is string => !!id,
+      ),
+    );
+  const prevIds = boundIds(arrow.startBinding, arrow.endBinding);
+  const nextIds = boundIds(
+    nextBindings.startBinding === undefined
+      ? arrow.startBinding
+      : nextBindings.startBinding,
+    nextBindings.endBinding === undefined
+      ? arrow.endBinding
+      : nextBindings.endBinding,
+  );
+
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const bindableById = (id: string) => {
+    const element = elementsMap.get(id);
+    return element && isBindableElement(element) ? element : null;
+  };
+
+  for (const id of prevIds) {
+    const bindable = !nextIds.has(id) && bindableById(id);
+    if (bindable) {
+      scene.mutateElement(bindable, {
+        boundElements: bindable.boundElements?.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      });
+    }
+  }
+
+  for (const id of nextIds) {
+    const bindable = !prevIds.has(id) && bindableById(id);
+    if (
+      bindable &&
+      !bindable.boundElements?.some((element) => element.id === arrow.id)
+    ) {
+      scene.mutateElement(bindable, {
+        boundElements: (bindable.boundElements || []).concat({
+          id: arrow.id,
+          type: "arrow",
+        }),
+      });
+    }
+  }
+};
+
 export const reanchorBindingsToOutline = (
   changedElement: NonDeleted<ExcalidrawBindableElement>,
   scene: Scene,

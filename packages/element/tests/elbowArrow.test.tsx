@@ -451,6 +451,109 @@ describe("elbow arrow ui", () => {
     expect(arrow.endBinding?.mode).toBe("orbit");
   });
 
+  describe("retargeting a bound end with Alt held", () => {
+    // An elbow arrow bound to `from`, with `to` below it, and the arrow's end
+    // ready to be dragged
+    const setup = () => {
+      const from = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const to = UI.createElement("rectangle", {
+        x: 200,
+        y: 300,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(0, 50);
+      mouse.moveTo(240, 40);
+      mouse.up();
+
+      const arrow = h.scene.getSelectedElements(
+        h.state,
+      )[0] as ExcalidrawElbowArrowElement;
+      expect(arrow.endBinding?.elementId).toBe(from.id);
+      expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      UI.clickTool("selection");
+      const end = arrow.points[arrow.points.length - 1];
+      mouse.reset();
+      mouse.downAt(arrow.x + end[0], arrow.y + end[1]);
+
+      return { from, to, arrow };
+    };
+
+    it("drops the arrow from the original element when dropped on the canvas", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+
+        // while inside the other element, it's bound there on both sides
+        expect(arrow.endBinding?.elementId).toBe(to.id);
+        expect(arrow.endBinding?.mode).toBe("inside");
+        expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+        expect(from.boundElements ?? []).toEqual([]);
+
+        mouse.moveTo(600, 600);
+        mouse.up();
+      });
+
+      expect(arrow.endBinding).toBe(null);
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("drops the arrow from the original element when Alt is released before dropping on the canvas", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+      });
+      mouse.moveTo(600, 600);
+      mouse.up();
+
+      expect(arrow.endBinding).toBe(null);
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("moves the arrow from the original element to the one dropped in", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+        mouse.up();
+      });
+
+      expect(arrow.endBinding?.elementId).toBe(to.id);
+      expect(arrow.endBinding?.mode).toBe("inside");
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+    });
+
+    it("keeps the arrow on the original element when dragged back onto it", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+        mouse.moveTo(260, 60);
+        mouse.up();
+      });
+
+      expect(arrow.endBinding?.elementId).toBe(from.id);
+      expect(arrow.endBinding?.mode).toBe("inside");
+      expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+  });
+
   it("keeps arrow shape when the whole set of arrow and bindables are duplicated", async () => {
     UI.createElement("rectangle", {
       x: -150,
