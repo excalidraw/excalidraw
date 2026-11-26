@@ -31,8 +31,11 @@ export const shouldDiscardRemoteElement = (
     // holds the draft, and writes it on top of whatever the scene has by
     // then, so the newest write wins on every client. Discarded, a remote
     // copy isn't sent again, and the clients end up on different texts.)
-    (local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.newElement?.id ||
+    // Also never discard a newer remote deletion tombstone so active local
+    // resize/creation states cannot resurrect a deleted element.
+    ((!remote.isDeleted &&
+      (local.id === localAppState.resizingElement?.id ||
+        local.id === localAppState.newElement?.id)) ||
       // local element is newer
       local.version > remote.version ||
       // resolve conflicting edits deterministically by taking the one with

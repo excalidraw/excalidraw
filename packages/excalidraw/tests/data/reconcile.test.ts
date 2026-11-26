@@ -318,6 +318,73 @@ describe("elements reconciliation", () => {
     expect(reconciled[0]).not.toBe(local);
   });
 
+  it("does not discard a newer remote deletion tombstone for editing, resizing, or new elements", () => {
+    const [base] = idsToElements(["A:1"]);
+    const deletedRemote = {
+      ...base,
+      version: base.version + 1,
+      isDeleted: true,
+    } as RemoteExcalidrawElement;
+
+    for (const appStateOverride of [
+      {},
+      { editingTextElement: base },
+      { resizingElement: base },
+      { newElement: base },
+    ]) {
+      const reconciled = reconcileElements(
+        [base] as OrderedExcalidrawElement[],
+        [deletedRemote],
+        appStateOverride as unknown as AppState,
+      );
+      expect(reconciled).toHaveLength(1);
+      expect(reconciled[0]).toBe(deletedRemote);
+      expect(reconciled[0].isDeleted).toBe(true);
+    }
+  });
+
+  it("still discards non-deletion remote updates while resizing or creating a new element", () => {
+    const [local] = idsToElements(["A:1"]);
+    const [remote] = idsToElements(["A:2"]);
+
+    for (const appStateOverride of [
+      { resizingElement: local },
+      { newElement: local },
+    ]) {
+      const reconciled = reconcileElements(
+        [local] as OrderedExcalidrawElement[],
+        [remote] as RemoteExcalidrawElement[],
+        appStateOverride as unknown as AppState,
+      );
+      expect(reconciled).toEqual([local]);
+      expect(reconciled[0]).toBe(local);
+    }
+  });
+
+  it("still discards an older remote deletion tombstone when local has a higher version", () => {
+    const [local] = idsToElements(["A:3"]);
+    const deletedRemote = {
+      ...local,
+      version: local.version - 1,
+      isDeleted: true,
+    } as RemoteExcalidrawElement;
+
+    for (const appStateOverride of [
+      {},
+      { editingTextElement: local },
+      { resizingElement: local },
+      { newElement: local },
+    ]) {
+      const reconciled = reconcileElements(
+        [local] as OrderedExcalidrawElement[],
+        [deletedRemote],
+        appStateOverride as unknown as AppState,
+      );
+      expect(reconciled).toEqual([local]);
+      expect(reconciled[0].isDeleted).toBeFalsy();
+    }
+  });
+
   it("test identical elements reconciliation", () => {
     const testIdentical = (
       local: ElementLike[],
