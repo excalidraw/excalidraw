@@ -1,6 +1,7 @@
 import { isValidFontProviderKey } from "../fonts";
 import {
   createGoogleFontResolver,
+  getGoogleFontKind,
   getGoogleFontPreviewText,
   loadMoreGoogleFonts,
   GOOGLE_FONT_DEFAULT_PICKS,
@@ -58,6 +59,12 @@ describe("Google Fonts catalog", () => {
     expect(await getGoogleFontPreviewText("Zen Maru Gothic")).toBe("あ");
     expect(await getGoogleFontPreviewText("Open Sans")).toBe("");
     expect(await getGoogleFontPreviewText("Not A Font")).toBe("");
+  });
+
+  it("tells what kind of font a family is", async () => {
+    expect(await getGoogleFontKind("Kalam")).toBe("hand-drawn");
+    expect(await getGoogleFontKind("Fira Mono")).toBe("code");
+    expect(await getGoogleFontKind("Not A Font")).toBe(undefined);
   });
 });
 

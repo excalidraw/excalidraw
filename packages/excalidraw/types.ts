@@ -724,8 +724,19 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+/**
+ * What a font is for, as the font picker's icons tell it: handwriting, text,
+ * code (monospace) or headings (display).
+ */
+export type FontKind = "hand-drawn" | "normal" | "code" | "heading";
+
 export interface FontProvider {
-  icon: React.JSX.Element;
+  /**
+   * The icon of a family's row in the font list where the provider says
+   * nothing else about it - see `getKind` and `getPreviewText`. Without one
+   * such a row gets the icon of a "normal" font.
+   */
+  icon?: React.JSX.Element;
   /**
    * Resolve a bare font family name (i.e. "Roboto") into a loadable font
    * definition.
@@ -751,9 +762,9 @@ export interface FontProvider {
    * It stands for the family when pinned to the font picker's top picks -
    * "Aa" when omitted, empty or failed, and while a returned promise is
    * pending ("Aa" falls back to another font where the family has no Latin
-   * glyphs). In the font list it takes the place of `icon` in the family's
-   * row, so that a family named in Latin letters shows which script it
-   * writes; without one the row keeps `icon`.
+   * glyphs). In the font list it is the icon of the family's row, so that a
+   * family named in Latin letters shows which script it writes; without one
+   * the row's icon follows `getKind`, then `icon`.
    *
    * Asked once per listed or pinned family, the answer is kept for the
    * session.
@@ -761,6 +772,19 @@ export interface FontProvider {
    * @param fontFamily the family's id, i.e. "Roboto" - see {@link ProvidedFont}
    */
   getPreviewText?(fontFamily: string): string | Promise<string>;
+  /**
+   * What kind of font a family is. Its row in the font list gets the icon
+   * our own fonts of that kind have, so that the list reads the same way
+   * throughout. Return nothing for a family you can't tell it of - its row
+   * gets `icon`.
+   *
+   * Asked once per listed family, the answer is kept for the session.
+   *
+   * @param fontFamily the family's id, i.e. "Roboto" - see {@link ProvidedFont}
+   */
+  getKind?(
+    fontFamily: string,
+  ): FontKind | undefined | Promise<FontKind | undefined>;
   /**
    * Find families beyond `availableFonts` as the user types into the font
    * picker's search (debounced, and aborted via `signal` once superseded).

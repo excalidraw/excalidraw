@@ -339,6 +339,42 @@ describe("FontPicker", () => {
     expect(hasProviderIcon(await getIcon("Latin Row"))).toBe(true);
   });
 
+  it("lists a family by the icon our own fonts of its kind have", async () => {
+    const { queryByTestId } = await render(
+      <Excalidraw
+        handleKeyboardGlobally={true}
+        fontProviders={{
+          "test.provider": {
+            resolve: createDeferredResolver().resolver,
+            availableFonts: ["Mono Row", "Plain Row"],
+            getKind: (name) =>
+              name === "Mono Row" ? Promise.resolve("code") : undefined,
+          },
+        }}
+      />,
+    );
+    Keyboard.keyPress(KEYS.T);
+    act(() => {
+      queryByTestId("font-family-show-fonts")!.click();
+    });
+
+    // the icon's shape - its markup differs in the order of the attributes
+    const getIcon = async (label: string) =>
+      Array.from(
+        (await screen.findByText(label))
+          .closest("button")!
+          .querySelectorAll(".dropdown-menu-item__icon path"),
+        (path) => path.getAttribute("d"),
+      ).join(" ");
+
+    await waitFor(async () =>
+      expect(await getIcon("Mono Row")).toBe(await getIcon("Comic Shanns")),
+    );
+    // no kind, and no icon of the provider's: a normal font's
+    expect(await getIcon("Plain Row")).toBe(await getIcon("Nunito"));
+    expect(await getIcon("Plain Row")).not.toBe(await getIcon("Mono Row"));
+  });
+
   it("registers a visible available font before previewing it", async () => {
     const restoreIntersectionObserver = mockVisibleIntersections();
     const deferred = createDeferredResolver();

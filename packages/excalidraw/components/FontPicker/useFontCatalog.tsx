@@ -30,13 +30,15 @@ import {
 } from "../icons";
 
 import {
+  getProvidedFontKind,
   getProvidedFontPreviewText,
+  loadFontKind,
   loadFontPreviewText,
-} from "./fontPreviewText";
+} from "./fontProviderInfo";
 
 import type { Fonts } from "../../fonts";
 
-import type { FontProviders, ProvidedFont } from "../../types";
+import type { FontKind, FontProviders, ProvidedFont } from "../../types";
 import type { RegisteredFont } from "../../fonts";
 
 import type { ProviderSearchResult } from "./useFontSearch";
@@ -110,14 +112,30 @@ const getGlyphIcon = (fontFamily: CustomFontFamily, text: string) => {
   return icon;
 };
 
+/** the icons our own fonts have, for a provider's family of the same kind */
+const FONT_KIND_ICONS: Record<FontKind, JSX.Element> = {
+  "hand-drawn": FreedrawIcon,
+  normal: FontFamilyNormalIcon,
+  code: FontFamilyCodeIcon,
+  heading: FontFamilyHeadingIcon,
+};
+
+/**
+ * A custom family goes by what its provider says about it: a sample of its
+ * script, else the icon of its kind, else the provider's own icon.
+ */
 export const getFontFamilyIcon = (
   fontFamily: FontFamily,
-  icons?: Record<string, { icon: JSX.Element }>,
+  icons?: Record<string, { icon?: JSX.Element }>,
 ): JSX.Element => {
   if (isCustomFontFamily(fontFamily)) {
     const previewText = getProvidedFontPreviewText(fontFamily);
     if (previewText) {
       return getGlyphIcon(fontFamily, previewText);
+    }
+    const kind = getProvidedFontKind(fontFamily);
+    if (kind) {
+      return FONT_KIND_ICONS[kind];
     }
     const parsed = parseProviderFontFamily(fontFamily);
     const icon = parsed ? icons?.[parsed.providerId]?.icon : undefined;
@@ -265,17 +283,18 @@ export const useFontCatalog = ({
     [searchResults],
   );
 
-  // the preview texts arrive after the rows they change the icon of
-  const [previewTextsVersion, onPreviewTextChange] = useReducer(
+  // what a provider says about a family arrives after the row it changes the
+  // icon of
+  const [providerInfoVersion, onProviderInfoChange] = useReducer(
     (version: number) => version + 1,
     0,
   );
   const getIcon = useMemo(() => {
     // a new function per version: the lists below rebuild with the new icons
-    void previewTextsVersion;
+    void providerInfoVersion;
     return (fontFamily: FontFamily) =>
       getFontFamilyIcon(fontFamily, fontProviders);
-  }, [fontProviders, previewTextsVersion]);
+  }, [fontProviders, providerInfoVersion]);
 
   const { allFonts, moreOnlyFamilies } = useMemo(() => {
     const descriptors = new Map<FontFamily, FontDescriptor>();
@@ -488,28 +507,30 @@ export const useFontCatalog = ({
     }, [filteredFontDescriptors, searchResults, getCustomFontStatus, getIcon]);
 
   // layout effect: a synchronous answer lands before paint, without flashing
-  // the provider's icon first
+  // another icon first
   useLayoutEffect(() => {
     let isCurrent = true;
-    /** @returns whether the answer came synchronously, and changed the text */
+    const getIconSource = (fontFamily: FontFamily) =>
+      getProvidedFontPreviewText(fontFamily) ?? getProvidedFontKind(fontFamily);
+    /** @returns whether an answer came synchronously, and changed the icon */
     const load = (fontFamily: FontFamily) => {
-      const previousText = getProvidedFontPreviewText(fontFamily);
-      const hasChanged = () =>
-        getProvidedFontPreviewText(fontFamily) !== previousText;
-      const pending = loadFontPreviewText(fontFamily, fontProviders);
-      pending?.then(() => {
+      const previous = getIconSource(fontFamily);
+      const hasChanged = () => getIconSource(fontFamily) !== previous;
+      const onSettled = () => {
         if (isCurrent && hasChanged()) {
-          onPreviewTextChange();
+          onProviderInfoChange();
         }
-      });
-      return !pending && hasChanged();
+      };
+      loadFontPreviewText(fontFamily, fontProviders)?.then(onSettled);
+      loadFontKind(fontFamily, fontProviders)?.then(onSettled);
+      return hasChanged();
     };
     // `map`, not `some`: every family gets asked
     const hasSyncAnswer = [...allFonts, ...searchMatches, ...searchSuggestions]
       .map((font) => load(font.value))
       .includes(true);
     if (hasSyncAnswer) {
-      onPreviewTextChange();
+      onProviderInfoChange();
     }
     return () => {
       isCurrent = false;

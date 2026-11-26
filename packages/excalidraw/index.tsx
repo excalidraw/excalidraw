@@ -524,6 +524,7 @@ export type {
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 
 export type {
+  FontKind,
   FontProvider,
   FontProviders,
   FontSearchResult,

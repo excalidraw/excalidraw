@@ -1,11 +1,11 @@
 [
-  ["Kalam", 1000, 1063, -531, 0],
-  ["Patrick Hand", 1000, 1042, -312, 0],
-  ["Pacifico", 1000, 1303, -453, 0],
-  ["Open Sans", 2048, 2189, -600, 0],
-  ["Literata", 1000, 1177, -308, 0],
-  ["Fira Mono", 1000, 935, -265, 0],
-  ["Bevan", 2048, 2366, -925, 0],
-  ["Zen Maru Gothic", 1000, 1160, -288, 0, "Jpan"],
-  ["Gowun Dodum", 1000, 1160, -288, 0, "Kore"]
+  ["Kalam", 1000, 1063, -531, 0, "hand-drawn"],
+  ["Patrick Hand", 1000, 1042, -312, 0, "hand-drawn"],
+  ["Pacifico", 1000, 1303, -453, 0, "hand-drawn"],
+  ["Open Sans", 2048, 2189, -600, 0, "normal"],
+  ["Literata", 1000, 1177, -308, 0, "normal"],
+  ["Fira Mono", 1000, 935, -265, 0, "code"],
+  ["Bevan", 2048, 2366, -925, 0, "heading"],
+  ["Zen Maru Gothic", 1000, 1160, -288, 0, "normal", "Jpan"],
+  ["Gowun Dodum", 1000, 1160, -288, 0, "normal", "Kore"]
 ]

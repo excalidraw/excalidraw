@@ -29,7 +29,7 @@
  */
 import type { FontDefinition, FontResolver } from "../Fonts";
 
-import type { FontSearchResult } from "../../types";
+import type { FontKind, FontSearchResult } from "../../types";
 
 /** the provider key of every Google font id, i.e. "google:Open Sans" */
 export { GOOGLE_FONT_PROVIDER_KEY } from "../providerKey";
@@ -48,6 +48,8 @@ export type GoogleFont = {
   name: string;
   /** read from the font files when the catalog is generated */
   metrics: FontDefinition["metadata"]["metrics"];
+  /** set by hand - Google's categories file i.e. a display face as a serif */
+  kind: FontKind;
   /**
    * Text previewing the family where "Aa" would misrepresent it: CJK
    * families, and families with no Latin glyphs.
@@ -63,10 +65,10 @@ export type GoogleFontCatalog = {
 };
 
 /**
- * [name, unitsPerEm, ascender, descender, lineGap, script?] - see
+ * [name, unitsPerEm, ascender, descender, lineGap, kind, script?] - see
  * `scripts/buildGoogleFontsCatalog.mjs`
  */
-type CatalogEntry = [string, number, number, number, number, string?];
+type CatalogEntry = [string, number, number, number, number, FontKind, string?];
 
 const PREVIEW_TEXT_BY_SCRIPT: Record<string, string> = {
   Jpan: "あ",
@@ -94,7 +96,7 @@ export const loadGoogleFontCatalog = (): Promise<GoogleFontCatalog> => {
   if (!catalogPromise) {
     catalogPromise = import("./catalog.json").then((module) => {
       const fonts = (module.default as CatalogEntry[]).map(
-        ([name, unitsPerEm, ascender, descender, lineGap, script]) => {
+        ([name, unitsPerEm, ascender, descender, lineGap, kind, script]) => {
           const font: GoogleFont = {
             name,
             metrics: {
@@ -104,6 +106,7 @@ export const loadGoogleFontCatalog = (): Promise<GoogleFontCatalog> => {
               // the font's own default line spacing, over the em
               lineHeight: (ascender - descender + lineGap) / unitsPerEm,
             },
+            kind,
           };
           const previewText = script && PREVIEW_TEXT_BY_SCRIPT[script];
           if (previewText) {
@@ -448,6 +451,15 @@ export const getGoogleFontPreviewText = async (
   familyName: string,
 ): Promise<string> =>
   (await loadGoogleFontCatalog()).get(familyName)?.previewText ?? "";
+
+/**
+ * A font provider's `getKind`: what kind of font the family is, for the icon
+ * of its row in the font list.
+ */
+export const getGoogleFontKind = async (
+  familyName: string,
+): Promise<FontKind | undefined> =>
+  (await loadGoogleFontCatalog()).get(familyName)?.kind;
 
 /**
  * The catalog's families by name and in its order, for a font picker's

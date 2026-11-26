@@ -6,7 +6,7 @@ import type { FontFamily } from "@excalidraw/common";
 
 import { useTopPicksDnD } from "../TopPicksDnD/topPicksDnD";
 
-import { getFontPreviewText } from "./fontPreviewText";
+import { getFontPreviewText } from "./fontProviderInfo";
 
 import type {
   CreateTopPicksGhost,

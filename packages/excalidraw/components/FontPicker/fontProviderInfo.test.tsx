@@ -1,6 +1,11 @@
 import { FONT_FAMILY } from "@excalidraw/common";
 
-import { getFontPreviewText, loadFontPreviewText } from "./fontPreviewText";
+import {
+  getFontPreviewText,
+  getProvidedFontKind,
+  loadFontKind,
+  loadFontPreviewText,
+} from "./fontProviderInfo";
 
 import type { FontProviders } from "../../types";
 
@@ -91,5 +96,24 @@ describe("font preview text", () => {
 
     expect(error).toHaveBeenCalledTimes(2);
     error.mockRestore();
+  });
+});
+
+describe("font kind", () => {
+  it("keeps a kind we have an icon for, and no other", () => {
+    const fontProviders = {
+      google: {
+        resolve: vi.fn(),
+        availableFonts: [],
+        // a host's answer isn't necessarily one of ours
+        getKind: (familyName: string) => familyName.toLowerCase() as "code",
+      },
+    };
+
+    loadFontKind("google:Code", fontProviders);
+    loadFontKind("google:Serif", fontProviders);
+
+    expect(getProvidedFontKind("google:Code")).toBe("code");
+    expect(getProvidedFontKind("google:Serif")).toBe(null);
   });
 });

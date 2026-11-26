@@ -36,7 +36,7 @@ import {
 
 import { FontPickerList, type FontSelectionOptions } from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
-import { getFontPreviewText, loadFontPreviewText } from "./fontPreviewText";
+import { getFontPreviewText, loadFontPreviewText } from "./fontProviderInfo";
 import {
   FontPickerDnDContext,
   useFontPickerDnD,

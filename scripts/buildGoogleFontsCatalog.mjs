@@ -53,8 +53,9 @@
  *   A family already in the catalog stays, whatever it's classified as
  *   later - see the second rule.
  *
- * Entry: [name, unitsPerEm, ascender, descender, lineGap, script?], in the
- * order of `OFFERED_FAMILIES`. `script` is set where "Aa" makes a poor preview: CJK
+ * Entry: [name, unitsPerEm, ascender, descender, lineGap, kind, script?], in
+ * the order of `OFFERED_FAMILIES`. `kind` is what the family is for, as the font
+ * picker's icons tell it. `script` is set where "Aa" makes a poor preview: CJK
  * families, and families with no Latin subset.
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -351,32 +352,40 @@ const getOffBaselineReason = (sfnt) => {
     : undefined;
 };
 
+/** what a family is for - the font picker's icon for it (`FontKind`) */
+const KINDS = new Set(["hand-drawn", "normal", "code", "heading"]);
+
 /**
  * The families the catalog holds, in its order: what a font picker lists and
- * pages through. To offer another one, add its name - after looking at it in
+ * pages through. To offer another one, add it - after looking at it in
  * Chrome, Firefox and Safari, on the canvas and in the text editor, at a few
  * font sizes. A name can't be taken out again once a release has had it.
+ *
+ * Each with its kind, set by hand: Google's own categories aren't it (they
+ * file Bevan, a display face, as a serif).
  *
  * All are under the SIL Open Font License, with no reserved font name.
  */
 const OFFERED_FAMILIES = [
   // handwriting
-  "Kalam",
-  "Patrick Hand",
-  "Pacifico",
+  ["Kalam", "hand-drawn"],
+  ["Patrick Hand", "hand-drawn"],
+  ["Pacifico", "hand-drawn"],
   // sans
-  "Open Sans",
+  ["Open Sans", "normal"],
   // serif
-  "Literata",
+  ["Literata", "normal"],
   // monospace
-  "Fira Mono",
+  ["Fira Mono", "code"],
   // display
-  "Bevan",
+  ["Bevan", "heading"],
   // Japanese
-  "Zen Maru Gothic",
+  ["Zen Maru Gothic", "normal"],
   // Korean
-  "Gowun Dodum",
+  ["Gowun Dodum", "normal"],
 ];
+const OFFERED_NAMES = OFFERED_FAMILIES.map(([name]) => name);
+const KIND_BY_NAME = new Map(OFFERED_FAMILIES);
 
 /** why a family can't be offered, if it can't */
 const getExclusionReason = (family) => {
@@ -531,7 +540,12 @@ const resolveFamily = async (family, checkOutlines) => {
 };
 
 const main = async () => {
-  /** @type {Array<[string, number, number, number, number, string?]>} */
+  const unkind = OFFERED_FAMILIES.find(([, kind]) => !KINDS.has(kind));
+  if (unkind) {
+    throw new Error(`"${unkind[0]}" has a kind unknown to us: ${unkind[1]}`);
+  }
+
+  /** @type {Array<[string, number, number, number, number, string, string?]>} */
   const previous = JSON.parse(
     await readFile(CATALOG_PATH, "utf8").catch(() => "[]"),
   );
@@ -559,7 +573,7 @@ const main = async () => {
   const entries = new Map();
 
   // the offered ones which Google lists, in our order
-  const queue = OFFERED_FAMILIES.flatMap(
+  const queue = OFFERED_NAMES.flatMap(
     (name) => familiesByName.get(name) ?? [],
   ).filter((family) => {
     // an entry is forever, also when its family got reclassified since
@@ -577,7 +591,7 @@ const main = async () => {
     }
     return true;
   });
-  const unknown = OFFERED_FAMILIES.filter(
+  const unknown = OFFERED_NAMES.filter(
     (name) => !familiesByName.has(name) && !previousByName.has(name),
   );
 
@@ -610,9 +624,10 @@ const main = async () => {
     const metrics = kept && !(refresh && live) ? kept : live;
 
     if (metrics) {
+      const kind = KIND_BY_NAME.get(name);
       entries.set(
         name,
-        script ? [name, ...metrics, script] : [name, ...metrics],
+        script ? [name, ...metrics, kind, script] : [name, ...metrics, kind],
       );
       if (!before) {
         added.push(name);
@@ -638,7 +653,7 @@ const main = async () => {
   // in our order; what left Google's list (or failed to resolve this time)
   // keeps the entry it had
   const retired = previous.filter((entry) => !entries.has(entry[0]));
-  const catalog = OFFERED_FAMILIES.map(
+  const catalog = OFFERED_NAMES.map(
     (name) => entries.get(name) ?? previousByName.get(name),
   ).filter(Boolean);
 
