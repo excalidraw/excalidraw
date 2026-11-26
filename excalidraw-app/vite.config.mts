@@ -1,3 +1,4 @@
+import { readFile } from "node:fs";
 import path from "path";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
@@ -12,7 +13,41 @@ import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 import { APP_ROUTES } from "./app_routes";
 import { MERMAID_CHUNKS_LIST_NAME } from "./data/cacheMermaidChunks";
 
-import type { Plugin, Rollup } from "vite";
+import type { Connect, Plugin, Rollup } from "vite";
+
+const configureNotFoundPage = ({
+  middlewares,
+}: {
+  middlewares: Connect.Server;
+}) => {
+  middlewares.use((req, res, next) => {
+    const pathname = req.url?.split("?", 1)[0];
+    if (
+      (req.method !== "GET" && req.method !== "HEAD") ||
+      (pathname !== "/404" && pathname !== "/404.html")
+    ) {
+      return next();
+    }
+
+    readFile(path.resolve(__dirname, "../public/404.html"), (error, page) => {
+      if (error) {
+        return next(error);
+      }
+      res.writeHead(pathname === "/404" ? 404 : 200, {
+        "Content-Type": "text/html; charset=utf-8",
+      });
+      res.end(page);
+    });
+  });
+};
+
+const notFoundPagePlugin: Plugin = {
+  name: "excalidraw-not-found-page",
+  // Serve the static page before vite-plugin-html rewrites navigation requests.
+  enforce: "pre",
+  configureServer: configureNotFoundPage,
+  configurePreviewServer: configureNotFoundPage,
+};
 
 /**
  * Collects into `lazyChunkFileNames` the chunks reachable only via a dynamic
@@ -272,6 +307,7 @@ export default defineConfig(({ mode }) => {
       assetsInlineLimit: 0,
     },
     plugins: [
+      notFoundPagePlugin,
       Sitemap({
         hostname: "https://excalidraw.com",
         outDir: "build",
