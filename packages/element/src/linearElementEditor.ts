@@ -2476,8 +2476,9 @@ const pointDraggingUpdates = (
 
     // Elbow arrows route around the elements they're bound to while dragging
     // (see `getElbowArrowData`) unless the dragged end binds inside (Alt held),
-    // so the inside binding is applied as the end is dragged, and an existing
-    // inside binding falls back to orbiting when Alt is released.
+    // so the inside binding is applied as the end is dragged. An existing
+    // inside binding falls back to orbiting when Alt is released over the
+    // same element, and is dropped once the end leaves it.
     const bindingUpdates: Pick<
       PointMoveOtherUpdates,
       "startBinding" | "endBinding"
@@ -2500,7 +2501,11 @@ const pointDraggingUpdates = (
           ),
         };
       } else if (currentBinding?.mode === "inside") {
-        bindingUpdates[bindingKey] = { ...currentBinding, mode: "orbit" };
+        bindingUpdates[bindingKey] =
+          draggedStrategy?.mode === "orbit" &&
+          draggedStrategy.element.id === currentBinding.elementId
+            ? { ...currentBinding, mode: "orbit" }
+            : null;
       }
     }
 

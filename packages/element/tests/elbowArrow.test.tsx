@@ -546,6 +546,101 @@ describe("elbow arrow ui", () => {
     expect(validateElbowPoints(arrow.points)).toBe(true);
   });
 
+  it("drops the click-to-place preview's inside binding when moved off the element", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 50);
+    mouse.click();
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(240, 40);
+    });
+
+    const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+
+    mouse.moveTo(100, 300);
+
+    expect(arrow.endBinding).toBe(null);
+    expect(rect.boundElements ?? []).toEqual([]);
+  });
+
+  describe("finishing click-to-place before the end is placed", () => {
+    const isDeleted = (id: string) =>
+      h.elements.find((element) => element.id === id)?.isDeleted;
+
+    it.each([
+      ["Escape", "straight", KEYS.ESCAPE, [250, 50]],
+      ["Enter", "straight", KEYS.ENTER, [250, 50]],
+      ["Escape", "bent", KEYS.ESCAPE, [240, 140]],
+      ["Enter", "bent", KEYS.ENTER, [240, 140]],
+    ] as const)(
+      "discards the arrow on %s with a %s route",
+      (_key, _route, key, [x, y]) => {
+        UI.clickTool("arrow");
+        UI.clickOnTestId("elbow-arrow");
+
+        mouse.reset();
+        mouse.moveTo(0, 50);
+        mouse.click();
+        mouse.moveTo(x, y);
+
+        const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+        expect(arrow.points.length).toBe(x === 250 ? 2 : 4);
+
+        Keyboard.keyPress(key);
+
+        expect(h.state.multiElement).toBe(null);
+        expect(isDeleted(arrow.id)).toBe(true);
+      },
+    );
+
+    it("drops the discarded arrow from the elements its ends were bound to", () => {
+      const start = UI.createElement("rectangle", {
+        x: -100,
+        y: 0,
+        width: 80,
+        height: 100,
+      });
+      const end = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+
+      mouse.reset();
+      mouse.moveTo(-15, 50);
+      mouse.click();
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 40);
+      });
+
+      const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+      expect(arrow.startBinding?.elementId).toBe(start.id);
+      expect(arrow.endBinding?.elementId).toBe(end.id);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(h.state.multiElement).toBe(null);
+      expect(isDeleted(arrow.id)).toBe(true);
+      expect(start.boundElements ?? []).toEqual([]);
+      expect(end.boundElements ?? []).toEqual([]);
+    });
+  });
+
   describe("retargeting a bound end with Alt held", () => {
     // An elbow arrow bound to `from`, with `to` below it, and the arrow's end
     // ready to be dragged
@@ -617,6 +712,44 @@ describe("elbow arrow ui", () => {
       expect(arrow.endBinding).toBe(null);
       expect(from.boundElements ?? []).toEqual([]);
       expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("drops the arrow from the element it was inside when Alt is released and it's dropped on another one's outline", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+      });
+      mouse.moveTo(240, -5);
+
+      expect(arrow.endBinding).toBe(null);
+      expect(to.boundElements ?? []).toEqual([]);
+
+      mouse.up();
+
+      expect(arrow.endBinding?.elementId).toBe(from.id);
+      expect(arrow.endBinding?.mode).toBe("orbit");
+      expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("keeps orbiting the element it was inside when Alt is released over it", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+      });
+      mouse.moveTo(250, 350);
+
+      expect(arrow.endBinding?.elementId).toBe(to.id);
+      expect(arrow.endBinding?.mode).toBe("orbit");
+
+      mouse.up();
+
+      expect(arrow.endBinding?.elementId).toBe(to.id);
+      expect(arrow.endBinding?.mode).toBe("orbit");
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
     });
 
     it("moves the arrow from the original element to the one dropped in", () => {
