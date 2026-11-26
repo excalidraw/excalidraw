@@ -5681,11 +5681,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.key === KEYS.ALT) {
       this.bucketFill.closeTemporaryEyeDropper();
-      maybeHandleArrowPointlikeDrag({ app: this, event });
-    }
-
-    if (event.key === KEYS.SHIFT) {
-      maybeHandleArrowPointlikeDrag({ app: this, event });
     }
 
     if (
@@ -5735,7 +5730,15 @@ class App extends React.Component<AppProps, AppState> {
 
         this.textTool.refresh(event);
       }
-
+    }
+    // Releasing Alt, Shift or Ctrl changes how the point being placed or
+    // dragged binds, so re-run it now instead of on the next pointer move.
+    // Once, after binding is re-enabled above.
+    if (
+      event.key === KEYS.ALT ||
+      event.key === KEYS.SHIFT ||
+      !event[KEYS.CTRL_OR_CMD]
+    ) {
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
     if (isArrowKey(event.key)) {
