@@ -39,7 +39,7 @@ export const PADDING = 40;
  * The shortest the first and the last segment can be, where there isn't
  * room for more (an arrowhead on a shorter one is drawn smaller to fit)
  */
-export const MIN_LEG = 10;
+export const MIN_LEG = 40;
 
 /**
  * How much faster than an element moves a segment moves out of its way, as
