@@ -93,6 +93,7 @@ import {
   STORAGE_KEYS,
   SYNC_BROWSER_TABS_TIMEOUT,
 } from "./app_constants";
+import { APP_ROUTES } from "./app_routes";
 import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
@@ -610,6 +611,13 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
+            // a text edit goes on through the sync: its editor takes the
+            // synced text, or closes if the text is gone
+            appState: localDataState.appState && {
+              ...localDataState.appState,
+              editingTextElement:
+                excalidrawAPI.getAppState().editingTextElement,
+            },
             captureUpdate: CaptureUpdateAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
@@ -1314,7 +1322,7 @@ const ExcalidrawWrapper = () => {
 
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
-    window.location.pathname === "/excalidraw-plus-export";
+    window.location.pathname === APP_ROUTES.excalidrawPlusExport;
   if (isCloudExportWindow) {
     return <ExcalidrawPlusIframeExport />;
   }

@@ -377,6 +377,11 @@ export interface AppState {
   /** user preference whether to show contextual hints above the toolbar */
   showHints: boolean;
   /**
+   * user preference whether multiline text is pasted split into a text
+   * element per line (set from the toast shown after such a paste)
+   */
+  splitOnPaste: boolean;
+  /**
    * user preference for what the wheel does: with a `trackpad` a plain wheel
    * pans; with a `mouse` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is
    * delivered) zooms with either device. Shift+wheel pans horizontally;
@@ -518,6 +523,8 @@ export interface AppState {
     message: React.ReactNode;
     closable?: boolean;
     duration?: number;
+    /** a link-like button after the message; it closes the toast, too */
+    action?: { label: string; onClick: () => void };
   } | null;
   zenModeEnabled: boolean;
   minimapEnabled: boolean;

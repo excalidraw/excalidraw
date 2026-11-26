@@ -1,7 +1,6 @@
 import { flushSync } from "react-dom";
 
 import {
-  DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   getFontString,
   getLineHeight,
@@ -14,9 +13,12 @@ import {
 import {
   convertToExcalidrawElements,
   embeddableURLValidator,
+  fixBindingsAfterDeletion,
   getCommonBounds,
   getEmbedLink,
   getLineHeightInPx,
+  getTextAnchorRatios,
+  isTextElement,
   makeNextSelectedElementIds,
   maybeParseEmbedSrc,
   measureText,
@@ -44,7 +46,6 @@ import {
   MERMAID_TO_EXCALIDRAW_CONFIG,
 } from "../mermaid";
 import { withBatchedUpdates } from "../reactUtils";
-import { getShortcutKey } from "../shortcut";
 import { scrollBoundsIntoView } from "../viewport";
 
 import type React from "react";
@@ -55,11 +56,10 @@ import type {
   PastedMixedContent,
 } from "../clipboard";
 import type App from "./App";
-import type { Offsets } from "../types";
+import type { AppState, Offsets } from "../types";
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
-let PLAIN_PASTE_TOAST_SHOWN = false;
 
 type AppClipboardDependencies = {
   getContainer: () => HTMLDivElement | null;
@@ -74,6 +74,12 @@ type AppClipboardDependencies = {
  * as a library item or a drop does.
  */
 export class AppClipboard {
+  /**
+   * The toast offering to have the text pasted last the other way (split
+   * into lines, or as one element), while it's offered.
+   */
+  private pasteToast: AppState["toast"] = null;
+
   constructor(
     private app: App,
     private dependencies: AppClipboardDependencies,
@@ -357,6 +363,12 @@ export class AppClipboard {
 
       const data = await parseClipboard(dataTransferList, isPlainPaste);
 
+      // the offer for the text pasted before is for the last paste only
+      if (this.pasteToast && this.app.state.toast === this.pasteToast) {
+        this.app.setToast(null);
+      }
+      this.pasteToast = null;
+
       if (this.app.props.onPaste) {
         try {
           if ((await this.app.props.onPaste(data, event)) === false) {
@@ -453,7 +465,7 @@ export class AppClipboard {
       text,
       fontSize: this.app.state.currentItemFontSize,
       fontFamily: this.app.state.currentItemFontFamily,
-      textAlign: DEFAULT_TEXT_ALIGN,
+      textAlign: this.app.state.currentItemTextAlign,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       locked: false,
     };
@@ -462,74 +474,74 @@ export class AppClipboard {
       fontFamily: textElementProps.fontFamily,
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
-    const LINE_GAP = 10;
 
-    const lines = isPlainPaste ? [text] : text.split("\n");
+    const originalText = normalizeText(text).trim();
+    // a phone shows no toast, to have a text the other way from
+    const isPhone = this.app.editorInterface.formFactor === "phone";
+    // as last chosen from the toast after a paste (kept by the host, with
+    // the app state it stores)
+    const asLines = !isPlainPaste && !isPhone && this.app.state.splitOnPaste;
+    /** the text as one element, as laid out last: what its lines are of */
+    let singleTextElement: ExcalidrawTextElement | null = null;
+    // one element, centered at the pointer — or, as chosen from the toast
+    // before, its lines, as splitting it lays them out (either can be had
+    // the other way after, from the toast)
     const createTextElements = (maxTextWidth: number) => {
-      let currentY = y;
-      return lines.reduce((acc: ExcalidrawTextElement[], line, idx) => {
-        const originalText = normalizeText(line).trim();
-        if (originalText.length) {
-          const topLayerFrame = this.app.getTopLayerFrameAtSceneCoords({
-            x,
-            y: currentY,
-          });
-
-          let metrics = measureText(
+      if (!originalText.length) {
+        return [];
+      }
+      const wraps =
+        measureText(
+          originalText,
+          fontString,
+          lineHeight,
+          this.app.renderEnvironment,
+        ).width > maxTextWidth;
+      const wrappedText = wraps
+        ? wrapText(
             originalText,
             fontString,
-            lineHeight,
+            maxTextWidth,
             this.app.renderEnvironment,
-          );
-          const isTextUnwrapped = metrics.width > maxTextWidth;
-
-          const text = isTextUnwrapped
-            ? wrapText(
-                originalText,
-                fontString,
-                maxTextWidth,
-                this.app.renderEnvironment,
-              )
-            : originalText;
-
-          metrics = isTextUnwrapped
-            ? measureText(
-                text,
-                fontString,
-                lineHeight,
-                this.app.renderEnvironment,
-              )
-            : metrics;
-
-          const startX = x - metrics.width / 2;
-          const startY = currentY - metrics.height / 2;
-
-          const element = newTextElement({
-            ...textElementProps,
-            x: startX,
-            y: startY,
-            text,
-            originalText,
-            lineHeight,
-            autoResize: !isTextUnwrapped,
-            frameId: topLayerFrame ? topLayerFrame.id : null,
-            renderEnvironment: this.app.renderEnvironment,
-          });
-          acc.push(element);
-          currentY += element.height + LINE_GAP;
-        } else {
-          const prevLine = lines[idx - 1]?.trim();
-          // add paragraph only if previous line was not empty, IOW don't add
-          // more than one empty line
-          if (prevLine) {
-            currentY +=
-              getLineHeightInPx(textElementProps.fontSize, lineHeight) +
-              LINE_GAP;
-          }
-        }
-
-        return acc;
-      }, []);
+          )
+        : originalText;
+      const metrics = measureText(
+        wrappedText,
+        fontString,
+        lineHeight,
+        this.app.renderEnvironment,
+      );
+      const topLayerFrame = this.app.getTopLayerFrameAtSceneCoords({ x, y });
+      // a text's placed at its anchor: its left edge, center or right edge,
+      // as it's aligned
+      const { x: anchorRatio } = getTextAnchorRatios(textElementProps);
+      const textElement = newTextElement({
+        ...textElementProps,
+        x: x + metrics.width * (anchorRatio - 0.5),
+        y: y - metrics.height / 2,
+        text: wrappedText,
+        originalText,
+        lineHeight,
+        autoResize: !wraps,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+        renderEnvironment: this.app.renderEnvironment,
+      });
+      singleTextElement = textElement;
+      const lines = asLines && this.layoutTextLines(textElement);
+      if (!lines) {
+        return [textElement];
+      }
+      // the lines are centered at the pointer as what they take themselves:
+      // less than the text does, with blank lines between them
+      const [x1, y1, x2, y2] = getCommonBounds(lines);
+      return (
+        this.layoutTextLines(
+          newElementWith(textElement, {
+            x: textElement.x + x - (x1 + x2) / 2,
+            y: textElement.y + y - (y1 + y2) / 2,
+          }),
+        ) ?? lines
+      );
     };
 
     // long texts wrap as a typed one does; wrapped to fit the view, all of
@@ -628,19 +640,223 @@ export class AppClipboard {
     this.app.store.scheduleCapture();
     this.app.setState({ selectedElementIds: getSelectedElementIds() });
 
-    if (
-      !isPlainPaste &&
-      textElements.length > 1 &&
-      PLAIN_PASTE_TOAST_SHOWN === false &&
-      this.app.editorInterface.formFactor !== "phone"
-    ) {
-      this.app.setToast({
-        message: t("toast.pasteAsSingleElement", {
-          shortcut: getShortcutKey("CtrlOrCmd+Shift+V"),
-        }),
-        duration: 5000,
-      });
-      PLAIN_PASTE_TOAST_SHOWN = true;
+    if (isPlainPaste || isPhone) {
+      return;
+    }
+    const single: ExcalidrawTextElement | null = singleTextElement;
+    if (textElements.length > 1 && single) {
+      const lineIds = textElements.map((element) => element.id);
+      this.showPasteToast(
+        t("toast.pastedAsTextElements"),
+        t("toast.pasteAsSingleText"),
+        () => {
+          this.app.setState({ splitOnPaste: false });
+          this.replaceTextLines(lineIds, single);
+        },
+      );
+    } else if (getTextLines(textElements[0]).length > 1) {
+      const [{ id }] = textElements;
+      this.showPasteToast(
+        t("toast.pastedAsSingleText"),
+        t("toast.splitIntoTextElements"),
+        () => {
+          this.app.setState({ splitOnPaste: true });
+          this.splitTextIntoLines(id);
+        },
+      );
     }
   }
+
+  /** the toast offering to have the text just pasted the other way */
+  private showPasteToast(message: string, label: string, onClick: () => void) {
+    this.pasteToast = {
+      message,
+      action: {
+        label,
+        onClick: () => {
+          onClick();
+          // the button's gone with the toast, and the focus with it
+          this.app.focusContainer();
+        },
+      },
+      duration: 8000,
+    };
+    this.app.setToast(this.pasteToast);
+  }
+
+  /** splits a text into an element per line, in its place (one step to undo) */
+  private splitTextIntoLines(elementId: ExcalidrawTextElement["id"]) {
+    const element = this.app.scene.getElement(elementId);
+    if (
+      !element ||
+      element.isDeleted ||
+      !isTextElement(element) ||
+      element.containerId
+    ) {
+      return;
+    }
+    const lines = this.layoutTextLines(element);
+    if (lines) {
+      this.replaceTextElements([element], lines);
+    }
+  }
+
+  /**
+   * A text's lines (blank ones dropped) as elements of their own, laid out
+   * as in it: each line where it was across, indented and wrapped as it
+   * was, and stacked top to bottom from its top, half a line height apart.
+   * None for a text of one line.
+   */
+  private layoutTextLines(element: ExcalidrawTextElement) {
+    const lines = getTextLines(element);
+    if (lines.length < 2) {
+      return null;
+    }
+
+    const fontString = getFontString(element);
+    const { lineHeight } = element;
+    const lineGap = getLineHeightInPx(element.fontSize, lineHeight) / 2;
+    // a text's placed at its anchor: its left edge, center or right edge,
+    // as it's aligned (and its top, middle or bottom)
+    const anchorRatios = getTextAnchorRatios(element);
+    const anchorX = element.x + element.width * anchorRatios.x;
+    let currentY = element.y;
+    return lines.map(({ originalText, text }) => {
+      const { width, height } = measureText(
+        text,
+        fontString,
+        lineHeight,
+        this.app.renderEnvironment,
+      );
+      // moved down by the gaps, a line may've left the frame: each is in
+      // the one at its center, as a pasted text is
+      const topLayerFrame = this.app.getTopLayerFrameAtSceneCoords({
+        x: anchorX + width * (0.5 - anchorRatios.x),
+        y: currentY + height / 2,
+      });
+      const textElement = newTextElement({
+        x: anchorX,
+        y: currentY + height * anchorRatios.y,
+        text,
+        originalText,
+        autoResize: !text.includes("\n"),
+        fontSize: element.fontSize,
+        fontFamily: element.fontFamily,
+        textAlign: element.textAlign,
+        verticalAlign: element.verticalAlign,
+        lineHeight,
+        strokeColor: element.strokeColor,
+        backgroundColor: element.backgroundColor,
+        fillStyle: element.fillStyle,
+        strokeWidth: element.strokeWidth,
+        strokeStyle: element.strokeStyle,
+        roughness: element.roughness,
+        roundness: element.roundness,
+        opacity: element.opacity,
+        groupIds: element.groupIds,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+        locked: element.locked,
+        renderEnvironment: this.app.renderEnvironment,
+      });
+      currentY += height + lineGap;
+      return textElement;
+    });
+  }
+
+  /**
+   * Replaces the lines a text was pasted split into with the text as one
+   * element — the very one it'd have been pasted as — where they are now:
+   * at the first one's top, as aligned. One step to undo.
+   */
+  private replaceTextLines(
+    lineIds: readonly ExcalidrawTextElement["id"][],
+    /** the text as one element, as laid out when pasted */
+    single: ExcalidrawTextElement,
+  ) {
+    const lines: ExcalidrawTextElement[] = [];
+    for (const id of lineIds) {
+      const line = this.app.scene.getElement(id);
+      if (!line || line.isDeleted || !isTextElement(line) || line.containerId) {
+        return;
+      }
+      lines.push(line);
+    }
+
+    const [first] = lines;
+    const { x: anchorRatio } = getTextAnchorRatios(first);
+    const x = first.x + (first.width - single.width) * anchorRatio;
+    const topLayerFrame = this.app.getTopLayerFrameAtSceneCoords({
+      x: x + single.width / 2,
+      y: first.y + single.height / 2,
+    });
+    this.replaceTextElements(lines, [
+      newElementWith(single, {
+        x,
+        y: first.y,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+      }),
+    ]);
+  }
+
+  /**
+   * Replaces texts with others, selected: in the first one's place in the
+   * layer order (but for those in another frame, which join its children),
+   * arrows bound to the replaced ones let go of. One step to undo.
+   */
+  private replaceTextElements(
+    previous: readonly ExcalidrawTextElement[],
+    next: readonly ExcalidrawTextElement[],
+  ) {
+    const [first] = previous;
+    fixBindingsAfterDeletion(this.app.scene.getNonDeletedElements(), previous);
+    for (const element of previous) {
+      this.app.scene.mutateElement(element, { isDeleted: true });
+    }
+    const [inPlace, inOtherFrame] = next.reduce(
+      (acc: [ExcalidrawTextElement[], ExcalidrawTextElement[]], element) => {
+        acc[
+          element.frameId === null || element.frameId === first.frameId ? 0 : 1
+        ].push(element);
+        return acc;
+      },
+      [[], []],
+    );
+    this.app.scene.insertElementsAtIndex(
+      inPlace,
+      this.app.scene.getElementIndex(first.id),
+    );
+    this.app.insertNewElements(inOtherFrame);
+    this.app.store.scheduleCapture();
+    this.app.setState({
+      selectedElementIds: makeNextSelectedElementIds(
+        Object.fromEntries(next.map((element) => [element.id, true])),
+        this.app.state,
+      ),
+    });
+  }
 }
+
+/**
+ * A text's lines (blank ones dropped), each as it's wrapped in the text:
+ * the rows it takes there are told by what's in them, as wrapping drops
+ * nothing but whitespace. Wrapping a line anew may break it elsewhere (the
+ * text's width is what its rows measure, not what they were wrapped to).
+ */
+const getTextLines = (element: ExcalidrawTextElement) => {
+  // normalized, as text is for wrapping (a row may be shorter than what
+  // it's of in the line)
+  const getLength = (text: string) =>
+    text.replace(/\s/g, "").normalize("NFC").length;
+  const rows = element.text.split("\n");
+  let rowIndex = 0;
+  return element.originalText.split("\n").flatMap((line) => {
+    const length = getLength(line);
+    let text = rows[rowIndex++] ?? "";
+    while (rowIndex < rows.length && getLength(text) < length) {
+      text += `\n${rows[rowIndex++]}`;
+    }
+    return length
+      ? [{ originalText: line.trimEnd(), text: text.trimEnd() }]
+      : [];
+  });
+};

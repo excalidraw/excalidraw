@@ -3,19 +3,23 @@ import { vi } from "vitest";
 
 import * as MermaidToExcalidrawLib from "@excalidraw/mermaid-to-excalidraw";
 
-import { getLineHeightInPx } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getLineHeightInPx,
+  setCustomTextMetricsProvider,
+} from "@excalidraw/element";
 
 import {
   KEYS,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
-  arrayToMap,
   getLineHeight,
 } from "@excalidraw/common";
 
-import { getElementBounds } from "@excalidraw/element";
-
-import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
@@ -26,6 +30,7 @@ import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { Pointer, Keyboard } from "./helpers/ui";
 import {
   act,
+  fireEvent,
   render,
   waitFor,
   GlobalTestState,
@@ -136,21 +141,69 @@ describe("general paste behavior", () => {
   });
 });
 
-describe("paste text as single lines", () => {
-  it("should create an element for each line when copying with Ctrl/Cmd+V", async () => {
-    const text = "sajgfakfn\naaksfnknas\nakefnkasf";
-    pasteWithCtrlCmdV(text);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(text.split("\n").length);
-    });
+/** the toast's button, once it's shown */
+const getToastAction = () =>
+  waitFor(() => {
+    const button = document.querySelector<HTMLButtonElement>(".Toast__action");
+    expect(button).not.toBe(null);
+    return button!;
   });
 
-  it("should ignore empty lines when creating an element for each line", async () => {
-    const text = "\n\nsajgfakfn\n\n\naaksfnknas\n\nakefnkasf\n\n\n";
-    pasteWithCtrlCmdV(text);
-    await waitFor(() => {
-      expect(h.elements.length).toEqual(3);
-    });
+const clickToastAction = (button: HTMLButtonElement) => {
+  // as a click does
+  button.focus();
+  fireEvent.click(button);
+};
+
+/**
+ * pastes a text with Ctrl/Cmd+V, and splits it from the toast (the pasted
+ * text, then the lines it's split into, are what's selected)
+ */
+const pasteAndSplit = async (
+  text: string,
+  beforeSplit?: (pasted: ExcalidrawTextElement) => void,
+) => {
+  pasteWithCtrlCmdV(text);
+  const button = await getToastAction();
+  const pasted = API.getSelectedElement() as ExcalidrawTextElement;
+  beforeSplit?.(pasted);
+  clickToastAction(button);
+  return {
+    pasted,
+    texts: API.getSelectedElements() as ExcalidrawTextElement[],
+  };
+};
+
+describe("paste multiline text", () => {
+  it("should paste a single element, and offer to split it into an element per line", async () => {
+    const text = "sajgfakfn\n\n  aaksfnknas\nakefnkasf\n";
+    const { pasted, texts } = await pasteAndSplit(text);
+    expect(pasted.originalText).toBe(text.trim());
+
+    // blank lines dropped (the indentation kept), in place of the pasted
+    // text, selected
+    expect(texts.map((text) => text.originalText)).toEqual([
+      "sajgfakfn",
+      "  aaksfnknas",
+      "akefnkasf",
+    ]);
+    expect(h.elements.find((el) => el.id === pasted.id)?.isDeleted).toBe(true);
+    expect(texts[0].x).toBeCloseTo(pasted.x);
+    expect(texts[0].y).toBeCloseTo(pasted.y);
+    expect(Object.keys(h.state.selectedElementIds).sort()).toEqual(
+      texts.map((text) => text.id).sort(),
+    );
+    expect(h.state.toast).toBe(null);
+    // the button's gone, the focus is back in the editor (to paste again)
+    expect(document.activeElement).toBe(
+      document.querySelector(".excalidraw-container"),
+    );
+
+    // one step to undo
+    Keyboard.undo();
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.id),
+    ).toEqual([pasted.id]);
   });
 
   it("should not create any element if clipboard has only new lines", async () => {
@@ -162,58 +215,289 @@ describe("paste text as single lines", () => {
     });
   });
 
-  it("should space items correctly", async () => {
-    const elementsMap = arrayToMap(h.elements);
-
-    const text = "hkhkjhki\njgkjhffjh\njgkjhffjh";
-    const lineHeightPx =
-      getLineHeightInPx(
-        h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
-      ) +
-      10 / h.app.state.zoom.value;
+  it("should space the split lines by half a line height, ignoring blank lines", async () => {
+    const lineHeightPx = getLineHeightInPx(
+      h.app.state.currentItemFontSize,
+      getLineHeight(h.state.currentItemFontFamily),
+    );
     mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV(text);
-    await waitFor(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
-      for (let i = 1; i < h.elements.length; i++) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [fx, elY] = getElementBounds(h.elements[i], elementsMap);
-        expect(elY).toEqual(firstElY + lineHeightPx * i);
-      }
-    });
+    const { texts } = await pasteAndSplit("hkhkjhki\njgkjhffjh\n\n\njgkjhffjh");
+    expect(texts.length).toBe(3);
+    for (let i = 1; i < texts.length; i++) {
+      expect(texts[i].y).toBeCloseTo(texts[0].y + lineHeightPx * 1.5 * i);
+    }
   });
 
-  it("should leave a space for blank new lines", async () => {
-    const elementsMap = arrayToMap(h.elements);
-    const text = "hkhkjhki\n\njgkjhffjh";
-    const lineHeightPx =
-      getLineHeightInPx(
-        h.app.state.currentItemFontSize,
-        getLineHeight(h.state.currentItemFontFamily),
-      ) +
-      10 / h.app.state.zoom.value;
-    mouse.moveTo(100, 100);
-    pasteWithCtrlCmdV(text);
+  it.each(["left", "center", "right"] as const)(
+    "should align the split lines as the text is (%s)",
+    async (textAlign) => {
+      API.setAppState({ currentItemTextAlign: textAlign });
+      const { pasted, texts } = await pasteAndSplit("short\nmuch longer line");
+      const [short, long] = texts;
+      expect(pasted.textAlign).toBe(textAlign);
+      expect(short.textAlign).toBe(textAlign);
+      expect(long.textAlign).toBe(textAlign);
+      expect(short.width).toBeLessThan(long.width);
+      const getEdge = (text: ExcalidrawTextElement) =>
+        textAlign === "left"
+          ? text.x
+          : textAlign === "right"
+          ? text.x + text.width
+          : text.x + text.width / 2;
+      expect(getEdge(short)).toBeCloseTo(getEdge(pasted));
+      expect(getEdge(long)).toBeCloseTo(getEdge(pasted));
+    },
+  );
 
-    await waitFor(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [fx, firstElY] = getElementBounds(h.elements[0], elementsMap);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [lx, lastElY] = getElementBounds(h.elements[1], elementsMap);
-      expect(lastElY).toEqual(firstElY + lineHeightPx * 2);
+  it("should stack split lines that wrap to different heights without overlap", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
     });
+    const long =
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+    const { pasted, texts } = await pasteAndSplit(
+      `short\n${long}\n${long} ${long}\nshort`,
+    );
+    expect(pasted.autoResize).toBe(false);
+    // wrapped as they were in the pasted text
+    expect(texts.map((text) => text.text).join("\n")).toBe(pasted.text);
+    expect(texts.map((text) => text.autoResize)).toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
+    expect(texts[2].height).toBeGreaterThan(texts[1].height);
+    const lineGap =
+      getLineHeightInPx(texts[0].fontSize, texts[0].lineHeight) / 2;
+    for (let i = 1; i < texts.length; i++) {
+      expect(texts[i].y).toBeCloseTo(
+        texts[i - 1].y + texts[i - 1].height + lineGap,
+      );
+    }
+  });
+
+  it("should keep the split lines wrapped as they were, not wrap them anew", async () => {
+    // kerning: a row is narrower than its characters are, one by one — as
+    // a long word is measured when it's broken up
+    setCustomTextMetricsProvider({
+      getLineWidth: (text) => text.length * 10 - Math.max(0, text.length - 1),
+    });
+    try {
+      API.setAppState({
+        width: 1000,
+        zoom: { value: 8 as NormalizedZoomValue },
+      });
+      const { pasted, texts } = await pasteAndSplit(
+        "abcdefghijklmnopqrstuvwx\nshort",
+      );
+      // the word's broken up into rows that, measured one character at a
+      // time, wouldn't fit the width the text ends up with
+      const rows = pasted.text.split("\n");
+      expect(rows.length).toBeGreaterThan(2);
+      expect(rows[0].length * 10).toBeGreaterThan(pasted.width);
+      expect(texts.map((text) => text.text).join("\n")).toBe(pasted.text);
+    } finally {
+      setCustomTextMetricsProvider(undefined);
+    }
+  });
+
+  it("should take a split line that's left the frame out of it", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 200,
+      y: 240,
+      width: 200,
+      height: 120,
+    });
+    API.setElements([frame]);
+    // four lines fit the frame, not so half a line height apart
+    h.app.viewport.lastPosition.x = 300;
+    h.app.viewport.lastPosition.y = 300;
+    const { pasted, texts } = await pasteAndSplit("a\nb\nc\nd");
+    expect(pasted.frameId).toBe(frame.id);
+    expect(texts.map((text) => text.frameId)).toEqual([
+      frame.id,
+      frame.id,
+      frame.id,
+      null,
+    ]);
+  });
+
+  it("should put the split lines in the text's place in the layer order, and let go of arrows bound to it", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    const arrow = API.createElement({ type: "arrow" });
+    const { texts } = await pasteAndSplit("a\nb", (pasted) => {
+      API.setElements([
+        {
+          ...pasted,
+          boundElements: [{ id: arrow.id, type: "arrow" }],
+        },
+        rectangle,
+        {
+          ...arrow,
+          startBinding: {
+            elementId: pasted.id,
+            fixedPoint: [0.5, 0.5],
+            mode: "orbit",
+          },
+        },
+      ]);
+    });
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.id),
+    ).toEqual([...texts.map((text) => text.id), rectangle.id, arrow.id]);
+    expect(
+      (h.elements.find((el) => el.id === arrow.id) as ExcalidrawArrowElement)
+        .startBinding,
+    ).toBe(null);
+  });
+
+  it("should offer to split the text pasted last only", async () => {
+    pasteWithCtrlCmdV("a\nb");
+    await waitFor(() => {
+      expect(h.state.toast).not.toBe(null);
+    });
+    // no offer for this one: the one for the text before is gone
+    pasteWithCtrlCmdShiftV("c\nd");
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+    });
+    expect(h.state.toast).toBe(null);
+  });
+
+  it("should tell the rows of a wrapped line with characters that wrapping composes", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+    // e + a combining accent: one character in the rows
+    const { texts } = await pasteAndSplit(
+      "Excalidraw is an opensource virtual cafe\u0301 whiteboard\nTAIL",
+    );
+    expect(texts.length).toBe(2);
+    expect(texts[0].autoResize).toBe(false);
+    expect(texts[1].text).toBe("TAIL");
+  });
+
+  it("should center the lines a text's pasted split into at the pointer, whatever blank lines it has", async () => {
+    API.setAppState({ splitOnPaste: true });
+    h.app.viewport.lastPosition.x = 300;
+    h.app.viewport.lastPosition.y = 300;
+    pasteWithCtrlCmdV(`first${"\n".repeat(50)}second`);
+    await waitFor(() => {
+      expect(h.elements.length).toBe(2);
+    });
+    const [x1, y1, x2, y2] = getCommonBounds(h.elements);
+    expect((x1 + x2) / 2).toBeCloseTo(300);
+    expect((y1 + y2) / 2).toBeCloseTo(300);
+  });
+
+  it("should never paste split into lines on a phone, which shows no toast to have it as one from", async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        UIOptions={{ getFormFactor: () => "phone" }}
+      />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+    API.setAppState({ splitOnPaste: true });
+    pasteWithCtrlCmdV("a\nb");
+    await waitFor(() => {
+      expect(h.elements.length).toBe(1);
+    });
+    expect(h.state.toast).toBe(null);
+  });
+
+  it("should paste split into lines once a text's been split (an app state preference), and as one again once they've been joined", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+    const long =
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+    // spaces at a line's end, too: kept in a single text
+    const text = `short  \n\n${long}\nshort`;
+    const { pasted } = await pasteAndSplit(text);
+    expect(pasted.autoResize).toBe(false);
+
+    // kept in the app state, for the host to store: as an editor mounted
+    // after gets it
+    expect(h.state.splitOnPaste).toBe(true);
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        initialData={{ appState: { splitOnPaste: true } }}
+      />,
+    );
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+
+    // not for a plain paste
+    pasteWithCtrlCmdShiftV(text);
+    await waitFor(() => {
+      expect(API.getSelectedElements()).toEqual([
+        expect.objectContaining({ originalText: pasted.originalText }),
+      ]);
+    });
+    expect(h.state.toast).toBe(null);
+
+    // split, offered as one
+    pasteWithCtrlCmdV(text);
+    const button = await getToastAction();
+    expect(button.textContent).toBe("Paste as a single text element");
+    const lines = API.getSelectedElements() as ExcalidrawTextElement[];
+    expect(lines.map((line) => line.originalText)).toEqual([
+      "short",
+      long,
+      "short",
+    ]);
+
+    // replaced with the text as it'd have been pasted as one (the blank
+    // line, the spaces, the rows), in their place
+    clickToastAction(button);
+    const [joined] = API.getSelectedElements() as ExcalidrawTextElement[];
+    expect(joined.originalText).toBe(text);
+    expect(joined.text).toBe(
+      ["short  ", "", lines[1].text, lines[2].text].join("\n"),
+    );
+    expect(joined.autoResize).toBe(false);
+    expect(joined.x).toBeCloseTo(lines[0].x);
+    expect(joined.y).toBeCloseTo(lines[0].y);
+    expect(document.activeElement).toBe(
+      document.querySelector(".excalidraw-container"),
+    );
+    // one step to undo
+    Keyboard.undo();
+    expect(API.getSelectedElements().map((element) => element.id)).toEqual(
+      lines.map((line) => line.id),
+    );
+
+    // pasted as one again
+    expect(h.state.splitOnPaste).toBe(false);
+    pasteWithCtrlCmdV(text);
+    expect((await getToastAction()).textContent).toBe(
+      "Split into separate text elements",
+    );
   });
 });
 
 describe("paste text as a single element", () => {
-  it("should create single text element when copying text with Ctrl/Cmd+Shift+V", async () => {
+  it("should create single text element when copying text with Ctrl/Cmd+Shift+V, not offering to split it", async () => {
     const text = "sajgfakfn\naaksfnknas\nakefnkasf";
     pasteWithCtrlCmdShiftV(text);
     await waitFor(() => {
       expect(h.elements.length).toEqual(1);
     });
+    expect(h.state.toast).toBe(null);
   });
   it("should not make a pasted text wider than the view", async () => {
     API.setAppState({
@@ -899,13 +1183,9 @@ describe("clipboard - pasting mermaid definition", () => {
     const text = "flowchart TD xx\nA";
     pasteWithCtrlCmdV(text);
     await waitFor(() => {
-      expect(h.elements.length).toEqual(2);
-      expect(h.elements).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ type: "text", text: "flowchart TD xx" }),
-          expect.objectContaining({ type: "text", text: "A" }),
-        ]),
-      );
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: "flowchart TD xx\nA" }),
+      ]);
     });
   });
 });
@@ -1010,8 +1290,7 @@ describe("paste routing", () => {
     );
     await waitFor(() => {
       expect(h.elements.map((element) => (element as any).text)).toEqual([
-        "hello",
-        "world",
+        "hello\n\nworld",
       ]);
     });
   });

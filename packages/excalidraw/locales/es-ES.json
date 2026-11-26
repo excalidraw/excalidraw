@@ -1,7 +1,8 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Registrarse",
+    "signIn": "Iniciar sesión",
+    "upgrade": "Actualizar",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar como texto sin formato",
     "pasteCharts": "Pegar gráficos",
@@ -27,6 +28,7 @@
     "copyStyles": "Copiar estilos",
     "pasteStyles": "Pegar estilos",
     "stroke": "Trazo",
+    "textColor": "Color del texto",
     "changeStroke": "Cambiar el color del trazo",
     "background": "Fondo",
     "changeBackground": "Cambiar el color de fondo",
@@ -37,9 +39,9 @@
     "strokeStyle_dashed": "Discontinua",
     "strokeStyle_dotted": "Punteado",
     "sloppiness": "Estilo de trazo",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Presión",
+    "pressure_constant": "Constante",
+    "pressure_variable": "Variable",
     "opacity": "Opacidad",
     "textAlign": "Alineado de texto",
     "edges": "Bordes",
@@ -111,8 +113,10 @@
     "group": "Agrupar selección",
     "ungroup": "No agrupar selección",
     "collaborators": "Colaboradores",
-    "you": "",
+    "you": "Tú",
     "toggleGrid": "Alternar rejilla",
+    "minimap": "Minimapa",
+    "zoom": "Zoom",
     "addToLibrary": "Añadir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "Cargando biblioteca…",
@@ -182,20 +186,27 @@
     "zoomToFit": "Zoom para mostrar todos los elementos",
     "installPWA": "Instalar Excalidraw localmente (PWA)",
     "autoResize": "Activar redimensionado automático de texto",
+    "toggleAutoResize": "Alternar redimensionado automático de texto",
     "imageCropping": "Recortar imagen",
     "unCroppedDimension": "Dimensión no recortada",
     "copyElementLink": "Copiar enlace al objeto",
     "linkToElement": "Enlace al objeto",
     "wrapSelectionInFrame": "Ajustar la selección en el marco",
+    "removeFrame": "Quitar marco",
+    "toggleWrap": "Envolver o desenvolver la selección",
     "tab": "Tabulador",
     "shapeSwitch": "Cambiar forma",
     "preferences": "Preferencias",
     "preferences_toolLock": "Bloqueo de herramienta",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Seleccionar al",
+    "boxSelectionContain": "Envolver",
+    "boxSelectionOverlap": "Solapar",
     "arrowBinding": "Vinculación de flecha",
-    "midpointSnapping": "Adherirse a los puntos medios"
+    "midpointSnapping": "Adherirse a los puntos medios",
+    "showHints": "Sugerencias de herramientas",
+    "inputDevice": "Dispositivo",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Ratón"
   },
   "elementLink": {
     "title": "Enlace al objeto",
@@ -219,7 +230,7 @@
     "singleResult": "resultado",
     "multipleResults": "resultados",
     "placeholder": "Encontrar texto en lienzo...",
-    "frames": "",
+    "frames": "Marcos",
     "texts": "Textos"
   },
   "buttons": {
@@ -239,12 +250,14 @@
     "zoomIn": "Acercarse",
     "zoomOut": "Alejarse",
     "resetZoom": "Restablecer zoom",
+    "zoomToFit": "Ajustar al contenido",
     "menu": "Menú",
     "done": "Hecho",
     "edit": "Editar",
     "undo": "Deshacer",
     "redo": "Rehacer",
     "resetLibrary": "Reiniciar biblioteca",
+    "reset": "Restablecer",
     "createNewRoom": "Crear nueva sala",
     "fullScreen": "Pantalla completa",
     "darkMode": "Modo oscuro",
@@ -332,18 +345,19 @@
     "eraser": "Borrar",
     "frame": "Herramienta Estructura",
     "magicframe": "Esquema a código",
+    "stickynote": "Nota adhesiva",
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "Dibujo a forma",
+    "bucketfill": "Bote de pintura",
     "hand": "Mano (herramienta de panorama)",
     "extraTools": "Más herramientas",
     "mermaidToExcalidraw": "Mermaid a Excalidraw",
     "convertElementType": "Cambiar tipo de forma"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "No se pudo encontrar ninguna zona cerrada para rellenar aquí.",
+    "tooComplex": "Esta zona es demasiado compleja para rellenarla."
   },
   "element": {
     "rectangle": "Rectángulo",
@@ -357,6 +371,7 @@
     "group": "Grupo",
     "frame": "Marco",
     "magicframe": "Esquema a código",
+    "stickynote": "Nota adhesiva",
     "embeddable": "Incrustar Web",
     "selection": "Selección",
     "iframe": "IFrame"
@@ -375,15 +390,18 @@
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "embeddable": "Haga clic y arrastre para crear un sitio web incrustado",
-    "autoshape": "",
+    "stickynote": "Haz clic para colocar una nota o arrastra para definir su tamaño",
+    "autoshape": "Dibuja rectángulos, círculos, rombos, líneas y flechas",
     "text_selected": "Haga doble clic o presione {{shortcut}} para editar el texto",
     "text_editing": "Pulsa {{shortcut_1}} o {{shortcut_2}} para terminar de editar",
+    "toggleTextAutoResize": "{{shortcut}} para alternar el redimensionado automático del texto",
     "linearElementMulti": "Haz clic en el último punto o pulsa {{shortcut_1}} o {{shortcut_2}} para terminar",
     "lockAngle": "Puedes restringir el ángulo manteniendo el {{shortcut}}",
     "resize": "Puedes restringir las proporciones manteniendo pulsado {{shortcut_1}} mientras cambias el tamaño,\nmantén pulsado {{shortcut_2}} para cambiar el tamaño desde el centro",
     "resizeImage": "Puedes cambiar el tamaño libremente manteniendo {{shortcut_1}},\nmantén pulsado {{shortcut_2}} para cambiar el tamaño desde el centro",
+    "resizeStickyNote": "mantén pulsado {{shortcut_1}} para cambiar el tamaño libremente, {{shortcut_2}} para cambiarlo desde el centro",
     "rotate": "Puedes restringir ángulos manteniendo pulsado el {{shortcut}} mientras giras",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Haz doble clic para poner o quitar la punta de flecha",
     "lineEditor_info": "Mantén pulsado {{shortcut_1}} y haz doble clic o pulsa {{shortcut_2}} para editar puntos",
     "lineEditor_line_info": "Haga doble clic o presione {{shortcut}} para editar puntos",
     "lineEditor_pointSelected": "Pulsa {{shortcut_1}} para eliminar punto(s),\n{{shortcut_2}} para duplicar, o arrastra para mover",
@@ -392,6 +410,7 @@
     "bindTextToElement": "{{shortcut}} Para añadir texto",
     "createFlowchart": "{{shortcut}} Para crear un diagrama de flujo",
     "deepBoxSelect": "Mantén pulsado {{shortcut}} para seleccionar en profundidad, y para evitar arrastrar",
+    "cycleSelection": "Haz clic con {{shortcut}} para alternar entre elementos superpuestos o arrastra para duplicar",
     "eraserRevert": "Mantén pulsado {{shortcut}} para revertir los elementos marcados para su eliminación",
     "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\".",
     "disableSnapping": "Mantén pulsado {{shortcut}} para deshabilitar el ajuste",
@@ -613,10 +632,10 @@
     "shades": "Sombras",
     "hexCode": "Código Hexadecimal",
     "noShades": "No hay sombras disponibles para este color",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "No es un color válido",
+    "invalidHexLength": "El código hexadecimal debe tener 3, 4, 6 u 8 caracteres",
+    "topPicksTip": "Consejo: arrastra cualquier color a tus favoritos para fijarlo",
+    "resetTopPicks": "Restablecer los colores favoritos predeterminados"
   },
   "overwriteConfirm": {
     "action": {
@@ -649,15 +668,27 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Suelta para reemplazar el contenido",
+    "add": "Suelta para añadir al lienzo",
+    "importLibrary": "Suelta para importar la biblioteca",
+    "replaceHint": "Mantén pulsado <shift>Shift</shift> para conservar el contenido actual",
+    "keepHint": "Se conservará tu contenido actual",
+    "libraryHint": "Los archivos de biblioteca se añadirán",
+    "replacedToast": "Contenido reemplazado. {{shortcut}} para deshacer"
+  },
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Insertar",
-    "description": "Actualmente solo se admiten los diagramas de <flowchartLink>Flujo</flowchartLink>, <sequenceLink>Secuencia</sequenceLink>, <classLink>Clase</classLink> y <erdLink>Entidad-Relación</erdLink>. Los demás tipos se renderizarán como imagen en Excalidraw.",
+    "description": "Los <flowchartLink>diagramas de flujo</flowchartLink>, de <sequenceLink>secuencia</sequenceLink>, de <classLink>clases</classLink>, de <stateLink>estados</stateLink> y de <erdLink>entidad-relación</erdLink>, los <ganttLink>diagramas de Gantt</ganttLink>, los <quadrantLink>gráficos de cuadrantes</quadrantLink> y las <timelineLink>líneas de tiempo</timelineLink> se convierten en elementos de Excalidraw. Los demás tipos se insertan como imagen.",
     "syntax": "Sintaxis Mermaid",
     "preview": "Vista previa",
     "label": "Mermaid",
-    "inputPlaceholder": "Escribe aquí la definición del diagrama Mermaid...",
-    "autoFixAvailable": "Autocorrección disponible"
+    "inputPlaceholder": "Escribe aquí la definición del diagrama de Mermaid...",
+    "autoFixAvailable": "Autocorrección disponible",
+    "loadError": "No se pudo cargar Mermaid. Comprueba tu conexión a internet e inténtalo de nuevo.",
+    "loadErrorReload": "No se pudo cargar Mermaid. Recarga la página para intentarlo de nuevo.",
+    "reload": "Recargar"
   },
   "ttd": {
     "error": "¡Error!"
@@ -682,7 +713,7 @@
     "placeholder": {
       "title": "Vamos a diseñar tu diagrama",
       "description": "Describa el diagrama que desea crear, y lo generaremos para usted.",
-      "hint": ""
+      "hint": "Por ahora conocemos los diagramas de flujo, de secuencia, de clases, de estados y de entidad-relación."
     },
     "preview": "Vista Previa",
     "insert": "Insertar",
@@ -714,7 +745,9 @@
     },
     "sceneFonts": "En esta escena",
     "availableFonts": "Fuentes disponibles",
-    "empty": "No se han encontrado fuentes"
+    "empty": "No se han encontrado fuentes",
+    "topPicksTip": "Consejo: arrastra cualquier fuente a tus favoritas para fijarla",
+    "resetTopPicks": "Restablecer las fuentes favoritas predeterminadas"
   },
   "userList": {
     "empty": "No se han encontrado usuarios",
@@ -752,5 +785,16 @@
     "spacebar": "Espacio",
     "delete": "Eliminar",
     "mmb": "Rueda del ratón"
+  },
+  "promoBanner": {
+    "presentations": "Presentaciones",
+    "mcp": "Dibuja con IA",
+    "comments": "Comentarios",
+    "teams": "En equipo",
+    "voiceChat": "Chat de voz",
+    "withExcalidrawPlus": "con Excalidraw+",
+    "excalidrawPlusMcp": "Excalidraw+ MCP",
+    "cli": "Excalidraw CLI",
+    "cliTagline": "para personas e IA"
   }
 }

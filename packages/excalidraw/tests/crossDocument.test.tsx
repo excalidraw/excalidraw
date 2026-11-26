@@ -7,7 +7,7 @@ import {
 } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { FONT_FAMILY } from "@excalidraw/common";
+import { COLOR_PALETTE, FONT_FAMILY } from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
@@ -75,6 +75,52 @@ const mountEditorInOwnDocument = (currentItemFontFamily?: FontFamily) => {
 };
 
 describe("cross-document rendering", () => {
+  it("preserves color picker focus and keyboard shortcuts in its owning document", async () => {
+    // Radix needs ResizeObserver, which JSDOM does not provide.
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+    const editor = mountEditorInOwnDocument();
+    const ownerDocument = editor.container.ownerDocument;
+
+    try {
+      await waitFor(() =>
+        expect(editor.getAPI()?.getAppState().isLoading).toBe(false),
+      );
+      act(() => {
+        editor.getAPI()!.setActiveTool({ type: "rectangle" });
+        editor.getAPI()!.updateScene({
+          appState: { currentItemStrokeColor: COLOR_PALETTE.red[4] },
+        });
+      });
+
+      const canvas = editor.container.querySelector("canvas.interactive")!;
+      fireEvent.keyDown(canvas, { key: "s" });
+
+      await waitFor(() => {
+        const picker = ownerDocument.querySelector(".color-picker-content");
+        expect(picker).not.toBeNull();
+        expect(picker!.contains(ownerDocument.activeElement)).toBe(true);
+      });
+
+      // Dispatch where a real key goes, rather than directly to the picker:
+      // Radix must not move focus to the outer dialog after the picker focuses.
+      fireEvent.keyDown(ownerDocument.activeElement!, { key: "s" });
+      expect(editor.getAPI()!.getAppState().currentItemStrokeColor).toBe(
+        COLOR_PALETTE.blue[4],
+      );
+      expect(editor.getAPI()!.getAppState().activeTool.type).toBe("rectangle");
+    } finally {
+      editor.cleanup();
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("binds top-picks drag interactions to the source window", () => {
     const iframe = document.createElement("iframe");
     document.body.append(iframe);

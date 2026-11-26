@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { pointFrom } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import {
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
@@ -24,6 +24,8 @@ import {
   TEXT_MAX_WRAP_WIDTH,
   TEXT_MAX_WRAP_WIDTH_ZOOMED_OUT,
 } from "@excalidraw/common";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawTextElement,
@@ -3651,6 +3653,42 @@ describe("textWysiwyg", () => {
       },
     );
 
+    // a rotated text turns about the center of its box, which (un)wrapping
+    // moves: the anchor has to stay put where it's drawn
+    it.each(["left", "center", "right"] as const)(
+      "keeps the anchor of a rotated %s text where it's drawn when (un)wrapping",
+      (textAlign) => {
+        API.setElements([
+          wrappedText({ textAlign, angle: (Math.PI / 3) as Radians }),
+        ]);
+        API.setAppState({ selectedElementIds: { text: true } });
+        const getDrawnAnchor = () => {
+          const text = h.elements[0] as ExcalidrawTextElement;
+          const ratio =
+            textAlign === "left" ? 0 : textAlign === "right" ? 1 : 0.5;
+          return pointRotateRads(
+            pointFrom<GlobalPoint>(text.x + text.width * ratio, text.y),
+            pointFrom<GlobalPoint>(
+              text.x + text.width / 2,
+              text.y + text.height / 2,
+            ),
+            text.angle,
+          );
+        };
+        const [x, y] = getDrawnAnchor();
+
+        API.executeAction(actionTextAutoResize);
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(true);
+        expect(getDrawnAnchor()[0]).toBeCloseTo(x, 4);
+        expect(getDrawnAnchor()[1]).toBeCloseTo(y, 4);
+
+        API.executeAction(actionTextAutoResize);
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
+        expect(getDrawnAnchor()[0]).toBeCloseTo(x, 4);
+        expect(getDrawnAnchor()[1]).toBeCloseTo(y, 4);
+      },
+    );
+
     it("unwraps a text clicked on its handle", async () => {
       // the handle's shown on desktop only
       unmountComponent();
@@ -3677,6 +3715,36 @@ describe("textWysiwyg", () => {
       const text = h.elements[0] as ExcalidrawTextElement;
       expect(text.autoResize).toBe(true);
       expect(text.text).toBe(text.originalText);
+    });
+
+    it("unwraps the text being edited clicked on its handle, still editing it", async () => {
+      unmountComponent();
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      API.setElements([wrappedText()]);
+      mouse.doubleClickAt(110, 110);
+      const editor = await getTextEditor();
+      // the editor listens for presses outside it from the next frame on
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const [x, y] = getTextAutoResizeHandle(
+        h.elements[0] as ExcalidrawTextElement,
+        h.state.zoom.value,
+        "desktop",
+      )!.center;
+
+      mouse.downAt(x, y);
+      // (as the browser does, the press on the canvas taking the focus)
+      fireEvent.blur(editor);
+      mouse.upAt(x, y);
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      expect(editor.style.whiteSpace).toBe("pre");
     });
 
     it("toggles auto-resizing of the selected texts with Alt+W, wrapping at the max width at most", () => {
@@ -3849,13 +3917,6 @@ describe("textWysiwyg", () => {
       const { width, height } = text;
       const x = text.x + text.width + 4;
       const y = text.y + text.height / 2;
-
-      // the side under the pointer is the one drawn, to show it can be dragged
-      mouse.moveTo(x, y);
-      expect(h.app.text.editedTextHoveredSide).toBe("e");
-      mouse.moveTo(x + 40, y);
-      expect(h.app.text.editedTextHoveredSide).toBe(null);
-
       mouse.downAt(x, y);
       mouse.moveTo(x - 40, y);
       mouse.moveTo(x - 80, y);

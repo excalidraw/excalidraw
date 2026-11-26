@@ -9,6 +9,7 @@ import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
+import { APP_ROUTES } from "./app_routes";
 import { MERMAID_CHUNKS_LIST_NAME } from "./data/cacheMermaidChunks";
 
 import type { Plugin, Rollup } from "vite";
@@ -274,6 +275,7 @@ export default defineConfig(({ mode }) => {
       Sitemap({
         hostname: "https://excalidraw.com",
         outDir: "build",
+        exclude: ["/404"],
         changefreq: "monthly",
         // its static in public folder
         generateRobotsTxt: false,
@@ -306,8 +308,19 @@ export default defineConfig(({ mode }) => {
         },
 
         workbox: {
+          // Serve the cached app shell only for the paths the app lives on
+          // (matched against pathname + search). Anything else goes to the
+          // network, so that unknown paths get the server's 404.
+          // To add a path, add it to APP_ROUTES.
+          navigateFallbackAllowlist: [
+            /^\/(\?|$)/,
+            ...Object.values(APP_ROUTES).map(
+              (route) => new RegExp(`^${route}(\\?|$)`),
+            ),
+          ],
           // don't precache fonts, locales and separate chunks
           globIgnores: [
+            "404.html",
             "fonts.css",
             "**/locales/**",
             "service-worker.js",
@@ -433,23 +446,6 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-          share_target: {
-            action: "/web-share-target",
-            method: "POST",
-            enctype: "multipart/form-data",
-            params: {
-              files: [
-                {
-                  name: "file",
-                  accept: [
-                    "application/vnd.excalidraw+json",
-                    "application/json",
-                    ".excalidraw",
-                  ],
-                },
-              ],
-            },
-          },
           screenshots: [
             {
               src: "/screenshots/virtual-whiteboard.png",
