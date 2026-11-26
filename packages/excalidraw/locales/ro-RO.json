@@ -592,8 +592,8 @@
     "selection": "selecția",
     "pastedAsSingleText": "",
     "splitIntoTextElements": "",
-    "pastedAsTextElements": "",
-    "pasteAsSingleText": "",
+    "pastedAsTextElements": "Inserate ca elemente de text separate.",
+    "pasteAsSingleText": "Inserat ca element de text separat",
     "unableToEmbed": "Încorporarea acestui URL nu este permisă momentan. Deschideți un tichet cu probleme pe GitHub pentru a solicita adăugarea acestui URL în lista albă",
     "unrecognizedLinkFormat": "URL-ul pe care l-ai încorporat nu coincide cu formatul așteptat. Încearcă să lipești șirul „de încorporat” furnizat de pagina sursă",
     "elementLinkCopied": "Link copiat în memoria temporară"
