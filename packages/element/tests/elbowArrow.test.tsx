@@ -782,6 +782,46 @@ describe("elbow arrow ui", () => {
     });
   });
 
+  it("moves the arrow from the original element to the one its end is dropped on without Alt", () => {
+    const from = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const to = UI.createElement("rectangle", {
+      x: 200,
+      y: 300,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.downAt(0, 50);
+    mouse.moveTo(240, 40);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(from.id);
+    expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+    UI.clickTool("selection");
+    const end = arrow.points[arrow.points.length - 1];
+    mouse.reset();
+    mouse.downAt(arrow.x + end[0], arrow.y + end[1]);
+    mouse.moveTo(240, 340);
+    mouse.up();
+
+    expect(arrow.endBinding?.elementId).toBe(to.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    expect(from.boundElements ?? []).toEqual([]);
+    expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+  });
+
   describe("changing the arrow type of an inside bound arrow", () => {
     // A straight arrow from the canvas into `rect`, its end bound inside at
     // [0.54, 0.35]

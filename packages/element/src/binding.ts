@@ -1128,7 +1128,8 @@ export const bindOrUnbindBindingElements = (
 
 /**
  * Writes a binding onto the arrow and records the arrow on the bind target,
- * keeping the two sides of the relationship in step.
+ * keeping the two sides of the relationship in step: the element the end was
+ * bound to before stops listing the arrow, unless the other end is bound to it.
  */
 const applyBinding = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
@@ -1137,9 +1138,10 @@ const applyBinding = (
   startOrEnd: "start" | "end",
   scene: Scene,
 ): void => {
-  scene.mutateElement(arrow, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
-  });
+  const field = startOrEnd === "start" ? "startBinding" : "endBinding";
+
+  syncBoundElementsWithNextBindings(arrow, { [field]: binding }, scene);
+  scene.mutateElement(arrow, { [field]: binding });
 
   const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
   if (!boundElementsMap.has(arrow.id)) {
