@@ -7,9 +7,13 @@ import {
   generateEncryptionKey,
   IV_LENGTH_BYTES,
 } from "@excalidraw/excalidraw/data/encryption";
+import { clearAppStateForDatabase } from "@excalidraw/excalidraw/appState";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { isInvisiblySmallElement } from "@excalidraw/element";
-import { isInitializedImageElement } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  isInvisiblySmallElement,
+  isInitializedImageElement,
+} from "@excalidraw/element";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { bytesToHexString } from "@excalidraw/common";
 
@@ -304,4 +308,131 @@ export const exportToBackend = async (
 
     return { url: null, errorMessage: t("alerts.couldNotCreateShareableLink") };
   }
+};
+
+const NON_CONTENT_ELEMENT_KEYS = new Set([
+  "version",
+  "versionNonce",
+  "updated",
+  "index",
+]);
+
+const areJsonValuesEqual = (a: unknown, b: unknown): boolean => {
+  // Use `===` so `-0` and `0` match JSON serialization semantics, plus NaN check
+  if (a === b || (Number.isNaN(a) && Number.isNaN(b))) {
+    return true;
+  }
+
+  if (
+    typeof a !== typeof b ||
+    a === null ||
+    b === null ||
+    typeof a !== "object"
+  ) {
+    return false;
+  }
+
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
+      return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+      if (!areJsonValuesEqual(a[i], b[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA).filter((key) => objA[key] !== undefined);
+  const keysB = Object.keys(objB).filter((key) => objB[key] !== undefined);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  for (const key of keysA) {
+    if (
+      !Object.prototype.hasOwnProperty.call(objB, key) ||
+      !areJsonValuesEqual(objA[key], objB[key])
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const areElementsContentEqual = (
+  a: ExcalidrawElement,
+  b: ExcalidrawElement,
+): boolean => {
+  if (a.type !== b.type) {
+    return false;
+  }
+
+  const isIgnoredKey = (key: string) =>
+    NON_CONTENT_ELEMENT_KEYS.has(key) ||
+    (key === "status" && a.type === "image");
+
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA).filter(
+    (key) => !isIgnoredKey(key) && objA[key] !== undefined,
+  );
+  const keysB = Object.keys(objB).filter(
+    (key) => !isIgnoredKey(key) && objB[key] !== undefined,
+  );
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  for (const key of keysA) {
+    if (
+      !Object.prototype.hasOwnProperty.call(objB, key) ||
+      !areJsonValuesEqual(objA[key], objB[key])
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Checks whether two scenes have identical persisted content (non-deleted
+ * elements in order and server-persisted appState properties), ignoring local
+ * metadata such as element version/nonce/updated/index, image cache status,
+ * and transient UI state (zoom, scroll, theme, selection, tool).
+ */
+export const isSameSceneContent = (
+  localScene: {
+    elements?: readonly ExcalidrawElement[] | null;
+    appState?: Partial<AppState> | null;
+  },
+  incomingScene: {
+    elements?: readonly ExcalidrawElement[] | null;
+    appState?: Partial<AppState> | null;
+  },
+): boolean => {
+  const localElements = getNonDeletedElements(localScene.elements || []);
+  const incomingElements = getNonDeletedElements(incomingScene.elements || []);
+
+  if (localElements.length !== incomingElements.length) {
+    return false;
+  }
+
+  for (let i = 0; i < localElements.length; i++) {
+    if (!areElementsContentEqual(localElements[i], incomingElements[i])) {
+      return false;
+    }
+  }
+
+  return areJsonValuesEqual(
+    clearAppStateForDatabase(localScene.appState || {}),
+    clearAppStateForDatabase(incomingScene.appState || {}),
+  );
 };
