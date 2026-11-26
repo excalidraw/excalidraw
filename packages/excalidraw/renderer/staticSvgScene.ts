@@ -15,7 +15,6 @@ import {
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OPACITY,
-  TEXT_KERNING,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
@@ -832,10 +831,7 @@ const renderElementToSvg = (
             ),
           );
           text.setAttribute("text-anchor", textAnchor);
-          text.setAttribute(
-            "style",
-            `white-space: pre; font-kerning: ${TEXT_KERNING};`,
-          );
+          text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
           text.setAttribute("dominant-baseline", "alphabetic");
           node.appendChild(text);

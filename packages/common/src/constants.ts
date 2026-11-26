@@ -402,32 +402,23 @@ export const FONT_TOP_PICKS_SLOTS = 3;
 export const DEFAULT_TEXT_ALIGN = "left";
 
 /**
- * How text is kerned wherever we measure or draw it: the canvas, the text
- * editor and exported SVG.
- *
- * Left on the default (`auto`), browsers skip the kerning between a letter
- * and a space in places: Chrome on canvas (but not in the DOM), Firefox
- * everywhere. A line such as "A V A T A R" is then several px wider on canvas
- * than in Chrome's text editor, and wider in Firefox than in Chrome, so the
- * same text wraps at different words. `normal` asks for the font's kerning
- * in full, which is also what skia-canvas does on a server.
- *
- * Must be set on all of them, or none.
- */
-export const TEXT_KERNING = "normal";
-
-/**
  * How a canvas shapes the text it measures or draws.
  *
- * Left on the default (`auto`), Chrome's canvas shapes a line word by word.
- * A font which picks a letter's shape by what's around it, across spaces too
- * (i.e. Caveat), then comes out several px a line wider or narrower than in
- * the text editor, which the DOM lays out as a whole. `optimizeLegibility`
- * has the canvas shape the line as a whole as well. It changes nothing for a
- * font without such rules, ours included.
+ * Left on the default (`auto`), Chrome's canvas shapes a line word by word,
+ * where its text editor (the DOM) lays the line out as a whole. Two things
+ * then differ between the two, and the same text wraps at different words:
+ *
+ * - the kerning between a letter and a space is left out on canvas, so a
+ *   line such as "A V A T A R" is several px wider there;
+ * - a font which picks a letter's shape by what's around it, across spaces
+ *   too (i.e. Caveat), comes out several px a line wider or narrower.
+ *
+ * `optimizeLegibility` has the canvas shape the line as a whole as well.
  *
  * For the canvas only: the DOM, Firefox's canvas and skia-canvas shape whole
- * lines as it is.
+ * lines as it is. Kerning itself (`font-kerning`) is left on the browser's
+ * default everywhere: set to `normal`, Firefox also closes up Japanese and
+ * Chinese text.
  */
 export const TEXT_RENDERING = "optimizeLegibility";
 export const DEFAULT_VERTICAL_ALIGN = "top";

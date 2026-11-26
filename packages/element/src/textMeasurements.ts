@@ -2,7 +2,6 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
-  TEXT_KERNING,
   TEXT_RENDERING,
   getFontString,
   isTestEnv,
@@ -160,7 +159,6 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
   public getLineWidth(text: string, fontString: FontString): number {
     const context = this.canvas.getContext("2d")!;
     context.font = fontString;
-    context.fontKerning = TEXT_KERNING;
     context.textRendering = TEXT_RENDERING;
     const metrics = context.measureText(text);
     const advanceWidth = metrics.width;

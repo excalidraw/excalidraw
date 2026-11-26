@@ -13,7 +13,6 @@ import {
   isRTL,
   hasRTLChars,
   viewportCoordsToSceneCoords,
-  TEXT_KERNING,
 } from "@excalidraw/common";
 import {
   clamp,
@@ -228,8 +227,6 @@ const measureNativeLineCaretPositions = ({
     pointerEvents: "none",
     whiteSpace: "pre",
     font,
-    // as the editor's, and likewise after `font`
-    fontKerning: TEXT_KERNING,
     lineHeight: `${lineHeightPx}px`,
   });
   mirror.append(textNode);
@@ -546,9 +543,8 @@ export const textWysiwyg = ({
 
       Object.assign(editable.style, {
         font,
-        // must be defined *after* font ¯\_(ツ)_/¯ (the shorthand resets them)
+        // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        fontKerning: TEXT_KERNING,
         width: `${editorWidth}px`,
         height: `${height}px`,
         transformOrigin: "0 0",
