@@ -1,9 +1,7 @@
 import clsx from "clsx";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useTransition } from "react";
 
 import type { ExcalidrawElement, NonDeleted } from "@excalidraw/element/types";
-
-import { useTransition } from "../hooks/useTransition";
 
 import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
 
