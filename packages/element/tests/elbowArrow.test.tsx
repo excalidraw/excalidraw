@@ -554,6 +554,94 @@ describe("elbow arrow ui", () => {
     });
   });
 
+  describe("changing the arrow type of an inside bound arrow", () => {
+    // A straight arrow from the canvas into `rect`, its end bound inside at
+    // [0.54, 0.35]
+    const setup = (elbowed = false) => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "arrow", type: "arrow" }],
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: 0,
+        y: 50,
+        elbowed,
+        points: elbowed
+          ? [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(127, 0),
+              pointFrom<LocalPoint>(127, -15),
+              pointFrom<LocalPoint>(254, -15),
+            ]
+          : [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(254, -15)],
+        endBinding: {
+          elementId: rect.id,
+          mode: "inside",
+          fixedPoint: [0.54, 0.35],
+        },
+      });
+      API.setElements([rect, arrow]);
+      API.setSelectedElements([arrow]);
+
+      return {
+        rect: h.elements[0] as ExcalidrawBindableElement,
+        arrow: () => h.elements[1] as ExcalidrawArrowElement,
+      };
+    };
+
+    const endOf = (arrow: ExcalidrawArrowElement) => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [[arrow.x + end[0], arrow.y + end[1]]];
+    };
+
+    it("keeps the inside anchor when changed to elbow", () => {
+      const { rect, arrow } = setup();
+
+      UI.clickOnTestId("elbow-arrow");
+
+      expect(arrow().elbowed).toBe(true);
+      expect(arrow().endBinding?.elementId).toBe(rect.id);
+      expect(arrow().endBinding?.mode).toBe("inside");
+      expect(arrow().endBinding?.fixedPoint[0]).toBeCloseTo(0.54);
+      expect(arrow().endBinding?.fixedPoint[1]).toBeCloseTo(0.35);
+      expect(endOf(arrow())).toCloselyEqualPoints([[254, 35]]);
+      expect(validateElbowPoints(arrow().points)).toBe(true);
+    });
+
+    it("keeps the inside anchor when changed from elbow", () => {
+      const { rect, arrow } = setup(true);
+
+      UI.clickOnTestId("sharp-arrow");
+
+      expect(arrow().elbowed).toBe(false);
+      expect(arrow().endBinding?.elementId).toBe(rect.id);
+      expect(arrow().endBinding?.mode).toBe("inside");
+      expect(arrow().endBinding?.fixedPoint[0]).toBeCloseTo(0.54);
+      expect(arrow().endBinding?.fixedPoint[1]).toBeCloseTo(0.35);
+      expect(endOf(arrow())).toCloselyEqualPoints([[254, 35]]);
+    });
+
+    it("keeps the inside anchor when changed to round", () => {
+      const { rect, arrow } = setup();
+
+      UI.clickOnTestId("round-arrow");
+
+      expect(arrow().roundness).not.toBe(null);
+      expect(arrow().endBinding?.elementId).toBe(rect.id);
+      expect(arrow().endBinding?.mode).toBe("inside");
+      expect(arrow().endBinding?.fixedPoint[0]).toBeCloseTo(0.54);
+      expect(arrow().endBinding?.fixedPoint[1]).toBeCloseTo(0.35);
+      expect(endOf(arrow())).toCloselyEqualPoints([[254, 35]]);
+    });
+  });
+
   it("keeps arrow shape when the whole set of arrow and bindables are duplicated", async () => {
     UI.createElement("rectangle", {
       x: -150,
