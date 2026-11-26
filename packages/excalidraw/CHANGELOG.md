@@ -15,7 +15,7 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
-- The Excalidraw package now requires React and React DOM 18.2 or 19. Upgrade both packages before updating Excalidraw. [#12750](https://github.com/excalidraw/excalidraw/issues/12750)
+- The Excalidraw package now requires React and React DOM 18.2 or 19. Upgrade both packages before updating Excalidraw. [#12751](https://github.com/excalidraw/excalidraw/pull/12751)
 
 ### Minimap, zoom menu and `ui.disabled` (2026-11-12) [#12605](https://github.com/excalidraw/excalidraw/pull/12605), [#12606](https://github.com/excalidraw/excalidraw/pull/12606)
 
