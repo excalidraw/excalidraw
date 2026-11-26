@@ -5337,6 +5337,12 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // Shift locks the angle of the point being placed or dragged, so
+      // re-run it now instead of on the next pointer move
+      if (event.key === KEYS.SHIFT && !event.repeat) {
+        maybeHandleArrowPointlikeDrag({ app: this, event });
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
@@ -5672,6 +5678,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.key === KEYS.ALT) {
       this.bucketFill.closeTemporaryEyeDropper();
+      maybeHandleArrowPointlikeDrag({ app: this, event });
+    }
+
+    if (event.key === KEYS.SHIFT) {
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
 
