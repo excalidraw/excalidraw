@@ -1516,6 +1516,14 @@ export const doBoundsIntersect = (
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
 
+/** the smallest bounds containing both */
+export const unionBounds = (bounds1: Bounds, bounds2: Bounds): Bounds => [
+  Math.min(bounds1[0], bounds2[0]),
+  Math.min(bounds1[1], bounds2[1]),
+  Math.max(bounds1[2], bounds2[2]),
+  Math.max(bounds1[3], bounds2[3]),
+];
+
 export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
   [
     pointFrom<GlobalPoint>(innerBounds[0], innerBounds[1]),
