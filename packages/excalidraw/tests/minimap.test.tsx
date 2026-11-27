@@ -222,6 +222,67 @@ describe("minimap", () => {
     expect(getViewportCenter().y).toBeCloseTo(center.y);
   });
 
+  it("pans the canvas with the arrow keys", async () => {
+    const content = { width: 4000, height: 2800 };
+    await render(
+      <Excalidraw
+        initialData={{
+          elements: [
+            API.createElement({ type: "rectangle", x: 0, y: 0, ...content }),
+          ],
+          appState: { minimapEnabled: true, scrollX: 0, scrollY: 0 },
+        }}
+      />,
+    );
+
+    const minimap = getMinimap()!;
+    await waitFor(() => {
+      minimap.focus();
+      expect(document.activeElement).toBe(minimap);
+    });
+
+    const beforeScrollX = h.state.scrollX;
+    fireEvent.keyDown(minimap, { key: "ArrowLeft" });
+    await waitFor(() => expect(h.state.scrollX).toBeGreaterThan(beforeScrollX));
+    fireEvent.keyUp(minimap, { key: "ArrowLeft" });
+
+    const beforeScrollY = h.state.scrollY;
+    fireEvent.keyDown(minimap, { key: "ArrowUp" });
+    await waitFor(() => expect(h.state.scrollY).toBeGreaterThan(beforeScrollY));
+    fireEvent.keyUp(minimap, { key: "ArrowUp" });
+  });
+
+  it("zooms the canvas with PageUp/PageDown", async () => {
+    const content = { width: 4000, height: 2800 };
+    await render(
+      <Excalidraw
+        initialData={{
+          elements: [
+            API.createElement({ type: "rectangle", x: 0, y: 0, ...content }),
+          ],
+          appState: { minimapEnabled: true, scrollX: 0, scrollY: 0 },
+        }}
+      />,
+    );
+
+    const minimap = getMinimap()!;
+    await waitFor(() => {
+      minimap.focus();
+      expect(document.activeElement).toBe(minimap);
+    });
+
+    const beforeZoom = h.state.zoom.value;
+    fireEvent.keyDown(minimap, { key: "PageUp" });
+    await waitFor(() => expect(h.state.zoom.value).toBeGreaterThan(beforeZoom));
+    fireEvent.keyUp(minimap, { key: "PageUp" });
+
+    fireEvent.keyDown(minimap, { key: "PageDown" });
+    await waitFor(() =>
+      expect(h.state.zoom.value).toBeLessThan(beforeZoom + 1),
+    );
+    fireEvent.keyUp(minimap, { key: "PageDown" });
+  });
+
   it("has the theme applied by the time its change is notified (for the colors to be read)", async () => {
     const { container } = await render(<Excalidraw />);
     const editor = container.querySelector(".excalidraw")!;

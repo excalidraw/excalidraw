@@ -8,6 +8,10 @@
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
+import type { AppClassProperties } from "../../types";
+
+import type { MinimapHandler } from "./minimap-input.chunk";
+
 import type {
   MinimapBounds,
   MinimapColors,
@@ -17,18 +21,8 @@ import type {
   MinimapTransform,
   MinimapViewport,
 } from "./minimap-shared.chunk";
-import type { AppClassProperties } from "../../types";
 
 type MinimapShared = typeof import("./minimap-shared.chunk");
-
-/**
- * Edge auto-pan: while the viewport is dragged with the pointer held outside
- * of the minimap, it keeps panning that way — by this many viewport sizes per
- * second for each px the pointer is past the minimap's edge...
- */
-const AUTO_PAN_SPEED = 1 / 8;
-/** ...up to this many viewport sizes per second */
-const AUTO_PAN_MAX_SPEED = 3;
 
 /** polylines are downsampled to at most this many points */
 const MAX_PATH_POINTS = 24;
@@ -71,38 +65,9 @@ export class MinimapController {
   private encodingTimer: number | null = null;
   private encodingFrame: number | null = null;
 
-  private drag: {
-    pointerId: number;
-    /**
-     * The transform at the start of the drag, which the pointer is mapped to
-     * the scene with throughout: the minimap is fitted to the content along
-     * with the viewport, so it rescales once the viewport is dragged past the
-     * content — mapping the pointer through that would feed back into itself.
-     */
-    transform: MinimapTransform;
-    /** position of the pointer in the minimap (CSS px) */
-    x: number;
-    y: number;
-    /** scene offset of the pointer from the viewport's top-left corner */
-    offsetX: number;
-    offsetY: number;
-    /**
-     * The scene bounds the viewport is kept in, or null where the editor's
-     * own scroll constraints apply instead.
-     */
-    bounds: MinimapBounds | null;
-    /** the scene distance auto-panned so far */
-    panX: number;
-    panY: number;
-    autoPanFrame: number | null;
-    autoPanTime: number | null;
-    /** @see AppViewport.beginGesture */
-    endGesture: () => void;
-  } | null = null;
-  /** @see unlockOnceSettled */
-  private unlockFrame: number | null = null;
+  private handlers: MinimapHandler[] = [];
 
-  constructor(private app: AppClassProperties, private container: HTMLElement) {
+  constructor(public app: AppClassProperties, public container: HTMLElement) {
     this.init(typeof Worker !== "undefined").catch((error: unknown) => {
       console.error("Failed to initialize the minimap", error);
     });
@@ -125,6 +90,7 @@ export class MinimapController {
     const canvas = this.container.ownerDocument.createElement("canvas");
     canvas.className = "minimap__canvas";
     this.container.appendChild(canvas);
+    this.container.focus();
     this.canvas = canvas;
 
     const config = this.getConfig();
@@ -174,6 +140,14 @@ export class MinimapController {
       this.fallback.handle({ type: "init", canvas, config });
     }
 
+    const { MinimapKeyboardHandler, MinimapPointerHandler } = await import(
+      "./minimap-input.chunk"
+    );
+    this.handlers = [
+      new MinimapPointerHandler(this),
+      new MinimapKeyboardHandler(this),
+    ];
+
     this.subscribe();
     this.syncViewport();
     this.scheduleEncoding();
@@ -203,19 +177,9 @@ export class MinimapController {
       this.cleanups.push(() => resizeObserver.disconnect());
     }
 
-    container.addEventListener("pointerdown", this.onPointerDown);
-    container.addEventListener("pointermove", this.onPointerMove);
-    container.addEventListener("pointerup", this.onPointerUp);
-    container.addEventListener("pointercancel", this.onPointerUp);
-    container.addEventListener("lostpointercapture", this.onPointerUp);
-    container.addEventListener("wheel", this.onWheel, { passive: false });
-    this.cleanups.push(() => {
-      container.removeEventListener("wheel", this.onWheel);
-      container.removeEventListener("pointerdown", this.onPointerDown);
-      container.removeEventListener("pointermove", this.onPointerMove);
-      container.removeEventListener("pointerup", this.onPointerUp);
-      container.removeEventListener("pointercancel", this.onPointerUp);
-      container.removeEventListener("lostpointercapture", this.onPointerUp);
+    this.handlers.forEach((h) => {
+      h.attach();
+      this.cleanups.push(() => h.detach());
     });
   }
 
@@ -245,8 +209,7 @@ export class MinimapController {
 
     this.transform = null;
     this.contentBounds = null;
-    this.endDrag();
-    this.cancelUnlock();
+    this.handlers.forEach((h) => h.destroy());
     this.isElementsDirty = true;
     this.isAwaitingFrame = false;
   }
@@ -268,7 +231,7 @@ export class MinimapController {
   // editor → renderer
   // ---------------------------------------------------------------------------
 
-  private send(message: MinimapInMessage, transfer?: Transferable[]) {
+  send(message: MinimapInMessage, transfer?: Transferable[]) {
     if (this.worker) {
       this.worker.postMessage(message, transfer ?? []);
     } else {
@@ -276,7 +239,7 @@ export class MinimapController {
     }
   }
 
-  private getConfig(): MinimapConfig {
+  getConfig(): MinimapConfig {
     const style = this.app.ownerWindow.getComputedStyle(this.container);
     const getColor = (name: string, fallback: string) =>
       style.getPropertyValue(name).trim() || fallback;
@@ -314,7 +277,7 @@ export class MinimapController {
     this.send({ type: "config", config });
   };
 
-  private getViewport(): MinimapViewport {
+  getViewport(): MinimapViewport {
     const { scrollX, scrollY, zoom, width, height } = this.app.state;
     return {
       x: -scrollX,
@@ -322,6 +285,16 @@ export class MinimapController {
       width: width / zoom.value,
       height: height / zoom.value,
     };
+  }
+
+  getShared() {
+    return this.shared;
+  }
+  getTransform() {
+    return this.transform;
+  }
+  getContentBounds() {
+    return this.contentBounds;
   }
 
   private syncViewport = () => {
@@ -449,269 +422,6 @@ export class MinimapController {
     if (message.elementsSeq === this.elementsSeq) {
       this.isAwaitingFrame = false;
       this.scheduleEncoding();
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // dragging the viewport
-  // ---------------------------------------------------------------------------
-
-  /** the position of the pointer in the minimap (CSS px) */
-  private getPointerPosition(event: PointerEvent) {
-    const rect = this.container.getBoundingClientRect();
-    return {
-      x: event.clientX - rect.left - this.container.clientLeft,
-      y: event.clientY - rect.top - this.container.clientTop,
-    };
-  }
-
-  private onPointerDown = (event: PointerEvent) => {
-    if (
-      event.button !== 0 ||
-      this.drag ||
-      !this.transform ||
-      !this.shared ||
-      !this.app.isNavigationEnabled()
-    ) {
-      return;
-    }
-    event.preventDefault();
-    // (still locked to the transform of the previous drag, if any)
-    this.cancelUnlock();
-
-    const transform = this.transform;
-    const viewport = this.getViewport();
-    const { x, y } = this.getPointerPosition(event);
-    const rect = this.shared.getMinimapViewportRect(viewport, transform);
-    const isOverViewport =
-      x >= rect.x &&
-      x <= rect.x + rect.width &&
-      y >= rect.y &&
-      y <= rect.y + rect.height;
-
-    // (a zoom-only lock leaves scrolling unconstrained)
-    const isLocked = !!this.app.state.scrollConstraints?.lockScroll;
-
-    this.drag = {
-      pointerId: event.pointerId,
-      transform,
-      x,
-      y,
-      // pressing outside of the viewport centers it on the pointer
-      offsetX: isOverViewport
-        ? (x - transform.translateX) / transform.scale - viewport.x
-        : viewport.width / 2,
-      offsetY: isOverViewport
-        ? (y - transform.translateY) / transform.scale - viewport.y
-        : viewport.height / 2,
-      bounds: isLocked ? null : this.getDragBounds(viewport),
-      panX: 0,
-      panY: 0,
-      autoPanFrame: null,
-      autoPanTime: null,
-      // holds the rubberband overscroll (of a locked viewport) until release,
-      // instead of it snapping back whenever the pointer rests
-      endGesture: this.app.viewport.beginGesture(),
-    };
-    if (isLocked) {
-      // the viewport can only rubberband past the lock, which the minimap
-      // shouldn't rescale for (nor for it snapping back, see
-      // `unlockOnceSettled`)
-      this.send({ type: "lock", transform });
-    }
-    this.container.setPointerCapture(event.pointerId);
-    this.container.classList.add("minimap--dragging");
-
-    if (!isOverViewport) {
-      this.moveViewport();
-    }
-  };
-
-  /**
-   * The viewport can be dragged up to its own size past the content, i.e.
-   * until the content is just out of view (or as far as it already is).
-   */
-  private getDragBounds(viewport: MinimapViewport): MinimapBounds {
-    const { x, y, width, height } = viewport;
-    if (!this.contentBounds) {
-      return [x, y, x + width, y + height];
-    }
-    const [minX, minY, maxX, maxY] = this.contentBounds;
-    return [
-      Math.min(minX - width, x),
-      Math.min(minY - height, y),
-      Math.max(maxX + width, x + width),
-      Math.max(maxY + height, y + height),
-    ];
-  }
-
-  private onPointerMove = (event: PointerEvent) => {
-    const { drag } = this;
-    if (!drag || drag.pointerId !== event.pointerId) {
-      return;
-    }
-    const { x, y } = this.getPointerPosition(event);
-    drag.x = x;
-    drag.y = y;
-    this.moveViewport();
-    if (drag.autoPanFrame === null) {
-      this.autoPan(null);
-    }
-  };
-
-  /** moves the viewport where the pointer drags it */
-  private moveViewport() {
-    const { drag } = this;
-    if (!drag) {
-      return;
-    }
-    const { transform, bounds } = drag;
-    const viewport = this.getViewport();
-
-    let x =
-      (drag.x - transform.translateX) / transform.scale -
-      drag.offsetX +
-      drag.panX;
-    let y =
-      (drag.y - transform.translateY) / transform.scale -
-      drag.offsetY +
-      drag.panY;
-
-    if (bounds) {
-      const constrain = (
-        value: number,
-        min: number,
-        max: number,
-        pan: number,
-      ): [value: number, pan: number] => {
-        const constrained = Math.max(min, Math.min(value, max));
-        const excess = value - constrained;
-        // drop the auto-panned distance that'd lead past the bounds, so
-        // that it doesn't have to be made up for when dragging back
-        if (excess * pan > 0) {
-          pan -= Math.sign(pan) * Math.min(Math.abs(pan), Math.abs(excess));
-        }
-        return [constrained, pan];
-      };
-      [x, drag.panX] = constrain(
-        x,
-        bounds[0],
-        bounds[2] - viewport.width,
-        drag.panX,
-      );
-      [y, drag.panY] = constrain(
-        y,
-        bounds[1],
-        bounds[3] - viewport.height,
-        drag.panY,
-      );
-    }
-
-    this.app.viewport.translate({ scrollX: -x, scrollY: -y });
-  }
-
-  /**
-   * Keeps panning the viewport for as long as the pointer is held outside of
-   * the minimap, the faster the further out it is — the pointer may have
-   * nowhere further to go (the minimap sits in the corner of the screen).
-   */
-  private autoPan = (timestamp: number | null) => {
-    const { drag, config } = this;
-    if (!drag) {
-      return;
-    }
-    drag.autoPanFrame = null;
-
-    const getSpeed = (position: number, size: number) => {
-      const distance = position < 0 ? position : Math.max(position - size, 0);
-      return (
-        Math.sign(distance) *
-        Math.min(Math.abs(distance) * AUTO_PAN_SPEED, AUTO_PAN_MAX_SPEED)
-      );
-    };
-    const speedX = getSpeed(drag.x, config?.width ?? 0);
-    const speedY = getSpeed(drag.y, config?.height ?? 0);
-
-    if (!drag.bounds || (!speedX && !speedY)) {
-      drag.autoPanTime = null;
-      return;
-    }
-
-    if (timestamp !== null && drag.autoPanTime !== null) {
-      // (capped in case the frames were paused, e.g. in a background tab)
-      const elapsed = Math.min((timestamp - drag.autoPanTime) / 1000, 0.1);
-      const viewport = this.getViewport();
-      drag.panX += speedX * viewport.width * elapsed;
-      drag.panY += speedY * viewport.height * elapsed;
-      this.moveViewport();
-    }
-    drag.autoPanTime = timestamp;
-    drag.autoPanFrame = this.app.ownerWindow.requestAnimationFrame(
-      this.autoPan,
-    );
-  };
-
-  /**
-   * Zooms the canvas around the center of its viewport, wherever in the
-   * minimap the pointer (or the viewport) is — as opposed to over the canvas,
-   * wheeling over the minimap never pans.
-   */
-  private onWheel = (event: WheelEvent) => {
-    // the editor would otherwise handle it as wheeling over the canvas
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (
-      event.deltaY &&
-      // the dragged viewport is tied to the pointer
-      !this.drag &&
-      this.app.isNavigationEnabled()
-    ) {
-      this.app.wheel.zoomBy(event.deltaY, "center");
-    }
-  };
-
-  private onPointerUp = (event: PointerEvent) => {
-    if (this.drag?.pointerId === event.pointerId) {
-      this.endDrag();
-    }
-  };
-
-  private endDrag() {
-    const { drag } = this;
-    if (!drag) {
-      return;
-    }
-    this.drag = null;
-    if (drag.autoPanFrame !== null) {
-      this.app.ownerWindow.cancelAnimationFrame(drag.autoPanFrame);
-    }
-    drag.endGesture();
-    this.container.classList.remove("minimap--dragging");
-    this.unlockOnceSettled();
-  }
-
-  /**
-   * Ending the drag may leave the viewport animating (the rubberband
-   * overscroll of a locked viewport snapping back). The minimap is kept as is
-   * until that settles, so that only the viewport moves, instead of the
-   * minimap refitting itself under it on each frame.
-   */
-  private unlockOnceSettled = () => {
-    this.unlockFrame = null;
-    if (this.app.viewport.isAnimating) {
-      this.unlockFrame = this.app.ownerWindow.requestAnimationFrame(
-        this.unlockOnceSettled,
-      );
-      return;
-    }
-    this.send({ type: "lock", transform: null });
-  };
-
-  private cancelUnlock() {
-    if (this.unlockFrame !== null) {
-      this.app.ownerWindow.cancelAnimationFrame(this.unlockFrame);
-      this.unlockFrame = null;
     }
   }
 }
