@@ -131,12 +131,12 @@ Try the [CodeSandbox example](https://codesandbox.io/p/sandbox/github/excalidraw
 
 ## Integration
 
-Read the [integration docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration).
+Read the [integration docs](https://plus.excalidraw.com/docs/sdk/excalidraw/integration).
 
 ## API
 
-Read the [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api).
+Read the [API docs](https://plus.excalidraw.com/docs/sdk/excalidraw/api).
 
 ## Contributing
 
-Read the [contributing docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing).
+Read the [contributing docs](https://plus.excalidraw.com/docs/sdk/contributing).

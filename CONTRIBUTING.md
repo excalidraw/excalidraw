@@ -1,3 +1,3 @@
 # Contributing
 
-Head over to the [docs](https://docs.excalidraw.com/docs/introduction/contributing)
+Head over to the [docs](https://plus.excalidraw.com/docs/sdk/contributing)

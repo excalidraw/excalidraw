@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>Excalidraw banner</title>
+<style>
+  @font-face {
+    font-family: "Geist";
+    src: url("geist-latin-wght-normal.woff2") format("woff2");
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: "Geist Mono";
+    src: url("geist-mono-latin-wght-normal.woff2") format("woff2");
+    font-weight: 100 900;
+  }
+  /* the Latin subset of the editor's own hand-drawn font */
+  @font-face {
+    font-family: "Excalifont";
+    src: url("../../../packages/excalidraw/fonts/Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2")
+      format("woff2");
+  }
+
+  :root {
+    --bg: #fbfbfd;
+    --dots: #dcdce6;
+    --fg: #17171c;
+    --muted: #6b6b7b;
+    --card: #ffffff;
+    --border: #e6e6ee;
+    --primary: #6965db;
+    --primary-soft: #ecebfd;
+    --glow: rgba(105, 101, 219, 0.26);
+    --glow-2: rgba(32, 201, 151, 0.1);
+    --shadow: 0 1px 2px rgba(20, 20, 40, 0.06),
+      0 18px 48px -12px rgba(40, 36, 120, 0.28);
+  }
+  .dark {
+    --bg: #0e0e12;
+    --dots: #24242c;
+    --fg: #f4f4f7;
+    --muted: #a1a1b0;
+    --card: #18181d;
+    --border: rgba(255, 255, 255, 0.09);
+    --primary: #9b97f5;
+    --primary-soft: rgba(155, 151, 245, 0.14);
+    --glow: rgba(105, 101, 219, 0.38);
+    --glow-2: rgba(32, 201, 151, 0.12);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 24px 60px -12px rgba(0, 0, 0, 0.7);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    margin: 0;
+  }
+  body {
+    font-family: "Geist", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    position: relative;
+    width: 1280px;
+    height: 600px;
+    overflow: hidden;
+    border-radius: 18px;
+    color: var(--fg);
+    background: radial-gradient(
+        560px 460px at 76% 52%,
+        var(--glow),
+        transparent 72%
+      ),
+      radial-gradient(480px 320px at 4% 100%, var(--glow-2), transparent 70%),
+      radial-gradient(circle, var(--dots) 1.2px, transparent 1.4px) 0 0 / 22px
+        22px,
+      var(--bg);
+  }
+
+  .left {
+    position: absolute;
+    left: 72px;
+    top: 0;
+    bottom: 0;
+    width: 470px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .logo {
+    width: 54px;
+    height: 54px;
+    flex: none;
+    margin-right: 16px;
+    transform: translateY(2px);
+  }
+  h1 {
+    margin: 0;
+    font-size: 58px;
+    line-height: 1;
+    font-weight: 650;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+  h1 .row {
+    display: flex;
+    align-items: center;
+  }
+  h1 .row + .row {
+    margin-top: 14px;
+  }
+  .hand {
+    position: relative;
+    display: inline-block;
+    font-family: "Excalifont";
+    font-weight: 400;
+    color: var(--primary);
+    letter-spacing: 0;
+    /* sized so the word is as wide as the row above it, logo included */
+    font-size: 66px;
+  }
+  .hand svg {
+    position: absolute;
+    left: -6px;
+    bottom: -14px;
+    width: calc(100% + 6px);
+    height: 18px;
+    overflow: visible;
+  }
+  .points {
+    margin: 38px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 21px;
+    line-height: 1;
+    color: var(--muted);
+    letter-spacing: -0.01em;
+  }
+  .points li {
+    display: flex;
+    align-items: center;
+  }
+  .points li + li {
+    margin-top: 12px;
+  }
+  .points svg {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    margin-right: 14px;
+    padding: 6px;
+    border-radius: 9px;
+    color: var(--primary);
+    background: var(--primary-soft);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .editor {
+    position: absolute;
+    right: 34px;
+    top: 75px;
+    width: 706px;
+    padding: 10px;
+    border-radius: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transform: rotate(1.6deg);
+  }
+  .editor img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .term {
+    /* as wide as the title above it */
+    width: 353px;
+    margin-top: 30px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #15151b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 22px 50px -18px rgba(10, 8, 40, 0.55);
+    font-family: "Geist Mono", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #e6e6ef;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 13px;
+    background: #1c1c24;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .bar i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .bar span {
+    margin-left: 9px;
+    font-size: 11.5px;
+    color: #8b8b9c;
+    font-family: "Geist", sans-serif;
+  }
+  pre {
+    margin: 0;
+    padding: 11px 16px 13px;
+    font: inherit;
+    white-space: pre;
+  }
+  .pr {
+    color: #9b97f5;
+  }
+  .s {
+    color: #a6e3a1;
+  }
+</style>
+
+<div class="hero" id="hero">
+  <div class="left">
+    <h1>
+      <span class="row"
+        ><svg class="logo" viewBox="0 0 32 32" fill="none">
+          <path
+            d="M31.818 26.31c-.067-.043-.133-.066-.222-.043-1.664-2.467-3.794-4.8-5.835-7.067l-.333-.378a.17.17 0 0 0-.045-.111.463.463 0 0 0-.133-.089l-.066-.067-.045-.044c-.066-.133-.222-.222-.377-.133-.621.31-1.198.777-1.753 1.222-.732.578-1.464 1.155-2.152 1.8a6.715 6.715 0 0 0-.777.822c-.11.156-.022.289.111.356a93.39 93.39 0 0 0-1.464 1.489.252.252 0 0 0-.067.177c0 .067.044.134.089.156l.865.667v.022c1.22 1.222 3.373 2.889 5.658 4.689.333.266.688.533 1.021.8.155.177.31.377.444.555a.238.238 0 0 0 .31.045c.045.044.111.088.156.133.044.022.089.044.133.044a.202.202 0 0 0 .178-.088.316.316 0 0 0 .044-.134c.022 0 .022.022.044.022a.252.252 0 0 0 .178-.066l4.038-4.422a.248.248 0 0 0 0-.356Zm-11.627-1.532c.022.044.045.066.089.11.466.4.954.8 1.464 1.245l-2.041-1.555-.2-.134c-.044-.022-.088-.066-.133-.089l-.155-.133.044-.044.045-.045.088-.089a234.53 234.53 0 0 1 2.463-2.422c-.643.645-1.93 2.533-1.664 3.156Zm6.967 5.51L25.472 29a35.632 35.632 0 0 0-2.086-2c.91.689 1.687 1.289 1.798 1.4.887.778.843.644 1.442 1.155l.732.534a.846.846 0 0 1-.2.2Zm.444.334-.044-.022c.066-.045.133-.09.2-.156l-.156.178ZM.976 4.6c.044.29.11.578.155.845.266 1.466.533 2.8 1.02 3.8l.2.755c.067.29.178.645.289.734 1.132 1 2.862 2.489 4.726 3.91.089.067.2.067.289 0 0 0 0 .023.022.023a.201.201 0 0 0 .155.067.252.252 0 0 0 .178-.067c2.374-2.644 4.149-4.822 5.414-6.644.088-.09.11-.223.11-.334.09-.089.156-.2.245-.266.088-.09.088-.245 0-.312l-.022-.022c0-.044-.023-.11-.067-.133-.555-.533-.954-.911-1.376-1.311-.732-.69-1.486-1.4-3.084-3l-.022-.022c-.022-.023-.045-.045-.089-.045-.444-.155-1.353-.311-2.485-.511C4.948 1.778 2.662 1.378.599.756c0 0-.134 0-.156.022L.377.845C.355.867.332.889.199.934h.045-.045c.022.133.022.222.067.377 0 .045.089.4.089.445L.975 4.6ZM13.29 7.223l-.267-.267c.067.089.156.155.267.267Zm-2.818 3.733-.045.044c0-.022.022-.044.045-.044Zm-1.62-8c.133.133.688.667.82.778-.576-.267-2.018-.934-2.684-1.156.666.133 1.575.267 1.864.378Zm-7.61-1.111c.332.578.598 2.578.864 4.533-.155-.622-.266-1.244-.399-1.822-.2-1.022-.4-1.933-.666-2.733.045 0 .111 0 .2.022Zm-.134-.467c-.089 0-.178-.022-.244-.022 0-.022 0-.045-.022-.045.11 0 .177.023.266.067Zm-.865.178c0-.022 0-.022 0 0ZM31.463 1.067c.023-.089-.443-.489-.288-.511.333-.022.333-.534 0-.534-.444.023-.91.134-1.331.2-.777.156-1.576.312-2.352.49a104.59 104.59 0 0 0-5.215 1.244c-.532.155-1.131.266-1.642.533-.177.089-.155.267-.066.378-.045.022-.067.022-.111.044-.155.023-.289.045-.444.067-.133.022-.2.133-.177.267 0 .022.022.066.022.089a138.091 138.091 0 0 1-3.107 3.955c-1.11 1.289-2.285 2.645-3.461 4.045-3.75 4.4-7.988 9.4-12.67 13.8a.215.215 0 0 0 0 .31c.022.023.044.045.067.045-.067.067-.134.111-.2.178-.044.044-.067.089-.067.133-.022.023-.066.067-.088.111-.09.09-.09.245.022.311.089.09.244.09.31-.022.023-.022.023-.044.045-.044a.348.348 0 0 1 .488 0c.266.289.532.578.777.822l-.555-.467c-.089-.088-.244-.066-.31.023-.09.088-.067.244.021.31L7.034 31.8c.044.045.088.045.155.045.066 0 .11-.022.155-.067l.133-.133c.023.022.067.022.09.022.066 0 .11-.022.154-.067 7.988-8.044 14.423-14.11 21.79-19.533.066-.044.088-.133.088-.2.09 0 .156-.067.2-.156 1.354-4.155 1.62-7.844 1.709-9.666v-.023c0-.022.022-.044.022-.066.022-.045.022-.067.022-.067a1.309 1.309 0 0 0-.089-.822ZM17.173 7.6c.356-.4.71-.822 1.066-1.2-2.286 3.022-6.08 7.667-11.45 13.2 3.662-4.066 7.345-8.266 10.385-12ZM4.239 28.622h.066-.066Zm2.751 2.556c-.022-.022-.022-.022 0-.022v.022Zm3.306-2.867c.178-.2.355-.377.555-.577 0 0 0 .022.022.022-.2.178-.377.355-.577.555Zm.91-.889c.111-.11.222-.266.355-.4l.022-.022a346.331 346.331 0 0 1 4.039-4.089l.022-.022c.333-.267.732-.555 1.087-.822a301.53 301.53 0 0 0-5.525 5.355Zm8.61-22.244c-.733.956-1.554 2.222-2.242 3.222-2.174 3.156-9.164 10.867-9.319 11a1572.044 1572.044 0 0 1-6.39 6.111l-.134.134c-.11-.134-.11-.334.023-.445 9.874-9.31 15.865-17.066 18.283-20.466-.066.155-.11.288-.222.444Zm3.838 4.556c-.888-.512-1.31-1.312-1.065-2.09l.066-.266c.023-.067.067-.156.111-.222.244-.4.6-.734.999-.934.022 0 .044 0 .067-.022-.023-.044-.023-.11-.023-.178.023-.133.111-.222.267-.222.266 0 1.087.245 1.397.511.09.067.178.156.267.245.11.133.288.355.377.533.044.022.089.245.155.356.045.177.089.377.067.555-.022.022 0 .156-.022.156a2.143 2.143 0 0 1-.289.822c-.022.022-.022.044-.044.067l-.022.022a1.617 1.617 0 0 1-.422.444c-.51.356-1.087.467-1.664.311 0 0-.155-.066-.222-.088Zm6.48-.667c-.2.822-.422 1.667-.711 2.533 0 .023-.022.067 0 .09-.044 0-.067.021-.11.044-1.754 1.289-3.462 2.644-5.17 4.022 1.464-1.311 2.928-2.645 4.46-3.956.443-.4.753-.91.842-1.489l.222-1.333v-.044c.111-.267.533-.156.466.133Z"
+            fill="#6965DB"
+          /></svg
+        ><span>Excalidraw</span></span
+      >
+      <span class="row"
+        ><span class="hand"
+          >whiteboard<svg viewBox="0 0 200 18" preserveAspectRatio="none">
+            <path
+              d="M3 11 C 40 4, 80 15, 120 8 S 180 6, 197 10"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            /></svg></span
+      ></span>
+    </h1>
+    <!-- the icons are the editor's own, from packages/excalidraw/components/icons.tsx -->
+    <ul class="points">
+      <li>
+        <svg viewBox="0 0 20 20">
+          <path
+            d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+          />
+          <path d="m11.25 5.417 3.333 3.333" />
+        </svg>
+        Hand-drawn like diagrams
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" style="stroke-width: 1.8">
+          <circle cx="9" cy="7" r="4" />
+          <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+        </svg>
+        Real-time collaboration
+      </li>
+      <li>
+        <svg viewBox="0 0 20 20">
+          <path
+            d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
+          />
+          <path
+            d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
+          />
+          <path
+            d="M6.667 8.333V5.417C6.667 3.806 8.159 2.5 10 2.5c1.841 0 3.333 1.306 3.333 2.917v2.916"
+          />
+        </svg>
+        End-to-end encrypted
+      </li>
+      <li>
+        <svg viewBox="0 0 20 20">
+          <path
+            d="M7.5 15.833c-3.583 1.167-3.583-2.083-5-2.5m10 4.167v-2.917c0-.833.083-1.166-.417-1.666 2.334-.25 4.584-1.167 4.584-5a3.833 3.833 0 0 0-1.084-2.667 3.5 3.5 0 0 0-.083-2.667s-.917-.25-2.917 1.084a10.25 10.25 0 0 0-5.166 0C5.417 2.333 4.5 2.583 4.5 2.583a3.5 3.5 0 0 0-.083 2.667 3.833 3.833 0 0 0-1.084 2.667c0 3.833 2.25 4.75 4.584 5-.5.5-.5 1-.417 1.666V17.5"
+          />
+        </svg>
+        Free and open source
+      </li>
+    </ul>
+
+    <div class="term">
+      <div class="bar">
+        <i style="background: #ff5f57"></i><i style="background: #febc2e"></i
+        ><i style="background: #28c840"></i><span>~/my-app</span>
+      </div>
+      <pre><span class="pr">$</span> npm install <span class="s">@excalidraw/excalidraw</span></pre>
+    </div>
+  </div>
+
+  <div class="editor"><img id="editor" alt="" /></div>
+</div>
+
+<script>
+  const rawTheme = new URLSearchParams(location.search).get("theme");
+  const theme =
+    rawTheme === "dark" || rawTheme === "light" ? rawTheme : "light";
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  document.getElementById("editor").src = `editor-${theme}.png`;
+</script>
