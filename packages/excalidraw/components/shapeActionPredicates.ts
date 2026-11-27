@@ -5,6 +5,7 @@ import {
   suppportsHorizontalAlign,
   getColorTargetElement,
   hasBoundTextElement,
+  isArrowElement,
   isElbowArrow,
   isImageElement,
   isLinearElement,
@@ -180,6 +181,9 @@ export const getShapeActionPredicates = (
       !appState.croppingElementId &&
       singleSelected &&
       isImageElement(targetElements[0]),
+    reverseArrow:
+      !appState.selectedLinearElement?.isEditing &&
+      targetElements.some(isArrowElement),
     lineEditor:
       !appState.selectedLinearElement?.isEditing &&
       singleSelected &&

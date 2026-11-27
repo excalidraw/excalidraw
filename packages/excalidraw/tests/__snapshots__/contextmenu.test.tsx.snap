@@ -736,6 +736,57 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      {
+        "PanelComponent": [Function],
+        "category": "Elements",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={"1.25000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M21 7l-18 0"
+            />
+            <path
+              d="M18 10l3 -3l-3 -3"
+            />
+            <path
+              d="M6 20l-3 -3l3 -3"
+            />
+            <path
+              d="M3 17l18 0"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "direction",
+          "swap",
+          "flip",
+          "arrowhead",
+        ],
+        "label": "labels.reverseArrow",
+        "name": "reverseArrow",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
       "separator",
       {
         "PanelComponent": [Function],
@@ -5608,6 +5659,57 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      {
+        "PanelComponent": [Function],
+        "category": "Elements",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={"1.25000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M21 7l-18 0"
+            />
+            <path
+              d="M18 10l3 -3l-3 -3"
+            />
+            <path
+              d="M6 20l-3 -3l3 -3"
+            />
+            <path
+              d="M3 17l18 0"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "direction",
+          "swap",
+          "flip",
+          "arrowhead",
+        ],
+        "label": "labels.reverseArrow",
+        "name": "reverseArrow",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
       "separator",
       {
         "PanelComponent": [Function],
@@ -6841,6 +6943,57 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "PanelComponent": [Function],
+        "category": "Elements",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={"1.25000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M21 7l-18 0"
+            />
+            <path
+              d="M18 10l3 -3l-3 -3"
+            />
+            <path
+              d="M6 20l-3 -3l3 -3"
+            />
+            <path
+              d="M3 17l18 0"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "direction",
+          "swap",
+          "flip",
+          "arrowhead",
+        ],
+        "label": "labels.reverseArrow",
+        "name": "reverseArrow",
+        "perform": [Function],
+        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
@@ -8888,6 +9041,57 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      {
+        "PanelComponent": [Function],
+        "category": "Elements",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={"1.25000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M21 7l-18 0"
+            />
+            <path
+              d="M18 10l3 -3l-3 -3"
+            />
+            <path
+              d="M6 20l-3 -3l3 -3"
+            />
+            <path
+              d="M3 17l18 0"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "direction",
+          "swap",
+          "flip",
+          "arrowhead",
+        ],
+        "label": "labels.reverseArrow",
+        "name": "reverseArrow",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
       "separator",
       {
         "PanelComponent": [Function],
@@ -9891,6 +10095,57 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "label": "labels.flipVertical",
         "name": "flipVertical",
         "perform": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "PanelComponent": [Function],
+        "category": "Elements",
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth={"1.25000"}
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M21 7l-18 0"
+            />
+            <path
+              d="M18 10l3 -3l-3 -3"
+            />
+            <path
+              d="M6 20l-3 -3l3 -3"
+            />
+            <path
+              d="M3 17l18 0"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "direction",
+          "swap",
+          "flip",
+          "arrowhead",
+        ],
+        "label": "labels.reverseArrow",
+        "name": "reverseArrow",
+        "perform": [Function],
+        "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },

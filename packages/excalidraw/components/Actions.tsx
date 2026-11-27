@@ -219,6 +219,7 @@ export const SelectedShapeActions = ({
             {predicates.link && renderAction("hyperlink")}
             {predicates.cropEditor && renderAction("cropEditor")}
             {predicates.lineEditor && renderAction("toggleLinearEditor")}
+            {predicates.reverseArrow && renderAction("reverseArrow")}
           </div>
         </fieldset>
       )}
@@ -608,6 +609,22 @@ const LinearEditorAction = ({
   );
 };
 
+const ReverseArrowAction = ({
+  renderAction,
+  predicates,
+}: {
+  renderAction: ActionManager["renderAction"];
+  predicates: ShapeActionPredicates;
+}) => {
+  if (!predicates.reverseArrow) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">{renderAction("reverseArrow")}</div>
+  );
+};
+
 /**
  * Compact styles panel — the collapsed, popover-driven layout used on tablets
  * and on desktop when the UI is in "compact" mode.
@@ -682,6 +699,11 @@ export const CompactShapeActions = ({
       {predicates.lineEditor && (
         <div className="compact-action-item">
           {renderAction("toggleLinearEditor")}
+        </div>
+      )}
+      {predicates.reverseArrow && (
+        <div className="compact-action-item">
+          {renderAction("reverseArrow")}
         </div>
       )}
 
@@ -830,6 +852,10 @@ export const MobileShapeActions = ({
         />
         {/* Linear Editor */}
         <LinearEditorAction
+          renderAction={renderAction}
+          predicates={predicates}
+        />
+        <ReverseArrowAction
           renderAction={renderAction}
           predicates={predicates}
         />
