@@ -10979,6 +10979,8 @@ class App extends React.Component<AppProps, AppState> {
             isLoading: false,
           },
           replaceFiles: true,
+          // a dropped scene's custom fonts are resolved by no one else
+          loadFonts: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
         return true;
