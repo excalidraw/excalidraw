@@ -1,0 +1,4 @@
+.vite/
+.vite-server.log
+# commit snapshots (yarn ab --clean)
+.cache/
