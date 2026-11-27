@@ -915,6 +915,10 @@ export interface ExcalidrawProps {
     appState: AppState,
     files: BinaryFiles,
   ) => void;
+  /**
+   * When supplied, the editor no longer changes its theme on its own: the
+   * host app must update the `theme` prop in response.
+   */
   onThemeChange?: (theme: Theme | "system") => void;
   /**
    * note: only subscribes if the props.onIncrement is defined on initial render
@@ -923,6 +927,10 @@ export interface ExcalidrawProps {
   initialData?:
     | (() => MaybePromise<ExcalidrawInitialDataState | null>)
     | MaybePromise<ExcalidrawInitialDataState | null>;
+  /**
+   * Read once, when the initial scene loads. `viewport` takes precedence over
+   * `initialData.scrollToContent`.
+   */
   initialState?: ExcalidrawInitialState;
   /**
    * Invoked as soon as the Excalidraw API is available
@@ -1058,6 +1066,9 @@ export interface ExcalidrawProps {
     | { type: "custom"; customType: string };
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  /**
+   * NOTE: currently not forwarded by `<Excalidraw>`, so it has no effect.
+   */
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
   theme?: Theme;
@@ -1093,6 +1104,10 @@ export interface ExcalidrawProps {
     pointerDownState: PointerDownState,
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number, zoom: Zoom) => void;
+  /**
+   * The host app must update `userToFollow` in response. An `UNFOLLOW` is also
+   * emitted when the user takes over the viewport.
+   */
   onUserFollow?: (payload: OnUserFollowedPayload) => void;
   children?: React.ReactNode;
   validateEmbeddable?:
@@ -1105,7 +1120,9 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  /** @default true */
   aiEnabled?: boolean;
+  /** Fonts already used in the scene are always listed. */
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
   viewportStatusFrame?: ViewportStatusFrame | null;
