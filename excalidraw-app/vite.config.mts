@@ -371,6 +371,32 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
+              // A Google font's stylesheet, which lists the font's files:
+              // what resolving a `google:` font asks for first (the files
+              // themselves fall under the `.woff2` rule above). Without it
+              // such a font resolves offline only for as long as the
+              // browser's HTTP cache happens to hold the stylesheet, a day
+              // by Google's headers. Served from the cache and refreshed in
+              // the background - the files stay at the urls an older
+              // stylesheet lists.
+              urlPattern: new RegExp(
+                "^https://fonts\\.googleapis\\.com/css2\\?",
+              ),
+              handler: "StaleWhileRevalidate",
+              options: {
+                cacheName: "google-fonts-stylesheets",
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
+                },
+                cacheableResponse: {
+                  // a CORS response - never an opaque one, which could be
+                  // an error page
+                  statuses: [200],
+                },
+              },
+            },
+            {
               urlPattern: new RegExp("locales/[^/]+.js"),
               handler: "CacheFirst",
               options: {
