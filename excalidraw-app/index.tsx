@@ -5,6 +5,7 @@ import { registerSW } from "virtual:pwa-register";
 import "../excalidraw-app/sentry";
 
 import ExcalidrawApp from "./App";
+import { getThemeFromSearch } from "./appTheme";
 
 // the entry's JavaScript and CSS loaded and ran (`scripts/stats/perf.mjs`)
 performance.mark("excalidraw:app-start");
@@ -15,6 +16,10 @@ const root = createRoot(rootElement);
 registerSW();
 root.render(
   <StrictMode>
-    <ExcalidrawApp />
+    <ExcalidrawApp
+      initialTheme={getThemeFromSearch(
+        rootElement.ownerDocument.defaultView?.location.search || "",
+      )}
+    />
   </StrictMode>,
 );
