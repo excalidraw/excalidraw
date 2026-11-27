@@ -194,6 +194,37 @@
         user-select: none;
       }
 
+      #app-load-help {
+        box-sizing: border-box;
+        max-width: 38rem;
+        max-height: 100%;
+        margin: auto;
+        padding: 1rem;
+        overflow: auto;
+        font: 1rem/1.5 system-ui, sans-serif;
+        user-select: text;
+      }
+
+      #app-load-help a {
+        color: inherit;
+      }
+
+      /* Keep the normal startup quiet; show help immediately without JS. */
+      @media (scripting: enabled) {
+        #app-load-help {
+          animation: show-load-help 0s 4s backwards;
+        }
+      }
+
+      @keyframes show-load-help {
+        from {
+          visibility: hidden;
+        }
+        to {
+          visibility: visible;
+        }
+      }
+
       @media screen and (min-width: 1200px) {
         #root {
           -webkit-touch-callout: default;
@@ -208,11 +239,45 @@
   </head>
 
   <body>
-    <noscript> You need to enable JavaScript to run this app. </noscript>
     <header>
       <h1 class="visually-hidden">Excalidraw</h1>
     </header>
-    <div id="root"></div>
+    <div id="root">
+      <main id="app-load-help">
+        <h2>Trouble opening Excalidraw?</h2>
+        <p>
+          The drawing editor needs JavaScript. Check your connection, allow
+          JavaScript for this site in your browser or script blocker, then
+          reload the page.
+        </p>
+        <p>
+          <a href="https://www.enable-javascript.com/"
+            >How to enable JavaScript</a
+          >
+          ·
+          <a
+            href="https://www.enable-javascript.com/es/"
+            lang="es"
+            hreflang="es"
+            >Español</a
+          >
+          ·
+          <a
+            href="https://www.enable-javascript.com/pt/"
+            lang="pt"
+            hreflang="pt"
+            >Português</a
+          >
+          ·
+          <a
+            href="https://www.enable-javascript.com/fr/"
+            lang="fr"
+            hreflang="fr"
+            >Français</a
+          >
+        </p>
+      </main>
+    </div>
     <script type="module" src="index.tsx"></script>
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <!-- 100% privacy friendly analytics -->
