@@ -58,6 +58,7 @@ export const fileSave = (
     /** existing FileSystemFileHandle */
     fileHandle?: FileSystemFileHandle | null;
   },
+  filePickerShown?: (handle: FileSystemFileHandle | null) => void,
 ) => {
   return _fileSave(
     blob,
@@ -69,6 +70,7 @@ export const fileSave = (
     },
     opts.fileHandle,
     false,
+    filePickerShown,
   );
 };
 

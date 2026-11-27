@@ -2799,9 +2799,15 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null },
+    opts: {
+      exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+      onFilePickerShown?: (handle: FileSystemFileHandle | null) => void;
+    },
   ) => {
     trackEvent("export", type, "ui");
+    let hasError = false;
+    let wasAborted = false;
+
     const fileHandle = await exportCanvas(
       type,
       elements,
@@ -2811,10 +2817,18 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         exportingFrame: opts.exportingFrame,
         renderEnvironment: this.renderEnvironment,
+        onFilePickerShown: opts.onFilePickerShown,
       },
     )
-      .catch(muteFSAbortError)
       .catch((error) => {
+        if (error?.name === "AbortError") {
+          wasAborted = true;
+          return muteFSAbortError(error);
+        }
+        throw error;
+      })
+      .catch((error) => {
+        hasError = true;
         console.error(error);
         this.setState({ errorMessage: error.message });
       });
@@ -2825,6 +2839,20 @@ class App extends React.Component<AppProps, AppState> {
       isImageFileHandle(fileHandle)
     ) {
       this.setState({ fileHandle });
+    }
+
+    if (!hasError && !wasAborted && (type === "png" || type === "svg")) {
+      this.setToast({
+        message:
+          fileHandle && isImageFileHandle(fileHandle) && fileHandle.name
+            ? t("toast.fileSavedToFilename").replace(
+                "{filename}",
+                `"${fileHandle.name}"`,
+              )
+            : t("toast.fileSaved"),
+        duration: 3000,
+        closable: true,
+      });
     }
   };
 
