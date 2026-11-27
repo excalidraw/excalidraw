@@ -305,7 +305,8 @@
 
 <script>
   const rawTheme = new URLSearchParams(location.search).get("theme");
-  const theme = rawTheme === "dark" || rawTheme === "light" ? rawTheme : "light";
+  const theme =
+    rawTheme === "dark" || rawTheme === "light" ? rawTheme : "light";
   document.documentElement.classList.toggle("dark", theme === "dark");
   document.getElementById("editor").src = `editor-${theme}.png`;
 </script>
