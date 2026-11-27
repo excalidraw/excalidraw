@@ -9,7 +9,7 @@
 // once into a cache, so no worktree or branch is needed. A dir is a checkout
 // used live (uncommitted changes and HMR included), e.g. `yarn ab .`.
 
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -173,18 +173,21 @@ const snapshot = (sha) => {
     const tmp = `${root}.tmp-${process.pid}`;
     fs.rmSync(tmp, { recursive: true, force: true });
     fs.mkdirSync(tmp, { recursive: true });
-    execFileSync(
-      "sh",
-      [
-        "-c",
-        'git -C "$1" archive --format=tar "$2" packages | tar -x -C "$3"',
-        "sh",
-        REPO,
-        sha,
-        tmp,
-      ],
-      { stdio: ["ignore", "ignore", "inherit"] },
+    const gitArchive = spawnSync(
+      "git",
+      ["-C", REPO, "archive", "--format=tar", sha, "packages"],
+      { stdio: ["ignore", "pipe", "inherit"] },
     );
+    if (gitArchive.status !== 0 || !gitArchive.stdout) {
+      fail(`failed to archive packages for ${sha}`);
+    }
+    const tarExtract = spawnSync("tar", ["-x", "-C", tmp], {
+      input: gitArchive.stdout,
+      stdio: ["pipe", "ignore", "inherit"],
+    });
+    if (tarExtract.status !== 0) {
+      fail(`failed to extract snapshot for ${sha}`);
+    }
     fs.writeFileSync(path.join(tmp, ".complete"), "");
     fs.rmSync(root, { recursive: true, force: true });
     fs.renameSync(tmp, root);
