@@ -725,6 +725,14 @@ const ExcalidrawWrapper = () => {
     appState: AppState,
     files: BinaryFiles,
   ) => {
+    // show the file name (or scene name) in the window/tab title so that
+    // multiple open windows (e.g. PWA) can be told apart
+    const name =
+      appState.fileHandle?.name.replace(/\.excalidraw$/, "") || appState.name;
+    const title = name ? `${name} - Excalidraw` : "Excalidraw Whiteboard";
+    if (document.title !== title) {
+      document.title = title;
+    }
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
