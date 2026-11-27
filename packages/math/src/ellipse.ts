@@ -25,7 +25,6 @@ import type {
  * Construct an Ellipse object from the parameters
  *
  * @param center The center of the ellipse
- * @param angle The slanting of the ellipse in radians
  * @param halfWidth Half of the width of a non-slanted version of the ellipse
  * @param halfHeight Half of the height of a non-slanted version of the ellipse
  * @returns The constructed Ellipse object

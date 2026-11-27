@@ -22,7 +22,8 @@ import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
 /**
  * Create a line segment from two points.
  *
- * @param points The two points delimiting the line segment on each end
+ * @param a The point at one end of the line segment
+ * @param b The point at the other end of the line segment
  * @returns The line segment delineated by the points
  */
 export function lineSegment<P extends GlobalPoint | LocalPoint>(
