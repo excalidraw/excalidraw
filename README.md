@@ -1,32 +1,26 @@
-<a href="https://excalidraw.com/" target="_blank" rel="noopener">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />
-    <img alt="Excalidraw" src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png" />
-  </picture>
-</a>
+<p align="center">
+  <a href="https://excalidraw.com" target="_blank" rel="noopener">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/assets/banner-dark.png">
+      <img alt="Excalidraw whiteboard: hand-drawn like diagrams, real-time collaboration, end-to-end encrypted, free and open source" src=".github/assets/banner-light.png" width="100%">
+    </picture>
+  </a>
+</p>
 
-<h4 align="center">
-  <a href="https://excalidraw.com">Excalidraw Editor</a> |
-  <a href="https://plus.excalidraw.com/blog">Blog</a> |
-  <a href="https://docs.excalidraw.com">Documentation</a> |
+<p align="center">
+  <a href="https://excalidraw.com"><b>Excalidraw Editor</b></a> ·
+  <a href="https://plus.excalidraw.com/docs/sdk">Documentation</a> ·
+  <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">npm</a> ·
+  <a href="https://plus.excalidraw.com/blog">Blog</a> ·
   <a href="https://plus.excalidraw.com">Excalidraw+</a>
-</h4>
+</p>
 
-<div align="center">
-  <h2>
-    An open source virtual hand-drawn style whiteboard. </br>
-    Collaborative and end-to-end encrypted. </br>
-  <br />
-  </h2>
-</div>
-
-<br />
 <p align="center">
   <a href="https://github.com/excalidraw/excalidraw/blob/master/LICENSE">
     <img alt="Excalidraw is released under the MIT license." src="https://img.shields.io/badge/license-MIT-blue.svg"  /></a>
   <a href="https://www.npmjs.com/package/@excalidraw/excalidraw">
     <img alt="npm downloads/month" src="https://img.shields.io/npm/dm/@excalidraw/excalidraw"  /></a>
-  <a href="https://docs.excalidraw.com/docs/introduction/contributing">
+  <a href="https://plus.excalidraw.com/docs/sdk/contributing">
     <img alt="PRs welcome!" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"  /></a>
   <a href="https://discord.gg/UexuTaE">
     <img alt="Chat on Discord" src="https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widget=false"/></a>
@@ -36,55 +30,42 @@
     <img alt="Follow Excalidraw on Twitter" src="https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter"/></a>
 </p>
 
-<div align="center">
-  <figure>
-    <a href="https://excalidraw.com" target="_blank" rel="noopener">
-      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
-    </a>
-    <figcaption>
-      <p align="center">
-        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.
-      </p>
-    </figcaption>
-  </figure>
-</div>
+An open source virtual whiteboard with a hand-drawn style, collaborative and end-to-end encrypted. Sketch diagrams, wireframes or whatever you like at [excalidraw.com](https://excalidraw.com), or embed the editor in your own app with the [`@excalidraw/excalidraw`](https://www.npmjs.com/package/@excalidraw/excalidraw) React component.
 
 ## Features
 
 The Excalidraw editor (npm package) supports:
 
-- 💯&nbsp;Free & open-source.
-- 🎨&nbsp;Infinite, canvas-based whiteboard.
-- ✍️&nbsp;Hand-drawn like style.
-- 🌓&nbsp;Dark mode.
-- 🏗️&nbsp;Customizable.
-- 📷&nbsp;Image support.
-- 😀&nbsp;Shape libraries support.
-- 🌐&nbsp;Localization (i18n) support.
-- 🖼️&nbsp;Export to PNG, SVG & clipboard.
-- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.
-- ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...
-- ➡️&nbsp;Arrow-binding & labeled arrows.
-- 🔙&nbsp;Undo / Redo.
-- 🔍&nbsp;Zoom and panning support.
+- 💯 **Free and open source**: MIT licensed.
+- 🎨 **Infinite canvas**: zoom and pan without running out of room, with a minimap to find your way around.
+- ✍️ **Hand-drawn style**: shapes, arrows and text that look sketched, with a choice of fonts, in light or dark mode.
+- ⚒️ **Wide range of tools**: rectangle, diamond, ellipse, arrow, line, free-draw, text, sticky notes, frames, web embeds, laser pointer, eraser and more.
+- ➡️ **Arrows that follow your shapes**: arrow binding, labeled arrows and elbow arrows.
+- 🔀 **Flowcharts from the keyboard**: Ctrl/Cmd+arrow keys add the next node, Alt+arrow keys move between nodes.
+- 🧜 **Mermaid diagrams**: paste a Mermaid definition and get shapes you can keep editing, with [Mermaid to Excalidraw](https://github.com/excalidraw/mermaid-to-excalidraw).
+- 📊 **Charts**: paste spreadsheet data and get a bar, line or radar chart.
+- 📷 **Images and shape libraries**: drop in images and crop them, and reuse shapes from [public libraries](https://libraries.excalidraw.com) or your own.
+- 🔍 **Command palette and search**: run any action, or find text in the scene, from the keyboard.
+- 🖼️ **Export to PNG, SVG and clipboard**: or save the drawing as an `.excalidraw` JSON file, an open format.
+- 🌐 **Localization (i18n)**: translated by the community.
+- 🏗️ **Customizable**: props, an imperative API and UI you can extend when you embed it.
 
 ## Excalidraw.com
 
 The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
 
-- 📡&nbsp;PWA support (works offline).
-- 🤼&nbsp;Real-time collaboration.
-- 🔒&nbsp;End-to-end encryption.
-- 💾&nbsp;Local-first support (autosaves to the browser).
-- 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
+- 📡 **PWA support**: works offline.
+- 🤼 **Real-time collaboration**: draw together in the same scene.
+- 🔒 **End-to-end encryption**: the server can't read what you draw.
+- 💾 **Local-first**: autosaves to the browser.
+- 🔗 **Shareable links**: export to a read-only link you can share with others.
+- ✨ **Generative AI**: text to diagram and wireframe to code.
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
 ## Quick start
 
-**Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
-
-Use `npm` or `yarn` to install the package.
+**Note:** the following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://plus.excalidraw.com/docs/sdk/development).
 
 ```bash
 npm install react react-dom @excalidraw/excalidraw
@@ -92,18 +73,74 @@ npm install react react-dom @excalidraw/excalidraw
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
+To try unreleased changes, use `@excalidraw/excalidraw@next`.
+
+```tsx
+import { Excalidraw } from "@excalidraw/excalidraw";
+import "@excalidraw/excalidraw/index.css";
+
+export default function App() {
+  return (
+    <div style={{ height: "100vh" }}>
+      <Excalidraw />
+    </div>
+  );
+}
+```
+
+Excalidraw fills its parent, so the parent needs a height. See [installation](https://plus.excalidraw.com/docs/sdk/excalidraw/installation) and [integration](https://plus.excalidraw.com/docs/sdk/excalidraw/integration) for Next.js and other setups.
+
+## Excalidraw+
+
+[Excalidraw+](https://plus.excalidraw.com) is the hosted workspace for teams, built on this editor. Using it also supports the open source project. On top of everything above, you get:
+
+- ☁️ **Unlimited scenes, saved to the cloud**: organized in collections, with a dashboard to find them again.
+- 👥 **Team workspaces**: access management, sharing with edit or view rights, read-only links and embeds.
+- 💬 **Comments, voice hangouts and screensharing**: discuss a scene where you draw it.
+- 🎞️ **Presentations**: turn frames into slides, present them live and export them to PDF or PPTX.
+- ✨ **More AI**: 100 requests a day for text to diagram and wireframe to code, or bring your own key.
+- 🤖 **MCP server and REST API**: let AI agents and scripts read and edit your scenes. See the [MCP](https://plus.excalidraw.com/docs/mcp) and [API](https://plus.excalidraw.com/docs/api) docs.
+- 🔌 **Integrations**: bring your scenes into the tools your team already works in.
+- 🏢 **Enterprise ready**: SSO (SAML or OIDC), admin controls for sharing and AI, and audit logs.
+- 🔐 **Security**: two-factor authentication that admins can require of every member, encryption at rest and in transit, daily backups and SOC 2 Type 2. See [security and compliance](https://plus.excalidraw.com/security-and-compliance).
+
+**[Try Excalidraw+ free for 14 days](https://plus.excalidraw.com)** · [Pricing](https://plus.excalidraw.com/pricing)
+
+## Excalidraw CLI
+
+The [Excalidraw CLI](https://github.com/excalidraw/cli) brings Excalidraw to your terminal, scripts and AI agents. It renders drawings and converts Mermaid diagrams on your computer, free and without an account:
+
+```bash
+npx @excalidraw/cli render drawing.excalidraw --out drawing.png
+npx @excalidraw/cli mermaid flow.mmd --out flow.excalidraw
+```
+
+Log in to Excalidraw+ and it manages your workspace too: scenes, collections, share links and presentations. `excalidraw mcp` gives AI agents the Excalidraw+ drawing tools through the same login. See the [CLI docs](https://plus.excalidraw.com/docs/cli).
+
+## Documentation
+
+📚 **[plus.excalidraw.com/docs/sdk](https://plus.excalidraw.com/docs/sdk)**
+
+- [Installation](https://plus.excalidraw.com/docs/sdk/excalidraw/installation) and [integration](https://plus.excalidraw.com/docs/sdk/excalidraw/integration)
+- [API: props, methods and utilities](https://plus.excalidraw.com/docs/sdk/excalidraw/api)
+- [Customizing styles](https://plus.excalidraw.com/docs/sdk/excalidraw/customizing-styles)
+- [FAQ](https://plus.excalidraw.com/docs/sdk/excalidraw/faq)
+- [Self-hosting the open source editor](https://plus.excalidraw.com/docs/self-hosting/excalidraw-open-source-selfhosting)
+- [Development](https://plus.excalidraw.com/docs/sdk/development) and [the codebase](https://plus.excalidraw.com/docs/sdk/codebase/json-schema)
 
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
-- Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
-- Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
+- Want to contribute? Check out our [contribution guide](https://plus.excalidraw.com/docs/sdk/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
+- Want to help with translations? See the [translation guide](https://plus.excalidraw.com/docs/sdk/contributing#translating).
 
 ## Integrations
 
-- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
 - [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw)
+- [Excalidraw CLI](https://github.com/excalidraw/cli)
+- [Mermaid to Excalidraw](https://github.com/excalidraw/mermaid-to-excalidraw)
+- [Excalidraw MCP](https://github.com/excalidraw/excalidraw-mcp)
+- [VScode extension](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
 
 ## Who's integrating Excalidraw
 
