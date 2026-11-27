@@ -52,7 +52,7 @@ const RE_GIPHY =
   /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
 
 const RE_REDDIT =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?reddit\.com\/r\/([a-zA-Z0-9_]+)\/comments\/([a-zA-Z0-9_]+)\/([a-zA-Z0-9_]+)\/?(?:\?[^#\s]*)?(?:#[^\s]*)?$/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?reddit\.com\/r\/([a-zA-Z0-9_]+)\/comments\/([a-zA-Z0-9_]+)\/([a-zA-Z0-9_-]+)(?:\/([a-zA-Z0-9]+))?\/?(?:\?[^#\s]*)?(?:#[^\s]*)?$/;
 
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
@@ -377,9 +377,11 @@ export const getEmbedLink = (
   }
 
   if (RE_REDDIT.test(link)) {
-    const [, page, postId, title] = link.match(RE_REDDIT)!;
+    const [, page, postId, title, commentId] = link.match(RE_REDDIT)!;
     const safeURL = escapeDoubleQuotes(
-      `https://reddit.com/r/${page}/comments/${postId}/${title}`,
+      `https://reddit.com/r/${page}/comments/${postId}/${
+        commentId ? `comment/${commentId}` : title
+      }`,
     );
     const ret: IframeDataWithSandbox = {
       type: "document",
