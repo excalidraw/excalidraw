@@ -89,7 +89,6 @@ import type {
   ExcalidrawImageElement,
   ElementsMap,
   ExcalidrawElbowArrowElement,
-  ExcalidrawArrowElement,
 } from "./types";
 import type { ElementUpdate } from "./mutateElement";
 
@@ -946,7 +945,7 @@ export const resizeSingleElement = (
     Number.isFinite(newOrigin.x) &&
     Number.isFinite(newOrigin.y)
   ) {
-    let updates: ElementUpdate<ExcalidrawElement> = {
+    const updates: ElementUpdate<ExcalidrawElement> = {
       ...newOrigin,
       width: Math.abs(nextWidth),
       height: Math.abs(nextHeight),
@@ -955,20 +954,10 @@ export const resizeSingleElement = (
 
     if (isBindingElement(latestElement)) {
       if (latestElement.startBinding) {
-        updates = {
-          ...updates,
-        } as ElementUpdate<ExcalidrawArrowElement>;
-
-        if (latestElement.startBinding) {
-          unbindBindingElement(latestElement, "start", scene);
-        }
+        unbindBindingElement(latestElement, "start", scene);
       }
-
       if (latestElement.endBinding) {
-        updates = {
-          ...updates,
-          endBinding: null,
-        } as ElementUpdate<ExcalidrawArrowElement>;
+        unbindBindingElement(latestElement, "end", scene);
       }
     }
 

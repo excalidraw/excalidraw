@@ -1,6 +1,9 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { bindOrUnbindBindingElement } from "@excalidraw/element/binding";
+import {
+  bindOrUnbindBindingElement,
+  fixBindingsAfterDeletion,
+} from "@excalidraw/element/binding";
 import {
   isValidPolygon,
   LinearElementEditor,
@@ -155,7 +158,10 @@ export const actionFinalize = register<FormData>({
         // so filter out this element if it is too small,
         // but do an update to all new elements anyway for undo/redo purposes.
 
-        if (element && isInvisiblySmallElement(element)) {
+        if (
+          element &&
+          (element.points.length < 2 || isInvisiblySmallElement(element))
+        ) {
           // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
           newElements = newElements.map((el) => {
             if (el.id === element.id) {
@@ -165,20 +171,16 @@ export const actionFinalize = register<FormData>({
             }
             return el;
           });
+          fixBindingsAfterDeletion(
+            newElements,
+            newElements.filter((el) => el.id === element.id),
+          );
         }
 
         const activeToolLocked = appState.activeTool?.locked;
 
         return {
-          elements:
-            element.points.length < 2 || isInvisiblySmallElement(element)
-              ? elements.map((el) => {
-                  if (el.id === element.id) {
-                    return newElementWith(el, { isDeleted: true });
-                  }
-                  return el;
-                })
-              : newElements,
+          elements: newElements,
           appState: {
             ...appState,
             cursorButton: "up",
@@ -307,6 +309,10 @@ export const actionFinalize = register<FormData>({
           }
           return el;
         });
+        fixBindingsAfterDeletion(
+          newElements,
+          newElements.filter((el) => el.id === element?.id),
+        );
       }
 
       if (isLinearElement(element) || isFreeDrawElement(element)) {

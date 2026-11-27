@@ -1611,6 +1611,54 @@ describe("repairing bindings", () => {
       }),
     ]);
   });
+
+  it("should remove stale arrow references from boundElements when repair is true", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      boundElements: [{ type: "arrow", id: "detached-arrow" }],
+    });
+    const detachedArrow = API.createElement({
+      type: "arrow",
+      id: "detached-arrow",
+      startBinding: null,
+      endBinding: null,
+    });
+    const deletedRect = API.createElement({
+      type: "rectangle",
+      isDeleted: true,
+      boundElements: [{ type: "arrow", id: "deleted-detached-arrow" }],
+    });
+    const deletedDetachedArrow = API.createElement({
+      type: "arrow",
+      id: "deleted-detached-arrow",
+      isDeleted: true,
+      startBinding: null,
+      endBinding: null,
+    });
+
+    const restoredElements = restore.restoreElements(
+      [rect, detachedArrow, deletedRect, deletedDetachedArrow],
+      null,
+      { repairBindings: true },
+    );
+
+    expect(restoredElements).toEqual([
+      expect.objectContaining({
+        id: rect.id,
+        boundElements: [],
+      }),
+      expect.objectContaining({
+        id: detachedArrow.id,
+      }),
+      expect.objectContaining({
+        id: deletedRect.id,
+        boundElements: [],
+      }),
+      expect.objectContaining({
+        id: deletedDetachedArrow.id,
+      }),
+    ]);
+  });
 });
 
 describe("restoreLibraryItems creation timestamps", () => {

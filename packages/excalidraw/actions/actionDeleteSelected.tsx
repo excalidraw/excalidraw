@@ -247,6 +247,10 @@ export const actionDeleteSelected = register<{
           }
           return el;
         });
+        fixBindingsAfterDeletion(
+          nextElements,
+          nextElements.filter((el) => el.isDeleted),
+        );
         const nextAppState = handleGroupEditingState(appState, nextElements);
 
         return {

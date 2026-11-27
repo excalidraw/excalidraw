@@ -21,6 +21,7 @@ import type { Radians } from "@excalidraw/math";
 import {
   bindBindingElement,
   getBindingGap,
+  unbindBindingElement,
   updateBoundElements,
 } from "../src/binding";
 import { Scene } from "../src/Scene";
@@ -779,6 +780,8 @@ describe("binding for simple arrows", () => {
 
       expect(arrow.startBinding).toBe(null);
       expect(arrow.endBinding).toBe(null);
+      expect(rectLeft.boundElements).toEqual([]);
+      expect(rectRight.boundElements).toEqual([]);
     });
 
     it("should unbind arrow when arrow is rotated", () => {
@@ -871,6 +874,273 @@ describe("binding for simple arrows", () => {
           }
         });
       });
+    });
+
+    it("clears boundElements on the shape when dragging a bound arrow endpoint away, including after deleting both", () => {
+      const rect = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(0, 50);
+      mouse.moveTo(210, 50);
+      mouse.up();
+
+      const arrow = API.getSelectedElement() as ExcalidrawArrowElement;
+      expect(arrow.endBinding?.elementId).toBe(rect.id);
+      expect(rect.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      // Enter edit mode and drag the bound end away from the rectangle
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      mouse.reset();
+      mouse.downAt(arrow.x + arrow.points[1][0], arrow.y + arrow.points[1][1]);
+      mouse.moveTo(100, 200);
+      mouse.up();
+
+      expect(arrow.endBinding).toBe(null);
+      expect(rect.boundElements).toEqual([]);
+
+      // Delete the rectangle, then the arrow (issue #12723)
+      mouse.select(rect);
+      Keyboard.keyPress(KEYS.DELETE);
+      mouse.clickAt(arrow.x + 50, arrow.y + 75);
+      Keyboard.keyPress(KEYS.DELETE);
+
+      const latestArrow = h.elements.find((el) => el.id === arrow.id)!;
+      expect(rect.isDeleted).toBe(true);
+      expect(latestArrow.isDeleted).toBe(true);
+      expect((latestArrow as ExcalidrawArrowElement).endBinding).toBe(null);
+      expect(rect.boundElements).toEqual([]);
+    });
+
+    it("clears boundElements when dragging an arrow endpoint from one shape onto another (simple & elbow)", () => {
+      const rectA = API.createElement({
+        type: "rectangle",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      }) as NonDeleted<ExcalidrawBindableElement>;
+      const rectB = API.createElement({
+        type: "rectangle",
+        x: 200,
+        y: 250,
+        width: 100,
+        height: 100,
+      }) as NonDeleted<ExcalidrawBindableElement>;
+
+      const simpleArrow = API.createElement({
+        type: "arrow",
+        x: 0,
+        y: 50,
+        points: [pointFrom(0, 0), pointFrom(190, 0)],
+      }) as NonDeleted<ExcalidrawArrowElement>;
+      const elbowArrow = API.createElement({
+        type: "arrow",
+        elbowed: true,
+        x: 0,
+        y: 60,
+        points: [pointFrom(0, 0), pointFrom(190, 0)],
+      }) as NonDeleted<ExcalidrawArrowElement>;
+      API.setElements([rectA, rectB, simpleArrow, elbowArrow]);
+
+      bindBindingElement(
+        simpleArrow,
+        rectA,
+        "orbit",
+        "end",
+        h.scene,
+        DEFAULT_ZOOM,
+      );
+      bindBindingElement(
+        elbowArrow,
+        rectA,
+        "orbit",
+        "end",
+        h.scene,
+        DEFAULT_ZOOM,
+      );
+
+      expect(rectA.boundElements).toEqual([
+        { id: simpleArrow.id, type: "arrow" },
+        { id: elbowArrow.id, type: "arrow" },
+      ]);
+
+      // Drag simple arrow's end onto rectB
+      mouse.reset();
+      mouse.clickAt(simpleArrow.x + 50, simpleArrow.y);
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      mouse.reset();
+      mouse.downAt(
+        simpleArrow.x + simpleArrow.points[simpleArrow.points.length - 1][0],
+        simpleArrow.y + simpleArrow.points[simpleArrow.points.length - 1][1],
+      );
+      mouse.moveTo(250, 300);
+      mouse.up();
+
+      expect(simpleArrow.endBinding?.elementId).toBe(rectB.id);
+      expect(rectA.boundElements).toEqual([
+        { id: elbowArrow.id, type: "arrow" },
+      ]);
+      expect(rectB.boundElements).toEqual([
+        { id: simpleArrow.id, type: "arrow" },
+      ]);
+
+      // Rebind elbow arrow directly to rectB via bindBindingElement
+      bindBindingElement(
+        elbowArrow,
+        rectB,
+        "orbit",
+        "end",
+        h.scene,
+        DEFAULT_ZOOM,
+      );
+
+      expect(elbowArrow.endBinding?.elementId).toBe(rectB.id);
+      expect(rectA.boundElements).toEqual([]);
+      expect(rectB.boundElements).toEqual([
+        { id: simpleArrow.id, type: "arrow" },
+        { id: elbowArrow.id, type: "arrow" },
+      ]);
+    });
+
+    it("keeps boundElements while one end of a self-bound arrow remains bound and clears once both detach", () => {
+      const rect = UI.createElement("rectangle", {
+        x: 200,
+        y: 200,
+        width: 120,
+        height: 120,
+      });
+
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(220, 220);
+      mouse.moveTo(280, 280);
+      mouse.up();
+
+      const arrow = API.getSelectedElement() as ExcalidrawArrowElement;
+      expect(arrow.startBinding?.elementId).toBe(rect.id);
+      expect(arrow.endBinding?.elementId).toBe(rect.id);
+      expect(rect.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      // Detach only the end point
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      mouse.reset();
+      mouse.downAt(
+        arrow.x + arrow.points[arrow.points.length - 1][0],
+        arrow.y + arrow.points[arrow.points.length - 1][1],
+      );
+      mouse.moveTo(500, 500);
+      mouse.up();
+
+      expect(arrow.startBinding?.elementId).toBe(rect.id);
+      expect(arrow.endBinding).toBe(null);
+      expect(rect.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      // Detach the start point as well
+      mouse.reset();
+      mouse.downAt(arrow.x + arrow.points[0][0], arrow.y + arrow.points[0][1]);
+      mouse.moveTo(0, 0);
+      mouse.up();
+
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+      expect(rect.boundElements).toEqual([]);
+    });
+
+    it("restores boundElements when dragging an arrow endpoint away and back onto the shape before release", () => {
+      const rect = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(0, 50);
+      mouse.moveTo(210, 50);
+      mouse.up();
+
+      const arrow = API.getSelectedElement() as ExcalidrawArrowElement;
+      expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      mouse.reset();
+      mouse.downAt(arrow.x + arrow.points[1][0], arrow.y + arrow.points[1][1]);
+      mouse.moveTo(50, 200);
+      expect(rect.boundElements).toEqual([]);
+      mouse.moveTo(250, 50);
+      mouse.up();
+
+      expect(arrow.endBinding?.elementId).toBe(rect.id);
+      expect(rect.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+    });
+
+    it("clears boundElements when deleting all points of a bound arrow in edit mode", () => {
+      const rect = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(0, 50);
+      mouse.moveTo(210, 50);
+      mouse.up();
+
+      const arrow = API.getSelectedElement() as ExcalidrawArrowElement;
+      expect(rect.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      act(() => {
+        h.app.setState({
+          selectedLinearElement: {
+            ...h.state.selectedLinearElement!,
+            isEditing: true,
+            selectedPointsIndices: [0, 1],
+          },
+        });
+      });
+      Keyboard.keyPress(KEYS.DELETE);
+
+      const latestArrow = h.elements.find((el) => el.id === arrow.id)!;
+      expect(latestArrow.isDeleted).toBe(true);
+      expect(rect.boundElements).toEqual([]);
+    });
+
+    it("unbindBindingElement safely clears arrow binding even if target element is missing", () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 0,
+        y: 0,
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
+        endBinding: {
+          elementId: "missing-element",
+          fixedPoint: [0.5, 0.5],
+          mode: "orbit",
+        },
+      }) as NonDeleted<ExcalidrawArrowElement>;
+      API.setElements([arrow]);
+
+      expect(() => unbindBindingElement(arrow, "end", h.scene)).not.toThrow();
+      expect(arrow.endBinding).toBe(null);
     });
   });
 

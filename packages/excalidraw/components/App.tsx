@@ -10317,31 +10317,52 @@ class App extends React.Component<AppProps, AppState> {
     this.elementsPendingErasure.forEach((id) => {
       const element = this.scene.getElement(id);
       if (isBindingElement(element)) {
-        if (element.startBinding) {
+        if (
+          element.startBinding &&
+          !this.elementsPendingErasure.has(element.startBinding.elementId)
+        ) {
           const bindable = this.scene.getElement(
             element.startBinding.elementId,
-          )!;
-          // NOTE: We use the raw mutateElement() because we don't want history
-          // entries or multiplayer updates
-          mutateElement(bindable, this.scene.getElementsMapIncludingDeleted(), {
-            boundElements: bindable.boundElements!.filter(
-              (e) => e.id !== element.id,
-            ),
-          });
+          );
+          if (bindable?.boundElements) {
+            // NOTE: We use the raw mutateElement() because we don't want history
+            // entries or multiplayer updates
+            mutateElement(
+              bindable,
+              this.scene.getElementsMapIncludingDeleted(),
+              {
+                boundElements: bindable.boundElements.filter(
+                  (e) => e.id !== element.id,
+                ),
+              },
+            );
+          }
         }
-        if (element.endBinding) {
-          const bindable = this.scene.getElement(element.endBinding.elementId)!;
-          // NOTE: We use the raw mutateElement() because we don't want history
-          // entries or multiplayer updates
-          mutateElement(bindable, this.scene.getElementsMapIncludingDeleted(), {
-            boundElements: bindable.boundElements!.filter(
-              (e) => e.id !== element.id,
-            ),
-          });
+        if (
+          element.endBinding &&
+          !this.elementsPendingErasure.has(element.endBinding.elementId)
+        ) {
+          const bindable = this.scene.getElement(element.endBinding.elementId);
+          if (bindable?.boundElements) {
+            // NOTE: We use the raw mutateElement() because we don't want history
+            // entries or multiplayer updates
+            mutateElement(
+              bindable,
+              this.scene.getElementsMapIncludingDeleted(),
+              {
+                boundElements: bindable.boundElements.filter(
+                  (e) => e.id !== element.id,
+                ),
+              },
+            );
+          }
         }
       } else if (isBindableElement(element)) {
         element.boundElements?.forEach((boundElement) => {
-          if (boundElement.type === "arrow") {
+          if (
+            boundElement.type === "arrow" &&
+            !this.elementsPendingErasure.has(boundElement.id)
+          ) {
             const arrow = this.scene.getElement(
               boundElement.id,
             ) as ExcalidrawArrowElement;
