@@ -1733,10 +1733,10 @@ describe("FontPicker", () => {
         );
       });
 
-      it("doesn't load on a scroll before it was asked for, nor offer it while searching", async () => {
+      it("lists nothing on a scroll before it was asked for, nor offers it while searching", async () => {
         const loadMore = vi
           .fn<NonNullable<FontProvider["loadMore"]>>()
-          .mockResolvedValue([]);
+          .mockResolvedValue(["Zulu"]);
         await open({
           fontProviders: {
             "test.provider": {
@@ -1747,12 +1747,15 @@ describe("FontPicker", () => {
             },
           },
         });
+        // the look ahead, which tells whether there is anything to offer
+        await screen.findByText("Browse more fonts");
         const list = document.querySelector<HTMLElement>(
           ".properties-content .dropdown-menu.fonts",
         )!;
         list.scrollTop = 900;
         fireEvent.scroll(list);
-        expect(loadMore).not.toHaveBeenCalled();
+        expect(loadMore).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText("Zulu")).toBe(null);
 
         fireEvent.input(
           document.querySelector(".properties-content .QuickSearch__input")!,
@@ -1761,6 +1764,26 @@ describe("FontPicker", () => {
         await waitFor(() =>
           expect(screen.queryByText("Browse more fonts")).toBe(null),
         );
+      });
+
+      it("offers nothing more when a provider has no font beyond the listed ones", async () => {
+        const loadMore = vi
+          .fn<NonNullable<FontProvider["loadMore"]>>()
+          .mockResolvedValue(["Aardvark"]);
+        await open({
+          fontProviders: {
+            "test.provider": {
+              icon: <span />,
+              resolve,
+              availableFonts: ["Aardvark"],
+              loadMore,
+            },
+          },
+        });
+
+        await waitFor(() => expect(loadMore).toHaveBeenCalledTimes(1));
+        await act(async () => {});
+        expect(screen.queryByText("Browse more fonts")).toBe(null);
       });
 
       it("offers nothing more without a provider able to page", async () => {

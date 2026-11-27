@@ -804,9 +804,11 @@ export interface FontProvider {
   ): Promise<FontSearchResult>;
   /**
    * More of the provider's fonts than `availableFonts`, a page at a time -
-   * turns "Browse more fonts" on at the end of the font picker's list. The
-   * picker asks for the next page when the user clicks it, and from then on
-   * whenever they reach the end of the list.
+   * turns "Browse more fonts" on at the end of the font picker's list, as
+   * long as there is a font to show for it: the picker asks for the first
+   * page as it opens (once), and offers nothing where that brings no font it
+   * doesn't list already. It asks for the next page when the user clicks, and
+   * from then on whenever they reach the end of the list.
    *
    * Return the fonts in an order which stays the same between calls (i.e.
    * most popular first), `limit` of them at most - fewer mean there are no

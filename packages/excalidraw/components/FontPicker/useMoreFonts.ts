@@ -34,6 +34,13 @@ interface MoreFontsOptions {
 interface MoreFontsState {
   moreFonts: readonly MoreFont[];
   /**
+   * fetched ahead and not listed yet: what tells whether there is anything to
+   * browse, and what the first "Browse more fonts" lists
+   */
+  peeked: readonly MoreFont[];
+  /** the look ahead is done - until then nothing is offered */
+  isProbed: boolean;
+  /**
    * the user asked for more at least once - from then on more gets loaded
    * as they reach the end of the list
    */
@@ -55,6 +62,8 @@ const getMoreFontsState = (fonts: Fonts) => {
   if (!state) {
     state = {
       moreFonts: [],
+      peeked: [],
+      isProbed: false,
       isActive: false,
       offsets: new Map(),
       exhausted: new Set(),
@@ -97,8 +106,8 @@ export const useMoreFonts = ({
     [fonts],
   );
 
-  const { exhausted } = state;
-  const hasMore = useMemo(
+  const { exhausted, peeked, isProbed } = state;
+  const hasUnexhausted = useMemo(
     () =>
       Object.entries(fontProviders ?? {}).some(
         ([providerId, provider]) =>
@@ -106,21 +115,20 @@ export const useMoreFonts = ({
       ),
     [fontProviders, exhausted],
   );
+  // offered only once we know there is a font to show for it
+  const hasMore = peeked.length > 0 || (isProbed && hasUnexhausted);
 
-  const loadMore = useCallback(async () => {
-    if (controllerRef.current) {
-      return;
-    }
-    const controller = new AbortController();
-    controllerRef.current = controller;
-    setIsLoading(true);
-    state.isActive = true;
-
-    const added: MoreFont[] = [];
-    const exhausted = new Set(state.exhausted);
-    try {
-      // a page may hold nothing but fonts which are listed already (i.e. the
-      // most popular ones, which a host tends to offer up front)
+  /**
+   * The next fonts which aren't listed yet, paging on while a page holds
+   * nothing but listed ones (i.e. the most popular ones, which a host tends
+   * to offer up front).
+   *
+   * @returns `null` once aborted
+   */
+  const fetchUnlisted = useCallback(
+    async (signal: AbortSignal) => {
+      const added: MoreFont[] = [];
+      const exhausted = new Set(state.exhausted);
       for (let page = 0; page < MAX_PAGES_PER_LOAD && !added.length; page++) {
         const next = Object.entries(fontProvidersRef.current ?? {}).find(
           ([providerId, provider]) =>
@@ -137,11 +145,11 @@ export const useMoreFonts = ({
           const result = await provider.loadMore!({
             offset,
             limit: PAGE_SIZE,
-            signal: controller.signal,
+            signal,
           });
           provided = Array.isArray(result) ? result : [];
         } catch (error) {
-          if (!controller.signal.aborted) {
+          if (!signal.aborted) {
             // not asked again for as long as the list is kept
             console.error(
               `loading more fonts failed for provider "${providerId}"`,
@@ -149,8 +157,8 @@ export const useMoreFonts = ({
             );
           }
         }
-        if (controller.signal.aborted) {
-          return;
+        if (signal.aborted) {
+          return null;
         }
 
         state.offsets.set(providerId, offset + provided.length);
@@ -168,20 +176,61 @@ export const useMoreFonts = ({
           }
         }
       }
-    } finally {
+      if (exhausted.size !== state.exhausted.size) {
+        state.exhausted = exhausted;
+      }
+      return added;
+    },
+    [state, listedFamiliesRef],
+  );
+
+  // Look ahead once, as the picker opens: a provider may have nothing beyond
+  // what's listed (i.e. it offers all of its fonts up front), and "Browse
+  // more fonts" would then bring nothing.
+  useEffect(() => {
+    if (state.isProbed || !hasUnexhausted || controllerRef.current) {
+      return;
+    }
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    fetchUnlisted(controller.signal).then((added) => {
       if (controllerRef.current === controller) {
         controllerRef.current = null;
-        if (added.length) {
-          state.moreFonts = [...state.moreFonts, ...added];
+        if (added) {
+          state.peeked = added;
+          state.isProbed = true;
+          rerender();
         }
-        if (exhausted.size !== state.exhausted.size) {
-          state.exhausted = exhausted;
-        }
-        setIsLoading(false);
-        rerender();
       }
+    });
+  }, [state, hasUnexhausted, fetchUnlisted]);
+
+  const loadMore = useCallback(async () => {
+    if (controllerRef.current) {
+      return;
     }
-  }, [state, listedFamiliesRef]);
+    state.isActive = true;
+    // what the look ahead found comes first
+    if (state.peeked.length) {
+      state.moreFonts = [...state.moreFonts, ...state.peeked];
+      state.peeked = [];
+      rerender();
+      return;
+    }
+
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    setIsLoading(true);
+    const added = await fetchUnlisted(controller.signal);
+    if (controllerRef.current === controller) {
+      controllerRef.current = null;
+      if (added?.length) {
+        state.moreFonts = [...state.moreFonts, ...added];
+      }
+      setIsLoading(false);
+      rerender();
+    }
+  }, [state, fetchUnlisted]);
 
   return {
     moreFonts: state.moreFonts,
