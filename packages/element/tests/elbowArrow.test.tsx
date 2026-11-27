@@ -1,11 +1,11 @@
-import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
+import { ARROW_TYPE, DEFAULT_ZOOM, KEYS } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
 import { actionChangeArrowhead } from "@excalidraw/excalidraw/actions/actionProperties";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   act,
   fireEvent,
@@ -330,6 +330,632 @@ describe("elbow arrow ui", () => {
       [51, 164],
       [101, 164],
     ]);
+  });
+
+  it("binds to the outline without Alt held", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.downAt(0, 50);
+    mouse.moveTo(240, 40);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    // the end is snapped onto the outline, not left where it was dropped
+    const end = arrow.points[arrow.points.length - 1];
+    expect(arrow.y + end[1]).toBeLessThan(0);
+  });
+
+  it("enters the side its end snaps to while dragged deep inside the element", async () => {
+    UI.createElement("rectangle", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 200,
+    });
+    UI.createElement("rectangle", {
+      x: 300,
+      y: 600,
+      width: 300,
+      height: 200,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.downAt(305, 100);
+    mouse.moveTo(450, 400);
+    // 20px under the top edge, beyond the binding distance, near the top
+    // right corner: the end snaps onto the top edge, so the arrow comes down
+    // into it rather than going past the element's right side and back
+    // along its top edge
+    mouse.moveTo(565, 620);
+
+    const arrow = h.elements[
+      h.elements.length - 1
+    ] as ExcalidrawElbowArrowElement;
+    const route = () =>
+      arrow.points.map((point) => [
+        Math.round(arrow.x + point[0]),
+        Math.round(arrow.y + point[1]),
+      ]);
+
+    const expected = [
+      [306, 100],
+      [565, 100],
+      [565, 594],
+    ];
+    expect(route()).toEqual(expected);
+
+    mouse.up();
+
+    // the same as the route once it's dropped there
+    expect(route()).toEqual(expected);
+  });
+
+  it("binds inside the element with Alt held", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(0, 50);
+      mouse.moveTo(240, 40);
+      mouse.up();
+    });
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    expect(arrow.endBinding?.fixedPoint[0]).toBeCloseTo(0.4);
+    expect(arrow.endBinding?.fixedPoint[1]).toBeCloseTo(0.4);
+    expect(rect.boundElements).toContainEqual({ id: arrow.id, type: "arrow" });
+
+    const end = arrow.points[arrow.points.length - 1];
+    expect([[arrow.x + end[0], arrow.y + end[1]]]).toCloselyEqualPoints([
+      [240, 40],
+    ]);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+
+    // follows the element, staying inside it where it was bound
+    UI.clickTool("selection");
+    mouse.reset();
+    mouse.downAt(200, 80);
+    mouse.moveTo(300, 180);
+    mouse.up();
+
+    expect(rect.x).toBe(300);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    const movedEnd = arrow.points[arrow.points.length - 1];
+    expect([
+      [arrow.x + movedEnd[0], arrow.y + movedEnd[1]],
+    ]).toCloselyEqualPoints([[340, 140]]);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
+  it("switches between inside and outline binding as Alt is pressed and released without moving", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.downAt(0, 50);
+    mouse.moveTo(240, 40);
+
+    const arrow = h.state.newElement as ExcalidrawElbowArrowElement;
+    const endOf = () => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [[arrow.x + end[0], arrow.y + end[1]]];
+    };
+
+    expect(endOf()[0][1]).toBeLessThan(0);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    expect(endOf()).toCloselyEqualPoints([[240, 40]]);
+    // no midpoint indicators while binding inside
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.suggestedBinding?.inside).toBe(true);
+    expect(h.state.suggestedBinding?.midPoint).toBeUndefined();
+
+    Keyboard.keyUp(KEYS.ALT);
+
+    expect(arrow.endBinding?.mode).not.toBe("inside");
+    expect(endOf()[0][1]).toBeLessThan(0);
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.suggestedBinding?.inside).toBe(false);
+
+    mouse.up();
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+  });
+
+  it("moves the click-to-place preview inside when Alt is pressed without moving", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 50);
+    mouse.click();
+    mouse.moveTo(240, 40);
+
+    const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+    const endOf = () => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [arrow.x + end[0], arrow.y + end[1]];
+    };
+
+    expect(endOf()[1]).toBeLessThan(0);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+
+    // the preview already shows where the click will put the end
+    expect(endOf()[0]).toBeCloseTo(240);
+    expect(endOf()[1]).toBeCloseTo(40);
+    expect(h.state.suggestedBinding?.element.id).toBe(rect.id);
+    expect(h.state.suggestedBinding?.inside).toBe(true);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.click();
+    });
+
+    expect(h.state.multiElement).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+    expect(endOf()[0]).toBeCloseTo(240);
+    expect(endOf()[1]).toBeCloseTo(40);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
+  it("moves the click-to-place preview onto the outline when Alt is released without moving", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 50);
+    mouse.click();
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(240, 40);
+    });
+
+    const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+    const endOf = () => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [arrow.x + end[0], arrow.y + end[1]];
+    };
+
+    expect(endOf()[0]).toBeCloseTo(240);
+    expect(endOf()[1]).toBeCloseTo(40);
+
+    Keyboard.keyUp(KEYS.ALT);
+
+    // the preview already shows where the click will put the end
+    const [previewX, previewY] = endOf();
+    expect(previewY).toBeLessThan(0);
+
+    mouse.click();
+
+    expect(h.state.multiElement).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    expect(endOf()[0]).toBeCloseTo(previewX);
+    expect(endOf()[1]).toBeCloseTo(previewY);
+    expect(validateElbowPoints(arrow.points)).toBe(true);
+  });
+
+  it("drops the click-to-place preview's inside binding when moved off the element", async () => {
+    const rect = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 50);
+    mouse.click();
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(240, 40);
+    });
+
+    const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+    expect(arrow.endBinding?.mode).toBe("inside");
+
+    mouse.moveTo(100, 300);
+
+    expect(arrow.endBinding).toBe(null);
+    expect(rect.boundElements ?? []).toEqual([]);
+  });
+
+  describe("finishing click-to-place before the end is placed", () => {
+    const isDeleted = (id: string) =>
+      h.elements.find((element) => element.id === id)?.isDeleted;
+
+    it.each([
+      ["Escape", "straight", KEYS.ESCAPE, [250, 50]],
+      ["Enter", "straight", KEYS.ENTER, [250, 50]],
+      ["Escape", "bent", KEYS.ESCAPE, [240, 140]],
+      ["Enter", "bent", KEYS.ENTER, [240, 140]],
+    ] as const)(
+      "discards the arrow on %s with a %s route",
+      (_key, _route, key, [x, y]) => {
+        UI.clickTool("arrow");
+        UI.clickOnTestId("elbow-arrow");
+
+        mouse.reset();
+        mouse.moveTo(0, 50);
+        mouse.click();
+        mouse.moveTo(x, y);
+
+        const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+        expect(arrow.points.length).toBe(x === 250 ? 2 : 4);
+
+        Keyboard.keyPress(key);
+
+        expect(h.state.multiElement).toBe(null);
+        expect(isDeleted(arrow.id)).toBe(true);
+      },
+    );
+
+    it("drops the discarded arrow from the elements its ends were bound to", () => {
+      const start = UI.createElement("rectangle", {
+        x: -100,
+        y: 0,
+        width: 80,
+        height: 100,
+      });
+      const end = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+
+      mouse.reset();
+      mouse.moveTo(-15, 50);
+      mouse.click();
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 40);
+      });
+
+      const arrow = h.state.multiElement as ExcalidrawElbowArrowElement;
+      expect(arrow.startBinding?.elementId).toBe(start.id);
+      expect(arrow.endBinding?.elementId).toBe(end.id);
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(h.state.multiElement).toBe(null);
+      expect(isDeleted(arrow.id)).toBe(true);
+      expect(start.boundElements ?? []).toEqual([]);
+      expect(end.boundElements ?? []).toEqual([]);
+    });
+  });
+
+  describe("retargeting a bound end with Alt held", () => {
+    // An elbow arrow bound to `from`, with `to` below it, and the arrow's end
+    // ready to be dragged
+    const setup = () => {
+      const from = UI.createElement("rectangle", {
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+      const to = UI.createElement("rectangle", {
+        x: 200,
+        y: 300,
+        width: 100,
+        height: 100,
+      });
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(0, 50);
+      mouse.moveTo(240, 40);
+      mouse.up();
+
+      const arrow = h.scene.getSelectedElements(
+        h.state,
+      )[0] as ExcalidrawElbowArrowElement;
+      expect(arrow.endBinding?.elementId).toBe(from.id);
+      expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      UI.clickTool("selection");
+      const end = arrow.points[arrow.points.length - 1];
+      mouse.reset();
+      mouse.downAt(arrow.x + end[0], arrow.y + end[1]);
+
+      return { from, to, arrow };
+    };
+
+    it("drops the arrow from the original element when dropped on the canvas", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+
+        // while inside the other element, it's bound there on both sides
+        expect(arrow.endBinding?.elementId).toBe(to.id);
+        expect(arrow.endBinding?.mode).toBe("inside");
+        expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+        expect(from.boundElements ?? []).toEqual([]);
+
+        mouse.moveTo(600, 600);
+        mouse.up();
+      });
+
+      expect(arrow.endBinding).toBe(null);
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("drops the arrow from the original element when Alt is released before dropping on the canvas", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+      });
+      mouse.moveTo(600, 600);
+      mouse.up();
+
+      expect(arrow.endBinding).toBe(null);
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("drops the arrow from the element it was inside when Alt is released and it's dropped on another one's outline", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+      });
+      mouse.moveTo(240, -5);
+
+      expect(arrow.endBinding).toBe(null);
+      expect(to.boundElements ?? []).toEqual([]);
+
+      mouse.up();
+
+      expect(arrow.endBinding?.elementId).toBe(from.id);
+      expect(arrow.endBinding?.mode).toBe("orbit");
+      expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+
+    it("keeps orbiting the element it was inside when Alt is released over it", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+      });
+      mouse.moveTo(250, 350);
+
+      expect(arrow.endBinding?.elementId).toBe(to.id);
+      expect(arrow.endBinding?.mode).toBe("orbit");
+
+      mouse.up();
+
+      expect(arrow.endBinding?.elementId).toBe(to.id);
+      expect(arrow.endBinding?.mode).toBe("orbit");
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+    });
+
+    it("moves the arrow from the original element to the one dropped in", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+        mouse.up();
+      });
+
+      expect(arrow.endBinding?.elementId).toBe(to.id);
+      expect(arrow.endBinding?.mode).toBe("inside");
+      expect(from.boundElements ?? []).toEqual([]);
+      expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+    });
+
+    it("keeps the arrow on the original element when dragged back onto it", () => {
+      const { from, to, arrow } = setup();
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(240, 340);
+        mouse.moveTo(260, 60);
+        mouse.up();
+      });
+
+      expect(arrow.endBinding?.elementId).toBe(from.id);
+      expect(arrow.endBinding?.mode).toBe("inside");
+      expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+      expect(to.boundElements ?? []).toEqual([]);
+    });
+  });
+
+  it("moves the arrow from the original element to the one its end is dropped on without Alt", () => {
+    const from = UI.createElement("rectangle", {
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const to = UI.createElement("rectangle", {
+      x: 200,
+      y: 300,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.downAt(0, 50);
+    mouse.moveTo(240, 40);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(from.id);
+    expect(from.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+    UI.clickTool("selection");
+    const end = arrow.points[arrow.points.length - 1];
+    mouse.reset();
+    mouse.downAt(arrow.x + end[0], arrow.y + end[1]);
+    mouse.moveTo(240, 340);
+    mouse.up();
+
+    expect(arrow.endBinding?.elementId).toBe(to.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    expect(from.boundElements ?? []).toEqual([]);
+    expect(to.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+  });
+
+  describe("changing the arrow type of an inside bound arrow", () => {
+    // A straight arrow from the canvas into `rect`, its end bound inside at
+    // [0.54, 0.35]
+    const setup = (elbowed = false) => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "arrow", type: "arrow" }],
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: 0,
+        y: 50,
+        elbowed,
+        points: elbowed
+          ? [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(127, 0),
+              pointFrom<LocalPoint>(127, -15),
+              pointFrom<LocalPoint>(254, -15),
+            ]
+          : [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(254, -15)],
+        endBinding: {
+          elementId: rect.id,
+          mode: "inside",
+          fixedPoint: [0.54, 0.35],
+        },
+      });
+      API.setElements([rect, arrow]);
+      API.setSelectedElements([arrow]);
+
+      return {
+        rect: h.elements[0] as ExcalidrawBindableElement,
+        arrow: () => h.elements[1] as ExcalidrawArrowElement,
+      };
+    };
+
+    const endOf = (arrow: ExcalidrawArrowElement) => {
+      const end = arrow.points[arrow.points.length - 1];
+      return [[arrow.x + end[0], arrow.y + end[1]]];
+    };
+
+    it("keeps the inside anchor when changed to elbow", () => {
+      const { rect, arrow } = setup();
+
+      UI.clickOnTestId("elbow-arrow");
+
+      expect(arrow().elbowed).toBe(true);
+      expect(arrow().endBinding?.elementId).toBe(rect.id);
+      expect(arrow().endBinding?.mode).toBe("inside");
+      expect(arrow().endBinding?.fixedPoint[0]).toBeCloseTo(0.54);
+      expect(arrow().endBinding?.fixedPoint[1]).toBeCloseTo(0.35);
+      expect(endOf(arrow())).toCloselyEqualPoints([[254, 35]]);
+      expect(validateElbowPoints(arrow().points)).toBe(true);
+    });
+
+    it("keeps the inside anchor when changed from elbow", () => {
+      const { rect, arrow } = setup(true);
+
+      UI.clickOnTestId("sharp-arrow");
+
+      expect(arrow().elbowed).toBe(false);
+      expect(arrow().endBinding?.elementId).toBe(rect.id);
+      expect(arrow().endBinding?.mode).toBe("inside");
+      expect(arrow().endBinding?.fixedPoint[0]).toBeCloseTo(0.54);
+      expect(arrow().endBinding?.fixedPoint[1]).toBeCloseTo(0.35);
+      expect(endOf(arrow())).toCloselyEqualPoints([[254, 35]]);
+    });
+
+    it("keeps the inside anchor when changed to round", () => {
+      const { rect, arrow } = setup();
+
+      UI.clickOnTestId("round-arrow");
+
+      expect(arrow().roundness).not.toBe(null);
+      expect(arrow().endBinding?.elementId).toBe(rect.id);
+      expect(arrow().endBinding?.mode).toBe("inside");
+      expect(arrow().endBinding?.fixedPoint[0]).toBeCloseTo(0.54);
+      expect(arrow().endBinding?.fixedPoint[1]).toBeCloseTo(0.35);
+      expect(endOf(arrow())).toCloselyEqualPoints([[254, 35]]);
+    });
   });
 
   it("keeps arrow shape when the whole set of arrow and bindables are duplicated", async () => {

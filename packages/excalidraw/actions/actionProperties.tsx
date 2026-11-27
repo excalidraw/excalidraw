@@ -85,10 +85,12 @@ import type {
   Arrowhead,
   ElementsMap,
   ExcalidrawBindableElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FixedPointBinding,
   FontFamilyValues,
   StrokeVariability,
   NonDeleted,
@@ -2162,36 +2164,41 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement);
 
-        const startBinding =
-          startElement && newElement.startBinding
-            ? {
-                // @ts-ignore TS cannot discern check above
-                ...newElement.startBinding!,
-                ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
-                  startElement,
-                  "start",
-                  elementsMap,
-                  appState.zoom,
-                  appState.isBindingEnabled,
-                ),
-              }
+        // Inside bound ends keep their anchor within the element, only
+        // orbiting ends are snapped to the outline
+        const toElbowBinding = (
+          arrow: NonDeleted<ExcalidrawElbowArrowElement>,
+          binding: FixedPointBinding | null,
+          bindable: ExcalidrawBindableElement | null | undefined,
+          startOrEnd: "start" | "end",
+        ): FixedPointBinding | null =>
+          bindable && binding
+            ? binding.mode === "inside"
+              ? binding
+              : {
+                  ...binding,
+                  ...calculateFixedPointForElbowArrowBinding(
+                    arrow,
+                    bindable,
+                    startOrEnd,
+                    elementsMap,
+                    appState.zoom,
+                    appState.isBindingEnabled,
+                  ),
+                }
             : null;
-        const endBinding =
-          endElement && newElement.endBinding
-            ? {
-                // @ts-ignore TS cannot discern check above
-                ...newElement.endBinding,
-                ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
-                  endElement,
-                  "end",
-                  elementsMap,
-                  appState.zoom,
-                  appState.isBindingEnabled,
-                ),
-              }
-            : null;
+        const startBinding = toElbowBinding(
+          newElement,
+          newElement.startBinding,
+          startElement,
+          "start",
+        );
+        const endBinding = toElbowBinding(
+          newElement,
+          newElement.endBinding,
+          endElement,
+          "end",
+        );
 
         newElement = {
           ...newElement,
@@ -2217,7 +2224,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
             bindBindingElement(
               newElement,
               startElement,
-              appState.bindMode === "inside" ? "inside" : "orbit",
+              newElement.startBinding.mode,
               "start",
               app.scene,
               appState.zoom,
@@ -2232,7 +2239,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
             bindBindingElement(
               newElement,
               endElement,
-              appState.bindMode === "inside" ? "inside" : "orbit",
+              newElement.endBinding.mode,
               "end",
               app.scene,
               appState.zoom,

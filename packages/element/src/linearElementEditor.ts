@@ -58,6 +58,7 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isBindingEnabled,
+  syncBoundElementsWithNextBindings,
   updateBoundPoint,
 } from "./binding";
 import {
@@ -308,7 +309,9 @@ export class LinearElementEditor {
   }
 
   static handlePointerMove(
-    event: PointerEvent,
+    // only its modifier keys are used, so a keyboard event can re-run the
+    // preview when they change without the pointer moving
+    event: PointerEvent | KeyboardEvent,
     app: AppClassProperties,
     scenePointerX: number,
     scenePointerY: number,
@@ -467,7 +470,9 @@ export class LinearElementEditor {
   }
 
   static handlePointDragging(
-    event: PointerEvent,
+    // only its modifier keys are used, so a keyboard event can re-run the drag
+    // when they change without the pointer moving
+    event: PointerEvent | KeyboardEvent,
     app: AppClassProperties,
     scenePointerX: number,
     scenePointerY: number,
@@ -1852,6 +1857,10 @@ export class LinearElementEditor {
       isMidpointSnappingEnabled?: boolean;
     },
   ) {
+    if (otherUpdates && isArrowElement(element)) {
+      syncBoundElementsWithNextBindings(element, otherUpdates, scene);
+    }
+
     if (isElbowArrow(element)) {
       const updates: {
         startBinding?: FixedPointBinding | null;
@@ -2461,30 +2470,66 @@ const pointDraggingUpdates = (
   );
 
   if (isElbowArrow(element)) {
-    const suggestedBindingElement = startIsDragged
-      ? start.element
-      : endIsDragged
-      ? end.element
-      : null;
+    const draggedStrategy = startIsDragged ? start : endIsDragged ? end : null;
+    const suggestedBindingElement = draggedStrategy?.element ?? null;
+    const isInside = draggedStrategy?.mode === "inside";
+
+    // Elbow arrows route around the elements they're bound to while dragging
+    // (see `getElbowArrowData`) unless the dragged end binds inside (Alt held),
+    // so the inside binding is applied as the end is dragged. An existing
+    // inside binding falls back to orbiting when Alt is released over the
+    // same element, and is dropped once the end leaves it.
+    const bindingUpdates: Pick<
+      PointMoveOtherUpdates,
+      "startBinding" | "endBinding"
+    > = {};
+    if (startIsDragged !== endIsDragged) {
+      const startOrEnd = startIsDragged ? "start" : "end";
+      const bindingKey = startIsDragged ? "startBinding" : "endBinding";
+      const currentBinding = element[bindingKey];
+
+      if (draggedStrategy?.mode === "inside") {
+        bindingUpdates[bindingKey] = {
+          elementId: draggedStrategy.element.id,
+          mode: "inside",
+          ...calculateFixedPointForNonElbowArrowBinding(
+            element,
+            draggedStrategy.element,
+            startOrEnd,
+            elementsMap,
+            draggedStrategy.focusPoint,
+          ),
+        };
+      } else if (currentBinding?.mode === "inside") {
+        bindingUpdates[bindingKey] =
+          draggedStrategy?.mode === "orbit" &&
+          draggedStrategy.element.id === currentBinding.elementId
+            ? { ...currentBinding, mode: "orbit" }
+            : null;
+      }
+    }
 
     return {
       positions: naiveDraggingPoints,
       updates: {
+        ...bindingUpdates,
         suggestedBinding: suggestedBindingElement
           ? {
               element: suggestedBindingElement,
-              midPoint: app.state.isMidpointSnappingEnabled
-                ? getSnapOutlineMidPoint(
-                    pointFrom<GlobalPoint>(
-                      scenePointerX - linearElementEditor.pointerOffset.x,
-                      scenePointerY - linearElementEditor.pointerOffset.y,
-                    ),
-                    suggestedBindingElement,
-                    elementsMap,
-                    app.state.zoom,
-                    element,
-                  )
-                : undefined,
+              inside: isInside,
+              midPoint:
+                app.state.isMidpointSnappingEnabled && !isInside
+                  ? getSnapOutlineMidPoint(
+                      pointFrom<GlobalPoint>(
+                        scenePointerX - linearElementEditor.pointerOffset.x,
+                        scenePointerY - linearElementEditor.pointerOffset.y,
+                      ),
+                      suggestedBindingElement,
+                      elementsMap,
+                      app.state.zoom,
+                      element,
+                    )
+                  : undefined,
             }
           : null,
       },

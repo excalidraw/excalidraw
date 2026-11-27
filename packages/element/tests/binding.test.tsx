@@ -1106,6 +1106,83 @@ describe("binding to a point-like (sub-pixel) element", () => {
   );
 });
 
+describe("rebinding an arrow end to another element", () => {
+  beforeEach(async () => {
+    mouse.reset();
+    await act(() => setLanguage(defaultLang));
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const setup = (elbowed: boolean) => {
+    const a = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    }) as NonDeleted<ExcalidrawBindableElement>;
+    const b = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 300,
+      width: 100,
+      height: 100,
+    }) as NonDeleted<ExcalidrawBindableElement>;
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed,
+      x: 0,
+      y: 50,
+      width: 195,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(195, 0)],
+    }) as NonDeleted<ExcalidrawArrowElement>;
+    API.setElements([a, b, arrow]);
+
+    return { a, b, arrow };
+  };
+
+  it.each([
+    ["simple", false],
+    ["elbow", true],
+  ])(
+    "drops the %s arrow from the element its end was bound to",
+    (_label, elbowed) => {
+      const { a, b, arrow } = setup(elbowed);
+
+      bindBindingElement(arrow, a, "orbit", "end", h.scene, DEFAULT_ZOOM);
+      expect(a.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      bindBindingElement(arrow, b, "orbit", "end", h.scene, DEFAULT_ZOOM);
+
+      expect(arrow.endBinding?.elementId).toBe(b.id);
+      expect(a.boundElements ?? []).toEqual([]);
+      expect(b.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+    },
+  );
+
+  it.each([
+    ["simple", false],
+    ["elbow", true],
+  ])(
+    "keeps the %s arrow on the element its other end is still bound to",
+    (_label, elbowed) => {
+      const { a, b, arrow } = setup(elbowed);
+
+      bindBindingElement(arrow, a, "orbit", "start", h.scene, DEFAULT_ZOOM);
+      bindBindingElement(arrow, a, "orbit", "end", h.scene, DEFAULT_ZOOM);
+      expect(a.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+
+      bindBindingElement(arrow, b, "orbit", "end", h.scene, DEFAULT_ZOOM);
+
+      expect(arrow.startBinding?.elementId).toBe(a.id);
+      expect(arrow.endBinding?.elementId).toBe(b.id);
+      expect(a.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+      expect(b.boundElements).toEqual([{ id: arrow.id, type: "arrow" }]);
+    },
+  );
+});
+
 describe("updateBoundElements with a render environment", () => {
   it("re-measures bound arrow labels with the given environment", () => {
     const renderEnvironment: RenderEnvironment = {

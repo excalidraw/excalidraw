@@ -1,6 +1,9 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { bindOrUnbindBindingElement } from "@excalidraw/element/binding";
+import {
+  bindOrUnbindBindingElement,
+  unbindBindingElement,
+} from "@excalidraw/element/binding";
 import {
   isValidPolygon,
   LinearElementEditor,
@@ -10,6 +13,7 @@ import {
 
 import {
   isBindingElement,
+  isElbowArrow,
   isFreeDrawElement,
   isLinearElement,
   isLineElement,
@@ -245,6 +249,8 @@ export const actionFinalize = register<FormData>({
     }
 
     if (element) {
+      let discard = false;
+
       // pen and mouse have hover
       if (
         appState.selectedLinearElement &&
@@ -259,47 +265,57 @@ export const actionFinalize = register<FormData>({
           points[points.length - 1] !== lastCommittedPoint
         ) {
           shouldCommit = false;
-          scene.mutateElement(element, {
-            points: element.points.slice(0, -1),
-          });
-          if (
-            isBindingElement(element) &&
-            element.endBinding &&
-            // after slicing the trailing point a <2-point arrow may be left
-            element.points.length > 1
-          ) {
-            const newArrow = !!appState.newElement;
-            const draggedPoints: PointsPositionUpdates = new Map([
-              [
-                element.points.length - 1,
-                {
-                  point: element.points[element.points.length - 1],
-                  isDragging: false,
-                },
-              ],
-            ]);
-            const globalPoint =
-              LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          if (isElbowArrow(element)) {
+            // Elbow arrows are placed by their start and end only, the points
+            // after the start being the route to the end. Dropping the
+            // uncommitted end leaves the start alone, so the arrow is
+            // discarded, as other arrows are when only their start is placed.
+            unbindBindingElement(element, "start", scene);
+            unbindBindingElement(element, "end", scene);
+            discard = true;
+          } else {
+            scene.mutateElement(element, {
+              points: element.points.slice(0, -1),
+            });
+            if (
+              isBindingElement(element) &&
+              element.endBinding &&
+              // after slicing the trailing point a <2-point arrow may be left
+              element.points.length > 1
+            ) {
+              const newArrow = !!appState.newElement;
+              const draggedPoints: PointsPositionUpdates = new Map([
+                [
+                  element.points.length - 1,
+                  {
+                    point: element.points[element.points.length - 1],
+                    isDragging: false,
+                  },
+                ],
+              ]);
+              const globalPoint =
+                LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                  element,
+                  -1,
+                  elementsMap,
+                );
+              bindOrUnbindBindingElement(
                 element,
-                -1,
-                elementsMap,
+                draggedPoints,
+                globalPoint[0],
+                globalPoint[1],
+                scene,
+                appState,
+                {
+                  newArrow,
+                },
               );
-            bindOrUnbindBindingElement(
-              element,
-              draggedPoints,
-              globalPoint[0],
-              globalPoint[1],
-              scene,
-              appState,
-              {
-                newArrow,
-              },
-            );
+            }
           }
         }
       }
 
-      if (element && isInvisiblySmallElement(element)) {
+      if (element && (discard || isInvisiblySmallElement(element))) {
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
         newElements = newElements.map((el) => {
           if (el.id === element?.id) {

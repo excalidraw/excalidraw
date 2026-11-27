@@ -5299,9 +5299,18 @@ class App extends React.Component<AppProps, AppState> {
           return;
         } else if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.handleSkipBindMode();
-        } else {
+        } else if (!event.repeat) {
+          // Alt changes how the point being placed or dragged binds, so re-run
+          // it now instead of on the next pointer move. Auto-repeats change
+          // nothing.
           maybeHandleArrowPointlikeDrag({ app: this, event });
         }
+      }
+
+      // Shift locks the angle of the point being placed or dragged, so
+      // re-run it now instead of on the next pointer move
+      if (event.key === KEYS.SHIFT && !event.repeat) {
+        maybeHandleArrowPointlikeDrag({ app: this, event });
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -5639,7 +5648,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.key === KEYS.ALT) {
       this.bucketFill.closeTemporaryEyeDropper();
-      maybeHandleArrowPointlikeDrag({ app: this, event });
     }
 
     if (
@@ -5689,7 +5697,15 @@ class App extends React.Component<AppProps, AppState> {
 
         this.textTool.refresh(event);
       }
-
+    }
+    // Releasing Alt, Shift or Ctrl changes how the point being placed or
+    // dragged binds, so re-run it now instead of on the next pointer move.
+    // Once, after binding is re-enabled above.
+    if (
+      event.key === KEYS.ALT ||
+      event.key === KEYS.SHIFT ||
+      !event[KEYS.CTRL_OR_CMD]
+    ) {
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
     if (isArrowKey(event.key)) {
@@ -7012,16 +7028,25 @@ class App extends React.Component<AppProps, AppState> {
           this.state.zoom,
         );
         if (hoveredElement) {
+          // An elbow arrow started here with Alt held binds inside, where
+          // there are no midpoints to snap to
+          const inside =
+            arrow.elbowed &&
+            event.altKey &&
+            isPointInElement(globalPoint, hoveredElement, elementsMap);
           this.setState({
             suggestedBinding: {
               element: hoveredElement,
-              midPoint: getSnapOutlineMidPoint(
-                globalPoint,
-                hoveredElement,
-                elementsMap,
-                this.state.zoom,
-                arrow,
-              ),
+              inside,
+              midPoint: inside
+                ? undefined
+                : getSnapOutlineMidPoint(
+                    globalPoint,
+                    hoveredElement,
+                    elementsMap,
+                    this.state.zoom,
+                    arrow,
+                  ),
             },
           });
         } else if (this.state.suggestedBinding) {
@@ -8729,6 +8754,11 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
+      // An elbow arrow's start bound inside (Alt held) has no midpoints to
+      // snap to
+      const startsInside =
+        isElbowArrow(element) && element.startBinding?.mode === "inside";
+
       // NOTE: We need the flushSync here for the
       // delayed bind mode change to see the right state
       // (specifically the `newElement`)
@@ -8770,13 +8800,16 @@ class App extends React.Component<AppProps, AppState> {
               boundElement && isBindingElement(element)
                 ? {
                     element: boundElement,
-                    midPoint: getSnapOutlineMidPoint(
-                      point,
-                      boundElement,
-                      elementsMap,
-                      this.state.zoom,
-                      element,
-                    ),
+                    inside: startsInside,
+                    midPoint: startsInside
+                      ? undefined
+                      : getSnapOutlineMidPoint(
+                          point,
+                          boundElement,
+                          elementsMap,
+                          this.state.zoom,
+                          element,
+                        ),
                   }
                 : null,
             selectedElementIds: nextSelectedElementIds,

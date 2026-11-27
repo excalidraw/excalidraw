@@ -37,6 +37,7 @@ export const KEYS = {
   PAGE_DOWN: "PageDown",
   BACKSPACE: "Backspace",
   ALT: "Alt",
+  SHIFT: "Shift",
   CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",
   DELETE: "Delete",
   ENTER: "Enter",

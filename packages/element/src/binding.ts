@@ -272,6 +272,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom: AppState["zoom"],
+  altKey?: boolean,
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -298,20 +299,28 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     zoom,
   );
 
-  const current = hit
-    ? {
-        element: hit,
-        mode: "orbit" as const,
-        focusPoint: LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          arrow,
-          pointIdx,
-          elementsMap,
-        ),
-      }
+  // Elbow arrows bind inside (the endpoint stays where it's dropped within
+  // the element, the route starting from there) only while Alt is held
+  const current: BindingStrategy = hit
+    ? altKey && isPointInElement(globalPoint, hit, elementsMap)
+      ? {
+          element: hit,
+          mode: "inside",
+          focusPoint: globalPoint,
+        }
+      : {
+          element: hit,
+          mode: "orbit",
+          focusPoint: LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            pointIdx,
+            elementsMap,
+          ),
+        }
     : {
         mode: null,
       };
-  const other = { mode: undefined };
+  const other: BindingStrategy = { mode: undefined };
 
   return pointIdx === 0
     ? { start: current, end: other }
@@ -714,6 +723,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       elementsMap,
       elements,
       appState.zoom,
+      opts?.altKey,
     );
   }
 
@@ -972,6 +982,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
   opts?: {
     newArrow?: boolean;
     shiftKey?: boolean;
+    altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
   },
@@ -1021,6 +1032,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
       elementsMap,
       elements,
       appState.zoom,
+      opts?.altKey,
     );
   }
 
@@ -1116,7 +1128,8 @@ export const bindOrUnbindBindingElements = (
 
 /**
  * Writes a binding onto the arrow and records the arrow on the bind target,
- * keeping the two sides of the relationship in step.
+ * keeping the two sides of the relationship in step: the element the end was
+ * bound to before stops listing the arrow, unless the other end is bound to it.
  */
 const applyBinding = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
@@ -1125,9 +1138,10 @@ const applyBinding = (
   startOrEnd: "start" | "end",
   scene: Scene,
 ): void => {
-  scene.mutateElement(arrow, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
-  });
+  const field = startOrEnd === "start" ? "startBinding" : "endBinding";
+
+  syncBoundElementsWithNextBindings(arrow, { [field]: binding }, scene);
+  scene.mutateElement(arrow, { [field]: binding });
 
   const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
   if (!boundElementsMap.has(arrow.id)) {
@@ -1155,7 +1169,21 @@ export const bindBindingElement = (
 
   let binding: FixedPointBinding;
 
-  if (isElbowArrow(arrow)) {
+  if (isElbowArrow(arrow) && mode === "inside") {
+    // Inside bound elbow arrow endpoints stay where they are within the
+    // element, no outline snapping
+    binding = {
+      elementId: hoveredElement.id,
+      mode: "inside",
+      ...calculateFixedPointForNonElbowArrowBinding(
+        arrow,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+        focusPoint,
+      ),
+    };
+  } else if (isElbowArrow(arrow)) {
     binding = {
       elementId: hoveredElement.id,
       mode: "orbit",
@@ -1312,6 +1340,72 @@ export const unbindBindingElement = (
   return binding.elementId;
 };
 
+/**
+ * For bindings about to be written onto the arrow directly (e.g. while its
+ * endpoint is dragged), records the arrow on the elements it becomes bound to
+ * and drops it from those it no longer is, so the elements it's dragged away
+ * from don't keep listing it. Call before writing the bindings.
+ */
+export const syncBoundElementsWithNextBindings = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  nextBindings: {
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
+  },
+  scene: Scene,
+): void => {
+  const boundIds = (
+    startBinding: FixedPointBinding | null,
+    endBinding: FixedPointBinding | null,
+  ) =>
+    new Set(
+      [startBinding?.elementId, endBinding?.elementId].filter(
+        (id): id is string => !!id,
+      ),
+    );
+  const prevIds = boundIds(arrow.startBinding, arrow.endBinding);
+  const nextIds = boundIds(
+    nextBindings.startBinding === undefined
+      ? arrow.startBinding
+      : nextBindings.startBinding,
+    nextBindings.endBinding === undefined
+      ? arrow.endBinding
+      : nextBindings.endBinding,
+  );
+
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const bindableById = (id: string) => {
+    const element = elementsMap.get(id);
+    return element && isBindableElement(element) ? element : null;
+  };
+
+  for (const id of prevIds) {
+    const bindable = !nextIds.has(id) && bindableById(id);
+    if (bindable) {
+      scene.mutateElement(bindable, {
+        boundElements: bindable.boundElements?.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      });
+    }
+  }
+
+  for (const id of nextIds) {
+    const bindable = !prevIds.has(id) && bindableById(id);
+    if (
+      bindable &&
+      !bindable.boundElements?.some((element) => element.id === arrow.id)
+    ) {
+      scene.mutateElement(bindable, {
+        boundElements: (bindable.boundElements || []).concat({
+          id: arrow.id,
+          type: "arrow",
+        }),
+      });
+    }
+  }
+};
+
 export const reanchorBindingsToOutline = (
   changedElement: NonDeleted<ExcalidrawBindableElement>,
   scene: Scene,
@@ -1339,7 +1433,7 @@ export const reanchorBindingsToOutline = (
 
       const startOrEndName = startOrEnd === "startBinding" ? "start" : "end";
 
-      if (isElbowArrow(element)) {
+      if (isElbowArrow(element) && binding.mode !== "inside") {
         updates[startOrEnd] = {
           ...binding,
           ...calculateFixedPointForElbowArrowBinding(
