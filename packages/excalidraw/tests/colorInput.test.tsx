@@ -25,8 +25,7 @@ describe("normalizeInputColor", () => {
       expect(normalizeInputColor("#ff0000ff")).toBe("#ff0000ff");
     });
 
-    it("does NOT add hash to hexa without hash (tinycolor detects as hex8, not hex)", () => {
-      // Note: tinycolor detects 8-digit hex as "hex8" format, not "hex"
+    it("adds hash to hexa without hash", () => {
       expect(normalizeInputColor("ff000080")).toBe("#ff000080");
     });
   });
@@ -53,8 +52,8 @@ describe("normalizeInputColor", () => {
       expect(normalizeInputColor("rgb(0,0,0)")).toBe("rgb(0,0,0)");
     });
 
-    // NOTE: tinycolor clamps values, so rgb(256, 0, 0) is treated as valid
-    it("tinycolor considers out-of-range rgb values as valid (clamped)", () => {
+    // CSS clamps out-of-range channels, so rgb(256, 0, 0) is a valid color
+    it("considers out-of-range rgb values as valid (clamped)", () => {
       expect(normalizeInputColor("rgb(256, 0, 0)")).toBe("rgb(256, 0, 0)");
     });
 

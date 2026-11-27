@@ -1,9 +1,12 @@
-import tinycolor from "tinycolor2";
+import { colord, extend } from "colord";
+import namesPlugin from "colord/plugins/names";
 
 import { clamp } from "@excalidraw/math";
 import { degreesToRadians } from "@excalidraw/math";
 
 import type { Degrees } from "@excalidraw/math";
+
+extend([namesPlugin]);
 
 // ---------------------------------------------------------------------------
 // Dark mode color transformation
@@ -93,12 +96,10 @@ export const applyDarkModeFilter = (color: string, enable = true): string => {
     return cached;
   }
 
-  const tc = tinycolor(color);
-  const alpha = tc.getAlpha();
+  const rgb = colord(color).toRgb();
 
   // order of operations matters
   // (corresponds to "filter: invert(invertPercent) hue-rotate(hueDegrees)" in css)
-  const rgb = tc.toRgb();
   const inverted = cssInvert(
     rgb.r,
     rgb.g,
@@ -112,7 +113,7 @@ export const applyDarkModeFilter = (color: string, enable = true): string => {
     DARK_MODE_FILTER_HUE_ROTATE_DEGREES,
   );
 
-  const result = rgbToHex(rotated.r, rotated.g, rotated.b, alpha);
+  const result = colord({ ...rotated, a: rgb.a }).toHex();
 
   if (DARK_MODE_COLORS_CACHE) {
     DARK_MODE_COLORS_CACHE.set(color, result);
@@ -139,9 +140,7 @@ const _reverseDarkModeInvert = (
 };
 
 export const removeDarkModeFilter = (color: string): string => {
-  const tc = tinycolor(color);
-  const alpha = tc.getAlpha();
-  const rgb = tc.toRgb();
+  const rgb = colord(color).toRgb();
 
   // 180deg hue rotation is its own inverse, so undo it before the inversion.
   const rotatedBack = cssHueRotate(
@@ -156,7 +155,7 @@ export const removeDarkModeFilter = (color: string): string => {
     rotatedBack.b,
   );
 
-  return rgbToHex(restored.r, restored.g, restored.b, alpha);
+  return colord({ ...restored, a: rgb.a }).toHex();
 };
 
 // ---------------------------------------------------------------------------
@@ -342,35 +341,17 @@ export const getAllColorsSpecificShade = (index: 0 | 1 | 2 | 3 | 4) => [
 // other helpers
 // -----------------------------------------------------------------------------
 
-export const rgbToHex = (r: number, g: number, b: number, a?: number) => {
-  // (1 << 24) adds 0x1000000 to ensure the hex string is always 7 chars,
-  // then slice(1) removes the leading "1" to get exactly 6 hex digits
-  // e.g. rgb(0,0,0) -> 0x1000000 -> "1000000" -> "000000"
-  const hex6 = `#${((1 << 24) + (r << 16) + (g << 8) + b)
-    .toString(16)
-    .slice(1)}`;
-  if (a !== undefined && a < 1) {
-    // convert alpha from 0-1 float to 0-255 int, then to 2-digit hex
-    // e.g. 0.5 -> 128 -> "80"
-    const alphaHex = Math.round(a * 255)
-      .toString(16)
-      .padStart(2, "0");
-    return `${hex6}${alphaHex}`;
-  }
-  return hex6;
-};
+/** @returns #RRGGBB, or #RRGGBBAA if `a` is below 1 */
+export const rgbToHex = (r: number, g: number, b: number, a?: number) =>
+  colord({ r, g, b, a }).toHex();
 
 /**
  * @returns the color with its alpha replaced by `alpha` (as #RRGGBBAA), or the
  *  input unchanged if it's not a valid color
  */
 export const setColorAlpha = (color: string, alpha: number): string => {
-  const tc = tinycolor(color);
-  if (!tc.isValid()) {
-    return color;
-  }
-  const { r, g, b } = tc.toRgb();
-  return rgbToHex(r, g, b, alpha);
+  const parsed = colord(color);
+  return parsed.isValid() ? parsed.alpha(alpha).toHex() : color;
 };
 
 /**
@@ -378,16 +359,12 @@ export const setColorAlpha = (color: string, alpha: number): string => {
  *  null if not valid color
  */
 export const colorToHex = (color: string): string | null => {
-  const tc = tinycolor(color);
-  if (!tc.isValid()) {
-    return null;
-  }
-  const { r, g, b, a } = tc.toRgb();
-  return rgbToHex(r, g, b, a);
+  const parsed = colord(color);
+  return parsed.isValid() ? parsed.toHex() : null;
 };
 
 export const isTransparent = (color: string) => {
-  return tinycolor(color).getAlpha() === 0;
+  return colord(color).alpha() === 0;
 };
 
 /**
@@ -398,7 +375,7 @@ export const isTransparent = (color: string) => {
  * (it renders) nor opaque (what's beneath shows through it).
  */
 export const isOpaqueColor = (color: string) => {
-  return tinycolor(color).getAlpha() === 1;
+  return colord(color).alpha() === 1;
 };
 
 // -----------------------------------------------------------------------------
@@ -423,13 +400,13 @@ export const isColorDark = (color: string, threshold = 160): boolean => {
     return false;
   }
 
-  const tc = tinycolor(color);
-  if (!tc.isValid()) {
+  const parsed = colord(color);
+  if (!parsed.isValid()) {
     // invalid color -> assume it defaults to black
     return true;
   }
 
-  const { r, g, b } = tc.toRgb();
+  const { r, g, b } = parsed.toRgb();
   return calculateContrast(r, g, b) < threshold;
 };
 
@@ -443,19 +420,12 @@ export const isColorDark = (color: string, threshold = 160): boolean => {
  */
 export const normalizeInputColor = (color: string): string | null => {
   color = color.trim();
-  if (isTransparent(color)) {
+  if (colord(color).isValid()) {
     return color;
   }
 
-  const tc = tinycolor(color);
-  if (tc.isValid()) {
-    // testing for `#` first fixes a bug on Electron (more specfically, an
-    // Obsidian popout window), where a hex color without `#` is considered valid
-    if (["hex", "hex8"].includes(tc.getFormat()) && !color.startsWith("#")) {
-      return `#${color}`;
-    }
-    return color;
-  }
-
-  return null;
+  // a hex code typed without the leading `#`: CSS requires it, so the canvas
+  // wouldn't render the color as typed
+  const hex = `#${color}`;
+  return colord(hex).isValid() ? hex : null;
 };
