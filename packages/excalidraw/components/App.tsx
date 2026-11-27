@@ -3241,7 +3241,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   });
 
-  private onUnload = () => {
+  private onPageHide = () => {
     this.onBlur();
   };
 
@@ -4241,7 +4241,12 @@ class App extends React.Component<AppProps, AppState> {
         passive: false,
       }),
       addEventListener(this.ownerWindow, EVENT.RESIZE, this.onResize, false),
-      addEventListener(this.ownerWindow, EVENT.UNLOAD, this.onUnload, false),
+      addEventListener(
+        this.ownerWindow,
+        EVENT.PAGE_HIDE,
+        this.onPageHide,
+        false,
+      ),
       addEventListener(this.ownerWindow, EVENT.BLUR, this.onBlur, false),
       addEventListener(
         this.excalidrawContainerRef.current,
