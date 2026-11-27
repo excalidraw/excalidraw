@@ -114,6 +114,7 @@ import {
   getCollaborationLinkData,
   importFromBackend,
   isCollaborationLink,
+  isSameSceneContent,
 } from "./data";
 
 import { updateStaleImageStatuses } from "./data/FileManager";
@@ -249,36 +250,55 @@ const initializeScene = async (opts: {
   };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
-  const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+  let isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
   if (isExternalScene) {
+    let importedScene: {
+      elements: ReturnType<typeof restoreElements>;
+      appState: ReturnType<typeof restoreAppState>;
+    } | null = null;
+
+    if (jsonBackendMatch && !roomLinkData) {
+      const imported = await importFromBackend(
+        jsonBackendMatch[1],
+        jsonBackendMatch[2],
+      );
+
+      if (!imported.elements) {
+        window.history.replaceState({}, APP_NAME, window.location.origin);
+        return { scene, isExternalScene: false };
+      }
+
+      importedScene = {
+        elements: restoreElements(imported.elements, null, {
+          repairBindings: true,
+          deleteInvisibleElements: true,
+        }),
+        appState: restoreAppState(
+          imported.appState,
+          // local appState when importing from backend to ensure we restore
+          // localStorage user settings which we do not persist on server.
+          localDataState?.appState,
+        ),
+      };
+    }
+
     if (
       // don't prompt if scene is empty
       !scene.elements.length ||
       // don't prompt for collab scenes because we don't override local storage
       roomLinkData ||
+      // don't prompt if the incoming scene is identical to the local scene
+      (importedScene && isSameSceneContent(scene, importedScene)) ||
       // otherwise, prompt whether user wants to override current scene
       (await openConfirmModal(shareableLinkConfirmDialog))
     ) {
-      if (jsonBackendMatch) {
-        const imported = await importFromBackend(
-          jsonBackendMatch[1],
-          jsonBackendMatch[2],
-        );
-
+      if (importedScene) {
         scene = {
           elements: bumpElementVersions(
-            restoreElements(imported.elements, null, {
-              repairBindings: true,
-              deleteInvisibleElements: true,
-            }),
+            importedScene.elements,
             localDataState?.elements,
           ),
-          appState: restoreAppState(
-            imported.appState,
-            // local appState when importing from backend to ensure we restore
-            // localStorage user settings which we do not persist on server.
-            localDataState?.appState,
-          ),
+          appState: importedScene.appState,
         };
       }
       scene.scrollToContent = true;
@@ -300,6 +320,7 @@ const initializeScene = async (opts: {
       }
 
       roomLinkData = null;
+      isExternalScene = false;
       window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   } else if (externalUrlMatch) {
@@ -311,6 +332,7 @@ const initializeScene = async (opts: {
       const data = await loadFromBlob(await request.blob(), null, null);
       if (
         !scene.elements.length ||
+        isSameSceneContent(scene, data) ||
         (await openConfirmModal(shareableLinkConfirmDialog))
       ) {
         return { scene: data, isExternalScene };
@@ -579,6 +601,7 @@ const ExcalidrawWrapper = () => {
           collabAPI.stopCollaboration(false);
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
+        LocalData.flushSave();
 
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
