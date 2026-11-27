@@ -19,6 +19,7 @@ import {
   useApp,
   useAppProps,
   useExcalidrawContainer,
+  useExcalidrawSetAppState,
   useStylesPanelMode,
 } from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
@@ -27,6 +28,7 @@ import { ScrollableList } from "../ScrollableList";
 import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
 import { TopPicksDnDOutline } from "../TopPicksDnD/topPicksDnD";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
+import { DragDropIcon } from "../icons";
 
 import { useFontPickerDnD } from "./fontTopPicksDnD";
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
@@ -71,6 +73,7 @@ export const FontPickerList = React.memo(
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
     const app = useApp();
+    const setAppState = useExcalidrawSetAppState();
     const fonts = app.fonts.instance;
     const { showDeprecatedFonts, fontProviders, fontPickerTip, pinnedFonts } =
       useAppProps();
@@ -392,7 +395,16 @@ export const FontPickerList = React.memo(
           filteredFonts: selectableFonts,
           onSelect: selectFontFamily,
           onHover: hoverFontFamily,
-          onClose,
+          // Escape, wherever the focus is in the popup. `onClose` alone takes
+          // a preview back and leaves the popup open - it is also what a
+          // focus moving out reports, which doesn't close it
+          onClose: () => {
+            onClose();
+            setAppState((state) => ({
+              openPopup:
+                state.openPopup === "fontFamily" ? null : state.openPopup,
+            }));
+          },
         });
 
         if (handled) {
@@ -406,6 +418,7 @@ export const FontPickerList = React.memo(
         selectFontFamily,
         hoverFontFamily,
         onClose,
+        setAppState,
         inputRef,
         isLoadingMoreOnScroll,
         canLoadMoreFonts,
@@ -565,9 +578,16 @@ export const FontPickerList = React.memo(
           <TopPicksTip
             className="FontPicker__tip"
             tip={
-              fontPickerTip === undefined
-                ? t("fontList.topPicksTip")
-                : fontPickerTip
+              fontPickerTip === undefined ? (
+                <>
+                  <span className="FontPicker__tip-icon" aria-hidden="true">
+                    {DragDropIcon}
+                  </span>
+                  {t("fontList.topPicksTip")}
+                </>
+              ) : (
+                fontPickerTip
+              )
             }
             onReset={onResetTopPicks}
             resetTitle={t("fontList.resetTopPicks")}

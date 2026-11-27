@@ -408,7 +408,7 @@ describe("FontPicker", () => {
     expect(API.getElement(text).isDeleted).toBe(true);
   });
 
-  it("reverts a hover preview after an Escape, which keeps the popup open", async () => {
+  it("reverts a hover preview after a close request which keeps the popup open", async () => {
     const { queryByTestId } = await render(<Excalidraw />);
     const text = API.createElement({ type: "text", text: "Hello" });
     API.setElements([text]);
@@ -420,11 +420,11 @@ describe("FontPicker", () => {
       "button",
     )!;
 
-    // as do compact mode refocusing the text editor and StrictMode
-    fireEvent.keyDown(
-      document.querySelector(".properties-content .QuickSearch__input")!,
-      { key: KEYS.ESCAPE },
-    );
+    // the focus moving out asks the popup to close, which it doesn't - as do
+    // compact mode refocusing the text editor, and StrictMode
+    act(() => {
+      document.querySelector<HTMLElement>(".excalidraw-container")!.focus();
+    });
     expect(h.state.openPopup).toBe("fontFamily");
 
     fireEvent.mouseMove(comicShanns);
@@ -439,6 +439,35 @@ describe("FontPicker", () => {
       expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
     );
     expect(h.state.currentHoveredFontFamily).toBeNull();
+  });
+
+  it("closes on Escape, from the search too, taking a preview back", async () => {
+    const { queryByTestId } = await render(<Excalidraw />);
+    const text = API.createElement({ type: "text", text: "Hello" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+
+    fireEvent.click(queryByTestId("font-family-show-fonts")!);
+    fireEvent.mouseMove(
+      (await screen.findByText("Comic Shanns")).closest("button")!,
+    );
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    fireEvent.keyDown(
+      document.querySelector(".properties-content .QuickSearch__input")!,
+      { key: KEYS.ESCAPE },
+    );
+
+    await waitFor(() => expect(h.state.openPopup).toBe(null));
+    expect(document.querySelector(".dropdown-menu.fonts")).toBe(null);
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(initialFontFamily),
+    );
+    // the text is still selected - Escape went to the picker alone
+    expect(h.state.selectedElementIds[text.id]).toBe(true);
   });
 
   it("lists a family by its preview text in place of the provider's icon", async () => {
@@ -2326,7 +2355,7 @@ describe("FontPicker", () => {
       )!;
       input.blur();
 
-      expect(await dragToPin(getRow())).toBe("Pin");
+      expect(await dragToPin(getRow())).toBe("Drop to pin");
       // the drag took the focus - the search has it back
       expect(document.activeElement).toBe(input);
 
@@ -2339,7 +2368,7 @@ describe("FontPicker", () => {
       // dropping is not selecting
       expect(h.state.currentItemFontFamily).toBe(FONT_FAMILY.Excalifont);
 
-      expect(await dragToPin(getRow())).toBe("Unpin");
+      expect(await dragToPin(getRow())).toBe("Drop to unpin");
 
       await waitFor(() => expect(screen.queryByText("Pinned")).toBe(null));
       expect(getGroupFamilies("Available fonts")).toContain("Lilita One");

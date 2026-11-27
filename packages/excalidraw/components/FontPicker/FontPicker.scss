@@ -104,6 +104,18 @@
     margin-top: 0.5rem;
   }
 
+  .FontPicker__tip-icon {
+    display: inline-flex;
+    margin-right: 0.25rem;
+    // sits on the text's line, without making it taller
+    vertical-align: -0.2em;
+
+    svg {
+      width: 1.2em;
+      height: 1.2em;
+    }
+  }
+
   // anchor for the pin drop zone, which covers the search for a drag
   .FontPicker__search {
     position: relative;
