@@ -21,6 +21,7 @@ describe("flowchart", () => {
       backgroundColor: "#ffec99",
       strokeColor: "#1e1e1e",
       strokeWidth: 2,
+      footerOptions: { type: "text", text: "Research" },
     });
     const scene = new Scene([sticky], { skipValidation: true });
     const {
@@ -50,6 +51,7 @@ describe("flowchart", () => {
       backgroundColor: sticky.backgroundColor,
       strokeColor: sticky.strokeColor,
       strokeWidth: sticky.strokeWidth,
+      footerOptions: sticky.footerOptions,
     });
     expect(bindingArrow).toMatchObject({
       type: "arrow",

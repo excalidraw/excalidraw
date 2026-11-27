@@ -9,6 +9,7 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
+  isStickyNoteElement,
   hasStrokeColor,
   toolIsArrow,
 } from "@excalidraw/element";
@@ -153,6 +154,16 @@ export const getShapeActionPredicates = (
       activeToolType === "text" ||
       suppportsHorizontalAlign(targetElements, elementsMap),
     verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
+    stickyNoteFooter:
+      app.isUIControlEnabled("stickyNoteFooter") &&
+      (activeToolType === "stickynote" ||
+        targetElements.some(
+          (element) =>
+            isStickyNoteElement(element) ||
+            (isTextElement(element) &&
+              !!element.containerId &&
+              isStickyNoteElement(elementsMap.get(element.containerId))),
+        )),
 
     opacity: activeToolType !== "autoshape" || hasSelection,
 

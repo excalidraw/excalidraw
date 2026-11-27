@@ -1,5 +1,14 @@
 {
   "labels": {
+    "stickyNote": {
+      "footer": "Sticky note footer",
+      "footerNone": "No footer",
+      "footerShortDate": "Short date",
+      "footerTime": "Creation time",
+      "footerFullDate": "Full date",
+      "footerMixed": "Mixed footers",
+      "footerCustom": "Custom text"
+    },
     "signUp": "Sign up",
     "signIn": "Sign in",
     "upgrade": "Upgrade",

@@ -241,7 +241,7 @@ export type ValidStickyNote = {
   id?: ExcalidrawStickyNoteElement["id"];
   label?: Extract<ValidContainer, { label?: unknown }>["label"];
 } & ElementConstructorOpts &
-  Partial<Pick<ExcalidrawStickyNoteElement, "baseHeight">>;
+  Partial<Pick<ExcalidrawStickyNoteElement, "baseHeight" | "footerOptions">>;
 
 export type ExcalidrawElementSkeleton =
   | Extract<

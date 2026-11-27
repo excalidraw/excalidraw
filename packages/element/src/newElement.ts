@@ -25,6 +25,7 @@ import {
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
 import {
+  normalizeStickyNoteFooterOptions,
   normalizeStickyNoteBackgroundColor,
   normalizeStickyNoteStrokeColor,
 } from "./stickyNote";
@@ -58,6 +59,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
+  StickyNoteFooterOptions,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -233,6 +235,7 @@ export const newStickyNoteElement = (
   opts: {
     type: "stickynote";
     baseHeight?: number;
+    footerOptions?: StickyNoteFooterOptions | null;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawStickyNoteElement> => {
   const base = _newElementBase<ExcalidrawStickyNoteElement>("stickynote", opts);
@@ -241,6 +244,7 @@ export const newStickyNoteElement = (
   return normalizeStickyNoteStyle({
     ...base,
     baseHeight: opts.baseHeight ?? base.height,
+    footerOptions: normalizeStickyNoteFooterOptions(opts.footerOptions),
   });
 };
 

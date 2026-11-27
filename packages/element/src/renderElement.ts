@@ -483,7 +483,11 @@ const drawElementOnCanvas = (
         // the label is absolute, so this cached canvas only goes stale at a
         // year boundary — and is regenerated on the next zoom, theme or
         // element change anyway
-        const footer = getStickyNoteFooter(element);
+        const footer = getStickyNoteFooter(
+          element,
+          undefined,
+          renderConfig.renderEnvironment,
+        );
         if (footer) {
           context.font = `${STICKY_NOTE_FOOTER.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}`;
           context.textAlign = "right";

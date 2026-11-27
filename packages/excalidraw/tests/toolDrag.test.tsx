@@ -105,6 +105,20 @@ describe("dragging a tool out of the toolbar", () => {
     expect(liveNotes()).toHaveLength(0);
   });
 
+  it("uses the host footer default for both toolbar preview and drop", async () => {
+    API.updateScene({ appState: { currentItemStickynoteFooterOptions: null } });
+    dragOut(300, 260);
+    expect(h.app.toolDrag.preview).toMatchObject({ footerOptions: null });
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      ...POINTER,
+      button: 0,
+      clientX: 300,
+      clientY: 260,
+    });
+    expect(liveNotes()[0].footerOptions).toBeNull();
+    Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+  });
+
   it("places the preview and dropped note on the grid", () => {
     API.setAppState({ gridModeEnabled: true, gridSize: 20 });
     dragOut(300, 300);

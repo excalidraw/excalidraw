@@ -303,6 +303,57 @@ convertToExcalidrawElements([
 
 Notes keep their invariants regardless of the properties you pass: the background is never transparent (it falls back to the default yellow), the fill is solid, and the size is at least 75×75. The height you pass is kept as the note's `baseHeight`; if a label needs more room at the minimum font size, the created note is taller.
 
+#### Host-controlled footers
+
+Use `footerOptions` to choose a note's footer. The existing short creation date remains the default when the property is omitted. The built-in picker offers no footer, short date, creation time and full date. Hosts can hide it with `ui={{ disabled: { stickyNoteFooter: true } }}` and supply their own controls.
+
+| `footerOptions` | Result |
+| --- | --- |
+| `null` | No footer; its space becomes available to the label. |
+| `{ type: "date", format: "short" }` | Existing short creation date, including the year when needed. |
+| `{ type: "date", format: "time" }` | Creation time in the viewer's locale. |
+| `{ type: "date", format: "long" }` | Full creation date in the viewer's locale. |
+| `{ type: "text", text: "Research" }` | Host-supplied text, including a category or a preformatted date. |
+
+Date footers use `created`, never the last edit time. Text footers also work when `created` is unknown. Long text is displayed on one line with an ellipsis; the full value remains in the saved scene. Footers are shared by the editor, canvas exports, and SVG exports. Invalid imported options fall back to the short date.
+
+For new notes placed with the tool, set `appState.currentItemStickynoteFooterOptions` through `initialData` or `excalidrawAPI.updateScene()`. This sets a creation default and leaves existing notes unchanged. The default is persisted in browser app state, but is not included in scene exports.
+
+```jsx
+<Excalidraw
+  initialData={{
+    appState: { currentItemStickynoteFooterOptions: null },
+  }}
+/>
+```
+
+To change existing notes, use `newElementWith()` and `updateScene()`. When hiding or showing the footer, refresh the dimensions through `restoreElements()` so the label uses the correct space. Capture the change immediately to make it one undoable action. The same update can apply to an empty note or a selection of notes.
+
+```js
+import {
+  CaptureUpdateAction,
+  newElementWith,
+  restoreElements,
+} from "@excalidraw/excalidraw";
+
+const elements = excalidrawAPI.getSceneElementsIncludingDeleted();
+const updated = elements.map((element) =>
+  element.type === "stickynote" && selectedIds.has(element.id)
+    ? newElementWith(element, { footerOptions: null })
+    : element,
+);
+
+excalidrawAPI.updateScene({
+  elements: restoreElements(updated, null, {
+    refreshDimensions: true,
+    repairBindings: true,
+  }),
+  captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+});
+```
+
+Hosts that need another date format can supply it as text. Text is stored as a value, so it stays the same across viewers and does not update automatically when a note is duplicated. A host can use `onDuplicate` to set a new label when that is its intended behavior. Built-in date footers use the duplicate's new creation timestamp. No custom date-format parser or host callback is required for rendering and exporting a saved note.
+
 ### Labelled Arrows
 
 Similar to Text Containers, you can create labelled arrows as well.
