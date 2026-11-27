@@ -171,6 +171,48 @@ describe("Test wrapText", () => {
     ]);
   });
 
+  it("should retain original text offsets for decomposed (NFD) text", () => {
+    // "café café café end" with "é" as "e" + U+0301 combining acute accent
+    const text = "café café café end";
+    const lines = getWrappedTextLines(text, font, 60);
+
+    expect(lines.map((line) => line.text)).toEqual([
+      "café",
+      "café",
+      "café",
+      "end",
+    ]);
+    for (const line of lines) {
+      expect(text.slice(line.start, line.end).normalize("NFC")).toBe(line.text);
+    }
+    expect(lines[3]).toEqual({ text: "end", start: 18, end: 21 });
+
+    // "한글" x3 as conjoining Hangul jamo (NFD), wrapped per syllable
+    const hangul = "한글";
+    const korean = `${hangul} ${hangul}`;
+    const koreanLines = getWrappedTextLines(korean, font, 10);
+
+    expect(koreanLines.map((line) => line.text)).toEqual([
+      "한",
+      "글",
+      "한",
+      "글",
+    ]);
+    for (const line of koreanLines) {
+      expect(korean.slice(line.start, line.end).normalize("NFC")).toBe(
+        line.text,
+      );
+    }
+
+    // a word longer than the max width, broken by characters
+    const word = "éééé";
+    const wordLines = getWrappedTextLines(word, font, 20);
+    expect(wordLines).toEqual([
+      { text: "éé", start: 0, end: 4 },
+      { text: "éé", start: 4, end: 8 },
+    ]);
+  });
+
   describe("When text is CJK", () => {
     it("should break each CJK character when width is very small", () => {
       // "안녕하세요" (Hangul) + "こんにちは世界" (Hiragana, Kanji) + "ｺﾝﾆﾁハ" (Katakana) + "你好" (Han) = "Hello Hello World Hello Hi"
