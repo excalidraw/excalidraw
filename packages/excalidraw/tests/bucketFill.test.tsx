@@ -797,6 +797,33 @@ describe("bucket fill tool", () => {
     ).toHaveLength(1);
   });
 
+  it("does not commit an outside-canceled fill on a later release", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    const pen = {
+      clientX: 80,
+      clientY: 70,
+      button: 0,
+      pointerId: 1,
+      pointerType: "pen",
+    };
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, pen);
+    fireEvent.pointerCancel(document.body, pen);
+    fireEvent.pointerUp(document.body, {
+      ...pen,
+      pointerId: 2,
+      pointerType: "mouse",
+    });
+
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(0);
+  });
+
   it("does not fill in view mode", () => {
     seedRectangle();
     act(() => {
