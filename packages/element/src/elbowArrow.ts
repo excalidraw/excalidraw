@@ -2155,7 +2155,7 @@ const estimateSegmentCount = (
 };
 
 /**
- * Get neighboring points for a gived grid address
+ * Get neighboring points for a given grid address
  */
 const getNeighbors = ([col, row]: [number, number], grid: Grid) =>
   [
