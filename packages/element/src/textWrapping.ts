@@ -510,13 +510,28 @@ const wrapLine = (
     const tokenEnd = tokenStart + token.length;
     const testLine = currentLine + token;
 
+    const isWhitespace = /\s/.test(token);
+
     // cache single codepoint whitespace, CJK or emoji width calc. as kerning should not apply here
-    const testLineWidth = isSingleCharacter(token)
+    let testLineWidth = isSingleCharacter(token)
       ? currentLineWidth + charWidth.calculate(token, font, env)
       : getLineWidth(testLine, font, env);
 
+    // ...except where it does: a single letter kerns with its neighbours
+    // (i.e. "A V A"), which the sum above leaves out. So before the line
+    // breaks on such a token, measure it as a whole, as the text editor
+    // lays it out - else the two break at different words.
+    if (
+      currentLine &&
+      !isWhitespace &&
+      testLineWidth > maxWidth &&
+      isSingleCharacter(token)
+    ) {
+      testLineWidth = getLineWidth(testLine, font, env);
+    }
+
     // build up the current line, skipping length check for possibly trailing whitespaces
-    if (/\s/.test(token) || testLineWidth <= maxWidth) {
+    if (isWhitespace || testLineWidth <= maxWidth) {
       if (!currentLine) {
         currentLineStart = tokenStart;
       }
@@ -613,7 +628,13 @@ const wrapWord = (
     const charStart = offset;
     const charEnd = charStart + char.length;
     const _charWidth = charWidth.calculate(char, font, env);
-    const testLineWidth = currentLineWidth + _charWidth;
+    let testLineWidth = currentLineWidth + _charWidth;
+
+    // the sum leaves out the kerning between the letters, so before the word
+    // breaks here, measure the line as a whole (see `wrapLine`)
+    if (currentLine && testLineWidth > maxWidth) {
+      testLineWidth = getLineWidth(currentLine + char, font, env);
+    }
 
     if (testLineWidth <= maxWidth) {
       if (!currentLine) {
