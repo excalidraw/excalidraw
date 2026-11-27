@@ -13,6 +13,7 @@ import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 import { TOOLS } from "../components/Tools";
 
 import { Excalidraw } from "../index";
+import { DEFAULT_SELECTION_COLOR } from "../renderer/helpers";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
@@ -2027,5 +2028,62 @@ describe("deselecting", () => {
     expect(API.getSelectedElements()).toEqual([]);
     expect(h.state.editingGroupId).toBeNull();
     expect(h.state.selectedGroupIds).toEqual({});
+  });
+});
+
+describe("group selection border color", () => {
+  it("uses the primary selection color for dashed group borders", async () => {
+    await render(<Excalidraw />);
+    API.setAppState({ width: 800, height: 600 });
+
+    const rectA = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+      width: 40,
+      height: 40,
+      groupIds: ["group1"],
+    });
+    const rectB = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 20,
+      width: 40,
+      height: 40,
+      groupIds: ["group1"],
+    });
+    API.setElements([rectA, rectB]);
+
+    const context = GlobalTestState.interactiveCanvas.getContext("2d") as any;
+    context.__clearEvents();
+
+    mouse.select(rectA);
+
+    const strokeStylesWithGroupDash = await waitFor(() => {
+      const events = context.__getEvents() as Array<{
+        type: string;
+        props: { value?: string; segments?: number[] };
+      }>;
+      const styles: string[] = [];
+      let currentStrokeStyle = "";
+      for (const event of events) {
+        if (event.type === "strokeStyle" && event.props.value) {
+          currentStrokeStyle = event.props.value;
+        } else if (
+          event.type === "setLineDash" &&
+          event.props.segments?.length === 2 &&
+          event.props.segments[0] === 8 &&
+          event.props.segments[1] === 4
+        ) {
+          styles.push(currentStrokeStyle);
+        }
+      }
+      expect(styles.length).toBeGreaterThan(0);
+      return styles;
+    });
+
+    expect(strokeStylesWithGroupDash).toContain(DEFAULT_SELECTION_COLOR);
+    expect(strokeStylesWithGroupDash).not.toContain("#000");
+    expect(strokeStylesWithGroupDash).not.toContain("#000000");
   });
 });

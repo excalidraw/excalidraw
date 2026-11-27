@@ -1872,7 +1872,6 @@ const _renderInteractiveScene = ({
     const selectionColor =
       renderConfig.selectionColor || getThemedColor("#000", appState.theme);
     const lockedSelectionColor = getThemedColor("#ced4da", appState.theme);
-    const groupSelectionColor = getThemedColor("#000", appState.theme);
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
@@ -1957,7 +1956,7 @@ const _renderInteractiveScene = ({
           y2,
           selectionColors: groupElements.some((el) => el.locked)
             ? [lockedSelectionColor]
-            : [groupSelectionColor],
+            : [selectionColor],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
