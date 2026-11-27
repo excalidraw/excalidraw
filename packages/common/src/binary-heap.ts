@@ -87,6 +87,9 @@ export class BinaryHeap<T> {
     }
 
     const i = this.content.indexOf(node);
+    if (i === -1) {
+      return;
+    }
     const end = this.content.pop()!;
 
     if (i < this.content.length) {

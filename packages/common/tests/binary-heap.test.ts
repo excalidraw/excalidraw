@@ -85,6 +85,16 @@ describe("BinaryHeap", () => {
       expect(heap.size()).toBe(4);
       expect(heap.pop()).toBe(3);
     });
+
+    it("leaves the heap unchanged when the node is not present", () => {
+      const heap = numberHeap();
+      [5, 3, 8, 1, 9].forEach((n) => heap.push(n));
+
+      heap.remove(42);
+
+      expect(heap.size()).toBe(5);
+      expect(drain(heap)).toEqual([1, 3, 5, 8, 9]);
+    });
   });
 
   describe("rescoreElement", () => {
