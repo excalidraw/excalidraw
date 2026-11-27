@@ -9,6 +9,7 @@ import type { Radians } from "@excalidraw/math";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./shape";
+import { SpatialIndex } from "./spatialIndex";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
 
@@ -143,6 +144,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.versionNonce = updates.versionNonce ?? randomInteger();
   element.updated = getUpdatedTimestamp();
 
+  SpatialIndex.onElementMutated(element);
+
   return element;
 };
 
@@ -192,5 +195,6 @@ export const bumpVersion = <T extends Mutable<ExcalidrawElement>>(
   element.version = (version ?? element.version) + 1;
   element.versionNonce = randomInteger();
   element.updated = getUpdatedTimestamp();
+  SpatialIndex.onElementMutated(element);
   return element;
 };
