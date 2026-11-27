@@ -1297,7 +1297,6 @@ const getElbowArrowData = (
     startGlobalPoint,
     endGlobalPoint,
     hoveredStartElement,
-    origStartGlobalPoint,
     elementsMap,
     zoom,
   );
@@ -1305,7 +1304,6 @@ const getElbowArrowData = (
     endGlobalPoint,
     startGlobalPoint,
     hoveredEndElement,
-    origEndGlobalPoint,
     elementsMap,
     zoom,
   );
@@ -2429,7 +2427,6 @@ const getBindPointHeading = (
   p: GlobalPoint,
   otherPoint: GlobalPoint,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
-  origPoint: GlobalPoint,
   elementsMap: ElementsMap,
   zoom?: AppState["zoom"],
 ): Heading =>
@@ -2448,7 +2445,7 @@ const getBindPointHeading = (
           number,
         ],
       ),
-    origPoint,
+    p,
     elementsMap,
     zoom,
   );

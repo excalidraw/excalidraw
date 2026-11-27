@@ -359,6 +359,54 @@ describe("elbow arrow ui", () => {
     expect(arrow.y + end[1]).toBeLessThan(0);
   });
 
+  it("enters the side its end snaps to while dragged deep inside the element", async () => {
+    UI.createElement("rectangle", {
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 200,
+    });
+    UI.createElement("rectangle", {
+      x: 300,
+      y: 600,
+      width: 300,
+      height: 200,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.downAt(305, 100);
+    mouse.moveTo(450, 400);
+    // 20px under the top edge, beyond the binding distance, near the top
+    // right corner: the end snaps onto the top edge, so the arrow comes down
+    // into it rather than going past the element's right side and back
+    // along its top edge
+    mouse.moveTo(565, 620);
+
+    const arrow = h.elements[
+      h.elements.length - 1
+    ] as ExcalidrawElbowArrowElement;
+    const route = () =>
+      arrow.points.map((point) => [
+        Math.round(arrow.x + point[0]),
+        Math.round(arrow.y + point[1]),
+      ]);
+
+    const expected = [
+      [306, 100],
+      [565, 100],
+      [565, 594],
+    ];
+    expect(route()).toEqual(expected);
+
+    mouse.up();
+
+    // the same as the route once it's dropped there
+    expect(route()).toEqual(expected);
+  });
+
   it("binds inside the element with Alt held", async () => {
     const rect = UI.createElement("rectangle", {
       x: 200,
