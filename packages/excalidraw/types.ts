@@ -1284,24 +1284,27 @@ export interface ExcalidrawProps {
    */
   fontProviders?: FontProviders;
   /**
-   * The user's favorite fonts, and what to do when they change - turns
-   * favorites on in the font picker. A font is added by dragging it from the
+   * The fonts the user has pinned, and what to do when they change - turns
+   * pinning on in the font picker. A font is pinned by dragging it from the
    * picker's list onto the drop zone which takes the search's place for the
-   * drag, and removed the same way. Favorites are listed in a section of
+   * drag, and unpinned the same way. Pinned fonts are listed in a section of
    * their own, below the fonts the scene uses.
+   *
+   * Not the top picks (`appState.fontTopPicks`), the strip of buttons next
+   * to the picker, which a font can be dragged onto as well.
    *
    * Controlled: the editor keeps nothing, so that the host can store the
    * list where it stores the user's other preferences.
    */
-  fontFavorites?: {
+  pinnedFonts?: {
     /** font ids as in `fontFamily`, i.e. `5` or `"google:Roboto"` */
     fonts: readonly FontFamily[];
     onChange: (fonts: FontFamily[]) => void;
   };
   /**
-   * Replaces the tip at the bottom of the font picker ("drag any font onto
-   * your top picks to pin it"), i.e. to say where the fonts offered there
-   * come from and where to change them. `null` shows none.
+   * Replaces the tip at the bottom of the font picker ("Drag a font to
+   * pin"), i.e. to say where the fonts offered there come from and where to
+   * change them. `null` shows none.
    *
    * Replaces the whole text rather than adding to it, so that the tip never
    * mixes the host's translations with the editor's - localize it yourself.

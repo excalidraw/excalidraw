@@ -316,18 +316,18 @@ export const FontPicker = React.memo(
 
     const resetTopPicks = () => onTopPicksChange(null);
 
-    const { fontFavorites } = useAppProps();
+    const { pinnedFonts } = useAppProps();
 
     const dnd = useFontTopPicksDnD({
       enabled: isTopPicksCustomizable,
       picks,
       onPicksChange: onTopPicksChange,
-      onFavoriteToggle: fontFavorites
+      onPinToggle: pinnedFonts
         ? (fontFamily) => {
-            const { fonts, onChange } = fontFavorites;
+            const { fonts, onChange } = pinnedFonts;
             onChange(
               fonts.includes(fontFamily)
-                ? fonts.filter((favorite) => favorite !== fontFamily)
+                ? fonts.filter((pinned) => pinned !== fontFamily)
                 : [...fonts, fontFamily],
             );
           }

@@ -208,8 +208,8 @@ interface FontCatalogOptions {
   failedResolutions: ReadonlyMap<string, unknown>;
   selectedFontFamily: FontFamily | null;
   hoveredFontFamily: FontFamily | null;
-  /** the user's favorites - see `ExcalidrawProps.fontFavorites` */
-  favoriteFamilies: ReadonlySet<FontFamily>;
+  /** the fonts the user pinned - see `ExcalidrawProps.pinnedFonts` */
+  pinnedFamilies: ReadonlySet<FontFamily>;
   /** fonts loaded on demand, in the order they arrived - see `useMoreFonts` */
   moreFonts: readonly MoreFont[];
   resolvingFamily: CustomFontFamily | null;
@@ -225,7 +225,7 @@ export const useFontCatalog = ({
   failedResolutions,
   selectedFontFamily,
   hoveredFontFamily,
-  favoriteFamilies,
+  pinnedFamilies,
   moreFonts,
   resolvingFamily,
   searchTerm,
@@ -316,7 +316,7 @@ export const useFontCatalog = ({
     for (const familyId of [
       ...sceneFamilies,
       // listed whether or not their provider (still) offers them
-      ...favoriteFamilies,
+      ...pinnedFamilies,
       // the current family may be in no element yet (i.e. found by search
       // and picked with nothing on canvas) - it must still be listed. One
       // loaded on demand is, and keeps its place there
@@ -400,24 +400,24 @@ export const useFontCatalog = ({
     resolvingFamily,
     resultFamilies,
     sceneFamilies,
-    favoriteFamilies,
+    pinnedFamilies,
     selectedFontFamily,
     getIcon,
   ]);
 
-  // a font is listed once: with the scene's, else among the favorites, else
+  // a font is listed once: with the scene's, else among the pinned ones, else
   // among the available ones
   const sceneFonts = useMemo(
     () => allFonts.filter((font) => sceneFamilies.has(font.value)),
     [allFonts, sceneFamilies],
   );
-  const favoriteFonts = useMemo(
+  const pinnedFonts = useMemo(
     () =>
       allFonts.filter(
         (font) =>
-          favoriteFamilies.has(font.value) && !sceneFamilies.has(font.value),
+          pinnedFamilies.has(font.value) && !sceneFamilies.has(font.value),
       ),
-    [allFonts, favoriteFamilies, sceneFamilies],
+    [allFonts, pinnedFamilies, sceneFamilies],
   );
   // Ours lead (the current ones, then the deprecated ones), a host's follow
   // by name, and what got loaded on demand comes last in the order it
@@ -426,7 +426,7 @@ export const useFontCatalog = ({
     const available = allFonts.filter(
       (font) =>
         !sceneFamilies.has(font.value) &&
-        !favoriteFamilies.has(font.value) &&
+        !pinnedFamilies.has(font.value) &&
         // the current font is listed even when deprecated
         (showDeprecatedFonts ||
           !font.deprecated ||
@@ -455,16 +455,16 @@ export const useFontCatalog = ({
     moreFonts,
     moreOnlyFamilies,
     sceneFamilies,
-    favoriteFamilies,
+    pinnedFamilies,
     showDeprecatedFonts,
     selectedFontFamily,
   ]);
   const filteredFontDescriptors = useMemo(
     () =>
-      [...sceneFonts, ...favoriteFonts, ...availableFonts].filter((font) =>
+      [...sceneFonts, ...pinnedFonts, ...availableFonts].filter((font) =>
         font.text.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
-    [sceneFonts, favoriteFonts, availableFonts, searchTerm],
+    [sceneFonts, pinnedFonts, availableFonts, searchTerm],
   );
   const { searchMatches, hiddenSearchMatchCount, searchSuggestions } =
     useMemo(() => {
@@ -553,21 +553,21 @@ export const useFontCatalog = ({
       filteredFontDescriptors.filter((font) => sceneFamilies.has(font.value)),
     [filteredFontDescriptors, sceneFamilies],
   );
-  const favoriteFilteredFonts = useMemo(
+  const pinnedFilteredFonts = useMemo(
     () =>
       filteredFontDescriptors.filter(
         (font) =>
-          favoriteFamilies.has(font.value) && !sceneFamilies.has(font.value),
+          pinnedFamilies.has(font.value) && !sceneFamilies.has(font.value),
       ),
-    [filteredFontDescriptors, favoriteFamilies, sceneFamilies],
+    [filteredFontDescriptors, pinnedFamilies, sceneFamilies],
   );
   const availableFilteredFonts = useMemo(
     () =>
       filteredFontDescriptors.filter(
         (font) =>
-          !sceneFamilies.has(font.value) && !favoriteFamilies.has(font.value),
+          !sceneFamilies.has(font.value) && !pinnedFamilies.has(font.value),
       ),
-    [filteredFontDescriptors, sceneFamilies, favoriteFamilies],
+    [filteredFontDescriptors, sceneFamilies, pinnedFamilies],
   );
 
   const listedFamilies = useMemo(
@@ -579,7 +579,7 @@ export const useFontCatalog = ({
     listedFamilies,
     selectableFonts,
     sceneFilteredFonts,
-    favoriteFilteredFonts,
+    pinnedFilteredFonts,
     availableFilteredFonts,
     searchMatches,
     hiddenSearchMatchCount,

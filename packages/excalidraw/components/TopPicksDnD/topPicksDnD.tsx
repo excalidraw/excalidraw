@@ -14,7 +14,7 @@ import "./TopPicksDnD.scss";
  * `data-top-pick-index` (hit-testing and the drop animation measure these).
  *
  * A picker may register one more drop target beside the strip, via
- * `setDropZoneEl` (e.g. the font picker's favorites) - a dragged value
+ * `setDropZoneEl` (e.g. the font picker's pinned fonts) - a dragged value
  * dropped there is handed to `onDropZoneDrop`, leaving the picks alone.
  */
 
