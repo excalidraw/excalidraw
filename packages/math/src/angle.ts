@@ -53,6 +53,10 @@ export function radiansBetweenAngles(
   min = normalizeRadians(min);
   max = normalizeRadians(max);
 
+  if (Math.abs(min - max) < PRECISION) {
+    return Math.abs(a - min) < PRECISION;
+  }
+
   if (min < max) {
     return a >= min && a <= max;
   }
