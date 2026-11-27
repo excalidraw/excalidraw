@@ -402,6 +402,7 @@ export class AppDuplicate {
       elements,
       appState: this.app.state,
       randomizeSeed: true,
+      isAltDrag: true,
       idsOfElementsToDuplicate,
       overrides: ({ duplicateElement, origElement }) => {
         return {

@@ -70,6 +70,7 @@ export const actionDuplicateSelection = register({
       ),
       appState,
       randomizeSeed: true,
+      isAltDrag: false,
       overrides: ({ origElement, origIdToDuplicateId }) => {
         const duplicateFrameId =
           origElement.frameId && origIdToDuplicateId.get(origElement.frameId);
