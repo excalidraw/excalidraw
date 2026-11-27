@@ -65,6 +65,14 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
   },
+  [FONT_FAMILY["LXGW WenKai"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 928,
+      descender: -256,
+      lineHeight: 1.25,
+    },
+  },
   [FONT_FAMILY.Virgil]: {
     metrics: {
       unitsPerEm: 1000,
