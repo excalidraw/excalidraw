@@ -93,6 +93,7 @@ export type ActionName =
   | "clearCanvas"
   | "zoomIn"
   | "zoomOut"
+  | "resetToolStyles"
   | "resetZoom"
   | "zoomToFit"
   | "zoomToFitSelection"
