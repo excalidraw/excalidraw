@@ -29,12 +29,14 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  isProviderQualifiedFontFamily,
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
   isTransparent,
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
+
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
@@ -84,6 +86,8 @@ import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
+import type { FontFamily } from "@excalidraw/common";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -97,7 +101,6 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FixedPointBinding,
-  FontFamilyValues,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -286,13 +289,44 @@ const restoreFreedrawStrokeOptions = (
   };
 };
 
-const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
+/** for the legacy `font` property only, i.e. "20px Virgil" */
+const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
     return FONT_FAMILY[
       fontFamilyName as keyof typeof FONT_FAMILY
-    ] as FontFamilyValues;
+    ] as FontFamily;
   }
+
   return DEFAULT_FONT_FAMILY;
+};
+
+/**
+ * Keeps whatever the document holds, as master always has - only a missing
+ * value gets the default.
+ *
+ * WARN: don't normalize here. Restore runs on every path a document takes
+ * (files, collab, library, paste) and its output gets saved, so a value this
+ * version rewrites is a value no later version can ever introduce: a future
+ * `fontFamily` shape would be turned into the default font by every deployed
+ * client and synced back. Values we can't interpret are instead dealt with
+ * where they are *read* - see `getFontFamilyString`.
+ */
+const restoreFontFamily = (fontFamily: unknown): FontFamily =>
+  fontFamily == null ? DEFAULT_FONT_FAMILY : (fontFamily as FontFamily);
+
+/**
+ * Unlike element families, the default for *new* text is normalized - it's
+ * browser-only state, and a value we can't interpret must not be written into
+ * every text element created from now on.
+ */
+const restoreCurrentItemFontFamily = (fontFamily: unknown): FontFamily => {
+  if (typeof fontFamily === "string") {
+    return isProviderQualifiedFontFamily(fontFamily)
+      ? fontFamily
+      : DEFAULT_FONT_FAMILY;
+  }
+
+  return isFiniteNumber(fontFamily) ? fontFamily : DEFAULT_FONT_FAMILY;
 };
 
 /**
@@ -558,7 +592,7 @@ export const restoreElement = (
       delete (element as any).rawText;
 
       let fontSize = element.fontSize;
-      let fontFamily = element.fontFamily;
+      let fontFamily = restoreFontFamily(element.fontFamily);
       if ("font" in element) {
         const [fontPx, _fontFamily]: [string, string] = (
           element as any
@@ -1243,21 +1277,24 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
   return colors.size ? [...colors.values()] : null;
 };
 
-const restoreFontTopPicks = (
-  value: unknown,
-): readonly FontFamilyValues[] | null => {
+const restoreFontTopPicks = (value: unknown): readonly FontFamily[] | null => {
   if (!Array.isArray(value)) {
     return null;
   }
-  const fontFamilies = new Set<FontFamilyValues>();
+  const fontFamilies = new Set<FontFamily>();
   for (const fontFamily of value) {
     const metadata =
       typeof fontFamily === "number" ? FONT_METADATA[fontFamily] : undefined;
-    // only families the font picker lists (no internal or fallback fonts)
-    if (!metadata || metadata.private || metadata.fallback) {
+    // only families the font picker lists (custom, or built-ins that are not
+    // internal or fallback fonts)
+    const isPickable =
+      typeof fontFamily === "string"
+        ? isProviderQualifiedFontFamily(fontFamily)
+        : !!metadata && !metadata.private && !metadata.fallback;
+    if (!isPickable) {
       continue;
     }
-    fontFamilies.add(fontFamily as FontFamilyValues);
+    fontFamilies.add(fontFamily as FontFamily);
     if (fontFamilies.size >= FONT_TOP_PICKS_SLOTS) {
       break;
     }
@@ -1340,6 +1377,11 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
+    // or a bare name from persisted data leaks into every newly created
+    // text element
+    currentItemFontFamily: restoreCurrentItemFontFamily(
+      nextAppState.currentItemFontFamily,
+    ),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:

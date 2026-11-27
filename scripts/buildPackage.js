@@ -107,7 +107,19 @@ function buildProd(config) {
 
 const createESMRawBuild = async () => {
   const chunksConfig = {
-    entryPoints: ["index.tsx", "**/*.chunk.ts"],
+    entryPoints: [
+      "index.tsx",
+      "**/*.chunk.ts",
+      // its own entry (`@excalidraw/excalidraw/fonts/google`), so that the
+      // catalog stays out of the main bundle and loads without the editor
+      // (entries are emitted flat, by name)
+      { in: "fonts/google/index.ts", out: "fonts-google" },
+      // The catalog, which the entry above imports on first use. An entry
+      // too, so that it's emitted next to it: as a chunk it would land in
+      // `fonts/google/`, and `fonts/` is the folder of font files which
+      // hosts copy over to serve them themselves
+      { in: "fonts/google/catalog.json", out: "fonts-google-catalog" },
+    ],
     entryNames: "[name]",
   };
 

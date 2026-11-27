@@ -1,7 +1,12 @@
 import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  TEXT_ALIGN,
+  TEXT_RENDERING,
+  VERTICAL_ALIGN,
+} from "@excalidraw/common";
 
 import {
   computeContainerDimensionForBoundText,
@@ -10,11 +15,47 @@ import {
   getBoundTextMaxHeight,
   computeBoundTextPosition,
 } from "../src/textElement";
-import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
+import {
+  detectLineHeight,
+  getLineHeightInPx,
+  getLineWidth,
+} from "../src/textMeasurements";
 
-import type { ExcalidrawTextElementWithContainer } from "../src/types";
+import type { RenderEnvironment } from "../src/renderEnvironment";
+import type {
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../src/types";
 
 describe("Test measureText", () => {
+  it("should measure text as the text editor lays it out", () => {
+    // left on its default, Chrome's canvas shapes a line word by word (and
+    // so skips the kerning next to a space), while its text editor doesn't,
+    // so the two would wrap at different words
+    const renderingWhenMeasured: string[] = [];
+    const env: RenderEnvironment = {
+      createCanvas: () =>
+        ({
+          getContext: () => {
+            const context = {
+              font: "",
+              textRendering: "auto",
+              measureText: (text: string) => {
+                renderingWhenMeasured.push(context.textRendering);
+                return { width: text.length };
+              },
+            };
+            return context;
+          },
+        } as unknown as HTMLCanvasElement),
+      createImage: () => ({} as HTMLImageElement),
+    };
+
+    getLineWidth("A V A T A R", "20px Helvetica" as FontString, env);
+
+    expect(renderingWhenMeasured).toEqual([TEXT_RENDERING]);
+  });
+
   describe("Test getContainerCoords", () => {
     const params = { width: 200, height: 100, x: 10, y: 20 };
 
@@ -206,6 +247,10 @@ describe("Test getDefaultLineHeight", () => {
 
   it("should return correct line height", () => {
     expect(getLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
+  });
+
+  it("should return line height using default font family for a custom font which isn't resolved yet", () => {
+    expect(getLineHeight("google:Unresolved")).toBe(1.25);
   });
 });
 

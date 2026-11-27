@@ -83,7 +83,6 @@ import {
   deriveStylesPanelMode,
   isIOS,
   isBrave,
-  isSafari,
   type EditorInterface,
   type StylesPanelMode,
   loadDesktopUIModePreference,
@@ -151,11 +150,9 @@ import {
   updateImageCache as _updateImageCache,
   getBoundTextElement,
   getContainerCenter,
-  getContainerElement,
   getColorUpdate,
   getStickyNoteMinSize,
   isValidTextContainer,
-  redrawTextBoundingBox,
   hasBoundingBox,
   getFrameChildrenInsertionIndex,
   isCursorInFrame,
@@ -344,7 +341,6 @@ import {
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
 
-import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
@@ -392,6 +388,7 @@ import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppDuplicate } from "./App.duplicate";
 import { AppFlowchart } from "./App.flowchart";
+import { AppFonts } from "./App.fonts";
 import { AppModifiers } from "./App.modifiers";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
@@ -630,7 +627,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public scene: Scene;
-  public fonts: Fonts;
+  public fonts: AppFonts;
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   /** whether the last render had any renderable elements (excludes e.g. the
@@ -915,7 +912,12 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = new Fonts(this.scene, this.ownerDocument);
+    this.fonts = new AppFonts(this, {
+      // font reflows must not get absorbed into the next user action's undo
+      // delta (same pattern as the image-cache error path)
+      onBeforeSceneMutation: () =>
+        this.store.scheduleAction(CaptureUpdateAction.NEVER),
+    });
     this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
@@ -2670,6 +2672,7 @@ class App extends React.Component<AppProps, AppState> {
                               pendingFlowchartNodes:
                                 this.flowchart.pendingNodes,
                               theme: this.state.theme,
+                              isFontBlocked: this.fonts.isFontBlocked,
                               ...this.getRenderOverrideConfig(),
                             }}
                           />
@@ -2810,6 +2813,7 @@ class App extends React.Component<AppProps, AppState> {
       {
         name: this.getName(),
         exportingFrame: opts.exportingFrame,
+        fontResolvers: this.fonts.instance.fontResolvers,
         renderEnvironment: this.renderEnvironment,
       },
     )
@@ -3157,6 +3161,12 @@ class App extends React.Component<AppProps, AppState> {
     if (actionResult.elements) {
       this.scene.replaceAllElements(actionResult.elements);
       didUpdate = true;
+    }
+
+    if (actionResult.loadFonts) {
+      this.fonts.refreshSceneFonts(
+        actionResult.appState?.currentItemFontFamily,
+      );
     }
 
     if (actionResult.files) {
@@ -3721,16 +3731,8 @@ class App extends React.Component<AppProps, AppState> {
     // can be loaded fresh
     this.clearImageShapeCache();
 
-    // manually loading the font faces seems faster even in browsers that do
-    // fire the loadingdone event. Prewarming the default font family, so that
-    // the first text element is not rendered with a fallback font.
-    // NOTE: reading from `restoredAppState` instead of `this.state`, as the
-    // `syncActionResult` above sets the state asynchronously
-    this.fonts
-      .loadSceneFonts(restoredAppState.currentItemFontFamily)
-      .then((fontFaces) => {
-        this.fonts.onLoaded(fontFaces);
-      });
+    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
+    this.fonts.refreshSceneFonts(restoredAppState.currentItemFontFamily);
 
     if (isElementLink(this.ownerWindow.location.href)) {
       this.viewport.setViewport({
@@ -3822,6 +3824,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public async componentDidMount() {
     this.unmounted = false;
+    this.fonts.onMount();
     this.api = this.createExcalidrawAPI();
     this.host.sync();
 
@@ -3857,7 +3860,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         fonts: {
           configurable: true,
-          value: this.fonts,
+          get: () => this.fonts.instance,
         },
       });
     }
@@ -3945,7 +3948,7 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer.destroy(this.canvas);
     this.scene.destroy();
     this.scene = new Scene();
-    this.fonts = new Fonts(this.scene, this.ownerDocument);
+    this.fonts.destroy();
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
@@ -4036,14 +4039,10 @@ class App extends React.Component<AppProps, AppState> {
           passive: false,
         },
       ), // #3553
-      // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         this.ownerDocument.fonts,
         "loadingdone",
-        (event) => {
-          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-          this.fonts.onLoaded(fontFaces);
-        },
+        this.fonts.onDocumentFontsLoaded,
         { passive: false },
       ),
       addEventListener(
@@ -4313,6 +4312,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    this.fonts.onPropsUpdated(prevProps);
+
     // must be updated *before* state change listeners are triggered below
     if (!this._initialized && !this.state.isLoading) {
       this._initialized = true;
@@ -4508,6 +4509,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store.commit(elementsMap, this.state);
 
+    this.fonts.onStateUpdated(prevState);
+
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
     // init, which would trigger onChange with empty elements, which would then
@@ -4667,29 +4670,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
 
-    duplicatedElements.forEach((newElement) => {
-      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
-        const container = getContainerElement(
-          newElement,
-          this.scene.getElementsMapIncludingDeleted(),
-        );
-        redrawTextBoundingBox(
-          newElement,
-          container,
-          this.scene,
-          this.renderEnvironment,
-        );
-      }
-    });
-
-    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements, this.ownerDocument).then(
-        (fontFaces) => {
-          this.fonts.onLoaded(fontFaces);
-        },
-      );
-    }
+    this.fonts.onElementsInserted(duplicatedElements);
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
@@ -4962,6 +4943,9 @@ class App extends React.Component<AppProps, AppState> {
     return { addedFiles };
   };
 
+  /**
+   * Update the scene with new elements, appState or collaborators.
+   */
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
@@ -5005,6 +4989,11 @@ class App extends React.Component<AppProps, AppState> {
       if (elements) {
         this.scene.replaceAllElements(elements);
       }
+
+      this.fonts.onSceneUpdated(
+        elements,
+        appState as Pick<AppState, "currentItemFontFamily"> | null,
+      );
 
       if (collaborators) {
         this.laserTrails.updateCollabTrails(collaborators);
@@ -10990,6 +10979,8 @@ class App extends React.Component<AppProps, AppState> {
             isLoading: false,
           },
           replaceFiles: true,
+          // a dropped scene's custom fonts are resolved by no one else
+          loadFonts: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
         return true;

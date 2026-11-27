@@ -393,6 +393,14 @@ export class AppText {
           this.app.store.scheduleCapture();
         }
 
+        if (!isDeleted) {
+          // measured just now - in the fallback font, if a font face for what
+          // got typed is still on its way
+          this.app.fonts.repairTextOnFontLoad([element], {
+            keepLineHeight: true,
+          });
+        }
+
         flushSync(() => {
           this.app.setState({
             newElement: null,
@@ -1127,6 +1135,8 @@ export class AppText {
       } else {
         this.app.insertNewElement(element);
       }
+      // typed in the fallback font for now, if its own is still on its way
+      this.app.fonts.repairTextOnFontLoad([element]);
     }
 
     if (arrowEndpoint && arrowEndpointBinding) {

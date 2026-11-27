@@ -66,6 +66,7 @@ import {
 } from "./fixtures/constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { getTextEditor } from "./queries/dom";
 import { INITIALIZED_IMAGE_PROPS } from "./helpers/constants";
 import {
   GlobalTestState,
@@ -145,6 +146,106 @@ describe("history", () => {
   });
 
   describe("singleplayer undo/redo", () => {
+    it("keeps a font repair deferred during a drag out of the drag's undo entry", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      // created before its family is in - bakes in the fallback metrics
+      const text = API.createElement({
+        type: "text",
+        text: "drag me",
+        x: 10,
+        y: 10,
+        fontFamily: "test.historyrepair:Font",
+      });
+      API.updateScene({
+        elements: [text],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      API.setSelectedElements([text]);
+
+      const originalLineHeight = text.lineHeight;
+      expect(originalLineHeight).not.toBe(2);
+
+      // drag the element...
+      mouse.downAt(text.x + text.width / 2, text.y + text.height / 2);
+      mouse.moveTo(text.x + text.width / 2 + 30, text.y + text.height / 2);
+
+      // ...and let its font settle mid-drag - the repair of text measured
+      // before that (see `AppFonts.repairTextOnFontLoad`) must defer, as
+      // mutating mid-gesture would corrupt the gesture's undo entry
+      // (`CaptureUpdateAction.NEVER` outranks the gesture's `EVENTUALLY`)
+      act(() => {
+        h.app.fonts.instance.runSceneRepair(() => {
+          h.app.scene.mutateElement(
+            h.app.scene.getElement(text.id) as ExcalidrawTextElement,
+            { lineHeight: 2 as ExcalidrawTextElement["lineHeight"] },
+          );
+        });
+      });
+      expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(
+        originalLineHeight,
+      );
+
+      mouse.up();
+
+      // the gesture got captured, then the repair ran in its own
+      // non-capturable pass
+      await waitFor(() =>
+        expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2),
+      );
+      expect(h.elements[0].x).not.toBe(10);
+
+      // creation baseline + the drag
+      expect(API.getUndoStack().length).toBe(2);
+      Keyboard.undo();
+
+      // undo reverts the drag - and only the drag; the repair is not part
+      // of its entry
+      expect(h.elements[0].x).toBe(10);
+      expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2);
+    });
+
+    it("keeps a font repair deferred during a text edit out of the edit's undo entry", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      UI.clickTool("text");
+      mouse.clickAt(100, 100);
+      const editor = await getTextEditor();
+      fireEvent.input(editor, { target: { value: "hello" } });
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.text).toBe("hello");
+
+      // its font settles while typing - the repair must defer, as typing
+      // isn't captured until submitted: a `CaptureUpdateAction.NEVER` commit
+      // would take what's been typed into the snapshot, out of undo's reach
+      act(() => {
+        h.app.fonts.instance.runSceneRepair(() => {
+          h.app.scene.mutateElement(
+            h.app.scene.getElement(text.id) as ExcalidrawTextElement,
+            { lineHeight: 2 as ExcalidrawTextElement["lineHeight"] },
+          );
+        });
+      });
+      // (and something commits meanwhile, i.e. the font load's rerender)
+      act(() => {
+        h.app.scene.triggerUpdate();
+      });
+      expect((h.elements[0] as ExcalidrawTextElement).lineHeight).not.toBe(2);
+
+      Keyboard.exitTextEditor(editor);
+
+      // the edit got captured, then the repair ran in its own
+      // non-capturable pass
+      await waitFor(() =>
+        expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(2),
+      );
+      expect(API.getUndoStack().length).toBe(1);
+
+      Keyboard.undo();
+      expect(h.elements[0].isDeleted).toBe(true);
+    });
+
     it("should not collapse when applying corrupted history entry", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       const rect = API.createElement({ type: "rectangle" });

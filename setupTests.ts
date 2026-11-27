@@ -64,6 +64,8 @@ Object.defineProperty(window, "matchMedia", {
 
 Object.defineProperty(window, "FontFace", {
   enumerable: true,
+  // a test of an environment without one takes it away (`vi.stubGlobal`)
+  configurable: true,
   value: class {
     private family: string;
     private source: string;
@@ -87,10 +89,15 @@ Object.defineProperty(window, "FontFace", {
 
 Object.defineProperty(document, "fonts", {
   value: {
-    load: vi.fn().mockResolvedValue([]),
-    check: vi.fn().mockResolvedValue(true),
-    has: vi.fn().mockResolvedValue(true),
+    // an implementation (unlike `mockResolvedValue`) survives a test's
+    // `mockRestore()` - `load` always returns a promise in the browser
+    load: vi.fn(() => Promise.resolve([])),
+    // `check` and `has` are synchronous booleans in the browser - a promise
+    // here would be always-truthy and silently skip loading branches
+    check: vi.fn(() => true),
+    has: vi.fn(() => true),
     add: vi.fn(),
+    delete: vi.fn(),
   },
 });
 

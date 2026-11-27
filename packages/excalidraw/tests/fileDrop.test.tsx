@@ -270,6 +270,50 @@ describe("dropping scenes", () => {
   );
 });
 
+describe("dropping a scene with a custom font", () => {
+  it("resolves the font", async () => {
+    const resolve = vi.fn(async () => ({
+      fontFaces: [{ uri: "https://example.com/font.woff2" }] as const,
+      metadata: {
+        metrics: {
+          unitsPerEm: 1000,
+          ascender: 800,
+          descender: -200,
+          lineHeight: 1.2,
+        },
+      },
+    }));
+    await render(
+      <Excalidraw
+        handleKeyboardGlobally
+        fontProviders={{ "test.drop": { resolve, availableFonts: [] } }}
+      />,
+    );
+    const file = new h.app.ownerWindow.File(
+      [
+        serializeAsJSON(
+          [
+            API.createElement({
+              type: "text",
+              text: "a",
+              fontFamily: "test.drop:Font",
+            }),
+          ],
+          h.state,
+          {},
+          "local",
+        ),
+      ],
+      "scene.excalidraw",
+      { type: MIME_TYPES.json },
+    );
+
+    drag(GlobalTestState.interactiveCanvas, "drop", { files: [file] });
+
+    await waitFor(() => expect(resolve).toHaveBeenCalledWith("Font"));
+  });
+});
+
 describe("ignoring drops", () => {
   it.each([
     ["in view mode", { viewModeEnabled: true }],

@@ -1,8 +1,12 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import {
   applyDarkModeFilter,
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  TEXT_RENDERING,
   THEME,
 } from "@excalidraw/common";
 
@@ -19,7 +23,8 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import { getDefaultAppState } from "../../appState";
 import * as staticSceneModule from "../../renderer/staticScene";
-import { exportScene } from "../../scene/export";
+import { registerFontResolvers } from "../../fonts";
+import { exportScene, serializeSvg } from "../../scene/export";
 
 import { prepareElementsForExport } from "../../data";
 import {
@@ -419,6 +424,168 @@ describe("exportToCanvas", () => {
     ]);
     getContextSpy.mockRestore();
   });
+
+  it("draws text with the setting it's measured with", async () => {
+    const renderingWhenDrawn: string[] = [];
+    const fillTextSpy = vi
+      .spyOn(CanvasRenderingContext2D.prototype, "fillText")
+      .mockImplementation(function (this: CanvasRenderingContext2D) {
+        renderingWhenDrawn.push(this.textRendering);
+      });
+
+    await exportScene({
+      type: "canvas",
+      data: {
+        elements: [API.createElement({ type: "text", text: "A V A T A R" })],
+        files: null,
+      },
+    });
+
+    expect(renderingWhenDrawn).toEqual([TEXT_RENDERING]);
+    fillTextSpy.mockRestore();
+  });
+});
+
+describe("registerFontResolvers", () => {
+  const METADATA = {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 800,
+      descender: -200,
+      lineHeight: 1.2,
+    },
+  };
+  const createResolver = () =>
+    vi.fn(async () => ({
+      fontFaces: [{ uri: "https://example.com/font.woff2" }] as const,
+      metadata: METADATA,
+    }));
+
+  const exportText = (
+    fontFamily: string,
+    fontResolvers?: Parameters<typeof registerFontResolvers>[0],
+  ) =>
+    exportScene({
+      type: "svg",
+      data: {
+        elements: [
+          API.createElement({
+            type: "text",
+            text: "a",
+            fontFamily: fontFamily as `${string}:${string}`,
+          }),
+        ],
+        appState: {},
+        files: null,
+      },
+      config: { skipInliningFonts: true, fontResolvers },
+    });
+
+  it("resolves custom fonts in every export, until taken back", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const resolver = createResolver();
+    const unregister = registerFontResolvers({ "test.registered": resolver });
+
+    await exportText("test.registered:First");
+    expect(resolver).toHaveBeenCalledWith("First");
+    expect(warn).not.toHaveBeenCalled();
+
+    unregister();
+    await exportText("test.registered:Second");
+    expect(resolver).toHaveBeenCalledTimes(1);
+    // nothing supplies the font any more - that isn't silent
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it("doesn't resolve the font of a deleted element", async () => {
+    const resolver = createResolver();
+
+    await exportScene({
+      type: "svg",
+      data: {
+        elements: [
+          API.createElement({
+            type: "text",
+            text: "a",
+            fontFamily: "test.deleted:Gone",
+            isDeleted: true,
+          }),
+        ],
+        appState: {},
+        files: null,
+      },
+      config: {
+        skipInliningFonts: true,
+        fontResolvers: { "test.deleted": resolver },
+      },
+    });
+
+    expect(resolver).not.toHaveBeenCalled();
+  });
+
+  it("lets a resolver passed to the export win", async () => {
+    const registered = createResolver();
+    const passed = createResolver();
+    const unregister = registerFontResolvers({ "test.override": registered });
+
+    await exportText("test.override:Font", { "test.override": passed });
+
+    expect(passed).toHaveBeenCalledWith("Font");
+    expect(registered).not.toHaveBeenCalled();
+    unregister();
+  });
+
+  it("is shared with another copy of the package in the realm", async () => {
+    const resolver = createResolver();
+    const unregister = registerFontResolvers({ "test.shared": resolver });
+
+    // i.e. `@excalidraw/utils`, or a second bundle - loaded later, at that
+    vi.resetModules();
+    const otherCopy = await import("../../fonts/resolvers");
+
+    expect(otherCopy.registerFontResolvers).not.toBe(registerFontResolvers);
+    expect(otherCopy.getExportFontResolvers()).toMatchObject({
+      "test.shared": resolver,
+    });
+    unregister();
+    expect(otherCopy.getExportFontResolvers()).not.toHaveProperty(
+      "test.shared",
+    );
+  });
+
+  it("rejects a provider key the editor wouldn't accept", () => {
+    expect(() => registerFontResolvers({ acme: createResolver() })).toThrow(
+      "Invalid font provider key",
+    );
+  });
+});
+
+describe("serializeSvg", () => {
+  it("serializes a non-breaking space as XML can parse it", async () => {
+    const svg = await exportScene({
+      type: "svg",
+      data: {
+        // the entity typed out must survive as text
+        elements: [
+          API.createElement({ type: "text", text: "a\u00a0b &nbsp; c" }),
+        ],
+        appState: {},
+        files: null,
+      },
+      config: { skipInliningFonts: true },
+    });
+
+    // HTML serialization writes `&nbsp;`, an entity XML doesn't define
+    expect(svg.outerHTML).toContain("&nbsp;");
+
+    const markup = serializeSvg(svg);
+    expect(markup).toContain("a&#160;b &amp;nbsp; c");
+
+    const parsed = new DOMParser().parseFromString(markup, "image/svg+xml");
+    expect(parsed.querySelector("parsererror")).toBe(null);
+    expect(parsed.querySelector("text")?.textContent).toBe("a\u00a0b &nbsp; c");
+  });
 });
 
 describe("export background", () => {
@@ -612,6 +779,99 @@ describe("export inputs", () => {
       consoleWarn.mockRestore();
     });
 
+    it.each([
+      ["a local font", FONT_FAMILY.Helvetica],
+      ["a font of a provider nobody configured", "test.unconfigured:Brand"],
+      ["a font a configured resolver supplies", "test.headless:Brand"],
+    ] as const)("needs no `FontFace` either, for %s", async (_, fontFamily) => {
+      const consoleWarn = vi
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      const ownerDocument = document.implementation.createHTMLDocument();
+      vi.stubGlobal("document", ownerDocument);
+      vi.stubGlobal("FontFace", undefined);
+      const loadFonts = vi.fn(async () => {});
+
+      // twice: the second export finds the resolved family registered
+      for (let i = 0; i < 2; i++) {
+        const svg = await exportScene({
+          type: "svg",
+          data: {
+            elements: [
+              API.createElement({ type: "text", text: "hi", fontFamily }),
+            ],
+          },
+          config: {
+            skipInliningFonts: true,
+            fontResolvers: {
+              "test.headless": async () => ({
+                fontFaces: [{ uri: "https://example.com/font.woff2" }],
+                metadata: {
+                  metrics: {
+                    unitsPerEm: 1000,
+                    ascender: 800,
+                    descender: -200,
+                    lineHeight: 1.2,
+                  },
+                },
+              }),
+            },
+            environment: { document: ownerDocument, loadFonts },
+          },
+        });
+
+        expect(svg.querySelector("text")?.textContent).toBe("hi");
+      }
+      expect(loadFonts).toHaveBeenCalledTimes(2);
+      consoleWarn.mockRestore();
+    });
+
+    it("embeds a resolved font with no `window`, `document` or `FontFace` at all (i.e. Node)", async () => {
+      // the export is handed the document to build the SVG in
+      const ownerDocument = document.implementation.createHTMLDocument();
+      const font = readFileSync(
+        path.resolve(__dirname, "../../fonts/Virgil/Virgil-Regular.woff2"),
+      );
+      const element = API.createElement({
+        type: "text",
+        text: "hi",
+        fontFamily: "test.node:Virgil",
+      });
+      vi.stubGlobal("FontFace", undefined);
+      vi.stubGlobal("window", undefined);
+      vi.stubGlobal("document", undefined);
+      vi.stubGlobal("self", undefined);
+
+      const svg = await exportScene({
+        type: "svg",
+        data: { elements: [element] },
+        config: {
+          fontResolvers: {
+            // a face without a `unicodeRange`
+            "test.node": async () => ({
+              fontFaces: [
+                { uri: `data:font/woff2;base64,${font.toString("base64")}` },
+              ],
+              metadata: {
+                metrics: {
+                  unitsPerEm: 1000,
+                  ascender: 800,
+                  descender: -200,
+                  lineHeight: 1.25,
+                },
+              },
+            }),
+          },
+          environment: { document: ownerDocument, loadFonts: async () => {} },
+        },
+      });
+
+      expect(svg.querySelector("text")?.textContent).toBe("hi");
+      expect(svg.querySelector("style.style-fonts")?.textContent).toMatch(
+        /@font-face.*url\(data:/,
+      );
+    });
+
     it("loads fonts into a worker's own font set", async () => {
       const fonts = {
         has: () => true,
@@ -632,6 +892,25 @@ describe("export inputs", () => {
         "hi",
       );
     });
+  });
+
+  it("loads fonts into the document it's given (e.g. a popout window's)", async () => {
+    const ownerDocument = document.implementation.createHTMLDocument();
+    const load = vi.fn(async () => []);
+    Object.defineProperty(ownerDocument, "fonts", {
+      value: { has: () => true, add: vi.fn(), check: () => false, load },
+    });
+
+    await exportScene({
+      type: "svg",
+      data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      config: { environment: { document: ownerDocument } },
+    });
+
+    expect(load).toHaveBeenCalledWith(
+      expect.stringContaining("Excalifont"),
+      "hi",
+    );
   });
 
   it("renders frame decorations per config.frames", async () => {

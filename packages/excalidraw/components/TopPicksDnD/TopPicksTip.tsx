@@ -6,7 +6,8 @@ import { t } from "../../i18n";
 
 /**
  * "drag to pin" hint shown in a picker popup whose top picks are
- * customizable — with a reset link while the picks are customized
+ * customizable — with a reset link while the picks are customized. A host may
+ * put its own text in place of the hint (see `fontPickerTip`), or none.
  */
 export const TopPicksTip = ({
   className,
@@ -15,7 +16,7 @@ export const TopPicksTip = ({
   resetTitle,
 }: {
   className?: string;
-  tip: string;
+  tip: React.ReactNode;
   /** present only while the top picks are customized */
   onReset?: () => void;
   resetTitle: string;
@@ -24,7 +25,7 @@ export const TopPicksTip = ({
     {tip}
     {onReset && (
       <>
-        {" · "}
+        {tip != null && tip !== false && tip !== "" && " · "}
         <button
           type="button"
           className="top-picks-dnd__tip-reset"

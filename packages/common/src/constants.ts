@@ -1,7 +1,4 @@
-import type {
-  ExcalidrawElement,
-  FontFamilyValues,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type {
   AppProps,
   AppState,
@@ -156,6 +153,131 @@ export const FONT_FAMILY = {
   Assistant: 10,
 };
 
+/** separates the provider id from the family name, i.e. "google:Roboto" */
+export const FONT_PROVIDER_SEPARATOR = ":";
+
+/**
+ * A custom font family, qualified by the provider able to resolve it.
+ *
+ * WARN: the type only enforces the separator's presence - either side may
+ * still be empty (i.e. ":Roboto"), so anything trusting the parts has to go
+ * through {@link parseProviderFontFamily} regardless.
+ */
+export type CustomFontFamily =
+  `${string}${typeof FONT_PROVIDER_SEPARATOR}${string}`;
+
+/** numeric id for built-ins ({@link FONT_FAMILY}), qualified name for custom */
+export type FontFamily = number | CustomFontFamily;
+
+/**
+ * Whether the family is a custom one, i.e. "google:Roboto".
+ *
+ * WARN: only tells built-in from custom - not whether the family is
+ * well-formed, let alone resolvable. Use {@link parseProviderFontFamily} for
+ * anything which needs the provider.
+ */
+export const isCustomFontFamily = (
+  fontFamily: FontFamily,
+): fontFamily is CustomFontFamily => typeof fontFamily === "string";
+
+/** whether the family is a built-in one (see {@link FONT_FAMILY}) */
+export const isBuiltInFontFamily = (
+  fontFamily: FontFamily,
+): fontFamily is number => typeof fontFamily === "number";
+
+/**
+ * Parse a provider-qualified custom font family, i.e. "google:Roboto". Splits
+ * on the first separator, so family names may contain one themselves.
+ *
+ * @returns `null` when the separator is missing, leading (":Roboto") or
+ * trailing ("google:")
+ */
+export const parseProviderFontFamily = (
+  fontFamily: string,
+): { providerId: string; familyName: string } | null => {
+  const separatorIndex = fontFamily.indexOf(FONT_PROVIDER_SEPARATOR);
+
+  if (separatorIndex <= 0 || separatorIndex === fontFamily.length - 1) {
+    return null;
+  }
+
+  return {
+    providerId: fontFamily.slice(0, separatorIndex),
+    familyName: fontFamily.slice(separatorIndex + 1),
+  };
+};
+
+/**
+ * Type-guard flavor of {@link parseProviderFontFamily}, for narrowing plain
+ * strings at data boundaries (i.e. restored documents, DOM round-trips).
+ */
+export const isProviderQualifiedFontFamily = (
+  fontFamily: string,
+): fontFamily is CustomFontFamily =>
+  parseProviderFontFamily(fontFamily) !== null;
+
+/** build a provider-qualified custom font family from its parts */
+export const createProviderFontFamily = (
+  providerId: string,
+  familyName: string,
+): CustomFontFamily => `${providerId}${FONT_PROVIDER_SEPARATOR}${familyName}`;
+
+const CSS_FONT_FAMILY_PREFIX = "xf-";
+const CSS_FONT_FAMILY_SLUG_LENGTH = 40;
+
+/** per page, as it's asked for on every text measure & render */
+const cssFontFamilies = new Map<string, string>();
+
+/** 32-bit FNV-1a over UTF-16 code units, so lone surrogates stay distinct */
+const hashFontFamily = (fontFamily: string) => {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < fontFamily.length; i++) {
+    hash ^= fontFamily.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+};
+
+/**
+ * The CSS family name a custom font is registered and referred to by, i.e.
+ * "google:Press Start 2P" -> "xf-press-start-2p-b5b3c1d0".
+ *
+ * The persisted id itself never reaches CSS, canvas or SVG. That is what lets
+ * its family part be any string (as `text` can): CSS matches family names
+ * case-insensitively and has its own escaping, so ids differing only by case
+ * would share a font, and control characters, quotes or a lone surrogate
+ * would match no font at all. The result is a plain CSS identifier - nothing
+ * to quote or escape anywhere it ends up.
+ *
+ * - prefix: keeps a bare name (i.e. "Nunito") from matching an installed or
+ *   built-in font
+ * - slug: the family part, for readability only
+ * - hash: of the whole id, which is what makes the name unique
+ *
+ * WARN: one-way and never persisted, so the format is free to change - don't
+ * parse it back into an id, and don't store it.
+ */
+export const getCustomFontCSSFamily = (fontFamily: string): string => {
+  let cssFamily = cssFontFamilies.get(fontFamily);
+
+  if (cssFamily === undefined) {
+    const familyName =
+      parseProviderFontFamily(fontFamily)?.familyName ?? fontFamily;
+    const slug = familyName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .slice(0, CSS_FONT_FAMILY_SLUG_LENGTH)
+      .replace(/^-+|-+$/g, "");
+
+    cssFamily = `${CSS_FONT_FAMILY_PREFIX}${
+      slug ? `${slug}-` : ""
+    }${hashFontFamily(fontFamily)}`;
+    cssFontFamilies.set(fontFamily, cssFamily);
+  }
+
+  return cssFamily;
+};
+
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it
 export const SANS_SERIF_GENERIC_FONT = "sans-serif";
@@ -173,7 +295,7 @@ export const FONT_FAMILY_FALLBACKS = {
 };
 
 export function getGenericFontFamilyFallback(
-  fontFamily: number,
+  fontFamily: FontFamily,
 ): keyof typeof FONT_FAMILY_GENERIC_FALLBACKS {
   switch (fontFamily) {
     case FONT_FAMILY.Cascadia:
@@ -186,7 +308,7 @@ export function getGenericFontFamilyFallback(
 }
 
 export const getFontFamilyFallbacks = (
-  fontFamily: number,
+  fontFamily: FontFamily,
 ): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
   const genericFallbackFont = getGenericFontFamilyFallback(fontFamily);
 
@@ -271,13 +393,34 @@ export const STICKY_NOTE_SHADOW_OFFSET = 3;
 export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
 export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
 export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+export const DEFAULT_FONT_FAMILY = FONT_FAMILY.Excalifont;
 /** number of slots in the font-picker top-picks strip — pick customization
  * (replace / reorder) preserves it. Must equal `DEFAULT_FONTS.length` in
  * `packages/excalidraw/components/FontPicker/FontPicker.tsx` (enforced by
  * `fontTopPicks.test.ts`) */
 export const FONT_TOP_PICKS_SLOTS = 3;
 export const DEFAULT_TEXT_ALIGN = "left";
+
+/**
+ * How a canvas shapes the text it measures or draws.
+ *
+ * Left on the default (`auto`), Chrome's canvas shapes a line word by word,
+ * where its text editor (the DOM) lays the line out as a whole. Two things
+ * then differ between the two, and the same text wraps at different words:
+ *
+ * - the kerning between a letter and a space is left out on canvas, so a
+ *   line such as "A V A T A R" is several px wider there;
+ * - a font which picks a letter's shape by what's around it, across spaces
+ *   too (i.e. Caveat), comes out several px a line wider or narrower.
+ *
+ * `optimizeLegibility` has the canvas shape the line as a whole as well.
+ *
+ * For the canvas only: the DOM, Firefox's canvas and skia-canvas shape whole
+ * lines as it is. Kerning itself (`font-kerning`) is left on the browser's
+ * default everywhere: set to `normal`, Firefox also closes up Japanese and
+ * Chinese text.
+ */
+export const TEXT_RENDERING = "optimizeLegibility";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;

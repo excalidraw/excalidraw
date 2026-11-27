@@ -28,6 +28,7 @@ import {
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
+  TEXT_RENDERING,
   STICKY_NOTE_SHADOW_OPACITY,
   DEFAULT_ZOOM,
 } from "@excalidraw/common";
@@ -676,6 +677,7 @@ const drawElementOnCanvas = (
         }
         withSavedContext(context, () => {
           context.font = getFontString(element);
+          context.textRendering = TEXT_RENDERING;
           context.fillStyle = applyDarkModeFilter(
             element.strokeColor,
             renderConfig.theme === THEME.DARK,
@@ -1037,6 +1039,16 @@ export const renderElement = (
     allElementsMap,
   ),
 ) => {
+  // its font is still loading - drawn once it arrives (or its block period
+  // runs out), instead of flashing in the fallback font first
+  if (
+    isTextElement(element) &&
+    !renderConfig.isExporting &&
+    renderConfig.isFontBlocked?.(element.fontFamily)
+  ) {
+    return;
+  }
+
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&
