@@ -15,6 +15,7 @@ import {
   isArrowElement,
   isElbowArrow,
   isLinearElement,
+  isNonDeletedElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
@@ -57,6 +58,8 @@ import {
 import { ShapeCache } from "@excalidraw/element";
 
 import {
+  bindBindingElement,
+  calculateFixedPointForElbowArrowBinding,
   isBindableElement,
   reanchorBindingsToOutline,
   updateBindings,
@@ -66,7 +69,9 @@ import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
   ConvertibleTypes,
+  ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
@@ -74,6 +79,7 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
+  FixedPointBinding,
   FixedSegment,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -120,6 +126,19 @@ const LINEAR_TYPES = [
   "curvedArrow",
   "elbowArrow",
 ] as const;
+
+// lines can neither bind to shapes nor carry a label, so bound or labeled
+// arrows may only switch between the arrow types
+const ARROW_ONLY_TYPES = LINEAR_TYPES.filter((type) => type !== "line");
+
+const isArrowOnlyElement = (element: ExcalidrawElement) =>
+  isArrowElement(element) &&
+  (isArrowBoundToElement(element) || hasBoundTextElement(element));
+
+const getAvailableLinearTypes = (
+  elements: readonly ExcalidrawElement[],
+): readonly ConvertibleLinearTypes[] =>
+  elements.some(isArrowOnlyElement) ? ARROW_ONLY_TYPES : LINEAR_TYPES;
 
 const CONVERTIBLE_GENERIC_TYPES: ReadonlySet<ConvertibleGenericTypes> = new Set(
   GENERIC_TYPES,
@@ -298,14 +317,18 @@ const Panel = ({
     }
   }, [genericElements, app.scene]);
 
+  const availableLinearTypes = getAvailableLinearTypes(linearElements);
+
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
+      ? (
+          [
+            ["line", LineIcon],
+            ["sharpArrow", sharpArrowIcon],
+            ["curvedArrow", roundArrowIcon],
+            ["elbowArrow", elbowArrowIcon],
+          ] as [ConvertibleLinearTypes, ReactNode][]
+        ).filter(([type]) => availableLinearTypes.includes(type))
       : conversionType === "generic"
       ? [
           ["rectangle", RectangleIcon],
@@ -528,6 +551,16 @@ export const convertElementTypes = (
   if (conversionType === "linear") {
     const convertibleLinearElements =
       filterLinearConvertibleElements(selectedElements);
+    const availableLinearTypes = getAvailableLinearTypes(
+      convertibleLinearElements,
+    );
+
+    if (
+      nextType === "line" &&
+      convertibleLinearElements.some(isArrowOnlyElement)
+    ) {
+      return false;
+    }
 
     if (!nextType) {
       const commonSubType = reduceToCommonValue(
@@ -535,10 +568,13 @@ export const convertElementTypes = (
         getLinearElementSubType,
       );
 
-      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
+      const index = commonSubType
+        ? availableLinearTypes.indexOf(commonSubType)
+        : -1;
       nextType =
-        LINEAR_TYPES[
-          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
+        availableLinearTypes[
+          (index + availableLinearTypes.length + advancement) %
+            availableLinearTypes.length
         ];
     }
 
@@ -589,16 +625,19 @@ export const convertElementTypes = (
                 index: i + 1,
               });
             }
-            const updates = updateElbowArrowPoints(
-              element,
-              app.scene.getNonDeletedElementsMap(),
-              {
-                points: nextPoints,
-                fixedSegments,
-              },
-            );
-            mutateElement(element, app.scene.getNonDeletedElementsMap(), {
+            const elementsMap = app.scene.getNonDeletedElementsMap();
+            const startBinding = getElbowArrowBinding(element, "start", app);
+            const endBinding = getElbowArrowBinding(element, "end", app);
+            const updates = updateElbowArrowPoints(element, elementsMap, {
+              points: nextPoints,
+              fixedSegments,
+              startBinding,
+              endBinding,
+            });
+            mutateElement(element, elementsMap, {
               ...updates,
+              startBinding,
+              endBinding,
               endArrowhead: "arrow",
             });
           } else {
@@ -620,6 +659,23 @@ export const convertElementTypes = (
                 points,
               });
             }
+
+            if (isArrowElement(element)) {
+              rebindArrowEnds(element, app);
+            }
+          }
+
+          const boundText = getBoundTextElement(
+            element,
+            app.scene.getNonDeletedElementsMap(),
+          );
+          if (boundText) {
+            redrawTextBoundingBox(
+              boundText,
+              element,
+              app.scene,
+              app.renderEnvironment,
+            );
           }
         }
       }
@@ -672,12 +728,68 @@ export const getConversionTypeFromElements = (
   return null;
 };
 
-const isEligibleLinearElement = (element: ExcalidrawElement) => {
-  return (
-    isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
-  );
+const isEligibleLinearElement = (element: ExcalidrawElement) =>
+  isLinearElement(element);
+
+// newArrowElement() drops bindings, so the converted arrow carries them over
+// and they're re-snapped here to the bound shapes' outlines
+const getElbowArrowBinding = (
+  arrow: ExcalidrawElbowArrowElement,
+  startOrEnd: "start" | "end",
+  app: AppClassProperties,
+): FixedPointBinding | null => {
+  const binding =
+    startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const bindableElement = binding && elementsMap.get(binding.elementId);
+
+  if (
+    !bindableElement ||
+    !isBindableElement(bindableElement) ||
+    !isNonDeletedElement(arrow)
+  ) {
+    return null;
+  }
+
+  return {
+    ...binding,
+    ...calculateFixedPointForElbowArrowBinding(
+      arrow,
+      bindableElement,
+      startOrEnd,
+      elementsMap,
+      app.state.zoom,
+      app.state.isBindingEnabled,
+    ),
+  };
+};
+
+const rebindArrowEnds = (
+  arrow: ExcalidrawArrowElement,
+  app: AppClassProperties,
+) => {
+  if (!isNonDeletedElement(arrow)) {
+    return;
+  }
+
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+
+  for (const startOrEnd of ["start", "end"] as const) {
+    const binding =
+      startOrEnd === "start" ? arrow.startBinding : arrow.endBinding;
+    const bindableElement = binding && elementsMap.get(binding.elementId);
+
+    if (bindableElement && isBindableElement(bindableElement)) {
+      bindBindingElement(
+        arrow,
+        bindableElement,
+        binding.mode,
+        startOrEnd,
+        app.scene,
+        app.state.zoom,
+      );
+    }
+  }
 };
 
 const toCacheKey = (
@@ -881,6 +993,9 @@ const convertElementType = <
   }
 
   if (isConvertibleLinearType(targetType)) {
+    const startBinding = isLinearElement(element) ? element.startBinding : null;
+    const endBinding = isLinearElement(element) ? element.endBinding : null;
+
     switch (targetType) {
       case "line": {
         return bumpVersion(
@@ -891,8 +1006,8 @@ const convertElementType = <
         );
       }
       case "sharpArrow": {
-        return bumpVersion(
-          newArrowElement({
+        return bumpVersion({
+          ...newArrowElement({
             ...element,
             type: "arrow",
             elbowed: false,
@@ -900,11 +1015,13 @@ const convertElementType = <
             startArrowhead: app.state.currentItemStartArrowhead,
             endArrowhead: app.state.currentItemEndArrowhead,
           }),
-        );
+          startBinding,
+          endBinding,
+        });
       }
       case "curvedArrow": {
-        return bumpVersion(
-          newArrowElement({
+        return bumpVersion({
+          ...newArrowElement({
             ...element,
             type: "arrow",
             elbowed: false,
@@ -914,18 +1031,22 @@ const convertElementType = <
             startArrowhead: app.state.currentItemStartArrowhead,
             endArrowhead: app.state.currentItemEndArrowhead,
           }),
-        );
+          startBinding,
+          endBinding,
+        });
       }
       case "elbowArrow": {
-        return bumpVersion(
-          newArrowElement({
+        return bumpVersion({
+          ...newArrowElement({
             ...element,
             type: "arrow",
             elbowed: true,
             fixedSegments: null,
             roundness: null,
           }),
-        );
+          startBinding,
+          endBinding,
+        });
       }
     }
   }
