@@ -348,6 +348,11 @@ export class AppText {
           });
         }
       }),
+      onCancel: withBatchedUpdates(() => {
+        this.textWysiwygSubmitHandler = null;
+        this.app.setState({ newElement: null, editingTextElement: null });
+        this.app.focusContainer();
+      }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         this.textWysiwygSubmitHandler = null;
 

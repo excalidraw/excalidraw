@@ -7,6 +7,7 @@ import {
   getOriginalContainerHeightFromCache,
   isTextElement,
   newElementWith,
+  CaptureUpdateAction,
 } from "@excalidraw/element";
 
 import {
@@ -50,11 +51,15 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
 import * as dataModule from "../data";
+import { reconcileElements } from "../data/reconcile";
+
 import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getTextAutoResizeHandle } from "../textAutoResizeHandle";
 
 import { CARET_FOLLOW_PADDING } from "./textWysiwyg";
+
+import type { RemoteExcalidrawElement } from "../data/reconcile";
 
 const { h } = window;
 
@@ -97,6 +102,82 @@ const exitTextEditorAndAssertSelection = async ({
 };
 
 describe("textWysiwyg", () => {
+  describe("remote deletion during editing", () => {
+    it.each(["free", "bound", "removed"])(
+      "cancels %s text without submitting stale content",
+      async (kind) => {
+        await render(<Excalidraw handleKeyboardGlobally={true} />);
+        const container = API.createElement({
+          type: "rectangle",
+          id: "container",
+          boundElements: [{ type: "text", id: "T" }],
+        });
+        const text = API.createElement({
+          type: "text",
+          id: "T",
+          text: "original",
+          containerId: kind === "bound" ? container.id : null,
+        });
+        API.setElements(kind === "bound" ? [container, text] : [text]);
+        API.setSelectedElements([text]);
+        Keyboard.keyPress(KEYS.ENTER);
+        const editor = await getTextEditor();
+        updateTextEditor(editor, "local edit");
+        const staleInput = editor.oninput!;
+        const staleSubmit = h.app.text.textWysiwygSubmitHandler!;
+        const undoCount = API.getUndoStack().length;
+        const current = h.elements.find((el) => el.id === text.id)!;
+        const tombstone = newElementWith(current, {
+          isDeleted: true,
+        }) as RemoteExcalidrawElement;
+        API.updateScene({
+          elements:
+            kind === "removed"
+              ? []
+              : reconcileElements(
+                  h.app.scene.getElementsIncludingDeleted(),
+                  [tombstone],
+                  h.state,
+                ),
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+        await waitFor(() => expect(editor.isConnected).toBe(false));
+        expect(h.state.editingTextElement).toBeNull();
+        expect(h.app.text.textWysiwygSubmitHandler).toBeNull();
+        const scene = h.elements.map((el) => ({ ...el }));
+        act(() => {
+          editor.value = "late input";
+          staleInput.call(editor, new h.app.ownerWindow.InputEvent("input"));
+          staleSubmit();
+          fireEvent.blur(editor);
+        });
+        expect(h.elements).toEqual(scene);
+        expect(API.getUndoStack()).toHaveLength(undoCount);
+        expect(h.state.selectedElementIds[text.id]).toBeFalsy();
+        if (kind !== "removed") {
+          expect(h.elements.find((el) => el.id === text.id)).toEqual(tombstone);
+        }
+      },
+    );
+
+    it("allows clearing and retyping text before a normal submit", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const text = API.createElement({ type: "text", text: "original" });
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "");
+      updateTextEditor(editor, "replacement");
+      Keyboard.exitTextEditor(editor);
+      expect(h.elements[0]).toEqual(
+        expect.objectContaining({
+          originalText: "replacement",
+          isDeleted: false,
+        }),
+      );
+    });
+  });
   describe("start text editing", () => {
     const { h } = window;
     beforeEach(async () => {

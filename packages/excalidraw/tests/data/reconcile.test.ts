@@ -9,6 +9,8 @@ import type {
 
 import { reconcileElements } from "../../data/reconcile";
 
+import { API } from "../helpers/api";
+
 import type { RemoteExcalidrawElement } from "../../data/reconcile";
 
 import type { AppState } from "../../types";
@@ -137,6 +139,105 @@ const test = <U extends `${string}:${"L" | "R"}`>(
 };
 
 describe("elements reconciliation", () => {
+  describe.each([
+    "editingTextElement",
+    "resizingElement",
+    "newElement",
+  ] as const)("%s conflicts with deletions", (interaction) => {
+    it.each([
+      {
+        localVersion: 1,
+        remoteVersion: 2,
+        localNonce: 10,
+        remoteNonce: 20,
+        remoteWins: true,
+      },
+      {
+        localVersion: 3,
+        remoteVersion: 2,
+        localNonce: 10,
+        remoteNonce: 20,
+        remoteWins: false,
+      },
+      {
+        localVersion: 2,
+        remoteVersion: 2,
+        localNonce: 20,
+        remoteNonce: 10,
+        remoteWins: true,
+      },
+      {
+        localVersion: 2,
+        remoteVersion: 2,
+        localNonce: 10,
+        remoteNonce: 20,
+        remoteWins: false,
+      },
+      {
+        localVersion: 2,
+        remoteVersion: 2,
+        localNonce: 10,
+        remoteNonce: 10,
+        remoteWins: false,
+      },
+    ])(
+      "uses version ordering: %j",
+      ({
+        localVersion,
+        remoteVersion,
+        localNonce,
+        remoteNonce,
+        remoteWins,
+      }) => {
+        for (const localDeleted of [false, true]) {
+          const [base] = syncInvalidIndices([
+            API.createElement({
+              type: "text",
+              id: "T",
+              text: "local",
+              isDeleted: localDeleted,
+            }),
+          ]);
+          const local = {
+            ...base,
+            version: localVersion,
+            versionNonce: localNonce,
+          };
+          const remote = {
+            ...local,
+            text: "remote",
+            version: remoteVersion,
+            versionNonce: remoteNonce,
+            isDeleted: !localDeleted,
+          } as RemoteExcalidrawElement;
+          const state = { [interaction]: local } as unknown as AppState;
+          expect(reconcileElements([local], [remote], state)).toEqual([
+            remoteWins ? remote : local,
+          ]);
+          // Without an ongoing interaction the result must be identical.
+          expect(reconcileElements([local], [remote], {} as AppState)).toEqual([
+            remoteWins ? remote : local,
+          ]);
+        }
+      },
+    );
+
+    it("preserves the existing policy for interactions between active elements", () => {
+      const [local] = syncInvalidIndices([
+        API.createElement({ type: "text", text: "local" }),
+      ]);
+      const remote = {
+        ...local,
+        text: "remote",
+        version: local.version + 1,
+      } as RemoteExcalidrawElement;
+      expect(
+        reconcileElements([local], [remote], {
+          [interaction]: local,
+        } as unknown as AppState),
+      ).toEqual([interaction === "editingTextElement" ? remote : local]);
+    });
+  });
   it("reconcileElements()", () => {
     // -------------------------------------------------------------------------
     //
