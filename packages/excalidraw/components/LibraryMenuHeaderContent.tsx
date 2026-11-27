@@ -6,7 +6,7 @@ import { muteFSAbortError } from "@excalidraw/common";
 import { useUIAppState } from "../context/ui-appState";
 import { fileOpen } from "../data/filesystem";
 import { saveLibraryAsJSON } from "../data/json";
-import { libraryItemsAtom } from "../data/library";
+import { libraryItemsAtom, loadLibraryFromBlobs } from "../data/library";
 import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
@@ -165,7 +165,8 @@ export const LibraryDropdownMenuButton: React.FC<{
           /*
             extensions: [".json", ".excalidrawlib"],
             */
-        }),
+          multiple: true,
+        }).then((files) => loadLibraryFromBlobs(files)),
         merge: true,
         openLibraryMenu: true,
       });
