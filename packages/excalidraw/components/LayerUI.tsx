@@ -749,6 +749,7 @@ const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
     snapLines,
     originSnapOffset,
     suggestedBinding,
+    textToolHover,
     frameToHighlight,
     elementsToHighlight,
     ...ret
