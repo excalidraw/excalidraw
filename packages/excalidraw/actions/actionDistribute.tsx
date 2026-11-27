@@ -76,6 +76,10 @@ export const distributeHorizontally = register({
   label: "labels.distributeHorizontally",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    if (!enableActionGroup(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: distributeSelectedElements(elements, appState, app, {
@@ -107,6 +111,10 @@ export const distributeVertically = register({
   label: "labels.distributeVertically",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    if (!enableActionGroup(appState, app)) {
+      return false;
+    }
+
     return {
       appState,
       elements: distributeSelectedElements(elements, appState, app, {
