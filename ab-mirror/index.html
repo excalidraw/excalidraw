@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Excalidraw A/B mirror</title>
+    <link rel="stylesheet" href="./harness.css" />
+  </head>
+  <body>
+    <header id="bar">
+      <strong class="title">A/B mirror</strong>
+      <label title="Replay input from the pane you use into the other pane">
+        <input type="checkbox" id="mirror" checked /> Mirror input
+      </label>
+      <label
+        title="Draw the other pane's version of each differing arrow (dashed)"
+      >
+        <input type="checkbox" id="ghosts" checked /> Ghosts
+      </label>
+      <span class="sep"></span>
+      <button
+        id="copy-lr"
+        title="Copy the left scene into the right as-is (resync after drift)"
+      >
+        Copy L→R
+      </button>
+      <button
+        id="copy-rl"
+        title="Copy the right scene into the left as-is (resync after drift)"
+      >
+        Copy R→L
+      </button>
+      <button
+        id="reroute-lr"
+        title="Copy the left scene (incl. bindings) into the right, then let the right's code re-route every elbow arrow"
+      >
+        L→R + re-route
+      </button>
+      <button
+        id="reroute-rl"
+        title="Copy the right scene (incl. bindings) into the left, then let the left's code re-route every elbow arrow"
+      >
+        R→L + re-route
+      </button>
+      <button
+        id="reroute-both"
+        title="Each pane re-routes its own elbow arrows from its own bindings"
+      >
+        Re-route both
+      </button>
+      <span class="sep"></span>
+      <button
+        id="load"
+        title="Load a .excalidraw file into both panes; both then re-route their elbow arrows"
+      >
+        Load…
+      </button>
+      <button
+        id="restore"
+        title="Load the autosaved left scene (kept across reloads) into both panes; both then re-route"
+      >
+        Restore
+      </button>
+      <button id="save-left">Save L</button>
+      <button id="save-right">Save R</button>
+      <button id="clear">Clear</button>
+      <input
+        type="file"
+        id="file"
+        accept=".excalidraw,.json,application/json"
+        hidden
+      />
+      <span id="status"></span>
+    </header>
+
+    <main id="panes">
+      <section class="pane" data-side="left">
+        <div class="pane-label"></div>
+        <div class="frame-wrap">
+          <iframe title="left editor"></iframe>
+          <svg class="ghosts"></svg>
+          <div class="cursor" hidden></div>
+        </div>
+      </section>
+      <section class="pane" data-side="right">
+        <div class="pane-label"></div>
+        <div class="frame-wrap">
+          <iframe title="right editor"></iframe>
+          <svg class="ghosts"></svg>
+          <div class="cursor" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="report">
+      <div id="diff">
+        <div id="diff-summary">loading…</div>
+        <ol id="diff-list"></ol>
+      </div>
+      <ol id="log"></ol>
+    </footer>
+
+    <script type="module" src="./harness.ts"></script>
+  </body>
+</html>

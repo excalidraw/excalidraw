@@ -9,3 +9,6 @@ packages/excalidraw/types
 examples/**/public
 dev-dist
 coverage
+# yarn ab snapshots + its Vite cache (also keeps `yarn prettier` out of them)
+ab-mirror/.cache
+ab-mirror/.vite

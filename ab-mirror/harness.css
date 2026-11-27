@@ -1,0 +1,265 @@
+:root {
+  --bg: #f4f4f6;
+  --panel: #ffffff;
+  --text: #1b1b1f;
+  --muted: #6b6b76;
+  --border: #d9d9e0;
+  --accent: #6965db;
+  --ghost: #e03177;
+  --ok: #2b8a3e;
+  --bad: #c92a2a;
+  --warn: #b35c00;
+  font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) 150px;
+  overflow: hidden;
+}
+
+#bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 6px 10px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+#bar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+
+#bar button {
+  font: inherit;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+#bar button:hover {
+  border-color: var(--accent);
+}
+
+.sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+}
+
+#status {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+#status.ok {
+  color: var(--ok);
+}
+
+#status.bad {
+  color: var(--bad);
+}
+
+#panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  min-height: 0;
+}
+
+.pane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane-label {
+  padding: 0 2px 4px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pane-label b {
+  color: var(--text);
+}
+
+.tree-warning {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.frame-wrap {
+  position: relative;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pane.leader .frame-wrap {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.frame-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.frame-wrap svg.ghosts {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ghosts polyline {
+  fill: none;
+  stroke: var(--ghost);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  opacity: 0.85;
+}
+
+.ghosts rect {
+  fill: none;
+  stroke: var(--ghost);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  opacity: 0.8;
+}
+
+.ghosts circle {
+  fill: var(--ghost);
+  opacity: 0.85;
+}
+
+.ghosts text {
+  fill: var(--ghost);
+  font: 600 11px system-ui, sans-serif;
+}
+
+.cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.cursor.down {
+  background: var(--accent);
+}
+
+#report {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 8px;
+  padding: 0 8px 8px;
+  min-height: 0;
+}
+
+#diff,
+#log {
+  margin: 0;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+
+#diff-summary {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+#diff-summary.ok {
+  color: var(--ok);
+}
+
+#diff-summary.bad {
+  color: var(--bad);
+}
+
+#diff-list,
+#log {
+  list-style: none;
+  padding-left: 8px;
+  font: 12px/1.45 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+#diff-list {
+  margin: 0;
+  padding: 0;
+}
+
+#diff-list li .kind {
+  display: inline-block;
+  min-width: 58px;
+  font-weight: 700;
+}
+
+.kind-route .kind,
+.kind-binding .kind {
+  color: var(--ghost);
+}
+
+.kind-count .kind,
+.kind-type .kind,
+.kind-shape .kind {
+  color: var(--warn);
+}
+
+#log li {
+  color: var(--muted);
+}
+
+#log li.warn {
+  color: var(--warn);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181b;
+    --panel: #232329;
+    --text: #e8e8ee;
+    --muted: #9a9aa6;
+    --border: #3a3a44;
+    --ok: #69db7c;
+    --bad: #ff8787;
+    --warn: #ffa94d;
+  }
+}
