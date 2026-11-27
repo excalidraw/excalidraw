@@ -331,19 +331,24 @@ export class AppSelectionTool {
           // position-based hit test above missed the element
           (hitElement !== null &&
             this.app.selection.isASelectedElement(hitElement));
-        if (
+        const shouldClearSelection =
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
           (!this.app.state.selectedLinearElement?.isEditing ||
             (hitElement &&
               hitElement?.id !==
-                this.app.state.selectedLinearElement?.elementId))
-        ) {
+                this.app.state.selectedLinearElement?.elementId));
+        if (shouldClearSelection) {
           this.clearSelection(hitElement);
         }
 
-        if (this.app.state.selectedLinearElement?.isEditing) {
+        // pressing another element exits the line editor with the cleared
+        // selection, and selects that element below so it can be dragged
+        if (
+          this.app.state.selectedLinearElement?.isEditing &&
+          !shouldClearSelection
+        ) {
           this.app.setState((prevState) => ({
             selectedLinearElement: prevState.selectedLinearElement
               ? {
