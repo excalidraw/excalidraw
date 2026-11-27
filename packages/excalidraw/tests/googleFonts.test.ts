@@ -3,7 +3,6 @@ import {
   createGoogleFontResolver,
   getGoogleFontPreviewText,
   loadMoreGoogleFonts,
-  GOOGLE_FONT_BROWSE_LIMIT,
   GOOGLE_FONT_DEFAULT_PICKS,
   GOOGLE_FONT_PROVIDER_KEY,
   GoogleFontError,
@@ -20,7 +19,7 @@ const css = (
     .map(
       ({ url, format = "woff2", unicodeRange }) => `/* subset */
 @font-face {
-  font-family: 'Roboto';
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -49,83 +48,15 @@ describe("Google Fonts catalog", () => {
     }
   });
 
-  it("leaves out families with no regular 400 face", async () => {
-    const catalog = await loadGoogleFontCatalog();
+  it("holds the families we offer and no other, in the order they're listed", async () => {
+    const { fonts } = await loadGoogleFontCatalog();
 
-    // `css2` only serves these with an explicit weight
-    for (const name of ["Buda", "Sunflower", "UnifrakturCook", "Molle"]) {
-      expect(catalog.get(name)).toBe(undefined);
-    }
-  });
-
-  it("leaves out families which aren't text fonts", async () => {
-    const catalog = await loadGoogleFontCatalog();
-
-    for (const name of [
-      // classified as "Symbols" by Google
-      "Yarndings 20 Charted",
-      "Libre Barcode 39",
-      "Redacted",
-      // not classified as such
-      "Noto Color Emoji",
-      "Jersey 10 Charted",
-    ]) {
-      expect(catalog.get(name)).toBe(undefined);
-    }
-    // letters are letters in a math family
-    expect(catalog.get("STIX Two Math")).not.toBe(undefined);
-    // ...but this one draws relation signs over the letter before them
-    expect(catalog.get("Libertinus Math")).toBe(undefined);
-  });
-
-  it("leaves out families which are slow to draw", async () => {
-    const catalog = await loadGoogleFontCatalog();
-
-    // seconds, not milliseconds, for a line of text
-    for (const name of ["Rubik Pixels", "Rubik 80s Fade", "Bitcount Ink"]) {
-      expect(catalog.get(name)).toBe(undefined);
-    }
-    // over 10 ms, where the median family takes 1.5 ms
-    for (const name of ["Protest Revolution", "Rubik Doodle Shadow"]) {
-      expect(catalog.get(name)).toBe(undefined);
-    }
-    // the family they are variants of stays
-    expect(catalog.get("Rubik")).not.toBe(undefined);
-  });
-
-  it("leaves out families whose text would jump in the text editor", async () => {
-    const catalog = await loadGoogleFontCatalog();
-
-    // browsers don't agree on their vertical metrics, or the metrics are
-    // broken - so the textarea and the canvas place their text differently
-    for (const name of ["Katibeh", "Tajawal", "Coiny", "Revalia", "Allkin"]) {
-      expect(catalog.get(name)).toBe(undefined);
-    }
-    // a descender of zero alone is fine
-    expect(catalog.get("Press Start 2P")).not.toBe(undefined);
-  });
-
-  it("leaves out families the canvas and the text editor lay out differently", async () => {
-    const catalog = await loadGoogleFontCatalog();
-
-    for (const name of ["Arvo", "Cherry Bomb One", "Playpen Sans", "Vibur"]) {
-      expect(catalog.get(name)).toBe(undefined);
-    }
-    // a small gap in one browser stays
-    expect(catalog.get("Caveat")).not.toBe(undefined);
-  });
-
-  it("holds every default pick", async () => {
-    const catalog = await loadGoogleFontCatalog();
-
-    expect(
-      GOOGLE_FONT_DEFAULT_PICKS.filter((name) => !catalog.get(name)),
-    ).toEqual([]);
+    expect(fonts.map((font) => font.name)).toEqual(GOOGLE_FONT_DEFAULT_PICKS);
   });
 
   it("previews a family in its own script where it has one", async () => {
-    expect(await getGoogleFontPreviewText("Noto Sans JP")).toBe("あ");
-    expect(await getGoogleFontPreviewText("Roboto")).toBe("");
+    expect(await getGoogleFontPreviewText("Zen Maru Gothic")).toBe("あ");
+    expect(await getGoogleFontPreviewText("Open Sans")).toBe("");
     expect(await getGoogleFontPreviewText("Not A Font")).toBe("");
   });
 });
@@ -141,11 +72,11 @@ describe("createGoogleFontResolver", () => {
       ),
     );
 
-    const definition = await createGoogleFontResolver({ fetch })("Roboto");
+    const definition = await createGoogleFontResolver({ fetch })("Open Sans");
 
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(String(fetch.mock.calls[0][0])).toBe(
-      "https://fonts.googleapis.com/css2?family=Roboto&display=swap",
+      "https://fonts.googleapis.com/css2?family=Open+Sans&display=swap",
     );
     expect(definition.fontFaces).toEqual([
       {
@@ -155,7 +86,7 @@ describe("createGoogleFontResolver", () => {
       { uri: "https://fonts.gstatic.com/b.woff2" },
     ]);
     expect(definition.metadata.metrics).toEqual(
-      (await loadGoogleFontCatalog()).get("Roboto")!.metrics,
+      (await loadGoogleFontCatalog()).get("Open Sans")!.metrics,
     );
   });
 
@@ -164,7 +95,7 @@ describe("createGoogleFontResolver", () => {
     const resolve = createGoogleFontResolver({ fetch });
 
     // ids are exact - a differently cased name is a different id
-    for (const name of ["roboto", "Material Icons Round", "Buda"]) {
+    for (const name of ["open sans", "Material Icons Round", "Roboto"]) {
       await expect(resolve(name)).rejects.toMatchObject({
         name: "GoogleFontError",
         reason: "unknown-family",
@@ -182,7 +113,7 @@ describe("createGoogleFontResolver", () => {
         ok(css([{ url: "https://fonts.gstatic.com/a.woff2" }])),
       );
 
-    const definition = await createGoogleFontResolver({ fetch })("Roboto");
+    const definition = await createGoogleFontResolver({ fetch })("Open Sans");
 
     expect(fetch).toHaveBeenCalledTimes(3);
     expect(definition.fontFaces).toHaveLength(1);
@@ -192,7 +123,7 @@ describe("createGoogleFontResolver", () => {
     const fetch = vi.fn(async () => new Response("", { status: 400 }));
 
     await expect(
-      createGoogleFontResolver({ fetch })("Roboto"),
+      createGoogleFontResolver({ fetch })("Open Sans"),
     ).rejects.toMatchObject({ reason: "unavailable" });
     expect(fetch).toHaveBeenCalledTimes(1);
   });
@@ -203,7 +134,7 @@ describe("createGoogleFontResolver", () => {
       ok(css([{ url: "https://fonts.gstatic.com/a.ttf", format: "truetype" }])),
     );
 
-    const error = await createGoogleFontResolver({ fetch })("Roboto").catch(
+    const error = await createGoogleFontResolver({ fetch })("Open Sans").catch(
       (error) => error,
     );
 
@@ -219,13 +150,13 @@ describe("createGoogleFontResolver", () => {
     const resolve = createGoogleFontResolver({ fetch });
 
     const [first, second] = await Promise.all([
-      resolve("Roboto"),
-      resolve("Roboto"),
+      resolve("Open Sans"),
+      resolve("Open Sans"),
     ]);
     expect(first).toBe(second);
     expect(fetch).toHaveBeenCalledTimes(1);
 
-    await resolve("Roboto");
+    await resolve("Open Sans");
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
@@ -235,9 +166,9 @@ describe("createGoogleFontResolver", () => {
     ]);
     const resolve = createGoogleFontResolver({ source, fetch: vi.fn() });
 
-    const definition = await resolve("Roboto");
+    const definition = await resolve("Open Sans");
 
-    expect(source.mock.calls[0][0]).toMatchObject({ name: "Roboto" });
+    expect(source.mock.calls[0][0]).toMatchObject({ name: "Open Sans" });
     expect(definition.fontFaces).toEqual([
       { uri: "https://mirror.example/roboto.woff2" },
     ]);
@@ -245,23 +176,23 @@ describe("createGoogleFontResolver", () => {
 });
 
 describe("searchGoogleFonts", () => {
-  it("lists the families containing the query, most popular first", async () => {
+  it("lists the families containing the query, in the catalog's order", async () => {
     const { fonts } = await loadGoogleFontCatalog();
-    const result = await searchGoogleFonts(" Sans ");
+    const result = await searchGoogleFonts(" An ");
 
     expect(result.kind).toBe("match");
-    expect(result.fonts.length).toBeGreaterThan(10);
+    expect(result.fonts.length).toBeGreaterThan(1);
     expect(result.fonts).toEqual(
       fonts
-        .filter((font) => font.name.toLowerCase().includes("sans"))
+        .filter((font) => font.name.toLowerCase().includes("an"))
         .map((font) => font.name),
     );
   });
 
   it("suggests the families a typo away when nothing matches", async () => {
-    expect(await searchGoogleFonts("robotto")).toEqual({
+    expect(await searchGoogleFonts("literrata")).toEqual({
       kind: "suggestion",
-      fonts: ["Roboto"],
+      fonts: ["Literata"],
     });
   });
 
@@ -274,47 +205,26 @@ describe("searchGoogleFonts", () => {
     controller.abort();
 
     await expect(
-      searchGoogleFonts("rob", { signal: controller.signal }),
+      searchGoogleFonts("zen", { signal: controller.signal }),
     ).rejects.toThrow();
   });
 });
 
 describe("loadMoreGoogleFonts", () => {
-  it("pages through the most popular families", async () => {
+  it("pages through the catalog, to its end", async () => {
     const { fonts } = await loadGoogleFontCatalog();
     const names = fonts.map((font) => font.name);
+    expect(names.length).toBeGreaterThan(5);
 
-    expect(await loadMoreGoogleFonts({ offset: 0, limit: 20 })).toEqual(
-      names.slice(0, 20),
+    expect(await loadMoreGoogleFonts({ offset: 0, limit: 5 })).toEqual(
+      names.slice(0, 5),
     );
-    expect(await loadMoreGoogleFonts({ offset: 20, limit: 20 })).toEqual(
-      names.slice(20, 40),
-    );
-  });
-
-  it("ends at the browse limit, which the search isn't bound by", async () => {
-    const { fonts } = await loadGoogleFontCatalog();
-    expect(fonts.length).toBeGreaterThan(GOOGLE_FONT_BROWSE_LIMIT);
-
     // fewer than asked for: the end
-    expect(
-      await loadMoreGoogleFonts({
-        offset: GOOGLE_FONT_BROWSE_LIMIT - 5,
-        limit: 20,
-      }),
-    ).toHaveLength(5);
-    expect(
-      await loadMoreGoogleFonts({
-        offset: GOOGLE_FONT_BROWSE_LIMIT,
-        limit: 20,
-      }),
-    ).toEqual([]);
-
-    // i.e. the math families, which are far from the most popular ones
-    const names = fonts.map((font) => font.name);
-    expect(names.indexOf("STIX Two Math")).toBeGreaterThan(
-      GOOGLE_FONT_BROWSE_LIMIT,
+    expect(await loadMoreGoogleFonts({ offset: 5, limit: 5 })).toEqual(
+      names.slice(5),
     );
-    expect((await searchGoogleFonts("stix")).fonts).toContain("STIX Two Math");
+    expect(
+      await loadMoreGoogleFonts({ offset: names.length, limit: 5 }),
+    ).toEqual([]);
   });
 });

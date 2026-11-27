@@ -31,7 +31,7 @@ import type { FontDefinition, FontResolver } from "../Fonts";
 
 import type { FontSearchResult } from "../../types";
 
-/** the provider key of every Google font id, i.e. "google:Roboto" */
+/** the provider key of every Google font id, i.e. "google:Open Sans" */
 export { GOOGLE_FONT_PROVIDER_KEY } from "../providerKey";
 
 /**
@@ -82,11 +82,13 @@ const PREVIEW_TEXT_BY_SCRIPT: Record<string, string> = {
 let catalogPromise: Promise<GoogleFontCatalog> | null = null;
 
 /**
- * The catalog: every Google font family with a regular (400) face. A chunk of
- * its own (~20 KB gzipped), loaded on first use and kept for the session.
+ * The catalog: the Google font families the editor offers. A small,
+ * hand-picked set - each one looked at on the canvas and in the text editor,
+ * in Chrome, Firefox and Safari - and not Google's whole list. A chunk of
+ * its own, loaded on first use and kept for the session.
  *
  * Append-only across releases, as font ids are saved into documents. A family
- * newer than this version of the package isn't in it.
+ * added in a later version of the package isn't in it.
  */
 export const loadGoogleFontCatalog = (): Promise<GoogleFontCatalog> => {
   if (!catalogPromise) {
@@ -359,9 +361,8 @@ const getEditDistance = (a: string, b: string) => {
 
 /**
  * A font provider's `search`, over the catalog: the families whose name
- * contains the query, most popular first - so "sans" offers "Open Sans"
- * ahead of the lesser-known families starting with it. Only when none does,
- * the families a typo away ("robotto").
+ * contains the query, in the catalog's order. Only when none does, the
+ * families a typo away ("literrata").
  */
 export const searchGoogleFonts = async (
   query: string,
@@ -399,7 +400,7 @@ export const searchGoogleFonts = async (
 
   return {
     kind: "suggestion",
-    // stable, so equally close families stay in popularity order
+    // stable, so equally close families stay in the catalog's order
     fonts: suggestions
       .sort((a, b) => a.distance - b.distance)
       .slice(0, SUGGESTIONS_LIMIT)
@@ -408,9 +409,9 @@ export const searchGoogleFonts = async (
 };
 
 /**
- * How many of the catalog's families `loadMoreGoogleFonts` pages through:
- * the most popular ones. The rest is found by `searchGoogleFonts`, which
- * covers the whole catalog.
+ * How many of the catalog's families `loadMoreGoogleFonts` pages through at
+ * most: its first ones. The rest is found by `searchGoogleFonts`, which
+ * covers the whole catalog. (The catalog is smaller than this today.)
  *
  * A font picker draws each family's name in its own font, so browsing costs
  * a download per family (about 20 KB) and the memory of a loaded font, which
@@ -419,8 +420,8 @@ export const searchGoogleFonts = async (
 export const GOOGLE_FONT_BROWSE_LIMIT = 100;
 
 /**
- * A font provider's `loadMore`, over the catalog: its most popular families
- * (`GOOGLE_FONT_BROWSE_LIMIT` of them) a page at a time, most popular first.
+ * A font provider's `loadMore`, over the catalog: its families (the first
+ * `GOOGLE_FONT_BROWSE_LIMIT` of them) a page at a time, in its order.
  */
 export const loadMoreGoogleFonts = async ({
   offset,
@@ -449,44 +450,25 @@ export const getGoogleFontPreviewText = async (
   (await loadGoogleFontCatalog()).get(familyName)?.previewText ?? "";
 
 /**
- * A hand-picked starting set for a font picker (`availableFonts`), a few
- * families of each kind.
- *
- * PROVISIONAL: a placeholder selection, to be picked anew before release.
+ * The catalog's families by name and in its order, for a font picker's
+ * `availableFonts`: a few of each kind. Here as well, so that a host can list
+ * them without loading the catalog.
  */
 export const GOOGLE_FONT_DEFAULT_PICKS: readonly string[] = [
   // handwriting
-  "Caveat",
   "Kalam",
   "Patrick Hand",
-  "Gochi Hand",
-  "Indie Flower",
-  "Architects Daughter",
-  "Shadows Into Light",
-  "Permanent Marker",
-  // sans
-  "Inter",
-  "Roboto",
-  "Poppins",
-  "Montserrat",
-  // serif
-  "Lora",
-  "Merriweather",
-  "Playfair Display",
-  "EB Garamond",
-  // mono
-  "JetBrains Mono",
-  "Fira Code",
-  "Space Mono",
-  // display
-  "Bebas Neue",
   "Pacifico",
-  "Lobster",
-  "Press Start 2P",
-  // non-latin
-  "Noto Sans JP",
-  "Klee One",
-  "Yomogi",
-  "Gaegu",
-  "Noto Sans KR",
+  // sans
+  "Open Sans",
+  // serif
+  "Literata",
+  // monospace
+  "Fira Mono",
+  // display
+  "Bevan",
+  // Japanese
+  "Zen Maru Gothic",
+  // Korean
+  "Gowun Dodum",
 ];

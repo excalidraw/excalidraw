@@ -3,7 +3,7 @@
  * (`packages/excalidraw/fonts/google/catalog.json`), which the Google font
  * resolver reads its family names and metrics from.
  *
- *   yarn gen:google-fonts             # add new families, report drift
+ *   yarn gen:google-fonts             # add newly offered families, report drift
  *   yarn gen:google-fonts --new-only  # the same, without checking existing ones
  *   yarn gen:google-fonts --refresh   # also take over drifted metrics
  *   yarn gen:google-fonts --allow "A Family" --allow "Another"
@@ -15,6 +15,11 @@
  *
  * Rules:
  *
+ * - The catalog holds the families we offer and nothing else - see
+ *   `OFFERED_FAMILIES`. Each was looked at in Chrome, Firefox and Safari
+ *   before it went in: the canvas and the text editor have to lay its text
+ *   out alike, in each of them and between them. The rules further down are
+ *   what a family is checked against here, before anyone looks at it.
  * - The catalog is append-only. A font id (i.e. "google:Roboto") is saved
  *   into documents, so an entry never goes away and never changes:
  *   - A family which leaves Google's list keeps its entry. The run fails if
@@ -46,10 +51,10 @@
  *   tell, so a family new to Google's list isn't held back for it: that
  *   takes measuring in a browser.
  *   A family already in the catalog stays, whatever it's classified as
- *   later - see the first rule.
+ *   later - see the second rule.
  *
- * Entry: [name, unitsPerEm, ascender, descender, lineGap, script?], most
- * popular family first. `script` is set where "Aa" makes a poor preview: CJK
+ * Entry: [name, unitsPerEm, ascender, descender, lineGap, script?], in the
+ * order of `OFFERED_FAMILIES`. `script` is set where "Aa" makes a poor preview: CJK
  * families, and families with no Latin subset.
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -346,7 +351,34 @@ const getOffBaselineReason = (sfnt) => {
     : undefined;
 };
 
-/** why a family is left out, if it is */
+/**
+ * The families the catalog holds, in its order: what a font picker lists and
+ * pages through. To offer another one, add its name - after looking at it in
+ * Chrome, Firefox and Safari, on the canvas and in the text editor, at a few
+ * font sizes. A name can't be taken out again once a release has had it.
+ *
+ * All are under the SIL Open Font License, with no reserved font name.
+ */
+const OFFERED_FAMILIES = [
+  // handwriting
+  "Kalam",
+  "Patrick Hand",
+  "Pacifico",
+  // sans
+  "Open Sans",
+  // serif
+  "Literata",
+  // monospace
+  "Fira Mono",
+  // display
+  "Bevan",
+  // Japanese
+  "Zen Maru Gothic",
+  // Korean
+  "Gowun Dodum",
+];
+
+/** why a family can't be offered, if it can't */
 const getExclusionReason = (family) => {
   const name = family.family;
   if (
@@ -510,8 +542,11 @@ const main = async () => {
   if (metadataText.startsWith(")]}'")) {
     metadataText = metadataText.slice(metadataText.indexOf("\n") + 1);
   }
-  const families = JSON.parse(metadataText).familyMetadataList.sort(
-    (a, b) => a.popularity - b.popularity,
+  const familiesByName = new Map(
+    JSON.parse(metadataText).familyMetadataList.map((family) => [
+      family.family,
+      family,
+    ]),
   );
 
   const skipped = [];
@@ -523,7 +558,10 @@ const main = async () => {
   const added = [];
   const entries = new Map();
 
-  const queue = families.filter((family) => {
+  // the offered ones which Google lists, in our order
+  const queue = OFFERED_FAMILIES.flatMap(
+    (name) => familiesByName.get(name) ?? [],
+  ).filter((family) => {
     // an entry is forever, also when its family got reclassified since
     const exclusionReason = getExclusionReason(family);
     if (exclusionReason && !previousByName.has(family.family)) {
@@ -539,6 +577,9 @@ const main = async () => {
     }
     return true;
   });
+  const unknown = OFFERED_FAMILIES.filter(
+    (name) => !familiesByName.has(name) && !previousByName.has(name),
+  );
 
   let done = 0;
   const work = async (family) => {
@@ -594,13 +635,12 @@ const main = async () => {
     }),
   );
 
-  // in Google's order, then whatever left Google's list (or failed to
-  // resolve this time) with the entry it had
-  const catalog = queue
-    .map((family) => entries.get(family.family))
-    .filter(Boolean);
+  // in our order; what left Google's list (or failed to resolve this time)
+  // keeps the entry it had
   const retired = previous.filter((entry) => !entries.has(entry[0]));
-  catalog.push(...retired);
+  const catalog = OFFERED_FAMILIES.map(
+    (name) => entries.get(name) ?? previousByName.get(name),
+  ).filter(Boolean);
 
   const names = new Set(catalog.map((entry) => entry[0]));
   const lost = previous.filter((entry) => !names.has(entry[0]));
@@ -640,15 +680,22 @@ const main = async () => {
     "No longer in Google's list, kept",
     retired.map((entry) => entry[0]),
   );
-  report("Left out", excluded);
+  report("Offered, but can't be: see the rules", excluded);
+  report("Offered, but not in Google's list", unknown);
   report(
     "Held back: looks slow to draw, or off the baseline. Measure it (see getHeavyOutlinesReason, OFF_BASELINE_FAMILIES), then add it to the list it belongs to or run with --allow",
     heldBack,
   );
-  report("Left out, no regular 400 face", skipped);
+  report("Offered, but has no regular 400 face", skipped);
   report("Failed to resolve", failed);
 
-  if (failed.length) {
+  if (
+    failed.length ||
+    excluded.length ||
+    skipped.length ||
+    unknown.length ||
+    heldBack.length
+  ) {
     process.exitCode = 1;
   }
 };
