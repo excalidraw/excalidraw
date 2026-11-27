@@ -9,6 +9,7 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
   createPasteEvent,
+  isClipboardReadDenied,
   probablySupportsClipboardBlob,
   probablySupportsClipboardWriteText,
   readSystemClipboard,
@@ -61,9 +62,26 @@ export const actionPaste = register({
     try {
       types = await readSystemClipboard();
     } catch (error: any) {
-      if (error.name === "AbortError" || error.name === "NotAllowedError") {
+      if (error.name === "AbortError") {
         // user probably aborted the action. Though not 100% sure, it's best
         // to not annoy them with an error message.
+        return false;
+      }
+
+      if (error.name === "NotAllowedError") {
+        if (await isClipboardReadDenied()) {
+          // clipboard access is blocked for the site, e.g. via browser site
+          // settings — every paste attempt fails, so tell the user why
+          return {
+            captureUpdate: CaptureUpdateAction.EVENTUALLY,
+            appState: {
+              ...appState,
+              errorMessage: t("errors.asyncPasteFailedOnRead"),
+            },
+          };
+        }
+
+        // the user likely just dismissed the permission prompt — stay quiet
         return false;
       }
 
