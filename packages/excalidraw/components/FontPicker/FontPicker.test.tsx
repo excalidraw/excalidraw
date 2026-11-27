@@ -1721,7 +1721,7 @@ describe("FontPicker", () => {
     const resolve: FontResolver = async () => ({ fontFaces, metadata });
 
     const open = async (
-      props?: Pick<ExcalidrawProps, "fontProviders" | "pinnedFonts">,
+      props?: Pick<ExcalidrawProps, "fontProviders" | "fontFavorites">,
       /** what's on canvas as the picker opens */
       elements: readonly ExcalidrawElement[] = [],
     ) => {
@@ -2057,10 +2057,10 @@ describe("FontPicker", () => {
       });
     });
 
-    it("lists a pinned font once, below the scene's fonts", async () => {
+    it("lists a favorite once, below the scene's fonts", async () => {
       await open(
         {
-          pinnedFonts: {
+          fontFavorites: {
             // the scene's font stays with the scene
             fonts: [FONT_FAMILY.Nunito, FONT_FAMILY.Excalifont],
             onChange: vi.fn(),
@@ -2070,7 +2070,7 @@ describe("FontPicker", () => {
       );
 
       expect(getGroupFamilies("In this scene")).toEqual(["Excalifont"]);
-      expect(getGroupFamilies("Pinned")).toEqual(["Nunito"]);
+      expect(getGroupFamilies("Favorites")).toEqual(["Nunito"]);
       expect(getGroupFamilies("Available fonts")).toEqual([
         "Comic Shanns",
         "Lilita One",
@@ -2080,7 +2080,7 @@ describe("FontPicker", () => {
           document.querySelectorAll(".dropdown-menu-group-title"),
           (title) => title.textContent,
         ),
-      ).toEqual(["In this scene", "Pinned", "Available fonts"]);
+      ).toEqual(["In this scene", "Favorites", "Available fonts"]);
     });
 
     it("scrolls to the highlighted font on open and on keyboard navigation only", async () => {
@@ -2147,7 +2147,7 @@ describe("FontPicker", () => {
         if (this.classList.contains("top-picks-dnd")) {
           return new DOMRect(0, 0, SLOT_SPAN * 2 + SLOT_SIZE, SLOT_SIZE);
         }
-        if (this.classList.contains("FontPicker__pin-drop-zone")) {
+        if (this.classList.contains("FontPicker__favorites-drop-zone")) {
           return new DOMRect(0, 100, 200, 30);
         }
         return new DOMRect(0, 300, SLOT_SIZE, SLOT_SIZE);
@@ -2185,7 +2185,7 @@ describe("FontPicker", () => {
       ).map((button) => button.title);
 
     const openFontPicker = async (
-      props?: Pick<ExcalidrawProps, "fontPickerTip" | "pinnedFonts">,
+      props?: Pick<ExcalidrawProps, "fontPickerTip" | "fontFavorites">,
     ) => {
       const utils = await render(
         <Excalidraw handleKeyboardGlobally={true} {...props} />,
@@ -2344,12 +2344,12 @@ describe("FontPicker", () => {
       );
     });
 
-    const getPinDropZone = () =>
-      document.querySelector<HTMLElement>(".FontPicker__pin-drop-zone");
+    const getFavoritesDropZone = () =>
+      document.querySelector<HTMLElement>(".FontPicker__favorites-drop-zone");
 
     // the zone only mounts once a drag is in flight, so it takes a move to
     // start the drag and another one to get onto it
-    const dragToPin = async (source: HTMLElement) => {
+    const dragToFavorites = async (source: HTMLElement) => {
       fireEvent.pointerDown(source, {
         pointerId: 1,
         button: 0,
@@ -2362,7 +2362,7 @@ describe("FontPicker", () => {
         clientX: 16,
         clientY: 200,
       });
-      const label = getPinDropZone()?.textContent ?? null;
+      const label = getFavoritesDropZone()?.textContent ?? null;
       fireEvent.pointerMove(window, {
         pointerId: 1,
         clientX: 100,
@@ -2381,15 +2381,15 @@ describe("FontPicker", () => {
           ?.querySelectorAll<HTMLElement>("button[value]") ?? [],
       ).map((button) => button.title);
 
-    it("pins a font dropped on the pin zone, and unpins it the same way", async () => {
+    it("adds a font dropped on the favorites zone, and removes it the same way", async () => {
       const Host = () => {
         const [fonts, setFonts] = React.useState<
-          NonNullable<ExcalidrawProps["pinnedFonts"]>["fonts"]
+          NonNullable<ExcalidrawProps["fontFavorites"]>["fonts"]
         >([]);
         return (
           <Excalidraw
             handleKeyboardGlobally={true}
-            pinnedFonts={{ fonts, onChange: setFonts }}
+            fontFavorites={{ fonts, onChange: setFonts }}
           />
         );
       };
@@ -2403,7 +2403,7 @@ describe("FontPicker", () => {
           '.dropdown-menu.fonts [title="Lilita One"]',
         )!;
       await waitFor(() => expect(getRow()).not.toBeNull());
-      expect(getPinDropZone()).toBe(null);
+      expect(getFavoritesDropZone()).toBe(null);
       // the zone shows up only once a drag starts - the tip tells of it
       expect(
         document.querySelector<HTMLElement>(".FontPicker__tip")!.textContent,
@@ -2414,32 +2414,32 @@ describe("FontPicker", () => {
       )!;
       input.blur();
 
-      expect(await dragToPin(getRow())).toBe("Drop to pin");
+      expect(await dragToFavorites(getRow())).toBe("Drag to favorite");
       // the drag took the focus - the search has it back
       expect(document.activeElement).toBe(input);
 
       // in a section of its own, and no longer among the available ones
       await waitFor(() =>
-        expect(getGroupFamilies("Pinned")).toEqual(["Lilita One"]),
+        expect(getGroupFamilies("Favorites")).toEqual(["Lilita One"]),
       );
       expect(getGroupFamilies("Available fonts")).not.toContain("Lilita One");
-      expect(getPinDropZone()).toBe(null);
+      expect(getFavoritesDropZone()).toBe(null);
       // dropping is not selecting
       expect(h.state.currentItemFontFamily).toBe(FONT_FAMILY.Excalifont);
 
-      expect(await dragToPin(getRow())).toBe("Drop to unpin");
+      expect(await dragToFavorites(getRow())).toBe("Remove favorite");
 
-      await waitFor(() => expect(screen.queryByText("Pinned")).toBe(null));
+      await waitFor(() => expect(screen.queryByText("Favorites")).toBe(null));
       expect(getGroupFamilies("Available fonts")).toContain("Lilita One");
     });
 
-    it("offers no pin zone unless the host keeps pinned fonts", async () => {
+    it("offers no favorites zone unless the host keeps favorites", async () => {
       await openFontPicker();
       const row = document.querySelector<HTMLElement>(
         '.dropdown-menu.fonts [title="Lilita One"]',
       )!;
 
-      expect(await dragToPin(row)).toBe(null);
+      expect(await dragToFavorites(row)).toBe(null);
       // a drag which went nowhere hands the focus back all the same
       expect(document.activeElement).toBe(
         document.querySelector(".properties-content .QuickSearch__input"),
@@ -2455,7 +2455,7 @@ describe("FontPicker", () => {
       const tip = document.querySelector<HTMLElement>(".FontPicker__tip")!;
 
       expect(tip.querySelector(".host-tip")).not.toBe(null);
-      expect(tip.textContent).not.toContain("Drag a font");
+      expect(tip.textContent).not.toContain("drag any font");
 
       // the editor's reset link stays next to it
       act(() => {

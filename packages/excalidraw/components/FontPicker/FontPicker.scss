@@ -116,12 +116,12 @@
     }
   }
 
-  // anchor for the pin drop zone, which covers the search for a drag
+  // anchor for the favorites drop zone, which covers the search for a drag
   .FontPicker__search {
     position: relative;
   }
 
-  .FontPicker__pin-drop-zone {
+  .FontPicker__favorites-drop-zone {
     position: absolute;
     inset: 0;
     // above the search's own icon
@@ -154,7 +154,7 @@
         stroke: var(--color-danger);
       }
 
-      &.FontPicker__pin-drop-zone--over {
+      &.FontPicker__favorites-drop-zone--over {
         background: var(--color-danger-icon-background);
         color: var(--color-danger-icon-color);
       }

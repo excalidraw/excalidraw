@@ -75,22 +75,22 @@ export const FontPickerList = React.memo(
     const app = useApp();
     const setAppState = useExcalidrawSetAppState();
     const fonts = app.fonts.instance;
-    const { showDeprecatedFonts, fontProviders, fontPickerTip, pinnedFonts } =
+    const { showDeprecatedFonts, fontProviders, fontPickerTip, fontFavorites } =
       useAppProps();
     const stylesPanelMode = useStylesPanelMode();
     const hasFontProviders = useMemo(
       () => !!Object.keys(fontProviders ?? {}).length,
       [fontProviders],
     );
-    const pinnedFamilies = useMemo(
+    const favoriteFamilies = useMemo(
       () =>
         new Set(
-          (pinnedFonts?.fonts ?? []).filter(
+          (fontFavorites?.fonts ?? []).filter(
             (fontFamily) =>
               typeof fontFamily === "number" || typeof fontFamily === "string",
           ),
         ),
-      [pinnedFonts?.fonts],
+      [fontFavorites?.fonts],
     );
     // present only when the top picks are customizable
     const dnd = useFontPickerDnD();
@@ -151,7 +151,7 @@ export const FontPickerList = React.memo(
       listedFamilies,
       selectableFonts,
       sceneFilteredFonts,
-      pinnedFilteredFonts,
+      favoriteFilteredFonts,
       availableFilteredFonts,
       searchMatches,
       hiddenSearchMatchCount,
@@ -163,7 +163,7 @@ export const FontPickerList = React.memo(
       failedResolutions,
       selectedFontFamily,
       hoveredFontFamily,
-      pinnedFamilies,
+      favoriteFamilies,
       moreFonts,
       resolvingFamily,
       searchTerm,
@@ -467,7 +467,11 @@ export const FontPickerList = React.memo(
     };
 
     pushGroup(t("fontList.sceneFonts"), "group_1", sceneFilteredFonts);
-    pushGroup(t("fontList.pinnedFonts"), "group_pinned", pinnedFilteredFonts);
+    pushGroup(
+      t("fontList.favoriteFonts"),
+      "group_favorites",
+      favoriteFilteredFonts,
+    );
     pushGroup(
       t("fontList.availableFonts"),
       "group_2",
@@ -546,22 +550,21 @@ export const FontPickerList = React.memo(
             />
             {/* takes the search's place for the drag - on top of it rather
                 than instead of it, so that the query and the focus survive */}
-            {pinnedFonts && dnd?.dragState && (
+            {fontFavorites && dnd?.dragState && (
               <div
                 ref={dnd.setDropZoneEl}
-                className={clsx("FontPicker__pin-drop-zone", {
-                  "FontPicker__pin-drop-zone--over":
+                className={clsx("FontPicker__favorites-drop-zone", {
+                  "FontPicker__favorites-drop-zone--over":
                     dnd.dragState.isOverDropZone,
-                  "FontPicker__pin-drop-zone--remove": pinnedFamilies.has(
-                    dnd.dragState.value,
-                  ),
+                  "FontPicker__favorites-drop-zone--remove":
+                    favoriteFamilies.has(dnd.dragState.value),
                 })}
               >
                 <TopPicksDnDOutline />
                 {t(
-                  pinnedFamilies.has(dnd.dragState.value)
-                    ? "fontList.unpinFont"
-                    : "fontList.pinFont",
+                  favoriteFamilies.has(dnd.dragState.value)
+                    ? "fontList.removeFromFavorites"
+                    : "fontList.addToFavorites",
                 )}
               </div>
             )}
