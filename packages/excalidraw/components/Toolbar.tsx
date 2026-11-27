@@ -8,6 +8,7 @@ import { t } from "../i18n";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { HintViewer } from "./HintViewer";
+import { IconButton } from "./IconButton";
 import { Island } from "./Island";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
@@ -24,6 +25,8 @@ import {
   MagicIcon,
   mermaidLogoIcon,
   DotsIcon,
+  eyeIcon,
+  eyeClosedIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -239,6 +242,11 @@ export const Toolbar = ({
 }) => {
   const editorInterface = useEditorInterface();
   const isCompactStylesPanel = useStylesPanelMode() === "compact";
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
+  const isToolbarHidden = isCompactStylesPanel && toolbarCollapsed;
+  const toolbarVisibilityLabel = isToolbarHidden
+    ? t("toolBar.showToolbar")
+    : t("toolBar.hideToolbar");
 
   const activeTool = appState.activeTool;
   const toolProps = { app, activeTool };
@@ -252,14 +260,19 @@ export const Toolbar = ({
       })}
       data-viewport-ui="top"
     >
-      <HintViewer
-        appState={appState}
-        isMobile={editorInterface.formFactor === "phone"}
-        editorInterface={editorInterface}
-        app={app}
-      />
-      {heading}
-      <Stack.Row gap={isCompactStylesPanel ? 0.5 : 1}>
+      {!isToolbarHidden && (
+        <HintViewer
+          appState={appState}
+          isMobile={editorInterface.formFactor === "phone"}
+          editorInterface={editorInterface}
+          app={app}
+        />
+      )}
+      {!isToolbarHidden && heading}
+      <Stack.Row
+        gap={isCompactStylesPanel ? 0.5 : 1}
+        style={{ display: isToolbarHidden ? "none" : undefined }}
+      >
         {/* in compact UI the pen mode button is rendered as a separate
             floating button below the compact actions menu */}
         {!isCompactStylesPanel && (
@@ -321,6 +334,16 @@ export const Toolbar = ({
           UIOptions={UIOptions}
         />
       </Stack.Row>
+      {isCompactStylesPanel && (
+        <IconButton
+          type="button"
+          icon={isToolbarHidden ? eyeIcon : eyeClosedIcon}
+          aria-label={toolbarVisibilityLabel}
+          title={toolbarVisibilityLabel}
+          data-testid="toolbar-visibility-toggle"
+          onClick={() => setToolbarCollapsed((collapsed) => !collapsed)}
+        />
+      )}
     </Island>
   );
 };
