@@ -16,11 +16,7 @@ import { bytesToHexString } from "@excalidraw/common";
 import type { UserIdleState } from "@excalidraw/common";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type { SceneBounds } from "@excalidraw/element";
-import type {
-  ExcalidrawElement,
-  FileId,
-  OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -40,11 +36,11 @@ import { saveFilesToFirebase } from "./firebase";
 
 import type { WS_SUBTYPES } from "../app_constants";
 
-export type SyncableExcalidrawElement = OrderedExcalidrawElement &
+export type SyncableExcalidrawElement = ExcalidrawElement &
   MakeBrand<"SyncableExcalidrawElement">;
 
 export const isSyncableElement = (
-  element: OrderedExcalidrawElement,
+  element: ExcalidrawElement,
 ): element is SyncableExcalidrawElement => {
   if (element.isDeleted) {
     if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
@@ -55,9 +51,7 @@ export const isSyncableElement = (
   return !isInvisiblySmallElement(element);
 };
 
-export const getSyncableElements = (
-  elements: readonly OrderedExcalidrawElement[],
-) =>
+export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
   elements.filter((element) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
@@ -83,13 +77,13 @@ export type SocketUpdateDataSource = {
   SCENE_INIT: {
     type: WS_SUBTYPES.INIT;
     payload: {
-      elements: readonly OrderedExcalidrawElement[];
+      elements: readonly ExcalidrawElement[];
     };
   };
   SCENE_UPDATE: {
     type: WS_SUBTYPES.UPDATE;
     payload: {
-      elements: readonly OrderedExcalidrawElement[];
+      elements: readonly ExcalidrawElement[];
     };
   };
   MOUSE_LOCATION: {

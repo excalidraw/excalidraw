@@ -102,7 +102,6 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  Ordered,
   PointsPositionUpdates,
   TextAlign,
   VerticalAlign,
@@ -621,7 +620,7 @@ class ElementStore {
     // programmatically created elements are always non-deleted
     return syncInvalidIndices(
       Array.from(this.excalidrawElements.values()),
-    ) as Ordered<NonDeletedExcalidrawElement>[];
+    ) as NonDeletedExcalidrawElement[];
   };
 
   getElementsMap = () => {

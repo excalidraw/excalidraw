@@ -65,8 +65,11 @@ type _ExcalidrawElementBase = Readonly<{
   /** String in a fractional form defined by https://github.com/rocicorp/fractional-indexing.
       Used for ordering in multiplayer scenarios, such as during reconciliation or undo / redo.
       Always kept in sync with the array order by `syncMovedIndices` and `syncInvalidIndices`.
-      Could be null, i.e. for new elements which were not yet assigned to the scene. */
-  index: FractionalIndex | null;
+      Every element inside the scene (and every element emitted by the editor
+      APIs) is ordered. Elements entering the scene from the outside
+      (i.e. via `updateScene` or from remote clients) may not be ordered yet,
+      for these use `NonRestoredExcalidrawElement`. */
+  index: FractionalIndex;
   isDeleted: boolean;
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
@@ -238,11 +241,32 @@ export type ExcalidrawNonSelectionElement = Exclude<
   ExcalidrawSelectionElement
 >;
 
-export type Ordered<TElement extends ExcalidrawElement> = TElement & {
-  index: FractionalIndex;
-};
+/**
+ * Element which was not yet restored / assigned to the scene, and as such
+ * might not have a valid fractional `index` yet (i.e. element coming from
+ * the host app through `updateScene`, or a freshly created element).
+ *
+ * Fractional indices are internal, so the editor must never require the
+ * host apps to pass ordered elements.
+ */
+export type NonRestoredExcalidrawElement<
+  TElement extends ExcalidrawElement = ExcalidrawElement,
+> = TElement extends ExcalidrawElement
+  ? Omit<TElement, "index"> & { index: FractionalIndex | null }
+  : never;
 
-export type OrderedExcalidrawElement = Ordered<ExcalidrawElement>;
+/**
+ * @deprecated every `ExcalidrawElement` is now ordered, use the element type
+ * directly. Kept only for backwards compatibility of the public types.
+ */
+export type Ordered<TElement extends ExcalidrawElement> = TElement;
+
+/**
+ * @deprecated every `ExcalidrawElement` is now ordered, use
+ * `ExcalidrawElement` directly. Kept only for backwards compatibility of the
+ * public types.
+ */
+export type OrderedExcalidrawElement = ExcalidrawElement;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: false;
@@ -461,10 +485,7 @@ export type NonDeletedElementsMap = Map<
  * Map of all excalidraw Scene elements, including deleted.
  * Not a subset. Use this type when you need access to current Scene elements.
  */
-export type SceneElementsMap = Map<
-  ExcalidrawElement["id"],
-  Ordered<ExcalidrawElement>
-> &
+export type SceneElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement> &
   MakeBrand<"SceneElementsMap">;
 
 /**
@@ -473,7 +494,7 @@ export type SceneElementsMap = Map<
  */
 export type NonDeletedSceneElementsMap = Map<
   ExcalidrawElement["id"],
-  Ordered<NonDeletedExcalidrawElement>
+  NonDeletedExcalidrawElement
 > &
   MakeBrand<"NonDeletedSceneElementsMap">;
 
