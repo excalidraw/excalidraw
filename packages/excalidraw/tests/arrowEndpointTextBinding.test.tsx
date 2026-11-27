@@ -1,6 +1,6 @@
 import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
 
-import { isTextElement } from "@excalidraw/element";
+import { isTextElement, updateBoundElements } from "@excalidraw/element";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -8,6 +8,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawTextElement,
+  NonDeleted,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -618,6 +619,60 @@ describe("binding text to an arrow endpoint", () => {
       expect(Math.abs(tipAfter[0] - centre)).toBeLessThan(
         Math.abs(tipBefore[0] - centre),
       );
+    });
+
+    // each text's re-routing re-places both ends of an arrow bound to two of
+    // the toggled texts, so each has to see the other's new geometry too
+    it("re-routes an arrow bound to two of the toggled texts", () => {
+      const wrappedText = (id: string, y: number) => ({
+        ...API.createElement({
+          type: "text",
+          id,
+          x: 200,
+          y,
+          width: 300,
+          height: 50,
+          text: "this is it my friends\nald aksdl askdlasdk",
+          textAlign: "right",
+          verticalAlign: "middle",
+          boundElements: [{ id: "arrow", type: "arrow" }],
+        }),
+        originalText: "this is it my friends ald aksdl askdlasdk",
+        autoResize: false,
+      });
+      // from the bottom side of one to the top side of the other, i.e. not
+      // the sides the alignment pins
+      const arrow = createArrow("arrow", [350, 160], [350, 390], {
+        startBinding: {
+          elementId: "a",
+          fixedPoint: [0.5001, 1],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: "b",
+          fixedPoint: [0.5001, 0],
+          mode: "orbit",
+        },
+      });
+      API.setElements([wrappedText("a", 100), wrappedText("b", 400), arrow]);
+
+      API.setAppState({ selectedElementIds: { a: true, b: true } });
+      API.executeAction(actionTextAutoResize);
+
+      const a = h.elements.find(
+        (element): element is NonDeleted<ExcalidrawTextElement> =>
+          element.id === "a",
+      )!;
+      expect(a.autoResize).toBe(true);
+      const start = endpointOf(getArrow("arrow"), "start");
+      const end = endpointOf(getArrow("arrow"), "end");
+
+      // re-routing it to the texts as they now are leaves it as it is
+      updateBoundElements(a, h.app.scene, {
+        renderEnvironment: h.app.renderEnvironment,
+      });
+      expectPointsClose(endpointOf(getArrow("arrow"), "start"), start);
+      expectPointsClose(endpointOf(getArrow("arrow"), "end"), end);
     });
 
     it("leaves the arrow endpoint where it was", async () => {
