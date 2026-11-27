@@ -7,6 +7,7 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
+import { isInvisiblySmallElement } from "@excalidraw/element";
 import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -164,6 +165,18 @@ export const loadSceneOrLibraryFromBlob = async (
         repairBindings: true,
         deleteInvisibleElements: true,
       });
+      // a scene whose elements were all dropped or invalidated during
+      // restore is a corrupted file, not an empty scene
+      if (
+        data.elements?.some(
+          (element: ExcalidrawElement | null) => element && !element.isDeleted,
+        ) &&
+        !elements.some(
+          (element) => !element.isDeleted && !isInvisiblySmallElement(element),
+        )
+      ) {
+        throw new Error("Error: invalid file");
+      }
       return {
         type: MIME_TYPES.excalidraw,
         data: {
