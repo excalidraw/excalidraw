@@ -139,6 +139,7 @@ const lazyChunksPlugin = (
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
+  const serverEnv = loadEnv(mode, `../`, "");
   // mermaid (+ its many deps & per-diagram chunks) is lazy-loaded and large,
   // so we don't precache it (the app caches it once the TTD dialog is opened,
   // see `cacheMermaidChunks`). Populated at build time by `lazyChunksPlugin`.
@@ -146,9 +147,19 @@ export default defineConfig(({ mode }) => {
   // https://vitejs.dev/config/
   return {
     server: {
-      port: Number(envVars.VITE_APP_PORT || 3000),
-      // open the browser
-      open: true,
+      host: true,
+      port: Number(envVars.VITE_APP_PORT || 3001),
+      open: false,
+      proxy: {
+        "/api/llm": {
+          target: serverEnv.LITELLM_BASE_URL || "http://192.168.1.91:4000",
+          changeOrigin: true,
+          rewrite: (reqPath: string) => reqPath.replace(/^\/api\/llm/, "/v1"),
+          headers: serverEnv.LITELLM_API_KEY
+            ? { Authorization: `Bearer ${serverEnv.LITELLM_API_KEY}` }
+            : undefined,
+        },
+      },
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir

@@ -883,6 +883,21 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     document.addEventListener(EVENT.VISIBILITY_CHANGE, this.onVisibilityChange);
   };
 
+  private mergeLocalAgentCollaborator(
+    collaborators: Map<SocketId, Collaborator>,
+  ): Map<SocketId, Collaborator> {
+    const aiAgentSocketId = toBrandedType<SocketId>("ai-agent-collaborator");
+    const existingAgent = this.excalidrawAPI
+      .getAppState()
+      .collaborators.get(aiAgentSocketId);
+    if (!existingAgent || collaborators.has(aiAgentSocketId)) {
+      return collaborators;
+    }
+    const merged = new Map(collaborators);
+    merged.set(aiAgentSocketId, existingAgent);
+    return merged;
+  }
+
   setCollaborators(sockets: SocketId[]) {
     const collaborators: InstanceType<typeof Collab>["collaborators"] =
       new Map();
@@ -900,7 +915,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
     }
     this.collaborators = collaborators;
-    this.excalidrawAPI.updateScene({ collaborators });
+    this.excalidrawAPI.updateScene({
+      collaborators: this.mergeLocalAgentCollaborator(collaborators),
+    });
 
     // unfollow if the followed user left the room
     const userToFollow = appJotaiStore.get(userToFollowAtom);
@@ -924,7 +941,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.collaborators = collaborators;
 
     this.excalidrawAPI.updateScene({
-      collaborators,
+      collaborators: this.mergeLocalAgentCollaborator(collaborators),
     });
   };
 
