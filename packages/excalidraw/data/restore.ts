@@ -115,7 +115,12 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
+import type {
+  AppState,
+  BinaryFiles,
+  LibraryFolder,
+  LibraryItem,
+} from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -1426,4 +1431,71 @@ export const restoreLibraryItems = (
     }
   }
   return restoredItems;
+};
+
+export const restoreLibraryFolders = (
+  libraryFolders: readonly LibraryFolder[] | undefined,
+): LibraryFolder[] => {
+  const foldersById = new Map<string, LibraryFolder>();
+  for (const folder of libraryFolders || []) {
+    if (
+      !folder ||
+      typeof folder.id !== "string" ||
+      typeof folder.name !== "string" ||
+      foldersById.has(folder.id)
+    ) {
+      continue;
+    }
+    foldersById.set(folder.id, {
+      id: folder.id,
+      name: folder.name,
+      ...(typeof folder.parentId === "string" && folder.parentId.length > 0
+        ? { parentId: folder.parentId }
+        : {}),
+    });
+  }
+
+  for (const [id, folder] of foldersById) {
+    if (folder.parentId && !foldersById.has(folder.parentId)) {
+      const { parentId: _parentId, ...rootFolder } = folder;
+      foldersById.set(id, rootFolder);
+    }
+  }
+
+  const visitState = new Map<string, "visiting" | "visited">();
+  const visitPath: string[] = [];
+  const cyclicFolderIds = new Set<string>();
+  const visit = (id: string) => {
+    const state = visitState.get(id);
+    if (state === "visited") {
+      return;
+    }
+    if (state === "visiting") {
+      const cycleStart = visitPath.indexOf(id);
+      for (const cycleId of visitPath.slice(cycleStart)) {
+        cyclicFolderIds.add(cycleId);
+      }
+      return;
+    }
+
+    visitState.set(id, "visiting");
+    visitPath.push(id);
+    const parentId = foldersById.get(id)?.parentId;
+    if (parentId) {
+      visit(parentId);
+    }
+    visitPath.pop();
+    visitState.set(id, "visited");
+  };
+
+  for (const id of foldersById.keys()) {
+    visit(id);
+  }
+  for (const id of cyclicFolderIds) {
+    const folder = foldersById.get(id)!;
+    const { parentId: _parentId, ...rootFolder } = folder;
+    foldersById.set(id, rootFolder);
+  }
+
+  return Array.from(foldersById.values());
 };

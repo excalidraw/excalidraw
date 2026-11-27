@@ -434,6 +434,7 @@ export {
   restoreElement,
   restoreElements,
   restoreLibraryItems,
+  restoreLibraryFolders,
 } from "./data/restore";
 
 export { reconcileElements } from "./data/reconcile";
@@ -447,6 +448,7 @@ export type {
 } from "./scene/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
+export type { LibraryFolder } from "./types";
 export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,

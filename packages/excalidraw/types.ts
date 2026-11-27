@@ -668,8 +668,11 @@ export type LibraryItem = {
   /** timestamp in epoch (ms) */
   created: number;
   name?: string;
+  /** ID of the personal library folder containing this item. */
+  folderId?: string;
   error?: string;
 };
+export type LibraryFolder = { id: string; name: string; parentId?: string };
 export type LibraryItems = readonly LibraryItem[];
 export type LibraryItems_anyVersion = LibraryItems | LibraryItems_v1;
 
@@ -1074,7 +1077,10 @@ export interface ExcalidrawProps {
   imageOptions?: ImageOptions;
   detectScroll?: boolean;
   handleKeyboardGlobally?: boolean;
-  onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
+  onLibraryChange?: (
+    libraryItems: LibraryItems,
+    libraryFolders?: readonly LibraryFolder[],
+  ) => void | Promise<any>;
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;

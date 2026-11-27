@@ -7,6 +7,7 @@ import type {
   AppState,
   BinaryFiles,
   LibraryItem,
+  LibraryFolder,
   LibraryItems,
   LibraryItems_anyVersion,
 } from "../types";
@@ -54,6 +55,7 @@ export interface ExportedLibraryData {
   version: typeof VERSIONS.excalidrawLibrary;
   source: string;
   libraryItems: LibraryItems;
+  libraryFolders?: readonly LibraryFolder[];
 }
 
 export interface ImportedLibraryData extends Partial<ExportedLibraryData> {

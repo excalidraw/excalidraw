@@ -11,16 +11,25 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
-import { parseLibraryJSON } from "../data/blob";
+import { parseLibraryJSON, parseLibraryJSONWithFolders } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
-import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import {
+  deleteLibraryFolder,
+  distributeLibraryItemsOnSquareGrid,
+  useHandleLibrary,
+} from "../data/library";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
 import { fireEvent, render, waitFor } from "./test-utils";
 
-import type { LibraryItem, LibraryItems } from "../types";
+import type {
+  ExcalidrawImperativeAPI,
+  LibraryItem,
+  LibraryItems,
+} from "../types";
+import type { LibraryPersistenceAdapter } from "../data/library";
 
 const { h } = window;
 
@@ -142,6 +151,111 @@ describe("library items inserting", () => {
 });
 
 describe("library", () => {
+  it("serializes optional folder metadata", () => {
+    const folders = [{ id: "folder-a", name: "Sketches" }];
+    const serialized = JSON.parse(serializeLibraryAsJSON([], folders));
+    expect(serialized.libraryFolders).toEqual(folders);
+    expect(JSON.parse(serializeLibraryAsJSON([]))).not.toHaveProperty(
+      "libraryFolders",
+    );
+  });
+
+  it("restores folder metadata and drops invalid item assignments", () => {
+    const parsed = parseLibraryJSONWithFolders(
+      JSON.stringify({
+        type: "excalidrawlib",
+        version: 2,
+        libraryItems: [
+          {
+            id: "item-a",
+            status: "unpublished",
+            created: 1,
+            folderId: "folder-a",
+            elements: [
+              API.createElement({ id: "element-a", type: "rectangle" }),
+            ],
+          },
+          {
+            id: "item-b",
+            status: "unpublished",
+            created: 1,
+            folderId: "missing",
+            elements: [
+              API.createElement({ id: "element-b", type: "rectangle" }),
+            ],
+          },
+        ],
+        libraryFolders: [{ id: "folder-a", name: "Sketches" }],
+      }),
+    );
+    expect(parsed.libraryFolders).toEqual([
+      { id: "folder-a", name: "Sketches" },
+    ]);
+    expect(parsed.libraryItems[0].folderId).toBe("folder-a");
+    expect(parsed.libraryItems[1]).not.toHaveProperty("folderId");
+  });
+
+  it("restores nested folder metadata and repairs invalid parent links", () => {
+    const parsed = parseLibraryJSONWithFolders(
+      JSON.stringify({
+        type: "excalidrawlib",
+        version: 2,
+        libraryItems: [],
+        libraryFolders: [
+          { id: "root", name: "Root" },
+          { id: "child", name: "Child", parentId: "root" },
+          { id: "orphan", name: "Orphan", parentId: "missing" },
+          { id: "cycle-a", name: "Cycle A", parentId: "cycle-b" },
+          { id: "cycle-b", name: "Cycle B", parentId: "cycle-a" },
+        ],
+      }),
+    );
+
+    expect(parsed.libraryFolders).toEqual([
+      { id: "root", name: "Root" },
+      { id: "child", name: "Child", parentId: "root" },
+      { id: "orphan", name: "Orphan" },
+      { id: "cycle-a", name: "Cycle A" },
+      { id: "cycle-b", name: "Cycle B" },
+    ]);
+  });
+
+  it("deletes a folder subtree while either unfiling or deleting its items", () => {
+    const folders = [
+      { id: "root", name: "Root" },
+      { id: "child", name: "Child", parentId: "root" },
+      { id: "grandchild", name: "Grandchild", parentId: "child" },
+      { id: "other", name: "Other" },
+    ];
+    const item = (id: string, folderId?: string): LibraryItem => ({
+      id,
+      status: "unpublished",
+      created: 1,
+      elements: [API.createElement({ id: `element-${id}`, type: "rectangle" })],
+      ...(folderId ? { folderId } : {}),
+    });
+    const items = [
+      item("root-item", "root"),
+      item("child-item", "child"),
+      item("grandchild-item", "grandchild"),
+      item("other-item", "other"),
+    ];
+
+    expect(deleteLibraryFolder(folders, items, "root", false)).toEqual({
+      libraryFolders: [{ id: "other", name: "Other" }],
+      libraryItems: [
+        item("root-item"),
+        item("child-item"),
+        item("grandchild-item"),
+        item("other-item", "other"),
+      ],
+    });
+    expect(deleteLibraryFolder(folders, items, "root", true)).toEqual({
+      libraryFolders: [{ id: "other", name: "Other" }],
+      libraryItems: [item("other-item", "other")],
+    });
+  });
+
   beforeEach(async () => {
     await render(<Excalidraw />);
     await act(() => {
@@ -243,6 +357,103 @@ describe("library", () => {
 });
 
 describe("library menu", () => {
+  it("creates a personal library folder", async () => {
+    const { container, getByRole, getByText } = await render(<Excalidraw />);
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    const folderInput = getByRole("textbox", { name: "New folder" });
+    fireEvent.change(folderInput, { target: { value: "Sketches" } });
+    fireEvent.keyDown(folderInput, { key: KEYS.ENTER });
+    expect(getByText("Sketches")).toBeTruthy();
+  });
+
+  it("creates and navigates into a subfolder", async () => {
+    const { container, getByRole } = await render(<Excalidraw />);
+    await act(async () => {
+      await h.app.library.setLibraryFolders([
+        { id: "projects", name: "Projects" },
+      ]);
+    });
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    fireEvent.click(getByRole("button", { name: "Open Projects" }));
+
+    const folderInput = getByRole("textbox", { name: "New folder" });
+    fireEvent.change(folderInput, { target: { value: "Drafts" } });
+    fireEvent.keyDown(folderInput, { key: KEYS.ENTER });
+
+    expect(getByRole("button", { name: "Projects" })).toBeTruthy();
+    expect(getByRole("button", { name: "Drafts" })).toBeTruthy();
+  });
+
+  it("offers both delete choices and leaves the folder intact on cancel", async () => {
+    const { container, getByRole, getAllByRole } = await render(<Excalidraw />);
+    await act(async () => {
+      await h.app.library.setLibraryFolders([
+        { id: "projects", name: "Projects" },
+        { id: "drafts", name: "Drafts", parentId: "projects" },
+      ]);
+    });
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    fireEvent.click(getAllByRole("button", { name: "Delete" })[0]);
+
+    expect(
+      getByRole("button", { name: "Delete folders, keep items" }),
+    ).toBeTruthy();
+    expect(
+      getByRole("button", { name: "Delete folders and items" }),
+    ).toBeTruthy();
+    fireEvent.click(getByRole("button", { name: "Cancel" }));
+    expect(getByRole("button", { name: "Open Projects" })).toBeTruthy();
+  });
+
+  it("passes folder changes to onLibraryChange", async () => {
+    const onLibraryChange = vi.fn();
+    await render(<Excalidraw onLibraryChange={onLibraryChange} />);
+
+    const folders = [{ id: "folder-callback", name: "Callback" }];
+    await act(async () => {
+      await h.app.library.setLibraryFolders(folders);
+    });
+
+    expect(onLibraryChange).toHaveBeenCalledWith([], folders);
+  });
+
+  it("loads and saves folders through the persistence adapter", async () => {
+    const initialFolders = [{ id: "folder-loaded", name: "Loaded" }];
+    const adapter: LibraryPersistenceAdapter = {
+      load: vi.fn(async () => ({
+        libraryItems: [],
+        libraryFolders: initialFolders,
+      })),
+      save: vi.fn(async () => {}),
+    };
+    const AdapterHarness = () => {
+      const [api, setApi] = React.useState<ExcalidrawImperativeAPI | null>(
+        null,
+      );
+      useHandleLibrary({ excalidrawAPI: api, adapter });
+      return <Excalidraw onExcalidrawAPI={setApi} />;
+    };
+
+    const { container, getByRole } = await render(<AdapterHarness />);
+    await waitFor(() => expect(adapter.load).toHaveBeenCalled());
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+    expect(getByRole("button", { name: /Loaded/ })).toBeTruthy();
+
+    const updatedFolders = [
+      ...initialFolders,
+      { id: "folder-saved", name: "Saved" },
+    ];
+    await act(async () => {
+      await h.app.library.setLibraryFolders(updatedFolders);
+    });
+    expect(adapter.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        libraryItems: [],
+        libraryFolders: updatedFolders,
+      }),
+    );
+  });
+
   it("should load library from file picker", async () => {
     const { container } = await render(<Excalidraw />);
 

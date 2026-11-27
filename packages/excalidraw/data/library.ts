@@ -31,12 +31,13 @@ import { AbortError } from "../errors";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
 
-import { loadLibraryFromBlob } from "./blob";
-import { restoreLibraryItems } from "./restore";
+import { loadLibraryFromBlobWithFolders } from "./blob";
+import { restoreLibraryFolders, restoreLibraryItems } from "./restore";
 
 import type App from "../components/App";
 
 import type {
+  LibraryFolder,
   LibraryItems,
   LibraryItem,
   ExcalidrawImperativeAPI,
@@ -67,7 +68,10 @@ type LibraryUpdate = {
 
 // an object so that we can later add more properties to it without breaking,
 // such as schema version
-export type LibraryPersistedData = { libraryItems: LibraryItems };
+export type LibraryPersistedData = {
+  libraryItems: LibraryItems;
+  libraryFolders?: readonly LibraryFolder[];
+};
 
 const onLibraryUpdateEmitter = new Emitter<
   [update: LibraryUpdate, libraryItems: LibraryItems]
@@ -89,7 +93,10 @@ export interface LibraryPersistenceAdapter {
      * purposes, in which case host app can implement more aggressive caching.
      */
     source: LibraryAdatapterSource;
-  }): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
+  }): MaybePromise<{
+    libraryItems: LibraryItems_anyVersion;
+    libraryFolders?: readonly LibraryFolder[];
+  } | null>;
   /** Should persist to the database as is (do no change the data structure). */
   save(libraryData: LibraryPersistedData): MaybePromise<void>;
 }
@@ -99,7 +106,10 @@ export interface LibraryMigrationAdapter {
    * loads data from legacy data source. Returns `null` if no data is
    * to be migrated.
    */
-  load(): MaybePromise<{ libraryItems: LibraryItems_anyVersion } | null>;
+  load(): MaybePromise<{
+    libraryItems: LibraryItems_anyVersion;
+    libraryFolders?: readonly LibraryFolder[];
+  } | null>;
 
   /** clears entire storage afterwards */
   clear(): MaybePromise<void>;
@@ -111,7 +121,23 @@ export const libraryItemsAtom = atom<{
    * through at least one update). Used in UI. Specific to this atom only. */
   isInitialized: boolean;
   libraryItems: LibraryItems;
-}>({ status: "loaded", isInitialized: false, libraryItems: [] });
+  libraryFolders: readonly LibraryFolder[];
+}>({
+  status: "loaded",
+  isInitialized: false,
+  libraryItems: [],
+  libraryFolders: [],
+});
+
+let folderPersistenceAdapter: LibraryPersistenceAdapter | null = null;
+
+export const setLibraryFolders = (libraryFolders: readonly LibraryFolder[]) => {
+  const folders = cloneJSON(libraryFolders);
+  editorJotaiStore.set(libraryItemsAtom, (state) => ({
+    ...state,
+    libraryFolders: folders,
+  }));
+};
 
 const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
   cloneJSON(libraryItems);
@@ -154,6 +180,61 @@ export const mergeLibraryItems = (
   }
 
   return [...newItems, ...localItems];
+};
+
+export const getLibraryFolderDescendantIds = (
+  libraryFolders: readonly LibraryFolder[],
+  folderId: LibraryFolder["id"],
+): Set<LibraryFolder["id"]> => {
+  const deletedFolderIds = new Set([folderId]);
+  let hasNewDescendants = true;
+  while (hasNewDescendants) {
+    hasNewDescendants = false;
+    for (const folder of libraryFolders) {
+      if (
+        folder.parentId &&
+        deletedFolderIds.has(folder.parentId) &&
+        !deletedFolderIds.has(folder.id)
+      ) {
+        deletedFolderIds.add(folder.id);
+        hasNewDescendants = true;
+      }
+    }
+  }
+
+  return deletedFolderIds;
+};
+
+export const deleteLibraryFolder = (
+  libraryFolders: readonly LibraryFolder[],
+  libraryItems: LibraryItems,
+  folderId: LibraryFolder["id"],
+  deleteItems: boolean,
+): { libraryFolders: LibraryFolder[]; libraryItems: LibraryItems } => {
+  const deletedFolderIds = getLibraryFolderDescendantIds(
+    libraryFolders,
+    folderId,
+  );
+
+  const nextLibraryItems: LibraryItem[] = [];
+  for (const item of libraryItems) {
+    if (item.folderId && deletedFolderIds.has(item.folderId)) {
+      if (deleteItems) {
+        continue;
+      }
+      const { folderId: _folderId, ...unfiledItem } = item;
+      nextLibraryItems.push(unfiledItem);
+      continue;
+    }
+    nextLibraryItems.push(item);
+  }
+
+  return {
+    libraryFolders: libraryFolders.filter(
+      (folder) => !deletedFolderIds.has(folder.id),
+    ),
+    libraryItems: nextLibraryItems,
+  };
 };
 
 /**
@@ -207,6 +288,20 @@ class Library {
     this.app = app;
   }
 
+  setLibraryFolders = (libraryFolders: readonly LibraryFolder[]) => {
+    setLibraryFolders(libraryFolders);
+    const data = editorJotaiStore.get(libraryItemsAtom);
+    const onChange = this.app.props.onLibraryChange?.(
+      data.libraryItems,
+      data.libraryFolders,
+    );
+    const onSave = folderPersistenceAdapter?.save({
+      libraryItems: data.libraryItems,
+      libraryFolders: data.libraryFolders,
+    });
+    return Promise.all([onChange, onSave]);
+  };
+
   private updateQueue: Promise<LibraryItems>[] = [];
 
   private getLastUpdateTask = (): Promise<LibraryItems> | undefined => {
@@ -218,12 +313,14 @@ class Library {
       editorJotaiStore.set(libraryItemsAtom, (s) => ({
         status: "loading",
         libraryItems: this.currLibraryItems,
+        libraryFolders: s.libraryFolders,
         isInitialized: s.isInitialized,
       }));
     } else {
       editorJotaiStore.set(libraryItemsAtom, {
         status: "loaded",
         libraryItems: this.currLibraryItems,
+        libraryFolders: editorJotaiStore.get(libraryItemsAtom).libraryFolders,
         isInitialized: true,
       });
       try {
@@ -232,7 +329,10 @@ class Library {
 
         const nextLibraryItems = cloneLibraryItems(this.currLibraryItems);
 
-        this.app.props.onLibraryChange?.(nextLibraryItems);
+        this.app.props.onLibraryChange?.(
+          nextLibraryItems,
+          editorJotaiStore.get(libraryItemsAtom).libraryFolders,
+        );
 
         // for internal use in `useHandleLibrary` hook
         onLibraryUpdateEmitter.trigger(
@@ -259,6 +359,7 @@ class Library {
   };
 
   resetLibrary = () => {
+    void this.setLibraryFolders([]);
     return this.setLibrary([]);
   };
 
@@ -312,9 +413,15 @@ class Library {
             : libraryItems);
 
           let nextItems;
+          let importedFolders: readonly LibraryFolder[] | undefined;
 
           if (source instanceof Blob) {
-            nextItems = await loadLibraryFromBlob(source, defaultStatus);
+            const imported = await loadLibraryFromBlobWithFolders(
+              source,
+              defaultStatus,
+            );
+            nextItems = imported.libraryItems;
+            importedFolders = imported.libraryFolders;
           } else {
             nextItems = restoreLibraryItems(source, defaultStatus);
           }
@@ -331,6 +438,24 @@ class Library {
               // lest `props.autoFocus` is disabled (in which case we should
               // focus only on user action such as prompt confirm)
               this.app.focusContainer();
+            }
+
+            if (importedFolders) {
+              const currentFolders =
+                editorJotaiStore.get(libraryItemsAtom).libraryFolders;
+              this.setLibraryFolders(
+                merge
+                  ? [
+                      ...currentFolders,
+                      ...importedFolders.filter(
+                        (folder) =>
+                          !currentFolders.some(
+                            (existing) => existing.id === folder.id,
+                          ),
+                      ),
+                    ]
+                  : importedFolders,
+              );
             }
 
             if (merge) {
@@ -592,7 +717,9 @@ let lastSavedLibraryItemsHash = 0;
 let librarySaveCounter = 0;
 
 const getLibraryItemHash = (item: LibraryItem) => {
-  return `${item.id}:${item.name || ""}:${hashElementsVersion(item.elements)}`;
+  return `${item.id}:${item.name || ""}:${
+    item.folderId || ""
+  }:${hashElementsVersion(item.elements)}`;
 };
 
 export const getLibraryItemsHash = (items: LibraryItems) => {
@@ -662,7 +789,10 @@ const persistLibraryUpdate = async (
       const version = getLibraryItemsHash(nextLibraryItems);
 
       if (version !== lastSavedLibraryItemsHash) {
-        await adapter.save({ libraryItems: nextLibraryItems });
+        await adapter.save({
+          libraryItems: nextLibraryItems,
+          libraryFolders: editorJotaiStore.get(libraryItemsAtom).libraryFolders,
+        });
       }
 
       lastSavedLibraryItemsHash = version;
@@ -836,6 +966,7 @@ export const useHandleLibrary = (
 
     if ("adapter" in optsRef.current && optsRef.current.adapter) {
       const adapter = optsRef.current.adapter;
+      folderPersistenceAdapter = adapter;
       const migrationAdapter = optsRef.current.migrationAdapter;
 
       const initDataPromise = resolvablePromise<LibraryItems | null>();
@@ -862,6 +993,9 @@ export const useHandleLibrary = (
                 restoredData = restoreLibraryItems(
                   libraryData.libraryItems || [],
                   "published",
+                );
+                setLibraryFolders(
+                  restoreLibraryFolders(libraryData.libraryFolders),
                 );
 
                 // we don't queue this operation because it's running inside
@@ -896,7 +1030,10 @@ export const useHandleLibrary = (
         );
       } else {
         initDataPromise.resolve(
-          promiseTry(AdapterTransaction.getLibraryItems, adapter, "load"),
+          promiseTry(adapter.load, { source: "load" }).then((data) => {
+            setLibraryFolders(restoreLibraryFolders(data?.libraryFolders));
+            return restoreLibraryItems(data?.libraryItems || [], "published");
+          }),
         );
       }
 
@@ -990,6 +1127,11 @@ export const useHandleLibrary = (
       return () => {
         window.removeEventListener(EVENT.BEFORE_UNLOAD, onUnload);
         unsubOnLibraryUpdate();
+        const adapter =
+          ("adapter" in optsRef.current && optsRef.current.adapter) || null;
+        if (folderPersistenceAdapter === adapter) {
+          folderPersistenceAdapter = null;
+        }
         lastSavedLibraryItemsHash = 0;
         librarySaveCounter = 0;
       };

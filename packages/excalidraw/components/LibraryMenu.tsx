@@ -26,6 +26,7 @@ import type {
 import { trackEvent } from "../analytics";
 import { useUIAppState } from "../context/ui-appState";
 import {
+  deleteLibraryFolder,
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
@@ -157,6 +158,39 @@ const LibraryMenuContent = memo(
           theme={theme}
           onSelectItems={onSelectItems}
           selectedItems={selectedItems}
+          onMoveSelectedItems={(folderId) => {
+            const selected = new Set(selectedItems);
+            library
+              .setLibrary((items) =>
+                items.map((item) => {
+                  if (!selected.has(item.id) || item.status === "published") {
+                    return item;
+                  }
+                  const { folderId: _folderId, ...rest } = item;
+                  return folderId ? { ...rest, folderId } : rest;
+                }),
+              )
+              .catch(() =>
+                setAppState({
+                  errorMessage: t("alerts.errorRemovingFromLibrary"),
+                }),
+              );
+            onSelectItems([]);
+          }}
+          onDeleteFolder={(folderId, deleteContents) => {
+            const { libraryFolders, libraryItems } = deleteLibraryFolder(
+              libraryItemsData.libraryFolders,
+              libraryItemsData.libraryItems,
+              folderId,
+              deleteContents,
+            );
+            void library.setLibraryFolders(libraryFolders);
+            library.setLibrary(libraryItems).catch(() =>
+              setAppState({
+                errorMessage: t("alerts.errorRemovingFromLibrary"),
+              }),
+            );
+          }}
         />
         {showBtn && (
           <LibraryMenuControlButtons
