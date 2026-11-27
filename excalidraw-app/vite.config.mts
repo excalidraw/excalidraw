@@ -319,6 +319,7 @@ export default defineConfig(({ mode }) => {
             ),
           ],
           // don't precache fonts, locales and separate chunks
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
           globIgnores: [
             "404.html",
             "fonts.css",
