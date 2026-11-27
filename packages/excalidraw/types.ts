@@ -39,6 +39,7 @@ import type {
   BindMode,
   ExcalidrawTextElement,
   StrokeVariability,
+  StickyNoteFooterOptions,
 } from "@excalidraw/element/types";
 
 import type {
@@ -456,6 +457,8 @@ export interface AppState {
   currentItemStrokeColor: string;
   currentItemStickynoteStrokeColor: string;
   currentItemStickynoteBackgroundColor: string;
+  /** Host-controlled default for new notes; null hides the footer. */
+  currentItemStickynoteFooterOptions: StickyNoteFooterOptions | null;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;

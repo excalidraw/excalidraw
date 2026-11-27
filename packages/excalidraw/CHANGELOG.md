@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Sticky note footers [#12072](https://github.com/excalidraw/excalidraw/pull/12072)
+
+- Hosts can set a sticky note's `footerOptions` to hide its footer, show its creation date or time, or display custom text. The existing short date remains the default. Saved scenes, restore, skeleton creation, flowchart cloning, history, canvas exports and SVG exports preserve the options. Hiding the footer makes its space available to the label; long custom text is ellipsized without changing the saved value.
+- New `appState.currentItemStickynoteFooterOptions` sets the default for notes created with the tool, including toolbar drag-and-drop. Footer controls and custom date formatting remain host-owned.
+
 ### Minimap, zoom menu and `ui.disabled` (2026-11-12) [#12605](https://github.com/excalidraw/excalidraw/pull/12605), [#12606](https://github.com/excalidraw/excalidraw/pull/12606)
 
 - A toggleable minimap above the bottom-left canvas actions: drag its viewport (or press outside of it) to pan, wheel over it to zoom. Toggled from the footer button next to the zoom level, the Preferences menu, the command palette and the context menu; stored as `appState.minimapEnabled` (in the browser, not in exported files). Not shown on phones or in editors shorter than 500px.
