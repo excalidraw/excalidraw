@@ -197,6 +197,7 @@ export const SelectedShapeActions = ({
 
       {predicates.verticalAlign && renderAction("changeVerticalAlign")}
       {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
+      {predicates.arrowFlow && renderAction("changeArrowFlow")}
 
       {predicates.opacity && renderAction("changeOpacity")}
 
@@ -403,6 +404,7 @@ const CombinedArrowProperties = ({
             onClose={() => {}}
           >
             {renderAction("changeArrowProperties")}
+            {predicates.arrowFlow && renderAction("changeArrowFlow")}
           </PropertiesPopover>
         )}
       </Popover.Root>

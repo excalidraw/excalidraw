@@ -2276,6 +2276,61 @@ export const flipHorizontal = createIcon(
   tablerIconProps,
 );
 
+// arrow flow: a line with packets on it
+const arrowFlowIcon = (packets: React.ReactNode) =>
+  createIcon(
+    <g strokeWidth={1.5}>
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M3 12h18" />
+      {packets}
+    </g>,
+    tablerIconProps,
+  );
+export const arrowFlowNoneIcon = arrowFlowIcon(null);
+export const arrowFlowForwardIcon = arrowFlowIcon(
+  <>
+    <circle cx="8" cy="12" r="2.25" fill="currentColor" stroke="none" />
+    <path d="M14 9l3 3l-3 3" />
+  </>,
+);
+export const arrowFlowBackwardIcon = arrowFlowIcon(
+  <>
+    <circle cx="16" cy="12" r="2.25" fill="currentColor" stroke="none" />
+    <path d="M10 9l-3 3l3 3" />
+  </>,
+);
+export const arrowFlowBothIcon = arrowFlowIcon(
+  <>
+    <circle cx="7" cy="12" r="2.25" fill="currentColor" stroke="none" />
+    <circle cx="17" cy="12" r="2.25" fill="currentColor" stroke="none" />
+  </>,
+);
+// flow speed: one, two or three chevrons
+export const arrowFlowSlowIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M10 7l5 5l-5 5" />
+  </g>,
+  tablerIconProps,
+);
+export const arrowFlowNormalIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M7 7l5 5l-5 5" />
+    <path d="M13 7l5 5l-5 5" />
+  </g>,
+  tablerIconProps,
+);
+export const arrowFlowFastIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 7l5 5l-5 5" />
+    <path d="M10 7l5 5l-5 5" />
+    <path d="M16 7l5 5l-5 5" />
+  </g>,
+  tablerIconProps,
+);
+
 export const paintIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

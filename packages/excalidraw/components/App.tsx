@@ -417,6 +417,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { hideTooltip } from "./Tooltip";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
+import { ArrowFlowLayer } from "./canvases/ArrowFlowLayer";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { AppHost } from "./App.host";
 import { CursorHint, CursorHints } from "./CursorHint";
@@ -2672,6 +2673,11 @@ class App extends React.Component<AppProps, AppState> {
                               theme: this.state.theme,
                               ...this.getRenderOverrideConfig(),
                             }}
+                          />
+                          <ArrowFlowLayer
+                            elements={visibleElements}
+                            appState={this.state}
+                            ownerWindow={this.ownerWindow}
                           />
                           {previewElement && (
                             <NewElementCanvas
