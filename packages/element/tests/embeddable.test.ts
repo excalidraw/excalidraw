@@ -1,4 +1,75 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  IFRAME_ELEMENT_CSP,
+  embeddableURLValidator,
+  getEmbedLink,
+  injectIframeElementCSP,
+} from "../src/embeddable";
+
+const CSP_META = `<meta http-equiv="Content-Security-Policy" content="${IFRAME_ELEMENT_CSP}">`;
+
+describe("injectIframeElementCSP", () => {
+  it("inserts the CSP meta right after a lowercase doctype", () => {
+    expect(injectIframeElementCSP("<!doctype html><p>hi</p>")).toBe(
+      `<!doctype html>${CSP_META}<p>hi</p>`,
+    );
+  });
+
+  it("inserts the CSP meta right after an uppercase doctype", () => {
+    expect(
+      injectIframeElementCSP(
+        '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"><html><head></head></html>',
+      ),
+    ).toBe(
+      `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">${CSP_META}<html><head></head></html>`,
+    );
+  });
+
+  it("keeps leading whitespace before the doctype", () => {
+    expect(injectIframeElementCSP("\n  <!DOCTYPE html>\n<html></html>")).toBe(
+      `\n  <!DOCTYPE html>${CSP_META}\n<html></html>`,
+    );
+  });
+
+  it("prepends the CSP meta when there's no doctype", () => {
+    expect(injectIframeElementCSP("<p>hi</p>")).toBe(`${CSP_META}<p>hi</p>`);
+    expect(injectIframeElementCSP("  <html><body>x</body></html>")).toBe(
+      `${CSP_META}  <html><body>x</body></html>`,
+    );
+    expect(injectIframeElementCSP("")).toBe(CSP_META);
+  });
+
+  it("doesn't treat a non-leading doctype as leading", () => {
+    expect(injectIframeElementCSP("<p>a</p><!DOCTYPE html>")).toBe(
+      `${CSP_META}<p>a</p><!DOCTYPE html>`,
+    );
+  });
+
+  it("parses into <head> without flipping into quirks mode", () => {
+    const doc = new DOMParser().parseFromString(
+      injectIframeElementCSP(
+        '<!DOCTYPE html><html lang="en"><head><title>t</title></head><body><p>hi</p></body></html>',
+      ),
+      "text/html",
+    );
+    expect(doc.compatMode).toBe("CSS1Compat");
+    const meta = doc.head.querySelector("meta[http-equiv]");
+    expect(meta?.getAttribute("content")).toBe(IFRAME_ELEMENT_CSP);
+    expect(doc.head.querySelector("title")?.textContent).toBe("t");
+    expect(doc.documentElement.getAttribute("lang")).toBe("en");
+    expect(doc.body.innerHTML).toBe("<p>hi</p>");
+  });
+
+  it("parses into <head> when there's no doctype", () => {
+    const doc = new DOMParser().parseFromString(
+      injectIframeElementCSP("<p>hi</p>"),
+      "text/html",
+    );
+    expect(
+      doc.head.querySelector("meta[http-equiv]")?.getAttribute("content"),
+    ).toBe(IFRAME_ELEMENT_CSP);
+    expect(doc.body.innerHTML).toBe("<p>hi</p>");
+  });
+});
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
