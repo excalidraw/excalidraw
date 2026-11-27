@@ -124,15 +124,19 @@ export class AppFonts {
 
   /**
    * Whether the scene holds changes which are yet to be captured: a pointer
-   * gesture, or a text edit - typing writes to the element right away, while
-   * the edit is captured only once submitted.
+   * gesture, a text edit - typing writes to the element right away, while
+   * the edit is captured only once submitted - or a font hover preview,
+   * which is either taken back or captured once the font gets picked. A
+   * repair committed meanwhile would take the previewed font into the
+   * snapshot, and picking it would leave nothing to undo.
    */
   private isGestureInFlight = (state: AppState) =>
     state.selectedElementsAreBeingDragged ||
     state.isResizing ||
     state.isRotating ||
     state.cursorButton === "down" ||
-    !!state.editingTextElement;
+    !!state.editingTextElement ||
+    state.currentHoveredFontFamily != null;
 
   /**
    * Whether text in the family should stay undrawn for now, rather than be

@@ -1510,7 +1510,7 @@ export const actionChangeFontFamily = register<{
             }
 
             if (elementContainerMapping.size) {
-              app.fonts.instance.runSceneRepair(() => {
+              const redraw = () => {
                 for (const [element, container] of elementContainerMapping) {
                   // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
                   const latestElement = app.scene.getElement(element.id);
@@ -1532,7 +1532,17 @@ export const actionChangeFontFamily = register<{
                     );
                   }
                 }
-              });
+              };
+
+              if (app.state.currentHoveredFontFamily != null) {
+                // Still a preview: laid out again as part of it, uncaptured
+                // like the hover which made it. As a repair it would wait
+                // for the hover to end (see `AppFonts.isGestureInFlight`),
+                // the preview keeping the fallback font's layout meanwhile
+                redraw();
+              } else {
+                app.fonts.instance.runSceneRepair(redraw);
+              }
             }
 
             // trigger update once we've mutated all the elements, which also updates our cache

@@ -2,7 +2,11 @@ import { fireEvent, screen, waitFor } from "@testing-library/react";
 import React from "react";
 
 import { FONT_FAMILY, KEYS } from "@excalidraw/common";
-import { Scene, updateStickyNoteLayout } from "@excalidraw/element";
+import {
+  CaptureUpdateAction,
+  Scene,
+  updateStickyNoteLayout,
+} from "@excalidraw/element";
 
 import type { FontMetadata } from "@excalidraw/common";
 import type {
@@ -324,6 +328,61 @@ describe("FontPicker", () => {
       expect(API.getElement(label).fontFamily).toBe(fontFamily),
     );
     expect(API.getElement(label).fontSize).toBe(fontSize);
+  });
+
+  it("lets a font be undone which was picked after a font repair landed on its preview", async () => {
+    const { queryByTestId } = await render(
+      <Excalidraw handleKeyboardGlobally={true} />,
+    );
+    const text = API.createElement({ type: "text", text: "Hello" });
+    const other = API.createElement({ type: "text", text: "other", y: 200 });
+    API.updateScene({
+      elements: [text, other],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+    API.setSelectedElements([text]);
+    const initialFontFamily = API.getElement(text).fontFamily;
+    const undoStackLength = API.getUndoStack().length;
+
+    fireEvent.click(queryByTestId("font-family-show-fonts")!);
+    const comicShanns = (await screen.findByText("Comic Shanns")).closest(
+      "button",
+    )!;
+    fireEvent.mouseMove(comicShanns);
+    await waitFor(() =>
+      expect(API.getElement(text).fontFamily).toBe(FONT_FAMILY["Comic Shanns"]),
+    );
+
+    // Some font arrives during the hover, and text measured before it gets
+    // repaired. Committed right away (never captured), the repair would take
+    // the previewed font into the snapshot with it
+    act(() => {
+      h.app.fonts.instance.runSceneRepair(() => {
+        h.app.scene.mutateElement(
+          h.app.scene.getElement(other.id) as ExcalidrawTextElement,
+          { lineHeight: 2 as ExcalidrawTextElement["lineHeight"] },
+        );
+      });
+    });
+    act(() => {
+      h.app.scene.triggerUpdate();
+    });
+    expect(
+      (API.getElement(other) as ExcalidrawTextElement).lineHeight,
+    ).not.toBe(2);
+
+    fireEvent.click(comicShanns);
+    await waitFor(() => expect(h.state.openPopup).toBe(null));
+    expect(API.getUndoStack().length).toBe(undoStackLength + 1);
+    // the repair runs once the preview is over
+    await waitFor(() =>
+      expect((API.getElement(other) as ExcalidrawTextElement).lineHeight).toBe(
+        2,
+      ),
+    );
+
+    Keyboard.undo();
+    expect(API.getElement(text).fontFamily).toBe(initialFontFamily);
   });
 
   it("takes back the font alone when the text was edited during the preview", async () => {
