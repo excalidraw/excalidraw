@@ -19,12 +19,18 @@ let loadedWasm: ReturnType<typeof load> | null = null;
 
 // re-map from internal vector into byte array
 function convertFromVecToUint8Array(vector: Vector): Uint8Array<ArrayBuffer> {
-  const arr = [];
-  for (let i = 0, l = vector.size(); i < l; i++) {
-    arr.push(vector.get(i));
-  }
+  try {
+    const arr = [];
+    for (let i = 0, l = vector.size(); i < l; i++) {
+      arr.push(vector.get(i));
+    }
 
-  return new Uint8Array(arr);
+    return new Uint8Array(arr);
+  } finally {
+    // the vector lives in the wasm module's memory, which no garbage
+    // collector reaches - without this every call leaks its whole result
+    vector.delete();
+  }
 }
 
 // TODO: consider adding support for fetching the wasm from an URL (external CDN, data URL, etc.)
