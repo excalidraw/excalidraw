@@ -12,6 +12,7 @@ import {
 } from "@excalidraw/common";
 
 import { Excalidraw } from "@excalidraw/excalidraw";
+import { actionToggleLinearEditor } from "@excalidraw/excalidraw/actions/actionLinearEditor";
 import * as InteractiveCanvas from "@excalidraw/excalidraw/renderer/interactiveScene";
 import * as StaticScene from "@excalidraw/excalidraw/renderer/staticScene";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
@@ -349,6 +350,62 @@ describe("Test Linear Elements", () => {
 
     expect(h.state.selectedLinearElement?.isEditing).toBe(true);
     expect(h.state.selectedLinearElement?.elementId).toEqual(updatedArrow.id);
+  });
+
+  it.each(["line", "arrow"] as const)(
+    "should initialize the editor when editing a selected %s without an existing editor",
+    (type) => {
+      const element = createTwoPointerLinearElement(type);
+      API.setAppState({ selectedLinearElement: null });
+
+      fireEvent.contextMenu(interactiveCanvas, {
+        button: 2,
+        clientX: midpoint[0],
+        clientY: midpoint[1],
+      });
+      fireEvent.click(screen.getByTestId("toggleLinearEditor"));
+
+      expect(h.state.selectedLinearElement?.elementId).toBe(element.id);
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+      expect(h.elements).toEqual([element]);
+    },
+  );
+
+  it("should edit the selected arrow instead of a stale editor's target", () => {
+    const arrow = createTwoPointerLinearElement("arrow");
+    const otherArrow = API.createElement({ type: "arrow", x: 200 });
+    API.setElements([arrow, otherArrow]);
+    API.setAppState({
+      selectedLinearElement: new LinearElementEditor(
+        otherArrow,
+        h.scene.getNonDeletedElementsMap(),
+        true,
+      ),
+    });
+
+    act(() => h.app.actionManager.executeAction(actionToggleLinearEditor));
+
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+
+    act(() => h.app.actionManager.executeAction(actionToggleLinearEditor));
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+    expect(h.state.selectedLinearElement?.isEditing).toBe(false);
+  });
+
+  it("should ignore editing when the selection is no longer a single linear element", () => {
+    const arrow = createTwoPointerLinearElement("arrow");
+    const rectangle = API.createElement({ type: "rectangle", x: 200 });
+    API.setElements([arrow, rectangle]);
+
+    for (const selection of [[], [rectangle], [arrow, rectangle]]) {
+      API.setSelectedElements(selection);
+      const editor = h.state.selectedLinearElement;
+      act(() => h.app.actionManager.executeAction(actionToggleLinearEditor));
+
+      expect(h.state.selectedLinearElement).toBe(editor);
+      expect(API.getSelectedElements()).toEqual(selection);
+    }
   });
 
   it("should enter line editor via enter (line)", () => {

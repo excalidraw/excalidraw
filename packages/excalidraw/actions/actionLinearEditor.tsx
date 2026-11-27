@@ -2,8 +2,9 @@ import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
+  LinearElementEditor,
 } from "@excalidraw/element";
-import { arrayToMap, invariant } from "@excalidraw/common";
+import { arrayToMap } from "@excalidraw/common";
 
 import {
   toggleLinePolygonState,
@@ -53,20 +54,29 @@ export const actionToggleLinearEditor = register({
     return false;
   },
   perform(elements, appState, _, app) {
-    invariant(
-      appState.selectedLinearElement,
-      "No selected linear element found",
-    );
+    const selectedElements = app.scene.getSelectedElements(appState);
+    const selectedElement = selectedElements[0];
+    if (
+      selectedElements.length !== 1 ||
+      !isLinearElement(selectedElement) ||
+      isElbowArrow(selectedElement)
+    ) {
+      return false;
+    }
 
-    const selectedElement = app.scene.getElement(
-      appState.selectedLinearElement.elementId,
-    ) as ExcalidrawLinearElement | null;
-
-    invariant(selectedElement, "No selected element found");
+    // A selection can exist without an initialized point editor. Resolve the
+    // target from the selection, just as the action's predicate does.
+    const editor =
+      appState.selectedLinearElement?.elementId === selectedElement.id
+        ? appState.selectedLinearElement
+        : new LinearElementEditor(
+            selectedElement,
+            app.scene.getNonDeletedElementsMap(),
+          );
 
     const selectedLinearElement = {
-      ...appState.selectedLinearElement,
-      isEditing: !appState.selectedLinearElement.isEditing,
+      ...editor,
+      isEditing: !editor.isEditing,
     };
 
     return {
