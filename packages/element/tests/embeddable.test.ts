@@ -271,3 +271,32 @@ describe("Instagram embedding", () => {
     }
   });
 });
+
+describe("Mergin Maps embedding", () => {
+  it.each([
+    {
+      url: "https://app.merginmaps.com/maps/embed/S9RkdlZJjWHFOzVh6Yv97L-tPAE",
+    },
+    {
+      url: "https://app.merginmaps.com/maps/embed/S9RkdlZJjWHFOzVh6Yv97L-tPAE?basemap=1&tools=reload%2Cspinner%2Czoom%2Cscalebar&cx=-1.7637153463659816&cy=51.78648298081018&cz=16",
+    },
+    {
+      url: "https://app.dev.merginmaps.com/maps/embed/S9RkdlZJjWHFOzVh6Yv97L-tPAE?basemap=1",
+    },
+  ])("should validate Mergin Maps embed URLs by default: $url", ({ url }) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    const result = getEmbedLink(url);
+    expect(result?.type).toBe("generic");
+  });
+
+  it("should reject non-embed Mergin Maps URLs", () => {
+    // the allowlist is domain-based, but non-embed pages of the app
+    // must not silently turn into embeddables
+    expect(
+      embeddableURLValidator(
+        "https://evil.merginmaps.com/maps/embed/x",
+        undefined,
+      ),
+    ).toBe(false);
+  });
+});
