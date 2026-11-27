@@ -298,15 +298,31 @@ const Panel = ({
     }
   }, [genericElements, app.scene]);
 
+  // Checagem infalível: olha diretamente para os dados de conexão do elemento
+  const hasTextOrConnections = linearElements.some(
+    (element) =>
+      hasBoundTextElement(element) ||
+      element.startBinding != null ||
+      element.endBinding != null
+  );
+
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
-      : conversionType === "generic"
+      ? (hasTextOrConnections
+          ? [
+              // Sem a linha se estiver grudado
+              ["sharpArrow", sharpArrowIcon],
+              ["curvedArrow", roundArrowIcon],
+              ["elbowArrow", elbowArrowIcon],
+            ]
+          : [
+              // Com a linha se estiver solto
+              ["line", LineIcon],
+              ["sharpArrow", sharpArrowIcon],
+              ["curvedArrow", roundArrowIcon],
+              ["elbowArrow", elbowArrowIcon],
+            ])
+      : conversionType === "generic" // ... (o resto do SHAPES continua igual)
       ? [
           ["rectangle", RectangleIcon],
           ["diamond", DiamondIcon],
@@ -529,16 +545,28 @@ export const convertElementTypes = (
     const convertibleLinearElements =
       filterLinearConvertibleElements(selectedElements);
 
+    // Mesma checagem infalível para o atalho do teclado
+    const hasTextOrConnections = convertibleLinearElements.some(
+      (element) =>
+        hasBoundTextElement(element) ||
+        element.startBinding != null ||
+        element.endBinding != null
+    );
+
+    const availableLinearTypes = hasTextOrConnections
+      ? LINEAR_TYPES.filter((type) => type !== "line")
+      : LINEAR_TYPES;
+
     if (!nextType) {
       const commonSubType = reduceToCommonValue(
         convertibleLinearElements,
         getLinearElementSubType,
       );
 
-      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
+      const index = commonSubType ? availableLinearTypes.indexOf(commonSubType as any) : -1;
       nextType =
-        LINEAR_TYPES[
-          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
+        availableLinearTypes[
+          (index + availableLinearTypes.length + advancement) % availableLinearTypes.length
         ];
     }
 
@@ -673,11 +701,7 @@ export const getConversionTypeFromElements = (
 };
 
 const isEligibleLinearElement = (element: ExcalidrawElement) => {
-  return (
-    isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
-  );
+  return isLinearElement(element);
 };
 
 const toCacheKey = (
