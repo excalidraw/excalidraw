@@ -29,7 +29,7 @@
  */
 import type { FontDefinition, FontResolver } from "../Fonts";
 
-import type { FontKind, FontSearchResult } from "../../types";
+import type { FontKind, FontProvider, FontSearchResult } from "../../types";
 
 /** the provider key of every Google font id, i.e. "google:Open Sans" */
 export { GOOGLE_FONT_PROVIDER_KEY } from "../providerKey";
@@ -484,3 +484,46 @@ export const GOOGLE_FONT_DEFAULT_PICKS: readonly string[] = [
   // Korean
   "Gowun Dodum",
 ];
+
+/**
+ * The Google fonts as a font provider, for `<Excalidraw fontProviders>`
+ * under {@link GOOGLE_FONT_PROVIDER_KEY}:
+ *
+ * ```ts
+ * const google = createGoogleFontProvider();
+ * // image exports made outside of the editor don't get its `fontProviders`
+ * registerFontResolvers({ [GOOGLE_FONT_PROVIDER_KEY]: google.resolve });
+ *
+ * <Excalidraw fontProviders={{ [GOOGLE_FONT_PROVIDER_KEY]: google }} />
+ * ```
+ *
+ * Whatever the catalog and the font picker come to need from a provider is
+ * wired up here, so a host needn't follow along. Spread it to change a part,
+ * i.e. `availableFonts` for a list of your own.
+ */
+export const createGoogleFontProvider = ({
+  resolve = createGoogleFontResolver(),
+  offerInPicker = true,
+}: {
+  /**
+   * Defaults to `createGoogleFontResolver()`. Pass your own for another
+   * `source` of the font files, or to share one you've created already.
+   */
+  resolve?: FontResolver;
+  /**
+   * `false` keeps the fonts out of the font picker: none is listed up front,
+   * found by its search or browsed to. A scene's Google fonts still render,
+   * and are listed for as long as the scene uses them.
+   *
+   * @default true
+   */
+  offerInPicker?: boolean;
+} = {}): FontProvider => ({
+  resolve,
+  availableFonts: offerInPicker ? GOOGLE_FONT_DEFAULT_PICKS : [],
+  getKind: getGoogleFontKind,
+  getPreviewText: getGoogleFontPreviewText,
+  ...(offerInPicker
+    ? { search: searchGoogleFonts, loadMore: loadMoreGoogleFonts }
+    : null),
+});

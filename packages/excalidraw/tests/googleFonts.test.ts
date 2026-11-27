@@ -1,5 +1,6 @@
 import { isValidFontProviderKey } from "../fonts";
 import {
+  createGoogleFontProvider,
   createGoogleFontResolver,
   getGoogleFontKind,
   getGoogleFontPreviewText,
@@ -65,6 +66,29 @@ describe("Google Fonts catalog", () => {
     expect(await getGoogleFontKind("Kalam")).toBe("hand-drawn");
     expect(await getGoogleFontKind("Fira Mono")).toBe("code");
     expect(await getGoogleFontKind("Not A Font")).toBe(undefined);
+  });
+});
+
+describe("createGoogleFontProvider", () => {
+  it("offers the catalog in the font picker, with the resolver it's given", async () => {
+    const resolve = vi.fn();
+    const provider = createGoogleFontProvider({ resolve });
+
+    expect(provider.resolve).toBe(resolve);
+    expect(provider.availableFonts).toEqual(GOOGLE_FONT_DEFAULT_PICKS);
+    expect(await provider.getKind!("Kalam")).toBe("hand-drawn");
+    expect(await provider.getPreviewText!("Zen Maru Gothic")).toBe("あ");
+    expect(provider.search).toBe(searchGoogleFonts);
+    expect(provider.loadMore).toBe(loadMoreGoogleFonts);
+  });
+
+  it("offers nothing in the picker when told so, and still tells of a scene's fonts", async () => {
+    const provider = createGoogleFontProvider({ offerInPicker: false });
+
+    expect(provider.availableFonts).toEqual([]);
+    expect(provider.search).toBe(undefined);
+    expect(provider.loadMore).toBe(undefined);
+    expect(await provider.getKind!("Kalam")).toBe("hand-drawn");
   });
 });
 
