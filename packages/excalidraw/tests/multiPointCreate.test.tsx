@@ -6,16 +6,23 @@ import { KEYS, reseed } from "@excalidraw/common";
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { API } from "./helpers/api";
+
 import {
   render,
+  act,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
+  waitFor,
+  GlobalTestState,
 } from "./test-utils";
 
 unmountComponent();
@@ -92,6 +99,272 @@ describe("remove shape in non linear elements", () => {
 });
 
 describe("multi point mode in linear elements", () => {
+  it.each(["selection", "rectangle", "line"] as const)(
+    "cancels an unfinished elbow arrow when switching to %s",
+    async (nextTool) => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const mouse = new Pointer("mouse");
+      UI.clickTool("arrow");
+      API.setAppState({ currentItemArrowType: "elbow" });
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+
+      expect(h.state.multiElement).toMatchObject({ elbowed: true });
+      expect(h.state.multiElement!.points.length).toBeGreaterThan(2);
+      const preview = h.state.multiElement!;
+      const points = [...preview.points];
+
+      UI.clickTool(nextTool);
+
+      expect(h.state.activeTool.type).toBe(nextTool);
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+      expect(preview.points).toEqual(points);
+
+      mouse.moveTo(150, 150);
+      expect(preview.points).toEqual(points);
+      UI.clickTool("arrow");
+      mouse.clickAt(200, 200);
+      mouse.moveTo(300, 300);
+      mouse.click();
+
+      const elements = h.app.scene.getNonDeletedElements();
+      expect(elements).toHaveLength(1);
+      const arrow = elements[0] as ExcalidrawLinearElement;
+      expect(arrow).toMatchObject({ type: "arrow", elbowed: true });
+      expect(arrow.points.length).toBeGreaterThan(2);
+      expect(arrow.points[0]).toEqual([0, 0]);
+      expect(arrow.points[arrow.points.length - 1]).toEqual([100, 100]);
+
+      Keyboard.undo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+      Keyboard.redo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(h.app.scene.getNonDeletedElements()[0]).toMatchObject({
+        id: arrow.id,
+        points: arrow.points,
+      });
+    },
+  );
+
+  it("cancels an unfinished elbow arrow after returning to its starting point", async () => {
+    await render(<Excalidraw />);
+    const mouse = new Pointer("mouse");
+    UI.clickTool("arrow");
+    API.setAppState({ currentItemArrowType: "elbow" });
+    mouse.clickAt(30, 30);
+    mouse.moveTo(100, 100);
+    mouse.moveTo(30, 30);
+
+    expect(h.state.multiElement).not.toBeNull();
+    UI.clickTool("selection");
+
+    expect(h.state.multiElement).toBeNull();
+    expect(h.state.newElement).toBeNull();
+    expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+  });
+
+  it("removes bindings when canceling an unfinished elbow arrow through the API", async () => {
+    await render(<Excalidraw />);
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([rectangle]);
+    const mouse = new Pointer("mouse");
+    UI.clickTool("arrow");
+    API.setAppState({ currentItemArrowType: "elbow" });
+    mouse.clickAt(100, 50);
+    mouse.moveTo(200, 150);
+
+    const preview = h.state.multiElement!;
+    expect(preview).toMatchObject({
+      startBinding: { elementId: rectangle.id },
+    });
+    expect(rectangle.boundElements).toContainEqual({
+      id: preview.id,
+      type: "arrow",
+    });
+
+    act(() => h.app.setActiveTool({ type: "selection" }));
+
+    expect(h.app.scene.getNonDeletedElements()).toEqual([rectangle]);
+    expect(rectangle.boundElements).not.toContainEqual({
+      id: preview.id,
+      type: "arrow",
+    });
+  });
+
+  it.each([
+    ["arrow", "clipboard", false],
+    ["arrow", "clipboard", true],
+    ["arrow", "library", false],
+    ["arrow", "library", true],
+    ["line", "clipboard", false],
+    ["line", "clipboard", true],
+    ["line", "library", false],
+    ["line", "library", true],
+  ] as const)(
+    "finalizes an in-progress %s and selects elements inserted through %s (committed segment %s)",
+    async (drawingTool, source, hasCommittedSegment) => {
+      await render(<Excalidraw autoFocus handleKeyboardGlobally={true} />);
+      Object.assign(h.app.ownerDocument, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+      const mouse = new Pointer("mouse");
+      UI.clickTool(drawingTool);
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+      if (hasCommittedSegment) {
+        mouse.click();
+        mouse.moveTo(150, 50);
+      }
+
+      const preview = h.state.multiElement!;
+      expect(preview.points).toHaveLength(hasCommittedSegment ? 3 : 2);
+
+      const elements = [API.createElement({ type: "rectangle" })];
+      await act(async () => {
+        if (source === "clipboard") {
+          h.app.ownerDocument.dispatchEvent(
+            createPasteEvent({
+              types: {
+                "text/plain": serializeAsClipboardJSON({
+                  elements,
+                  files: null,
+                }),
+              },
+            }),
+          );
+        } else {
+          h.app.addElementsFromPasteOrLibrary({
+            elements,
+            files: null,
+            position: "cursor",
+          });
+        }
+      });
+
+      await waitFor(() => {
+        expect(h.app.scene.getNonDeletedElements()).toHaveLength(
+          hasCommittedSegment ? 2 : 1,
+        );
+      });
+      expect(preview.points).toEqual(
+        hasCommittedSegment
+          ? [
+              [0, 0],
+              [70, 70],
+            ]
+          : [[0, 0]],
+      );
+      const sceneElements = h.app.scene.getNonDeletedElements();
+      if (hasCommittedSegment) {
+        expect(sceneElements[0]).toMatchObject({
+          type: drawingTool,
+          points: [
+            [0, 0],
+            [70, 70],
+          ],
+        });
+      }
+      const rectangle = sceneElements[sceneElements.length - 1];
+      expect(rectangle.type).toBe("rectangle");
+      expect(h.state.activeTool.type).toBe("selection");
+      expect(h.state.selectedElementIds).toEqual({ [rectangle.id]: true });
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+    },
+  );
+
+  it.each([
+    ["arrow", "selection"],
+    ["arrow", "rectangle"],
+    ["arrow", "line"],
+    ["line", "selection"],
+    ["line", "rectangle"],
+    ["line", "arrow"],
+  ] as const)(
+    "cancels an unfinished %s when switching to %s",
+    async (drawingTool, nextTool) => {
+      await render(<Excalidraw />);
+      const mouse = new Pointer("mouse");
+      UI.clickTool(drawingTool);
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+
+      expect(h.state.multiElement?.type).toBe(drawingTool);
+      expect(h.elements).toHaveLength(1);
+
+      UI.clickTool(nextTool);
+
+      expect(h.state.activeTool.type).toBe(nextTool);
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+
+      mouse.moveTo(150, 150);
+      UI.clickTool(drawingTool);
+      mouse.downAt(200, 200);
+      mouse.moveTo(300, 300);
+      mouse.up();
+
+      const elements = h.app.scene.getNonDeletedElements();
+      expect(elements).toHaveLength(1);
+      expect(elements[0]).toMatchObject({
+        type: drawingTool,
+        x: 200,
+        y: 200,
+        points: [
+          [0, 0],
+          [100, 100],
+        ],
+      });
+    },
+  );
+
+  it.each(["arrow", "line"] as const)(
+    "preserves committed %s points when switching tools through the API",
+    async (drawingTool) => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      const mouse = new Pointer("mouse");
+      UI.clickTool(drawingTool);
+      mouse.clickAt(30, 30);
+      mouse.moveTo(100, 100);
+
+      mouse.click();
+      mouse.moveTo(150, 50);
+      expect(h.state.multiElement?.points).toHaveLength(3);
+
+      act(() => h.app.setActiveTool({ type: "rectangle" }));
+
+      expect(h.state.activeTool.type).toBe("rectangle");
+      expect(h.state.multiElement).toBeNull();
+      expect(h.state.newElement).toBeNull();
+      const committedPoints = [
+        [0, 0],
+        [70, 70],
+      ];
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(h.app.scene.getNonDeletedElements()[0]).toMatchObject({
+        type: drawingTool,
+        points: committedPoints,
+      });
+
+      Keyboard.undo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(0);
+      Keyboard.redo();
+      expect(h.app.scene.getNonDeletedElements()).toHaveLength(1);
+      expect(h.app.scene.getNonDeletedElements()[0]).toMatchObject({
+        points: committedPoints,
+      });
+    },
+  );
+
   it("arrow", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);
     // select tool
