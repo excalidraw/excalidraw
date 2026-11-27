@@ -5188,6 +5188,11 @@ class App extends React.Component<AppProps, AppState> {
           this.focusContainer();
           return;
         } else if (
+          // the shape switch popup is only rendered with the default UI
+          // (#12678): cycling shapes via Tab without it would silently
+          // convert elements and leave a stale popup state that swallows
+          // Esc/Enter
+          this.isDefaultUIEnabled() &&
           event.key === KEYS.TAB &&
           (this.ownerDocument.activeElement ===
             this.excalidrawContainerRef?.current ||
