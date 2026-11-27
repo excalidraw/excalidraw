@@ -2508,6 +2508,7 @@ class App extends React.Component<AppProps, AppState> {
                             generateLinkForSelection={
                               this.props.generateLinkForSelection
                             }
+                            onLinkLookup={this.props.onLinkLookup}
                             currentUserControls={this.props.currentUserControls}
                           >
                             {this.props.children}

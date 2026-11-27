@@ -213,7 +213,13 @@
   "elementLink": {
     "title": "Link to object",
     "desc": "Click on a shape on canvas or paste a link.",
-    "notFound": "Linked object wasn't found on canvas."
+    "notFound": "Linked object wasn't found on canvas.",
+    "lookupAction": "Find a public link",
+    "lookupPlaceholder": "Search for a public link",
+    "lookupHint": "Type a query and press Enter to search.",
+    "lookupSearching": "Searching…",
+    "lookupNoResults": "No results found.",
+    "lookupFailed": "Link lookup failed."
   },
   "library": {
     "noItems": "No items added yet...",

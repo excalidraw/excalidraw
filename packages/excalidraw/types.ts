@@ -1078,6 +1078,16 @@ export interface ExcalidrawProps {
   autoFocus?: boolean;
   generateIdForFile?: (file: File) => string | Promise<string>;
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
+  /**
+   * Optional. Lets the host app offer a public-link lookup in the element
+   * link editor. Receives only the typed query and a signal — never scene
+   * data. Must resolve to results with absolute http(s) URLs; any other
+   * results are filtered out by the editor.
+   */
+  onLinkLookup?: (
+    query: string,
+    opts: { signal: AbortSignal },
+  ) => Promise<LinkLookupResult[]>;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
@@ -1217,6 +1227,15 @@ export type UIOptions = Partial<{
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;
+
+/**
+ * A single result of a host-provided link lookup, shown in the element
+ * link editor. `url` must be an absolute http(s) URL.
+ */
+export type LinkLookupResult = {
+  title: string;
+  url: string;
+};
 
 export type AppProps = Merge<
   ExcalidrawProps,
