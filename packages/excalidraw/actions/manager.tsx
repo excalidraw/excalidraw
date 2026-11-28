@@ -136,6 +136,8 @@ export class ActionManager {
       return true;
     }
 
+    this.app.flushArrowMoveCapture?.();
+
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
     const value = null;
@@ -168,6 +170,8 @@ export class ActionManager {
       return;
     }
 
+    this.app.flushArrowMoveCapture?.();
+
     const elements = this.getElementsIncludingDeleted();
     const appState = this.getAppState();
 
@@ -199,6 +203,8 @@ export class ActionManager {
 
         // read fresh state at call time — memoized panel children may invoke
         // an `updateData` closure minted by an earlier render
+        this.app.flushArrowMoveCapture?.();
+
         trackAction(
           action,
           "ui",

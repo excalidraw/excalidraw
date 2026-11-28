@@ -1,5 +1,1076 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`history > move elements with arrow keys > coalesces rapid arrow key nudges into a single history entry after debounce > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 0,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "splitOnPaste": false,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > move elements with arrow keys > coalesces rapid arrow key nudges into a single history entry after debounce > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 8,
+  "width": 10,
+  "x": 12,
+  "y": 21,
+}
+`;
+
+exports[`history > move elements with arrow keys > coalesces rapid arrow key nudges into a single history entry after debounce > [end of test] number of elements 1`] = `1`;
+
+exports[`history > move elements with arrow keys > coalesces rapid arrow key nudges into a single history entry after debounce > [end of test] number of renders 1`] = `10`;
+
+exports[`history > move elements with arrow keys > coalesces rapid arrow key nudges into a single history entry after debounce > [end of test] redo stack 1`] = `[]`;
+
+exports[`history > move elements with arrow keys > coalesces rapid arrow key nudges into a single history entry after debounce > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "created": 1,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": 10,
+            "y": 20,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 8,
+            "x": 12,
+            "y": 21,
+          },
+          "inserted": {
+            "version": 7,
+            "x": 10,
+            "y": 20,
+          },
+        },
+      },
+    },
+    "id": "id6",
+  },
+]
+`;
+
+exports[`history > move elements with arrow keys > does not record a history entry when pressing arrow keys with empty selection > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 0,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "searchMatches": null,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "splitOnPaste": false,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > move elements with arrow keys > does not record a history entry when pressing arrow keys with empty selection > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "width": 10,
+  "x": 10,
+  "y": 20,
+}
+`;
+
+exports[`history > move elements with arrow keys > does not record a history entry when pressing arrow keys with empty selection > [end of test] number of elements 1`] = `1`;
+
+exports[`history > move elements with arrow keys > does not record a history entry when pressing arrow keys with empty selection > [end of test] number of renders 1`] = `7`;
+
+exports[`history > move elements with arrow keys > does not record a history entry when pressing arrow keys with empty selection > [end of test] redo stack 1`] = `[]`;
+
+exports[`history > move elements with arrow keys > does not record a history entry when pressing arrow keys with empty selection > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "created": 1,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": 10,
+            "y": 20,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {},
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id5",
+  },
+]
+`;
+
+exports[`history > move elements with arrow keys > flushes pending arrow move before immediate undo or pointer down > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 0,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "splitOnPaste": false,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > move elements with arrow keys > flushes pending arrow move before immediate undo or pointer down > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 8,
+  "width": 10,
+  "x": 11,
+  "y": 20,
+}
+`;
+
+exports[`history > move elements with arrow keys > flushes pending arrow move before immediate undo or pointer down > [end of test] number of elements 1`] = `1`;
+
+exports[`history > move elements with arrow keys > flushes pending arrow move before immediate undo or pointer down > [end of test] number of renders 1`] = `12`;
+
+exports[`history > move elements with arrow keys > flushes pending arrow move before immediate undo or pointer down > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id12",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 8,
+            "y": 20,
+          },
+          "inserted": {
+            "version": 7,
+            "y": 21,
+          },
+        },
+      },
+    },
+    "id": "id13",
+  },
+]
+`;
+
+exports[`history > move elements with arrow keys > flushes pending arrow move before immediate undo or pointer down > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "created": 1,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": 10,
+            "y": 20,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 6,
+            "x": 11,
+          },
+          "inserted": {
+            "version": 5,
+            "x": 10,
+          },
+        },
+      },
+    },
+    "id": "id6",
+  },
+]
+`;
+
+exports[`history > move elements with arrow keys > records separate history entries when arrow key nudges are separated by debounce timeout > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+    "stickyNoteBackground": null,
+    "stickyNoteStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteStrokeColor": "#1e1e1e",
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "fontTopPicks": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 0,
+  "hoveredElementIds": {},
+  "inputDevice": "auto",
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "minimapEnabled": false,
+  "multiElement": null,
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHints": true,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "splitOnPaste": false,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "textToolHover": null,
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > move elements with arrow keys > records separate history entries when arrow key nudges are separated by debounce timeout > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 10,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 7,
+  "width": 10,
+  "x": 10,
+  "y": 20,
+}
+`;
+
+exports[`history > move elements with arrow keys > records separate history entries when arrow key nudges are separated by debounce timeout > [end of test] number of elements 1`] = `1`;
+
+exports[`history > move elements with arrow keys > records separate history entries when arrow key nudges are separated by debounce timeout > [end of test] number of renders 1`] = `9`;
+
+exports[`history > move elements with arrow keys > records separate history entries when arrow key nudges are separated by debounce timeout > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 6,
+            "y": 20,
+          },
+          "inserted": {
+            "version": 5,
+            "y": 21,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "version": 7,
+            "x": 10,
+          },
+          "inserted": {
+            "version": 6,
+            "x": 11,
+          },
+        },
+      },
+    },
+    "id": "id8",
+  },
+]
+`;
+
+exports[`history > move elements with arrow keys > records separate history entries when arrow key nudges are separated by debounce timeout > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "created": 1,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": 10,
+            "y": 20,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+]
+`;
+
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,

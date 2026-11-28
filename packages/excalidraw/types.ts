@@ -1313,6 +1313,7 @@ export type AppClassProperties = {
   requestUnfollow: App["requestUnfollow"];
 
   setAppState: App["setAppState"];
+  flushArrowMoveCapture: App["flushArrowMoveCapture"];
 
   isInteractionEnabled: App["isInteractionEnabled"];
   isNavigationEnabled: App["isNavigationEnabled"];

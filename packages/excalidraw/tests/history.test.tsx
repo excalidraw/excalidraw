@@ -5354,4 +5354,168 @@ describe("history", () => {
       });
     });
   });
+
+  describe("move elements with arrow keys", () => {
+    it("coalesces rapid arrow key nudges into a single history entry after debounce", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect = UI.createElement("rectangle", { x: 10, y: 20 });
+      expect(API.getUndoStack().length).toBe(1);
+
+      vi.useFakeTimers();
+      try {
+        Keyboard.keyPress(KEYS.ARROW_RIGHT);
+        Keyboard.keyPress(KEYS.ARROW_RIGHT);
+        Keyboard.keyPress(KEYS.ARROW_DOWN);
+
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            x: 12,
+            y: 21,
+            isDeleted: false,
+          }),
+        ]);
+        expect(API.getUndoStack().length).toBe(1);
+
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+
+        expect(API.getUndoStack().length).toBe(2);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            x: 10,
+            y: 20,
+            isDeleted: false,
+          }),
+        ]);
+
+        Keyboard.redo();
+        expect(API.getUndoStack().length).toBe(2);
+        expect(API.getRedoStack().length).toBe(0);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            x: 12,
+            y: 21,
+            isDeleted: false,
+          }),
+        ]);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("records separate history entries when arrow key nudges are separated by debounce timeout", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect = UI.createElement("rectangle", { x: 10, y: 20 });
+      expect(API.getUndoStack().length).toBe(1);
+
+      vi.useFakeTimers();
+      try {
+        Keyboard.keyPress(KEYS.ARROW_RIGHT);
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+        expect(API.getUndoStack().length).toBe(2);
+
+        Keyboard.keyPress(KEYS.ARROW_DOWN);
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+        expect(API.getUndoStack().length).toBe(3);
+
+        Keyboard.undo();
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: rect.id, x: 11, y: 20 }),
+        ]);
+
+        Keyboard.undo();
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: rect.id, x: 10, y: 20 }),
+        ]);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("flushes pending arrow move before immediate undo or pointer down", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const rect = UI.createElement("rectangle", {
+        x: 10,
+        y: 20,
+        width: 10,
+        height: 10,
+      });
+      expect(API.getUndoStack().length).toBe(1);
+
+      vi.useFakeTimers();
+      try {
+        Keyboard.keyPress(KEYS.ARROW_RIGHT);
+        expect(API.getUndoStack().length).toBe(1);
+
+        // Immediate Ctrl+Z before 300ms must revert only the arrow move, not delete rect
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: rect.id,
+            x: 10,
+            y: 20,
+            isDeleted: false,
+          }),
+        ]);
+
+        Keyboard.redo();
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: rect.id, x: 11, y: 20 }),
+        ]);
+
+        Keyboard.keyPress(KEYS.ARROW_DOWN);
+        // Immediate canvas pointer down before 300ms flushes the move
+        mouse.downAt(-50, -50);
+        expect(API.getUndoStack().length).toBe(3);
+        mouse.upAt(-50, -50);
+        expect(API.getUndoStack().length).toBe(4);
+
+        // Undo deselect, then undo the flushed arrow move
+        Keyboard.undo();
+        Keyboard.undo();
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: rect.id, x: 11, y: 20 }),
+        ]);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("does not record a history entry when pressing arrow keys with empty selection", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      UI.createElement("rectangle", { x: 10, y: 20 });
+      mouse.clickAt(-50, -50);
+      expect(API.getSelectedElements().length).toBe(0);
+      const stackLengthBefore = API.getUndoStack().length;
+
+      vi.useFakeTimers();
+      try {
+        Keyboard.keyPress(KEYS.ARROW_RIGHT);
+        act(() => {
+          vi.advanceTimersByTime(300);
+        });
+        expect(API.getUndoStack().length).toBe(stackLengthBefore);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
 });
