@@ -2,12 +2,16 @@ import React from "react";
 
 import { MIME_TYPES } from "@excalidraw/common";
 
-import { serializeAsJSON } from "../data/json";
+import type { FileId } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
+import { serializeAsJSON } from "../data/json";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { act, fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
+
+import type { BinaryFileData, DataURL } from "../types";
 
 const { h } = window;
 
@@ -268,6 +272,41 @@ describe("dropping scenes", () => {
       expect(h.elements[1]).toMatchObject({ type: "text", text: "😀" });
     },
   );
+});
+
+it("keeps the replaced scene's files, so undoing the replace restores its images", async () => {
+  const file: BinaryFileData = {
+    id: "file" as FileId,
+    mimeType: MIME_TYPES.png,
+    created: 1,
+    lastRetrieved: 1,
+    dataURL:
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" as DataURL,
+  };
+  await render(
+    <Excalidraw
+      handleKeyboardGlobally
+      initialData={{
+        elements: [
+          API.createElement({ type: "image", id: "image", fileId: file.id }),
+        ],
+        files: { [file.id]: file },
+      }}
+    />,
+  );
+  await waitFor(() => expect(h.app.files[file.id]).toBeDefined());
+
+  drag(GlobalTestState.interactiveCanvas, "drop", { files: [sceneFile()] });
+  await waitFor(() => expect(h.state.toast).not.toBeNull());
+  expect(h.app.scene.getNonDeletedElements()).toEqual([
+    expect.objectContaining({ type: "ellipse" }),
+  ]);
+
+  Keyboard.undo();
+  expect(h.app.scene.getNonDeletedElements()).toEqual([
+    expect.objectContaining({ id: "image" }),
+  ]);
+  expect(h.app.files[file.id]).toBe(file);
 });
 
 describe("ignoring drops", () => {
