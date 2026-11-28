@@ -24,7 +24,7 @@ type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|live\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?(?:youtu(?:be\.com|\.be)|youtube-nocookie\.com)\/(embed\/|watch\?v=|shorts\/|live\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)/;
 
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
@@ -138,6 +138,7 @@ const parseGoogleDriveVideoLink = (
 
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
+  "youtube-nocookie.com",
   "youtu.be",
   "vimeo.com",
   "player.vimeo.com",
@@ -158,6 +159,7 @@ const ALLOWED_DOMAINS = new Set([
 
 const ALLOW_SAME_ORIGIN = new Set([
   "youtube.com",
+  "youtube-nocookie.com",
   "youtu.be",
   "vimeo.com",
   "player.vimeo.com",
@@ -200,19 +202,23 @@ export const getEmbedLink = (
     const startTime = parseYouTubeLikeTimestamp(originalLink);
     const time = startTime > 0 ? `&start=${startTime}` : ``;
     const isPortrait = link.includes("shorts");
+    // keep YouTube's privacy-enhanced mode if the link uses it
+    const ytOrigin = link.includes("youtube-nocookie.com")
+      ? "https://www.youtube-nocookie.com"
+      : "https://www.youtube.com";
     type = "video";
     switch (ytLink[1]) {
       case "embed/":
       case "watch?v=":
       case "shorts/":
-        link = `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`;
+        link = `${ytOrigin}/embed/${ytLink[2]}?enablejsapi=1${time}`;
         break;
       case "playlist?list=":
       case "embed/videoseries?list=":
-        link = `https://www.youtube.com/embed/videoseries?list=${ytLink[2]}&enablejsapi=1${time}`;
+        link = `${ytOrigin}/embed/videoseries?list=${ytLink[2]}&enablejsapi=1${time}`;
         break;
       default:
-        link = `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`;
+        link = `${ytOrigin}/embed/${ytLink[2]}?enablejsapi=1${time}`;
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
