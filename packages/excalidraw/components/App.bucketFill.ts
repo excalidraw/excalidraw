@@ -6,6 +6,7 @@ import {
   getSizeFromPoints,
   isTransparent,
   THEME,
+  tupleToCoors,
 } from "@excalidraw/common";
 import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 
@@ -31,11 +32,6 @@ import { activeEyeDropperAtom, type EyeDropperProperties } from "./EyeDropper";
 
 import type App from "./App";
 
-type ScenePoint = {
-  x: number;
-  y: number;
-};
-
 const BUCKET_FILL_KEYBOARD_COLOR_PICKS = BUCKET_FILL_BACKGROUND_PICKS.filter(
   (color) => color !== COLOR_PALETTE.white,
 );
@@ -53,10 +49,10 @@ export class AppBucketFill {
    * down the editor cannot yet know the gesture will stay a single-pointer
    * click.
    */
-  private pending: ScenePoint | null = null;
+  private pending: GlobalPoint | null = null;
 
   /** Arm a fill at the pointer-down position; nothing mutates yet. */
-  handlePointerDown = (scenePointer: ScenePoint) => {
+  handlePointerDown = (scenePointer: GlobalPoint) => {
     this.pending = scenePointer;
   };
 
@@ -152,7 +148,7 @@ export class AppBucketFill {
     this.app.scheduleCapture();
   };
 
-  private fill = (scenePointer: ScenePoint) => {
+  private fill = (scenePointer: GlobalPoint) => {
     // shared with the generic shape background, but a transparent fill would
     // be invisible, so fall back to a real color (appState is not mutated)
     const backgroundColor = this.getBucketFillBackgroundColor(
@@ -161,7 +157,7 @@ export class AppBucketFill {
 
     const elements = this.app.scene.getNonDeletedElements();
     const elementsMap = this.app.scene.getNonDeletedElementsMap();
-    const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
+    const point = scenePointer;
 
     const hitElement = this.app.getElementAtPosition(point[0], point[1]);
 
@@ -228,7 +224,8 @@ export class AppBucketFill {
       ? isFrameLikeElement(owner)
         ? owner.id
         : owner.frameId
-      : this.app.getTopLayerFrameAtSceneCoords(scenePointer)?.id ?? null;
+      : this.app.getTopLayerFrameAtSceneCoords(tupleToCoors(scenePointer))
+          ?.id ?? null;
     const groupIds = owner
       ? owner.groupIds
       : result.boundaryElementIds

@@ -10,7 +10,13 @@ import {
   viewportCoordsToSceneCoords,
   ZOOM_STEP,
 } from "@excalidraw/common";
-import { clamp, pointDistance, pointFrom, roundToStep } from "@excalidraw/math";
+import {
+  clamp,
+  pointDistance,
+  pointFrom,
+  roundToStep,
+  type GlobalPoint,
+} from "@excalidraw/math";
 
 import {
   CaptureUpdateAction,
@@ -369,7 +375,7 @@ const doBoundsExceedViewport = (appState: AppState, bounds: Bounds) => {
 
 export const getClosestElementBounds = (
   elements: readonly ExcalidrawElement[],
-  from: { x: number; y: number },
+  from: GlobalPoint,
 ): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
@@ -382,7 +388,7 @@ export const getClosestElementBounds = (
     const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
     const distance = pointDistance(
       pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
-      pointFrom(from.x, from.y),
+      from,
     );
 
     if (distance < minDistance) {
@@ -497,12 +503,14 @@ export const getScrollToContentState = (
   if (doBoundsExceedViewport(appState, [x1, y1, x2, y2])) {
     [x1, y1, x2, y2] = getClosestElementBounds(
       elements,
-      viewportCoordsToSceneCoords(
-        {
-          clientX: appState.offsetLeft + appState.width / 2,
-          clientY: appState.offsetTop + appState.height / 2,
-        },
-        appState,
+      pointFrom<GlobalPoint>(
+        viewportCoordsToSceneCoords(
+          {
+            clientX: appState.offsetLeft + appState.width / 2,
+            clientY: appState.offsetTop + appState.height / 2,
+          },
+          appState,
+        ),
       ),
     );
   }
