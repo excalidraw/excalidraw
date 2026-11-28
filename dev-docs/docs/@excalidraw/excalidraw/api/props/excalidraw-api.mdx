@@ -272,10 +272,13 @@ Returns current appState.
 ```tsx
 {
   clear: () => void
+  prune: () => void
 }
 ```
 
 This is the history API. history.clear() will clear the history.
+
+history.prune() drops the undo and redo entries that have nothing left to act on, so that undo and redo aren't left enabled with nothing to do. Entries further down the stacks are dropped once an undo or redo reaches them. Call it after an [updateScene](#updatescene) that removed elements from the scene for good (left them out rather than marking them `isDeleted`), and clear those elements from `selectedElementIds` in the same update: an entry that can still change the selection isn't dropped. Don't call it when collaborating: a collaborator can restore an element, which brings its entries back to life.
 
 ## scrollToContent
 

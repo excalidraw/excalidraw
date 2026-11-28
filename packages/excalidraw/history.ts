@@ -16,6 +16,11 @@ import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import type { AppState } from "./types";
 
+const isGone = (elements: SceneElementsMap, id: string) => {
+  const element = elements.get(id);
+  return !element || element.isDeleted;
+};
+
 export class HistoryDelta extends StoreDelta {
   /**
    * Apply the delta to the passed elements and appState, does not modify the snapshot.
@@ -50,6 +55,31 @@ export class HistoryDelta extends StoreDelta {
       elementsContainVisibleChange || appStateContainsVisibleChange;
 
     return [nextElements, nextAppState, appliedVisibleChanges];
+  }
+
+  /** The ids of the elements the delta touches. */
+  public getElementIds() {
+    const { added, removed, updated } = this.elements;
+
+    return [
+      ...Object.keys(added),
+      ...Object.keys(removed),
+      ...Object.keys(updated),
+    ];
+  }
+
+  /**
+   * Whether there is nothing left for the delta to act on: all it touches is
+   * gone from the scene, it brings nothing back and it changes no visible
+   * appState. Only tells of the scene as it is, as an entry further up the
+   * stack can bring an element back for this one.
+   */
+  public isStale(elements: SceneElementsMap, appState: AppState) {
+    return (
+      !Object.keys(this.elements.added).length &&
+      this.getElementIds().every((id) => isGone(elements, id)) &&
+      !this.appState.applyTo(appState, elements)[1]
+    );
   }
 
   /**
@@ -102,6 +132,13 @@ export class History {
   public readonly undoStack: HistoryDelta[] = [];
   public readonly redoStack: HistoryDelta[] = [];
 
+  /**
+   * The elements a host declared gone through `prune`. Undo / redo drop the
+   * entries they uncover on these, and on these only: elsewhere an entry that
+   * can't act now can still be brought back to life, i.e. by a collaborator.
+   */
+  private readonly prunedElementIds = new Set<string>();
+
   public get isUndoStackEmpty() {
     return this.undoStack.length === 0;
   }
@@ -115,6 +152,7 @@ export class History {
   public clear() {
     this.undoStack.length = 0;
     this.redoStack.length = 0;
+    this.prunedElementIds.clear();
   }
 
   /**
@@ -141,6 +179,55 @@ export class History {
     this.onHistoryChangedEmitter.trigger(
       new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
     );
+  }
+
+  /**
+   * Drops the entries on top of the undo and redo stacks that have nothing
+   * left to act on, the ones an undo / redo would skip without showing
+   * anything: else they stay enabled with nothing to do. Stops at the first
+   * entry that can still act, as it can bring back what the entries below it
+   * touch. The ones below are dropped once an undo / redo uncovers them.
+   *
+   * Not for collaboration: a collaborator can restore an element, and its
+   * entries are live again then.
+   */
+  public prune(elements: SceneElementsMap, appState: AppState) {
+    for (const entry of [...this.undoStack, ...this.redoStack]) {
+      for (const id of entry.getElementIds()) {
+        if (isGone(elements, id)) {
+          this.prunedElementIds.add(id);
+        } else {
+          this.prunedElementIds.delete(id);
+        }
+      }
+    }
+
+    if (this.dropStaleEntries(elements, appState)) {
+      this.onHistoryChangedEmitter.trigger(
+        new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
+      );
+    }
+  }
+
+  private dropStaleEntries(elements: SceneElementsMap, appState: AppState) {
+    if (!this.prunedElementIds.size) {
+      return false;
+    }
+
+    const isDroppable = (entry: HistoryDelta | undefined) =>
+      entry?.isStale(elements, appState) &&
+      entry.getElementIds().every((id) => this.prunedElementIds.has(id));
+
+    let dropped = false;
+
+    for (const stack of [this.undoStack, this.redoStack]) {
+      while (isDroppable(stack.at(-1))) {
+        stack.pop();
+        dropped = true;
+      }
+    }
+
+    return dropped;
   }
 
   public undo(
@@ -242,6 +329,8 @@ export class History {
 
         historyDelta = pop();
       }
+
+      this.dropStaleEntries(nextElements, nextAppState);
 
       return [nextElements, nextAppState];
     } finally {
