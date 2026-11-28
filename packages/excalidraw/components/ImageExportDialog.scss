@@ -102,6 +102,21 @@
       }
     }
 
+    &__aspect-ratio {
+      max-width: 10rem;
+      padding: 0.375rem 0.5rem;
+      color: var(--text-primary-color);
+      background-color: var(--input-bg-color);
+      border: 1.5px solid var(--input-border-color);
+      border-radius: var(--space-factor);
+      font: inherit;
+
+      &:hover,
+      &:focus-visible {
+        border-color: var(--color-brand-hover);
+      }
+    }
+
     &__settings {
       display: flex;
       flex-direction: column;

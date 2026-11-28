@@ -27,6 +27,8 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { exportScene, getExportConfigFromAppState } from "../scene/export";
 
+import { getExportSizeForAspectRatio } from "../scene/exportSize";
+
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
@@ -86,6 +88,10 @@ const ImageExportModal = ({
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
+  const [exportAspectRatio, setExportAspectRatio] = useState<number | null>(
+    null,
+  );
+
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
   const [renderError, setRenderError] = useState<Error | null>(null);
@@ -101,6 +107,7 @@ const ImageExportModal = ({
     exportWithBackground,
     exportWithDarkMode,
     exportScale,
+    exportAspectRatio,
     embedScene,
     resetCopyStatus,
   ]);
@@ -139,11 +146,14 @@ const ImageExportModal = ({
           ...appStateSnapshot,
           exportBackground: exportWithBackground,
           exportWithDarkMode,
-          // the preview fits `maxWidthOrHeight`
-          exportScale: 1,
         }),
         padding: DEFAULT_EXPORT_PADDING,
-        maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+        ...getExportSizeForAspectRatio(
+          exportedElements,
+          exportingFrame ? null : exportAspectRatio,
+        ),
+        scale: (width, height) =>
+          Math.min(1, maxWidth / width, maxHeight / height),
         exportingFrame,
       },
     })
@@ -191,6 +201,7 @@ const ImageExportModal = ({
     exportWithBackground,
     exportWithDarkMode,
     exportScale,
+    exportAspectRatio,
     embedScene,
   ]);
 
@@ -305,6 +316,41 @@ const ImageExportModal = ({
           />
         </ExportSetting>
 
+        {!exportingFrame && (
+          <ExportSetting
+            label={t("imageExportDialog.label.aspectRatio")}
+            name="exportAspectRatio"
+          >
+            <select
+              id="exportAspectRatio"
+              className="ImageExportModal__aspect-ratio"
+              value={exportAspectRatio ?? "original"}
+              onChange={(event) => {
+                setExportAspectRatio(
+                  event.currentTarget.value === "original"
+                    ? null
+                    : Number(event.currentTarget.value),
+                );
+              }}
+            >
+              <option value="original">
+                {t("imageExportDialog.label.original")}
+              </option>
+              {[
+                [1, 1],
+                [4, 3],
+                [3, 4],
+                [16, 9],
+                [9, 16],
+              ].map(([width, height]) => (
+                <option key={`${width}:${height}`} value={width / height}>
+                  {`${width}:${height}`}
+                </option>
+              ))}
+            </select>
+          </ExportSetting>
+        )}
+
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
@@ -312,6 +358,7 @@ const ImageExportModal = ({
             onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
                 exportingFrame,
+                exportAspectRatio,
               })
             }
             icon={downloadIcon}
@@ -324,6 +371,7 @@ const ImageExportModal = ({
             onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
                 exportingFrame,
+                exportAspectRatio,
               })
             }
             icon={downloadIcon}
@@ -341,6 +389,7 @@ const ImageExportModal = ({
                   exportedElements,
                   {
                     exportingFrame,
+                    exportAspectRatio,
                   },
                 );
                 onCopy();
