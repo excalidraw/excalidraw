@@ -34,7 +34,7 @@ describe("flipping re-centers selection", () => {
         id: "arr",
         x: 149,
         y: 95,
-        width: 66,
+        width: 161,
         height: 244,
         startBinding: {
           elementId: "rec1",
@@ -55,8 +55,8 @@ describe("flipping re-centers selection", () => {
         points: [
           pointFrom(0, 0),
           pointFrom(0, -40),
-          pointFrom(57, -40),
-          pointFrom(57, 204),
+          pointFrom(-95, -40),
+          pointFrom(-95, 204),
           pointFrom(66, 204),
         ],
         elbowed: true,
