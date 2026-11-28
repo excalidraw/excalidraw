@@ -11,7 +11,16 @@ export const normalizeLink = (link: string) => {
 };
 
 export const isLocalLink = (link: string | null) => {
-  return !!(link?.includes(location.origin) || link?.startsWith("/"));
+  if (!link) {
+    return false;
+  }
+  try {
+    // compare origins so `//other.host` or links that merely contain our
+    // origin (e.g. in a query string) aren't treated as local
+    return new URL(link, location.origin).origin === location.origin;
+  } catch {
+    return false;
+  }
 };
 
 /**
