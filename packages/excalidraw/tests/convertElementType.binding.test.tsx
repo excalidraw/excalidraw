@@ -1,6 +1,10 @@
 import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 
-import { getBindingGap, distanceToElement } from "@excalidraw/element";
+import {
+  getBindingGap,
+  distanceToElement,
+  getLinearElementSubType,
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawArrowElement,
@@ -9,7 +13,10 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { convertElementTypes } from "../components/ConvertElementTypePopup";
+import {
+  convertElementTypes,
+  getConversionTypeFromElements,
+} from "../components/ConvertElementTypePopup";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -87,4 +94,82 @@ describe("convert element type keeps bound arrows attached", () => {
       },
     );
   }
+
+  it("allows switching arrow types when arrow is bound and preserves bindings (#9656)", () => {
+    const shape = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: false,
+      roundness: null,
+      x: 300,
+      y: 100,
+      width: 100,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(-100, 0)],
+      startBinding: null,
+      endBinding: {
+        elementId: shape.id,
+        fixedPoint: [1, 0.5],
+        mode: "orbit",
+      } as FixedPointBinding,
+      endArrowhead: "triangle",
+    });
+    API.setElements([
+      { ...shape, boundElements: [{ id: arrow.id, type: "arrow" }] },
+      arrow,
+    ]);
+    API.setSelectedElements([arrow]);
+
+    // Bound arrow should be eligible for linear conversion
+    expect(getConversionTypeFromElements([arrow])).toBe("linear");
+
+    // Switching without nextType (Tab key) cycles: sharp -> curved
+    act(() => {
+      convertElementTypes(h.app, {
+        conversionType: "linear",
+      });
+    });
+    const curvedArrow = h.elements[1] as ExcalidrawArrowElement;
+    expect(getLinearElementSubType(curvedArrow)).toBe("curvedArrow");
+    expect(curvedArrow.endBinding?.elementId).toBe(shape.id);
+    expect(curvedArrow.endArrowhead).toBe("triangle");
+
+    // Next cycle: curved -> elbow
+    act(() => {
+      convertElementTypes(h.app, {
+        conversionType: "linear",
+      });
+    });
+    const elbowArrow = h.elements[1] as ExcalidrawArrowElement;
+    expect(getLinearElementSubType(elbowArrow)).toBe("elbowArrow");
+    expect(elbowArrow.endBinding?.elementId).toBe(shape.id);
+
+    // Next cycle: elbow -> sharp (skips 'line' because arrow is bound!)
+    act(() => {
+      convertElementTypes(h.app, {
+        conversionType: "linear",
+      });
+    });
+    const sharpArrow = h.elements[1] as ExcalidrawArrowElement;
+    expect(getLinearElementSubType(sharpArrow)).toBe("sharpArrow");
+    expect(sharpArrow.endBinding?.elementId).toBe(shape.id);
+
+    // Explicitly requesting conversion to 'line' on bound arrow should be rejected
+    let lineResult;
+    act(() => {
+      lineResult = convertElementTypes(h.app, {
+        conversionType: "linear",
+        nextType: "line",
+      });
+    });
+    expect(lineResult).toBe(false);
+    expect(h.elements[1].type).toBe("arrow");
+  });
 });
+
