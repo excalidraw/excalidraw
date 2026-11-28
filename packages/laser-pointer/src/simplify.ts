@@ -1,7 +1,7 @@
 import { type Point, distancePointToSegment } from "./math";
 
 export function douglasPeucker(points: Point[], epsilon: number): Point[] {
-  if (epsilon === 0) {
+  if (epsilon <= 0) {
     return points;
   }
 
