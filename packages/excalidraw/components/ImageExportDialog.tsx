@@ -86,6 +86,11 @@ const ImageExportModal = ({
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
+  const [exportPadding, setExportPadding] = useState(DEFAULT_EXPORT_PADDING);
+  const [paddingInput, setPaddingInput] = useState(
+    String(DEFAULT_EXPORT_PADDING),
+  );
+
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
   const [renderError, setRenderError] = useState<Error | null>(null);
@@ -101,6 +106,7 @@ const ImageExportModal = ({
     exportWithBackground,
     exportWithDarkMode,
     exportScale,
+    exportPadding,
     embedScene,
     resetCopyStatus,
   ]);
@@ -139,11 +145,11 @@ const ImageExportModal = ({
           ...appStateSnapshot,
           exportBackground: exportWithBackground,
           exportWithDarkMode,
-          // the preview fits `maxWidthOrHeight`
-          exportScale: 1,
         }),
-        padding: DEFAULT_EXPORT_PADDING,
-        maxWidthOrHeight: Math.max(maxWidth, maxHeight),
+        padding: exportPadding,
+        // Scale the padding with the drawing so the preview matches the export.
+        scale: (width, height) =>
+          Math.min(1, maxWidth / width, maxHeight / height),
         exportingFrame,
       },
     })
@@ -191,6 +197,7 @@ const ImageExportModal = ({
     exportWithBackground,
     exportWithDarkMode,
     exportScale,
+    exportPadding,
     embedScene,
   ]);
 
@@ -305,6 +312,31 @@ const ImageExportModal = ({
           />
         </ExportSetting>
 
+        {!exportingFrame && (
+          <ExportSetting
+            label={t("imageExportDialog.label.padding")}
+            name="exportPadding"
+          >
+            <input
+              id="exportPadding"
+              className="TextInput ImageExportModal__padding"
+              type="number"
+              min={0}
+              step={1}
+              value={paddingInput}
+              onChange={(event) => {
+                setPaddingInput(event.currentTarget.value);
+                const value = event.currentTarget.valueAsNumber;
+                if (Number.isSafeInteger(value) && value >= 0) {
+                  setExportPadding(value);
+                }
+              }}
+              onBlur={() => setPaddingInput(String(exportPadding))}
+            />
+            <span aria-hidden="true">px</span>
+          </ExportSetting>
+        )}
+
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
             className="ImageExportModal__settings__buttons__button"
@@ -312,6 +344,7 @@ const ImageExportModal = ({
             onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
                 exportingFrame,
+                exportPadding,
               })
             }
             icon={downloadIcon}
@@ -324,6 +357,7 @@ const ImageExportModal = ({
             onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
                 exportingFrame,
+                exportPadding,
               })
             }
             icon={downloadIcon}
@@ -341,6 +375,7 @@ const ImageExportModal = ({
                   exportedElements,
                   {
                     exportingFrame,
+                    exportPadding,
                   },
                 );
                 onCopy();
