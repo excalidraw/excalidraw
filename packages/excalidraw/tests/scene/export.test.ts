@@ -3,6 +3,7 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  SVG_NS,
   THEME,
 } from "@excalidraw/common";
 
@@ -79,6 +80,7 @@ describe("exportToSvg", () => {
     });
 
     expect(svgElement).toMatchSnapshot();
+    expect(svgElement.querySelector("title")).toBeNull();
   });
 
   it("with a CJK font", async () => {
@@ -329,6 +331,38 @@ describe("exportToSvg", () => {
     expect(Number(hole.getAttribute("height"))).toBe(
       label.height + BOUND_TEXT_PADDING * 2,
     );
+  });
+
+  it("with a title", async () => {
+    const title = "R&D <Roadmap> > Q4";
+    const svgElement = await exportScene({
+      type: "svg",
+      data: {
+        elements: ELEMENTS,
+        appState: DEFAULT_APP_STATE,
+        files: {},
+      },
+      config: { canvasBackgroundColor: false, title },
+    });
+
+    const titleElement = svgElement.querySelector("title");
+    expect(titleElement?.namespaceURI).toBe(SVG_NS);
+    expect(titleElement?.textContent).toBe(title);
+    expect(titleElement?.childElementCount).toBe(0);
+  });
+
+  it.each(["", "   "])("without a title when title is %j", async (title) => {
+    const svgElement = await exportScene({
+      type: "svg",
+      data: {
+        elements: ELEMENTS,
+        appState: DEFAULT_APP_STATE,
+        files: {},
+      },
+      config: { title },
+    });
+
+    expect(svgElement.querySelector("title")).toBeNull();
   });
 });
 
