@@ -35,9 +35,14 @@ export const actionSendBackward = register({
   },
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    event.code === CODES.BRACKET_LEFT,
+    isDarwin
+      ? event[KEYS.CTRL_OR_CMD] &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.code === CODES.BRACKET_LEFT
+      : event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -65,9 +70,14 @@ export const actionBringForward = register({
   },
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    event.code === CODES.BRACKET_RIGHT,
+    isDarwin
+      ? event[KEYS.CTRL_OR_CMD] &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.code === CODES.BRACKET_RIGHT
+      : event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -131,14 +141,15 @@ export const actionBringToFront = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  keyTest: (event) =>
-    isDarwin
+  keyTest: (event) => {
+    return isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
-        event.altKey &&
-        event.code === CODES.BRACKET_RIGHT
+          event.altKey &&
+          event.code === CODES.BRACKET_RIGHT
       : event[KEYS.CTRL_OR_CMD] &&
-        event.shiftKey &&
-        event.code === CODES.BRACKET_RIGHT,
+          event.shiftKey &&
+          event.code === CODES.BRACKET_RIGHT;
+  },
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
