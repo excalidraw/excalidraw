@@ -1,0 +1,82 @@
+name: Dependency scan
+
+on:
+  pull_request:
+    paths:
+      - "**/package.json"
+      - "yarn.lock"
+      - ".github/workflows/dependency-scan.yml"
+  schedule:
+    - cron: "23 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      REPORT_DIR: ${{ runner.temp }}/cve-lite-reports
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+      - name: Install scanner
+        run: |
+          npm install --prefix "$RUNNER_TEMP/cve-lite" --ignore-scripts --no-audit --no-fund cve-lite-cli@1.40.0
+          echo "$RUNNER_TEMP/cve-lite/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Scan dependencies
+        shell: bash
+        run: |
+          mkdir -p "$REPORT_DIR"
+          scan_exit=0
+          cve-lite . --json --sarif --no-cache --incomplete-policy error --output "$REPORT_DIR" || scan_exit=$?
+          if [ "$scan_exit" -gt 1 ]; then
+            exit "$scan_exit"
+          fi
+
+          # Findings are advisory-only. A missing or incomplete report is not.
+          # Exit 1 alone cannot distinguish findings from a network failure.
+          node <<'NODE'
+          const fs = require("node:fs");
+          const path = require("node:path");
+          const reports = fs.readdirSync(process.env.REPORT_DIR).filter(
+            (file) => /^cve-lite-scan-.*\.json$/.test(file),
+          );
+          if (reports.length !== 1) {
+            throw new Error("Expected one CVE Lite JSON report");
+          }
+          const report = JSON.parse(fs.readFileSync(
+            path.join(process.env.REPORT_DIR, reports[0]), "utf8",
+          ));
+          if (report.complete !== true || report.status !== "ok" ||
+              report.source !== "yarn-lock" ||
+              !Number.isInteger(report.packageCount) || report.packageCount <= 0 ||
+              !Number.isInteger(report.findingCount) || report.findingCount < 0) {
+            throw new Error("CVE Lite did not complete the root Yarn lockfile scan");
+          }
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, [
+            "## Dependency scan",
+            "",
+            `Scanned ${report.packageCount} dependency entries; ${report.findingCount} grouped findings.`,
+            "",
+            "Findings are advisory-only while the existing backlog is reviewed. Scanner errors fail this job.",
+            "Download the dependency-scan artifact for the JSON findings, remediation guidance, and SARIF report.",
+            "",
+          ].join("\n"));
+          NODE
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dependency-scan
+          path: |
+            ${{ env.REPORT_DIR }}/*.json
+            ${{ env.REPORT_DIR }}/*.sarif
+          if-no-files-found: warn
+          retention-days: 14
