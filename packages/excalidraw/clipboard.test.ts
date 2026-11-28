@@ -6,6 +6,41 @@ import {
 } from "./clipboard";
 import { API } from "./tests/helpers/api";
 
+describe("serializeAsClipboardJSON()", () => {
+  it("removes singleton groups without changing the original element", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      groupIds: ["inner", "outer"],
+    });
+    const { elements } = JSON.parse(
+      serializeAsClipboardJSON({ elements: [rectangle], files: null }),
+    );
+
+    expect(elements[0].groupIds).toEqual([]);
+    expect(rectangle.groupIds).toEqual(["inner", "outer"]);
+  });
+
+  it("preserves shared groups while removing singleton nested groups", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      groupIds: ["inner", "outer"],
+    });
+    const ellipse = API.createElement({
+      type: "ellipse",
+      groupIds: ["outer"],
+    });
+    const { elements } = JSON.parse(
+      serializeAsClipboardJSON({ elements: [rectangle, ellipse], files: null }),
+    );
+
+    expect(
+      elements.map((element: { groupIds: string[] }) => element.groupIds),
+    ).toEqual([["outer"], ["outer"]]);
+    expect(rectangle.groupIds).toEqual(["inner", "outer"]);
+    expect(ellipse.groupIds).toEqual(["outer"]);
+  });
+});
+
 describe("parseClipboard()", () => {
   it("should parse JSON as plaintext if not excalidraw-api/clipboard data", async () => {
     let text;
