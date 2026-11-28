@@ -4,6 +4,8 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { useCallback, useState } from "react";
 
+import { getLanguage } from "../../i18n";
+
 import { useEditorInterface } from "../App";
 import { Island } from "../Island";
 import Stack from "../Stack";
@@ -32,7 +34,9 @@ const DropdownMenuSubContent = ({
         const menuWidth = node.getBoundingClientRect().width;
 
         const viewportWidth = window.innerWidth;
-        const spaceRemaining = viewportWidth - parentRect.right;
+        const spaceRemaining = getLanguage().rtl
+          ? parentRect.left
+          : viewportWidth - parentRect.right;
         if (spaceRemaining < menuWidth + 20) {
           setSideOffset(spaceRemaining - menuWidth + BASE_ALIGN_OFFSET);
           setAlignOffset(BASE_ALIGN_OFFSET + 8);
