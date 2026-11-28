@@ -5,13 +5,24 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   FREEDRAW_STROKE_WIDTH,
   FONT_FAMILY,
+  KEYS,
   STROKE_WIDTH,
 } from "@excalidraw/common";
 
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
-import { UI } from "../tests/helpers/ui";
-import { render } from "../tests/test-utils";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { act, render } from "../tests/test-utils";
+
+import {
+  actionChangeRoundness,
+  actionChangeStrokeWidth,
+} from "./actionProperties";
+
+const { h } = window;
+const mouse = new Pointer("mouse");
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -251,5 +262,80 @@ describe("element locking", () => {
         "active",
       );
     });
+  });
+});
+
+describe("arrows bound to a shape whose outline changes", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const setup = () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rectangle",
+      x: 300,
+      y: 0,
+      width: 200,
+      height: 100,
+      strokeWidth: STROKE_WIDTH.thin,
+      roundness: null,
+    });
+    API.setElements([rectangle]);
+
+    // ends just outside the left edge near the top-left corner, so both
+    // the binding gap and the rounded corner move it
+    UI.clickTool("arrow");
+    mouse.reset();
+    mouse.downAt(0, 8);
+    mouse.moveTo(150, 8);
+    mouse.moveTo(296, 8);
+    mouse.up();
+
+    const arrow = h.elements.find(
+      (el) => el.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+
+    API.setSelectedElements([rectangle]);
+
+    return arrow.id;
+  };
+
+  const getArrowEnd = (arrowId: string) => {
+    const arrow = h.elements.find(
+      (el) => el.id === arrowId,
+    ) as ExcalidrawArrowElement;
+    const [x, y] = arrow.points[arrow.points.length - 1];
+    return [arrow.x + x, arrow.y + y];
+  };
+
+  // nudging the shape re-routes its arrows from scratch
+  const getRoutedArrowEnd = (arrowId: string) => {
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    return getArrowEnd(arrowId);
+  };
+
+  it("re-routes a bound arrow when changing the stroke width", () => {
+    const arrowId = setup();
+
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeStrokeWidth, "ui", "bold");
+    });
+
+    const end = getArrowEnd(arrowId);
+    expect(end).toEqual(getRoutedArrowEnd(arrowId));
+  });
+
+  it("re-routes a bound arrow when changing the roundness", () => {
+    const arrowId = setup();
+
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeRoundness, "ui", "round");
+    });
+
+    const end = getArrowEnd(arrowId);
+    expect(end).toEqual(getRoutedArrowEnd(arrowId));
   });
 });
