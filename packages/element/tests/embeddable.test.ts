@@ -271,3 +271,27 @@ describe("Instagram embedding", () => {
     }
   });
 });
+
+describe("World Bank data embedding", () => {
+  const widgetURL =
+    "https://data.worldbank.org/share/widget?indicators=EN.ATM.PM25.MC.M3&locations=IN-PK";
+
+  it("should validate World Bank data widgets by default", () => {
+    expect(embeddableURLValidator(widgetURL, undefined)).toBe(true);
+  });
+
+  it("should embed World Bank data widgets without same-origin access", () => {
+    const result = getEmbedLink(widgetURL);
+    expect(result?.type).toBe("generic");
+    expect(result?.sandbox.allowSameOrigin).toBe(false);
+    if (result?.type === "generic") {
+      expect(result.link).toBe(widgetURL);
+    }
+  });
+
+  it("should not allow other worldbank.org subdomains", () => {
+    expect(
+      embeddableURLValidator("https://www.worldbank.org/en/home", undefined),
+    ).toBe(false);
+  });
+});
