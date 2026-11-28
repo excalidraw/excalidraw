@@ -571,6 +571,8 @@
     "selected": "Selected",
     "storage": "Storage",
     "fullTitle": "Canvas & Shape properties",
+    "canvas": "Canvas",
+    "gridStep": "Grid step",
     "title": "Properties",
     "generalStats": "General",
     "elementProperties": "Shape properties",
