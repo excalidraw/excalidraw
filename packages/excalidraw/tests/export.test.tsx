@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SVG_NS } from "@excalidraw/common";
+import { SVG_NS, DEFAULT_JPEG_QUALITY } from "@excalidraw/common";
 
 import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
@@ -18,7 +18,7 @@ import {
 } from "../scene/export";
 
 import { API } from "./helpers/api";
-import { render, waitFor } from "./test-utils";
+import { fireEvent, render, screen, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -111,6 +111,80 @@ describe("export", () => {
 
     expect(await exportedWidthAt(2)).toBe((await exportedWidthAt(1)) * 2);
     copySpy.mockRestore();
+  });
+
+  it("exports JPEG with the requested quality", async () => {
+    const toBlobSpy = vi.spyOn(window.HTMLCanvasElement.prototype, "toBlob");
+
+    const blob = await exportScene({
+      type: "jpeg",
+      data: {
+        elements: testElements,
+        appState: getDefaultAppState(),
+        files: {},
+      },
+      config: { quality: 0.5 },
+    });
+
+    expect(blob.type).toBe("image/jpeg");
+    expect(toBlobSpy.mock.lastCall?.[2]).toBe(0.5);
+
+    toBlobSpy.mockRestore();
+  });
+
+  it("falls back to the default JPEG quality", async () => {
+    const toBlobSpy = vi.spyOn(window.HTMLCanvasElement.prototype, "toBlob");
+
+    await exportScene({
+      type: "jpeg",
+      data: {
+        elements: testElements,
+        appState: getDefaultAppState(),
+        files: {},
+      },
+      config: {},
+    });
+
+    expect(toBlobSpy.mock.lastCall?.[2]).toBe(DEFAULT_JPEG_QUALITY);
+
+    toBlobSpy.mockRestore();
+  });
+
+  it("respects an explicit JPEG quality of 0", async () => {
+    const toBlobSpy = vi.spyOn(window.HTMLCanvasElement.prototype, "toBlob");
+
+    await exportScene({
+      type: "jpeg",
+      data: {
+        elements: testElements,
+        appState: getDefaultAppState(),
+        files: {},
+      },
+      config: { quality: 0 },
+    });
+
+    expect(toBlobSpy.mock.lastCall?.[2]).toBe(0);
+
+    toBlobSpy.mockRestore();
+  });
+
+  it("shows the JPEG export controls in the image export dialog", async () => {
+    API.setAppState({ openDialog: { name: "imageExport" } });
+
+    expect(
+      await screen.findByRole("button", { name: "Export to JPEG" }),
+    ).toBeInTheDocument();
+
+    const qualityInput = screen.getByRole("slider", {
+      name: "JPEG quality",
+    }) as HTMLInputElement;
+
+    expect(qualityInput.value).toBe("92");
+
+    fireEvent.change(qualityInput, { target: { value: "50" } });
+
+    expect(qualityInput.value).toBe("50");
+    expect(screen.getByText("50%")).toBeInTheDocument();
   });
 
   it("export svg-embedded scene", async () => {

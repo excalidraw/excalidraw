@@ -1,6 +1,8 @@
 import {
+  COLOR_WHITE,
   DEFAULT_EXPORT_PADDING,
   DEFAULT_FILENAME,
+  DEFAULT_JPEG_QUALITY,
   IMAGE_MIME_TYPES,
   isFirefox,
   MIME_TYPES,
@@ -103,12 +105,15 @@ export const exportCanvas = async (
   files: BinaryFiles,
   {
     exportPadding = DEFAULT_EXPORT_PADDING,
+    exportQuality = DEFAULT_JPEG_QUALITY,
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
     renderEnvironment,
   }: {
     exportPadding?: number;
+    /** JPEG encoding quality between 0 and 1 */
+    exportQuality?: number;
     /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
@@ -167,6 +172,37 @@ export const exportCanvas = async (
       }
       return;
     }
+  }
+
+  if (type === "jpeg") {
+    const blob = exportScene({
+      type: "jpeg",
+      data: {
+        elements,
+        appState,
+        files,
+      },
+      config: {
+        ...config,
+        // JPEG doesn't support transparency, so fall back to white instead of
+        // exporting transparent pixels as black
+        canvasBackgroundColor:
+          config.canvasBackgroundColor === false ||
+          config.canvasBackgroundColor === "transparent"
+            ? COLOR_WHITE
+            : config.canvasBackgroundColor,
+        quality: exportQuality,
+        environment: renderEnvironment,
+      },
+    });
+
+    return fileSave(blob, {
+      description: "Export to JPEG",
+      name,
+      extension: "jpg",
+      mimeTypes: [IMAGE_MIME_TYPES.jpg],
+      fileHandle,
+    });
   }
 
   const tempCanvas = exportScene({
