@@ -775,10 +775,10 @@ export class AppSelectionTool {
         return true;
       }
 
-      // an alt-drag duplicates only once it's a deliberate drag, leaving
-      // alt-clicks to cycle the selection
+      // Ignore small pen movements on a tap and preserve alt-click cycling
+      // until the pointer has moved far enough to start a drag.
       if (
-        event.altKey &&
+        (event.pointerType === "pen" || event.altKey) &&
         !pointerDownState.drag.hasOccurred &&
         pointDistance(
           pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),

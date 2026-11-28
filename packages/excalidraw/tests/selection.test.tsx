@@ -230,6 +230,39 @@ describe("lasso on touch devices", () => {
   });
 });
 
+describe("dragging selected elements with a pen", () => {
+  it.each([
+    { pointerType: "pen", moves: [2], expectedX: 0 },
+    { pointerType: "pen", moves: [24, 2], expectedX: 2 },
+    { pointerType: "mouse", moves: [2], expectedX: 2 },
+  ] as const)(
+    "moves the selection to $expectedX after $pointerType movement $moves",
+    async ({ pointerType, moves, expectedX }) => {
+      await render(<Excalidraw />);
+      const pointer = new Pointer(pointerType);
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        backgroundColor: "red",
+        fillStyle: "solid",
+      });
+      API.setElements([rectangle]);
+
+      pointer.downAt(50, 50);
+      for (const dx of moves) {
+        pointer.moveTo(50 + dx, 50);
+      }
+      pointer.upAt();
+
+      assertSelectedElements([rectangle.id]);
+      expect(API.getElement(rectangle)).toMatchObject({ x: expectedX, y: 0 });
+    },
+  );
+});
+
 describe("alt-click cycling", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
