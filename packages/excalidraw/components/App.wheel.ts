@@ -50,6 +50,7 @@ export class AppWheel {
     }
 
     event.preventDefault();
+    this.app.keyboardPan.stop();
 
     // scrolling with the wheel button held down zooms: the wheel sits under
     // the same finger, so a wheel-button pan can be zoomed without reaching
