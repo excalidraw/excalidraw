@@ -58,6 +58,24 @@
       }
     }
 
+    &__version {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      color: var(--color-muted-darker);
+      font-size: 0.75rem;
+
+      span {
+        color: var(--text-primary-color);
+        font-weight: 600;
+      }
+
+      code {
+        overflow-wrap: anywhere;
+      }
+    }
+
     &__islands-container {
       display: grid;
       grid-column-gap: 1.5rem;
