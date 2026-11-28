@@ -206,6 +206,7 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    this.scheduledMicroActions = [];
   }
 
   /**
