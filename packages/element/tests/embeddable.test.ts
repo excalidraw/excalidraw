@@ -107,6 +107,66 @@ describe("YouTube timestamp parsing", () => {
     }
   });
 
+  it("should handle watch URLs where `v` is not the first parameter", () => {
+    const testCases = [
+      "https://www.youtube.com/watch?feature=shared&v=dQw4w9WgXcQ",
+      "https://youtube.com/watch?app=desktop&v=dQw4w9WgXcQ",
+      "https://www.youtube.com/watch?list=PLtest&index=2&v=dQw4w9WgXcQ",
+    ];
+
+    testCases.forEach((url) => {
+      const result = getEmbedLink(url);
+
+      expect(result?.type).toBe("video");
+      if (result?.type === "video" || result?.type === "generic") {
+        expect(result.link).toBe(
+          "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1",
+        );
+      }
+    });
+
+    const withTimestamp = getEmbedLink(
+      "https://www.youtube.com/watch?feature=shared&v=dQw4w9WgXcQ&t=90",
+    );
+    expect(withTimestamp?.type).toBe("video");
+    if (withTimestamp?.type === "video" || withTimestamp?.type === "generic") {
+      expect(withTimestamp.link).toBe(
+        "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&start=90",
+      );
+    }
+  });
+
+  it("should handle playlist URLs where `list` is not the first parameter", () => {
+    const result = getEmbedLink(
+      "https://www.youtube.com/playlist?si=abc123&list=PLtest",
+    );
+
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(
+        "https://www.youtube.com/embed/videoseries?list=PLtest&enablejsapi=1",
+      );
+    }
+  });
+
+  it("should keep the playlist id of `embed/videoseries` URLs", () => {
+    const testCases = [
+      "https://www.youtube.com/embed/videoseries?list=PLtest",
+      "https://www.youtube.com/embed/videoseries?si=abc123&list=PLtest",
+    ];
+
+    testCases.forEach((url) => {
+      const result = getEmbedLink(url);
+
+      expect(result?.type).toBe("video");
+      if (result?.type === "video" || result?.type === "generic") {
+        expect(result.link).toBe(
+          "https://www.youtube.com/embed/videoseries?list=PLtest&enablejsapi=1",
+        );
+      }
+    });
+  });
+
   it("should handle playlist URLs with timestamps", () => {
     const url =
       "https://www.youtube.com/playlist?list=PLrAXtmRdnEQy1KbG5lbfgQ0-PKQY6FKYZ&t=60";
