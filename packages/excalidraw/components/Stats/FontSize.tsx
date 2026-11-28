@@ -3,6 +3,7 @@ import {
   getBaseFontSize,
   getBaseFontSizeUpdate,
   redrawTextBoundingBox,
+  updateBoundElements,
 } from "@excalidraw/element";
 import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
 
@@ -80,6 +81,8 @@ const handleFontSizeChange: DragInputCallbackType<
         scene,
         app.renderEnvironment,
       );
+      // the text's outline changed, so its arrows have to follow
+      updateBoundElements(latestElement, scene);
     }
   }
 };

@@ -3,6 +3,7 @@ import {
   getBaseFontSize,
   getBaseFontSizeUpdate,
   redrawTextBoundingBox,
+  updateBoundElements,
 } from "@excalidraw/element";
 import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
 
@@ -11,6 +12,7 @@ import { isInGroup } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeleted,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
@@ -76,7 +78,7 @@ const handleFontSizeChange: DragInputCallbackType<
   const elementsMap = scene.getNonDeletedElementsMap();
   const latestTextElements = originalElements.map((el) =>
     elementsMap.get(el.id),
-  ) as ExcalidrawTextElement[];
+  ) as NonDeleted<ExcalidrawTextElement>[];
 
   let nextFontSize;
 
@@ -95,6 +97,8 @@ const handleFontSizeChange: DragInputCallbackType<
         scene,
         app.renderEnvironment,
       );
+      // the text's outline changed, so its arrows have to follow
+      updateBoundElements(textElement, scene);
     }
 
     scene.triggerUpdate();
@@ -127,6 +131,8 @@ const handleFontSizeChange: DragInputCallbackType<
         scene,
         app.renderEnvironment,
       );
+      // the text's outline changed, so its arrows have to follow
+      updateBoundElements(latestElement, scene);
     }
 
     scene.triggerUpdate();
