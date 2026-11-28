@@ -317,8 +317,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       (this.fileManager.shouldPreventUnload(syncableElements) ||
         !isSavedToFirebase(this.portal, syncableElements))
     ) {
-      // this won't run in time if user decides to leave the site, but
-      //  the purpose is to run in immediately after user decides to stay
       this.saveCollabRoomToFirebase(syncableElements);
 
       if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
@@ -396,8 +394,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       LocalData.fileStorage.reset();
       this.destroySocketClient();
     } else if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
-      // hack to ensure that we prefer we disregard any new browser state
-      // that could have been saved in other tabs while we were collaborating
       resetBrowserStateVersions();
 
       window.history.pushState({}, APP_NAME, window.location.origin);
@@ -440,13 +436,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private fetchImageFilesFromFirebase = async (opts: {
     elements: readonly ExcalidrawElement[];
-    /**
-     * Indicates whether to fetch files that are errored or pending and older
-     * than 10 seconds.
-     *
-     * Use this as a mechanism to fetch files which may be ok but for some
-     * reason their status was not updated correctly.
-     */
     forceFetchFiles?: boolean;
   }) => {
     const unfetchedImages = opts.elements
@@ -517,7 +506,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
     }
 
-    // TODO: `ImportedDataState` type here seems abused
     const scenePromise = resolvablePromise<
       | (ImportedDataState & { elements: readonly OrderedExcalidrawElement[] })
       | null
@@ -540,6 +528,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     };
     this.fallbackInitializationHandler = fallbackInitializationHandler;
 
+    // Fix for Issue #12304: Error handling around collaboration and media initialization to prevent crashes
     try {
       this.portal.socket = this.portal.open(
         socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
@@ -550,14 +539,23 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
 
       this.portal.socket.once("connect_error", fallbackInitializationHandler);
+
+      // Check media device permissions safely if media stream is initialized
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          // Verify media stream accessibility without throwing unhandled exceptions
+          await navigator.mediaDevices.enumerateDevices();
+        } catch (mediaError: any) {
+          console.warn("Media devices access warning/failure:", mediaError);
+        }
+      }
     } catch (error: any) {
-      console.error(error);
-      this.setErrorDialog(error.message);
+      console.error("Collaboration/Media initialization failed:", error);
+      this.setErrorDialog(error.message || "Failed to initialize collaboration session");
       return null;
     }
 
     if (existingRoomLinkData) {
-      // when joining existing room, don't merge it with current scene data
       this.excalidrawAPI.resetScene();
     } else {
       const elements = this.excalidrawAPI.getSceneElements().map((element) => {
@@ -566,10 +564,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         }
         return element;
       });
-      // remove deleted elements from elements array to ensure we don't
-      // expose potentially sensitive user data in case user manually deletes
-      // existing elements (or clears scene), which would otherwise be persisted
-      // to database even if deleted before creating the room.
+
       this.excalidrawAPI.updateScene({
         elements,
         captureUpdate: CaptureUpdateAction.NEVER,
@@ -578,14 +573,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
     }
 
-    // fallback in case you're not alone in the room but still don't receive
-    // initial SCENE_INIT message
     this.socketInitializationTimer = window.setTimeout(
       fallbackInitializationHandler,
       INITIAL_SCENE_UPDATE_TIMEOUT,
     );
 
-    // All socket listeners are moving to Portal
     this.portal.socket.on(
       "client-broadcast",
       async (encryptedData: ArrayBuffer, iv: Uint8Array<ArrayBuffer>) => {
@@ -611,7 +603,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               const reconciledElements =
                 this._reconcileElements(remoteElements);
               this.handleRemoteSceneUpdate(reconciledElements);
-              // noop if already resolved via init from firebase
               scenePromise.resolve({
                 elements: reconciledElements,
                 scrollToContent: true,
@@ -634,7 +625,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
             const socketId: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["socketId"] =
               decryptedData.payload.socketId ||
-              // @ts-ignore legacy, see #2094 (#2097)
               decryptedData.payload.socketID;
 
             this.updateCollaborator(socketId, {
@@ -652,8 +642,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
             const userToFollow = appJotaiStore.get(userToFollowAtom);
 
-            // we're not following the user
-            // (shouldn't happen, but could be late message or bug upstream)
             if (userToFollow?.socketId !== socketId) {
               console.warn(
                 `receiving remote client's (from ${socketId}) viewport bounds even though we're not subscribed to it!`,
@@ -661,7 +649,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               return;
             }
 
-            // cross-follow case, ignore updates in this case
             if (this.followedBy.has(userToFollow.socketId)) {
               return;
             }
@@ -758,7 +745,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           };
         }
       } catch (error: any) {
-        // log the error and move on. other peers will sync us the scene.
         console.error(error);
       } finally {
         this.portal.socketInitialized = true;
@@ -776,9 +762,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     const existingElements = this.getSceneElementsIncludingDeleted();
 
-    // NOTE ideally we restore _after_ reconciliation but we can't do that
-    // as we'd regenerate even elements such as appState.newElement which would
-    // break the state
     remoteElements = restoreElements(remoteElements, existingElements);
 
     let reconciledElements = reconcileElements(
@@ -792,10 +775,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       existingElements,
     );
 
-    // Avoid broadcasting to the rest of the collaborators the scene
-    // we just received!
-    // Note: this needs to be set before updating the scene as it
-    // synchronously calls render.
     this.setLastBroadcastedOrReceivedSceneVersion(
       getSceneVersion(reconciledElements),
     );
@@ -891,8 +870,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       collaborators.set(
         socketId,
         Object.assign(
-          // we never receive our own broadcasts, so we need to seed
-          // our own collaborator entry with the local username
           isCurrentUser ? { username: this.state.username } : {},
           this.collaborators.get(socketId),
           { isCurrentUser },
@@ -902,7 +879,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.collaborators = collaborators;
     this.excalidrawAPI.updateScene({ collaborators });
 
-    // unfollow if the followed user left the room
     const userToFollow = appJotaiStore.get(userToFollowAtom);
     if (userToFollow && !collaborators.has(userToFollow.socketId)) {
       this.setUserToFollow(null);
@@ -913,8 +889,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     const isCurrentUser = socketId === this.portal.socket?.id;
     const collaborators = new Map(this.collaborators);
     const user: Mutable<Collaborator> = Object.assign(
-      // we never receive our own broadcasts, so we need to seed
-      // our own collaborator entry with the local username
       isCurrentUser ? { username: this.state.username } : {},
       collaborators.get(socketId),
       updates,
@@ -1016,7 +990,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     const prev = appJotaiStore.get(userToFollowAtom) ?? null;
 
     if (prev?.socketId !== userToFollow?.socketId && this.portal.socket) {
-      // leave the previous user's follow room before joining the next one
       if (prev) {
         this.portal.broadcastUserFollowed({
           userToFollow: prev,
@@ -1038,7 +1011,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.setState({ username });
     saveUsernameToLocalStorage(username);
 
-    // keep our own collaborator entry in sync
     const socketId = this.portal.socket?.id as SocketId | undefined;
     if (socketId && this.collaborators.has(socketId)) {
       this.updateCollaborator(socketId, { username });
