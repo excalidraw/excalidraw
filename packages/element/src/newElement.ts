@@ -422,13 +422,18 @@ const getAdjustedDimensions = (
   }
 
   const { textAlign, verticalAlign } = element;
+  // Free auto-resizing text should be anchored at its starting position: the
+  // click point becomes the left edge of the bounding box regardless of
+  // `textAlign`, so the box only grows to the right while typing. The text
+  // content still renders according to `textAlign` inside the box via CSS.
+  // Bound text and fixed-width text keep their existing anchor semantics.
+  const isFreeAutoResize = !element.containerId && element.autoResize;
   let x: number;
   let y: number;
   if (
     textAlign === "center" &&
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
-    !element.containerId &&
-    element.autoResize
+    isFreeAutoResize
   ) {
     const prevMetrics = measureText(
       element.text,
@@ -441,7 +446,8 @@ const getAdjustedDimensions = (
       height: nextHeight - prevMetrics.height,
     });
 
-    x = element.x - offsets.x;
+    // Keep the left edge fixed; only update y to stay vertically centered.
+    x = element.x;
     y = element.y - offsets.y;
   } else {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -461,6 +467,11 @@ const getAdjustedDimensions = (
     // the anchor stays put as the text is edited. `verticalAlign` has no
     // visual effect on unbound text, but standalone text bound to an arrow
     // endpoint uses it to pin the side the arrow attaches to.
+    //
+    // For free auto-resizing text, center alignment anchors the left edge
+    // (not the center), so the box grows only rightward — matching the
+    // behavior where the click point remains the starting position of the
+    // text, regardless of the chosen text alignment.
     [x, y] = adjustXYWithRotation(
       {
         n:
@@ -470,7 +481,9 @@ const getAdjustedDimensions = (
           verticalAlign === VERTICAL_ALIGN.MIDDLE ||
           verticalAlign === VERTICAL_ALIGN.TOP,
         e: textAlign === "center" || textAlign === "left",
-        w: textAlign === "center" || textAlign === "right",
+        w: isFreeAutoResize
+          ? textAlign === "right"
+          : textAlign === "center" || textAlign === "right",
       },
       element.x,
       element.y,
