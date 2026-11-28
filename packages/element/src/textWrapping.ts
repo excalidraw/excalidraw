@@ -35,6 +35,12 @@ export const containsCJK = (text: string) => {
 
   return cachedCjkRegex.test(text);
 };
+/**
+ * Test if a given text contains any emoji characters.
+ */
+export const containsEmoji = (text: string) => {
+  return getEmojiRegex().test(text);
+};
 
 const getLineBreakRegex = () => {
   if (!cachedLineBreakRegex) {
