@@ -5,13 +5,25 @@ import {
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   FREEDRAW_STROKE_WIDTH,
   FONT_FAMILY,
+  KEYS,
+  ROUNDNESS,
   STROKE_WIDTH,
 } from "@excalidraw/common";
 
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
-import { UI } from "../tests/helpers/ui";
-import { render } from "../tests/test-utils";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { act, render } from "../tests/test-utils";
+
+import {
+  actionChangeRoundness,
+  actionChangeStrokeWidth,
+} from "./actionProperties";
+
+const { h } = window;
+const mouse = new Pointer("mouse");
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -252,4 +264,130 @@ describe("element locking", () => {
       );
     });
   });
+});
+
+describe("arrows bound to a shape whose stroke or roundness changes", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const setup = (elbowed: boolean) => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rect",
+      x: 300,
+      y: 80,
+      width: 200,
+      height: 160,
+      strokeWidth: STROKE_WIDTH.thin,
+      roundness: null,
+    });
+    API.setElements([rectangle]);
+
+    // ends just outside the left edge, near the top-left corner, so a
+    // thicker stroke pushes the end out and rounding the corner moves it
+    const endY = rectangle.y + 12;
+    UI.clickTool("arrow");
+    if (elbowed) {
+      UI.clickOnTestId("elbow-arrow");
+    }
+    mouse.reset();
+    mouse.downAt(0, endY);
+    mouse.moveTo(150, endY);
+    mouse.moveTo(rectangle.x - 4, endY);
+    mouse.up();
+
+    const arrow = h.elements.find(
+      (el) => el.type === "arrow",
+    ) as ExcalidrawArrowElement;
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+
+    API.setSelectedElements([rectangle]);
+
+    return { arrowId: arrow.id, rectangleId: rectangle.id };
+  };
+
+  const getArrow = (arrowId: string) =>
+    h.elements.find((el) => el.id === arrowId) as ExcalidrawArrowElement;
+
+  const getArrowEnd = (arrowId: string) => {
+    const arrow = getArrow(arrowId);
+    const [x, y] = arrow.points[arrow.points.length - 1];
+    return [arrow.x + x, arrow.y + y];
+  };
+
+  // nudging the shape re-routes its arrows from scratch
+  const getRoutedArrowEnd = (arrowId: string) => {
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    return getArrowEnd(arrowId);
+  };
+
+  const distance = (a: number[], b: number[]) =>
+    Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+  for (const elbowed of [false, true]) {
+    const arrowType = elbowed ? "elbow" : "simple";
+
+    it(`re-routes a bound ${arrowType} arrow when the stroke width changes`, () => {
+      const { arrowId, rectangleId } = setup(elbowed);
+      const before = getArrowEnd(arrowId);
+
+      act(() => {
+        h.app.actionManager.executeAction(
+          actionChangeStrokeWidth,
+          "ui",
+          "bold",
+        );
+      });
+
+      const rectangle = h.elements.find((el) => el.id === rectangleId);
+      expect(rectangle?.strokeWidth).toBe(STROKE_WIDTH.bold);
+      expect(getArrow(arrowId).endBinding?.elementId).toBe(rectangleId);
+
+      const end = getArrowEnd(arrowId);
+      // elbow ends are a fixed point on the box, so a nudge leaves them
+      // where they are; a simple arrow's end moves out with the thicker stroke
+      if (!elbowed) {
+        expect(distance(end, before)).toBeGreaterThan(0.5);
+        Keyboard.undo();
+        expect(
+          h.elements.find((el) => el.id === rectangleId)?.strokeWidth,
+        ).toBe(STROKE_WIDTH.thin);
+        expect(getArrowEnd(arrowId)).toEqual(before);
+        Keyboard.redo();
+        expect(getArrowEnd(arrowId)).toEqual(end);
+      }
+      expect(end).toEqual(getRoutedArrowEnd(arrowId));
+    });
+
+    it(`re-routes a bound ${arrowType} arrow when the edges are rounded`, () => {
+      const { arrowId, rectangleId } = setup(elbowed);
+      const before = getArrowEnd(arrowId);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeRoundness, "ui", "round");
+      });
+
+      const rectangle = h.elements.find((el) => el.id === rectangleId);
+      expect(rectangle?.roundness).toEqual({
+        type: ROUNDNESS.ADAPTIVE_RADIUS,
+      });
+      expect(getArrow(arrowId).endBinding?.elementId).toBe(rectangleId);
+
+      const end = getArrowEnd(arrowId);
+      // a simple arrow bound near the corner follows the rounded outline
+      if (!elbowed) {
+        expect(distance(end, before)).toBeGreaterThan(0.5);
+        Keyboard.undo();
+        expect(h.elements.find((el) => el.id === rectangleId)?.roundness).toBe(
+          null,
+        );
+        expect(getArrowEnd(arrowId)).toEqual(before);
+        Keyboard.redo();
+        expect(getArrowEnd(arrowId)).toEqual(end);
+      }
+      expect(end).toEqual(getRoutedArrowEnd(arrowId));
+    });
+  }
 });
