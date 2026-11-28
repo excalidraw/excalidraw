@@ -58,6 +58,17 @@
       }
     }
 
+    &__search {
+      margin-top: 1.5rem;
+    }
+
+    &__no-results {
+      margin: 1.5rem 0;
+      color: var(--text-primary-color);
+      opacity: 0.6;
+      font-size: 0.875rem;
+    }
+
     &__islands-container {
       display: grid;
       grid-column-gap: 1.5rem;
