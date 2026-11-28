@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Freedraw strokes cost the same per frame however long they get (2026-11-14) [#12621](https://github.com/excalidraw/excalidraw/pull/12621)
+
+- While a freedraw stroke is drawn, only the end of its outline (and of its SVG path) is recomputed when a point is added, instead of the whole stroke on every frame, for both constant and variable width. The outline is the same as before. At 2,000 points this takes about 0.06 ms per point instead of 1.7–7 ms (Node).
+- `@excalidraw/laser-pointer`: new `LaserPointer.getStrokeOutlineParts()`, which resumes the outline from its previous call, and its `StrokeOutlineParts` type.
+
 ### Minimap, zoom menu and `ui.disabled` (2026-11-12) [#12605](https://github.com/excalidraw/excalidraw/pull/12605), [#12606](https://github.com/excalidraw/excalidraw/pull/12606)
 
 - A toggleable minimap above the bottom-left canvas actions: drag its viewport (or press outside of it) to pan, wheel over it to zoom. Toggled from the footer button next to the zoom level, the Preferences menu, the command palette and the context menu; stored as `appState.minimapEnabled` (in the browser, not in exported files). Not shown on phones or in editors shorter than 500px.
