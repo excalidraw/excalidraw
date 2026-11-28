@@ -59,6 +59,7 @@ import { HelpDialog } from "./HelpDialog";
 import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
+import { MathSymbolsDialog } from "./MathSymbolsDialog/MathSymbolsDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 import { Toolbar } from "./Toolbar";
@@ -623,6 +624,15 @@ const LayerUI = ({
         <PasteChartDialog
           data={appState.openDialog.data}
           rawText={appState.openDialog.rawText}
+          onClose={() =>
+            setAppState({
+              openDialog: null,
+            })
+          }
+        />
+      )}
+      {defaultUIEnabled && appState.openDialog?.name === "mathSymbols" && (
+        <MathSymbolsDialog
           onClose={() =>
             setAppState({
               openDialog: null,
