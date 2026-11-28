@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SVG_NS } from "@excalidraw/common";
+import { MIME_TYPES, SVG_NS } from "@excalidraw/common";
 
 import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
@@ -260,5 +260,27 @@ describe("export", () => {
     // in case of regressions, save the SVG to a file and visually compare to:
     // src/tests/fixtures/svg-image-exporting-reference.svg
     expect(svgText).toMatchSnapshot(`svg export output`);
+  });
+
+  it("import scene with malformed element entries", async () => {
+    const data = JSON.parse(
+      serializeAsJSON(testElements, h.state, {}, "local"),
+    );
+    data.elements.unshift(null);
+
+    await API.drop([
+      {
+        kind: "file",
+        file: new File([JSON.stringify(data)], "scene.excalidraw", {
+          type: MIME_TYPES.excalidraw,
+        }),
+      },
+    ]);
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: "😀" }),
+      ]);
+    });
+    expect(h.state.errorMessage).toBe(null);
   });
 });
