@@ -34,16 +34,34 @@ export const shareDialogStateAtom = atom<
 >({ isOpen: false });
 
 const getShareIcon = () => {
-  const navigator = window.navigator as any;
-  const isAppleBrowser = /Apple/.test(navigator.vendor);
-  const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
+  // Prefer User-Agent Client Hints when available (Chromium-based)
+  // Fallback to navigator.platform and touch heuristics (for iPadOS which reports Mac)
+  try {
+    const nav = window.navigator as any;
+    const uaDataPlatform: string | undefined = nav.userAgentData?.platform;
+    const platform: string = uaDataPlatform || nav.platform || "";
 
-  if (isAppleBrowser) {
-    return shareIOS;
-  } else if (isWindowsBrowser) {
-    return shareWindows;
+    // Detect Apple platforms (iOS, iPadOS, macOS)
+    // Note: iPadOS may report "MacIntel", detect via touch points
+    const isIPadOS = platform === "MacIntel" && Number(nav.maxTouchPoints) > 1;
+    const isApplePlatform =
+      isIPadOS || /^(iPhone|iPad|iPod|Mac)/i.test(platform);
+
+    // Detect Windows platform
+    const isWindowsPlatform =
+      (uaDataPlatform && uaDataPlatform === "Windows") || /^Win/i.test(platform);
+
+    if (isApplePlatform) {
+      return shareIOS;
+    }
+    if (isWindowsPlatform) {
+      return shareWindows;
+    }
+  } catch {
+    // no-op, fall back to generic share icon
   }
 
+  // Default generic share icon
   return share;
 };
 
