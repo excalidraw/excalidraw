@@ -136,6 +136,42 @@ export const growOutline = (
 };
 
 /**
+ * A convex outline swept along `by`: all it covers as it moves that far,
+ * itself, where it ends up, and in between (convex too)
+ */
+export const sweepOutline = (
+  outline: readonly Point[],
+  [dx, dy]: Point,
+): Point[] => {
+  const points = [
+    ...outline,
+    ...outline.map(([x, y]): Point => [x + dx, y + dy]),
+  ].sort((p, q) => p[0] - q[0] || p[1] - q[1]);
+  if (points.length < 3) {
+    return points;
+  }
+  // (its convex hull, the lower half and then the upper, leaving out any
+  // corner on the line between its neighbours)
+  const cross = (o: Point, p: Point, q: Point) =>
+    (p[0] - o[0]) * (q[1] - o[1]) - (p[1] - o[1]) * (q[0] - o[0]);
+  const half = (sorted: Point[]) => {
+    const hull: Point[] = [];
+    for (const point of sorted) {
+      while (
+        hull.length >= 2 &&
+        cross(hull[hull.length - 2], hull[hull.length - 1], point) <= 0
+      ) {
+        hull.pop();
+      }
+      hull.push(point);
+    }
+    hull.pop();
+    return hull;
+  };
+  return [...half(points), ...half([...points].reverse())];
+};
+
+/**
  * How far a convex outline reaches toward `side` (the furthest left, right,
  * up or down it is) over the span from `from` to `to` across that side
  * (along x for the top and the bottom, along y for the left and the right)
