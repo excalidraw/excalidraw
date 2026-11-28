@@ -1,7 +1,5 @@
 import { isDevEnv } from "@excalidraw/common";
-
 import type { NestedKeyOf } from "@excalidraw/common/utility-types";
-
 import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
@@ -45,6 +43,7 @@ export const languages: Language[] = [
     { code: "ku-TR", label: "Kurdî" },
     { code: "lt-LT", label: "Lietuvių" },
     { code: "lv-LV", label: "Latviešu" },
+    { code: "mn", label: "Монгол" },
     { code: "my-MM", label: "Burmese" },
     { code: "nb-NO", label: "Norsk bokmål" },
     { code: "nl-NL", label: "Nederlands" },
@@ -104,7 +103,6 @@ export const setLanguage = async (lang: Language) => {
       currentLangData = fallbackLangData;
     }
   }
-
   editorJotaiStore.set(editorLangCodeAtom, lang.code);
 };
 
@@ -141,6 +139,7 @@ export const t = (
     findPartsForData(currentLangData, parts) ||
     findPartsForData(fallbackLangData, parts) ||
     fallback;
+
   if (translation === undefined) {
     const errorMessage = `Can't find translation for ${path}`;
     // in production, don't blow up the app on a missing translation key
@@ -156,6 +155,7 @@ export const t = (
       translation = translation.replace(`{{${key}}}`, String(replacement[key]));
     }
   }
+
   return translation;
 };
 
