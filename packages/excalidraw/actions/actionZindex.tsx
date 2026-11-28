@@ -1,4 +1,9 @@
-import { KEYS, CODES, isDarwin } from "@excalidraw/common";
+import {
+  KEYS,
+  isDarwin,
+  isBracketLeftKey,
+  isBracketRightKey,
+} from "@excalidraw/common";
 
 import {
   moveOneLeft,
@@ -35,9 +40,7 @@ export const actionSendBackward = register({
   },
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    event.code === CODES.BRACKET_LEFT,
+    event[KEYS.CTRL_OR_CMD] && !event.shiftKey && isBracketLeftKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -65,9 +68,7 @@ export const actionBringForward = register({
   },
   keyPriority: 40,
   keyTest: (event) =>
-    event[KEYS.CTRL_OR_CMD] &&
-    !event.shiftKey &&
-    event.code === CODES.BRACKET_RIGHT,
+    event[KEYS.CTRL_OR_CMD] && !event.shiftKey && isBracketRightKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -95,12 +96,8 @@ export const actionSendToBack = register({
   },
   keyTest: (event) =>
     isDarwin
-      ? event[KEYS.CTRL_OR_CMD] &&
-        event.altKey &&
-        event.code === CODES.BRACKET_LEFT
-      : event[KEYS.CTRL_OR_CMD] &&
-        event.shiftKey &&
-        event.code === CODES.BRACKET_LEFT,
+      ? event[KEYS.CTRL_OR_CMD] && event.altKey && isBracketLeftKey(event)
+      : event[KEYS.CTRL_OR_CMD] && event.shiftKey && isBracketLeftKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -133,12 +130,8 @@ export const actionBringToFront = register({
   },
   keyTest: (event) =>
     isDarwin
-      ? event[KEYS.CTRL_OR_CMD] &&
-        event.altKey &&
-        event.code === CODES.BRACKET_RIGHT
-      : event[KEYS.CTRL_OR_CMD] &&
-        event.shiftKey &&
-        event.code === CODES.BRACKET_RIGHT,
+      ? event[KEYS.CTRL_OR_CMD] && event.altKey && isBracketRightKey(event)
+      : event[KEYS.CTRL_OR_CMD] && event.shiftKey && isBracketRightKey(event),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
