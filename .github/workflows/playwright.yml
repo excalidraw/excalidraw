@@ -1,0 +1,129 @@
+name: Playwright E2E
+
+# Proof of concept: runs on pull requests and can also be triggered manually.
+# Manual runs accept an optional `pr_number` to post (or update) a detailed
+# report comment on that PR.
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to comment on (optional; leave empty for no comment)"
+        required: false
+        type: string
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: playwright-${{ github.workflow }}-${{ github.event.pull_request.number || inputs.pr_number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: yarn test:e2e:install
+
+      - name: Run Playwright tests
+        id: e2e
+        run: yarn test:e2e
+        env:
+          CI: "true"
+
+      - name: Upload Playwright report
+        id: report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test artifacts
+        id: test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results/
+          retention-days: 7
+
+      - name: Build PR comment
+        if: always()
+        run: node .github/scripts/playwright-comment.mjs
+        env:
+          PLAYWRIGHT_OUTCOME: ${{ steps.e2e.outcome }}
+          PLAYWRIGHT_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PLAYWRIGHT_REPORT_URL: ${{ steps.report.outputs.artifact-url }}
+          PLAYWRIGHT_ARTIFACTS_URL: ${{ steps.test-results.outputs.artifact-url }}
+
+      - name: Comment on PR
+        if: always() && (github.event_name == 'pull_request' || inputs.pr_number != '')
+        # PRs from forks get a read-only GITHUB_TOKEN, so commenting may be
+        # denied. Keep that from turning a passing test run red.
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          COMMENT_FILE: playwright-comment.md
+        with:
+          script: |
+            const fs = require("fs");
+            const body = fs.readFileSync(process.env.COMMENT_FILE, "utf8");
+            const marker = "<!-- playwright-e2e-report -->";
+
+            if (!body.includes(marker)) {
+              throw new Error("Playwright comment file is missing its marker");
+            }
+
+            const issue_number = Number(process.env.PR_NUMBER);
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
+                per_page: 100,
+              },
+            );
+
+            const existing = comments.find((comment) =>
+              comment.body?.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated PR comment ${existing.html_url}`);
+            } else {
+              const { data } = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
+                body,
+              });
+              core.info(`Created PR comment ${data.html_url}`);
+            }
