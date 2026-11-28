@@ -3231,6 +3231,31 @@ class App extends React.Component<AppProps, AppState> {
 
   public scheduleCapture = () => this.store.scheduleCapture();
 
+  private hasPendingArrowMoveCapture = false;
+
+  private capturePendingArrowMove = () => {
+    if (!this.hasPendingArrowMoveCapture) {
+      return;
+    }
+    this.hasPendingArrowMoveCapture = false;
+    this.store.scheduleCapture();
+    this.store.commit(this.scene.getElementsMapIncludingDeleted(), this.state);
+  };
+
+  private debouncedCaptureArrowMove = debounce(
+    this.capturePendingArrowMove,
+    300,
+  );
+
+  private scheduleArrowMoveCapture = () => {
+    this.hasPendingArrowMoveCapture = true;
+    this.debouncedCaptureArrowMove();
+  };
+
+  public flushArrowMoveCapture = () => {
+    this.debouncedCaptureArrowMove.flush();
+  };
+
   // Lifecycle
 
   private onBlur = withBatchedUpdates(() => {
@@ -3930,6 +3955,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    this.debouncedCaptureArrowMove.cancel();
     this.ownerWindow.clearTimeout(this.zenModeTransitionTimer);
     this.unmarkZenModeTransition();
     this.editorLifecycleEvents.emit("editor:unmount");
@@ -4982,6 +5008,8 @@ class App extends React.Component<AppProps, AppState> {
     }) => {
       const { elements, appState, collaborators, captureUpdate } = sceneData;
 
+      this.flushArrowMoveCapture();
+
       if (captureUpdate) {
         const nextElements = elements ? elements : undefined;
         const observedAppState = appState
@@ -5291,6 +5319,16 @@ class App extends React.Component<AppProps, AppState> {
 
       this.modifiers.sync(event);
 
+      if (
+        !isArrowKey(event.key) &&
+        event.key !== "Shift" &&
+        event.key !== "Control" &&
+        event.key !== "Alt" &&
+        event.key !== "Meta"
+      ) {
+        this.flushArrowMoveCapture();
+      }
+
       // Handle Alt key for bind mode
       if (event.key === KEYS.ALT) {
         if (this.state.activeTool.type === "bucketfill") {
@@ -5479,6 +5517,10 @@ class App extends React.Component<AppProps, AppState> {
           movedElements,
           this.scene.getNonDeletedElementsMap(),
         );
+
+        if (movedElements.length > 0 || frameArrowIds.size > 0) {
+          this.scheduleArrowMoveCapture();
+        }
 
         this.scene.triggerUpdate();
 
@@ -5741,6 +5783,10 @@ class App extends React.Component<AppProps, AppState> {
         });
 
       this.setState({ suggestedBinding: null });
+
+      if (this.hasPendingArrowMoveCapture) {
+        this.scheduleArrowMoveCapture();
+      }
     }
 
     this.flowchart.handleKeyEvent(event);
@@ -7532,6 +7578,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.flushArrowMoveCapture();
+
     if (
       !this.isInteractionEnabled() &&
       !this.isToolSupported(this.state.activeTool.type)
