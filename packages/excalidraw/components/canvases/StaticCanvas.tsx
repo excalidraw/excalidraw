@@ -1,5 +1,8 @@
 import React, { useEffect, useRef } from "react";
 
+import { isLinearElement } from "@excalidraw/element";
+import { restoreLinearElementAnimation } from "@excalidraw/element/linearElementAnimation";
+
 import { isShallowEqual } from "@excalidraw/common";
 
 import type {
@@ -9,6 +12,8 @@ import type {
 
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderStaticScene } from "../../renderer/staticScene";
+
+import { LinearAnimationOverlay } from "./LinearAnimationOverlay";
 
 import type {
   RenderableElementsMap,
@@ -33,6 +38,7 @@ type StaticCanvasProps = {
 const StaticCanvas = (props: StaticCanvasProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isComponentMounted = useRef(false);
+  const gapTime = useRef(0);
 
   useEffect(() => {
     props.canvas.style.width = `${props.appState.width}px`;
@@ -71,7 +77,92 @@ const StaticCanvas = (props: StaticCanvasProps) => {
     );
   });
 
-  return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
+  // A traveling gap must remove the shaft itself, so render it in the canvas
+  // instead of painting a background-colored patch over unrelated objects.
+  useEffect(() => {
+    const gaps = props.visibleElements.filter(
+      (element) =>
+        isLinearElement(element) &&
+        restoreLinearElementAnimation(element.animation)?.type === "gap",
+    );
+    if (!gaps.length) {
+      return;
+    }
+    const document = props.canvas.ownerDocument;
+    const ownerWindow = document.defaultView;
+    if (!ownerWindow) {
+      return;
+    }
+    const reducedMotion = ownerWindow.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    const moving = gaps.some(
+      (element) =>
+        isLinearElement(element) && (element.animation?.speed ?? 0) > 0,
+    );
+    let frame: number | undefined;
+    let previousTime: number | undefined;
+    let lastPaint = 0;
+    const paint = (motion: boolean) =>
+      renderStaticScene(
+        {
+          canvas: props.canvas,
+          rc: props.rc,
+          scale: props.scale,
+          elementsMap: props.elementsMap,
+          allElementsMap: props.allElementsMap,
+          visibleElements: props.visibleElements,
+          appState: props.appState,
+          renderConfig: {
+            ...props.renderConfig,
+            linearAnimationTime: motion ? gapTime.current : undefined,
+          },
+        },
+        false,
+      );
+    const tick = (time: number) => {
+      gapTime.current += previousTime === undefined ? 0 : time - previousTime;
+      previousTime = time;
+      if (time - lastPaint >= 1000 / 30) {
+        paint(true);
+        lastPaint = time;
+      }
+      frame = ownerWindow.requestAnimationFrame(tick);
+    };
+    const update = () => {
+      if (frame !== undefined) {
+        ownerWindow.cancelAnimationFrame(frame);
+        frame = undefined;
+      }
+      previousTime = undefined;
+      const enabled = !document.hidden && !reducedMotion.matches;
+      paint(enabled);
+      if (enabled && moving) {
+        frame = ownerWindow.requestAnimationFrame(tick);
+      }
+    };
+    update();
+    document.addEventListener("visibilitychange", update);
+    reducedMotion.addEventListener("change", update);
+    return () => {
+      if (frame !== undefined) {
+        ownerWindow.cancelAnimationFrame(frame);
+      }
+      document.removeEventListener("visibilitychange", update);
+      reducedMotion.removeEventListener("change", update);
+    };
+  });
+
+  return (
+    <>
+      <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />
+      <LinearAnimationOverlay
+        elements={props.visibleElements}
+        allElementsMap={props.allElementsMap}
+        appState={props.appState}
+      />
+    </>
+  );
 };
 
 const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {

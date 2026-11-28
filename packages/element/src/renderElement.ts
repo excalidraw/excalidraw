@@ -75,6 +75,10 @@ import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
 import {
+  getAnimationProgress,
+  restoreLinearElementAnimation,
+} from "./linearElementAnimation";
+import {
   getStickyNoteFooter,
   getStickyNotePathCommands,
   type StickyNotePathCommand,
@@ -828,6 +832,56 @@ const drawElementFromCanvas = (
 
   withSavedContext(context, () => {
     context.scale(1 / devicePixelRatio, 1 / devicePixelRatio);
+
+    // Clip only this element's cached bitmap: objects behind the gap remain
+    // visible, and later elements/labels retain the scene's normal paint order.
+    const animation = isLinearElement(element)
+      ? restoreLinearElementAnimation(element.animation)
+      : null;
+    if (
+      isLinearElement(element) &&
+      animation?.type === "gap" &&
+      renderConfig.linearAnimationTime !== undefined &&
+      !renderConfig.isExporting
+    ) {
+      // Intersect the outside of each hole separately: overlapping gaps must
+      // stay empty instead of canceling each other under the even-odd rule.
+      for (let itemIndex = 0; itemIndex < animation.count; itemIndex++) {
+        const point = LinearElementEditor.getPointAtPathParameter(
+          element,
+          getAnimationProgress(
+            renderConfig.linearAnimationTime,
+            animation,
+            itemIndex,
+          ),
+          allElementsMap,
+        );
+        if (point) {
+          const gapX =
+            (point[0] + positionOffset.x + appState.scrollX) * devicePixelRatio;
+          const gapY =
+            (point[1] + positionOffset.y + appState.scrollY) * devicePixelRatio;
+          const radius =
+            Math.max(animation.size / 2, element.strokeWidth * 2) *
+            devicePixelRatio;
+          const outerHalf =
+            (Math.max(distance(x1, x2), distance(y1, y2)) +
+              animation.size +
+              padding * 10) *
+            devicePixelRatio;
+          context.beginPath();
+          context.rect(
+            cx - outerHalf,
+            cy - outerHalf,
+            outerHalf * 2,
+            outerHalf * 2,
+          );
+          context.moveTo(gapX + radius, gapY);
+          context.arc(gapX, gapY, radius, 0, Math.PI * 2);
+          context.clip("evenodd");
+        }
+      }
+    }
 
     const boundTextElement = getBoundTextElement(element, allElementsMap);
 
