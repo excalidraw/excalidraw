@@ -3,10 +3,23 @@ import { expect } from "vitest";
 
 import { reseed } from "@excalidraw/common";
 
+import {
+  getGlobalFixedPointForBindableElement,
+  LinearElementEditor,
+} from "@excalidraw/element";
+
+import type {
+  ExcalidrawBindableElement,
+  ExcalidrawElbowArrowElement,
+} from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 
-import { UI } from "./helpers/ui";
+import { Pointer, UI } from "./helpers/ui";
 import { render, unmountComponent } from "./test-utils";
+
+const { h } = window;
+const mouse = new Pointer("mouse");
 
 unmountComponent();
 
@@ -82,4 +95,72 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(textArrow.points[0]).toEqual([0, 0]);
   expect(textArrow.points[1][0]).toBeCloseTo(-95.4635969899922, 0);
   expect(textArrow.points[1][1]).toBeCloseTo(-126.8785027399889, 0);
+});
+
+test("elbow arrow in a rotated selection re-routes to its bound targets", async () => {
+  await render(<Excalidraw />);
+  const left = UI.createElement("rectangle", {
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+  });
+  const right = UI.createElement("rectangle", {
+    x: 300,
+    y: 200,
+    width: 100,
+    height: 100,
+  });
+
+  UI.clickTool("arrow");
+  UI.clickOnTestId("elbow-arrow");
+  mouse.reset();
+  mouse.moveTo(105, 50);
+  mouse.click();
+  mouse.moveTo(295, 250);
+  mouse.click();
+
+  const arrow = h.scene.getSelectedElements(
+    h.state,
+  )[0] as ExcalidrawElbowArrowElement;
+
+  expect(arrow.startBinding?.elementId).toBe(left.id);
+  expect(arrow.endBinding?.elementId).toBe(right.id);
+
+  UI.rotate([left, right, arrow], [200, 100], { shift: true });
+
+  expect(left.angle).not.toBe(0);
+  expect(arrow.startBinding?.elementId).toBe(left.id);
+  expect(arrow.endBinding?.elementId).toBe(right.id);
+
+  // both endpoints sit on the fixed points of the rotated targets
+  const elementsMap = h.scene.getNonDeletedElementsMap();
+  for (const [index, binding, target] of [
+    [0, arrow.startBinding!, left],
+    [-1, arrow.endBinding!, right],
+  ] as const) {
+    const endpoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      index,
+      elementsMap,
+    );
+    const fixedPoint = getGlobalFixedPointForBindableElement(
+      binding.fixedPoint,
+      target as ExcalidrawBindableElement,
+      elementsMap,
+    );
+    expect(endpoint[0]).toBeCloseTo(fixedPoint[0], 0);
+    expect(endpoint[1]).toBeCloseTo(fixedPoint[1], 0);
+  }
+
+  // and the route stays orthogonal
+  expect(
+    arrow.points
+      .slice(1)
+      .every(
+        ([x, y], i) =>
+          Math.abs(x - arrow.points[i][0]) < 1 ||
+          Math.abs(y - arrow.points[i][1]) < 1,
+      ),
+  ).toBe(true);
 });
