@@ -47,6 +47,7 @@ export const TTDDialogPanel = ({
     if (panelAction?.variant === "link") {
       return (
         <button
+          data-excalidraw-control=""
           className={clsx(
             "ttd-dialog-panel-action-link",
             panelAction.className,
@@ -99,7 +100,11 @@ export const TTDDialogPanel = ({
     <div className={clsx("ttd-dialog-panel", className)}>
       {(label || renderTopRight) && (
         <div className="ttd-dialog-panel__header">
-          {typeof label === "string" ? <label>{label}</label> : label}
+          {typeof label === "string" ? (
+            <label data-excalidraw-control="">{label}</label>
+          ) : (
+            label
+          )}
           {renderTopRight?.()}
         </div>
       )}

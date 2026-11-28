@@ -83,6 +83,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
 
     return (
       <button
+        data-excalidraw-control=""
         className={clsx(
           "ExcButton",
           `ExcButton--color-${color}`,

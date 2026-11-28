@@ -22,8 +22,17 @@ export const ButtonIconCycle = <T extends any>({
   };
 
   return (
-    <label key={group} className={clsx({ active: current!.value !== null })}>
-      <input type="button" name={group} onClick={cycle} />
+    <label
+      data-excalidraw-control=""
+      key={group}
+      className={clsx({ active: current!.value !== null })}
+    >
+      <input
+        data-excalidraw-control=""
+        type="button"
+        name={group}
+        onClick={cycle}
+      />
       {current!.icon}
     </label>
   );

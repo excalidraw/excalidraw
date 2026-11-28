@@ -179,6 +179,7 @@ const SingleLibraryItem = ({
         }}
       >
         <label
+          data-excalidraw-control=""
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -194,6 +195,7 @@ const SingleLibraryItem = ({
             </span>
           </div>
           <input
+            data-excalidraw-control=""
             type="text"
             ref={inputRef}
             style={{ width: "80%", padding: "0.2rem" }}
@@ -437,7 +439,7 @@ const PublishLibrary = ({
           )}
           {renderLibraryItems()}
           <div className="publish-library__fields">
-            <label>
+            <label data-excalidraw-control="">
               <div>
                 <span>{t("publishDialog.libraryName")}</span>
                 <span aria-hidden="true" className="required">
@@ -445,6 +447,7 @@ const PublishLibrary = ({
                 </span>
               </div>
               <input
+                data-excalidraw-control=""
                 type="text"
                 name="name"
                 required
@@ -453,7 +456,10 @@ const PublishLibrary = ({
                 placeholder={t("publishDialog.placeholder.libraryName")}
               />
             </label>
-            <label style={{ alignItems: "flex-start" }}>
+            <label
+              data-excalidraw-control=""
+              style={{ alignItems: "flex-start" }}
+            >
               <div>
                 <span>{t("publishDialog.libraryDesc")}</span>
                 <span aria-hidden="true" className="required">
@@ -461,6 +467,7 @@ const PublishLibrary = ({
                 </span>
               </div>
               <textarea
+                data-excalidraw-control=""
                 name="description"
                 rows={4}
                 required
@@ -469,7 +476,7 @@ const PublishLibrary = ({
                 placeholder={t("publishDialog.placeholder.libraryDesc")}
               />
             </label>
-            <label>
+            <label data-excalidraw-control="">
               <div>
                 <span>{t("publishDialog.authorName")}</span>
                 <span aria-hidden="true" className="required">
@@ -477,6 +484,7 @@ const PublishLibrary = ({
                 </span>
               </div>
               <input
+                data-excalidraw-control=""
                 type="text"
                 name="authorName"
                 required
@@ -485,9 +493,10 @@ const PublishLibrary = ({
                 placeholder={t("publishDialog.placeholder.authorName")}
               />
             </label>
-            <label>
+            <label data-excalidraw-control="">
               <span>{t("publishDialog.githubUsername")}</span>
               <input
+                data-excalidraw-control=""
                 type="text"
                 name="githubHandle"
                 value={libraryData.githubHandle}
@@ -495,9 +504,10 @@ const PublishLibrary = ({
                 placeholder={t("publishDialog.placeholder.githubHandle")}
               />
             </label>
-            <label>
+            <label data-excalidraw-control="">
               <span>{t("publishDialog.twitterUsername")}</span>
               <input
+                data-excalidraw-control=""
                 type="text"
                 name="twitterHandle"
                 value={libraryData.twitterHandle}
@@ -505,9 +515,10 @@ const PublishLibrary = ({
                 placeholder={t("publishDialog.placeholder.twitterHandle")}
               />
             </label>
-            <label>
+            <label data-excalidraw-control="">
               <span>{t("publishDialog.website")}</span>
               <input
+                data-excalidraw-control=""
                 type="text"
                 name="website"
                 pattern="https?://.+"

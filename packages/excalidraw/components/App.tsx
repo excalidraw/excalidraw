@@ -2228,6 +2228,7 @@ class App extends React.Component<AppProps, AppState> {
 
         frameNameJSX = (
           <input
+            data-excalidraw-control=""
             autoFocus
             value={frameNameInEdit}
             onChange={(e) => {

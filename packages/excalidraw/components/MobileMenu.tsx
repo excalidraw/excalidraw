@@ -128,6 +128,7 @@ export const MobileMenu = ({
     !appState.openMenu &&
     !appState.openSidebar ? (
       <button
+        data-excalidraw-control=""
         type="button"
         className="scroll-back-to-content"
         onClick={() => {

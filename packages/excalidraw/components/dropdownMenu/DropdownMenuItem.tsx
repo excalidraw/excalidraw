@@ -47,6 +47,7 @@ const DropdownMenuItem = ({
       asChild
     >
       <button
+        data-excalidraw-control=""
         {...rest}
         value={value}
         className={getDropdownMenuItemClassName(className, selected)}

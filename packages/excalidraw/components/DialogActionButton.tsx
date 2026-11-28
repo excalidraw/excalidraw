@@ -27,6 +27,7 @@ const DialogActionButton = ({
 
   return (
     <button
+      data-excalidraw-control=""
       className={clsx("Dialog__action-button", cs, className)}
       type={type}
       aria-label={label}

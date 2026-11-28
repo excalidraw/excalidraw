@@ -109,6 +109,7 @@ export const ContextMenu = React.memo(
                 }}
               >
                 <button
+                  data-excalidraw-control=""
                   type="button"
                   className={clsx("context-menu-item", {
                     dangerous: actionName === "deleteSelectedElements",

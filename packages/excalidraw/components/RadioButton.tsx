@@ -19,6 +19,7 @@ export const RadioButton = forwardRef<HTMLButtonElement, RadioButtonProps>(
     const { title, className, testId, active, icon, onClick } = props;
     return (
       <button
+        data-excalidraw-control=""
         type="button"
         ref={ref}
         key={title}

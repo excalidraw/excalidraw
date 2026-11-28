@@ -45,6 +45,7 @@ export const CustomColorList = ({
         const displayColor = applyDarkModeFilter(c, theme === THEME.DARK);
         return (
           <button
+            data-excalidraw-control=""
             ref={color === c ? btnRef : undefined}
             tabIndex={-1}
             type="button"

@@ -31,7 +31,7 @@ const DropdownMenuItemContentRadio = <T,>({
     <>
       <div className="dropdown-menu-item-base dropdown-menu-item-bare">
         {icon && <div className="dropdown-menu-item__icon">{icon}</div>}
-        <label className="dropdown-menu-item__text">
+        <label data-excalidraw-control="" className="dropdown-menu-item__text">
           <Ellipsify>{children}</Ellipsify>
         </label>
         <RadioGroup

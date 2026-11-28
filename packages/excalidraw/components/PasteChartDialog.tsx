@@ -107,6 +107,7 @@ const ChartPreviewBtn = (props: {
 
   return (
     <button
+      data-excalidraw-control=""
       type="button"
       className="ChartPreview"
       aria-label={chartTypeLabel}
@@ -169,6 +170,7 @@ const PlainTextPreviewBtn = (props: {
 
   return (
     <button
+      data-excalidraw-control=""
       type="button"
       className="ChartPreview"
       aria-label={t("labels.chartType_plaintext")}

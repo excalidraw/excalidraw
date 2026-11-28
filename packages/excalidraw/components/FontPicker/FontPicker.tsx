@@ -149,6 +149,7 @@ const FontTopPicks = ({
             const reorderOffset = getTopPickReorderOffset(dragState, index);
             return (
               <button
+                data-excalidraw-control=""
                 key={fontFamily}
                 type="button"
                 title={font.text}

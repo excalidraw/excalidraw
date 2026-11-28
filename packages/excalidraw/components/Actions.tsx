@@ -266,6 +266,7 @@ const CombinedShapeProperties = ({
       >
         <Popover.Trigger asChild>
           <button
+            data-excalidraw-control=""
             type="button"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
@@ -351,6 +352,7 @@ const CombinedArrowProperties = ({
       >
         <Popover.Trigger asChild>
           <button
+            data-excalidraw-control=""
             type="button"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
@@ -448,6 +450,7 @@ const CombinedTextProperties = ({
       >
         <Popover.Trigger asChild>
           <button
+            data-excalidraw-control=""
             type="button"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
@@ -533,6 +536,7 @@ const CombinedExtraActions = ({
       >
         <Popover.Trigger asChild>
           <button
+            data-excalidraw-control=""
             type="button"
             className={clsx("compact-action-button properties-trigger", {
               active: isOpen,
@@ -1023,6 +1027,7 @@ export const ExitZenModeButton = ({
   showExitZenModeBtn: boolean;
 }) => (
   <button
+    data-excalidraw-control=""
     type="button"
     className={clsx("disable-zen-mode", {
       "disable-zen-mode--visible": showExitZenModeBtn,
@@ -1039,6 +1044,7 @@ export const ExitViewModeButton = ({
   actionManager: ActionManager;
 }) => (
   <button
+    data-excalidraw-control=""
     type="button"
     className="disable-view-mode"
     onClick={() => actionManager.executeAction(actionToggleViewMode)}

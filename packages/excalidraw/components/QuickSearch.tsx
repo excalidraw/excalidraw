@@ -17,6 +17,7 @@ export const QuickSearch = React.forwardRef<HTMLInputElement, QuickSearchProps>(
       <div className={clsx("QuickSearch__wrapper", className)}>
         {searchIcon}
         <input
+          data-excalidraw-control=""
           ref={ref}
           className="QuickSearch__input"
           type="text"

@@ -26,6 +26,7 @@ export const TopPicksTip = ({
       <>
         {" · "}
         <button
+          data-excalidraw-control=""
           type="button"
           className="top-picks-dnd__tip-reset"
           title={resetTitle}

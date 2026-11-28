@@ -28,13 +28,14 @@ export const Range = ({
   const progress = (value - min) / (max - min || 1);
 
   return (
-    <label className="control-label">
+    <label data-excalidraw-control="" className="control-label">
       {label}
       <div
         className="range-wrapper"
         style={{ ["--range-progress" as string]: progress }}
       >
         <input
+          data-excalidraw-control=""
           style={{
             ["--color-slider-track" as string]: hasCommonValue
               ? undefined

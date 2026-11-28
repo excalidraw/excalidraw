@@ -12,7 +12,12 @@ export const TTDDialogTabTrigger = ({
 } & Omit<React.HTMLAttributes<HTMLButtonElement>, "onSelect">) => {
   return (
     <RadixTabs.Trigger value={tab} asChild onSelect={onSelect}>
-      <button type="button" className="ttd-dialog-tab-trigger" {...rest}>
+      <button
+        data-excalidraw-control=""
+        type="button"
+        className="ttd-dialog-tab-trigger"
+        {...rest}
+      >
         {children}
       </button>
     </RadixTabs.Trigger>

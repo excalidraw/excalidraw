@@ -134,6 +134,7 @@ export const ChatMessage: React.FC<{
                   <div className="chat-message__error-actions">
                     {onMermaidTabClick && (
                       <button
+                        data-excalidraw-control=""
                         className="chat-message__error-link"
                         onClick={() => onMermaidTabClick(message)}
                         type="button"
@@ -143,6 +144,7 @@ export const ChatMessage: React.FC<{
                     )}
                     {onAiRepairClick && (
                       <button
+                        data-excalidraw-control=""
                         className="chat-message__error-link"
                         onClick={() => onAiRepairClick(message)}
                         disabled={rateLimitRemaining === 0}
@@ -169,6 +171,7 @@ export const ChatMessage: React.FC<{
         <div className="chat-message__actions">
           {!message.error && onInsertMessage && (
             <button
+              data-excalidraw-control=""
               className="chat-message__action"
               onClick={() => onInsertMessage(message)}
               type="button"
@@ -180,6 +183,7 @@ export const ChatMessage: React.FC<{
           )}
           {onMermaidTabClick && message.content && (
             <button
+              data-excalidraw-control=""
               className="chat-message__action"
               onClick={() => onMermaidTabClick(message)}
               type="button"
@@ -191,6 +195,7 @@ export const ChatMessage: React.FC<{
           )}
           {onDeleteMessage && message.errorType !== "network" && (
             <button
+              data-excalidraw-control=""
               className="chat-message__action chat-message__action--danger"
               onClick={() => onDeleteMessage(message.id)}
               type="button"
@@ -202,6 +207,7 @@ export const ChatMessage: React.FC<{
           )}
           {message.errorType === "network" && onRetry && isLastMessage && (
             <button
+              data-excalidraw-control=""
               className={clsx("chat-message__action", { invisible: !canRetry })}
               onClick={() => onRetry(message)}
               type="button"

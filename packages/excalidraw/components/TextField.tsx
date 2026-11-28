@@ -82,6 +82,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           })}
         >
           <input
+            data-excalidraw-control=""
             className={clsx({
               "is-redacted":
                 "value" in rest &&

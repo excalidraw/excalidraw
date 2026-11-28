@@ -702,6 +702,7 @@ const LayerUI = ({
                   scrollBackToContentUIEnabled &&
                   appState.scrolledOutside && (
                     <button
+                      data-excalidraw-control=""
                       type="button"
                       className="scroll-back-to-content"
                       onClick={() => {

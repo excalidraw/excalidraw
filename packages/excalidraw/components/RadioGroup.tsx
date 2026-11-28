@@ -32,6 +32,7 @@ export const RadioGroup = function <T>({
           title={choice.ariaLabel}
         >
           <input
+            data-excalidraw-control=""
             name={name}
             type="radio"
             checked={choice.value === value}

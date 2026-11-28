@@ -24,6 +24,7 @@ export const SidebarTrigger = ({
 
   return (
     <button
+      data-excalidraw-control=""
       type="button"
       title={title}
       className="sidebar-trigger__label-element"
