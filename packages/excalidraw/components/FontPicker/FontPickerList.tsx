@@ -78,6 +78,7 @@ export const getFontFamilyIcon = (
 ): JSX.Element => {
   switch (fontFamily) {
     case FONT_FAMILY.Excalifont:
+    case FONT_FAMILY["Playpen Arabic"]:
     case FONT_FAMILY.Virgil:
       return FreedrawIcon;
     case FONT_FAMILY.Nunito:
