@@ -271,3 +271,29 @@ describe("Instagram embedding", () => {
     }
   });
 });
+
+describe("mobile YouTube links", () => {
+  it.each([
+    {
+      url: "https://m.youtube.com/watch?v=dQw4w9WgXcQ",
+      expectedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1",
+    },
+    {
+      url: "https://m.youtube.com/watch?v=dQw4w9WgXcQ&t=90",
+      expectedLink:
+        "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&start=90",
+    },
+    {
+      url: "https://m.youtube.com/shorts/dQw4w9WgXcQ",
+      expectedLink: "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1",
+    },
+  ])("should embed $url", ({ url, expectedLink }) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    const result = getEmbedLink(url);
+    expect(result?.type).toBe("video");
+    expect(result?.sandbox.allowSameOrigin).toBe(true);
+    if (result?.type === "video") {
+      expect(result.link).toBe(expectedLink);
+    }
+  });
+});
