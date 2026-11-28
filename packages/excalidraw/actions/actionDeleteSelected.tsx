@@ -5,11 +5,15 @@ import {
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
-import { fixBindingsAfterDeletion } from "@excalidraw/element";
+import {
+  fixBindingsAfterDeletion,
+  unbindBindingElement,
+} from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import {
+  isArrowElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
@@ -257,6 +261,16 @@ export const actionDeleteSelected = register<{
           },
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
+      }
+
+      // a deleted endpoint takes its binding along
+      if (isArrowElement(linearElement)) {
+        if (selectedPointsIndices.includes(0)) {
+          unbindBindingElement(linearElement, "start", app.scene);
+        }
+        if (selectedPointsIndices.includes(linearElement.points.length - 1)) {
+          unbindBindingElement(linearElement, "end", app.scene);
+        }
       }
 
       LinearElementEditor.deletePoints(
