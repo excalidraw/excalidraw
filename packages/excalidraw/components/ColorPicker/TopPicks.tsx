@@ -89,6 +89,7 @@ export const TopPicks = ({
           const displayColor = applyDarkModeFilter(color, theme === THEME.DARK);
           return (
             <button
+              data-excalidraw-control=""
               className={clsx("color-picker__button top-picks-dnd__pick", {
                 active: color === activeColor,
                 "is-transparent": color === "transparent" || !color,

@@ -40,6 +40,7 @@ export const actionSendBackward = register({
     event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
+      data-excalidraw-control=""
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
@@ -70,6 +71,7 @@ export const actionBringForward = register({
     event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button
+      data-excalidraw-control=""
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
@@ -103,6 +105,7 @@ export const actionSendToBack = register({
         event.code === CODES.BRACKET_LEFT,
   PanelComponent: ({ updateData, appState }) => (
     <button
+      data-excalidraw-control=""
       type="button"
       className="zIndexButton"
       onClick={() => updateData(null)}
@@ -141,6 +144,7 @@ export const actionBringToFront = register({
         event.code === CODES.BRACKET_RIGHT,
   PanelComponent: ({ updateData, appState }) => (
     <button
+      data-excalidraw-control=""
       type="button"
       className="zIndexButton"
       onClick={(event) => updateData(null)}

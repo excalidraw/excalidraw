@@ -60,17 +60,18 @@ body.excalidraw-cursor-resize * {
   height: 100%;
   width: 100%;
 
-  button {
+  // Shared control styles opt in so host-supplied JSX keeps its own styles.
+  button:where([data-excalidraw-control]) {
     // browser default. Looks kinda good on low-dpi.
     font-size: 0.8333rem;
   }
 
-  button,
-  label {
+  button:where([data-excalidraw-control]),
+  label:where([data-excalidraw-control]) {
     @include buttonNoHighlight;
   }
 
-  button {
+  button:where([data-excalidraw-control]) {
     cursor: pointer;
     user-select: none;
   }
@@ -191,7 +192,7 @@ body.excalidraw-cursor-resize * {
       display: block;
     }
 
-    .control-label input {
+    .control-label input:where([data-excalidraw-control]) {
       display: block;
       width: 100%;
     }
@@ -211,12 +212,12 @@ body.excalidraw-cursor-resize * {
       column-gap: 0.5rem;
       row-gap: 0.5rem;
 
-      label {
+      label:where([data-excalidraw-control]) {
         font-size: 0.75rem;
       }
 
-      input[type="radio"],
-      input[type="button"] {
+      input:where([data-excalidraw-control])[type="radio"],
+      input:where([data-excalidraw-control])[type="button"] {
         opacity: 0;
         position: absolute;
         pointer-events: none;
@@ -242,9 +243,9 @@ body.excalidraw-cursor-resize * {
 
   .welcome-screen-menu-item:focus-visible,
   .dropdown-menu-item:focus-visible,
-  button:focus-visible,
-  .buttonList label:focus-within,
-  input:focus-visible {
+  button:where([data-excalidraw-control]):focus-visible,
+  .buttonList label:where([data-excalidraw-control]):focus-within,
+  input:where([data-excalidraw-control]):focus-visible {
     outline: transparent;
     box-shadow: 0 0 0 1px var(--color-brand-hover);
   }
@@ -267,12 +268,12 @@ body.excalidraw-cursor-resize * {
       display: flex !important;
     }
 
-    button {
+    button:where([data-excalidraw-control]) {
       background-color: transparent;
     }
 
-    label,
-    button,
+    label:where([data-excalidraw-control]),
+    button:where([data-excalidraw-control]),
     .zIndexButton {
       @include outlineButtonIconStyles;
     }
@@ -280,7 +281,7 @@ body.excalidraw-cursor-resize * {
 
   // an icon button rendered outside a .buttonList context (e.g. the font
   // picker trigger)
-  button.standalone {
+  button:where([data-excalidraw-control]).standalone {
     @include outlineButtonIconStyles;
 
     .ToolIcon__icon {
@@ -630,7 +631,7 @@ body.excalidraw-cursor-resize * {
     margin-bottom: 0.5rem;
   }
 
-  .help-icon {
+  .exc-help-icon {
     @include outlineButtonStyles;
     @include filledButtonOnCanvas;
 
@@ -826,8 +827,8 @@ body.excalidraw-cursor-resize * {
     -webkit-text-security: disc;
   }
 
-  input[type="text"],
-  textarea:not(.excalidraw-wysiwyg) {
+  input:where([data-excalidraw-control])[type="text"],
+  textarea:where([data-excalidraw-control]):not(.excalidraw-wysiwyg) {
     color: var(--text-primary-color);
     border: 1.5px solid var(--input-border-color);
     padding: 0.75rem;

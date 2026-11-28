@@ -20,6 +20,7 @@ export const Switch = ({
   return (
     <div className={clsx("Switch", { toggled: checked, disabled })}>
       <input
+        data-excalidraw-control=""
         name={name}
         id={name}
         title={title}

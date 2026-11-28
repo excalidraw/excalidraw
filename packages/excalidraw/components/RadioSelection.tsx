@@ -40,11 +40,13 @@ export const RadioSelection = <T extends Object>(
         />
       ) : (
         <label
+          data-excalidraw-control=""
           key={option.text}
           className={clsx({ active: props.value === option.value })}
           title={option.text}
         >
           <input
+            data-excalidraw-control=""
             type="radio"
             name={props.group}
             onChange={() => props.onChange(option.value)}

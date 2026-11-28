@@ -92,6 +92,7 @@ const PickerColorList = ({
 
         return (
           <button
+            data-excalidraw-control=""
             ref={colorObj?.colorName === key ? btnRef : undefined}
             tabIndex={-1}
             type="button"

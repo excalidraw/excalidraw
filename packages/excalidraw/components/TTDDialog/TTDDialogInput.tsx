@@ -115,6 +115,7 @@ export const TTDDialogInput = ({
   if (editorState.type === "fallback") {
     return (
       <textarea
+        data-excalidraw-control=""
         className="ttd-dialog-input"
         onChange={(e) => onChange(e.target.value)}
         value={input}

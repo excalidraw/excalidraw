@@ -12,7 +12,8 @@ type HelpButtonProps = {
 export const HelpButton = (props: HelpButtonProps) => (
   <Tooltip label={`${t("helpDialog.title")} — ?`} delay>
     <button
-      className="help-icon"
+      data-excalidraw-control=""
+      className="exc-help-icon"
       onClick={props.onClick}
       type="button"
       aria-label={t("helpDialog.title")}

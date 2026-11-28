@@ -67,6 +67,7 @@ export const ShadeList = ({
             );
             return (
               <button
+                data-excalidraw-control=""
                 ref={
                   i === shade && activeColorPickerSection === "shades"
                     ? btnRef
@@ -111,6 +112,7 @@ export const ShadeList = ({
       tabIndex={-1}
     >
       <button
+        data-excalidraw-control=""
         type="button"
         tabIndex={-1}
         className="color-picker__button color-picker__button--large color-picker__button--no-focus-visible"

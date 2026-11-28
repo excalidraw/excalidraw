@@ -636,7 +636,7 @@ describe("ui={false}", () => {
     expect(queryContainer(".main-menu-trigger")).toBe(null);
     expect(queryContainer(".default-sidebar-trigger")).toBe(null);
     expect(queryContainer(".layer-ui__wrapper__footer-left")).toBe(null);
-    expect(queryContainer(".help-icon")).toBe(null);
+    expect(queryContainer(".exc-help-icon")).toBe(null);
   });
 
   it("host children still mount", () => {
@@ -709,7 +709,7 @@ describe("ui={{ enabled: ... }}", () => {
     expect(queryContainer(".App-toolbar")).toBe(null);
     expect(queryContainer(".main-menu-trigger")).toBe(null);
     expect(queryContainer(".default-sidebar-trigger")).toBe(null);
-    expect(queryContainer(".help-icon")).toBe(null);
+    expect(queryContainer(".exc-help-icon")).toBe(null);
     expect(
       queryContainer(".excalidraw-container")!.classList.contains(
         "excalidraw--ui-hidden",

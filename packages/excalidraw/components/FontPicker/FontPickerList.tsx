@@ -315,6 +315,7 @@ export const FontPickerList = React.memo(
 
       return (
         <button
+          data-excalidraw-control=""
           ref={ref}
           type="button"
           value={font.value}

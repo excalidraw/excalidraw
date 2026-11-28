@@ -319,6 +319,7 @@ export const Hyperlink = ({
     >
       {isEditing ? (
         <input
+          data-excalidraw-control=""
           className={clsx("excalidraw-hyperlinkContainer-input")}
           placeholder={t("labels.link.hint")}
           ref={inputRef}

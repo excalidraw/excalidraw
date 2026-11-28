@@ -24,6 +24,7 @@ export const CheckboxItem: React.FC<{
       }}
     >
       <button
+        data-excalidraw-control=""
         type="button"
         className="Checkbox-box"
         role="checkbox"

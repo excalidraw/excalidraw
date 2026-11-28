@@ -199,6 +199,7 @@ function Picker<T>({
       <div className="picker-content">
         {options.map((option) => (
           <button
+            data-excalidraw-control=""
             type="button"
             className={clsx("picker-option", {
               active: value === option.value,

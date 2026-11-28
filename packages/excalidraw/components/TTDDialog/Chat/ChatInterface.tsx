@@ -152,6 +152,7 @@ export const ChatInterface = ({
             }}
           >
             <textarea
+              data-excalidraw-control=""
               ref={textareaRef}
               autoFocus
               className="chat-interface__input"
@@ -173,6 +174,7 @@ export const ChatInterface = ({
               onInput={onInput}
             />
             <button
+              data-excalidraw-control=""
               className="chat-interface__send-button"
               onClick={handleSubmit}
               disabled={!canSend && !canStop}

@@ -68,6 +68,7 @@ export const ChatHistoryMenu = ({
                       {chat.title}
                     </span>
                     <button
+                      data-excalidraw-control=""
                       className="ttd-chat-menu-item__delete"
                       onClick={(e) => onDeleteChat(chat.id, e)}
                       title={t("chat.deleteChat")}

@@ -111,6 +111,7 @@ export const IconButton = React.forwardRef(
     if (props.type === "button" || props.type === "icon") {
       return (
         <button
+          data-excalidraw-control=""
           className={clsx(
             "ToolIcon_type_button",
             sizeCn,
@@ -160,6 +161,7 @@ export const IconButton = React.forwardRef(
 
     return (
       <button
+        data-excalidraw-control=""
         className={clsx("ToolIcon", "ToolIcon_type_toggle", sizeCn, className, {
           "ToolIcon--checked": props.checked,
         })}

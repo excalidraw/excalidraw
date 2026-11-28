@@ -365,6 +365,7 @@ const StatsDragInput = <
         {icon ? <InlineIcon icon={icon} /> : label}
       </div>
       <input
+        data-excalidraw-control=""
         className="drag-input"
         autoComplete="off"
         spellCheck="false"

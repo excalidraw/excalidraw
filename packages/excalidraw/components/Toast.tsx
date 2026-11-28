@@ -85,6 +85,7 @@ const ToastComponent = ({
           <>
             {" "}
             <button
+              data-excalidraw-control=""
               type="button"
               className="Toast__action"
               onClick={() => {

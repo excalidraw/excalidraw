@@ -46,6 +46,7 @@ const WelcomeScreenMenuItem = ({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
     <button
+      data-excalidraw-control=""
       {...props}
       type="button"
       className={`welcome-screen-menu-item ${className}`}

@@ -121,6 +121,7 @@ export const Dialog = (props: DialogProps) => {
         )}
         {isFullscreen && (
           <button
+            data-excalidraw-control=""
             className="Dialog__close"
             onClick={onClose}
             title={t("buttons.close")}

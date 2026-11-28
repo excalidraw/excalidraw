@@ -55,6 +55,7 @@ export const ViewportStatusBadge = ({
     >
       {label.onClick && (
         <button
+          data-excalidraw-control=""
           type="button"
           className="viewport-status-frame__badge-action"
           aria-labelledby={labelId}
@@ -69,6 +70,7 @@ export const ViewportStatusBadge = ({
       </div>
       {label.onClose && (
         <button
+          data-excalidraw-control=""
           type="button"
           className="viewport-status-frame__badge-close"
           aria-label={t("buttons.close")}

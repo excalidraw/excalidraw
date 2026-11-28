@@ -40,10 +40,15 @@ export const ProjectName = (props: Props) => {
 
   return (
     <div className="ProjectName">
-      <label className="ProjectName-label" htmlFor="filename">
+      <label
+        data-excalidraw-control=""
+        className="ProjectName-label"
+        htmlFor="filename"
+      >
         {`${props.label}:`}
       </label>
       <input
+        data-excalidraw-control=""
         type="text"
         className="TextInput"
         onBlur={handleBlur}

@@ -204,6 +204,7 @@ const ImageExportModal = ({
         <div className="ImageExportModal__preview__filename">
           {!nativeFileSystemSupported && (
             <input
+              data-excalidraw-control=""
               type="text"
               className="TextInput"
               value={projectName}
@@ -372,6 +373,7 @@ const ExportSetting = ({
   return (
     <div className="ImageExportModal__settings__setting" title={label}>
       <label
+        data-excalidraw-control=""
         htmlFor={name}
         className="ImageExportModal__settings__setting__label"
       >

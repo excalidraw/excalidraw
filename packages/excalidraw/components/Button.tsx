@@ -33,6 +33,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <button
+      data-excalidraw-control=""
       onClick={composeEventHandlers(rest.onClick, (event) => {
         onSelect();
       })}

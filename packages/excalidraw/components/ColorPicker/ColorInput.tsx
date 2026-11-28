@@ -84,6 +84,7 @@ export const ColorInput = ({
       >
         <div className="color-picker__input-hash">#</div>
         <input
+          data-excalidraw-control=""
           ref={activeSection === "hex" ? inputRef : undefined}
           style={{ border: 0, padding: 0 }}
           spellCheck={false}
