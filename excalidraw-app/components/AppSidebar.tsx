@@ -5,6 +5,7 @@ import {
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 
 import "./AppSidebar.scss";
 
@@ -67,18 +68,21 @@ const SidebarPromoCopy = (props: SidebarPromoCopyProps) => {
 
 export const AppSidebar = () => {
   const { theme, openSidebar } = useUIAppState();
+  const { t } = useI18n();
 
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
         <Sidebar.TabTrigger
           tab="comments"
+          aria-label={t("labels.comments")}
           style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
         >
           {messageCircleIcon}
         </Sidebar.TabTrigger>
         <Sidebar.TabTrigger
           tab="presentation"
+          aria-label={t("labels.presentation")}
           style={{ opacity: openSidebar?.tab === "presentation" ? 1 : 0.4 }}
         >
           {presentationIcon}
