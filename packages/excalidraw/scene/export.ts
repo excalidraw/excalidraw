@@ -957,6 +957,8 @@ type ExportToSvgConfig = Pick<
      * Excalidraw.
      */
     embedScene?: boolean;
+    /** Accessible description of the exported SVG. */
+    description?: string;
   };
 
 const createHTMLComment = (ownerDocument: Document, text: string) => {
@@ -1022,6 +1024,13 @@ const exportToSvg = async ({
   );
   svgRoot.setAttribute("width", `${exportWidth}`);
   svgRoot.setAttribute("height", `${exportHeight}`);
+
+  const description = config?.description?.trim();
+  if (description) {
+    const descElement = ownerDocument.createElementNS(SVG_NS, "desc");
+    descElement.textContent = description;
+    svgRoot.appendChild(descElement);
+  }
 
   const defsElement = ownerDocument.createElementNS(SVG_NS, "defs");
 

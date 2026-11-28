@@ -2799,7 +2799,10 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null },
+    opts: {
+      exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+      description?: string;
+    },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -2810,6 +2813,7 @@ class App extends React.Component<AppProps, AppState> {
       {
         name: this.getName(),
         exportingFrame: opts.exportingFrame,
+        description: opts.description,
         renderEnvironment: this.renderEnvironment,
       },
     )

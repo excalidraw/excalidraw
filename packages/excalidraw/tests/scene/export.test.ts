@@ -230,6 +230,30 @@ describe("exportToSvg", () => {
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
 
+  it("includes a configured accessible description in the SVG root", async () => {
+    const description = 'Flow & <review> "draft"';
+    const svgElement = await exportScene({
+      type: "svg",
+      data: { elements: ELEMENTS, appState: DEFAULT_APP_STATE, files: {} },
+      config: { description, skipInliningFonts: true },
+    });
+
+    const descElement = svgElement.querySelector("desc");
+    expect(descElement?.parentElement).toBe(svgElement);
+    expect(descElement?.textContent).toBe(description);
+    expect(svgElement.outerHTML).toContain("Flow &amp; &lt;review&gt;");
+  });
+
+  it("omits an empty accessible description", async () => {
+    const svgElement = await exportScene({
+      type: "svg",
+      data: { elements: ELEMENTS, appState: DEFAULT_APP_STATE, files: {} },
+      config: { description: "  ", skipInliningFonts: true },
+    });
+
+    expect(svgElement.querySelector("desc")).toBeNull();
+  });
+
   // #11439: a perfectly horizontal/vertical arrow has a zero-size bounding box.
   // The bound-text "gap" mask must use userSpaceOnUse units, otherwise its
   // objectBoundingBox region collapses to zero area and the whole arrow line

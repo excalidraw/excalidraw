@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 
 import {
   DEFAULT_EXPORT_PADDING,
@@ -85,6 +85,8 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [svgDescription, setSvgDescription] = useState("");
+  const svgDescriptionId = useId();
 
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
@@ -304,6 +306,19 @@ const ImageExportModal = ({
             }))}
           />
         </ExportSetting>
+        <ExportSetting
+          label={t("imageExportDialog.label.svgDescription")}
+          tooltip={t("imageExportDialog.tooltip.svgDescription")}
+          name={svgDescriptionId}
+        >
+          <input
+            id={svgDescriptionId}
+            type="text"
+            className="TextInput"
+            value={svgDescription}
+            onChange={(event) => setSvgDescription(event.target.value)}
+          />
+        </ExportSetting>
 
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
@@ -324,6 +339,7 @@ const ImageExportModal = ({
             onClick={() =>
               onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
                 exportingFrame,
+                description: svgDescription,
               })
             }
             icon={downloadIcon}
