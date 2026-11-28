@@ -80,6 +80,10 @@ export function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
   polygon: readonly Point[],
   tolerance: number = PRECISION,
 ) {
+  if (polygon.length < 2) {
+    return false;
+  }
+
   return pointsEqual(polygon[0], polygon[polygon.length - 1], tolerance);
 }
 

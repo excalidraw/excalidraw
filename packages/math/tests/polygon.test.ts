@@ -2,6 +2,7 @@ import { pointFrom } from "../src/point";
 import {
   convexHull,
   polygonArea,
+  polygonIsClosed,
   polygonSignedArea,
   simplifyConvexPolygon,
 } from "../src/polygon";
@@ -28,6 +29,20 @@ describe("polygonArea", () => {
   it("reports the winding direction in the sign", () => {
     expect(polygonSignedArea(square)).toBe(100);
     expect(polygonSignedArea([...square].reverse())).toBe(-100);
+  });
+
+  it("handles an empty polygon", () => {
+    expect(polygonArea([])).toBe(0);
+    expect(polygonSignedArea([])).toBe(0);
+    expect(polygonIsClosed([])).toBe(false);
+  });
+
+  it("handles a single-point polygon", () => {
+    const singlePoint = [pointFrom(0, 0)];
+
+    expect(polygonArea(singlePoint)).toBe(0);
+    expect(polygonSignedArea(singlePoint)).toBe(0);
+    expect(polygonIsClosed(singlePoint)).toBe(false);
   });
 });
 
