@@ -1,9 +1,14 @@
 import React from "react";
 
-import { Excalidraw } from "../index";
+import { MAX_ZOOM, MIN_ZOOM } from "@excalidraw/common";
 
+import { Excalidraw } from "../index";
+import { getNormalizedZoom } from "../scene";
+
+import { API } from "./helpers/api";
 import {
   fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
@@ -92,4 +97,41 @@ describe("zoom menu", () => {
       expect(h.state.zoom.value).toBe(1);
     },
   );
+
+  it("disables the zoom buttons at the zoom limits", async () => {
+    await render(<Excalidraw ui={{ disabled: { minimap: true } }} />);
+
+    const getZoomInButton = () =>
+      document.querySelector<HTMLButtonElement>(".zoom-in-button")!;
+    const getZoomOutButton = () =>
+      document.querySelector<HTMLButtonElement>(".zoom-out-button")!;
+    expect(getZoomInButton().disabled).toBe(false);
+    expect(getZoomOutButton().disabled).toBe(false);
+
+    API.setAppState({ zoom: { value: getNormalizedZoom(MIN_ZOOM) } });
+    expect(getZoomInButton().disabled).toBe(false);
+    expect(getZoomOutButton().disabled).toBe(true);
+
+    API.setAppState({ zoom: { value: getNormalizedZoom(MAX_ZOOM) } });
+    expect(getZoomInButton().disabled).toBe(true);
+    expect(getZoomOutButton().disabled).toBe(false);
+  });
+
+  it("follows ui.disabled.minimap changing at runtime", async () => {
+    await render(<Excalidraw ui={{ disabled: { minimap: true } }} />);
+    expect(getTrigger()).toBe(null);
+    expect(document.querySelector(".reset-zoom-button")).not.toBe(null);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw ui={{ disabled: { minimap: false } }} />,
+    );
+    expect(getTrigger().textContent).toBe("100%");
+    expect(document.querySelector(".reset-zoom-button")).toBe(null);
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw ui={{ disabled: { minimap: true } }} />,
+    );
+    expect(getTrigger()).toBe(null);
+    expect(document.querySelector(".reset-zoom-button")).not.toBe(null);
+  });
 });
