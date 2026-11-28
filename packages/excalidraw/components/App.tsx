@@ -137,6 +137,7 @@ import {
   isBindableElement,
   isTextElement,
   isStickyNoteElement,
+  isFlowchartNodeElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -363,6 +364,7 @@ import {
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
+import { FlowchartAddButton } from "../components/FlowchartAddButton";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isOverScrollBars } from "../scene/scrollbars";
@@ -2615,6 +2617,23 @@ class App extends React.Component<AppProps, AppState> {
                                       }
                                     }
                                   }}
+                                />
+                              </ElementCanvasButtons>
+                            )}
+                          {this.isDefaultUIEnabled() &&
+                            selectedElements.length === 1 &&
+                            isFlowchartNodeElement(firstSelectedElement) && (
+                              <ElementCanvasButtons
+                                element={firstSelectedElement}
+                                elementsMap={renderableElementsMap}
+                              >
+                                <FlowchartAddButton
+                                  onAdd={(direction) =>
+                                    this.flowchart.addNextNode(
+                                      firstSelectedElement,
+                                      direction,
+                                    )
+                                  }
                                 />
                               </ElementCanvasButtons>
                             )}
