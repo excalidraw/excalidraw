@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 import { isShallowEqual } from "@excalidraw/common";
 
@@ -34,14 +34,18 @@ const StaticCanvas = (props: StaticCanvasProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isComponentMounted = useRef(false);
 
-  useEffect(() => {
+  // Layout effects, so the scene is drawn before the browser paints. Preact
+  // runs `useEffect` after the paint, which on pointerup shows a frame where
+  // <NewElementCanvas> is gone and the new element isn't drawn here yet.
+  // Resizing clears the canvas, so it has to happen before the render too.
+  useLayoutEffect(() => {
     props.canvas.style.width = `${props.appState.width}px`;
     props.canvas.style.height = `${props.appState.height}px`;
     props.canvas.width = props.appState.width * props.scale;
     props.canvas.height = props.appState.height * props.scale;
   }, [props.appState.height, props.appState.width, props.canvas, props.scale]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) {
       return;
