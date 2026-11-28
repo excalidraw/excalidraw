@@ -11,6 +11,7 @@ import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
 
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
+import { t } from "../i18n";
 
 import "../components/dropdownMenu/DropdownMenu.scss";
 
@@ -18,6 +19,7 @@ import { useExcalidrawSetAppState } from "./App";
 import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { Tooltip } from "./Tooltip";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
 
@@ -99,12 +101,22 @@ export const DefaultSidebar = Object.assign(
           <Sidebar.Tabs>
             <Sidebar.Header>
               <Sidebar.TabTriggers>
-                <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
-                  {searchIcon}
-                </Sidebar.TabTrigger>
-                <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
-                  {LibraryIcon}
-                </Sidebar.TabTrigger>
+                <Tooltip label={t("search.title")}>
+                  <Sidebar.TabTrigger
+                    tab={CANVAS_SEARCH_TAB}
+                    aria-label={t("search.title")}
+                  >
+                    {searchIcon}
+                  </Sidebar.TabTrigger>
+                </Tooltip>
+                <Tooltip label={t("toolBar.library")}>
+                  <Sidebar.TabTrigger
+                    tab={LIBRARY_SIDEBAR_TAB}
+                    aria-label={t("toolBar.library")}
+                  >
+                    {LibraryIcon}
+                  </Sidebar.TabTrigger>
+                </Tooltip>
                 <DefaultSidebarTabTriggersTunnel.Out />
               </Sidebar.TabTriggers>
             </Sidebar.Header>
