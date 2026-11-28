@@ -8,6 +8,8 @@ import { useEditorInterface } from "../App";
 import { Island } from "../Island";
 import Stack from "../Stack";
 
+import { shouldShiftSubMenu } from "./dropdownMenuUtils";
+
 const BASE_ALIGN_OFFSET = -4;
 const BASE_SIDE_OFFSET = 4;
 
@@ -33,7 +35,7 @@ const DropdownMenuSubContent = ({
 
         const viewportWidth = window.innerWidth;
         const spaceRemaining = viewportWidth - parentRect.right;
-        if (spaceRemaining < menuWidth + 20) {
+        if (shouldShiftSubMenu({ parentRect, viewportWidth, menuWidth })) {
           setSideOffset(spaceRemaining - menuWidth + BASE_ALIGN_OFFSET);
           setAlignOffset(BASE_ALIGN_OFFSET + 8);
         }
