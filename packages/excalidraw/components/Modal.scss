@@ -131,6 +131,11 @@
       max-width: 100%;
       border: 0;
       border-radius: 0;
+      // keep the dialog out of the notch / home indicator areas on phones
+      padding-top: var(--sat, 0);
+      padding-right: var(--sar, 0);
+      padding-bottom: var(--sab, 0);
+      padding-left: var(--sal, 0);
     }
   }
 }
