@@ -145,6 +145,12 @@ export const getCollaborationLinkData = (link: string) => {
   return match ? { roomId: match[1], roomKey: match[2] } : null;
 };
 
+/**
+ * Shareable links and collaboration rely on WebCrypto, which browsers only
+ * expose in secure contexts (HTTPS or localhost).
+ */
+export const isEncryptionAvailable = () => !!window.crypto?.subtle;
+
 export const generateCollaborationLinkData = async () => {
   const roomId = await generateRoomId();
   const roomKey = await generateEncryptionKey();
@@ -203,6 +209,11 @@ export const importFromBackend = async (
   id: string,
   decryptionKey: string,
 ): Promise<ImportedDataState> => {
+  if (!isEncryptionAvailable()) {
+    window.alert(t("errors.encryptionUnavailable"));
+    return {};
+  }
+
   try {
     const response = await fetch(`${BACKEND_V2_GET}${id}`);
 
@@ -250,6 +261,10 @@ export const exportToBackend = async (
   appState: Partial<AppState>,
   files: BinaryFiles,
 ): Promise<ExportToBackendResult> => {
+  if (!isEncryptionAvailable()) {
+    return { url: null, errorMessage: t("errors.encryptionUnavailable") };
+  }
+
   const encryptionKey = await generateEncryptionKey("string");
 
   const payload = await compressData(
