@@ -648,6 +648,107 @@ describe("stats for multiple elements", () => {
     expect(frame.angle).toBe(0);
   });
 
+  it.each([
+    ["W", "600"],
+    ["H", "200"],
+  ])(
+    "should update external arrow bindings after resizing a group via %s",
+    (property, value) => {
+      const left = API.createElement({
+        type: "rectangle",
+        id: "left",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "internal", type: "arrow" }],
+      });
+      const right = API.createElement({
+        type: "rectangle",
+        id: "right",
+        x: 200,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [
+          { id: "internal", type: "arrow" },
+          { id: "external", type: "arrow" },
+        ],
+      });
+      const internal = API.createElement({
+        type: "arrow",
+        id: "internal",
+        x: 105,
+        y: 50,
+        width: 90,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(90, 0)],
+        startBinding: {
+          elementId: left.id,
+          fixedPoint: [1.05, 0.5],
+          mode: "orbit",
+        },
+        endBinding: {
+          elementId: right.id,
+          fixedPoint: [-0.05, 0.5],
+          mode: "orbit",
+        },
+      });
+      const external = API.createElement({
+        type: "arrow",
+        id: "external",
+        x: 305,
+        y: 50,
+        width: 695,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(695, 0)],
+        startBinding: {
+          elementId: right.id,
+          fixedPoint: [1.05, 0.5],
+          mode: "orbit",
+        },
+      });
+      API.setElements([left, right, internal, external]);
+      API.setSelectedElements([left, right, internal]);
+      API.executeAction(actionGroup);
+
+      const input = UI.queryStatsProperty(property)?.querySelector(
+        ".drag-input",
+      ) as HTMLInputElement;
+      UI.updateInput(input, value);
+
+      const latestLeft = h.elements.find((element) => element.id === left.id)!;
+      const latestRight = h.elements.find(
+        (element) => element.id === right.id,
+      )!;
+      const latestInternal = h.elements.find(
+        (element) => element.id === internal.id,
+      )! as ExcalidrawLinearElement;
+      const latestExternal = h.elements.find(
+        (element) => element.id === external.id,
+      )! as ExcalidrawLinearElement;
+      expect(latestLeft.width).toBe(200);
+      expect(latestRight.x).toBe(400);
+      expect(latestInternal.x).toBe(210);
+      expect(latestInternal.y).toBe(100);
+      expect(latestInternal.points).toEqual([
+        pointFrom(0, 0),
+        pointFrom(180, 0),
+      ]);
+      expect(latestExternal.startBinding?.elementId).toBe(right.id);
+      expect(
+        latestExternal.x + latestExternal.points[0][0],
+      ).toBeGreaterThanOrEqual(600);
+      expect(latestExternal.x + latestExternal.points[0][0]).toBeLessThan(620);
+      expect(latestExternal.y + latestExternal.points[0][1]).toBeCloseTo(
+        100,
+        1,
+      );
+      expect(latestExternal.x + latestExternal.points[1][0]).toBe(1000);
+      expect(latestExternal.y + latestExternal.points[1][1]).toBe(50);
+    },
+  );
+
   it("should treat groups as single units", () => {
     const createAndSelectGroup = () => {
       UI.clickTool("rectangle");
