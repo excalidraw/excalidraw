@@ -171,8 +171,12 @@
 }
 
 // when side by side, the zoom level and the minimap toggle are sharp where
-// they meet (same as undo & redo)
-.excalidraw .zoom-actions > :not(:last-child) .zoom-menu-trigger {
+// they meet (same as undo & redo). Not in zen mode, where the toggle is
+// hidden (but still rendered), leaving the zoom level on its own.
+.excalidraw:not(.excalidraw--zen-mode)
+  .zoom-actions
+  > :not(:last-child)
+  .zoom-menu-trigger {
   border-start-end-radius: 0;
   border-end-end-radius: 0;
 }
