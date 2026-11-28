@@ -10,8 +10,8 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { CARDINALITY_ONE_OR_MANY_BAR_OFFSET } from "../src/arrowheads";
 import {
-  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
   elementsOverlappingBBox,
   getArrowheadAngle,
   getArrowheadPoints,
