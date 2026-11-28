@@ -3,6 +3,8 @@
     "signUp": "أنشئ حسابًا",
     "signIn": "سجّل الدخول",
     "upgrade": "ترقية",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "تم الحفظ باسم {filename}",
     "canvas": "لوحة الرسم",
     "selection": "العنصر المحدد",
-    "pasteAsSingleElement": "استخدم {{shortcut}} للصق كعنصر واحد،\nأو لصق في محرر نص موجود",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "تضمين هذا الرابط غير مسموح حاليًا. افتح بلاغًا على GitHub لطلب إدراج عنوان URL في القائمة البيضاء",
     "unrecognizedLinkFormat": "الرابط الذي أدرجته لا يتطابق مع التنسيق المتوقع. الرجاء محاولة لصق النص 'المضمن' المُزوَد من موقع المصدر",
     "elementLinkCopied": "تم نسخ الرابط إلى الحافظة"
@@ -785,16 +790,5 @@
     "spacebar": "مسافة",
     "delete": "احذف",
     "mmb": "عجلة التمرير"
-  },
-  "promoBanner": {
-    "presentations": "عروض تقديمية",
-    "mcp": "ارسم بـ AI",
-    "comments": "أضف تعليقات",
-    "teams": "العمل الجماعي",
-    "voiceChat": "محادثة صوتية",
-    "withExcalidrawPlus": "مع Excalidraw+‎",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "للبشر و AI"
   }
 }

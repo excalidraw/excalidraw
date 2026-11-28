@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Επικόλληση",
     "pasteAsPlaintext": "Επικόλληση ως απλό κείμενο",
     "pasteCharts": "Επικόλληση γραφημάτων",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}",
     "canvas": "καμβάς",
     "selection": "επιλογή",
-    "pasteAsSingleElement": "Χρησιμοποίησε το {{shortcut}} για να επικολλήσεις ως ένα μόνο στοιχείο,\nή να επικολλήσεις σε έναν υπάρχοντα επεξεργαστή κειμένου",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Η ενσωμάτωση αυτού του url δεν επιτρέπεται αυτήν τη στιγμή. Θέστε ένα πρόβλημα στο GitHub για να ζητήσετε το url να είναι στη λίστα των επιτρεπόμενων.",
     "unrecognizedLinkFormat": "Ο σύνδεσμος που ενσωματώσατε δεν ταιριάζει με την αναμενόμενη μορφή. Παρακαλώ προσπαθήστε να επικολλήσετε τη συμβολοσειρά 'embed' που παρέχεται από τον ιστότοπο προορισμού",
     "elementLinkCopied": ""
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Παρουσίαση",
-    "mcp": "Σχέδια με ΤΝ",
-    "comments": "Σχόλια",
-    "teams": "Ομάδες",
-    "voiceChat": "Κλήσεις ήχου",
-    "withExcalidrawPlus": "στο Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "για άτομα & ΤΝ"
   }
 }

@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Qoyıw",
     "pasteAsPlaintext": "Ápiwayı tekst retinde qoyıw",
     "pasteCharts": "Diagrammalardı qoyıw",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "{filename} saqlandı",
     "canvas": "",
     "selection": "",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
   }
 }

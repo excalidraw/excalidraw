@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Yapıştır",
     "pasteAsPlaintext": "Düz metin olarak yapıştır",
     "pasteCharts": "Grafikleri yapıştır",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",
     "selection": "seçim",
-    "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Bu URL'i yerleştirmeye şu anda izin verilmiyor. URL'in beyaz listeye alınmasını istiyorsanız GitHub'da bir issue açın",
     "unrecognizedLinkFormat": "Yerleştirdiğiniz bağlantı beklenen biçime uymuyor. Lütfen kaynak sitenin sağladığı \"yerleştir\" dizesini yapıştırmayı deneyin",
     "elementLinkCopied": "Bağlantı panoya kopyalandı"
@@ -785,16 +790,5 @@
     "spacebar": "Boşluk",
     "delete": "Sil",
     "mmb": "Kaydırma tekerleği"
-  },
-  "promoBanner": {
-    "presentations": "Sunumlar",
-    "mcp": "YZ ile çiz",
-    "comments": "Yorum yap",
-    "teams": "Ekip çalışması",
-    "voiceChat": "Sesli sohbet",
-    "withExcalidrawPlus": "Excalidraw+ ile",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "insan ve YZ için"
   }
 }

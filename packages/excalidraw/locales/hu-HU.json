@@ -3,6 +3,8 @@
     "signUp": "Regisztráció",
     "signIn": "Bejelentkezés",
     "upgrade": "Frissítés",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",
     "selection": "kijelölés",
-    "pasteAsSingleElement": "Egyetlen elemként való beillesztéshez használd a {{shortcut}} billentyűkombinációt,\nvagy illeszd be egy éppen szerkesztett szövegbe",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Ennek az URL-nek a beágyazása jelenleg nem engedélyezett. Nyiss egy hibajegyet a GitHubon, és kérd az URL felvételét az engedélyezett listára",
     "unrecognizedLinkFormat": "A beágyazott hivatkozás nem a várt formátumú. Próbáld meg a forrásoldal által biztosított 'embed' kódot beilleszteni",
     "elementLinkCopied": "Hivatkozás a vágólapra másolva"
@@ -785,16 +790,5 @@
     "spacebar": "Szóköz",
     "delete": "Delete",
     "mmb": "Görgő"
-  },
-  "promoBanner": {
-    "presentations": "Prezentációk",
-    "mcp": "Rajzolj AI-jal",
-    "comments": "Megjegyzések",
-    "teams": "Csapatmunka",
-    "voiceChat": "Hangcsevegés",
-    "withExcalidrawPlus": "Excalidraw+-szal",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "embernek & AI-nak"
   }
 }

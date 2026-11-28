@@ -3,6 +3,8 @@
     "signUp": "S'inscrire",
     "signIn": "Se connecter",
     "upgrade": "Mettre à niveau",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Coller",
     "pasteAsPlaintext": "Coller comme texte brut",
     "pasteCharts": "Coller les graphiques",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Enregistré sous {filename}",
     "canvas": "canevas",
     "selection": "sélection",
-    "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Intégrer cet URL n'est actuellement pas autorisé. Ouvrez un ticket sur GitHub pour demander son ajout à la liste blanche",
     "unrecognizedLinkFormat": "Le lien que vous avez intégré ne correspond pas au format attendu. Veuillez essayer de coller la chaîne d'intégration fournie par le site source",
     "elementLinkCopied": "Lien copié dans le presse-papiers"
@@ -785,16 +790,5 @@
     "spacebar": "Espace",
     "delete": "Supprimer",
     "mmb": "Clic molette"
-  },
-  "promoBanner": {
-    "presentations": "Présentations",
-    "mcp": "Dessin par IA",
-    "comments": "Commentaires",
-    "teams": "Travail d'équipe",
-    "voiceChat": "Chat vocal",
-    "withExcalidrawPlus": "avec Excalidraw+",
-    "excalidrawPlusMcp": "MCP Excalidraw+",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pour vous et l'IA"
   }
 }

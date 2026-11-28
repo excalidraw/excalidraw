@@ -3,6 +3,8 @@
     "signUp": "Zaregistrovat se",
     "signIn": "Přihlásit se",
     "upgrade": "Upgradovat",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Vložit",
     "pasteAsPlaintext": "Vložit jako prostý text",
     "pasteCharts": "Vložit grafy",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Uloženo do {filename}",
     "canvas": "plátno",
     "selection": "výběr",
-    "pasteAsSingleElement": "Pomocí {{shortcut}} vložte jako jeden objekt,\nnebo vložte do existujícího textového editoru",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Vložení této URL adresy momentálně není povoleno. O přidání URL adresy na seznam povolených můžete požádat na GitHubu",
     "unrecognizedLinkFormat": "Vložený odkaz neodpovídá očekávanému formátu. Zkuste prosím vložit řetězec 'embed' poskytnutý zdrojovým webem",
     "elementLinkCopied": "Odkaz zkopírován do schránky"
@@ -785,16 +790,5 @@
     "spacebar": "Mezerník",
     "delete": "Delete",
     "mmb": "Kolečko myši"
-  },
-  "promoBanner": {
-    "presentations": "Prezentace",
-    "mcp": "Kreslete s AI",
-    "comments": "Komentáře",
-    "teams": "Týmová práce",
-    "voiceChat": "Hlasový chat",
-    "withExcalidrawPlus": "v Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pro lidi i AI"
   }
 }

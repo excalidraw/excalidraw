@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Dán",
     "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "lựa chọn",
-    "pasteAsSingleElement": "Sử dụng {{shortcut}} để dán như một phần tử riêng lẻ hoặc dán vào một bộ soạn thảo văn bản có sẵn",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Nhúng liên kết này hiện không được phép. Đưa ra vấn đề trên GitHub để yêu cầu đưa liên kết này vào danh sách được phép",
     "unrecognizedLinkFormat": "Liên kết bạn nhúng không khớp với định dạng mong đợi. Vui lòng thử dán liên kết 'embed' do trang nguồn cung cấp",
     "elementLinkCopied": "Đã sao chép liên kết vào bộ nhớ tạm"
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Thuyết trình",
-    "mcp": "Vẽ bằng AI",
-    "comments": "Viết bình luận",
-    "teams": "Làm việc nhóm",
-    "voiceChat": "Gọi thoại",
-    "withExcalidrawPlus": "trên Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "cho người và AI"
   }
 }

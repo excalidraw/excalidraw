@@ -3,6 +3,8 @@
     "signUp": "Înscrie-te",
     "signIn": "Conectează-te",
     "upgrade": "Treci la un plan superior",
+    "tryExcalidrawPlus": "Încearcă Excalidraw+",
+    "plusFreeTrial": "Perioadă de încercare gratuită de 14 zile",
     "paste": "Lipire",
     "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Salvat în {filename}",
     "canvas": "pânza",
     "selection": "selecția",
-    "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "Inserate ca elemente de text separate.",
+    "pasteAsSingleText": "Inserat ca element de text separat",
     "unableToEmbed": "Încorporarea acestui URL nu este permisă momentan. Deschideți un tichet cu probleme pe GitHub pentru a solicita adăugarea acestui URL în lista albă",
     "unrecognizedLinkFormat": "URL-ul pe care l-ai încorporat nu coincide cu formatul așteptat. Încearcă să lipești șirul „de încorporat” furnizat de pagina sursă",
     "elementLinkCopied": "Link copiat în memoria temporară"
@@ -785,16 +790,5 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Rotiță maus"
-  },
-  "promoBanner": {
-    "presentations": "Prezentări",
-    "mcp": "Desen cu IA",
-    "comments": "Scrie comentarii",
-    "teams": "Lucru în echipă",
-    "voiceChat": "Apeluri vocale",
-    "withExcalidrawPlus": "cu Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pentru tine și IA"
   }
 }

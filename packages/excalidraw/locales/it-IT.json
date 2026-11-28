@@ -3,6 +3,8 @@
     "signUp": "Registrati",
     "signIn": "Accedi",
     "upgrade": "Aggiorna",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Incolla",
     "pasteAsPlaintext": "Incolla come testo normale",
     "pasteCharts": "Incolla grafici",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Salvato in {filename}",
     "canvas": "tela",
     "selection": "selezione",
-    "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
     "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine",
     "elementLinkCopied": "Link copiato negli appunti"
@@ -785,16 +790,5 @@
     "spacebar": "Spazio",
     "delete": "Elimina",
     "mmb": "Rotella di scorrimento"
-  },
-  "promoBanner": {
-    "presentations": "Presentazioni",
-    "mcp": "Disegna con l'IA",
-    "comments": "Commenti",
-    "teams": "Lavora in team",
-    "voiceChat": "Chat vocale",
-    "withExcalidrawPlus": "con Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "per persone e IA"
   }
 }

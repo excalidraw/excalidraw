@@ -3,6 +3,8 @@
     "signUp": "註冊",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "貼上",
     "pasteAsPlaintext": "以純文字貼上",
     "pasteCharts": "貼上圖表",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "儲存為 {filename}",
     "canvas": "畫布",
     "selection": "已選項目",
-    "pasteAsSingleElement": "使用 {{shortcut}} 以做為單一物件貼上，\n或貼上至現有的文字編輯器",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "目前不允許嵌入此網址。您可至 GitHub 提出 issue 以要求將此網址加入合格名單。",
     "unrecognizedLinkFormat": "您嵌入的連結格式不符。請嘗試貼入原網站所提供的「嵌入」字串。",
     "elementLinkCopied": "連結已複製至剪貼簿"
@@ -785,16 +790,5 @@
     "spacebar": "空白鍵",
     "delete": "Delete",
     "mmb": "滾輪"
-  },
-  "promoBanner": {
-    "presentations": "簡報",
-    "mcp": "用 AI 繪圖",
-    "comments": "留言討論",
-    "teams": "團隊協作",
-    "voiceChat": "語音通話",
-    "withExcalidrawPlus": "使用 Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "為人類與 AI 打造"
   }
 }

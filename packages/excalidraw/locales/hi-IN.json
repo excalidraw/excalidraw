@@ -3,6 +3,8 @@
     "signUp": "साइन अप करें",
     "signIn": "साइन इन करें",
     "upgrade": "अपग्रेड करें",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "{filename} में सुरक्षित की गयी",
     "canvas": "चित्रपटल",
     "selection": "चयन",
-    "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "यह यू-आर-एल जड़ने हेतु अस्वीकृत हैं. इस यू-आर-एल को श्वेतसूची मैं सम्मिलित कराने हेतु ग़िटहब पर मुद्दा उठायें",
     "unrecognizedLinkFormat": "जो कड़ी आपने जड़ी हैं, वह अनपेक्षित प्रारूप में हैं. कृपया मूल साइट द्वारा मुहैय्या कराया हुवा 'जड़ने हेतु' पाठ चिपकाने का प्रयास करें.",
     "elementLinkCopied": "कड़ी क्लिप बोर्ड पर कॉपी की गयी"
@@ -785,16 +790,5 @@
     "spacebar": "स्पेस",
     "delete": "Delete",
     "mmb": "स्क्रॉल व्हील"
-  },
-  "promoBanner": {
-    "presentations": "प्रस्तुतियाँ",
-    "mcp": "AI से चित्र बनाएँ",
-    "comments": "टिप्पणी करें",
-    "teams": "टीम में काम करें",
-    "voiceChat": "वॉइस चैट",
-    "withExcalidrawPlus": "Excalidraw+ में",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "इंसानों व AI के लिए"
   }
 }

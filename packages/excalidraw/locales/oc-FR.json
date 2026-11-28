@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",
     "selection": "seleccion",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": "Copiats al quichapapièrs"
@@ -785,16 +790,5 @@
     "spacebar": "Espaci",
     "delete": "Suprimir",
     "mmb": "Clic rodeta"
-  },
-  "promoBanner": {
-    "presentations": "Presentacions",
-    "mcp": "L’IA dessenha",
-    "comments": "Comentaris",
-    "teams": "En equipa",
-    "voiceChat": "Apèls vocals",
-    "withExcalidrawPlus": "amb Excalidraw+",
-    "excalidrawPlusMcp": "MCP Excalidraw+",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "pels umans e l’IA"
   }
 }

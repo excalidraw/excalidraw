@@ -3,6 +3,8 @@
     "signUp": "Registrieren",
     "signIn": "Login",
     "upgrade": "Upgrade",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Einfügen",
     "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
     "selection": "Auswahl",
-    "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
     "unrecognizedLinkFormat": "Der eingebettete Link stimmt nicht mit dem erwarteten Format überein. Bitte versuche, den Einbettungs-Code der Quellseite einzufügen",
     "elementLinkCopied": "Link in Zwischenablage kopiert"
@@ -785,16 +790,5 @@
     "spacebar": "Leertaste",
     "delete": "Löschen",
     "mmb": "Mausrad"
-  },
-  "promoBanner": {
-    "presentations": "Präsentieren",
-    "mcp": "Zeichne mit KI",
-    "comments": "Kommentieren",
-    "teams": "Teamarbeit",
-    "voiceChat": "Sprachchat",
-    "withExcalidrawPlus": "mit Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "für Mensch & KI"
   }
 }

@@ -3,6 +3,8 @@
     "signUp": "Tilmeld dig",
     "signIn": "Log ind",
     "upgrade": "Opgrader",
+    "tryExcalidrawPlus": "Prøv Excalidraw+",
+    "plusFreeTrial": "14 dages gratis prøveperiode",
     "paste": "Indsæt",
     "pasteAsPlaintext": "Indsæt som ren tekst",
     "pasteCharts": "Indsæt diagrammer",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Gemt i {filename}",
     "canvas": "lærred",
     "selection": "markering",
-    "pasteAsSingleElement": "Brug {{shortcut}} for at indsætte som ét element,\neller indsæt i en eksisterende teksteditor",
+    "pastedAsSingleText": "Indsat som ét tekstelement.",
+    "splitIntoTextElements": "Del op i separate tekstelementer",
+    "pastedAsTextElements": "Indsat som separate tekstelementer.",
+    "pasteAsSingleText": "Indsæt som ét tekstelement",
     "unableToEmbed": "Det er i øjeblikket ikke tilladt at indlejre denne URL. Opret et issue på GitHub for at få URL'en sat på tilladelseslisten",
     "unrecognizedLinkFormat": "Det link, du har indlejret, har ikke det forventede format. Prøv at indsætte den »embed«-streng, som kildewebstedet stiller til rådighed",
     "elementLinkCopied": "Linket er kopieret til udklipsholderen"
@@ -785,16 +790,5 @@
     "spacebar": "Mellemrum",
     "delete": "Delete",
     "mmb": "Rullehjul"
-  },
-  "promoBanner": {
-    "presentations": "Præsentationer",
-    "mcp": "Tegn med AI",
-    "comments": "Skriv kommentarer",
-    "teams": "Arbejd i et team",
-    "voiceChat": "Talechat",
-    "withExcalidrawPlus": "med Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "til mennesker og AI"
   }
 }

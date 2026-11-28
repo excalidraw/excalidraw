@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "",
     "pasteAsPlaintext": "",
     "pasteCharts": "",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "",
     "canvas": "",
     "selection": "",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "",
-    "mcp": "",
-    "comments": "",
-    "teams": "",
-    "voiceChat": "",
-    "withExcalidrawPlus": "",
-    "excalidrawPlusMcp": "",
-    "cli": "",
-    "cliTagline": ""
   }
 }

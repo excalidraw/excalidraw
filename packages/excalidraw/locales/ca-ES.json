@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Enganxa",
     "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
     "selection": "la selecció",
-    "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Actualment no es permet incrustar aquesta URL. Planteja un problema a GitHub per sol·licitar que l'URL estigui a la llista blanca",
     "unrecognizedLinkFormat": "L'enllaç que has incrustat no coincideix amb el format esperat. Si us plau, intenta enganxar l'enllaç 'embed' proporcionada pel lloc web d'origen",
     "elementLinkCopied": "Enllaç copiat al porta-retalls"
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Presentacions",
-    "mcp": "Dibuixa amb IA",
-    "comments": "Comentaris",
-    "teams": "En equip",
-    "voiceChat": "Xat de veu",
-    "withExcalidrawPlus": "amb Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "per a humans i IA"
   }
 }

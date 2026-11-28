@@ -3,6 +3,8 @@
     "signUp": "Registriraj se",
     "signIn": "Prijavi se",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
     "selection": "izbor",
-    "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Vdelava tega URL-ja trenutno ni dovoljena. Ustvarite vprašanje na GitHub-u in prosite za vmestitev URL-ja na seznam dovoljenih",
     "unrecognizedLinkFormat": "Povezava, ki ste jo vdelali, se ne ujema s pričakovano obliko. Poskusite prilepiti niz za vdelavo, ki ste ga prejeli na izvorni strani",
     "elementLinkCopied": "Povezava kopirana na odložišče"
@@ -785,16 +790,5 @@
     "spacebar": "Presledek",
     "delete": "Izbriši",
     "mmb": "Kolesce za pomikanje"
-  },
-  "promoBanner": {
-    "presentations": "Predstavitve",
-    "mcp": "Rišite z UI",
-    "comments": "Komentarji",
-    "teams": "Timsko delo",
-    "voiceChat": "Glasovni klici",
-    "withExcalidrawPlus": "v Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "za ljudi in UI"
   }
 }

@@ -3,6 +3,8 @@
     "signUp": "Daftar",
     "signIn": "Daftar",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Tempel",
     "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
     "selection": "pilihan",
-    "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempel unsur tunggal,\natau tempel ke penyunting teks",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Menyemat URL ini saat ini tidak boleh. Ajukan \"Issue\" di GitHub untuk meminta URL masuk daftar putih",
     "unrecognizedLinkFormat": "Tautan yang disematkan tidak sesuai dengan syarat format. Coba tempel untaian 'embed' (semat) yang disediakan situs sumber",
     "elementLinkCopied": "Tautan disalin ke papan klip"
@@ -785,16 +790,5 @@
     "spacebar": "Spasi",
     "delete": "Hapus",
     "mmb": "Roda gulir"
-  },
-  "promoBanner": {
-    "presentations": "Presentasi",
-    "mcp": "Gambar via AI",
-    "comments": "Beri komentar",
-    "teams": "Kerja tim",
-    "voiceChat": "Obrolan suara",
-    "withExcalidrawPlus": "di Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "bagi manusia & AI"
   }
 }

@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Liitä",
     "pasteAsPlaintext": "Liitä pelkkänä tekstinä",
     "pasteCharts": "Liitä kaaviot",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
     "selection": "valinta",
-    "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Esitykset",
-    "mcp": "Piirrä AI:lla",
-    "comments": "Kommentoi",
-    "teams": "Tiimityö",
-    "voiceChat": "Äänipuhelut",
-    "withExcalidrawPlus": "Excalidraw+:lla",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "ihmisille ja AI:lle"
   }
 }

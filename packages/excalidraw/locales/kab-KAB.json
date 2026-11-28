@@ -3,6 +3,8 @@
     "signUp": "",
     "signIn": "",
     "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Senṭeḍ",
     "pasteAsPlaintext": "",
     "pasteCharts": "Senṭeḍ udlifen",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",
     "selection": "tafrayt",
-    "pasteAsSingleElement": "",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "",
     "unrecognizedLinkFormat": "",
     "elementLinkCopied": ""
@@ -785,16 +790,5 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
-  },
-  "promoBanner": {
-    "presentations": "Tiskanin",
-    "mcp": "Suneɣ s AI",
-    "comments": "Rnu iwenniten",
-    "teams": "Amɛiwen",
-    "voiceChat": "Asiwel s taɣect",
-    "withExcalidrawPlus": "s Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "i yimdanen d AI"
   }
 }

@@ -3,6 +3,8 @@
     "signUp": "Registrer deg",
     "signIn": "Logg inn",
     "upgrade": "Oppgrader",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som rein tekst",
     "pasteCharts": "Lim inn diagram",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Lagra som {filename}",
     "canvas": "lerret",
     "selection": "val",
-    "pasteAsSingleElement": "Bruk {{shortcut}} for å lime inn som eitt element,\neller lim inn i eit eksisterande tekstredigeringsprogram",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Innebygging av denne nettadressa er ikkje tillate for tida. Opprett ei sak på GitHub og be om at nettadressa vert lagd på kvitlista",
     "unrecognizedLinkFormat": "Lenkja du bygde inn, har ikkje det forventa formatet. Prøv å lime inn «embed»-strengen frå kjeldenettstaden",
     "elementLinkCopied": "Lenkja er kopiert til utklippstavla"
@@ -785,16 +790,5 @@
     "spacebar": "Mellomrom",
     "delete": "Slett",
     "mmb": "Rullehjul"
-  },
-  "promoBanner": {
-    "presentations": "Presenter",
-    "mcp": "Teikn med KI",
-    "comments": "Kommenter",
-    "teams": "Arbeid i team",
-    "voiceChat": "Taleanrop",
-    "withExcalidrawPlus": "med Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "for folk & KI"
   }
 }

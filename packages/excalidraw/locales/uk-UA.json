@@ -3,6 +3,8 @@
     "signUp": "Зареєструватися",
     "signIn": "Увійти",
     "upgrade": "Оновити план",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Збережено в {filename}",
     "canvas": "полотно",
     "selection": "виділення",
-    "pasteAsSingleElement": "Використайте {{shortcut}} для вставки самостійного зразка або використайте в текстовому редакторі",
+    "pastedAsSingleText": "",
+    "splitIntoTextElements": "",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Вбудування цієї url на даний час не допускається. Підніміть питання на GitHub, щоб попросити внести URL-адресу до білого списку",
     "unrecognizedLinkFormat": "Посилання, яке ви вставили, не відповідає очікуваному формату. Будь ласка, спробуйте вставити рядок \"embed\", наданий сайтом-джерелом",
     "elementLinkCopied": "Посилання скопійовано в буфер обміну"
@@ -785,16 +790,5 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Коліщатко"
-  },
-  "promoBanner": {
-    "presentations": "Презентації",
-    "mcp": "Малюйте з ШІ",
-    "comments": "Коментарі",
-    "teams": "Співпраця",
-    "voiceChat": "Аудіочат",
-    "withExcalidrawPlus": "в Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "для людей і ШІ"
   }
 }

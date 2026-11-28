@@ -3,6 +3,8 @@
     "signUp": "Aanmelden",
     "signIn": "Inloggen",
     "upgrade": "Upgraden",
+    "tryExcalidrawPlus": "Probeer Excalidraw+",
+    "plusFreeTrial": "14-dagen gratis proefperiode",
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Grafieken plakken",
@@ -588,7 +590,10 @@
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
     "selection": "selectie",
-    "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
+    "pastedAsSingleText": "Geplakt als een enkel tekstelement.",
+    "splitIntoTextElements": "Gesplitst in afzonderlijke tekstelementen",
+    "pastedAsTextElements": "",
+    "pasteAsSingleText": "",
     "unableToEmbed": "Het insluiten van deze URL is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
     "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken",
     "elementLinkCopied": "Link gekopieerd naar klembord"
@@ -785,16 +790,5 @@
     "spacebar": "Spatie",
     "delete": "Delete",
     "mmb": "Muiswiel"
-  },
-  "promoBanner": {
-    "presentations": "Presentaties",
-    "mcp": "Teken met AI",
-    "comments": "Opmerkingen",
-    "teams": "Samenwerken",
-    "voiceChat": "Spraakchat",
-    "withExcalidrawPlus": "met Excalidraw+",
-    "excalidrawPlusMcp": "Excalidraw+ MCP",
-    "cli": "Excalidraw CLI",
-    "cliTagline": "voor mens & AI"
   }
 }
