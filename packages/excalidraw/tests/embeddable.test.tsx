@@ -24,6 +24,34 @@ describe("embeddables", () => {
     restoreOriginalGetBoundingClientRect();
   });
 
+  it("renders multiple embeds allowed by the same global regex", async () => {
+    await render(
+      <Excalidraw
+        viewModeEnabled
+        validateEmbeddable={/^https:\/\/example\.com\//g}
+      />,
+    );
+
+    API.setElements(
+      [20, 80].map((x) => ({
+        ...API.createElement({
+          type: "embeddable",
+          x,
+          y: 20,
+          width: 50,
+          height: 50,
+        }),
+        link: "https://example.com/embed",
+      })),
+    );
+
+    await waitFor(() => {
+      expect(
+        document.querySelectorAll("iframe.excalidraw__embeddable"),
+      ).toHaveLength(2);
+    });
+  });
+
   it("autoplays a Google Drive video on first activation only", async () => {
     await render(<Excalidraw viewModeEnabled />);
     await waitFor(() => expect(h.state.width).toBe(200));

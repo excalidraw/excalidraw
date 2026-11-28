@@ -1,5 +1,29 @@
 import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
 
+describe("custom embed validation", () => {
+  it.each(["", "g", "y", "gy"])(
+    "validates consistently with regex flags '%s'",
+    (flags) => {
+      const pattern = new RegExp("^https://example\\.com/", flags);
+      const url = "https://example.com/embed";
+
+      for (const validator of [pattern, [pattern]]) {
+        for (const lastIndex of [0, 5]) {
+          pattern.lastIndex = lastIndex;
+
+          expect(embeddableURLValidator(url, validator)).toBe(true);
+          expect(embeddableURLValidator(url, validator)).toBe(true);
+          expect(
+            embeddableURLValidator("https://other.example/embed", validator),
+          ).toBe(false);
+          expect(embeddableURLValidator(url, validator)).toBe(true);
+          expect(pattern.lastIndex).toBe(lastIndex);
+        }
+      }
+    },
+  );
+});
+
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
     const testCases = [
