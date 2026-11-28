@@ -30,9 +30,13 @@ const DropdownMenuSubContent = ({
       const parentRect = parentContainer?.getBoundingClientRect();
       if (parentRect) {
         const menuWidth = node.getBoundingClientRect().width;
+        const ownerDocument = node.ownerDocument;
+        const ownerWindow = ownerDocument.defaultView;
+        const isRTL = ownerDocument.documentElement.dir === "rtl";
 
-        const viewportWidth = window.innerWidth;
-        const spaceRemaining = viewportWidth - parentRect.right;
+        const spaceRemaining = isRTL
+          ? parentRect.left
+          : (ownerWindow?.innerWidth ?? 0) - parentRect.right;
         if (spaceRemaining < menuWidth + 20) {
           setSideOffset(spaceRemaining - menuWidth + BASE_ALIGN_OFFSET);
           setAlignOffset(BASE_ALIGN_OFFSET + 8);
