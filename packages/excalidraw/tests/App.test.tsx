@@ -7,6 +7,8 @@ import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import { render, queryByTestId, unmountComponent } from "../tests/test-utils";
 
+import { API } from "./helpers/api";
+
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 describe("Test <App/>", () => {
@@ -42,5 +44,26 @@ describe("Test <App/>", () => {
         "brave-measure-text-error",
       ),
     ).toMatchSnapshot();
+  });
+
+  it("should render iframe elements with renderIframe", async () => {
+    const iframe = API.createElement({
+      type: "iframe",
+      id: "iframe",
+      width: 320,
+      height: 180,
+    });
+
+    const { getByTestId, queryByTitle } = await render(
+      <Excalidraw
+        initialData={{ elements: [iframe] }}
+        renderIframe={(element) => (
+          <div data-testid="custom-iframe">{element.id}</div>
+        )}
+      />,
+    );
+
+    expect(getByTestId("custom-iframe")).toHaveTextContent("iframe");
+    expect(queryByTitle("Excalidraw Embedded Content")).toBeNull();
   });
 });
