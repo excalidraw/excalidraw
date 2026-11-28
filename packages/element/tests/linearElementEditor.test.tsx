@@ -440,6 +440,34 @@ describe("Test Linear Elements", () => {
     });
   });
 
+  it("clears stale hovered handle on pointer down away from the handle", () => {
+    createTwoPointerLinearElement("arrow");
+
+    // 1. Hover point 1, then pointer down away from it (at midpoint)
+    mouse.moveTo(p2[0], p2[1]);
+    expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(1);
+
+    mouse.downAt(midpoint[0], midpoint[1]);
+    expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(-1);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+    mouse.up();
+
+    // 2. Hover midpoint, then pointer down on point 1
+    mouse.moveTo(midpoint[0], midpoint[1]);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+
+    mouse.downAt(p2[0], p2[1]);
+    expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(1);
+    expect(h.state.selectedLinearElement?.segmentMidPointHoveredCoords).toBe(
+      null,
+    );
+    mouse.up();
+  });
+
   it("doesn't highlight the arrow's midpoint while its label is edited", async () => {
     createTwoPointerLinearElement("arrow");
     mouse.moveTo(midpoint[0], midpoint[1]);

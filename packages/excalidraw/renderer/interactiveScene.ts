@@ -1809,7 +1809,10 @@ const _renderInteractiveScene = ({
   // Arrows have a different highlight behavior when
   // they are the only selected element
   if (selectedLinearElement) {
-    if (!appState.selectedLinearElement.isDragging) {
+    if (
+      !appState.selectedLinearElement.isDragging &&
+      !appState.selectedElementsAreBeingDragged
+    ) {
       if (linearState.segmentMidPointHoveredCoords) {
         renderElbowArrowMidPointHighlight(context, appState);
       } else if (

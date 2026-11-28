@@ -259,6 +259,7 @@ export type InteractiveCanvasAppState = Readonly<
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
     currentItemArrowType: AppState["currentItemArrowType"];
+    selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
   }
 >;
 
