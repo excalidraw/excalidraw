@@ -56,6 +56,44 @@ Political Instinct\t3\t9`,
     });
   });
 
+  it("parses numeric header cells after an empty chart-name cell as titles", () => {
+    const result = tryParseSpreadsheet(
+      `\t2023\t2024
+North\t10\t20
+South\t5\t6
+East\t1\t2`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: null,
+        labels: ["North", "South", "East"],
+        series: [
+          { title: "2023", values: [10, 5, 1] },
+          { title: "2024", values: [20, 6, 2] },
+        ],
+      },
+    });
+  });
+
+  it("parses a numeric header cell after an empty label cell as the title", () => {
+    const result = tryParseSpreadsheet(
+      `\t2024
+North\t10
+South\t5`,
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        title: "2024",
+        labels: ["North", "South"],
+        series: [{ title: "2024", values: [10, 5] }],
+      },
+    });
+  });
+
   it("parses 2-row multi-series TSV without transposing", () => {
     const result = tryParseSpreadsheet(
       `Physical Strength\t10\t2

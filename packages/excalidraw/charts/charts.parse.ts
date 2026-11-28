@@ -15,6 +15,10 @@ export const tryParseNumber = (s: string): number | null => {
 const isNumericColumn = (lines: string[][], columnIndex: number) =>
   lines.slice(1).every((line) => tryParseNumber(line[columnIndex]) !== null);
 
+// spreadsheets leave the top-left cell empty above the label column, which
+// makes the first row a header even when its titles are numbers (e.g. years)
+const hasEmptyCornerCell = (cells: string[][]) => cells[0][0] === "";
+
 /**
  * @private exported for testing
  */
@@ -22,7 +26,9 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
   const numCols = cells[0].length;
 
   if (numCols > 2) {
-    const hasHeader = cells[0].every((cell) => tryParseNumber(cell) === null);
+    const hasHeader =
+      hasEmptyCornerCell(cells) ||
+      cells[0].every((cell) => tryParseNumber(cell) === null);
     const rows = hasHeader ? cells.slice(1) : cells;
 
     if (rows.length < 1) {
@@ -102,7 +108,8 @@ export const tryParseCells = (cells: string[][]): ParseSpreadsheetResult => {
     };
   }
 
-  const hasHeader = tryParseNumber(cells[0][1]) === null;
+  const hasHeader =
+    hasEmptyCornerCell(cells) || tryParseNumber(cells[0][1]) === null;
   const rows = hasHeader ? cells.slice(1) : cells;
 
   if (rows.length < 2) {
