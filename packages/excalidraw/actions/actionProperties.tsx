@@ -66,6 +66,7 @@ import {
 import {
   getColorTargetElement,
   getColorUpdate,
+  hasBackground,
   hasFillStyle,
   hasStrokeColor,
 } from "@excalidraw/element";
@@ -545,7 +546,13 @@ export const actionChangeBackgroundColor = register<
             (element) =>
               getColorTargetElement(element, "backgroundColor", elementsMap)
                 .backgroundColor,
-            true,
+            // elements that can't have a background (e.g. text, arrows)
+            // shouldn't break the common value of the rest of the selection
+            (element) =>
+              hasBackground(
+                getColorTargetElement(element, "backgroundColor", elementsMap)
+                  .type,
+              ),
             (hasSelection) => (!hasSelection ? target.currentValue : null),
           )}
           onChange={(color) => updateData({ color })}
