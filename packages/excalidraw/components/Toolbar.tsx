@@ -187,6 +187,7 @@ const ExtraToolsDropdown = ({
             icon={LassoIcon}
             data-testid="toolbar-lasso"
             selected={lassoToolSelected}
+            shortcut={getToolShortcut("lasso")}
             disabled={isToolButtonDisabled(app, "lasso")}
           >
             {t("toolBar.lasso")}
