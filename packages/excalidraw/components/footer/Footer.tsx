@@ -1,5 +1,8 @@
 import clsx from "clsx";
 
+import type { UIAppState } from "@excalidraw/excalidraw/types";
+
+import Stack from "../Stack";
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
@@ -7,10 +10,10 @@ import { useApp } from "../App";
 import { HelpButton } from "../HelpButton";
 import { Minimap } from "../Minimap/Minimap";
 import { Section } from "../Section";
-import Stack from "../Stack";
+
+import InputToggle from "./InputToggle";
 
 import type { ActionManager } from "../../actions/manager";
-import type { UIAppState } from "../../types";
 
 const Footer = ({
   appState,
@@ -69,6 +72,17 @@ const Footer = ({
                     "layer-ui__wrapper__footer-left--transition-bottom":
                       appState.zenModeEnabled,
                   })}
+                />
+              )}
+              {/*  New Input Toggle here, added so its easier to toggle between trackpad and mouse input modes */}
+              {defaultUIEnabled && !appState.viewModeEnabled && (
+                <InputToggle
+                  appState={appState}
+                  className={clsx("zen-mode-transition undo-redo-buttons", {
+                    "layer-ui__wrapper__footer-left--transition-bottom":
+                      appState.zenModeEnabled,
+                  })}
+                  show={!appState.zenModeEnabled}
                 />
               )}
             </Section>
