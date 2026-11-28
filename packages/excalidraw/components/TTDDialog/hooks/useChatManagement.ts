@@ -1,8 +1,10 @@
 import { useCallback, useState } from "react";
 
+import { randomId } from "@excalidraw/common";
+
 import { useAtom, useSetAtom } from "../../../editor-jotai";
 
-import { errorAtom, chatHistoryAtom } from "../TTDContext";
+import { chatHistoryAtom, errorAtom } from "../TTDContext";
 
 import { useTTDChatStorage } from "../useTTDChatStorage";
 
@@ -83,11 +85,24 @@ export const useChatManagement = ({
           const nextChat = updatedChats[0];
           applyChatToState(nextChat);
         } else {
-          await resetChatState();
+          setChatHistory({
+            id: randomId(),
+            messages: [],
+            currentPrompt: "",
+          });
+          setError(null);
+          setIsMenuOpen(false);
         }
       }
     },
-    [chatHistory.id, deleteChat, applyChatToState, resetChatState],
+    [
+      chatHistory.id,
+      deleteChat,
+      applyChatToState,
+      setChatHistory,
+      setError,
+      setIsMenuOpen,
+    ],
   );
 
   const handleNewChat = useCallback(async () => {
