@@ -282,6 +282,8 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionDownloadImage,
+  actionDownloadOriginalImage,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionPaste } from "../actions/actionClipboard";
@@ -11274,7 +11276,12 @@ class App extends React.Component<AppProps, AppState> {
     options.push(copyText);
 
     if (this.state.viewModeEnabled) {
-      return [actionCopy, ...options];
+      return [
+        actionCopy,
+        ...options,
+        actionDownloadImage,
+        actionDownloadOriginalImage,
+      ];
     }
 
     const zIndexActions: ContextMenuItems =
@@ -11299,6 +11306,8 @@ class App extends React.Component<AppProps, AppState> {
       actionWrapSelectionInFrame,
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
+      actionDownloadImage,
+      actionDownloadOriginalImage,
       CONTEXT_MENU_SEPARATOR,
       ...options,
       CONTEXT_MENU_SEPARATOR,

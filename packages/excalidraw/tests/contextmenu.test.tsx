@@ -2,12 +2,19 @@ import React from "react";
 import { vi } from "vitest";
 
 import { KEYS, STROKE_WIDTH, reseed } from "@excalidraw/common";
+import { newElementWith } from "@excalidraw/element";
 
 import { setDateTimeForTests } from "@excalidraw/common";
+
+import type { FileId } from "@excalidraw/element/types";
 
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
+
+import * as filesystemModule from "../data/filesystem";
+
+import { t } from "../i18n";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -28,6 +35,8 @@ import {
 
 import type { ShortcutName } from "../actions/shortcuts";
 import type { ActionName } from "../actions/types";
+
+import type { DataURL } from "../types";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
@@ -624,5 +633,192 @@ describe("contextMenu element", () => {
       expect.objectContaining({ id: rectangle1.id }),
       expect.objectContaining({ id: rectangle2.id }),
     ]);
+  });
+
+  it("shows 'Download image' in context menu for uncropped image and triggers download", async () => {
+    const fileSaveSpy = vi
+      .spyOn(filesystemModule, "fileSave")
+      .mockResolvedValue(null as any);
+
+    const image = API.createElement({
+      type: "image",
+      fileId: "test-file" as FileId,
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+    API.setElements([image]);
+    h.app.files = {
+      "test-file": {
+        id: "test-file" as FileId,
+        dataURL:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" as DataURL,
+        mimeType: "image/png",
+        created: Date.now(),
+      },
+    };
+    API.setSelectedElements([image]);
+
+    mouse.rightClickAt(50, 50);
+    const contextMenu = UI.queryContextMenu();
+    expect(contextMenu).not.toBeNull();
+
+    const downloadItem = contextMenu?.querySelector(
+      'li[data-testid="downloadImage"]',
+    );
+    expect(downloadItem).not.toBeNull();
+    expect(downloadItem?.textContent).toContain(t("labels.downloadImage"));
+
+    const downloadOriginalItem = contextMenu?.querySelector(
+      'li[data-testid="downloadOriginalImage"]',
+    );
+    expect(downloadOriginalItem).toBeNull();
+
+    const mockImg = new Image();
+    h.app.imageCache.set("test-file" as FileId, {
+      image: mockImg,
+      mimeType: "image/png",
+    });
+
+    fireEvent.click(downloadItem!);
+    await waitFor(() => {
+      expect(fileSaveSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          extension: "png",
+          description: "Download original image",
+        }),
+      );
+    });
+  });
+
+  it("shows 'Download cropped image' and 'Download original image' for cropped image, and downloads cropped image", async () => {
+    const fileSaveSpy = vi
+      .spyOn(filesystemModule, "fileSave")
+      .mockResolvedValue(null as any);
+
+    const baseImage = API.createElement({
+      type: "image",
+      fileId: "test-file" as FileId,
+      width: 50,
+      height: 50,
+      x: 0,
+      y: 0,
+    });
+    const image = newElementWith(baseImage, {
+      crop: {
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+        naturalWidth: 100,
+        naturalHeight: 100,
+      },
+    });
+    API.setElements([image]);
+    h.app.files = {
+      "test-file": {
+        id: "test-file" as FileId,
+        dataURL:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" as DataURL,
+        mimeType: "image/png",
+        created: Date.now(),
+      },
+    };
+    API.setSelectedElements([image]);
+
+    mouse.rightClickAt(25, 25);
+    const contextMenu = UI.queryContextMenu();
+    expect(contextMenu).not.toBeNull();
+
+    const downloadItem = contextMenu?.querySelector(
+      'li[data-testid="downloadImage"]',
+    );
+    expect(downloadItem).not.toBeNull();
+    expect(downloadItem?.textContent).toContain(
+      t("labels.downloadCroppedImage"),
+    );
+
+    const downloadOriginalItem = contextMenu?.querySelector(
+      'li[data-testid="downloadOriginalImage"]',
+    );
+    expect(downloadOriginalItem).not.toBeNull();
+    expect(downloadOriginalItem?.textContent).toContain(
+      t("labels.downloadOriginalImage"),
+    );
+
+    const mockImg = new Image();
+    h.app.imageCache.set("test-file" as FileId, {
+      image: mockImg,
+      mimeType: "image/png",
+    });
+
+    fireEvent.click(downloadItem!);
+    await waitFor(() => {
+      expect(fileSaveSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          extension: "png",
+          description: "Download cropped image",
+        }),
+      );
+    });
+  });
+
+  it("triggers original download for cropped image when clicking 'Download original image'", async () => {
+    const fileSaveSpy = vi
+      .spyOn(filesystemModule, "fileSave")
+      .mockResolvedValue(null as any);
+
+    const baseImage = API.createElement({
+      type: "image",
+      fileId: "test-file" as FileId,
+      width: 50,
+      height: 50,
+      x: 0,
+      y: 0,
+    });
+    const image = newElementWith(baseImage, {
+      crop: {
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+        naturalWidth: 100,
+        naturalHeight: 100,
+      },
+    });
+    API.setElements([image]);
+    h.app.files = {
+      "test-file": {
+        id: "test-file" as FileId,
+        dataURL:
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" as DataURL,
+        mimeType: "image/png",
+        created: Date.now(),
+      },
+    };
+    API.setSelectedElements([image]);
+
+    mouse.rightClickAt(25, 25);
+    const contextMenu = UI.queryContextMenu();
+    expect(contextMenu).not.toBeNull();
+
+    const downloadOriginalItem = contextMenu?.querySelector(
+      'li[data-testid="downloadOriginalImage"]',
+    );
+    expect(downloadOriginalItem).not.toBeNull();
+
+    fireEvent.click(downloadOriginalItem!);
+    await waitFor(() => {
+      expect(fileSaveSpy).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          extension: "png",
+          description: "Download original image",
+        }),
+      );
+    });
   });
 });
