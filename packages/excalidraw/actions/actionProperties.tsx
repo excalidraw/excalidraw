@@ -301,6 +301,9 @@ const changeFontSize = (
 ) => {
   const newFontSizes = new Set<number>();
   const elementsMap = app.scene.getNonDeletedElementsMap();
+  // freshly resized text elements, keyed by id, so arrows below are
+  // re-routed against the new sizes instead of the stale scene versions
+  const changedTextElements = new Map<string, ExcalidrawElement>();
 
   const updatedElements = changeProperty(
     elements,
@@ -328,6 +331,8 @@ const changeFontSize = (
           app.scene,
         );
 
+        changedTextElements.set(newElement.id, newElement);
+
         return newElement;
       }
       return oldElement;
@@ -342,6 +347,7 @@ const changeFontSize = (
     if (isTextElement(element)) {
       updateBoundElements(element, app.scene, {
         renderEnvironment: app.renderEnvironment,
+        changedElements: changedTextElements,
       });
     }
   });
@@ -1334,6 +1340,7 @@ export const actionChangeFontFamily = register<{
 
       if (skipFontFaceCheck || ownerDocument.fonts.check(fontString, chars)) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
+        const changedTextElements = new Map<string, ExcalidrawElement>();
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
           redrawTextBoundingBox(
@@ -1342,6 +1349,16 @@ export const actionChangeFontFamily = register<{
             app.scene,
             app.renderEnvironment,
           );
+          changedTextElements.set(element.id, element);
+        }
+        // re-route arrows bound to the resized text (see #12428)
+        for (const element of elementContainerMapping.keys()) {
+          if (isNonDeletedElement(element)) {
+            updateBoundElements(element, app.scene, {
+              renderEnvironment: app.renderEnvironment,
+              changedElements: changedTextElements,
+            });
+          }
         }
       } else {
         // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
@@ -1361,6 +1378,12 @@ export const actionChangeFontFamily = register<{
                 app.scene,
                 app.renderEnvironment,
               );
+              // re-route arrows bound to the resized text (see #12428)
+              if (isTextElement(latestElement) && isNonDeletedElement(latestElement)) {
+                updateBoundElements(latestElement, app.scene, {
+                  renderEnvironment: app.renderEnvironment,
+                });
+              }
             }
           }
 
