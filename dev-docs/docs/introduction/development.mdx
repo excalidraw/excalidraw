@@ -1,4 +1,11 @@
+
 # Development
+
+## Code Sandbox
+
+- Go to https://codesandbox.io/p/github/excalidraw/excalidraw
+  - You may need to sign in with GitHub and reload the page.
+  - You can start coding instantly and even send PRs from there!
 
 ## Local Installation
 
@@ -10,6 +17,18 @@ These instructions will get you a copy of the project up and running on your loc
 - [Yarn](https://yarnpkg.com/getting-started/install) (v1 or v2.4.2+)
 - [Git](https://git-scm.com/downloads)
 
+### Verify the installation
+
+Before proceeding, verify that the required tools are installed by running the following commands in your terminal:
+
+```bash
+node --version
+yarn --version
+git --version
+```
+
+If any command is not recognized, install the corresponding tool using the official installation guide linked above. Make sure your Node.js version is compatible with the requirements of the current repository.
+
 ### Clone the repo
 
 ```bash
@@ -18,35 +37,45 @@ git clone https://github.com/excalidraw/excalidraw.git
 
 ### Install the dependencies
 
+Navigate to the cloned repository and install the dependencies:
+
 ```bash
+cd excalidraw
 yarn
 ```
 
 ### Start the server
 
+Start the development server:
+
 ```bash
 yarn start
 ```
 
-Now you can open [http://localhost:3000](http://localhost:3000) and start coding in your favorite code editor.
+Once the server is running, open [http://localhost:3000](http://localhost:3000) in your browser and start coding in your favorite code editor.
+
+### Troubleshooting
+
+**The `yarn` command is not recognized**
+
+Verify that Yarn is installed and available in your terminal. If necessary, follow the official [Yarn installation guide](https://yarnpkg.com/getting-started/install).
+
+**The development server does not start**
+
+1. Check the terminal output for error messages.
+2. Confirm that the dependencies were installed successfully.
+3. Verify that your Node.js version meets the repository's requirements.
+4. If the port is already in use, identify the process using it or use the local URL reported by the development server.
+
+**The application does not open at `http://localhost:3000`**
+
+Confirm that the development server is still running. Check the terminal output for the correct local URL and any startup errors.
 
 ## Collaboration
 
-For collaboration, you will need to set up [collab server](https://github.com/excalidraw/excalidraw-room) in local.
+For collaboration, you will need to set up the [collaboration server](https://github.com/excalidraw/excalidraw-room) locally.
 
 ## Commands
-
-### Install the dependencies
-
-```bash
-yarn
-```
-
-### Run the project
-
-```bash
-yarn start
-```
 
 ### Reformat all files with Prettier
 
@@ -74,7 +103,7 @@ yarn test:code
 
 ### Docker Compose
 
-You can use docker-compose to work on Excalidraw locally if you don't want to setup a Node.js env.
+You can use Docker Compose to work on Excalidraw locally if you prefer not to set up a Node.js environment.
 
 ```bash
 docker-compose up --build -d
@@ -82,7 +111,7 @@ docker-compose up --build -d
 
 ## Self-hosting
 
-We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self-host your own client under your own domain, on Kubernetes, AWS ECS, etc.
+We publish a Docker image with the Excalidraw client at [excalidraw/excalidraw on Docker Hub](https://hub.docker.com/r/excalidraw/excalidraw). You can use it to self-host your own client under your own domain, on Kubernetes, AWS ECS, etc.
 
 ```bash
 docker build -t excalidraw/excalidraw .
